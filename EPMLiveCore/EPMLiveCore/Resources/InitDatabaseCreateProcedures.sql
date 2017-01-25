@@ -604,9 +604,9 @@ BEGIN
                         -- Init. listname
                               SET @ListName = (SELECT listname FROM @tblLists WHERE id = @ListCounter)                       
                         -- Init. list tablename             
-                              SET @TableName = (SELECT tablename FROM @tblLists WHERE id = @ListCounter)
+                              SET @TableName = (SELECT ''[''+tablename+'']'' FROM @tblLists WHERE id = @ListCounter)
                         -- Init. list snapshot tablename
-                              SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE id = @ListCounter)
+                              SET @SnapshotTableName = (SELECT ''[''+tablenamesnapshot+'']'' FROM @tblLists WHERE id = @ListCounter)
                         -- Insert record into RPTPeriodSnapshot table         
                               Exec spRPTPeriodSnapshot @TableName, @SnapshotTableName, @Title, @ReportPeriod, @siteID, @PeriodID, @Enabled
                         -- Insert log ''Success'' record into RPTLog for this list         
@@ -622,7 +622,7 @@ BEGIN
                         BEGIN 
                               -- Rollback tx
                               ROLLBACK TRANSACTION;
-                              -- Log error                              
+                              -- Log error                 
                               SET @errMsg = (SELECT ERROR_MESSAGE() as ErrorMessage)
                               SET @timestamp = getdate()
                               Exec spRPTLogInsert  @RPTListID, @ListName, ''Snapshot SQL Error.'',@errMsg ,1,2, @timestamp,@timerjobguid                       
@@ -635,9 +635,9 @@ BEGIN
             BEGIN TRANSACTION 
                   --Start Try
                   BEGIN TRY 
-                        -- table variable that will hold the comma delimited list of lists string values
-                        DECLARE @tblListNames table(id int, listid nvarchar(100))
-
+                         -- table variable that will hold the comma delimited list of lists string values
+                        --DECLARE @tblListNames table(id int,listname nvarchar(100), listid uniqueidentifier)
+						DECLARE @tblListNames table(id int identity(1,1),listid uniqueidentifier,listname nvarchar(100),siteid uniqueidentifier,tablename nvarchar(100), tablenamesnapshot nvarchar(100))
                         --Init. Report period and Report Title
                         SET @ReportPeriod = CONVERT(varchar,Getdate(),101)
                         SET @Title = CONVERT(varchar,Getdate(),100) 
@@ -645,7 +645,10 @@ BEGIN
                         -- List name
                         DECLARE @LstName nvarchar(100)                              
                         -- Init. table variable
-                        INSERT INTO @tblListNames(id,listid) SELECT * FROM dbo.Split(@ListIDs, '','')
+                        --INSERT INTO @tblListNames(id,listname) SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, ',') Spl 
+--inner join [RPTList] RPTL on data=listname
+                        INSERT INTO @tblListNames (listid, listname,siteid,tablename,tablenamesnapshot)
+                        ( SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, ',') Spl  inner join [RPTList] RPTL on Spl.data=RPTL.ListName WHERE Siteid = @siteID)
                         -- Init. list count
                         SET @ListCount = (SELECT COUNT(*) FROM @tblListNames)
                         -- Init. list counter
@@ -658,9 +661,9 @@ BEGIN
                         WHILE @ListCounter <= @ListCount
                               BEGIN 
 									SET @RPTListID = (SELECT listid FROM @tblListNames WHERE id = @ListCounter)                        
-                                    SET @LstName = (SELECT listname FROM @tblLists WHERE rptlistid = @RPTListID)
-                                    SET @TableName = (SELECT tablename FROM @tblLists WHERE rptlistid = @RPTListID)                                    
-                                    SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE rptlistid = @RPTListID)
+                                    SET @LstName = (SELECT listname FROM @tblListNames WHERE listid = @RPTListID)
+                                    SET @TableName = (SELECT ''[''+tablename+'']'' FROM @tblListNames WHERE listid = @RPTListID)                                    
+                                    SET @SnapshotTableName = (SELECT ''[''+tablenamesnapshot+'']'' FROM @tblListNames WHERE listid = @RPTListID)
                                     Exec spRPTPeriodSnapshot @TableName, @SnapshotTableName, @Title, @ReportPeriod, @siteID,@PeriodID, @Enabled
                                     -- Insert log ''Success'' record into RPTLog for this list    
                                     SET @timestamp = getdate()     
@@ -672,8 +675,8 @@ BEGIN
                   -- Start Catch/error handling
                   BEGIN CATCH                   
                         BEGIN 
-                              -- Rollback tx
-                              ROLLBACK TRANSACTION;
+    -- Rollback tx
+                            ROLLBACK TRANSACTION;
                               -- Log error
                               SET @errMsg = (SELECT ERROR_MESSAGE() as ErrorMessage)
                               SET @timestamp = getdate()
