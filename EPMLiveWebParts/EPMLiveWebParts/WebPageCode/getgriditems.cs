@@ -1038,14 +1038,14 @@ namespace EPMLiveWebParts
                                         if (dr[field.InternalName + "ID"].ToString() != "")
                                         {
                                             string[] sids = dr[field.InternalName + "ID"].ToString().Split(',');
-                                            string[] svals = dr[field.InternalName + "Text"].ToString().Split(',');
+                                            var users = SPContext.Current.Web.AllUsers;
 
                                             for (int j = 0; j < sids.Length; j++)
                                             {
                                                 val += sids[j] + ";#";
                                                 try
                                                 {
-                                                    val += svals[j] + ";#";
+                                                    val += users.GetByID(int.Parse(sids[j])).Name + ";#";
                                                 }
                                                 catch { }
 
@@ -6298,7 +6298,23 @@ namespace EPMLiveWebParts
                 case SPFieldType.User:
                     if (bUseReporting && group)
                     {
-                        return val.Replace(",", "\n");
+                        string value = dr[fieldname + "ID"].ToString();
+                        if (value.Contains(","))
+                        {
+                            val = "";
+                            SPUserCollection ucollection = SPContext.Current.Web.AllUsers;
+                            string[] arrval = value.Split(',');
+                            foreach (var i in arrval)
+                            {
+                                var item = ucollection.GetByID(int.Parse(i));
+                                val += item.Name + "\n";
+                            }
+                            return val.TrimEnd('\n');
+                        }
+                        else
+                        {
+                            return val;
+                        }
                     }
                     else
                     {
