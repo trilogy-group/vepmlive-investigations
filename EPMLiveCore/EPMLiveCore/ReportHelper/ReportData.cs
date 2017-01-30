@@ -511,7 +511,7 @@ namespace EPMLiveCore.ReportHelper
                 DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name,
                     string.Join(", ", columns.ToArray()));
             }
-            else if (name.ToLower().EndsWith("snapshot"))
+            else if (name.ToLower().Contains("snapshot"))
             {
                 script = string.Format(@"
                 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U'))
