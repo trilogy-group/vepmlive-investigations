@@ -201,7 +201,7 @@
                                 <a href="javascript:toggleSearch();" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Search"><span class="fui-search"></span></a>
                             </div>
                             <div id="zendesk-container" class="epm-global-button-right">
-                                <a id="epm-support-link" href="https://community.uplandsoftware.com" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Help"><span class="fui-question"></span></a>
+                                <a id="epm-support-link" href="https://support.versata.com/" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Help"><span class="fui-question"></span></a>
                             </div>
                             <%--<div id="uv-container" class="epm-global-button-right">
                                 <a href="http://ideas.epmlive.com" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom" data-delay="100" target="_blank"><span class="icon-bullhorn"></span></a>
