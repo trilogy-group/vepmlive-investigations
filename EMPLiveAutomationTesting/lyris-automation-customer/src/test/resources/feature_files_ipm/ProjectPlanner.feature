@@ -1,59 +1,42 @@
 Feature: Add, Edit and Delete Project
 
-Background:
-	When execute before conditions
-    
-	Scenario: Add, Edit and Delete Project
-	Given I Open project planer url
-	Then I click on new item
-	Then I enter ProjectName "Test003"
-	Then I select project status "(2) Proposed"
-	Then I select overAll status "(2) At Risk"
-	Then I select Project Update "(2) At Risk"
-	Then I click on save button
-	Then I click on delete button
-	Then I accept delete popup
+  Background:
+    Given execute before conditions
 
-Scenario: Add resources to project and assign tasks to them
-
+# C829527: Add, Edit and Delete Project
+  @Ready
+  Scenario: Add, Edit and Delete Project
     Given I Open project planer url
-	Then I am selecting any oneproject
-	Then I Click on Item menu
-	Then I Click on edit plan menu
-	Then I Click on project planner
-	Then I Click on edit team
-	Then I am selecting fist user from list
-	Then I Click on add user button
-	Then I Click on Save build team
-	Then I Click on add tasks
-	Then I enter task name "task name"
-	Then I Click on user cell
-	Then I select user for task
-	Then I save a task
-	Then I close Task Window
+    When I click on new item
+    And I enter a Project Name as "Test_EpmLive_Project"
+    And I select project status "(2) Proposed"
+    And I select overAll status "(2) At Risk"
+    And I select Project Update "(2) At Risk"
+    And I click on save button
+    Then The project created must be saved
+    And I click on delete button
+    And I accept delete popup
+    Then The project created must be deleted
+    And Close all browsers
 
-	Scenario: Edit project cost
-	Given I Open project planer url
-	Then I click on new item
-	Then I enter ProjectName "Test003"
-	Then I select project status "(2) Proposed"
-	Then I select overAll status "(2) At Risk"
-	Then I select Project Update "(2) At Risk"
-	Then I click on save button
-	Then I click on edit button
-	Then I enter project cost "50"
-	Then Save edited project
-	
-	@QA04  @Ready
-	Scenario: Edit Resource plan
-	Then I create project with defaultvalues and selectproject in projectsfolder "epmlive test"
-	Then I Click on Edit Resource Planner
-	Then I select user "newuser"
-	Then I click on add user in project planner
-	Then I enter hours in grid "50"
-	Then I click onResourse plannerSave button 
-	Then I click on set public ok button 
-	Then I click on Resource planner Close button 
-	 
-    	
-	
+#C829530: Add resources to project and assign tasks to them
+  @Ready
+  Scenario: Add resources to project and assign tasks to them
+    Given I Open project planer url
+    And I am selecting any oneproject
+    And I Click on Item menu
+    And I Click on edit plan menu
+    Then The Select Planner Page should be displayed
+    And I Click on project planner
+    When I Click on edit team
+    Then The Page Build Team should be displayed
+    When I am selecting the first user from the list
+    And I Click on add user button
+    And I Click on Save build team
+    Then The tasks page should be displayed
+    When I Click on add tasks
+    And I enter task name "task name"
+    And I Click on user cell
+    And I select user for task
+    And I save a task
+    And Close all browsers
