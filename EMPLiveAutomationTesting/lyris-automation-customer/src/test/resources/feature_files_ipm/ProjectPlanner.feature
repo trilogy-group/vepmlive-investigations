@@ -9,25 +9,56 @@ Feature: Add, Edit and Delete Project
     Given I Open project planer url
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
-    And I select project status "(2) Proposed"
-    And I select overAll status "(2) At Risk"
-    And I select Project Update "(2) At Risk"
+    And I select project status "(1) Proposed"
+    And I select Overall Health "(2) At Risk"
+    And I select Project Update "Schedule Driven"
+    And I enter a test as "testing"
     And I click on save button
     Then The project created must be saved
-    And I click on delete button
+    When I click on edit button
+    And I enter Project Work as "300"
+    And Project Actual Work as "40"
+    And I save after editing
+    Then The project created must be saved
+    And The values edited should be changed as "300" for Project Work  and "40" for Actual Work
+    When I click on delete button
     And I accept delete popup
     Then The project created must be deleted
     And Close all browsers
+
+##C829775: Edit Project Cost
+#  @Ready
+#  Scenario: Edit project cost
+#    Given I Open project planer url
+#    When I click on new item
+#    And I enter a Project Name as "EpmLive_Project_Test"
+#    And I select project status "(1) Proposed"
+#    And I select Overall Health "(2) At Risk"
+#    And I select Project Update "Schedule Driven"
+#    And I click on save button
+#    Then The project created must be saved
+#    When I click on edit button
+#    Then I enter project cost "550"
+#    Then I click on save button
+##    Then The cost project should be saved
+#    And Close all browsers
 
 #C829530: Add resources to project and assign tasks to them
   @Ready
   Scenario: Add resources to project and assign tasks to them
     Given I Open project planer url
+    When I click on new item
+    And I enter a Project Name as "Test_EpmLive_Project"
+    And I select project status "(1) Proposed"
+    And I enter a test as "testing"
+    And I click on save button
+    And I click on project panel
     And I am selecting any oneproject
     And I Click on Item menu
     And I Click on edit plan menu
     Then The Select Planner Page should be displayed
     And I Click on project planner
+    And I click on Blank Plan
     When I Click on edit team
     Then The Page Build Team should be displayed
     When I am selecting the first user from the list
@@ -39,4 +70,27 @@ Feature: Add, Edit and Delete Project
     And I Click on user cell
     And I select user for task
     And I save a task
+    When I click on publish
+    And I click on Close Tasks
+    Then The project summary page should be displayed
+    When I click on Tasks
+    Then The Tasks Summary page should displayed
+    And Task created should be saved
     And Close all browsers
+
+##C829770: Edit Resource plan
+#  @Ready
+#  Scenario: Add resources to project and assign tasks to them
+#    Given I Open project planer url
+#    And I am selecting any oneproject
+#    And I Click on Item menu
+#    When I Click on Edit Resource Planner
+#    Then Resource Planner page should be displayed
+#    When I select user "newuser"
+#    And I click on add user in project planner
+#    Then Resource should be added to top section
+#    When I enter hours in grid "50"
+#    And I click onResourse plannerSave button
+#    Then Pop up should displayed asking the User if they want to "Make Private Rows Public?"
+#    When I click on set public ok button
+#    Then The "Private" mark should turn to a green check mark next to the selected resources on the top grid

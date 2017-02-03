@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 public class ProjectPlannerDefinition {
 
     private static String createdProjectName;
+    private static String createdTask;
     private static WebElement addCellUserTask;
     @Autowired
     protected WebDriver driver;
@@ -40,13 +41,14 @@ public class ProjectPlannerDefinition {
     @Given("^I Open project planer url")
     public void openProjectCenter() {
         System.out.println("Open Projectplanner");
-        driver.navigate().to("http://qaepmlive6/sites/600/Lists/Project%20Center/Executive%20Summary.aspx");
+        driver.navigate().to("http://qaepmlive6/Lists/Project%20Center/Executive%20Summary.aspx");
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
     @Then("^I click on project panel")
-    public void clickToLaftpanel() {
-        driver.findElement(By.xpath("//*[@href='/sites/site1012/Lists/Project%20Center']")).click();
+    public void clickToLaftpanel() throws InterruptedException {
+        driver.findElement(By.id("EPMLiveNavt3")).click();
+        Thread.sleep(10000);
     }
 
     @When("^I click on new item")
@@ -71,7 +73,7 @@ public class ProjectPlannerDefinition {
         js.executeScript("$('#State_9602a7d9-37b9-4c13-b279-a52cf3ce9325_$DropDownChoice').change();");
     }
 
-    @Then("^I select overAll status \"([^\"]*)\"$")
+    @Then("^I select Overall Health \"([^\"]*)\"$")
     public void selectOverallHealth(String overallstatus) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("$('#OverallHealth_e4b98e4e-a3be-45be-9650-76865191d8c5_$DropDownChoice').val('"
@@ -104,8 +106,11 @@ public class ProjectPlannerDefinition {
     }
 
     @Then("^I click on edit button")
-    public void clickingOnEditbutton() {
+    public void clickingOnEditbutton() throws InterruptedException {
         driver.findElement(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_ctl04_ctl01_ctl00_ctl00_ctl07_upLevelDiv']")));
+        Thread.sleep(10000);
     }
 
     @When("^I click on delete button")
@@ -133,9 +138,11 @@ public class ProjectPlannerDefinition {
     }
 
     @And("^I am selecting any oneproject")
-    public void selectOneProject() {
+    public void selectOneProject() throws InterruptedException {
+        searchForCreatedProject(createdProjectName);
+        Thread.sleep(5000);
         Actions action = new Actions(driver).doubleClick(driver.findElement(By.xpath(
-                ".//*[@id='GanttGrid0Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[1]")));
+                ".//*[@id='GanttGrid0Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[1]")));
         action.build().perform();
     }
 
@@ -156,7 +163,7 @@ public class ProjectPlannerDefinition {
         driver.switchTo().frame(1);
         driver.findElement(By.xpath("//a[2]")).click();
         WebDriverWait wait = new WebDriverWait(driver, 30);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
     }
 
     @When("^I Click on edit team")
@@ -177,9 +184,9 @@ public class ProjectPlannerDefinition {
         driver.switchTo().defaultContent();
         driver.switchTo().frame(1);
         WebElement element = driver.findElement(By.xpath(
-                ".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]"));
+                ".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
         Actions builder = new Actions(driver);
-        Action actn = builder.moveToElement(element).click().doubleClick().sendKeys("test").build();
+        Action actn = builder.moveToElement(element).click().sendKeys("test").build();
         actn.perform();
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
@@ -219,7 +226,8 @@ public class ProjectPlannerDefinition {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
         webElements.get(webElements.size() - 1).findElement(By.xpath("./td[4]")).click();
         Thread.sleep(5000);
-        driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(task + System.currentTimeMillis() / 1000L);
+        createdTask = task + System.currentTimeMillis() / 1000L;
+        driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(createdTask);
         //     driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(Keys.RETURN);
         Thread.sleep(5000);
     }
@@ -227,9 +235,12 @@ public class ProjectPlannerDefinition {
     @Then("^I Click on user cell")
     public void clickOnUserCell() throws InterruptedException {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
-        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[11]")).click();
+        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
         Thread.sleep(5000);
-        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[11]")).click();
+//        if (!webElements.get(webElements.size() - 1).findElements(By.xpath("./td[8]")).isEmpty()) {
+//            webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
+//            Thread.sleep(5000);
+//        }
     }
 
     @Then("^I select user for task")
@@ -240,9 +251,9 @@ public class ProjectPlannerDefinition {
     }
 
     @Then("^I save a task")
-    public void saveTasks() {
+    public void saveTasks() throws InterruptedException {
         driver.findElement(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")).click();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(5000);
     }
 
     @Then("^I close Task Window")
@@ -265,6 +276,16 @@ public class ProjectPlannerDefinition {
         driver.findElement(By.xpath("//*[@id='searchtext0Main']")).click();
         driver.findElement(By.xpath("//*[@id='searchtext0Main']")).sendKeys(projectname);
         driver.findElement(By.xpath("//*[@id='searchtext0Main']")).sendKeys(Keys.RETURN);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    public void searchForCreatedTask(String projectname) {
+        driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='searchtext1Main']")));
+        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).click();
+        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(projectname);
+        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(Keys.RETURN);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
 
@@ -330,6 +351,9 @@ public class ProjectPlannerDefinition {
 
     @Then("^I enter project cost \"([^\"]*)\"$")
     public void enterProjectCost(String projectcost) {
+        driver.findElement(
+                By.xpath(".//*[@id='ProjectActualCost_851f0f4c-b798-4feb-8798-1853625d82fa_$CurrencyField']"))
+                .clear();
         driver.findElement(
                 By.xpath(".//*[@id='ProjectActualCost_851f0f4c-b798-4feb-8798-1853625d82fa_$CurrencyField']"))
                 .sendKeys(projectcost);
@@ -431,5 +455,78 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
         assertEquals("Title of Select Planner Pop-up", "Select Planner", driver.findElement(By.id("dialogTitleSpan")).getText());
+    }
+
+    @And("^I save after editing$")
+    public void iClickOnSaveButtonAfterEdit() throws Throwable {
+        driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
+    }
+
+    @And("^I enter Project Work as \"([^\"]*)\"$")
+    public void iEnterProjectWorkAs(String arg0) throws Throwable {
+        driver.findElement(By.id("ProjectWork_39a13b25-4a5c-45f1-8bd8-cae4a338c076_$NumberField")).clear();
+        driver.findElement(By.id("ProjectWork_39a13b25-4a5c-45f1-8bd8-cae4a338c076_$NumberField")).sendKeys(arg0);
+    }
+
+    @And("^Project Actual Work as \"([^\"]*)\"$")
+    public void projectActualWorkAs(String arg0) throws Throwable {
+        driver.findElement(By.id("ProjectActualWork_e73d0c0b-5964-4bcf-95bc-ead0218796b4_$NumberField")).clear();
+        driver.findElement(By.id("ProjectActualWork_e73d0c0b-5964-4bcf-95bc-ead0218796b4_$NumberField")).sendKeys(arg0);
+    }
+
+    @And("^I enter a test as \"([^\"]*)\"$")
+    public void iEnterATestAs(String arg0) throws Throwable {
+        driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys(arg0);
+    }
+
+    @And("^The values edited should be changed as \"([^\"]*)\" for Project Work  and \"([^\"]*)\" for Actual Work$")
+    public void theValuesEditedShouldBeChangedAsForProjectWorkAndForBudget(String arg0, String arg1) throws Throwable {
+        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getText().contains(arg0));
+        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getText().contains(arg1));
+    }
+
+    @And("^I click on Blank Plan$")
+    public void iClickOnBlankPlan() throws Throwable {
+        driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
+    }
+
+    @When("^I click on publish$")
+    public void iClickOnPublish() throws Throwable {
+        driver.findElement(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")).click();
+        Thread.sleep(10000);
+    }
+
+    @And("^I click on Close Tasks$")
+    public void iClickOnCloseTasks() throws Throwable {
+        driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
+    }
+
+    @Then("^The project summary page should be displayed$")
+    public void theProjectSummaryPageShouldBeDisplayed() throws Throwable {
+        assertTrue("Verify Project Page Title", driver.getTitle().contains("Project Center - Executive Summary"));
+    }
+
+    @When("^I click on Tasks$")
+    public void iClickOnTasks() throws Throwable {
+        driver.findElement(By.id("EPMLiveNavt4")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.titleIs("Task Center - My Tasks"));
+    }
+
+    @Then("^The Tasks Summary page should displayed$")
+    public void theTasksSummaryPageShouldDisplayed() throws Throwable {
+        assertTrue("Verify Tasks Page Title", driver.getTitle().contains("Task Center - My Tasks"));
+    }
+
+    @And("^Task created should be saved$")
+    public void taskCreatedShouldBeSaved() throws Throwable {
+        searchForCreatedTask(createdTask);
+        assertTrue("Project Not Deleted", !driver.findElements(By.xpath(".//*[@id='GanttGrid1Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr")).isEmpty());
     }
 }
