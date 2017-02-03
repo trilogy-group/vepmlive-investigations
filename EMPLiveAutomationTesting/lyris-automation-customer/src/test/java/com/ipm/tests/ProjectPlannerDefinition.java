@@ -121,7 +121,11 @@ public class ProjectPlannerDefinition {
 
     @Then("^I accept delete popup")
     public void acceptDelete() throws InterruptedException {
-        driver.switchTo().alert().accept();
+        try {
+            driver.switchTo().alert().accept();
+        } catch (Exception e) {
+            System.out.println("Alert Not Present");
+        }
         Thread.sleep(5000);
     }
 
@@ -253,7 +257,7 @@ public class ProjectPlannerDefinition {
     @Then("^I save a task")
     public void saveTasks() throws InterruptedException {
         driver.findElement(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")).click();
-        Thread.sleep(5000);
+        Thread.sleep(10000);
     }
 
     @Then("^I close Task Window")
