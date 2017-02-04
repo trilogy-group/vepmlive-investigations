@@ -10,7 +10,7 @@ public class LoginStepDefinition {
 //@Inject private TestProperty<WebDriver> driver;	
 
     private static IpmStepDefination ipm;
-    protected WebDriver driver;
+    protected static WebDriver driver;
 
 
     public LoginStepDefinition(WebDriver driver) {

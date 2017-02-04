@@ -1,12 +1,10 @@
 Feature: Add, Edit and Delete Project
 
-  Background:
-    Given execute before conditions
-
 # C829527: Add, Edit and Delete Project
   @Ready
   Scenario: Add, Edit and Delete Project
-    Given I Open project planer url
+    Given execute before conditions
+    And I Open project planer url
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
@@ -24,29 +22,30 @@ Feature: Add, Edit and Delete Project
     When I click on delete button
     And I accept delete popup
     Then The project created must be deleted
-    And Close all browsers
 
-##C829775: Edit Project Cost
+#C829775: Edit Project Cost
 #  @Ready
-#  Scenario: Edit project cost
-#    Given I Open project planer url
-#    When I click on new item
-#    And I enter a Project Name as "EpmLive_Project_Test"
-#    And I select project status "(1) Proposed"
-#    And I select Overall Health "(2) At Risk"
-#    And I select Project Update "Schedule Driven"
-#    And I click on save button
-#    Then The project created must be saved
-#    When I click on edit button
-#    Then I enter project cost "550"
-#    Then I click on save button
-##    Then The cost project should be saved
-#    And Close all browsers
+  Scenario: Edit project cost
+    Given execute before conditions
+    And I Open project planer url
+    When I click on new item
+    And I enter a Project Name as "Test_EpmLive_Project"
+    And I select project status "(1) Proposed"
+    And I enter a test as "testing"
+    And I click on save button
+    And I click on project panel
+    And I am selecting any oneproject
+    And I Click on Item menu
+    When I click on 'Edit Cost'
+    Then The cost Planner page should be displayed
+    When I enter some costs and I click on save button
+    And I click on Close button in Cost Planner Page
 
 #C829530: Add resources to project and assign tasks to them
   @Ready
   Scenario: Add resources to project and assign tasks to them
-    Given I Open project planer url
+    Given execute before conditions
+    And I Open project planer url
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
@@ -76,7 +75,6 @@ Feature: Add, Edit and Delete Project
     When I click on Tasks
     Then The Tasks Summary page should displayed
     And Task created should be saved
-    And Close all browsers
 
 ##C829770: Edit Resource plan
 #  @Ready
