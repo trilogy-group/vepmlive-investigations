@@ -1,15 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveCore.API;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.SharePoint.Fakes;
 using EPMLiveCore.API.Fakes;
 using System.Xml;
-using EPMLiveCore.Infrastructure.Logging.Fakes;
 using Microsoft.SharePoint;
+using System.Reflection;
+using System.Collections;
+using EPMLiveCore.Fakes;
+using System.Collections.Generic;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -77,5 +75,205 @@ namespace EPMLiveCore.API.Tests
             }
 
         }
+
+        [TestMethod()]
+        [ExpectedException(typeof(System.Reflection.TargetInvocationException))]
+        public void setPermissionsTest()
+        {
+            Guid jobid = Guid.NewGuid();
+            string XML = "<Grid WebId=\"0f681e6a-0113-4abc-a5b3-4d1f7e42ac41\" ListId=\"5bb9f6de-8444-4f17-b142-68b6f05a1221\" ItemId=\"4\" />";
+            var method = typeof(APITeam).GetMethod("setPermissions", BindingFlags.Static | BindingFlags.NonPublic);
+            using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            {
+
+
+                SPWeb spweb = new ShimSPWeb()
+                {
+                    
+
+                    GroupsGet = () =>
+                    {
+                        var groups = new ShimSPGroupCollection();
+                        ShimSPBaseCollection coll = new ShimSPBaseCollection(groups);
+                        coll.GetEnumerator = () =>
+                        {
+                            return new TestGroupEnumerator();
+                        };
+                        return groups;
+                    },
+                   
+                    
+                };
+               
+               
+
+               
+                method.Invoke("setPermissions", new object[] { spweb, "", "" });
+            }
+        }
+        [TestMethod()]
+        
+        public void setItemPermissions()
+        {
+            Guid jobid = Guid.NewGuid();
+            int fieldcount=0;
+            string XML = "<Grid WebId=\"0f681e6a-0113-4abc-a5b3-4d1f7e42ac41\" ListId=\"5bb9f6de-8444-4f17-b142-68b6f05a1221\" ItemId=\"4\" />";
+            var method = typeof(APITeam).GetMethod("setItemPermissions", BindingFlags.Static | BindingFlags.NonPublic);
+            using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            {
+
+                SPListItem item = new ShimSPListItem()
+                {
+                    ParentListGet = () =>
+                    {
+                        return new ShimSPList()
+                        {
+                            FieldsGet = () =>
+                            {
+                                return new ShimSPFieldCollection()
+                                {
+                                    GetFieldByInternalNameString = (s) =>
+                                    {
+                                        return new ShimSPFieldLookup()
+                                        {
+                                            LookupListGet = () => { return Guid.NewGuid().ToString(); }
+                                        };
+                                    },
+                                    
+                                };
+                            },
+                        };
+                    },
+                    HasUniqueRoleAssignmentsGet = () => { return true; },
+                    ItemGetString = (guid2) =>
+                    {
+                        fieldcount++;
+                        return "0";
+                    }
+
+                };
+                SPWeb spweb = new ShimSPWeb()
+                {
+                    SiteGet = () =>
+                    {
+                        return
+                        new ShimSPSite()
+                        {
+                            IDGet = () => { return jobid; },
+                        };
+                    },
+
+                 
+                    IDGet = () => { return jobid; },
+                    Dispose = () => { },
+                    ListsGet = () =>
+                    {
+                        ShimSPListCollection lists = new ShimSPListCollection();
+                        lists.ItemGetGuid = (guid2) =>
+                        {
+                            ShimSPList list = new ShimSPList()
+                            {
+                                GetItemByIdInt32 = (_int) =>
+                                {
+
+                                    return new ShimSPListItem()
+                                    {
+                                        HasUniqueRoleAssignmentsGet = () => { return false; },
+
+                                    };
+                                }
+                            };
+                            //list.TitleGet = () => { return listTitle; };
+
+
+                            return list;
+                        };
+                        return lists;
+                    },
+                    AllowUnsafeUpdatesSetBoolean = (bl) => { },
+                    
+                    EnsureUserString = (_str) => {
+                        return null;
+                    }
+                    
+                };
+
+               
+                ShimSPSite.ConstructorGuid = (spsite, gui) =>
+                {
+
+                };
+                ShimSPSite.AllInstances.OpenWebGuid = (instance, id) =>
+                {
+                    return spweb;
+                };
+                ShimListCommands.GetGridGanttSettingsSPList = (lst) =>
+                {
+                    GridGanttSettings stng = new ShimGridGanttSettings();
+                    stng.BuildTeamPermissions = "6|~|1758263";
+                    return stng;
+                };
+                List<string> lststr = new List<string>();
+                lststr.Add("Field1");
+                lststr.Add("Field2");
+                lststr.Add("Field3");
+                lststr.Add("Field4");
+                lststr.Add("Field5");
+                ShimSPSite.AllInstances.Dispose = (instance) => { };
+                ShimEnhancedLookupConfigValuesHelper.ConstructorString = (instance, _str) => { };
+                ShimEnhancedLookupConfigValuesHelper.AllInstances.GetSecuredFields = (instance) =>
+                {
+                   
+                    return lststr;
+                };
+                ShimSPFieldUserValue.AllInstances.UserGet = (instance) =>
+                {
+                    return new ShimSPUser()
+                    {
+                        LoginNameGet = () => { return "test/test"; }
+                    };
+                };
+                ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
+                {
+                    w();
+                };
+               
+                ShimGridGanttSettings.ConstructorSPList = (instance, slist) => { };
+                method.Invoke("setItemPermissions", new object[] { spweb, "", "", item });
+                Assert.AreEqual(lststr.Count, fieldcount);
+            }
+        }
+
+
+    }
+    public class TestGroupEnumerator : IEnumerator
+    {
+        public SPGroup[] _spGroup = new SPGroup[1];
+        int position = -1;
+        public TestGroupEnumerator()
+        {
+            _spGroup[0] = new ShimSPGroup()
+            {
+
+            };
+
+        }
+
+        public object Current
+        {
+            get
+            {
+                return _spGroup[position];
+            }
+        }
+
+        public bool MoveNext()
+        {
+            position++;
+            return (position < _spGroup.Length);
+        }
+
+        public void Reset()
+        { }
     }
 }
