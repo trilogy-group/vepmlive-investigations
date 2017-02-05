@@ -1,0 +1,24 @@
+<Fakes xmlns="http://schemas.microsoft.com/fakes/2011/">
+  <Assembly Name="EPM Live Core"/>
+  <StubGeneration>
+    <Clear/>
+  </StubGeneration>
+  <ShimGeneration>
+    <Clear/>
+    <Add FullName="EPMLiveCore.ReportingProxy.QueryExecutor!"/>
+    <Add FullName="EPMLiveCore.CoreFunctions!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Logging.LoggingService!"/>
+    <Add FullName="EPMLiveCore.FeatureActivationSvc.Service!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Setup.ActivateFeatureKey!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Setup.CreateEPMLiveDB!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.EPMData!"/>
+    <Add FullName="EPMLiveCore.API.APITeam!"/>
+    <Add FullName="EPMLiveCore.Utilities!"/>
+    <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>
+    <Add FullName="EPMLiveCore.API.ResourceImporter!"/>
+    <Add FullName="EPMLiveCore.API.ListCommands!"/>
+    <Add FullName="EPMLiveCore.GridGanttSettings!"/>
+    <Add FullName="EPMLiveCore.EnhancedLookupConfigValuesHelper!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.ReportData!"/>
+  </ShimGeneration>
+</Fakes>
