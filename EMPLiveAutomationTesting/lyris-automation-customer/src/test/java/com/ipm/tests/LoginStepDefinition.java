@@ -9,8 +9,8 @@ import java.util.Properties;
 public class LoginStepDefinition {
 //@Inject private TestProperty<WebDriver> driver;	
 
-    private static IpmStepDefination ipm;
     protected static WebDriver driver;
+    private static IpmStepDefination ipm;
 
 
     public LoginStepDefinition(WebDriver driver) {
@@ -18,7 +18,6 @@ public class LoginStepDefinition {
     }
 
     public static void login(WebDriver driver) {
-        //  driver.get("http://farmadmin:Pass%40word1@qaepmlive6/SitePages/Home.aspx");
         LoginStepDefinition lg = new LoginStepDefinition(driver);
         driver.get(lg.getUrl());
     }

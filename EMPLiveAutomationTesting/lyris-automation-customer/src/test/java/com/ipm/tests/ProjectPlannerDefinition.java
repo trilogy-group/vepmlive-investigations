@@ -7,10 +7,12 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import junit.framework.TestCase;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +31,7 @@ public class ProjectPlannerDefinition {
     private static String createdProjectName;
     private static String createdTask;
     private static WebElement addCellUserTask;
+    private static String userTobeAdded;
     @Autowired
     protected WebDriver driver;
     LoginPageObject objLogin;
@@ -59,7 +62,7 @@ public class ProjectPlannerDefinition {
         }
     }
 
-    @When("^execute before conditions")
+    @Given("^execute before conditions")
     public void initilize() {
         LoginStepDefinition.login(driver);
         driver.manage().window().maximize();
@@ -277,7 +280,6 @@ public class ProjectPlannerDefinition {
         Thread.sleep(5000);
         createdTask = task + System.currentTimeMillis() / 1000L;
         driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(createdTask);
-        //     driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(Keys.RETURN);
         Thread.sleep(5000);
     }
 
@@ -286,10 +288,6 @@ public class ProjectPlannerDefinition {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
         webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
         Thread.sleep(5000);
-//        if (!webElements.get(webElements.size() - 1).findElements(By.xpath("./td[8]")).isEmpty()) {
-//            webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
-//            Thread.sleep(5000);
-//        }
     }
 
     @Then("^I select user for task")
@@ -317,9 +315,15 @@ public class ProjectPlannerDefinition {
 
     @Then("^I Click on Edit Resource Planner")
     public void clickOnEditResourcePlanner() {
-        Actions action = new Actions(driver)
-                .doubleClick(driver.findElement(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
-        action.build().perform();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
     }
 
     public void searchForCreatedProject(String projectname) {
@@ -350,48 +354,60 @@ public class ProjectPlannerDefinition {
         action.build().perform();
     }
 
-    @Then("^I select user \"([^\"]*)\"$")
-    public void selectFirstUserInResourcePlanner(String username) throws InterruptedException {
-        Thread.sleep(10000);
-        driver.switchTo().frame(1);
-        // mouseClickById("idResourcesTab_ShowFilters");
-        mouseClickByxpath("//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[2]");
-        WebElement element = driver
-                .findElement(By.xpath("//[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[2]"));
-
-        JavascriptExecutor executor = (JavascriptExecutor) driver;
-        executor.executeScript("arguments[0].click();", element);
-        // js.executeScript("$('#ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem').click()");
-        driver.findElement(By.xpath("//*[@id='g_Res']/tbody/tr[1]/td[3]/div/table/tbody/tr[3]/td[3]")).click();
-        driver.findElement(By.xpath("//*[@id='g_Res']/tbody/tr[1]/td[3]/div/table/tbody/tr[3]/td[3]"))
-                .sendKeys(username);
-        driver.findElement(By.xpath("//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[2]")).click();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    @Then("^I select one user$")
+    public void selectFirstUserInResourcePlanner() throws InterruptedException {
+        Thread.sleep(5000);
+//        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+//        for (WebElement iframe : iframes) {
+//            driver.switchTo().defaultContent();
+//            driver.switchTo().frame(iframe);
+//            System.out.println("webdriver size  :" + driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[2]")).size());
+//        }
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame(3);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")));
+        driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).click();
+        userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).getText();
     }
 
     @Then("^I click on add user in project planner")
-    public void clickOnAddUserInResourcePlanner() {
-        driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[2]")).click();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    public void clickOnAddUserInResourcePlanner() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ResAddBtn")));
+        driver.findElement(By.id("ResAddBtn")).click();
+        Thread.sleep(10000);
     }
 
     @Then("^I enter hours in grid \"([^\"]*)\"$")
-    public void enterHoursInGrid(String Hours) {
-        for (int i = 1; i <= 15; i++) {
-            driver.findElement(By
-                    .xpath(".//*[@id='g_RPE']/tbody/tr[3]/td[5]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[2]//td["
-                            + i + "]"))
-                    .click();
-            driver.findElement(By.xpath("//*[@id='Grid0FocusCursors']/div[1]/div/input")).sendKeys(Hours);
-
+    public void enterHoursInGrid(String Hours) throws InterruptedException {
+        Thread.sleep(5000);
+        driver.switchTo().defaultContent();
+        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+        for (WebElement iframe : iframes) {
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame(iframe);
+            if (!driver.findElements(By.xpath(".//*[@id='g_RPE']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).isEmpty()) {
+                driver.findElement(By.xpath(".//*[@id='g_RPE']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).click();
+            }
         }
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        Thread.sleep(2000);
+        executor.executeScript("window.document.getElementById('SpreadBtn').click()");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("idSpreadAmount")));
+        Select select = new Select(driver.findElement(By.id("idSpreadFinishPeriod")));
+        select.selectByValue("Q47");
+        Thread.sleep(2000);
+        driver.findElement(By.xpath(".//*[@id='idSpreadDlgObj']/div/div[2]/div/input[1]")).click();
+        driver.findElement(By.xpath(".//*[@id='idSpreadDlgObj']/div/div[2]/div/input[2]")).click();
     }
 
     @Then("^I click onResourse plannerSave button")
     public void clickOnSaveButtonInResourcePlaner() {
-        driver.findElement(By.xpath("//*[@id='SavePlanBtn']")).click();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.switchTo().alert().accept();
+        driver.findElement(By.id("SavePlanBtn")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='idPrivateRowsDlg']/div[2]/input[1]")));
     }
 
     @Then("^I click on set public ok button")
@@ -617,19 +633,28 @@ public class ProjectPlannerDefinition {
     @When("^I enter some costs and I click on save button$")
     public void iEnterSomeCostsAndIClickOnSaveButton() throws Throwable {
 
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame(3);
-
+        Thread.sleep(20000);
         WebDriverWait wait = new WebDriverWait(driver, 30);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_1']/tbody/tr[2]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")));
-        driver.findElement(By.xpath(".//*[@id='g_1']/tbody/tr[2]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")).click();
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_1']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[2]")));
-        driver.findElement(By.xpath(".//*[@id='g_1']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[2]")).click();
-        driver.findElement(By.xpath(".//*[@id='g_1']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[2]")).sendKeys("10");
 
 
-        driver.findElement(By.xpath(".//*[@id='dhxTabbarObj_y4wtBLtLY43C']/div/div[1]/div/div[2]/span")).click();
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementsByClassName('dhx_tab_element dhx_tab_element_inactive dhx_tab_hover').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+
+
+        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+        for (WebElement iframe : iframes) {
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame(iframe);
+            System.out.println("---------------:::::::::::::" + driver.findElements(By.xpath(".//*[@id='dhxTabbarObj_beut9z1dQeRo']/div/div[1]/div/div[2]/div[3]")).size());
+        }
+
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='dhxTabbarObj_W4mtCes4IiNM']/div/div[1]/div/div[2]/span")));
+        driver.findElement(By.xpath(".//*[@id='dhxTabbarObj_W4mtCes4IiNM']/div/div[1]/div")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_9']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")));
         driver.findElement(By.xpath(".//*[@id='g_9']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).click();
         driver.findElement(By.xpath(".//*[@id='g_9']/tbody/tr[2]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).sendKeys("10");
@@ -649,6 +674,46 @@ public class ProjectPlannerDefinition {
 
     @Then("^Cost plan should be displayed$")
     public void costPlanShouldBeDisplayed() throws Throwable {
+
+    }
+
+    @And("^get url$")
+    public void getUrl() throws Throwable {
+        driver.get("http://qaepmlive6/Lists/Project%20Center/DispForm.aspx?ID=126&Source=http%3a%2f%2fqaepmlive6%2fLists%2fProject%20Center%2fExecutive%20Summary.aspx");
+    }
+
+    @Then("^Resource Planner page should be displayed$")
+    public void resourcePlannerPageShouldBeDisplayed() throws Throwable {
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        assertEquals("Title of Select Planner Pop-up", "Resource Planner - Project Mode", driver.findElement(By.id("dialogTitleSpan")).getText());
+    }
+
+    @Then("^Resource should be added to top section$")
+    public void resourceShouldBeAddedToTopSection() throws Throwable {
+        List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr"));
+        if (!webElements.isEmpty()) {
+            for (int i = 2; i < webElements.size(); i++) {
+                if (webElements.get(i).findElement(By.xpath("./td[3]")).getText().contains(userTobeAdded)) {
+                    TestCase.assertTrue("User added in ressource planner", true);
+                    break;
+                } else {
+                    TestCase.assertTrue("User has not added in ressource planner", false);
+                }
+            }
+        } else {
+            TestCase.assertTrue("User has not added in ressource planner", false);
+        }
+
+    }
+
+    @Then("^Pop up should displayed asking the User if they want to \"([^\"]*)\"$")
+    public void popUpShouldDisplayedAskingTheUserIfTheyWantTo(String arg0) throws Throwable {
+        assertTrue("Title Add ressource pop up", driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_ctl00layoutDiv']/div[6]/div/div[3]")).getText().contains(arg0));
+    }
+
+    @Then("^The \"([^\"]*)\" mark should turn to a green check mark next to the selected resources on the top grid$")
+    public void theMarkShouldTurnToAGreenCheckMarkNextToTheSelectedResourcesOnTheTopGrid(String arg0) throws Throwable {
 
     }
 
