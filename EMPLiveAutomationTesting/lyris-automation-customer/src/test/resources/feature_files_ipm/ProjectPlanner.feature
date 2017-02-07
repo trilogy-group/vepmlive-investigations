@@ -97,5 +97,4 @@ Feature: Add, Edit and Delete Project
     When I enter hours in grid "50"
     And I click onResourse plannerSave button
     Then Pop up should displayed asking the User if they want to "Make Private Rows Public?"
-    When I click on set public ok button
-    Then The "Private" mark should turn to a green check mark next to the selected resources on the top grid
+    Then I click on set public ok button

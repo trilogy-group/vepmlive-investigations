@@ -386,7 +386,9 @@ public class ProjectPlannerDefinition {
         List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
         for (WebElement iframe : iframes) {
             driver.switchTo().defaultContent();
+            Thread.sleep(1000);
             driver.switchTo().frame(iframe);
+            Thread.sleep(1000);
             if (!driver.findElements(By.xpath(".//*[@id='g_RPE']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).isEmpty()) {
                 driver.findElement(By.xpath(".//*[@id='g_RPE']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[3]")).click();
             }
