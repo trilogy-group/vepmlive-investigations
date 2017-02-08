@@ -50,6 +50,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I provide required value for new Change and I click on save button$")
     public void iProvideRequiredValueForNewChangeAndIClickOnSaveButton() throws Throwable {
+        Thread.sleep(10000);
         createdChangeTitle = "changeName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdChangeTitle);
