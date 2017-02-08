@@ -48,10 +48,12 @@ public class RessourceStepDefinition {
     @When("^I enter required fields and click on save button$")
     public void iEnterRequiredFieldsAndClickOnSaveButton() throws Throwable {
         createdRessourceName = "firstName" + System.currentTimeMillis() / 1000L;
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@title='First Name']")));
+        Thread.sleep(10000);
         driver.findElement(By.xpath("//input[@title='First Name']")).sendKeys(createdRessourceName);
-
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Role_ddlShowAll")));
             js.executeScript("window.document.getElementById('Role_ddlShowAll').click()");
             js.executeScript("window.document.getElementById('autoText_0').click()");
             js.executeScript("window.document.getElementById('HolidaySchedule_ddlShowAll').click()");

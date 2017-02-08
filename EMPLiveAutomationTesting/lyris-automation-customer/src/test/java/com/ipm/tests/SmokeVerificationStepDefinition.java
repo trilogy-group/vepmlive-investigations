@@ -147,6 +147,7 @@ public class SmokeVerificationStepDefinition {
     @When("^I click on project List from the 'Report List'$")
     public void iClickOnProjectListFromTheReportList() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='gridctl00$ctl36$g_ad12f598_1fd2_4896_9c89_84cd6fd83d86']/div[2]/table/tbody/tr[5]/td/div/div/img[1]")));
+        Thread.sleep(10000);
         driver.findElement(By.xpath(".//*[@id='gridctl00$ctl36$g_ad12f598_1fd2_4896_9c89_84cd6fd83d86']/div[2]/table/tbody/tr[5]/td/div/div/img[1]")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='nodeval']/a")));
     }
@@ -207,16 +208,22 @@ public class SmokeVerificationStepDefinition {
             driver.switchTo().frame(iframe);
             Thread.sleep(1000);
             System.out.println("add task timsheet size :" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).size());
-            System.out.println("add task timsheet size 2:" + driver.findElements(By.xpath("//td[@class=' GMClassReadOnly GMBool0RO GMWrap0 GMBool0RO GMCell GMEmpty GMCellBorderFF3 HideCol0Check']")).size());
-//            if (!driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).isEmpty()) {
+            System.out.println("add task timsheet size 2:" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).size());
+            if (!driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).isEmpty()) {
 //                workassigned = driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).getText();
 //                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[@class='GMClassReadOnly GMBool0RO GMWrap0 GMBool1RO GMCell GMEmpty GMCellBorderFF3 HideCol0Check']")));
-//                Actions action = new Actions(driver).click(driver.findElement(By.xpath("//td[@class='GMClassReadOnly GMBool0RO GMWrap0 GMBool1RO GMCell GMEmpty GMCellBorderFF3 HideCol0Check']")));
+//                Actions action = new Actions(driver).click(driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")));
 //                action.build().perform();
-//                wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")));
-//                driver.findElement(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")).click();
-//                Thread.sleep(5000);
-//            }
+
+                WebElement element = driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
+                JavascriptExecutor executor = (JavascriptExecutor) driver;
+                executor.executeScript("arguments[0].click();", element);
+
+
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")));
+                driver.findElement(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")).click();
+                Thread.sleep(5000);
+            }
         }
         try {
             driver.switchTo().alert().accept();

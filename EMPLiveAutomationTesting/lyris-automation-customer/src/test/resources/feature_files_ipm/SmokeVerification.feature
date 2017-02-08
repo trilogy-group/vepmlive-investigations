@@ -19,7 +19,7 @@ Feature: Smoke Tests
     Then Change should be deleted
 
 #C829754: View Reports
-  #@Ready
+  @Ready
   Scenario: View Reports
     Given execute before conditions
     When I click on Reports on the left panel
@@ -30,17 +30,17 @@ Feature: Smoke Tests
     And I Select 'Project Health' from the list
     Then Project health view should get displayed
 
-#C829743: Submit Timesheet
-  #@Ready
-  Scenario: Submit Timesheet
-    Given execute before conditions
-    When I click on 'My Workplace' from left panel
-    And Click on 'My Timesheet'
-    Then The 'My Timesheet' page should be displayed
-    And Click on 'Add Work'
-    Then Tasks assigned to user will be displayed
-    When I Select tasks and click on 'Add'
-    Then Selected task should be displayed in Timesheet page
-    When I click on 'Save' button
-#    And Click on 'Submit' button
-#    Then Timesheet should be submitted
+##C829743: Submit Timesheet
+#  #@Ready
+#  Scenario: Submit Timesheet
+#    Given execute before conditions
+#    When I click on 'My Workplace' from left panel
+#    And Click on 'My Timesheet'
+#    Then The 'My Timesheet' page should be displayed
+#    And Click on 'Add Work'
+#    Then Tasks assigned to user will be displayed
+#    When I Select tasks and click on 'Add'
+#    Then Selected task should be displayed in Timesheet page
+#    When I click on 'Save' button
+##    And Click on 'Submit' button
+##    Then Timesheet should be submitted

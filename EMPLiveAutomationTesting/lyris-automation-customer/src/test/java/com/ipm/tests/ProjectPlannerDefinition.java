@@ -191,7 +191,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on edit plan menu")
     public void editPlan() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.EPMLive.Planner-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -315,7 +315,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^I Click on Edit Resource Planner")
     public void clickOnEditResourcePlanner() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
