@@ -80,7 +80,9 @@ public class RessourceStepDefinition {
         driver.findElement(By.xpath(".//*[@id='toolBarResGridSelector']")).sendKeys(createdRessourceName);
         Thread.sleep(2000);
         driver.findElement(By.xpath("//a[contains(text(), '" + createdRessourceName + "')]")).click();
-        Thread.sleep(5000);
+        Thread.sleep(10000);
+        System.out.println("Ressource wanted :" + createdRessourceName);
+        System.out.println("Ressource founded :" + driver.findElement(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).getText());
         assertTrue("", driver.findElement(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).getText().contains(createdRessourceName));
     }
 }

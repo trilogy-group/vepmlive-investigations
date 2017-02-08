@@ -381,7 +381,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^I enter hours in grid \"([^\"]*)\"$")
     public void enterHoursInGrid(String Hours) throws InterruptedException {
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         driver.switchTo().defaultContent();
         List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
         for (WebElement iframe : iframes) {
@@ -612,7 +612,7 @@ public class ProjectPlannerDefinition {
     @And("^Task created should be saved$")
     public void taskCreatedShouldBeSaved() throws Throwable {
         searchForCreatedTask(createdTask);
-        assertTrue("Project Not Deleted", !driver.findElements(By.xpath(".//*[@id='GanttGrid1Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr")).isEmpty());
+        assertTrue("Task Created Not Saved", !driver.findElements(By.xpath(".//*[@id='GanttGrid1Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr")).isEmpty());
     }
 
     @When("^I click on 'Edit Cost'$")

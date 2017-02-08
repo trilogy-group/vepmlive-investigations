@@ -78,7 +78,7 @@ Feature: Add, Edit and Delete Project
 
 #C829770: Edit Resource plan
   @Ready
-  Scenario: Add resources to project and assign tasks to them
+  Scenario: Edit Resource plan
     Given execute before conditions
     And I Open project planer url
     When I click on new item
