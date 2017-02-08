@@ -68,8 +68,18 @@ public class RessourceStepDefinition {
 
     @Then("^Ressource should be added$")
     public void ressourceShouldBeAdded() throws Throwable {
+        Thread.sleep(5000);
         assertTrue("Verify title page", driver.getTitle().contains("Resource Pool"));
-        searchForCreatedRessource(createdRessourceName);
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")));
+        if (!driver.findElements(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).isEmpty()) {
+            assertTrue("", true);
+        } else {
+            assertTrue("", false);
+        }
+        System.out.println("Ressource founded :" + driver.findElement(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).getText());
+
+//        searchForCreatedRessource(createdRessourceName);
     }
 
     public void searchForCreatedRessource(String projectname) throws InterruptedException {
@@ -77,8 +87,9 @@ public class RessourceStepDefinition {
         Thread.sleep(5000);
         driver.findElement(By.xpath(".//*[@id='toolbar-search-icon']/span")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='toolBarResGridSelector']")));
+        Thread.sleep(5000);
         driver.findElement(By.xpath(".//*[@id='toolBarResGridSelector']")).sendKeys(createdRessourceName);
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         driver.findElement(By.xpath("//a[contains(text(), '" + createdRessourceName + "')]")).click();
         Thread.sleep(10000);
         System.out.println("Ressource wanted :" + createdRessourceName);
