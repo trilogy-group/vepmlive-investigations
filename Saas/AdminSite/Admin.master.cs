@@ -10,6 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using System.Data.SqlClient;
+using AdminSite;
 
 public partial class MasterPage : System.Web.UI.MasterPage
 {
@@ -28,7 +29,7 @@ public partial class MasterPage : System.Web.UI.MasterPage
         {
             case "default.aspx":
             case "editaccount.aspx":
-                checkPermissions(1);
+                checkPermissions(AppPermissions.AccountView);
                 strMenus[0] = "current";
                 break;
             case "createaccount.aspx":
@@ -36,70 +37,70 @@ public partial class MasterPage : System.Web.UI.MasterPage
                 break;
             case "edituser.aspx":
             case "users.aspx":
-                checkPermissions(2);
+                checkPermissions(AppPermissions.UserView);
                 strMenus[2] = "current";
                 break;
             case "signups.aspx":
-                checkPermissions(10);
+                checkPermissions(AppPermissions.TrialSignups);
                 strMenus[14] = "current";
                 break;
             case "oldsignups.aspx":
-                checkPermissions(10);
+                checkPermissions(AppPermissions.TrialSignups);
                 strMenus[3] = "current";
                 break;
             case "editcustomer.aspx":
-                checkPermissions(9);
+                checkPermissions(AppPermissions.OnsiteCustomerCreateOrEdit);
                 strMenus[4] = "current";
                 break;
             case "customers.aspx":
-                checkPermissions(8);
+                checkPermissions(AppPermissions.ViewReports);
                 strMenus[4] = "current";
                 break;
             case "versions.aspx":
                 strMenus[5] = "current";
                 break;
             case "partnerrequests.aspx":
-                checkPermissions(5);
+                checkPermissions(AppPermissions.PartnerAdmin);
                 strMenus[6] = "current";
                 break;
             case "activepartners.aspx":
-                checkPermissions(5);
+                checkPermissions(AppPermissions.PartnerAdmin);
                 strMenus[7] = "current";
                 break;
             case "perms.aspx":
-                checkPermissions(6);
+                checkPermissions(AppPermissions.OnsiteCustomerView);
                 strMenus[8] = "current";
                 break;
             case "addemail.aspx":
             case "emailtemplates.aspx":
-                checkPermissions(4);
+                checkPermissions(AppPermissions.EmailTemplateAdmin);
                 strMenus[9] = "current";
                 break;
             case "reports.aspx":
-                checkPermissions(7);
+                checkPermissions(AppPermissions.AdminSitePermissions);
                 strMenus[10] = "current";
                 break;
             case "addcustomer.aspx":
-                checkPermissions(9);
+                checkPermissions(AppPermissions.OnsiteCustomerCreateOrEdit);
                 strMenus[12] = "current";
                 break;
             case "fullfill.aspx":
-                checkPermissions(9);
+                checkPermissions(AppPermissions.OnsiteCustomerCreateOrEdit);
                 strMenus[13] = "current";
                 break;
             case "newzuoraorder.aspx":
-                checkPermissions(11);
+                checkPermissions(AppPermissions.CreateZuoraOrders);
                 strMenus[0] = "current";
                 break;
         }        
     }
 
-    private void checkPermissions(int level)
+    private void checkPermissions(AppPermissions level)
     {
         SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ToString());
         cn.Open();
 
-        bool hasPermissions = AdminSite.Helper.checkPermissions(level, cn);
+        bool hasPermissions = AdminSite.Helper.checkPermissions((int)level, cn);
 
         cn.Close();
         return;

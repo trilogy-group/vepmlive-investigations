@@ -22,6 +22,8 @@ namespace AdminSite
         protected int TotalTicketUsage;
         protected int TotalTickets;
         protected StringBuilder sbOrders = new StringBuilder();
+        protected readonly StringBuilder sbActiveLicenses = new StringBuilder();
+        protected readonly StringBuilder sbInactiveLicenses = new StringBuilder();
         protected bool usingNewBilling = true;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -93,7 +95,9 @@ namespace AdminSite
 
             try
             {
-                chkLockUsers.Checked = bool.Parse(dr["lockusers"].ToString());
+                bool lockusers;
+                bool.TryParse(dr["lockusers"].ToString(),out lockusers);
+                chkLockUsers.Checked = lockusers;
             }
             catch { }
 
@@ -115,7 +119,7 @@ namespace AdminSite
             int months = 1;
             try
             {
-                months = int.Parse(dr["monthsfree"].ToString());
+                int.TryParse(dr["monthsfree"].ToString(), out months);
             }
             catch { }
             try
@@ -127,28 +131,6 @@ namespace AdminSite
             lblExpiration.Text = dtCreated.AddMonths(months).ToShortDateString();
 
             ddlBillingType.SelectedValue = dr["billingType"].ToString();
-
-
-
-
-            //=============Zuora Account============
-            ZuoraHelper zuora = new ZuoraHelper();
-
-            ZuoraAPI.QueryResult qrAccount = zuora.RunQuery("SELECT BillToId, ID from ACCOUNT where accountref__c = '" + lblAccountRef.Text + "'");
-
-            if(qrAccount.records.Length > 0 && qrAccount.records[0] != null)
-            {
-                string accountid = qrAccount.records[0].Id;
-
-                lblZuoraLink.Text = "<A target=\"_blank\" href=\"https://www.zuora.com/apps/CustomerAccount.do?method=view&id=" + accountid + "\">View Zuora Account</a>";
-            }
-            else
-            {
-                lblZuoraLink.Text = "<A target=\"_blank\" href=\"createzuoraaccount.aspx?accountid=" + strAccountId + "\">Create</a>";
-            }
-            //======================================
-
-
 
             cmdGetSites = new SqlCommand("Select * from CONTRACTLEVEL_TITLES", cn);
             cmdGetSites.CommandType = CommandType.Text;
@@ -171,7 +153,6 @@ namespace AdminSite
                 cmdGetSites.CommandType = CommandType.Text;
                 cmdGetSites.Parameters.AddWithValue("@AccountRef", lblAccountRef.Text);
                 cmdGetSites.Parameters.AddWithValue("@clevel", drLevel["contractlevel"].ToString());
-                //SqlDataReader drLevelOrders = cmdGetSites.ExecuteReader();
                 SqlDataAdapter da2 = new SqlDataAdapter(cmdGetSites);
                 DataSet ds2 = new DataSet();
                 da2.Fill(ds2);

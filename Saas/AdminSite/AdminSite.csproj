@@ -77,6 +77,7 @@
     <Content Include="addfeature.aspx" />
     <Content Include="addkey.aspx" />
     <Content Include="addorder.aspx" />
+    <Content Include="addproduct.aspx" />
     <Content Include="addpubkey.aspx" />
     <Content Include="addticket.aspx" />
     <Content Include="adduserstotrial.aspx" />
@@ -232,6 +233,7 @@
     <Content Include="modal\modalmain.css" />
     <Content Include="modal\overlay.png" />
     <Content Include="modal\pencil.gif" />
+    <Content Include="newlicense.aspx" />
     <Content Include="newzuoraorder.aspx" />
     <Content Include="oldsignups.aspx" />
     <Content Include="partnerrequests.aspx" />
@@ -254,6 +256,8 @@
     <Content Include="style\menu_sel.png" />
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
+    <Content Include="WebControls\Product\AddProduct.ascx" />
+    <Content Include="WebControls\Product\ListProducts.ascx" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -386,6 +390,13 @@
     <Compile Include="addorder.aspx.designer.cs">
       <DependentUpon>addorder.aspx</DependentUpon>
     </Compile>
+    <Compile Include="addproduct.aspx.cs">
+      <DependentUpon>addproduct.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addproduct.aspx.designer.cs">
+      <DependentUpon>addproduct.aspx</DependentUpon>
+    </Compile>
     <Compile Include="addpubkey.aspx.cs">
       <DependentUpon>addpubkey.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -509,6 +520,13 @@
     </Compile>
     <Compile Include="linksite.aspx.designer.cs">
       <DependentUpon>linksite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="newlicense.aspx.cs">
+      <DependentUpon>newlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="newlicense.aspx.designer.cs">
+      <DependentUpon>newlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="newzuoraorder.aspx.cs">
       <DependentUpon>newzuoraorder.aspx</DependentUpon>
@@ -636,10 +654,25 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebControls\Product\AddProduct.ascx.cs">
+      <DependentUpon>AddProduct.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\AddProduct.ascx.designer.cs">
+      <DependentUpon>AddProduct.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProducts.ascx.cs">
+      <DependentUpon>ListProducts.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProducts.ascx.designer.cs">
+      <DependentUpon>ListProducts.ascx</DependentUpon>
+    </Compile>
     <Compile Include="ZuoraHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="WebControls\Licensing\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Admin.master" />
@@ -693,6 +726,12 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>AdminSite_emailservice_Service</CachedSettingsPropName>
     </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OnlineLicensing.Api\OnlineLicensing.Api.csproj">
+      <Project>{6fbe6f92-e82b-4d6f-b805-6465d92f63f3}</Project>
+      <Name>OnlineLicensing.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
