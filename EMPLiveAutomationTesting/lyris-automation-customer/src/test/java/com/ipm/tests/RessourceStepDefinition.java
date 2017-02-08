@@ -70,9 +70,8 @@ public class RessourceStepDefinition {
 
     @Then("^Ressource should be added$")
     public void ressourceShouldBeAdded() throws Throwable {
-        Thread.sleep(5000);
+        Thread.sleep(15000);
         assertTrue("Verify title page", driver.getTitle().contains("Resource Pool"));
-
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")));
         if (!driver.findElements(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).isEmpty()) {
             assertTrue("", true);

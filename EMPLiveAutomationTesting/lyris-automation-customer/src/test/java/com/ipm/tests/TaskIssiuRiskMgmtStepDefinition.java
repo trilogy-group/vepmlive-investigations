@@ -90,6 +90,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I make some changes and I click on save button$")
     public void iMakeSomeChangesAndIClickOnSaveButton() throws Throwable {
+        Thread.sleep(15000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Status_c15b34c3-ce7d-490a-b133-3f4de8801b76_$DropDownChoice")));
         Select select = new Select(driver.findElement(By.id("Status_c15b34c3-ce7d-490a-b133-3f4de8801b76_$DropDownChoice")));
         select.selectByValue("In Progress");

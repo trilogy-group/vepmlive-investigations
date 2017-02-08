@@ -190,8 +190,9 @@ public class ProjectPlannerDefinition {
     }
 
     @And("^I Click on edit plan menu")
-    public void editPlan() {
+    public void editPlan() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
+        Thread.sleep(10000);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.EPMLive.Planner-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -314,7 +315,8 @@ public class ProjectPlannerDefinition {
     }
 
     @Then("^I Click on Edit Resource Planner")
-    public void clickOnEditResourcePlanner() {
+    public void clickOnEditResourcePlanner() throws InterruptedException {
+        Thread.sleep(15000);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
         if (driver instanceof JavascriptExecutor) {
