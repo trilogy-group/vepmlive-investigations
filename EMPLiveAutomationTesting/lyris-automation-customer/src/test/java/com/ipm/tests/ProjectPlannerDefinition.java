@@ -77,7 +77,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^I click on project panel")
     public void clickToLaftpanel() throws InterruptedException {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("EPMLiveNavt3")));
         driver.findElement(By.id("EPMLiveNavt3")).click();
         Thread.sleep(10000);
@@ -85,7 +85,7 @@ public class ProjectPlannerDefinition {
 
     @When("^I click on new item")
     public void clickOnNewItem() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@title='New Item']//a//span[@class='dropdown-label']")));
         driver.findElement(By.xpath("//li[@title='New Item']//a//span[@class='dropdown-label']")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@title='Project Name Required Field']")));
@@ -94,7 +94,7 @@ public class ProjectPlannerDefinition {
     @Then("^I enter a Project Name as \"([^\"]*)\"$")
     public void enterProjectName(String ProjectName) {
         createdProjectName = ProjectName + System.currentTimeMillis() / 1000L;
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@title='Project Name Required Field']")));
         driver.findElement(By.xpath("//*[@title='Project Name Required Field']"))
                 .sendKeys(createdProjectName);
@@ -129,7 +129,7 @@ public class ProjectPlannerDefinition {
         driver.findElement(By
                 .xpath(".//*[@id='ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem']"))
                 .click();
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='divQuickDetailsHeader']")));
     }
 
@@ -174,7 +174,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on Item menu")
     public void ClickOnItem() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListItem-title']/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.ListItem-title']/a/span[1]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.New")));
@@ -206,7 +206,7 @@ public class ProjectPlannerDefinition {
     @And("^I Click on project planner")
     public void clickOnProjectPlaner() {
         driver.switchTo().frame(1);
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[2]")));
         driver.findElement(By.xpath("//a[2]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
@@ -214,7 +214,7 @@ public class ProjectPlannerDefinition {
 
     @When("^I Click on edit team")
     public void clicOnEditTeam() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -230,7 +230,7 @@ public class ProjectPlannerDefinition {
     public void selectFirstUser() {
         driver.switchTo().defaultContent();
         driver.switchTo().frame(1);
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
         Actions builder = new Actions(driver);
@@ -241,7 +241,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on add user button")
     public void clickOnAddUser() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='parentId']/tbody/tr/td[2]/input[1]")));
         driver.findElement(By.xpath(".//*[@id='parentId']/tbody/tr/td[2]/input[1]")).click();
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
@@ -296,7 +296,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
         driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
-        Thread.sleep(3000);
+        Thread.sleep(6000);
         driver.findElement(By.xpath("//*[contains(text(), 'OK')]")).click();
     }
 
@@ -329,7 +329,7 @@ public class ProjectPlannerDefinition {
     }
 
     public void searchForCreatedProject(String projectname) {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='searchtext0Main']")));
@@ -340,7 +340,7 @@ public class ProjectPlannerDefinition {
     }
 
     public void searchForCreatedTask(String projectname) {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='searchtext1Main']")));
@@ -473,7 +473,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^The project created must be saved$")
     public void theProjectCreatedMustBeSaved() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='dispFormFancyTitle']/span")));
         assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.xpath("//div[@class='dispFormFancyTitle']/span")).getText());
     }
@@ -481,7 +481,7 @@ public class ProjectPlannerDefinition {
     @Then("^The project created must be deleted$")
     public void theProjectCreatedMustBeDeleted() {
         searchForCreatedProject(createdProjectName);
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
         assertEquals("Project Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
     }
@@ -513,7 +513,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^The Page Build Team should be displayed$")
     public void thePageBuildTeamShouldBeOpened() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
         assertEquals("Title of Build Team page not appeared", "BUILD TEAM", driver.findElement(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")).getText());
     }
@@ -530,7 +530,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^The Select Planner Page should be displayed$")
     public void theSelectPlannerPageShouldBeDisplayed() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
         assertEquals("Title of Select Planner Pop-up", "Select Planner", driver.findElement(By.id("dialogTitleSpan")).getText());
     }
@@ -538,13 +538,13 @@ public class ProjectPlannerDefinition {
     @And("^I save after editing$")
     public void iClickOnSaveButtonAfterEdit() throws Throwable {
         driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
     }
 
     @And("^I enter Project Work as \"([^\"]*)\"$")
     public void iEnterProjectWorkAs(String arg0) throws Throwable {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ProjectWork_39a13b25-4a5c-45f1-8bd8-cae4a338c076_$NumberField")));
         driver.findElement(By.id("ProjectWork_39a13b25-4a5c-45f1-8bd8-cae4a338c076_$NumberField")).clear();
         driver.findElement(By.id("ProjectWork_39a13b25-4a5c-45f1-8bd8-cae4a338c076_$NumberField")).sendKeys(arg0);
@@ -563,7 +563,7 @@ public class ProjectPlannerDefinition {
 
     @And("^The values edited should be changed as \"([^\"]*)\" for Project Work  and \"([^\"]*)\" for Actual Work$")
     public void theValuesEditedShouldBeChangedAsForProjectWorkAndForBudget(String arg0, String arg1) throws Throwable {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")));
         assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getText().contains(arg0));
         assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getText().contains(arg1));
@@ -571,7 +571,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I click on Blank Plan$")
     public void iClickOnBlankPlan() throws Throwable {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
@@ -579,7 +579,7 @@ public class ProjectPlannerDefinition {
 
     @When("^I click on publish$")
     public void iClickOnPublish() throws Throwable {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")));
         driver.findElement(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")).click();
         Thread.sleep(10000);
@@ -587,7 +587,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I click on Close Tasks$")
     public void iClickOnCloseTasks() throws Throwable {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
         wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
@@ -625,7 +625,7 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
     }
 
@@ -638,7 +638,7 @@ public class ProjectPlannerDefinition {
     public void iEnterSomeCostsAndIClickOnSaveButton() throws Throwable {
 
         Thread.sleep(20000);
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
 
 
         if (driver instanceof JavascriptExecutor) {

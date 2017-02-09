@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.ipm.tests.LoginStepDefinition.driver;
@@ -182,8 +181,14 @@ public class SmokeVerificationStepDefinition {
     @And("^Click on 'Add Work'$")
     public void clickOnAddWork() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheet.WorkGroup.AddWork-Large")));
-        if (driver.findElement(By.id("mytimesheetstatus")).getText().equalsIgnoreCase("Submitted")) {
-            driver.findElement(By.xpath(".//*[@id='tsnav']/nav/div/div/ul/li[2]/span[2]")).click();
+        boolean issubmitted = true;
+        while (issubmitted) {
+            if (driver.findElement(By.id("mytimesheetstatus")).getText().equalsIgnoreCase("Submitted")) {
+                driver.findElement(By.xpath(".//*[@id='tsnav']/nav/div/div/ul/li[2]/span[2]")).click();
+                Thread.sleep(30000);
+            } else {
+                issubmitted = false;
+            }
         }
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheet.WorkGroup.AddWork-Large")));
@@ -202,40 +207,27 @@ public class SmokeVerificationStepDefinition {
     public void iSelectTasksAndClickOnAdd() throws Throwable {
         Thread.sleep(10000);
         driver.switchTo().defaultContent();
-        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
-        for (WebElement iframe : iframes) {
-            driver.switchTo().defaultContent();
-            Thread.sleep(1000);
-            driver.switchTo().frame(iframe);
-            Thread.sleep(1000);
-            System.out.println("add task timsheet size :" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).size());
-            System.out.println("add task timsheet size 2:" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).size());
-            if (!driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).isEmpty()) {
-//                workassigned = driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).getText();
-//                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[@class='GMClassReadOnly GMBool0RO GMWrap0 GMBool1RO GMCell GMEmpty GMCellBorderFF3 HideCol0Check']")));
-//                Actions action = new Actions(driver).click(driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")));
-//                action.build().perform();
-
-                WebElement element = driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
-                JavascriptExecutor executor = (JavascriptExecutor) driver;
-                executor.executeScript("arguments[0].click();", element);
-
-
-                wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")));
-                driver.findElement(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")).click();
-                Thread.sleep(5000);
+        driver.switchTo().frame(1);
+        Thread.sleep(1000);
+        System.out.println("add task timsheet size :" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[3]")).size());
+        System.out.println("add task timsheet size 2:" + driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).size());
+        if (!driver.findElements(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")).isEmpty()) {
+            WebElement element = driver.findElement(By.xpath(".//*[@id='TSWork']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
+            JavascriptExecutor executor = (JavascriptExecutor) driver;
+            executor.executeScript("arguments[0].click();", element);
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")));
+            driver.findElement(By.id("Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large")).click();
+            Thread.sleep(5000);
+        }
+        boolean isAlert = true;
+        while (isAlert) {
+            try {
+                driver.switchTo().alert().accept();
+            } catch (Exception e) {
+                System.out.println("Alert 1 Not Present");
+                isAlert = false;
             }
-        }
-        try {
-            driver.switchTo().alert().accept();
-        } catch (Exception e) {
-            System.out.println("Alert 1 Not Present");
-        }
-        Thread.sleep(5000);
-        try {
-            driver.switchTo().alert().accept();
-        } catch (Exception e) {
-            System.out.println("Alert 2 Not Present");
+            Thread.sleep(5000);
         }
     }
 
@@ -243,20 +235,41 @@ public class SmokeVerificationStepDefinition {
     public void iClickOnSaveButton() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large")));
         driver.findElement(By.id("Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large")).click();
+        Thread.sleep(2000);
+        boolean isAlert = true;
+        while (isAlert) {
+            try {
+                driver.switchTo().alert().accept();
+            } catch (Exception e) {
+                System.out.println("Alert 1 Not Present");
+                isAlert = false;
+            }
+            Thread.sleep(5000);
+        }
         wait.until(ExpectedConditions.textToBe(By.id("mytimesheetstatus"), "Unsubmitted"));
-
+        Thread.sleep(100000);
     }
 
     @And("^Click on 'Submit' button$")
     public void clickOnSubmitButton() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large")));
-        driver.findElement(By.id("Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large")).click();
+        while (!driver.findElement(By.id("Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large")).isEnabled()) {
+            Thread.sleep(5000);
+        }
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementById('Ribbon.MyTimesheet.ActionsGroup.SaveButton-Large').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mytimesheetstatus")));
+        Thread.sleep(100000);
     }
 
     @Then("^Timesheet should be submitted$")
     public void timesheetShouldBeSubmitted() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mytimesheetstatus")));
+        Thread.sleep(20000);
         assertTrue("TimeSheet is not submitted", driver.findElement(By.id("mytimesheetstatus")).getText().contains("Submitted"));
     }
 
@@ -267,6 +280,7 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Selected task should be displayed in Timesheet page$")
     public void selectedTaskShouldBeDisplayedInTimesheetPage() throws Throwable {
-        assertTrue("task not displayed in timesheet", driver.findElement(By.xpath(".//*[@id='TS0Main']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")).getText().contains(workassigned));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='TS0Main']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")));
+        assertTrue("task not displayed in timesheet", !driver.findElements(By.xpath(".//*[@id='TS0Main']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")).isEmpty());
     }
 }
