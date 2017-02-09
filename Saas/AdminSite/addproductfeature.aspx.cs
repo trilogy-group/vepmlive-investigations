@@ -5,9 +5,9 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace AdminSite.WebControls.Product
+namespace AdminSite
 {
-    public partial class AddProduct : System.Web.UI.UserControl
+    public partial class addproductfeature : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {

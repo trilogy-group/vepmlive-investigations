@@ -22,6 +22,11 @@ namespace OnlineLicensing.Api
 
         }
 
+        /// <summary>
+        /// Get product based on id
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
         public static LICENSEPRODUCT GetProduct(int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -36,6 +41,7 @@ namespace OnlineLicensing.Api
         /// </summary>
         /// <param name="sku"></param>
         /// <param name="name"></param>
+        /// <param name="active"></param>
         public static void AddProduct(string sku, string name, bool active)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -86,6 +92,68 @@ namespace OnlineLicensing.Api
                 if (existingOrdersForProduct != null) throw new LicenseProductInUseException();
                 var existingProduct = context.LICENSEPRODUCTS.SingleOrDefault(p => p.product_id == productId);
                 context.Entry(existingProduct).State = EntityState.Deleted;
+                context.SaveChanges();
+            }
+        }
+
+
+        /// <summary>
+        /// Get a list of assigned features for indicated product id
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        public static IEnumerable<LICENSEDETAIL> GetLicenseProductFeatures(int productId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                return context.LICENSEDETAILs.Include(o=>o.DETAILTYPE).Include(l=>l.LICENSEPRODUCT).Where(f=>f.product_id == productId).ToList().AsEnumerable();
+            }
+        }
+
+        public static IEnumerable<DETAILTYPE> GetAllDetailTypes()
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                return context.DETAILTYPES.ToList().AsEnumerable();
+            }
+        }
+
+
+        /// <summary>
+        /// Check if a feature has already been added to a License Product.
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="detailTypeId"></param>
+        /// <returns></returns>
+        public static bool CheckForFeatureDuplicate(int productId, int detailTypeId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var existingProduct = context.LICENSEDETAILs.SingleOrDefault(p => p.detail_type_id == detailTypeId && p.product_id == productId);
+                return existingProduct != null;
+            }
+        }
+
+        public static void AddProductFeature(int productId, int detailTypeId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var newProductFeature = new LICENSEDETAIL { product_id = productId, detail_type_id = detailTypeId };
+                context.LICENSEDETAILs.Add(newProductFeature);
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Delete a feature from a License product.
+        /// </summary>
+        /// <param name="licenseFeatureId"></param>
+        public static void DeleteProductFeature(int licenseFeatureId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var existingProductFeature = context.LICENSEDETAILs.SingleOrDefault(p => p.license_detail_id == licenseFeatureId);
+                context.Entry(existingProductFeature).State = EntityState.Deleted;
                 context.SaveChanges();
             }
         }

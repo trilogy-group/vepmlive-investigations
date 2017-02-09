@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AdminSite.WebControls.Product
+namespace AdminSite
 {
 
 
-    public partial class AddProduct
+    public partial class appfeature
     {
     }
 }

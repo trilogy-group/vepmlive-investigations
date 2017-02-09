@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using OnlineLicensing.Api;
 using OnlineLicensing.Api.Exceptions;
 
 namespace AdminSite.WebControls.Product
 {
-    public partial class AddEditProduct : System.Web.UI.UserControl
+    public partial class AddEditProduct : BaseWebControl
     {
         private bool EditMode => Request["edit"] == "1";
         private bool DeleteMode => Request["del"] == "1";
@@ -44,6 +39,8 @@ namespace AdminSite.WebControls.Product
 
         private bool SaveProduct()
         {
+            if (!ValidateForm()) return false;
+
             if (!EditMode && !DeleteMode)
             {
                 try
@@ -87,6 +84,22 @@ namespace AdminSite.WebControls.Product
                     return false;
                 }
             }
+            return true;
+        }
+
+        private bool ValidateForm()
+        {
+            if (string.IsNullOrWhiteSpace(txtSKU.Text))
+            {
+                lblMessage.Text = "Please enter the SKU #.";
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(txtName.Text))
+            {
+                lblMessage.Text = "Please enter the  Product name.";
+                return false;
+            }
+
             return true;
         }
     }

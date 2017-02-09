@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingSite", "BillingSite\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLicensing.Api", "OnlineLicensing.Api\OnlineLicensing.Api.csproj", "{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLicensing.ApiTests", "OnlineLicensing.ApiTests\OnlineLicensing.ApiTests.csproj", "{A9DAD9DB-4360-4C2C-8A6E-2FF6E43A2AA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9DAD9DB-4360-4C2C-8A6E-2FF6E43A2AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9DAD9DB-4360-4C2C-8A6E-2FF6E43A2AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9DAD9DB-4360-4C2C-8A6E-2FF6E43A2AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9DAD9DB-4360-4C2C-8A6E-2FF6E43A2AA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

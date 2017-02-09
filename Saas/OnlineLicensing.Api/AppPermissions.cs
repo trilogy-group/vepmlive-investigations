@@ -1,4 +1,4 @@
-﻿namespace AdminSite
+﻿namespace OnlineLicensing.Api
 {
     public enum AppPermissions
     {

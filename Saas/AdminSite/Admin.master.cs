@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.IO;
 using System.Data.SqlClient;
 using AdminSite;
+using OnlineLicensing.Api;
 
 public partial class MasterPage : System.Web.UI.MasterPage
 {
