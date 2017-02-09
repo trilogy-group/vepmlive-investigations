@@ -305,6 +305,8 @@
                 <%=sbInactiveLicenses.ToString()%>
             </div>
         </div>
+
+
         <div id="a5" name="Users" width="90px">
             <div style="padding: 5px">
                 <b>SharePoint Users</b>

@@ -92,6 +92,7 @@
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="LicenseFrequencyType.cs" />
+    <Compile Include="LicenseManager.cs" />
     <Compile Include="ProductCatalogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
