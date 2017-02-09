@@ -20,7 +20,7 @@ public partial class MasterPage : System.Web.UI.MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        strMenus = new string[15];
+        strMenus = new string[16];
         strCurrentUser = HttpContext.Current.User.Identity.Name;
         curPage = Path.GetFileName(Page.Request.Path).ToLower();
 
@@ -91,6 +91,10 @@ public partial class MasterPage : System.Web.UI.MasterPage
             case "newzuoraorder.aspx":
                 checkPermissions(AppPermissions.CreateZuoraOrders);
                 strMenus[0] = "current";
+                break;
+            case "manageproducts.aspx":
+                checkPermissions(AppPermissions.AdminSitePermissions);
+                strMenus[15] = "current";
                 break;
         }        
     }

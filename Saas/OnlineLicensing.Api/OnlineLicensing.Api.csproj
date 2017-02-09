@@ -66,6 +66,7 @@
     <Compile Include="Data\LICENSEPRODUCT.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\LICENSEPRODUCT.Partial.cs" />
     <Compile Include="Data\LicensingModel.Partial.cs" />
     <Compile Include="Data\LicensingModel.Context.cs">
       <AutoGen>True</AutoGen>
@@ -91,6 +92,8 @@
     <Compile Include="Data\vwAccountOrder.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Exceptions\LicenseProductInUseException.cs" />
+    <Compile Include="Exceptions\LicensingException.cs" />
     <Compile Include="LicenseFrequencyType.cs" />
     <Compile Include="ProductCatalogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

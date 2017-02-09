@@ -10,6 +10,6 @@
 namespace AdminSite {
     
     
-    public partial class addproduct {
+    public partial class manageproducts {
     }
 }
