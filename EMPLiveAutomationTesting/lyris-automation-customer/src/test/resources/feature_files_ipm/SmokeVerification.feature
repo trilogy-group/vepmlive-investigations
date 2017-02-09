@@ -30,17 +30,25 @@ Feature: Smoke Tests
     And I Select 'Project Health' from the list
     Then Project health view should get displayed
 
-#C829743: Submit Timesheet
+#C829790: Add an Item from Social Stream
   @Ready
-  Scenario: Submit Timesheet
+  Scenario: Add an Item from Social Stream
     Given execute before conditions
-    When I click on 'My Workplace' from left panel
-    And Click on 'My Timesheet'
-    Then The 'My Timesheet' page should be displayed
-    And Click on 'Add Work'
-    Then Tasks assigned to user will be displayed
-    When I Select tasks and click on 'Add'
-    Then Selected task should be displayed in Timesheet page
-    When I click on 'Save' button
-    And Click on 'Submit' button
-    #Then Timesheet should be submitted
+    When Click on 'More' option to view all available options in social stream
+    And Click on any of the link say : Project
+    Then A new item page form should be displayed
+    When I Provide value in required fields and I click on save button
+    Then An Item will create and will get display in social stream
+
+#C829751: Create and Remove Workspace
+  @Ready
+  Scenario: Create and Remove Workspace
+    Given execute before conditions
+    When I click on 'My Workspace' from left panel
+    And I click on 'New Workspace'
+    Then The 'Create Workspace' popup should be displayed
+    When I  provide Workspace name and description
+    And I select Permission as Private or Open
+    And I select any of the Online Template Like: Blank, Collaborative, PPM, Project
+    And I click on 'Create Workspace'
+    Then newly added workspace name would be displayed under 'Workspaces' panel

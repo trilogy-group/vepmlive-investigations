@@ -21,6 +21,8 @@ public class SmokeVerificationStepDefinition {
 
     private String createdChangeTitle;
     private String workassigned;
+    private String createdProjectName;
+    private String createdWorkSpaceName;
     private WebDriverWait wait = new WebDriverWait(driver, 60);
 
     @When("^I click on Changes on the left panel$")
@@ -282,5 +284,152 @@ public class SmokeVerificationStepDefinition {
     public void selectedTaskShouldBeDisplayedInTimesheetPage() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='TS0Main']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")));
         assertTrue("task not displayed in timesheet", !driver.findElements(By.xpath(".//*[@id='TS0Main']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")).isEmpty());
+    }
+
+    @When("^Click on 'More' option to view all available options in social stream$")
+    public void clickOnMoreOptionToViewAllAvailableOptionsInSocialStream() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span")));
+        driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a")));
+    }
+
+    @And("^Click on any of the link say : Project$")
+    public void clickOnAnyOfTheLinkSayProject() throws Throwable {
+        Thread.sleep(10000);
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+    }
+
+    @Then("^A new item page form should be displayed$")
+    public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Center - New Item"));
+    }
+
+    @When("^I Provide value in required fields and I click on save button$")
+    public void iprovideValueInRequiredFields() throws Throwable {
+        createdProjectName = "aaaProjName" + System.currentTimeMillis() / 1000L;
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame(3);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+        driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdProjectName);
+        driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys("testing");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
+        driver.findElement(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
+    }
+
+    @Then("^An Item will create and will get display in social stream$")
+    public void anItemWillCreateAndWillGetDisplayInSocialStream() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[contains(text(), '" + createdProjectName + "')]")));
+        if (!driver.findElements(By.xpath("//a[contains(text(), '" + createdProjectName + "')]")).isEmpty()) {
+            assertTrue("", true);
+        } else {
+            assertTrue("", false);
+        }
+    }
+
+    @When("^I click on 'My Workspace' from left panel$")
+    public void iClickOnMyWorkspaceFromLeftPanel() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
+        driver.findElement(By.id("epm-nav-top-workspaces")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+    }
+
+    @And("^I click on 'New Workspace'$")
+    public void iClickOnNewWorkspace() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+    }
+
+    @Then("^The 'Create Workspace' popup should be displayed$")
+    public void theCreateWorkspacePopupShouldBeDisplayed() throws Throwable {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Create Workspace"));
+    }
+
+    @When("^I  provide Workspace name and description$")
+    public void iProvideWorkspaceNameAndDescription() throws Throwable {
+        createdWorkSpaceName = "aaaWorksapce" + System.currentTimeMillis() / 1000L;
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame(3);
+        driver.findElement(By.id("tbWsName")).sendKeys(createdWorkSpaceName);
+    }
+
+    @And("^I select Permission as Private or Open$")
+    public void iSelectPermissionAsPrivateOrOpen() throws Throwable {
+    }
+
+    @And("^I select any of the Online Template Like: Blank, Collaborative, PPM, Project$")
+    public void iSelectAnyOfTheOnlineTemplateLikeBlankCollaborativePPMProject() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='onlineTemplates']/div[2]/ol/li[1]/img")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='onlineTemplates']/div[2]/ol/li[1]/img"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+    }
+
+    @And("^I click on 'Create Workspace'$")
+    public void iClickOnCreateWorkspace() throws Throwable {
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='OuterContainer']/div[2]/button[1]")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='OuterContainer']/div[2]/button[1]"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+
+    }
+
+    @Then("^after some time user will get a notification on right top corner that 'Workspace is created successfully'$")
+    public void afterSomeTimeUserWillGetANotificationOnRightTopCornerThatWorkspaceIsCreatedSuccessfully() throws Throwable {
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='toast-container']/div")));
+        } catch (Exception e) {
+            System.out.println("Workspace popup not displayed");
+        }
+    }
+
+    @Then("^newly added workspace name would be displayed under 'Workspaces' panel$")
+    public void newlyAddedWorkspaceNameWouldBeDisplayedUnderWorkspacesPanel() throws Throwable {
+        driver.navigate().refresh();
+        Thread.sleep(10000);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
+        driver.findElement(By.id("epm-nav-top-workspaces")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
+        if (!driver.findElements(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")).isEmpty()) {
+            assertTrue("", true);
+        } else {
+            assertTrue("", false);
+        }
+    }
+
+    @And("^I remove a workspace$")
+    public void iRemoveAWorkspace() throws Throwable {
+        WebElement element = driver.findElement(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]"));
+        WebElement parent = element.findElement(By.xpath(".."));
+        WebElement Grandparent = parent.findElement(By.xpath(".."));
+        WebElement menuElem = Grandparent.findElement(By.xpath("./Span[@class='epm-menu-btn']"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", menuElem);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='menu']/li[1]/a")));
+        WebElement removeElem = driver.findElement(By.xpath(".//*[@id='menu']/li[1]/a"));
+        executor.executeScript("arguments[0].click();", removeElem);
+        Thread.sleep(10000);
+    }
+
+    @Then("^workspace should be removed$")
+    public void workspaceShouldBeRemoved() throws Throwable {
+        System.out.println("createdWorkSpaceName :" + createdWorkSpaceName);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("EPMNavWSTSearch")));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("window.document.getElementById('EPMNavWSTSearch').click()");
+        driver.switchTo().activeElement().sendKeys(createdWorkSpaceName);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")));
+        assertTrue("", driver.findElement(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")).getText().contains("No search results"));
     }
 }
