@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Text;
 using System.Collections.Generic;
+using OnlineLicensing.Api;
 
 namespace AdminSite
 {
@@ -266,7 +267,7 @@ namespace AdminSite
                 }
             }
 
-            fillLicensesTab();
+            FillLicensesTab();
 
             //Plimus
             DataTable dtOrders = new DataTable();
@@ -462,7 +463,7 @@ namespace AdminSite
             cn.Close();
         }
 
-        private void fillLicensesTab()
+        private void FillLicensesTab()
         {
             List<LicenseOder> activeLicenses = new List<LicenseOder>
             {
@@ -474,7 +475,7 @@ namespace AdminSite
                 }
             };
 
-            GridViewActiveLicenses.DataSource = activeLicenses;
+            GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(12249); //get the reference number from the account number
             GridViewActiveLicenses.DataBind();
         }
 
