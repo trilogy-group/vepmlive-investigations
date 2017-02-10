@@ -405,11 +405,15 @@ public class SmokeVerificationStepDefinition {
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
         Thread.sleep(10000);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
-        if (!driver.findElements(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")).isEmpty()) {
-            assertTrue("", true);
-        } else {
-            assertTrue("", false);
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
+            if (!driver.findElements(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")).isEmpty()) {
+                assertTrue("", true);
+            } else {
+                assertTrue("", false);
+            }
+        } catch (Exception e) {
+            System.out.println("WorkSpace not found");
         }
     }
 
