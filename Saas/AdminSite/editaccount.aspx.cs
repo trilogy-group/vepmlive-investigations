@@ -465,26 +465,22 @@ namespace AdminSite
 
         private void FillLicensesTab()
         {
-            List<LicenseOder> activeLicenses = new List<LicenseOder>
-            {
-                new LicenseOder
-                {
-                    Product = "EPM Live Online",
-                    Features = $"Team Members: 15 <br /> Full Users: 4",
-                    ExpirationDate = DateTime.Now.ToShortDateString()
-                }
-            };
+            //List<LicenseOder> activeLicenses = new List<LicenseOder>
+            //{
+            //    new LicenseOder
+            //    {
+            //        Product = "EPM Live Online",
+            //        Features = $"Team Members: 15 <br /> Full Users: 4",
+            //        ExpirationDate = DateTime.Now.ToShortDateString()
+            //    }
+            //};
 
-            GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(12249); //get the reference number from the account number
+            var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
+            GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(accountRef); //get the reference number from the account number
             GridViewActiveLicenses.DataBind();
         }
 
-        private class LicenseOder
-        {
-            public string Product { get; set; }
-            public string Features { get; set; }
-            public string ExpirationDate { get; set; }
-        }
+       
 
         protected void gvTickets_RowCommand(object sender, GridViewCommandEventArgs e)
         {
