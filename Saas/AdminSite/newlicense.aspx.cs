@@ -24,7 +24,11 @@ namespace AdminSite
 
             foreach (var item in Products)
             {
-                DropDownProductCatalog.Items.Add(item);
+                DropDownProductCatalog.Items.Add(new ListItem
+                {
+                    Text = "Epm Live Online",
+                    Value = "9"
+                });
             }
 
             //TODO: Add the product catalog manager to get the enabled products from the catalog, should only return epm live online
@@ -78,6 +82,7 @@ namespace AdminSite
             var accountRef = AccountManager.GetAccountReference(accountId);
             var activationDate = Convert.ToDateTime(TxtActivationDate.Text);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Text);
+            var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
             var featureList = new List<Tuple<int, int>>();
 
             foreach (TableRow item in table.Rows)
@@ -90,7 +95,7 @@ namespace AdminSite
 
             using (var license = new LicenseManager())
             {
-                license.AddLicense(accountRef, activationDate, expirationDate, featureList);
+                license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
             }
         }
 
