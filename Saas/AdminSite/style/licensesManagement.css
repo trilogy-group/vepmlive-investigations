@@ -15,6 +15,14 @@
         padding-right: 20px;
     }
 
+    #newLicenseForm fieldset {
+        background-color:#F7F7DE;
+    }
+
+    #newLicenseForm fieldset legend {
+        font-weight: bold;
+    }
+
 br {
     clear: left;
 }
@@ -26,4 +34,5 @@ input[type=submit], input.button {
     color: #FFF;
     width: 64px;
     cursor: pointer;
+    margin: 5px;
 }

@@ -15,11 +15,14 @@ namespace AdminSite
         protected void Page_Load(object sender, EventArgs e)
         {
             PopulateProductCatalog();
-            PopulateFeatureList();
+            PopulateFeatureList();           
         }
 
         private void PopulateProductCatalog()
         {
+
+            var product = ProductCatalogManager.GetAllProducts();
+
             List<string> Products = new List<string>() { "Epm Live Online" };
 
             foreach (var item in Products)
@@ -57,15 +60,16 @@ namespace AdminSite
 
             foreach (var item in list)
             {
-                TableRow row = new TableRow();
-                TableCell cell = new TableCell();
+                var row = new TableRow();
+                var cell = new TableCell();
 
                 var tb = new TextBox() { ID = $" {item.Name.Replace(" ", "") }Qty" };
                 var label = new Label() { Text = item.Name, ID = item.Id.ToString() };
-
+                var validator = new RegularExpressionValidator() { ControlToValidate = tb.ID, ValidationExpression = @"\d+", ErrorMessage = "Only Numbers allowed" };
 
                 cell.Controls.Add(label);
                 cell.Controls.Add(tb);
+                cell.Controls.Add(validator);
 
                 row.Cells.Add(cell);
                 table.Rows.Add(row);
@@ -76,19 +80,18 @@ namespace AdminSite
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
-            //TODO: Get the account Id from the request object
-            Guid accountId = Guid.Parse("5448E44C-64AB-415D-A6D8-7E22F3EF7BD2");
+            Guid accountId = Guid.Parse(Request["accountId"]);
 
             var accountRef = AccountManager.GetAccountReference(accountId);
-            var activationDate = Convert.ToDateTime(TxtActivationDate.Text);
-            var expirationDate = Convert.ToDateTime(TxtExpirationDate.Text);
+            var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
+            var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
             var featureList = new List<Tuple<int, int>>();
 
             foreach (TableRow item in table.Rows)
             {
                 var featureId = Convert.ToInt32(item.Cells[0].Controls[0].ID);
-                var quantity = Convert.ToInt32((item.Cells[0].Controls[1] as TextBox).Text);
+                var quantity = Convert.ToInt32(string.IsNullOrEmpty((item.Cells[0].Controls[1] as TextBox).Text) ? "0" : (item.Cells[0].Controls[1] as TextBox).Text);
 
                 featureList.Add(new Tuple<int, int>(featureId, quantity));
             }
@@ -97,6 +100,14 @@ namespace AdminSite
             {
                 license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
             }
+
+            var script = string.Format(@"
+                <script>
+                    parent.location.href='editaccount.aspx?account_id={0}&tab=4';
+                </script>
+            ", Request["accountId"]);
+
+            ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
         }
 
         private class FeatureClass

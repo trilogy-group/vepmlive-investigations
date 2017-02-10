@@ -55,7 +55,7 @@ namespace AdminSite {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TxtActivationDate;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtActivationDate;
         
         /// <summary>
         /// Label3 control.
@@ -73,7 +73,7 @@ namespace AdminSite {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TxtExpirationDate;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtExpirationDate;
         
         /// <summary>
         /// featureListInnerDiv control.
@@ -92,5 +92,14 @@ namespace AdminSite {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button Button1;
+        
+        /// <summary>
+        /// Button2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Button2;
     }
 }
