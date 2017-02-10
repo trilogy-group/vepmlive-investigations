@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountManager.cs" />
     <Compile Include="AppPermissions.cs" />
     <Compile Include="Data\ACCOUNT.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>

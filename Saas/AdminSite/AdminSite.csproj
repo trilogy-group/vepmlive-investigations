@@ -249,6 +249,7 @@
     <Content Include="style\arrow.png" />
     <Content Include="style\arrow_select.png" />
     <Content Include="style\gallery.jpg" />
+    <Content Include="style\licensesManagement.css" />
     <Content Include="style\logo.gif" />
     <Content Include="style\logo.jpg" />
     <Content Include="style\main.png" />

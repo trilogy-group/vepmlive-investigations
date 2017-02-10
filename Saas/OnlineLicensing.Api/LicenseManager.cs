@@ -11,44 +11,45 @@ namespace OnlineLicensing.Api
     {
         protected bool Disposed { get; private set; }
 
-        public static IEnumerable<vwAccountOrder> GetAllActiveLicenses(int accountRef)
+        public static IEnumerable<vwAccountOrder> GetAllLicenses()
         {
-            using (var context = ConnectionHelper.CreateLicensingModel("server=win-6j09gf4nbp8;database=EPMLIVEdb;User ID=epmlivedb;Password=MCjhfd4562D^7"))
+            using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.vwAccountOrders.Where(l => l.account_ref == accountRef).ToList().AsEnumerable();
+                return context.vwAccountOrders.ToList().AsEnumerable(); //for that particular order
             }
+            
         }
 
-        public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, List<Tuple<int, int>> FeatureList)
+        public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, List<Tuple<int,int>> FeatureList)
         {
             using (var context = ConnectionHelper.CreateLicensingModel("server=win-6j09gf4nbp8;database=EPMLIVEdb;User ID=epmlivedb;Password=MCjhfd4562D^7"))
             {
                 var orderToAdd = new ORDER()
                 {
                     order_id = Guid.NewGuid(),
-                    account_ref = accountRef,
-                    activation = activationDate,
-                    expiration = expirationDate,
+                    account_ref = accountRef, 
+                    activation = activationDate, 
+                    expiration = expirationDate, 
                     contractid = "50000010",
 
-                    plimusReferenceNumber = "00000",
+                    plimusReferenceNumber = "00000", 
                     quantity = 1,
                     version = 2,
                     billingsystem = 3
-                };
+            };
 
                 foreach (var item in FeatureList)
                 {
                     orderToAdd.ORDERDETAILs.Add(AddLicenseDetails(orderToAdd.order_id, item));
                 }
-
+                
                 context.ORDERS.Add(orderToAdd);
                 context.SaveChanges();
 
             }
         }
 
-        public ORDERDETAIL AddLicenseDetails(Guid orderId, Tuple<int, int> Feature)
+        public ORDERDETAIL AddLicenseDetails(Guid orderId, Tuple<int,int> Feature )
         {
             return new ORDERDETAIL
             {
