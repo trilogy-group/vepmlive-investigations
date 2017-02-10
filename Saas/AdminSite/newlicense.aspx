@@ -17,13 +17,19 @@
               $(".datepicker").datepicker({
                   changeMonth: true,
                   changeYear: true
+                  
               });
+
+              $(".readonly").keydown(function (e) {
+                  e.preventDefault();
+              });
+
           } );
     </script>
 
 </head>
 <body>
-    <form id="newLicenseForm" runat="server">
+    <form id="newLicenseForm" runat="server" novalidate="novalidate">
     <div>
 
         <fieldset>
@@ -36,12 +42,12 @@
             <br />
 
             <asp:Label ID="Label2" runat="server" Text="Activation Date"></asp:Label>
-            <asp:TextBox class="datepicker" ID="TxtActivationDate" runat="server"></asp:TextBox>
-
+            <input type="text" class="datepicker readonly" runat="server" id="TxtActivationDate" required="required" />
+           
             <br />
 
             <asp:Label ID="Label3" runat="server" Text="Expiration Date"></asp:Label>
-            <asp:TextBox class="datepicker" ID="TxtExpirationDate" runat="server"></asp:TextBox>
+            <input type="text" class="datepicker readonly" runat="server" id="TxtExpirationDate" required="required" />
 
         </fieldset>
 
@@ -57,8 +63,8 @@
         
         <br />
 
-        <asp:Button ID="Button1" runat="server" Text="Add License" OnClick="btnSubmit_Click" />
-
+        <asp:Button ID="Button1" runat="server" Text="Add License"  OnClick="btnSubmit_Click" />
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseAddLicenseModal()"/>
     </div>
     </form>
 </body>
