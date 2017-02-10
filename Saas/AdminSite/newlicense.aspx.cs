@@ -20,7 +20,6 @@ namespace AdminSite
 
         private void PopulateProductCatalog()
         {
-
             var product = ProductCatalogManager.GetAllProducts();
 
             List<string> Products = new List<string>() { "Epm Live Online" };
@@ -80,6 +79,8 @@ namespace AdminSite
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
+            //TODO: check for active licenses for that product, what to do if a license is active for that product?
+
             Guid accountId = Guid.Parse(Request["accountId"]);
 
             var accountRef = AccountManager.GetAccountReference(accountId);

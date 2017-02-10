@@ -58,9 +58,11 @@ namespace OnlineLicensing.Api
                     product_id = productId,
                      
                     contractid = "50000010",
-                    plimusReferenceNumber = "00000", 
+                    plimusReferenceNumber = "00000",
+                    dtcreated = DateTime.Now, 
                     quantity = 1,
                     version = 2,
+                    enabled = true,
                     billingsystem = 3
             };
 
