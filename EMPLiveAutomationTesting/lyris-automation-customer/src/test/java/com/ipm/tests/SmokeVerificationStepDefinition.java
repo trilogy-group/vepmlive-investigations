@@ -291,8 +291,10 @@ public class SmokeVerificationStepDefinition {
     @When("^Click on 'More' option to view all available options in social stream$")
     public void clickOnMoreOptionToViewAllAvailableOptionsInSocialStream() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span")));
-        driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a")));
     }
 
     @And("^Click on any of the link say : Project$")
