@@ -112,6 +112,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'Delete' button$")
     public void iClickOnDeleteButton() throws Throwable {
+        Thread.sleep(10000);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
