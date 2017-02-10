@@ -78,7 +78,9 @@ public class TaskIssiuRiskMgmtStepDefinition {
     @When("^I click on 'Edit Item' button$")
     public void iClickOnEditItemButton() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")));
-        driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")).click();
+        WebElement menuElem = driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", menuElem);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
     }
 
