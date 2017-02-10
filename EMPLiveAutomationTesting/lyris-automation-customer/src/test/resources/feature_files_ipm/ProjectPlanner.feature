@@ -4,7 +4,7 @@ Feature: Add, Edit and Delete Project
   @Ready
   Scenario: Add, Edit and Delete Project
     Given execute before conditions
-    And I Open project planer url
+    And I click on project panel
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
@@ -27,7 +27,7 @@ Feature: Add, Edit and Delete Project
   @Ready
   Scenario: Add resources to project and assign tasks to them
     Given execute before conditions
-    And I Open project planer url
+    And I click on project panel
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
@@ -62,7 +62,7 @@ Feature: Add, Edit and Delete Project
   @Ready
   Scenario: Edit Resource plan
     Given execute before conditions
-    And I Open project planer url
+    And I click on project panel
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"

@@ -71,6 +71,7 @@ public class ProjectPlannerDefinition {
     @Given("^I Open project planer url")
     public void openProjectCenter() {
         System.out.println("Open Projectplanner");
+
         driver.navigate().to("http://qaepmlive6/Lists/Project%20Center/Executive%20Summary.aspx");
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
@@ -79,7 +80,13 @@ public class ProjectPlannerDefinition {
     public void clickToLaftpanel() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("EPMLiveNavt3")));
-        driver.findElement(By.id("EPMLiveNavt3")).click();
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementById('EPMLiveNavt3').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+        wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
         Thread.sleep(10000);
     }
 
@@ -581,7 +588,13 @@ public class ProjectPlannerDefinition {
     public void iClickOnPublish() throws Throwable {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")));
-        driver.findElement(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")).click();
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementById('Ribbon.WorkPlanner.StandardGroup.PublishButton-Large').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+
         Thread.sleep(10000);
     }
 
