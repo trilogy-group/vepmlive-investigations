@@ -17,7 +17,6 @@ namespace OnlineLicensing.Api
             {
                 return context.vwAccountOrders.ToList().AsEnumerable(); //for that particular order
             }
-            
         }
 
         public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, List<Tuple<int,int>> FeatureList)
