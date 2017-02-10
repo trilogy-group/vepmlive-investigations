@@ -1,0 +1,29 @@
+﻿
+#newLicenseForm {
+    padding: 10px;
+}
+
+    #newLicenseForm span, #newLicenseForm input {
+        display: block;
+        width: 150px; /*change to percent, 100 maybe*/
+        float: left;
+        margin-bottom: 10px;
+    }
+
+    #newLicenseForm span {
+        text-align: right;
+        padding-right: 20px;
+    }
+
+br {
+    clear: left;
+}
+
+input[type=submit], input.button {
+    background: #605D58;
+    border: 0px;
+    padding: 1px;
+    color: #FFF;
+    width: 64px;
+    cursor: pointer;
+}
