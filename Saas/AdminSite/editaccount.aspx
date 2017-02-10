@@ -4,6 +4,21 @@
 
     <link rel="STYLESHEET" type="text/css" href="modal/modal.css">
     <link rel="STYLESHEET" type="text/css" href="dhtmlxtab/dhtmlxtabbar.css" />
+    <style>
+        input[type=button]
+            { background: #605D58; 
+              border: 0px; 
+              padding: 4px;
+              color: #FFF;
+              width: 65px;
+              cursor: pointer;
+             }
+
+        #AddLicenseButton {
+            width: 100px;
+        }
+    </style>
+
     <script src="dhtmlxtab/dhtmlxcommon.js"></script>
     <script src="dhtmlxtab/dhtmlxtabbar.js"></script>
     <script src="dhtmlxtab/dhtmlxtabbar_start.js"></script>
@@ -299,12 +314,60 @@
             </div>
         </div>
         <div id="a4" name="Licenses" width="90px">
-            <div style="padding: 5px">
-                <%=sbActiveLicenses.ToString()%>
-                <a href="newlicense.aspx?account_id=<%=strAccountId %>">[Add License]</a>
-                <%=sbInactiveLicenses.ToString()%>
-            </div>
+        <div style="padding:5px">
+            <br />
+            
+            <%-- add a grid to display all the orders for this account --%>
+
+            <b>Active Licenses</b> <br /><br />
+            <asp:GridView Width="96%" RowStyle-HorizontalAlign="Left"  ID="GridViewActiveLicenses" runat="server" AutoGenerateColumns="False" CellPadding="4" ForeColor="Black" GridLines="Vertical" BackColor="White" BorderColor="#DEDFDE" BorderWidth="1px">
+                <Columns>
+                   
+                    <asp:BoundField DataField="product" HeaderText="Product">
+                        <ItemStyle HorizontalAlign="left"/>
+                    </asp:BoundField>
+                    <asp:BoundField DataField="features" HeaderText="Features" HtmlEncode="false">
+                        <ItemStyle HorizontalAlign="left" />
+                    </asp:BoundField>
+                    <asp:BoundField DataField="expirationdate" HeaderText="Expiration Date">
+                        <ItemStyle HorizontalAlign="left" />
+                    </asp:BoundField>
+                    <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+                        <ItemTemplate>
+                            <input type="button" value="View" />
+                         </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                        <ItemTemplate>
+                             <input type="button" value="Extend" />
+                         </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                        <ItemTemplate>
+                            <input type="button" value="Renew" />
+                         </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                        <ItemTemplate>
+                            <input type="button" value="Rebuke" />
+                            <%--<asp:LinkButton ID="DeleteLicenses" runat="server" CausesValidation="false" CommandName="DeleteLicense" Text="Delete" OnClientClick="return confirm('Are you certain you want to delete this item?');"></asp:LinkButton>--%>
+                         </ItemTemplate>
+                    </asp:TemplateField>
+                </Columns>
+                <FooterStyle BackColor="#CCCC99"/>
+                <RowStyle BackColor="#F7F7DE"  HorizontalAlign="Center"/>
+                <PagerStyle BackColor="#F7F7DE" ForeColor="Black" HorizontalAlign="Right" />
+                <SelectedRowStyle BackColor="#CE5D5A" Font-Bold="True" ForeColor="White" />
+                <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />
+                <AlternatingRowStyle BackColor="White" HorizontalAlign="Center" />
+            </asp:GridView>
+
+            <br />
+
+            <input type="button" id="AddLicenseButton" value="New License" />
+
         </div>
+    </div>
         <div id="a5" name="Users" width="90px">
             <div style="padding: 5px">
                 <b>SharePoint Users</b>

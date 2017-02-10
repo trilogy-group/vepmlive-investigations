@@ -10,6 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Text;
+using System.Collections.Generic;
 
 namespace AdminSite
 {
@@ -265,7 +266,7 @@ namespace AdminSite
                 }
             }
 
-
+            fillLicensesTab();
 
             //Plimus
             DataTable dtOrders = new DataTable();
@@ -461,7 +462,28 @@ namespace AdminSite
             cn.Close();
         }
 
-        
+        private void fillLicensesTab()
+        {
+            List<LicenseOder> activeLicenses = new List<LicenseOder>
+            {
+                new LicenseOder
+                {
+                    Product = "EPM Live Online",
+                    Features = $"Team Members: 15 <br /> Full Users: 4",
+                    ExpirationDate = DateTime.Now.ToShortDateString()
+                }
+            };
+
+            GridViewActiveLicenses.DataSource = activeLicenses;
+            GridViewActiveLicenses.DataBind();
+        }
+
+        private class LicenseOder
+        {
+            public string Product { get; set; }
+            public string Features { get; set; }
+            public string ExpirationDate { get; set; }
+        }
 
         protected void gvTickets_RowCommand(object sender, GridViewCommandEventArgs e)
         {
@@ -607,8 +629,6 @@ namespace AdminSite
             string _uid;
 
             DataControlRowType _rowType;
-
-
 
             public DynamicGridViewURLTemplate(string uid, DataControlRowType RowType)
             {
