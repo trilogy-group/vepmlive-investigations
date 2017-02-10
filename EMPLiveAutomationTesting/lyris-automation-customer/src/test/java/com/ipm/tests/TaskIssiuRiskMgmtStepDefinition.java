@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {AbstractCoreTest.class})
 public class TaskIssiuRiskMgmtStepDefinition {
 
-    private WebDriverWait wait = new WebDriverWait(driver, 60);
+    private WebDriverWait wait = new WebDriverWait(driver, 120);
     private String createdTaskName;
     private String createdRiskName;
     private String createdIssueName;
@@ -123,7 +123,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     public void taskShouldBeDeleted() throws Throwable {
         searchForCreatedTask(createdTaskName);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
-        assertEquals("Task Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+        assertTrue("Task Not Deleted", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText().contains("No data found"));
     }
 
     public void searchForCreatedTask(String projectname) {

@@ -117,7 +117,9 @@ public class SmokeVerificationStepDefinition {
     @When("^I click on 'Delete' button in change item$")
     public void iClickOnDeleteButtonInChangeItem() throws Throwable {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
-        driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
+        WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
         Thread.sleep(10000);
     }
 

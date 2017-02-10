@@ -346,7 +346,7 @@ public class ProjectPlannerDefinition {
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
 
-    public void searchForCreatedTask(String projectname) {
+    public void searchForCreatedTask(String projectname) throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")).click();
@@ -354,7 +354,7 @@ public class ProjectPlannerDefinition {
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).click();
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(projectname);
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(Keys.RETURN);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(10000);
     }
 
     public void selectFirstProject() {
@@ -627,7 +627,14 @@ public class ProjectPlannerDefinition {
     @And("^Task created should be saved$")
     public void taskCreatedShouldBeSaved() throws Throwable {
         searchForCreatedTask(createdTask);
-        assertTrue("Task Created Not Saved", !driver.findElements(By.xpath(".//*[@id='GanttGrid1Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr")).isEmpty());
+//        assertTrue("Task Created Not Saved", !driver.findElements(By.xpath(".//*[@id='GanttGrid1Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr")).isEmpty());
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[contains(text(), '" + createdTask + "')]")));
+        if (!driver.findElements(By.xpath("//a[contains(text(), '" + createdTask + "')]")).isEmpty()) {
+            assertTrue("", true);
+        } else {
+            assertTrue("", false);
+        }
     }
 
     @When("^I click on 'Edit Cost'$")
