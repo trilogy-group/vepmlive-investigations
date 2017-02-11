@@ -35,6 +35,7 @@ namespace OnlineLicensing.Api
 
                     yield return new LicenseOder
                     { 
+                        ProductId = Convert.ToInt32(item.product_id),
                         Product = productName,
                         Features = featureDetails.ToString(),
                         ExpirationDate = item.expiration.ToShortDateString()
@@ -88,6 +89,11 @@ namespace OnlineLicensing.Api
             };
         }
 
+        public bool ValidateSingleActiveLicenseForProduct(int ProductID, int accountRef)
+        {
+            return GetAllActiveLicenses(accountRef).Any(al => al.ProductId == ProductID);
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -102,6 +108,7 @@ namespace OnlineLicensing.Api
 
     public class LicenseOder
     {
+        public int ProductId { get; set; }
         public string Product { get; set; }
         public string Features { get; set; }
         public string ExpirationDate { get; set; }

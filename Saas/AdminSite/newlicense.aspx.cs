@@ -83,16 +83,26 @@ namespace AdminSite
 
             using (var license = new LicenseManager())
             {
-                license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
+
+                if (license.ValidateSingleActiveLicenseForProduct(productId, accountRef))
+                {
+                    errorLabel.InnerText = $"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }";
+                    errorLabel.Visible = true;
+                    PopulateFeatureList();
+                }
+                else
+                {
+                    license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
+
+                    var script = string.Format(@"
+                        <script>
+                            parent.location.href='editaccount.aspx?account_id={0}&tab=4';
+                        </script>
+                    ", Request["accountId"]);
+
+                    ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
+                }
             }
-
-            var script = string.Format(@"
-                <script>
-                    parent.location.href='editaccount.aspx?account_id={0}&tab=4';
-                </script>
-            ", Request["accountId"]);
-
-            ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
         }
 
         protected void DropDownProductCatalog_SelectedIndexChanged(object sender, EventArgs e)

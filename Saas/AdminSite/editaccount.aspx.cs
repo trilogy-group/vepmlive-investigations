@@ -465,16 +465,6 @@ namespace AdminSite
 
         private void FillLicensesTab()
         {
-            //List<LicenseOder> activeLicenses = new List<LicenseOder>
-            //{
-            //    new LicenseOder
-            //    {
-            //        Product = "EPM Live Online",
-            //        Features = $"Team Members: 15 <br /> Full Users: 4",
-            //        ExpirationDate = DateTime.Now.ToShortDateString()
-            //    }
-            //};
-
             var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
             GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(accountRef); //get the reference number from the account number
             GridViewActiveLicenses.DataBind();

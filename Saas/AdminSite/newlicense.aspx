@@ -29,9 +29,11 @@
 
 </head>
 <body>
-    <form id="newLicenseForm" runat="server" novalidate="novalidate">
+    <form id="newLicenseForm" runat="server">
     <div>
-
+        <%--<asp:Label ID="errorLabel" runat="server" Visible="false"></asp:Label>--%>
+        <label  ID="errorLabel" runat="server" Visible="false" style="color:red"></label>
+        <br />
         <fieldset>
             <legend>License Details</legend>
             <br />
@@ -51,7 +53,7 @@
 
         </fieldset>
 
-        <br /><br />
+        <br />
 
         <fieldset>
             <legend>License Features</legend>
