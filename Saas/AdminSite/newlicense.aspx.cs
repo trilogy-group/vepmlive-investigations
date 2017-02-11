@@ -17,8 +17,9 @@ namespace AdminSite
             if (!IsPostBack)
             {
                 PopulateProductCatalog();
-                PopulateFeatureList();
             }
+
+            PopulateFeatureList();
         }
 
         private void PopulateProductCatalog()
@@ -88,7 +89,6 @@ namespace AdminSite
                 {
                     errorLabel.InnerText = $"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }";
                     errorLabel.Visible = true;
-                    PopulateFeatureList();
                 }
                 else
                 {
