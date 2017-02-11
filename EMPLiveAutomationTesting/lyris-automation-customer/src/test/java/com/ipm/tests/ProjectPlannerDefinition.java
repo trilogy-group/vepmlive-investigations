@@ -160,7 +160,7 @@ public class ProjectPlannerDefinition {
     @Then("^I click on edit button")
     public void clickingOnEditbutton() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")));
         driver.findElement(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_ctl04_ctl01_ctl00_ctl00_ctl07_upLevelDiv']")));
         Thread.sleep(10000);
@@ -169,7 +169,7 @@ public class ProjectPlannerDefinition {
     @When("^I click on delete button")
     public void clickingOndeletebutton() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
         Thread.sleep(10000);
     }
@@ -347,17 +347,24 @@ public class ProjectPlannerDefinition {
     @Then("^I Click on Edit Resource Planner")
     public void clickOnEditResourcePlanner() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        //        if (driver instanceof JavascriptExecutor) {
-//            JavascriptExecutor js = (JavascriptExecutor) driver;
-//            js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
-//        } else {
-//            System.out.println("This driver does not support JavaScript!");
-//        }
-        while (!driver.findElements(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")).isEmpty()) {
-            wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
-            driver.findElement(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
+        } else {
+            System.out.println("This driver does not support JavaScript!");
         }
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        } catch (Exception e) {
+            if (driver instanceof JavascriptExecutor) {
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
+            } else {
+                System.out.println("This driver does not support JavaScript!");
+            }
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        }
     }
 
     public void searchForCreatedProject(String projectname) {
@@ -569,9 +576,17 @@ public class ProjectPlannerDefinition {
 
     @And("^I save after editing$")
     public void iClickOnSaveButtonAfterEdit() throws Throwable {
-        driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
+        driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
+        } catch (Exception e) {
+            if (!driver.findElements(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).isEmpty()) {
+                wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
+                driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
+            }
+        }
     }
 
     @And("^I enter Project Work as \"([^\"]*)\"$")
