@@ -206,6 +206,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on edit plan menu")
     public void editPlan() throws InterruptedException {
+        System.out.println("I Click on edit plan menu");
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListItem.EPMLive.Planner-Large")));
         if (driver instanceof JavascriptExecutor) {
