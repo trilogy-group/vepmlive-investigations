@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace OnlineLicensing.Api
 {
+    /// <summary>
+    /// Class to manage all the acount related options.
+    /// </summary>
     public class AccountManager
     {
+        /// <summary>
+        /// Gets the account reference number.
+        /// </summary>
+        /// <param name="accountId">The guid of the account to get the reference from.</param>
+        /// <returns>Returns the account reference number.</returns>
         public static int GetAccountReference(Guid accountId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())

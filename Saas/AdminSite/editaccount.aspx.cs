@@ -463,6 +463,9 @@ namespace AdminSite
             cn.Close();
         }
 
+        /// <summary>
+        /// Fills the licenses tab with active licenses
+        /// </summary>
         private void FillLicensesTab()
         {
             var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));

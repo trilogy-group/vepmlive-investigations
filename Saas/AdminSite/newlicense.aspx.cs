@@ -22,6 +22,9 @@ namespace AdminSite
             PopulateFeatureList();
         }
 
+        /// <summary>
+        /// Populates the product catalog drop down list with active products.
+        /// </summary>
         private void PopulateProductCatalog()
         {
             var Products = ProductCatalogManager.GetAllActiveProducts();
@@ -36,6 +39,9 @@ namespace AdminSite
             }
         }
 
+        /// <summary>
+        /// Populates feature list table with active features for that product.
+        /// </summary>
         private void PopulateFeatureList()
         {
             var featureList = ProductCatalogManager.GenerateProductDetail(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
@@ -64,8 +70,6 @@ namespace AdminSite
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
-            //TODO: check for active licenses for that product, what to do if a license is active for that product?
-
             Guid accountId = Guid.Parse(Request["accountId"]);
 
             var accountRef = AccountManager.GetAccountReference(accountId);

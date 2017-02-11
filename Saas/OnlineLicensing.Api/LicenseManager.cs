@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace OnlineLicensing.Api
 {
+    /// <summary>
+    /// Class to manage all the license related options.
+    /// </summary>
     public class LicenseManager : IDisposable
     {
         protected bool Disposed { get; private set; }
 
+        /// <summary>
+        /// Gets all the licences currently active in the account. Tere should only be one license active per product in the account.
+        /// </summary>
+        /// <param name="accountRef">The account reference number.</param>
+        /// <returns>Return an IEnumerable<LicenseOrder> containing all the active licenses in the account.</returns>
         public static IEnumerable<LicenseOder> GetAllActiveLicenses(int accountRef)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -46,6 +54,14 @@ namespace OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Adds a new license to an account.
+        /// </summary>
+        /// <param name="accountRef">The account reference number.</param>
+        /// <param name="activationDate">The date of activation of the license.</param>
+        /// <param name="expirationDate">The date of expiration of the license.</param>
+        /// <param name="productId">The id of the purchased product.</param>
+        /// <param name="FeatureList">Contains the quantity of seats for every product feature.</param>
         public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, int productId,List<Tuple<int,int>> FeatureList)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -78,22 +94,37 @@ namespace OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Adds a new order detail to an order. The order details contains the information of how many seats are purchased for that license.
+        /// </summary>
+        /// <param name="orderId">The id of the related order</param>
+        /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
+        /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
         public ORDERDETAIL AddLicenseDetails(Guid orderId, Tuple<int,int> Feature )
         {
             return new ORDERDETAIL
             {
                 order_detail_id = Guid.NewGuid(),
                 order_id = orderId,
-                detail_type_id = Feature.Item1, //this is the license type, full user, can be hardcoded 
-                quantity = Feature.Item2 //this value should come as a parameter
+                detail_type_id = Feature.Item1, 
+                quantity = Feature.Item2 
             };
         }
 
+        /// <summary>
+        /// Validates whether an account have an active license for the specified product.
+        /// </summary>
+        /// <param name="ProductID">The id of the product to check for existance.</param>
+        /// <param name="accountRef">The reference to the account with active licenses.</param>
+        /// <returns>Returns true if there is already an active license for that product. Returns false if there isn't an active license for that product.</returns>
         public bool ValidateSingleActiveLicenseForProduct(int ProductID, int accountRef)
         {
             return GetAllActiveLicenses(accountRef).Any(al => al.ProductId == ProductID);
         }
 
+        /// <summary>
+        /// Disposes object to the Garbage Collector.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -106,6 +137,9 @@ namespace OnlineLicensing.Api
         }
     }
 
+    /// <summary>
+    /// Class to represent the purchased licenses in an account.
+    /// </summary>
     public class LicenseOder
     {
         public int ProductId { get; set; }
@@ -114,6 +148,9 @@ namespace OnlineLicensing.Api
         public string ExpirationDate { get; set; }
     }
 
+    /// <summary>
+    /// Class to represent the available features in a product.
+    /// </summary>
     public class FeatureList
     {
         public int Id { get; set; }

@@ -15,6 +15,11 @@ namespace OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Gets all the enabled features for a particular product.
+        /// </summary>
+        /// <param name="productId">The id of the product to get the features from</param>
+        /// <returns>Returns an IEnumerable<FeatureList>containing all the features in a product.</returns>
         public static IEnumerable<FeatureList> GenerateProductDetail(int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -32,6 +37,10 @@ namespace OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Gets all the active products.
+        /// </summary>
+        /// <returns>Returns an IEnumerable<LICENSEPRODUCT> containing all the active products.</returns>
         public static IEnumerable<LICENSEPRODUCT> GetAllActiveProducts()
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
