@@ -513,8 +513,8 @@ public class ProjectPlannerDefinition {
     @Then("^The project created must be saved$")
     public void theProjectCreatedMustBeSaved() {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='dispFormFancyTitle']/span")));
-        assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.xpath("//div[@class='dispFormFancyTitle']/span")).getText());
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
+        assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")).getText());
     }
 
     @Then("^The project created must be deleted$")
@@ -582,10 +582,12 @@ public class ProjectPlannerDefinition {
         driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
         try {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
+            System.out.println("Clic to save after editing ok");
         } catch (Exception e) {
             if (!driver.findElements(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).isEmpty()) {
                 wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
                 driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
+                System.out.print("Exception click to save after editing");
             }
         }
     }
