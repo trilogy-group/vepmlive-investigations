@@ -371,9 +371,9 @@ public class ProjectPlannerDefinition {
 
     public void searchForCreatedTask(String projectname) throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='searchtext1Main']")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='searchtext1Main']")));
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).click();
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(projectname);
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(Keys.RETURN);

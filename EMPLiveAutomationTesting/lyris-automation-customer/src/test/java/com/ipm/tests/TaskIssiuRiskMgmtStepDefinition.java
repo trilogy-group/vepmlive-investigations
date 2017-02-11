@@ -6,7 +6,6 @@ import cucumber.api.java.en.When;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -59,6 +58,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Project_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
         } else {
             System.out.println("This driver does not support JavaScript!");
@@ -112,9 +112,10 @@ public class TaskIssiuRiskMgmtStepDefinition {
     @When("^I click on 'Delete' button$")
     public void iClickOnDeleteButton() throws Throwable {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
-        WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
-        JavascriptExecutor executor = (JavascriptExecutor) driver;
-        executor.executeScript("arguments[0].click();", element);
+//        WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
+//        JavascriptExecutor executor = (JavascriptExecutor) driver;
+//        executor.executeScript("arguments[0].click();", element);
+        driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
         Thread.sleep(10000);
     }
 
@@ -157,7 +158,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on Risks on the left panel$")
     public void iClickOnRisksOnTheLeftPanel() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("EPMLiveNavt5")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt5")));
         driver.findElement(By.id("EPMLiveNavt5")).click();
         wait.until(ExpectedConditions.titleIs("Risks - All My Risks"));
     }
@@ -177,9 +178,11 @@ public class TaskIssiuRiskMgmtStepDefinition {
         createdRiskName = "taskName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField"))).click();
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdRiskName);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Project_ddlShowAll"))).click();
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Project_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
         } else {
             System.out.println("This driver does not support JavaScript!");
@@ -227,14 +230,14 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'New Item' in Risk page$")
     public void iClickOnNewItemInRiskPage() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")).click();
         wait.until(ExpectedConditions.titleIs("Risks - New Item"));
     }
 
     @When("^I click on Issues on the left panel$")
     public void iClickOnIssuesOnTheLeftPanel() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("EPMLiveNavt6")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt6")));
         driver.findElement(By.id("EPMLiveNavt6")).click();
         wait.until(ExpectedConditions.titleIs("Issues - My Active Issue Summary"));
     }
@@ -246,7 +249,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'New Item' in Issue page$")
     public void iClickOnNewItemInIssuePage() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='actionmenu2Main']/div/ul[1]/li/a/span[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu2Main']/div/ul[1]/li/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='actionmenu2Main']/div/ul[1]/li/a/span[1]")).click();
         wait.until(ExpectedConditions.titleIs("Issues - New Item"));
     }
@@ -261,9 +264,11 @@ public class TaskIssiuRiskMgmtStepDefinition {
         createdIssueName = "issueName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField"))).click();
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdIssueName);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Project_ddlShowAll"))).click();
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Project_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
         } else {
             System.out.println("This driver does not support JavaScript!");

@@ -1,27 +1,27 @@
 Feature: Add, Edit and Delete Project
 
-# C829527: Add, Edit and Delete Project
-  @Ready
-  Scenario: Add, Edit and Delete Project
-    Given execute before conditions
-    And I click on project panel
-    When I click on new item
-    And I enter a Project Name as "Test_EpmLive_Project"
-    And I select project status "(1) Proposed"
-    And I select Overall Health "(2) At Risk"
-    And I select Project Update "Schedule Driven"
-    And I enter a test as "testing"
-    And I click on save button
-    Then The project created must be saved
-    When I click on edit button
-    And I enter Project Work as "300"
-    And Project Actual Work as "40"
-    And I save after editing
-    Then The project created must be saved
-    And The values edited should be changed as "300" for Project Work  and "40" for Actual Work
-    When I click on delete button
-    And I accept delete popup
-    Then The project created must be deleted
+## C829527: Add, Edit and Delete Project
+#  @Ready
+#  Scenario: Add, Edit and Delete Project
+#    Given execute before conditions
+#    And I click on project panel
+#    When I click on new item
+#    And I enter a Project Name as "Test_EpmLive_Project"
+#    And I select project status "(1) Proposed"
+#    And I select Overall Health "(2) At Risk"
+#    And I select Project Update "Schedule Driven"
+#    And I enter a test as "testing"
+#    And I click on save button
+#    Then The project created must be saved
+#    When I click on edit button
+#    And I enter Project Work as "300"
+#    And Project Actual Work as "40"
+#    And I save after editing
+#    Then The project created must be saved
+#    And The values edited should be changed as "300" for Project Work  and "40" for Actual Work
+#    When I click on delete button
+#    And I accept delete popup
+#    Then The project created must be deleted
 
 #C829530: Add resources to project and assign tasks to them
   @Ready
