@@ -53,7 +53,7 @@ Feature: Add, Edit and Delete Project
     Then The project summary page should be displayed
     When I click on Tasks
     Then The Tasks Summary page should displayed
-    And Task created should be saved
+    #And Task created should be saved
 
 #C829770: Edit Resource plan
   @Ready
