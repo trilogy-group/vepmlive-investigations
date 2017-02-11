@@ -21,6 +21,7 @@ public class RessourceStepDefinition {
 
     @When("^I click on Ressources on left panel$")
     public void iClickOnRessourcesOnLeftPanel() {
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt9")));
         driver.findElement(By.id("EPMLiveNavt9")).click();
         wait.until(ExpectedConditions.titleIs("Resource Pool"));
     }
@@ -34,7 +35,7 @@ public class RessourceStepDefinition {
     @When("^I click on 'Invite'$")
     public void iClickOnInvite() throws Throwable {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='resourcePoolToolBar']/ul[1]/li[1]/a/span[2]")));
-//        Thread.sleep(5000);
+        Thread.sleep(5000);
         driver.findElement(By.xpath(".//*[@id='resourcePoolToolBar']/ul[1]/li[1]/a/span[2]")).click();
         wait.until(ExpectedConditions.titleIs("Resources - New Item"));
 
