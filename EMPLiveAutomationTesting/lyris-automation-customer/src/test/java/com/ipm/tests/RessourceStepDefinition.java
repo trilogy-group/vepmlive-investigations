@@ -49,28 +49,32 @@ public class RessourceStepDefinition {
     public void iEnterRequiredFieldsAndClickOnSaveButton() throws Throwable {
         createdRessourceName = "firstName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@title='First Name']")));
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         driver.findElement(By.xpath("//input[@title='First Name']")).sendKeys(createdRessourceName);
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Role_ddlShowAll")));
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("Role_ddlShowAll")));
             js.executeScript("window.document.getElementById('Role_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("HolidaySchedule_ddlShowAll")));
             js.executeScript("window.document.getElementById('HolidaySchedule_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("WorkHours_ddlShowAll")));
             js.executeScript("window.document.getElementById('WorkHours_ddlShowAll').click()");
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")));
         driver.findElement(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")).click();
         wait.until(ExpectedConditions.titleIs("Resource Pool"));
     }
 
     @Then("^Ressource should be added$")
     public void ressourceShouldBeAdded() throws Throwable {
-        Thread.sleep(15000);
         assertTrue("Verify title page", driver.getTitle().contains("Resource Pool"));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")));
         if (!driver.findElements(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).isEmpty()) {
