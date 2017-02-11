@@ -33,9 +33,6 @@ Feature: Add, Edit and Delete Project
     And I select project status "(1) Proposed"
     And I enter a test as "testing"
     And I click on save button
- #    And I click on project panel
- #    And I am selecting any oneproject
- #    And I Click on Item menu
     And I Click on edit plan menu
     Then The Select Planner Page should be displayed
     And I Click on project planner
@@ -68,9 +65,6 @@ Feature: Add, Edit and Delete Project
     And I select project status "(1) Proposed"
     And I enter a test as "testing"
     And I click on save button
-#    And I click on project panel
-#    And I am selecting any oneproject
-#    And I Click on Item menu
     When I Click on Edit Resource Planner
     Then Resource Planner page should be displayed
     When I select one user
