@@ -15,7 +15,7 @@ Feature: Work with Tasks, Issues and Risks
     When I make some changes and I click on save button
     Then Change should be saved
     When I click on 'Delete' button
-    And I accept delete popup
+    And accept delete popup for task issu risk
     Then Task should be deleted
 
 #C829719: Add, Edit and Delete Risk
@@ -33,7 +33,7 @@ Feature: Work with Tasks, Issues and Risks
     When I make some changes on risk item and I click on save button
     Then Risk Changes should be saved
     When I click on 'Delete' button
-    And I accept delete popup
+    And accept delete popup for task issu risk
     Then Risk should be deleted
 
 #C829740: Add, Edit and Delete Issue
@@ -51,5 +51,5 @@ Feature: Work with Tasks, Issues and Risks
     When I make some changes on Issue item and I click on save button
     Then Issue Changes should be saved
     When I click on 'Delete' button
-    And I accept delete popup
+    And accept delete popup for task issu risk
     Then Issue should be deleted

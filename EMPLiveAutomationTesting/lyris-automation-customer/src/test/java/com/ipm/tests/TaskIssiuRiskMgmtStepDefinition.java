@@ -1,6 +1,7 @@
 package com.ipm.tests;
 
 import com.ipm.lib.AbstractCoreTest;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.openqa.selenium.By;
@@ -80,8 +81,32 @@ public class TaskIssiuRiskMgmtStepDefinition {
     @When("^I click on 'Edit Item' button$")
     public void iClickOnEditItemButton() throws Throwable {
         wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")));
-        driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+//        driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")).click();
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+            js.executeScript("window.document.getElementById('Ribbon.ListForm.Display.Manage.EditItem2-Large').click()");
+
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+        } catch (Exception e) {
+            if (!driver.findElements(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")).isEmpty()) {
+                if (driver instanceof JavascriptExecutor) {
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+
+                    js.executeScript("window.document.getElementById('Ribbon.ListForm.Display.Manage.EditItem2-Large').click()");
+
+                } else {
+                    System.out.println("This driver does not support JavaScript!");
+                }
+                System.out.println("I click on 'Edit Item' button -- first click not working");
+            }
+
+        }
+
     }
 
     @Then("^Edit Task page should be displayed$")
@@ -111,11 +136,19 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'Delete' button$")
     public void iClickOnDeleteButton() throws Throwable {
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']")));
 //        WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
 //        JavascriptExecutor executor = (JavascriptExecutor) driver;
 //        executor.executeScript("arguments[0].click();", element);
-        driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
+        if (driver instanceof JavascriptExecutor) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+            js.executeScript("window.document.getElementById('Ribbon.ListForm.Display.Manage.DeleteItem-Medium').click()");
+
+        } else {
+            System.out.println("This driver does not support JavaScript!");
+        }
+//        driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
         Thread.sleep(5000);
     }
 
@@ -311,5 +344,27 @@ public class TaskIssiuRiskMgmtStepDefinition {
         searchForCreatedIssue(createdIssueName);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
         assertEquals("Issue Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+    }
+
+    @And("^accept delete popup for task issu risk$")
+    public void iAcceptDeletePopupForTaskIssuRisk() throws Throwable {
+        try {
+            driver.switchTo().alert().accept();
+        } catch (Exception e) {
+            System.out.println("Alert Not Present");
+            if (driver instanceof JavascriptExecutor) {
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("window.document.getElementById('Ribbon.ListForm.Display.Manage.DeleteItem-Medium').click()");
+            } else {
+                System.out.println("This driver does not support JavaScript!");
+            }
+            Thread.sleep(5000);
+            try{
+                driver.switchTo().alert().accept();
+            }catch(Exception ex){
+                System.out.println("Alert Not Present for the second time");
+            }
+        }
+        Thread.sleep(5000);
     }
 }
