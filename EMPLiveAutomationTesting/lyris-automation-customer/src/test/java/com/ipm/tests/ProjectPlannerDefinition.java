@@ -8,6 +8,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import junit.framework.TestCase;
+import org.junit.Before;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
@@ -35,6 +36,12 @@ public class ProjectPlannerDefinition {
     @Autowired
     protected WebDriver driver;
     LoginPageObject objLogin;
+
+    @Before
+    public void zoomOut() {
+        WebElement html = driver.findElement(By.tagName("html"));
+        html.sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT));
+    }
 
     @After
     public void closeAllBrowsersAfter() throws Exception {
@@ -618,13 +625,16 @@ public class ProjectPlannerDefinition {
     public void iClickOnCloseTasks() throws Throwable {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
-        driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
-        wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
+        while (!driver.findElements(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).isEmpty()) {
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
+            driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
+        }
+        wait.until(ExpectedConditions.titleIs("Project Center"));
     }
 
     @Then("^The project summary page should be displayed$")
     public void theProjectSummaryPageShouldBeDisplayed() throws Throwable {
-        assertTrue("Verify Project Page Title", driver.getTitle().contains("Project Center - Executive Summary"));
+        assertTrue("Verify Project Page Title", driver.getTitle().contains("Project Center"));
     }
 
     @When("^I click on Tasks$")
