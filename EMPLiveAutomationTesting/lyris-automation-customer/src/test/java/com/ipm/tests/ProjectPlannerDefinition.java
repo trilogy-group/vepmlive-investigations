@@ -559,6 +559,8 @@ public class ProjectPlannerDefinition {
 
     @Then("^The tasks page should be displayed$")
     public void theTasksPageShouldBeDisplayed() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("DeltaPlaceHolderPageTitleInTitleArea")));
         if (!driver.findElements(By.id("DeltaPlaceHolderPageTitleInTitleArea")).isEmpty()) {
             assertTrue("Tasks page displayed", true);
         } else {
