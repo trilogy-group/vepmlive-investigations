@@ -27,6 +27,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I click on Changes on the left panel$")
     public void iClickOnChangesOnTheLeftPanel() {
+        checkPageIsReady();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt7")));
         driver.findElement(By.id("EPMLiveNavt7")).click();
         wait.until(ExpectedConditions.titleIs("Changes - My Active Changes"));
@@ -34,11 +35,13 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Change center page should be displayed$")
     public void changeCenterPageShouldBeDisplayed() throws Throwable {
+        checkPageIsReady();
         assertTrue("Verify changes page", driver.getTitle().contains("Changes - My Active Changes"));
     }
 
     @When("^I click on 'New Item' in Change page$")
     public void iClickOnNewItemInChangePage() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")).click();
         try {
@@ -54,11 +57,13 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Change New Item page should be displayed$")
     public void changeNewItemPageShouldBeDisplayed() throws Throwable {
+        checkPageIsReady();
         assertTrue("Verify New Item Changes page", driver.getTitle().contains("Changes - New Item"));
     }
 
     @When("^I provide required value for new Change and I click on save button$")
     public void iProvideRequiredValueForNewChangeAndIClickOnSaveButton() throws Throwable {
+        checkPageIsReady();
         Thread.sleep(5000);
         createdChangeTitle = "changeName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
@@ -78,11 +83,13 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Change should be created$")
     public void changeShouldBeCreated() throws Throwable {
+        checkPageIsReady();
         assertTrue("Change item is well created", driver.findElement(By.id("ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_lblItemTitle")).getText().contains(createdChangeTitle));
     }
 
     @Then("^Edit Change page should be displayed$")
     public void editChangePageShouldBeDisplayed() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
         System.out.println("Page Edit is open" + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
         assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
@@ -90,6 +97,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I make some changes on Change item and I click on save button$")
     public void iMakeSomeChangesOnChangeItemAndIClickOnSaveButton() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Status_5c820a57-98d6-44b5-95e6-4a717cfe5a06_$DropDownChoice")));
         Select select = new Select(driver.findElement(By.id("Status_5c820a57-98d6-44b5-95e6-4a717cfe5a06_$DropDownChoice")));
         select.selectByValue("In Progress");
@@ -101,12 +109,14 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Changes in change item should be saved$")
     public void changesInChangeItemShouldBeSaved() throws Throwable {
+        checkPageIsReady();
         assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]")).getText().contains("In Progress"));
         assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[4]/td[2]")).getText().contains("(3) Low"));
     }
 
     @Then("^Change should be deleted$")
     public void changeShouldBeDeleted() throws Throwable {
+        checkPageIsReady();
         searchForCreatedChange(createdChangeTitle);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
         assertEquals("Change item Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
@@ -124,6 +134,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I click on 'Delete' button in change item$")
     public void iClickOnDeleteButtonInChangeItem() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
@@ -448,5 +459,27 @@ public class SmokeVerificationStepDefinition {
         driver.switchTo().activeElement().sendKeys(createdWorkSpaceName);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")));
         assertTrue("", driver.findElement(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")).getText().contains("No search results"));
+    }
+
+    public void checkPageIsReady() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        //Initially bellow given if condition will check ready state of page.
+        if (js.executeScript("return document.readyState").toString().equals("complete")) {
+            System.out.println("Page Is loaded.");
+            return;
+        }
+        //This loop will rotate for 60 times to check If page Is ready after every 1 second.
+        //You can replace your value with 25 If you wants to Increase or decrease wait time.
+        for (int i = 0; i < 60; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+            //To check page ready state.
+            if (js.executeScript("return document.readyState").toString().equals("complete")) {
+                System.out.println("Page Is loaded : " + i);
+                break;
+            }
+        }
     }
 }
