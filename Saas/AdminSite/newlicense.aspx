@@ -16,8 +16,8 @@
           $( function() {
               $(".datepicker").datepicker({
                   changeMonth: true,
-                  changeYear: true
-                  
+                  changeYear: true,
+                  minDate: 0
               });
 
               $(".readonly").keydown(function (e) {
