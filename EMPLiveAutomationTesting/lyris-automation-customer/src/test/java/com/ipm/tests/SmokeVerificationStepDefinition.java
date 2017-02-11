@@ -27,7 +27,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I click on Changes on the left panel$")
     public void iClickOnChangesOnTheLeftPanel() {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("EPMLiveNavt7")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt7")));
         driver.findElement(By.id("EPMLiveNavt7")).click();
         wait.until(ExpectedConditions.titleIs("Changes - My Active Changes"));
     }
@@ -39,9 +39,17 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I click on 'New Item' in Change page$")
     public void iClickOnNewItemInChangePage() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")).click();
-        wait.until(ExpectedConditions.titleIs("Changes - New Item"));
+        try {
+            wait.until(ExpectedConditions.titleIs("Changes - New Item"));
+            System.out.println("I click on 'New Item' in Change page -- well clicked");
+        } catch (Exception e) {
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")));
+            driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li/a/span[1]")).click();
+            System.out.println("I click on 'New Item' in Change page -- Exception cached");
+            wait.until(ExpectedConditions.titleIs("Changes - New Item"));
+        }
     }
 
     @Then("^Change New Item page should be displayed$")

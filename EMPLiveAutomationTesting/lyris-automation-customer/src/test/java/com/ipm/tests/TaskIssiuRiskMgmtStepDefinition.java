@@ -53,13 +53,12 @@ public class TaskIssiuRiskMgmtStepDefinition {
     @When("^I provide required value and I click on save button$")
     public void iProvideRequiredValueAndIClickOnSaveButton() throws Throwable {
         createdTaskName = "taskName" + System.currentTimeMillis() / 1000L;
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdTaskName);
         wait.until(ExpectedConditions.elementToBeClickable(By.id("Project_ddlShowAll")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Project_ddlShowAll').click()");
-            wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
             js.executeScript("window.document.getElementById('autoText_0').click()");
         } else {
             System.out.println("This driver does not support JavaScript!");
@@ -142,9 +141,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 //        executor.executeScript("arguments[0].click();", element);
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
-
             js.executeScript("window.document.getElementById('Ribbon.ListForm.Display.Manage.DeleteItem-Medium').click()");
-
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
@@ -160,7 +157,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedTask(String projectname) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
@@ -170,7 +167,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedRisk(String projectname) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
@@ -180,7 +177,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedIssue(String projectname) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
@@ -350,6 +347,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     public void iAcceptDeletePopupForTaskIssuRisk() throws Throwable {
         try {
             driver.switchTo().alert().accept();
+            System.out.print("Alert accepted");
         } catch (Exception e) {
             System.out.println("Alert Not Present");
             if (driver instanceof JavascriptExecutor) {
@@ -359,9 +357,9 @@ public class TaskIssiuRiskMgmtStepDefinition {
                 System.out.println("This driver does not support JavaScript!");
             }
             Thread.sleep(5000);
-            try{
+            try {
                 driver.switchTo().alert().accept();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 System.out.println("Alert Not Present for the second time");
             }
         }
