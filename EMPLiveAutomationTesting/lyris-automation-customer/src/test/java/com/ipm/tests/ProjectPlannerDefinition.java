@@ -163,7 +163,7 @@ public class ProjectPlannerDefinition {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")));
         driver.findElement(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_ctl04_ctl01_ctl00_ctl00_ctl07_upLevelDiv']")));
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @When("^I click on delete button")
@@ -171,7 +171,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^I accept delete popup")
@@ -316,7 +316,7 @@ public class ProjectPlannerDefinition {
     @Then("^I Click on user cell")
     public void clickOnUserCell() throws InterruptedException {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
         Thread.sleep(5000);
     }
@@ -326,7 +326,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
         driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         driver.findElement(By.xpath("//*[contains(text(), 'OK')]")).click();
     }
 
@@ -335,7 +335,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")));
         driver.findElement(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")).click();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^I close Task Window")
@@ -387,7 +387,7 @@ public class ProjectPlannerDefinition {
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).clear();
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(projectname);
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(Keys.RETURN);
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     public void selectFirstProject() {
@@ -398,7 +398,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^I select one user$")
     public void selectFirstUserInResourcePlanner() throws InterruptedException {
-        Thread.sleep(10000);
+        Thread.sleep(5000);
 //        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
 //        for (WebElement iframe : iframes) {
 //            driver.switchTo().defaultContent();
@@ -418,7 +418,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ResAddBtn")));
         driver.findElement(By.id("ResAddBtn")).click();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^I enter hours in grid \"([^\"]*)\"$")
@@ -488,7 +488,7 @@ public class ProjectPlannerDefinition {
     @Then("^I create project with defaultvalues and selectproject in projectsfolder \"([^\"]*)\"$")
     public void createAndSelectProject(String projectname) throws InterruptedException {
         searchForCreatedProject(createProjectWithDefaultValues(projectname));
-        Thread.sleep(20000);
+        Thread.sleep(10000);
         ClickOnItem();
         selectFirstProject();
     }
@@ -564,7 +564,7 @@ public class ProjectPlannerDefinition {
         } else {
             assertTrue("Tasks page not displayed", false);
         }
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^The Select Planner Page should be displayed$")
@@ -636,7 +636,7 @@ public class ProjectPlannerDefinition {
             System.out.println("This driver does not support JavaScript!");
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @And("^I click on Close Tasks$")
@@ -701,7 +701,7 @@ public class ProjectPlannerDefinition {
     @When("^I enter some costs and I click on save button$")
     public void iEnterSomeCostsAndIClickOnSaveButton() throws Throwable {
 
-        Thread.sleep(20000);
+        Thread.sleep(10000);
         WebDriverWait wait = new WebDriverWait(driver, 60);
 
 

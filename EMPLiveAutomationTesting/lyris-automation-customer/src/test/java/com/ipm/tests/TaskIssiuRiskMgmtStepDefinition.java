@@ -116,7 +116,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 //        JavascriptExecutor executor = (JavascriptExecutor) driver;
 //        executor.executeScript("arguments[0].click();", element);
         driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")).click();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^Task should be deleted$")
