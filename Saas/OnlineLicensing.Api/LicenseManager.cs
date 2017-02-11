@@ -15,7 +15,7 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var orders = context.ORDERS.Where(l => l.account_ref == accountRef).ToList();
+                var orders = context.ORDERS.Where(l => l.account_ref == accountRef && l.enabled == true &&  l.activation <= DateTime.Now && l.expiration > DateTime.Now).ToList();
 
                 foreach (var item in orders)
                 {
