@@ -51,7 +51,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I provide required value for new Change and I click on save button$")
     public void iProvideRequiredValueForNewChangeAndIClickOnSaveButton() throws Throwable {
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         createdChangeTitle = "changeName" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdChangeTitle);
@@ -120,7 +120,7 @@ public class SmokeVerificationStepDefinition {
         WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @When("^I click on Reports on the left panel$")
@@ -151,7 +151,7 @@ public class SmokeVerificationStepDefinition {
     @When("^I click on project List from the 'Report List'$")
     public void iClickOnProjectListFromTheReportList() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='gridctl00$ctl36$g_ad12f598_1fd2_4896_9c89_84cd6fd83d86']/div[2]/table/tbody/tr[5]/td/div/div/img[1]")));
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         driver.findElement(By.xpath(".//*[@id='gridctl00$ctl36$g_ad12f598_1fd2_4896_9c89_84cd6fd83d86']/div[2]/table/tbody/tr[5]/td/div/div/img[1]")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='nodeval']/a")));
     }
@@ -189,7 +189,7 @@ public class SmokeVerificationStepDefinition {
         while (issubmitted) {
             if (driver.findElement(By.id("mytimesheetstatus")).getText().equalsIgnoreCase("Submitted")) {
                 driver.findElement(By.xpath(".//*[@id='tsnav']/nav/div/div/ul/li[2]/span[2]")).click();
-                Thread.sleep(30000);
+                Thread.sleep(5000);
             } else {
                 issubmitted = false;
             }
@@ -209,7 +209,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I Select tasks and click on 'Add'$")
     public void iSelectTasksAndClickOnAdd() throws Throwable {
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         driver.switchTo().defaultContent();
         driver.switchTo().frame(1);
         Thread.sleep(1000);
@@ -251,7 +251,7 @@ public class SmokeVerificationStepDefinition {
             Thread.sleep(5000);
         }
         wait.until(ExpectedConditions.textToBe(By.id("mytimesheetstatus"), "Unsubmitted"));
-        Thread.sleep(100000);
+        Thread.sleep(10000);
     }
 
     @And("^Click on 'Submit' button$")
@@ -267,13 +267,13 @@ public class SmokeVerificationStepDefinition {
             System.out.println("This driver does not support JavaScript!");
         }
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mytimesheetstatus")));
-        Thread.sleep(100000);
+        Thread.sleep(5000);
     }
 
     @Then("^Timesheet should be submitted$")
     public void timesheetShouldBeSubmitted() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mytimesheetstatus")));
-        Thread.sleep(20000);
+        Thread.sleep(5000);
         assertTrue("TimeSheet is not submitted", driver.findElement(By.id("mytimesheetstatus")).getText().contains("Submitted"));
     }
 
@@ -299,7 +299,7 @@ public class SmokeVerificationStepDefinition {
 
     @And("^Click on any of the link say : Project$")
     public void clickOnAnyOfTheLinkSayProject() throws Throwable {
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
@@ -400,11 +400,11 @@ public class SmokeVerificationStepDefinition {
     @Then("^newly added workspace name would be displayed under 'Workspaces' panel$")
     public void newlyAddedWorkspaceNameWouldBeDisplayedUnderWorkspacesPanel() throws Throwable {
         driver.navigate().refresh();
-        Thread.sleep(10000);
+//        Thread.sleep(10000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
-        Thread.sleep(10000);
+//        Thread.sleep(10000);
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
             if (!driver.findElements(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")).isEmpty()) {
@@ -428,7 +428,7 @@ public class SmokeVerificationStepDefinition {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='menu']/li[1]/a")));
         WebElement removeElem = driver.findElement(By.xpath(".//*[@id='menu']/li[1]/a"));
         executor.executeScript("arguments[0].click();", removeElem);
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 
     @Then("^workspace should be removed$")
