@@ -79,7 +79,7 @@ public class ProjectPlannerDefinition {
     @Then("^I click on project panel")
     public void clickToLaftpanel() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("EPMLiveNavt3")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt3")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('EPMLiveNavt3').click()");
@@ -87,13 +87,13 @@ public class ProjectPlannerDefinition {
             System.out.println("This driver does not support JavaScript!");
         }
         wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
-        Thread.sleep(10000);
+//        Thread.sleep(10000);
     }
 
     @When("^I click on new item")
     public void clickOnNewItem() {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@title='New Item']//a//span[@class='dropdown-label']")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li[@title='New Item']//a//span[@class='dropdown-label']")));
         driver.findElement(By.xpath("//li[@title='New Item']//a//span[@class='dropdown-label']")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@title='Project Name Required Field']")));
     }
@@ -133,10 +133,13 @@ public class ProjectPlannerDefinition {
 
     @Then("^I click on save button")
     public void clickingOnSavebutton() {
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem']")));
+
         driver.findElement(By
                 .xpath(".//*[@id='ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem']"))
                 .click();
-        WebDriverWait wait = new WebDriverWait(driver, 60);
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='divQuickDetailsHeader']")));
     }
 
@@ -181,16 +184,21 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on Item menu")
     public void ClickOnItem() {
+        System.out.println("I click on Item Menu");
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListItem-title']/a/span[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListItem-title']/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.ListItem-title']/a/span[1]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.New")));
     }
 
     @And("^I am selecting any oneproject")
     public void selectOneProject() throws InterruptedException {
+        System.out.println("I am selecting any oneproject");
         searchForCreatedProject(createdProjectName);
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[1]")));
         Thread.sleep(5000);
+
         Actions action = new Actions(driver).doubleClick(driver.findElement(By.xpath(
                 ".//*[@id='GanttGrid0Main']/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[3]/td/table/tbody/tr[2]/td[1]")));
         action.build().perform();
@@ -199,11 +207,12 @@ public class ProjectPlannerDefinition {
     @And("^I Click on edit plan menu")
     public void editPlan() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        Thread.sleep(10000);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.EPMLive.Planner-Large")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListItem.EPMLive.Planner-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
+
             js.executeScript("window.document.getElementById('Ribbon.ListItem.EPMLive.Planner-Large').click()");
+
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
@@ -212,17 +221,19 @@ public class ProjectPlannerDefinition {
 
     @And("^I Click on project planner")
     public void clickOnProjectPlaner() {
+        System.out.println("I Click on project planner");
         driver.switchTo().frame(1);
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[2]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[2]")));
         driver.findElement(By.xpath("//a[2]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
     }
 
     @When("^I Click on edit team")
     public void clicOnEditTeam() {
+        System.out.println("I Click on edit team");
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium').click()");
@@ -249,7 +260,7 @@ public class ProjectPlannerDefinition {
     @And("^I Click on add user button")
     public void clickOnAddUser() {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='parentId']/tbody/tr/td[2]/input[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='parentId']/tbody/tr/td[2]/input[1]")));
         driver.findElement(By.xpath(".//*[@id='parentId']/tbody/tr/td[2]/input[1]")).click();
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
@@ -257,7 +268,7 @@ public class ProjectPlannerDefinition {
     @And("^I Click on Save build team")
     public void saveBuildTeam() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript(
@@ -270,6 +281,8 @@ public class ProjectPlannerDefinition {
 
     @When("^I Click on add tasks")
     public void clickOnAddTask() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, 60);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.WorkPlanner.InsertGroup.AddTask-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Ribbon.WorkPlanner.InsertGroup.AddTask-Large').click()");
@@ -294,6 +307,7 @@ public class ProjectPlannerDefinition {
     @Then("^I Click on user cell")
     public void clickOnUserCell() throws InterruptedException {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
+        Thread.sleep(10000);
         webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
         Thread.sleep(5000);
     }
@@ -303,14 +317,14 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
         driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
-        Thread.sleep(6000);
+        Thread.sleep(10000);
         driver.findElement(By.xpath("//*[contains(text(), 'OK')]")).click();
     }
 
     @Then("^I save a task")
     public void saveTasks() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")));
         driver.findElement(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")).click();
         Thread.sleep(10000);
     }
@@ -579,15 +593,16 @@ public class ProjectPlannerDefinition {
     @And("^I click on Blank Plan$")
     public void iClickOnBlankPlan() throws Throwable {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
     }
 
     @When("^I click on publish$")
     public void iClickOnPublish() throws Throwable {
+        System.out.println("I click on publish");
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Ribbon.WorkPlanner.StandardGroup.PublishButton-Large').click()");
@@ -601,7 +616,7 @@ public class ProjectPlannerDefinition {
     @And("^I click on Close Tasks$")
     public void iClickOnCloseTasks() throws Throwable {
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
         driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
         wait.until(ExpectedConditions.titleIs("Project Center - Executive Summary"));
     }
@@ -613,8 +628,9 @@ public class ProjectPlannerDefinition {
 
     @When("^I click on Tasks$")
     public void iClickOnTasks() throws Throwable {
+        System.out.println("I click on Tasks");
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("EPMLiveNavt4")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt4")));
         driver.findElement(By.id("EPMLiveNavt4")).click();
         wait.until(ExpectedConditions.titleIs("Task Center - My Tasks"));
     }
