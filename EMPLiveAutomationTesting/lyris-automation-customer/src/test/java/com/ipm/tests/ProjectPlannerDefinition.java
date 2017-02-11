@@ -162,7 +162,17 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")));
         driver.findElement(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_ctl04_ctl01_ctl00_ctl00_ctl07_upLevelDiv']")));
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_ctl04_ctl01_ctl00_ctl00_ctl07_upLevelDiv']")));
+            System.out.println("I click on edit button : " + driver.getTitle());
+        } catch (Exception e) {
+            if (driver.findElements(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).isEmpty()) {
+                wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")));
+                driver.findElement(By.xpath("//a[@id='Ribbon.ListForm.Display.Manage.EditItem2-Large']")).click();
+                System.out.println("edit button Not working for the first time : " + driver.getTitle());
+            }
+            System.out.println("I click on edit button : " + "Exit without clicking on edit button");
+        }
         Thread.sleep(5000);
     }
 
@@ -224,7 +234,21 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        } catch (Exception e) {
+            if (!driver.findElements(By.id("Ribbon.ListItem.EPMLive.Planner-Large")).isEmpty()) {
+                if (driver instanceof JavascriptExecutor) {
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+                    js.executeScript("window.document.getElementById('Ribbon.ListItem.EPMLive.Planner-Large').click()");
+
+                } else {
+                    System.out.println("This driver does not support JavaScript!");
+                }
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+            }
+            System.out.print("I Click on edit plan menu : Exception on clicking on");
+        }
     }
 
     @And("^I Click on project planner")
@@ -309,6 +333,7 @@ public class ProjectPlannerDefinition {
         webElements.get(webElements.size() - 1).findElement(By.xpath("./td[4]")).click();
         Thread.sleep(5000);
         createdTask = task + System.currentTimeMillis() / 1000L;
+        System.out.println("Created task : " + createdTask);
         driver.findElement(By.xpath(".//*[@id='Grid6FocusCursors']/div[1]/div/input")).sendKeys(createdTask);
         Thread.sleep(5000);
     }
@@ -335,7 +360,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")));
         driver.findElement(By.xpath("//*[@id='Ribbon.WorkPlanner.StandardGroup.SaveButton-Large']")).click();
-        Thread.sleep(5000);
+        Thread.sleep(10000);
     }
 
     @Then("^I close Task Window")
@@ -513,6 +538,7 @@ public class ProjectPlannerDefinition {
     @Then("^The project created must be saved$")
     public void theProjectCreatedMustBeSaved() {
         WebDriverWait wait = new WebDriverWait(driver, 60);
+        System.out.print("The project created must be saved   : " + driver.getTitle());
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
         assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")).getText());
     }
@@ -579,7 +605,7 @@ public class ProjectPlannerDefinition {
     @And("^I save after editing$")
     public void iClickOnSaveButtonAfterEdit() throws Throwable {
         Thread.sleep(5000);
-        System.out.print("Enter in I save after editing");
+        System.out.print("Enter in I save after editing   : " + driver.getTitle());
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
         driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
@@ -590,8 +616,9 @@ public class ProjectPlannerDefinition {
             if (!driver.findElements(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).isEmpty()) {
                 wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
                 driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();
-                System.out.print("Exception click to save after editing");
+                System.out.print("Exception clic on save not working first time");
             }
+            System.out.print("Exception click to save after editing");
         }
     }
 
@@ -641,7 +668,7 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-
+        System.out.println("Publish is enabled :" + driver.findElement(By.id("Ribbon.WorkPlanner.StandardGroup.PublishButton-Large")).isEnabled());
         Thread.sleep(5000);
     }
 
