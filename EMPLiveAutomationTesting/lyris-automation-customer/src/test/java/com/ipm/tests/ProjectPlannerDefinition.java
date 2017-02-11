@@ -238,8 +238,9 @@ public class ProjectPlannerDefinition {
     }
 
     @When("^I Click on edit team")
-    public void clicOnEditTeam() {
+    public void clicOnEditTeam() throws InterruptedException {
         System.out.println("I Click on edit team");
+        Thread.sleep(5000);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
         if (driver instanceof JavascriptExecutor) {

@@ -28,7 +28,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on Tasks on the left panel$")
     public void iClickOnTasksOnTheLeftPanel() {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("EPMLiveNavt4")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("EPMLiveNavt4")));
         driver.findElement(By.id("EPMLiveNavt4")).click();
         wait.until(ExpectedConditions.titleIs("Task Center - My Tasks"));
     }
@@ -40,7 +40,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'New Item'$")
     public void iClickOnNewItem() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='actionmenu1Main']/div/ul[1]/li/a/span[1]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu1Main']/div/ul[1]/li/a/span[1]")));
         driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[1]/li/a/span[1]")).click();
         wait.until(ExpectedConditions.titleIs("Task Center - New Item"));
     }
@@ -53,8 +53,9 @@ public class TaskIssiuRiskMgmtStepDefinition {
     @When("^I provide required value and I click on save button$")
     public void iProvideRequiredValueAndIClickOnSaveButton() throws Throwable {
         createdTaskName = "taskName" + System.currentTimeMillis() / 1000L;
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField"))).click();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdTaskName);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Project_ddlShowAll")));
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.document.getElementById('Project_ddlShowAll').click()");
@@ -66,6 +67,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
         select.selectByValue("Not Started");
         driver.findElement(By.id("TestCol1_935a1af4-74ea-452e-9037-c6eb14d53091_$TextField")).sendKeys("test_1");
         driver.findElement(By.id("NewTestCol2_dffb091a-688c-4512-92d9-14c8a4300bec_$TextField")).sendKeys("test_2");
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ctl36_g_2e83c645_2091_434e_932c_0dab0cdff549_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
         driver.findElement(By.id("ctl00_ctl36_g_2e83c645_2091_434e_932c_0dab0cdff549_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ctl36_g_2c9fb646_5498_41ba_8780_3319593b2b20_lblItemTitle")));
     }
@@ -77,11 +79,8 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'Edit Item' button$")
     public void iClickOnEditItemButton() throws Throwable {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")));
-        Thread.sleep(5000);
-        WebElement menuElem = driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large"));
-        JavascriptExecutor executor = (JavascriptExecutor) driver;
-        executor.executeScript("arguments[0].click();", menuElem);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")));
+        driver.findElement(By.id("Ribbon.ListForm.Display.Manage.EditItem2-Large")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
     }
 
@@ -94,8 +93,8 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I make some changes and I click on save button$")
     public void iMakeSomeChangesAndIClickOnSaveButton() throws Throwable {
-        Thread.sleep(15000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Status_c15b34c3-ce7d-490a-b133-3f4de8801b76_$DropDownChoice")));
+        Thread.sleep(5000);
         Select select = new Select(driver.findElement(By.id("Status_c15b34c3-ce7d-490a-b133-3f4de8801b76_$DropDownChoice")));
         select.selectByValue("In Progress");
         Select select_0 = new Select(driver.findElement(By.id("Priority_a8eb573e-9e11-481a-a8c9-1104a54b2fbd_$DropDownChoice")));
@@ -112,8 +111,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     @When("^I click on 'Delete' button$")
     public void iClickOnDeleteButton() throws Throwable {
-        Thread.sleep(10000);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Display.Manage.DeleteItem-Medium']/span[2]"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);

@@ -1,23 +1,23 @@
 Feature: Work with Tasks, Issues and Risks
 
-##C829718: Add, Edit and Delete Task
-#  @Ready
-#  Scenario: Add, Edit and Delete Task
-#    Given execute before conditions
-#    When I click on Tasks on the left panel
-#    Then Task center page should be displayed
-#    When I click on 'New Item'
-#    Then New Item page should be displayed
-#    When I provide required value and I click on save button
-#    Then Task should be created
-#    When I click on 'Edit Item' button
-#    Then Edit Task page should be displayed
-#    When I make some changes and I click on save button
-#    Then Change should be saved
-#    When I click on 'Delete' button
-#    And I accept delete popup
-#    Then Task should be deleted
-#
+#C829718: Add, Edit and Delete Task
+  @Ready
+  Scenario: Add, Edit and Delete Task
+    Given execute before conditions
+    When I click on Tasks on the left panel
+    Then Task center page should be displayed
+    When I click on 'New Item'
+    Then New Item page should be displayed
+    When I provide required value and I click on save button
+    Then Task should be created
+    When I click on 'Edit Item' button
+    Then Edit Task page should be displayed
+    When I make some changes and I click on save button
+    Then Change should be saved
+    When I click on 'Delete' button
+    And I accept delete popup
+    Then Task should be deleted
+
 ##C829719: Add, Edit and Delete Risk
 #  @Ready
 #  Scenario: Add, Edit and Delete Risk
