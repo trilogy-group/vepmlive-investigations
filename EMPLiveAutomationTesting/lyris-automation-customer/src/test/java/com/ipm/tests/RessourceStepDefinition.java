@@ -79,7 +79,10 @@ public class RessourceStepDefinition {
     @Then("^Ressource should be added$")
     public void ressourceShouldBeAdded() throws Throwable {
         assertTrue("Verify title page", driver.getTitle().contains("Resource Pool"));
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")));
+//        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")));
+        driver.navigate().refresh();
+        System.out.println("page refreshed");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='8EAB8893CED34F54CCBF3D0E17CFBDF5']/tbody/tr[1]/td[1]/div/table/tbody/tr[2]/td[4]")));
         if (!driver.findElements(By.xpath("//td[contains(text(), '" + createdRessourceName + "')]")).isEmpty()) {
             assertTrue("", true);
         } else {
