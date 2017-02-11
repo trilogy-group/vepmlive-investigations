@@ -129,7 +129,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     public void searchForCreatedTask(String projectname) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("searchtext0Main")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
@@ -139,7 +139,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     public void searchForCreatedRisk(String projectname) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("searchtext0Main")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
@@ -149,7 +149,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     public void searchForCreatedIssue(String projectname) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("searchtext0Main")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);

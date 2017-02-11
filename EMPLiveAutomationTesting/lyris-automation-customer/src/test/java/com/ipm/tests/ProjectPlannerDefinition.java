@@ -346,14 +346,16 @@ public class ProjectPlannerDefinition {
 
     @Then("^I Click on Edit Resource Planner")
     public void clickOnEditResourcePlanner() throws InterruptedException {
-        Thread.sleep(15000);
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
-        if (driver instanceof JavascriptExecutor) {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
-        } else {
-            System.out.println("This driver does not support JavaScript!");
+        //        if (driver instanceof JavascriptExecutor) {
+//            JavascriptExecutor js = (JavascriptExecutor) driver;
+//            js.executeScript("window.document.getElementById('Ribbon.ListItem.Manage.EPKResourcePlanner-Large').click()");
+//        } else {
+//            System.out.println("This driver does not support JavaScript!");
+//        }
+        while (!driver.findElements(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")).isEmpty()) {
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")));
+            driver.findElement(By.id("Ribbon.ListItem.Manage.EPKResourcePlanner-Large")).click();
         }
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
     }
@@ -374,7 +376,8 @@ public class ProjectPlannerDefinition {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu1Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='searchtext1Main']")));
-        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).click();
+//        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).click();
+        driver.findElement(By.xpath("//*[@id='searchtext1Main']")).clear();
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(projectname);
         driver.findElement(By.xpath("//*[@id='searchtext1Main']")).sendKeys(Keys.RETURN);
         Thread.sleep(10000);
@@ -388,7 +391,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^I select one user$")
     public void selectFirstUserInResourcePlanner() throws InterruptedException {
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 //        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
 //        for (WebElement iframe : iframes) {
 //            driver.switchTo().defaultContent();
