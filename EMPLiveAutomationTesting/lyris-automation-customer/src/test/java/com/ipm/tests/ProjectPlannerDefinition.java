@@ -576,6 +576,7 @@ public class ProjectPlannerDefinition {
 
     @And("^I save after editing$")
     public void iClickOnSaveButtonAfterEdit() throws Throwable {
+        Thread.sleep(5000);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")));
         driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_f55c623a_bb6a_4823_ba38_6f0901e5712e_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem']")).click();

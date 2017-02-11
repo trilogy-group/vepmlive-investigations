@@ -69,8 +69,10 @@ public class RessourceStepDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")));
-        driver.findElement(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")).click();
+        while (!driver.findElements(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")).isEmpty()) {
+            wait.until(ExpectedConditions.elementToBeClickable(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")));
+            driver.findElement(By.id("ctl00_ctl36_g_aedfd158_1c7e_40b6_96e6_a8abc56e92ab_ctl00_toolBarTbl_RightRptControls_ctl00_ctl00_diidIOSaveItem")).click();
+        }
         wait.until(ExpectedConditions.titleIs("Resource Pool"));
     }
 
