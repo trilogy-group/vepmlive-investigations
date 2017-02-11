@@ -33,9 +33,9 @@ Feature: Add, Edit and Delete Project
     And I select project status "(1) Proposed"
     And I enter a test as "testing"
     And I click on save button
-#    And I click on project panel
-#    And I am selecting any oneproject
-#    And I Click on Item menu
+ #    And I click on project panel
+ #    And I am selecting any oneproject
+ #    And I Click on Item menu
     And I Click on edit plan menu
     Then The Select Planner Page should be displayed
     And I Click on project planner
@@ -58,25 +58,25 @@ Feature: Add, Edit and Delete Project
     Then The Tasks Summary page should displayed
     And Task created should be saved
 
-##C829770: Edit Resource plan
-#  @Ready
-#  Scenario: Edit Resource plan
-#    Given execute before conditions
-#    And I click on project panel
-#    When I click on new item
-#    And I enter a Project Name as "Test_EpmLive_Project"
-#    And I select project status "(1) Proposed"
-#    And I enter a test as "testing"
-#    And I click on save button
+#C829770: Edit Resource plan
+  @Ready
+  Scenario: Edit Resource plan
+    Given execute before conditions
+    And I click on project panel
+    When I click on new item
+    And I enter a Project Name as "Test_EpmLive_Project"
+    And I select project status "(1) Proposed"
+    And I enter a test as "testing"
+    And I click on save button
 #    And I click on project panel
 #    And I am selecting any oneproject
 #    And I Click on Item menu
-#    When I Click on Edit Resource Planner
-#    Then Resource Planner page should be displayed
-#    When I select one user
-#    And I click on add user in project planner
-#    Then Resource should be added to top section
-#    When I enter hours in grid "50"
-#    And I click onResourse plannerSave button
-#    Then Pop up should displayed asking the User if they want to "Make Private Rows Public?"
-#    Then I click on set public ok button
+    When I Click on Edit Resource Planner
+    Then Resource Planner page should be displayed
+    When I select one user
+    And I click on add user in project planner
+    Then Resource should be added to top section
+    When I enter hours in grid "50"
+    And I click onResourse plannerSave button
+    Then Pop up should displayed asking the User if they want to "Make Private Rows Public?"
+    Then I click on set public ok button

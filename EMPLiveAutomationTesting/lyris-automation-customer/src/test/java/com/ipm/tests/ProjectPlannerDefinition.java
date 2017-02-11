@@ -395,7 +395,7 @@ public class ProjectPlannerDefinition {
 //            System.out.println("webdriver size  :" + driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[2]")).size());
 //        }
         driver.switchTo().defaultContent();
-        driver.switchTo().frame(3);
+        driver.switchTo().frame(1);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")));
         driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).click();
@@ -412,7 +412,6 @@ public class ProjectPlannerDefinition {
 
     @Then("^I enter hours in grid \"([^\"]*)\"$")
     public void enterHoursInGrid(String Hours) throws InterruptedException {
-        Thread.sleep(10000);
         driver.switchTo().defaultContent();
         List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
         for (WebElement iframe : iframes) {
@@ -629,7 +628,6 @@ public class ProjectPlannerDefinition {
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")));
             driver.findElement(By.xpath(".//*[@id='Ribbon.WorkPlanner.StandardGroup.CloseButton-Large']/span[1]/span/img")).click();
         }
-        wait.until(ExpectedConditions.titleIs("Project Center"));
     }
 
     @Then("^The project summary page should be displayed$")
