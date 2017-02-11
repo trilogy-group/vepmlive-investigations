@@ -14,50 +14,34 @@ namespace AdminSite
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            PopulateProductCatalog();
-            PopulateFeatureList();           
+            if (!IsPostBack)
+            {
+                PopulateProductCatalog();
+                PopulateFeatureList();
+            }
         }
 
         private void PopulateProductCatalog()
         {
-            var product = ProductCatalogManager.GetAllProducts();
-
-            List<string> Products = new List<string>() { "Epm Live Online" };
+            var Products = ProductCatalogManager.GetAllActiveProducts();
 
             foreach (var item in Products)
             {
                 DropDownProductCatalog.Items.Add(new ListItem
                 {
-                    Text = "Epm Live Online",
-                    Value = "9"
+                    Text = item.name,
+                    Value = item.product_id.ToString()
                 });
             }
-
-            //TODO: Add the product catalog manager to get the enabled products from the catalog, should only return epm live online
-
-            //foreach (var item in ProductCatalogManager.GetAllProducts())
-            //{
-            //    DropDownProductCatalog.Items.Add(new ListItem
-            //    {
-            //        Text = item.name,
-            //        Value = item.product_id.ToString()
-            //    });
-            //}
         }
 
         private void PopulateFeatureList()
         {
-            //TODO: Get the feature list from the feature list method
-            var list = new List<FeatureClass>
-        {
-            new FeatureClass { Id = 3, Name = "Full User" },
-            new FeatureClass { Id = 1, Name = "Team Member" }
-        };
-
+            var featureList = ProductCatalogManager.GenerateProductDetail(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
 
             table.ID = "Table1";
 
-            foreach (var item in list)
+            foreach (var item in featureList)
             {
                 var row = new TableRow();
                 var cell = new TableCell();
@@ -111,10 +95,10 @@ namespace AdminSite
             ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
         }
 
-        private class FeatureClass
+        protected void DropDownProductCatalog_SelectedIndexChanged(object sender, EventArgs e)
         {
-            public int Id { get; set; }
-            public string Name { get; set; }
+            table.Rows.Clear();
+            PopulateFeatureList();
         }
     }
 }

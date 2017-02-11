@@ -37,7 +37,7 @@
             <br />
 
             <asp:Label ID="Label1" runat="server" Text="Select Product"></asp:Label>
-            <asp:DropDownList ID="DropDownProductCatalog" runat="server"></asp:DropDownList>
+            <asp:DropDownList ID="DropDownProductCatalog" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownProductCatalog_SelectedIndexChanged"></asp:DropDownList>
 
             <br />
 

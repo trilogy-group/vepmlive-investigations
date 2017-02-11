@@ -32,27 +32,6 @@ warning 6002: The table/view 'epmlivedb.dbo.ACCOUNT' does not have a primary key
           <Property Name="internalemail" Type="varchar" MaxLength="255" />
           <Property Name="SalesForceId" Type="varchar" MaxLength="25" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'epmlivedb.dbo.CONTRACTLEVEL_TITLES' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="CONTRACTLEVEL_TITLES">
-          <Property Name="CONTRACTLEVEL" Type="int" />
-          <Property Name="TITLE" Type="varchar" MaxLength="50" />
-          <Property Name="GroupId" Type="int" />
-          <Property Name="Template" Type="varchar" MaxLength="255" />
-          <Property Name="TrialUsers" Type="int" />
-          <Property Name="TrialMonths" Type="int" />
-          <Property Name="DETAIL_ID" Type="int" />
-          <Property Name="salesonly" Type="bit" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'epmlivedb.dbo.CONTRACTLEVELS' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="CONTRACTLEVELS">
-          <Property Name="contractId" Type="varchar" MaxLength="50" />
-          <Property Name="contractlevel" Type="int" />
-          <Property Name="contractlevelid" Type="uniqueidentifier" />
-          <Property Name="upgradeto" Type="varchar" MaxLength="50" />
-          <Property Name="istrial" Type="bit" />
-        </EntityType>-->
         <EntityType Name="DETAILTYPES">
           <Key>
             <PropertyRef Name="detail_type_id" />
@@ -86,6 +65,7 @@ warning 6013: The table/view 'epmlivedb.dbo.CONTRACTLEVELS' does not have a prim
           <Property Name="product_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="sku" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="active" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="ORDERDETAIL">
           <Key>
@@ -319,6 +299,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="LICENSEDETAILs" Relationship="OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="LICENSEDETAIL" />
           <NavigationProperty Name="ORDERS" Relationship="OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="ORDER" />
+          <Property Name="active" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_LICENSEDETAIL_DETAILTYPES">
           <End Type="OnlineLicensing.Api.Data.DETAILTYPE" Role="DETAILTYPE" Multiplicity="0..1" />
@@ -484,6 +465,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <EntitySetMapping Name="LICENSEPRODUCTS">
             <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.LICENSEPRODUCT">
               <MappingFragment StoreEntitySet="LICENSEPRODUCTS">
+                <ScalarProperty Name="active" ColumnName="active" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="sku" ColumnName="sku" />
                 <ScalarProperty Name="product_id" ColumnName="product_id" />

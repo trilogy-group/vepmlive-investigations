@@ -364,7 +364,7 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Rebuke" />
+                                <input type="button" value="Revoke" />
                                 <%--<asp:LinkButton ID="DeleteLicenses" runat="server" CausesValidation="false" CommandName="DeleteLicense" Text="Delete" OnClientClick="return confirm('Are you certain you want to delete this item?');"></asp:LinkButton>--%>
                             </ItemTemplate>
                         </asp:TemplateField>

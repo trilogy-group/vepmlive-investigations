@@ -47,7 +47,7 @@ namespace OnlineLicensing.Api
 
         public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, int productId,List<Tuple<int,int>> FeatureList)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel("server=win-6j09gf4nbp8;database=EPMLIVEdb;User ID=epmlivedb;Password=MCjhfd4562D^7"))
+            using (var context = ConnectionHelper.CreateLicensingModel())
             {
                 var orderToAdd = new ORDER()
                 {
@@ -105,5 +105,11 @@ namespace OnlineLicensing.Api
         public string Product { get; set; }
         public string Features { get; set; }
         public string ExpirationDate { get; set; }
+    }
+
+    public class FeatureList
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }
