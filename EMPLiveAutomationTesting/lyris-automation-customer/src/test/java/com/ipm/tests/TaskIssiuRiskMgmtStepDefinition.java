@@ -407,7 +407,9 @@ public class TaskIssiuRiskMgmtStepDefinition {
         }
         //This loop will rotate for 60 times to check If page Is ready after every 1 second.
         //You can replace your value with 25 If you wants to Increase or decrease wait time.
+        System.out.println("checkPageIsReady : page Not Ready");
         for (int i = 0; i < 30; i++) {
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
