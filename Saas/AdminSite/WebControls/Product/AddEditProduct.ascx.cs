@@ -1,6 +1,6 @@
 ﻿using System;
-using OnlineLicensing.Api;
-using OnlineLicensing.Api.Exceptions;
+using EPMLive.OnlineLicensing.Api;
+using EPMLive.OnlineLicensing.Api.Exceptions;
 
 namespace AdminSite.WebControls.Product
 {
@@ -21,7 +21,9 @@ namespace AdminSite.WebControls.Product
 
         private void LoadProduct(int productId)
         {
+            if (productId == 0) return;
             var prod = ProductCatalogManager.GetProduct(productId);
+            if (prod == null) return;
             lblProductId.Text = prod.product_id.ToString();
             txtSKU.Text = prod.sku;
             txtName.Text = prod.name;

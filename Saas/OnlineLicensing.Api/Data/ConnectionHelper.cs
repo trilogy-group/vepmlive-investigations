@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
 using System.Data.Entity.Core.EntityClient;
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     public class ConnectionHelper
     {

@@ -7,18 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class LICENSEPRODUCT
+    public partial class LicenseProduct
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public LICENSEPRODUCT()
+        public LicenseProduct()
         {
-            this.LICENSEDETAILs = new HashSet<LICENSEDETAIL>();
-            this.ORDERS = new HashSet<ORDER>();
+            this.LicenseDetails = new HashSet<LicenseDetail>();
+            this.Orders = new HashSet<Order>();
         }
     
         public int product_id { get; set; }
@@ -27,8 +27,8 @@ namespace OnlineLicensing.Api.Data
         public bool active { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LICENSEDETAIL> LICENSEDETAILs { get; set; }
+        public virtual ICollection<LicenseDetail> LicenseDetails { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ORDER> ORDERS { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

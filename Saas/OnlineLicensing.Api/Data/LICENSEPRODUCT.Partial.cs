@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OnlineLicensing.Api.Data
+﻿namespace EPMLive.OnlineLicensing.Api.Data
 {
-    public partial class LICENSEPRODUCT
+    public partial class LicenseProduct
     {
-        public bool CanBeDeleted => ORDERS.Count == 0;
+        public bool CanBeDeleted => Orders.Count == 0 && LicenseDetails.Count == 0;
     }
 }

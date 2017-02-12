@@ -1,6 +1,5 @@
 ﻿using System;
-using OnlineLicensing.Api;
-using OnlineLicensing.Api.Data;
+using EPMLive.OnlineLicensing.Api;
 
 namespace AdminSite.WebControls.Product
 {

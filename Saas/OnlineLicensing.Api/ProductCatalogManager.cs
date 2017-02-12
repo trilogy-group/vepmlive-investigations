@@ -1,19 +1,18 @@
-﻿using System;
-using OnlineLicensing.Api.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using OnlineLicensing.Api.Exceptions;
+using EPMLive.OnlineLicensing.Api.Data;
+using EPMLive.OnlineLicensing.Api.Exceptions;
 
-namespace OnlineLicensing.Api
+namespace EPMLive.OnlineLicensing.Api
 {
     public class ProductCatalogManager
     {
-        public static IEnumerable<LICENSEPRODUCT> GetAllProducts()
+        public static IEnumerable<LicenseProduct> GetAllProducts()
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.LICENSEPRODUCTS.Include(o => o.ORDERS).OrderBy(x => x.sku).ToList().AsEnumerable();
+                return context.LicenseProducts.Include(o => o.Orders).Include(d=>d.LicenseDetails).OrderBy(x => x.sku).ToList().AsEnumerable();
             }
         }
 
@@ -27,11 +26,11 @@ namespace OnlineLicensing.Api
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public static LICENSEPRODUCT GetProduct(int productId)
+        public static LicenseProduct GetProduct(int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.LICENSEPRODUCTS.SingleOrDefault(p => p.product_id == productId);
+                return context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
             }
         }
 
@@ -46,8 +45,8 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var newProduct = new LICENSEPRODUCT { sku = sku, name = name, active = active };
-                context.LICENSEPRODUCTS.Add(newProduct);
+                var newProduct = new LicenseProduct { sku = sku, name = name, active = active };
+                context.LicenseProducts.Add(newProduct);
                 context.SaveChanges();
             }
         }
@@ -63,12 +62,12 @@ namespace OnlineLicensing.Api
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
 
-                var existingProduct = context.LICENSEPRODUCTS.SingleOrDefault(p => p.product_id == productId);
+                var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
                 if (existingProduct != null)
                 {
                     existingProduct.name = name;
                     existingProduct.active = active;
-                    context.LICENSEPRODUCTS.Attach(existingProduct);
+                    context.LicenseProducts.Attach(existingProduct);
                     context.Entry(existingProduct).State = EntityState.Modified;
                 }
                 context.SaveChanges();
@@ -79,7 +78,7 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var existingProduct = context.LICENSEPRODUCTS.SingleOrDefault(p => p.sku.Equals(sku));
+                var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.sku.Equals(sku));
                 return existingProduct != null;
             }
         }
@@ -88,9 +87,9 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var existingOrdersForProduct = context.ORDERS.FirstOrDefault(o => o.product_id == productId);
+                var existingOrdersForProduct = context.Orders.FirstOrDefault(o => o.product_id == productId);
                 if (existingOrdersForProduct != null) throw new LicenseProductInUseException();
-                var existingProduct = context.LICENSEPRODUCTS.SingleOrDefault(p => p.product_id == productId);
+                var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
                 context.Entry(existingProduct).State = EntityState.Deleted;
                 context.SaveChanges();
             }
@@ -102,19 +101,19 @@ namespace OnlineLicensing.Api
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public static IEnumerable<LICENSEDETAIL> GetLicenseProductFeatures(int productId)
+        public static IEnumerable<LicenseDetail> GetLicenseProductFeatures(int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.LICENSEDETAILs.Include(o=>o.DETAILTYPE).Include(l=>l.LICENSEPRODUCT).Where(f=>f.product_id == productId).ToList().AsEnumerable();
+                return context.LicenseDetails.Include(o=>o.DetailType).Include(l=>l.LicenseProduct).Where(f=>f.product_id == productId).ToList().AsEnumerable();
             }
         }
 
-        public static IEnumerable<DETAILTYPE> GetAllDetailTypes()
+        public static IEnumerable<DetailType> GetAllDetailTypes()
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.DETAILTYPES.ToList().AsEnumerable();
+                return context.DetailTypes.ToList().AsEnumerable();
             }
         }
 
@@ -129,7 +128,7 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var existingProduct = context.LICENSEDETAILs.SingleOrDefault(p => p.detail_type_id == detailTypeId && p.product_id == productId);
+                var existingProduct = context.LicenseDetails.SingleOrDefault(p => p.detail_type_id == detailTypeId && p.product_id == productId);
                 return existingProduct != null;
             }
         }
@@ -138,8 +137,8 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var newProductFeature = new LICENSEDETAIL { product_id = productId, detail_type_id = detailTypeId };
-                context.LICENSEDETAILs.Add(newProductFeature);
+                var newProductFeature = new LicenseDetail { product_id = productId, detail_type_id = detailTypeId };
+                context.LicenseDetails.Add(newProductFeature);
                 context.SaveChanges();
             }
         }
@@ -152,7 +151,7 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var existingProductFeature = context.LICENSEDETAILs.SingleOrDefault(p => p.license_detail_id == licenseFeatureId);
+                var existingProductFeature = context.LicenseDetails.SingleOrDefault(p => p.license_detail_id == licenseFeatureId);
                 context.Entry(existingProductFeature).State = EntityState.Deleted;
                 context.SaveChanges();
             }

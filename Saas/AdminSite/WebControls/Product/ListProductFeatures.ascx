@@ -1,5 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ListProductFeatures.ascx.cs" Inherits="AdminSite.WebControls.Product.ListProductFeatures" %>
-<%@ Import Namespace="OnlineLicensing.Api.Data" %>
+<%@ Import Namespace="EPMLive.OnlineLicensing.Api.Data" %>
 
 <asp:GridView ID="grdProductFeatures" runat="server" CellPadding="4" ForeColor="Black" GridLines="Vertical" AutoGenerateColumns="False" Width="100%" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px">
     <FooterStyle BackColor="#CCCC99" />
@@ -11,17 +11,17 @@
     <Columns>
         <asp:TemplateField HeaderText="Feature">
             <ItemTemplate>
-                <%# ((LICENSEDETAIL)Container.DataItem).DETAILTYPE.detail_name %>
+                <%# ((LicenseDetail)Container.DataItem).DetailType.detail_name %>
             </ItemTemplate>
         </asp:TemplateField>
         <asp:TemplateField HeaderText="External User?">
             <ItemTemplate>
-                <%# ActiveToYesNo(((LICENSEDETAIL)Container.DataItem).DETAILTYPE.externalusers ?? false) %>
+                <%# ActiveToYesNo(((LicenseDetail)Container.DataItem).DetailType.externalusers ?? false) %>
             </ItemTemplate>
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Actions">
             <ItemTemplate>
-                <%# CheckIfDeletable(((LICENSEDETAIL)Container.DataItem).DETAILTYPE.detail_name,string.Format("addproductfeature.aspx?id={0}&fid={1}&del=1",((LICENSEDETAIL)Container.DataItem).product_id,((LICENSEDETAIL)Container.DataItem).license_detail_id), ()=>true) %>
+                <%# CheckIfDeletable(((LicenseDetail)Container.DataItem).DetailType.detail_name,string.Format("addproductfeature.aspx?id={0}&fid={1}&del=1",((LicenseDetail)Container.DataItem).product_id,((LicenseDetail)Container.DataItem).license_detail_id), ()=>true) %>
             </ItemTemplate>
         </asp:TemplateField>
     </Columns>

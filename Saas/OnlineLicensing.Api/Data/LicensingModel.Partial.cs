@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OnlineLicensing.Api.Data
+﻿namespace EPMLive.OnlineLicensing.Api.Data
 {
     public partial class LicensingModel 
     {

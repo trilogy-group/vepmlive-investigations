@@ -7,19 +7,19 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class LICENSEDETAIL
+    public partial class LicenseDetail
     {
         public int license_detail_id { get; set; }
         public int product_id { get; set; }
         public Nullable<int> detail_type_id { get; set; }
         public Nullable<int> contract_id { get; set; }
     
-        public virtual DETAILTYPE DETAILTYPE { get; set; }
-        public virtual LICENSEPRODUCT LICENSEPRODUCT { get; set; }
+        public virtual DetailType DetailType { get; set; }
+        public virtual LicenseProduct LicenseProduct { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OnlineLicensing.Api
+﻿namespace EPMLive.OnlineLicensing.Api
 {
     public enum LicenseFrequencyType
     {

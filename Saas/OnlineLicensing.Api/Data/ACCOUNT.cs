@@ -7,12 +7,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class ACCOUNT
+    public partial class Account
     {
         public System.Guid account_id { get; set; }
         public int account_ref { get; set; }

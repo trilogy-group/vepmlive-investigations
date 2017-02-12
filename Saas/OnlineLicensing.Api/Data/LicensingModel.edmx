@@ -58,7 +58,7 @@ warning 6002: The table/view 'epmlivedb.dbo.ACCOUNT' does not have a primary key
           <Property Name="duration" Type="int" Nullable="false" />
           <Property Name="duration_type" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="LICENSEPRODUCTS">
+        <EntityType Name="LicenseProducts">
           <Key>
             <PropertyRef Name="product_id" />
           </Key>
@@ -154,10 +154,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ORDERS_LICENSEPRODUCTS">
-          <End Role="LICENSEPRODUCTS" Type="Self.LICENSEPRODUCTS" Multiplicity="0..1" />
+          <End Role="LicenseProducts" Type="Self.LicenseProducts" Multiplicity="0..1" />
           <End Role="ORDERS" Type="Self.ORDERS" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="LICENSEPRODUCTS">
+            <Principal Role="LicenseProducts">
               <PropertyRef Name="product_id" />
             </Principal>
             <Dependent Role="ORDERS">
@@ -166,10 +166,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_PRODPLANS_HOSTEDPRODUCTS">
-          <End Role="LICENSEPRODUCTS" Type="Self.LICENSEPRODUCTS" Multiplicity="1" />
+          <End Role="LicenseProducts" Type="Self.LicenseProducts" Multiplicity="1" />
           <End Role="LICENSEDETAIL" Type="Self.LICENSEDETAIL" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="LICENSEPRODUCTS">
+            <Principal Role="LicenseProducts">
               <PropertyRef Name="product_id" />
             </Principal>
             <Dependent Role="LICENSEDETAIL">
@@ -181,7 +181,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <EntitySet Name="DETAILTYPES" EntityType="Self.DETAILTYPES" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LICENSEDETAIL" EntityType="Self.LICENSEDETAIL" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LICENSEFREQ" EntityType="Self.LICENSEFREQ" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="LICENSEPRODUCTS" EntityType="Self.LICENSEPRODUCTS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LicenseProducts" EntityType="Self.LicenseProducts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ORDERDETAIL" EntityType="Self.ORDERDETAIL" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ORDERS" EntityType="Self.ORDERS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ACCOUNT" EntityType="Self.ACCOUNT" store:Type="Tables" store:Schema="dbo">
@@ -233,53 +233,53 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
             <End Role="ORDERDETAIL" EntitySet="ORDERDETAIL" />
           </AssociationSet>
           <AssociationSet Name="FK_ORDERS_LICENSEPRODUCTS" Association="Self.FK_ORDERS_LICENSEPRODUCTS">
-            <End Role="LICENSEPRODUCTS" EntitySet="LICENSEPRODUCTS" />
+            <End Role="LicenseProducts" EntitySet="LicenseProducts" />
             <End Role="ORDERS" EntitySet="ORDERS" />
           </AssociationSet>
           <AssociationSet Name="FK_PRODPLANS_HOSTEDPRODUCTS" Association="Self.FK_PRODPLANS_HOSTEDPRODUCTS">
-            <End Role="LICENSEPRODUCTS" EntitySet="LICENSEPRODUCTS" />
+            <End Role="LicenseProducts" EntitySet="LicenseProducts" />
             <End Role="LICENSEDETAIL" EntitySet="LICENSEDETAIL" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="OnlineLicensing.Api.Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="EPMLive.OnlineLicensing.Api.Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="LicensingModel" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="DETAILTYPES" EntityType="OnlineLicensing.Api.Data.DETAILTYPE" />
-          <EntitySet Name="LICENSEDETAILs" EntityType="OnlineLicensing.Api.Data.LICENSEDETAIL" />
-          <EntitySet Name="LICENSEPRODUCTS" EntityType="OnlineLicensing.Api.Data.LICENSEPRODUCT" />
-          <AssociationSet Name="FK_LICENSEDETAIL_DETAILTYPES" Association="OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES">
-            <End Role="DETAILTYPE" EntitySet="DETAILTYPES" />
-            <End Role="LICENSEDETAIL" EntitySet="LICENSEDETAILs" />
+          <EntitySet Name="DetailTypes" EntityType="EPMLive.OnlineLicensing.Api.Data.DetailType" />
+          <EntitySet Name="LicenseDetails" EntityType="EPMLive.OnlineLicensing.Api.Data.LicenseDetail" />
+          <EntitySet Name="LicenseProducts" EntityType="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" />
+          <AssociationSet Name="FK_LICENSEDETAIL_DETAILTYPES" Association="EPMLive.OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES">
+            <End Role="DETAILTYPE" EntitySet="DetailTypes" />
+            <End Role="LICENSEDETAIL" EntitySet="LicenseDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK_PRODPLANS_HOSTEDPRODUCTS" Association="OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS">
-            <End Role="LICENSEPRODUCT" EntitySet="LICENSEPRODUCTS" />
-            <End Role="LICENSEDETAIL" EntitySet="LICENSEDETAILs" />
+          <AssociationSet Name="FK_PRODPLANS_HOSTEDPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS">
+            <End Role="LicenseProduct" EntitySet="LicenseProducts" />
+            <End Role="LICENSEDETAIL" EntitySet="LicenseDetails" />
           </AssociationSet>
-          <EntitySet Name="ORDERDETAILs" EntityType="OnlineLicensing.Api.Data.ORDERDETAIL" />
-          <EntitySet Name="ORDERS" EntityType="OnlineLicensing.Api.Data.ORDER" />
-          <EntitySet Name="ACCOUNTs" EntityType="OnlineLicensing.Api.Data.ACCOUNT" />
-          <EntitySet Name="vwAccountOrders" EntityType="OnlineLicensing.Api.Data.vwAccountOrder" />
-          <AssociationSet Name="FK_ORDERS_LICENSEPRODUCTS" Association="OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS">
-            <End Role="LICENSEPRODUCT" EntitySet="LICENSEPRODUCTS" />
-            <End Role="ORDER" EntitySet="ORDERS" />
+          <EntitySet Name="OrderDetails" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" />
+          <EntitySet Name="Orders" EntityType="EPMLive.OnlineLicensing.Api.Data.Order" />
+          <EntitySet Name="Accounts" EntityType="EPMLive.OnlineLicensing.Api.Data.Account" />
+          <EntitySet Name="vwAccountOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.vwAccountOrder" />
+          <AssociationSet Name="FK_ORDERS_LICENSEPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS">
+            <End Role="LicenseProduct" EntitySet="LicenseProducts" />
+            <End Role="ORDER" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK_ORDERDETAIL_ORDERS" Association="OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS">
-            <End Role="ORDER" EntitySet="ORDERS" />
-            <End Role="ORDERDETAIL" EntitySet="ORDERDETAILs" />
+          <AssociationSet Name="FK_ORDERDETAIL_ORDERS" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS">
+            <End Role="ORDER" EntitySet="Orders" />
+            <End Role="ORDERDETAIL" EntitySet="OrderDetails" />
           </AssociationSet>
         </EntityContainer>
-        <EntityType Name="DETAILTYPE">
+        <EntityType Name="DetailType">
           <Key>
             <PropertyRef Name="detail_type_id" />
           </Key>
           <Property Name="detail_type_id" Type="Int32" Nullable="false" />
           <Property Name="detail_name" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="externalusers" Type="Boolean" />
-          <NavigationProperty Name="LICENSEDETAILs" Relationship="OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" FromRole="DETAILTYPE" ToRole="LICENSEDETAIL" />
+          <NavigationProperty Name="LicenseDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" FromRole="DETAILTYPE" ToRole="LICENSEDETAIL" />
         </EntityType>
-        <EntityType Name="LICENSEDETAIL">
+        <EntityType Name="LicenseDetail">
           <Key>
             <PropertyRef Name="license_detail_id" />
           </Key>
@@ -287,23 +287,23 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="product_id" Type="Int32" Nullable="false" />
           <Property Name="detail_type_id" Type="Int32" />
           <Property Name="contract_id" Type="Int32" />
-          <NavigationProperty Name="DETAILTYPE" Relationship="OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" FromRole="LICENSEDETAIL" ToRole="DETAILTYPE" />
-          <NavigationProperty Name="LICENSEPRODUCT" Relationship="OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEDETAIL" ToRole="LICENSEPRODUCT" />
+          <NavigationProperty Name="DetailType" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" FromRole="LICENSEDETAIL" ToRole="DETAILTYPE" />
+          <NavigationProperty Name="LicenseProduct" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEDETAIL" ToRole="LicenseProduct" />
         </EntityType>
-        <EntityType Name="LICENSEPRODUCT">
+        <EntityType Name="LicenseProduct">
           <Key>
             <PropertyRef Name="product_id" />
           </Key>
           <Property Name="product_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="sku" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="LICENSEDETAILs" Relationship="OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="LICENSEDETAIL" />
-          <NavigationProperty Name="ORDERS" Relationship="OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="ORDER" />
+          <NavigationProperty Name="LicenseDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LicenseProduct" ToRole="LICENSEDETAIL" />
+          <NavigationProperty Name="Orders" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="LicenseProduct" ToRole="ORDER" />
           <Property Name="active" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_LICENSEDETAIL_DETAILTYPES">
-          <End Type="OnlineLicensing.Api.Data.DETAILTYPE" Role="DETAILTYPE" Multiplicity="0..1" />
-          <End Type="OnlineLicensing.Api.Data.LICENSEDETAIL" Role="LICENSEDETAIL" Multiplicity="*" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.DetailType" Role="DETAILTYPE" Multiplicity="0..1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.LicenseDetail" Role="LICENSEDETAIL" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="DETAILTYPE">
               <PropertyRef Name="detail_type_id" />
@@ -314,10 +314,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_PRODPLANS_HOSTEDPRODUCTS">
-          <End Type="OnlineLicensing.Api.Data.LICENSEPRODUCT" Role="LICENSEPRODUCT" Multiplicity="1" />
-          <End Type="OnlineLicensing.Api.Data.LICENSEDETAIL" Role="LICENSEDETAIL" Multiplicity="*" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" Role="LicenseProduct" Multiplicity="1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.LicenseDetail" Role="LICENSEDETAIL" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="LICENSEPRODUCT">
+            <Principal Role="LicenseProduct">
               <PropertyRef Name="product_id" />
             </Principal>
             <Dependent Role="LICENSEDETAIL">
@@ -325,7 +325,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="ORDERDETAIL">
+        <EntityType Name="OrderDetail">
           <Key>
             <PropertyRef Name="order_detail_id" />
           </Key>
@@ -333,9 +333,9 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="order_id" Type="Guid" />
           <Property Name="detail_type_id" Type="Int32" />
           <Property Name="quantity" Type="Int32" />
-          <NavigationProperty Name="ORDER" Relationship="OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" FromRole="ORDERDETAIL" ToRole="ORDER" />
+          <NavigationProperty Name="Order" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" FromRole="ORDERDETAIL" ToRole="ORDER" />
         </EntityType>
-        <EntityType Name="ORDER">
+        <EntityType Name="Order">
           <Key>
             <PropertyRef Name="order_id" />
           </Key>
@@ -359,10 +359,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="contractid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="billingsystem" Type="Int32" />
           <Property Name="product_id" Type="Int32" />
-          <NavigationProperty Name="LICENSEPRODUCT" Relationship="OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="ORDER" ToRole="LICENSEPRODUCT" />
-          <NavigationProperty Name="ORDERDETAILs" Relationship="OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" FromRole="ORDER" ToRole="ORDERDETAIL" />
+          <NavigationProperty Name="LicenseProduct" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="ORDER" ToRole="LicenseProduct" />
+          <NavigationProperty Name="OrderDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" FromRole="ORDER" ToRole="ORDERDETAIL" />
         </EntityType>
-        <EntityType Name="ACCOUNT">
+        <EntityType Name="Account">
           <Key>
             <PropertyRef Name="account_id" />
             <PropertyRef Name="account_ref" />
@@ -412,10 +412,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="order_id" Type="Guid" Nullable="false" />
         </EntityType>
         <Association Name="FK_ORDERS_LICENSEPRODUCTS">
-          <End Type="OnlineLicensing.Api.Data.LICENSEPRODUCT" Role="LICENSEPRODUCT" Multiplicity="0..1" />
-          <End Type="OnlineLicensing.Api.Data.ORDER" Role="ORDER" Multiplicity="*" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" Role="LicenseProduct" Multiplicity="0..1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.Order" Role="ORDER" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="LICENSEPRODUCT">
+            <Principal Role="LicenseProduct">
               <PropertyRef Name="product_id" />
             </Principal>
             <Dependent Role="ORDER">
@@ -424,10 +424,10 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ORDERDETAIL_ORDERS">
-          <End Type="OnlineLicensing.Api.Data.ORDER" Role="ORDER" Multiplicity="0..1">
+          <End Type="EPMLive.OnlineLicensing.Api.Data.Order" Role="ORDER" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="OnlineLicensing.Api.Data.ORDERDETAIL" Role="ORDERDETAIL" Multiplicity="*" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.OrderDetail" Role="ORDERDETAIL" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ORDER">
               <PropertyRef Name="order_id" />
@@ -443,8 +443,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="OnlineLicensingApiDataStoreContainer" CdmEntityContainer="LicensingModel">
-          <EntitySetMapping Name="DETAILTYPES">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.DETAILTYPE">
+          <EntitySetMapping Name="DetailTypes">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.DetailType">
               <MappingFragment StoreEntitySet="DETAILTYPES">
                 <ScalarProperty Name="externalusers" ColumnName="externalusers" />
                 <ScalarProperty Name="detail_name" ColumnName="detail_name" />
@@ -452,8 +452,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="LICENSEDETAILs">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.LICENSEDETAIL">
+          <EntitySetMapping Name="LicenseDetails">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.LicenseDetail">
               <MappingFragment StoreEntitySet="LICENSEDETAIL">
                 <ScalarProperty Name="contract_id" ColumnName="contract_id" />
                 <ScalarProperty Name="detail_type_id" ColumnName="detail_type_id" />
@@ -462,9 +462,9 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="LICENSEPRODUCTS">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.LICENSEPRODUCT">
-              <MappingFragment StoreEntitySet="LICENSEPRODUCTS">
+          <EntitySetMapping Name="LicenseProducts">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.LicenseProduct">
+              <MappingFragment StoreEntitySet="LicenseProducts">
                 <ScalarProperty Name="active" ColumnName="active" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="sku" ColumnName="sku" />
@@ -472,8 +472,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ORDERDETAILs">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.ORDERDETAIL">
+          <EntitySetMapping Name="OrderDetails">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.OrderDetail">
               <MappingFragment StoreEntitySet="ORDERDETAIL">
                 <ScalarProperty Name="quantity" ColumnName="quantity" />
                 <ScalarProperty Name="detail_type_id" ColumnName="detail_type_id" />
@@ -482,8 +482,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ORDERS">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.ORDER">
+          <EntitySetMapping Name="Orders">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.Order">
               <MappingFragment StoreEntitySet="ORDERS">
                 <ScalarProperty Name="product_id" ColumnName="product_id" />
                 <ScalarProperty Name="billingsystem" ColumnName="billingsystem" />
@@ -508,8 +508,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ACCOUNTs">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.ACCOUNT">
+          <EntitySetMapping Name="Accounts">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.Account">
               <MappingFragment StoreEntitySet="ACCOUNT">
                 <ScalarProperty Name="SalesForceId" ColumnName="SalesForceId" />
                 <ScalarProperty Name="internalemail" ColumnName="internalemail" />
@@ -533,7 +533,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="vwAccountOrders">
-            <EntityTypeMapping TypeName="OnlineLicensing.Api.Data.vwAccountOrder">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.vwAccountOrder">
               <MappingFragment StoreEntitySet="vwAccountOrders">
                 <ScalarProperty Name="order_id" ColumnName="order_id" />
                 <ScalarProperty Name="BillingSys" ColumnName="BillingSys" />
