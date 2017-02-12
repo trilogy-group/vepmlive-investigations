@@ -10,11 +10,9 @@ namespace AdminSite.WebControls.Product
         private bool DeleteMode => Request["del"] == "1";
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                if (DeleteMode) DeleteCurrentFeature();
-                LoadDetailTypes();
-            }
+            if (IsPostBack) return;
+            if (DeleteMode) DeleteCurrentFeature();
+            LoadDetailTypes();
         }
 
         private void DeleteCurrentFeature()
@@ -27,6 +25,7 @@ namespace AdminSite.WebControls.Product
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error deleting this product: " + ex.Message;
+                Logger.WarnFormat("There was an error deleting this product: {0}", ex.Message);
             }
         }
 
@@ -62,6 +61,7 @@ namespace AdminSite.WebControls.Product
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error adding feature to product: " + ex.Message;
+
                 return false;
             }
             return true;

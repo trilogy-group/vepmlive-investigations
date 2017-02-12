@@ -49,10 +49,12 @@ namespace AdminSite.WebControls.Product
                 {
                     if (ProductCatalogManager.CheckForSkuDuplicate(txtSKU.Text)) { lblMessage.Text = "The SKU entered already exists for another product. "; return false; }
                     ProductCatalogManager.AddProduct(txtSKU.Text, txtName.Text, chkActive.Checked);
+                    Logger.InfoFormat("{0} created a new License product: {1}[{2}]", CurrentUserName, txtName.Text,txtSKU.Text);
                 }
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error saving the new product: " + ex.Message;
+                    Logger.WarnFormat("There was an error saving the new product: {0}", ex.Message);
                     return false;
                 }
             }
@@ -61,15 +63,18 @@ namespace AdminSite.WebControls.Product
                 try
                 {
                     ProductCatalogManager.DeleteProduct(Convert.ToInt32(lblProductId.Text));
+                    Logger.InfoFormat("{0} deleted a License product: {1}[{2}]", CurrentUserName, txtName.Text, txtSKU.Text);
                 }
                 catch (LicenseProductInUseException)
                 {
                     lblMessage.Text = "Cannot delete this product because it is in use. ";
+                    Logger.WarnFormat("Cannot delete this product because it is in use: {0}", txtName.Text);
                     return false;
                 }
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error deleting this product: " + ex.Message;
+                    Logger.WarnFormat("There was an error deleting this product: {0}", ex.Message);
                     return false;
                 }
             }
@@ -79,10 +84,12 @@ namespace AdminSite.WebControls.Product
                 try
                 {
                     ProductCatalogManager.UpdateProduct(Convert.ToInt32(lblProductId.Text), txtName.Text, chkActive.Checked);
+                    Logger.InfoFormat("{0} updated License product: {1}[{2}]", CurrentUserName, txtName.Text, txtSKU.Text);
                 }
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error saving the product changes: " + ex.Message;
+                    Logger.WarnFormat("TThere was an error saving the product changes: {0}", ex.Message);
                     return false;
                 }
             }

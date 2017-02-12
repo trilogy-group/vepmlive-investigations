@@ -16,11 +16,6 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
-        public static void GenerateProductDetail(int productId)
-        {
-
-        }
-
         /// <summary>
         /// Get product based on id
         /// </summary>

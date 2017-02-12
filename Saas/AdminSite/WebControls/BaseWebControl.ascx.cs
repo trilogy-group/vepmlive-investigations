@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace AdminSite.WebControls
 {
     public partial class BaseWebControl : System.Web.UI.UserControl
     {
+        protected static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        protected string CurrentUserName => HttpContext.Current.User.Identity.Name;
+
         protected virtual string CheckIfDeletable(string name, string url, Func<bool> condition)
         {
             return condition()
