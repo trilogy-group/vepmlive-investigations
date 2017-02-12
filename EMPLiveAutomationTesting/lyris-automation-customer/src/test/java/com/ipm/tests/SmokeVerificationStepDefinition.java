@@ -357,6 +357,7 @@ public class SmokeVerificationStepDefinition {
 
     @When("^I click on 'My Workspace' from left panel$")
     public void iClickOnMyWorkspaceFromLeftPanel() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
@@ -364,6 +365,7 @@ public class SmokeVerificationStepDefinition {
 
     @And("^I click on 'New Workspace'$")
     public void iClickOnNewWorkspace() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
@@ -373,12 +375,14 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^The 'Create Workspace' popup should be displayed$")
     public void theCreateWorkspacePopupShouldBeDisplayed() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
         assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Create Workspace"));
     }
 
     @When("^I  provide Workspace name and description$")
     public void iProvideWorkspaceNameAndDescription() throws Throwable {
+        checkPageIsReady();
         createdWorkSpaceName = "aaaWorksapce" + System.currentTimeMillis() / 1000L;
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
         driver.switchTo().defaultContent();
@@ -392,6 +396,7 @@ public class SmokeVerificationStepDefinition {
 
     @And("^I select any of the Online Template Like: Blank, Collaborative, PPM, Project$")
     public void iSelectAnyOfTheOnlineTemplateLikeBlankCollaborativePPMProject() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='onlineTemplates']/div[2]/ol/li[1]/img")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='onlineTemplates']/div[2]/ol/li[1]/img"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
@@ -400,6 +405,7 @@ public class SmokeVerificationStepDefinition {
 
     @And("^I click on 'Create Workspace'$")
     public void iClickOnCreateWorkspace() throws Throwable {
+        checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='OuterContainer']/div[2]/button[1]")));
         WebElement element = driver.findElement(By.xpath(".//*[@id='OuterContainer']/div[2]/button[1]"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
@@ -419,6 +425,7 @@ public class SmokeVerificationStepDefinition {
     @Then("^newly added workspace name would be displayed under 'Workspaces' panel$")
     public void newlyAddedWorkspaceNameWouldBeDisplayedUnderWorkspacesPanel() throws Throwable {
         driver.navigate().refresh();
+        checkPageIsReady();
 //        Thread.sleep(10000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
