@@ -31,7 +31,6 @@
 <body>
     <form id="newLicenseForm" runat="server">
     <div>
-        <%--<asp:Label ID="errorLabel" runat="server" Visible="false"></asp:Label>--%>
         <label  ID="errorLabel" runat="server" Visible="false" style="color:red"></label>
         <br />
         <fieldset>

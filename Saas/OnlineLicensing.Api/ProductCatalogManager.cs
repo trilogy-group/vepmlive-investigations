@@ -19,8 +19,8 @@ namespace OnlineLicensing.Api
         /// Gets all the enabled features for a particular product.
         /// </summary>
         /// <param name="productId">The id of the product to get the features from</param>
-        /// <returns>Returns an IEnumerable<FeatureList>containing all the features in a product.</returns>
-        public static IEnumerable<FeatureList> GenerateProductDetail(int productId)
+        /// <returns>Returns an <see cref="IEnumerable{LicenseFeature}"/> containing all the features in a product.</returns>
+        public static IEnumerable<LicenseFeature> GetLicenseProductFeatures(int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
@@ -28,7 +28,7 @@ namespace OnlineLicensing.Api
 
                 foreach (var item in enabledFeatures)
                 {
-                    yield return new FeatureList
+                    yield return new LicenseFeature
                     {
                         Id = Convert.ToInt32(item.detail_type_id),
                         Name = context.DETAILTYPES.SingleOrDefault(d => d.detail_type_id == item.detail_type_id).detail_name

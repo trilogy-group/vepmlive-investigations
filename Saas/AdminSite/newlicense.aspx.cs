@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -27,9 +28,9 @@ namespace AdminSite
         /// </summary>
         private void PopulateProductCatalog()
         {
-            var Products = ProductCatalogManager.GetAllActiveProducts();
+            var products = ProductCatalogManager.GetAllActiveProducts();
 
-            foreach (var item in Products)
+            foreach (var item in products)
             {
                 DropDownProductCatalog.Items.Add(new ListItem
                 {
@@ -44,7 +45,7 @@ namespace AdminSite
         /// </summary>
         private void PopulateFeatureList()
         {
-            var featureList = ProductCatalogManager.GenerateProductDetail(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
+            var featureList = ProductCatalogManager.GetLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
 
             table.ID = "Table1";
 
@@ -55,7 +56,7 @@ namespace AdminSite
 
                 var tb = new TextBox() { ID = $" {item.Name.Replace(" ", "") }Qty" };
                 var label = new Label() { Text = item.Name, ID = item.Id.ToString() };
-                var validator = new RegularExpressionValidator() { ControlToValidate = tb.ID, ValidationExpression = @"\d+", ErrorMessage = "Only Numbers allowed" };
+                var validator = new RegularExpressionValidator() { CssClass = "QtyValidator", ControlToValidate = tb.ID, ValidationExpression = @"\d+", ErrorMessage = "Only Numbers allowed" };
 
                 cell.Controls.Add(label);
                 cell.Controls.Add(tb);
@@ -76,16 +77,10 @@ namespace AdminSite
             var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
-            var featureList = new List<Tuple<int, int>>();
 
-            foreach (TableRow item in table.Rows)
-            {
-                var featureId = Convert.ToInt32(item.Cells[0].Controls[0].ID);
-                var quantity = Convert.ToInt32(string.IsNullOrEmpty((item.Cells[0].Controls[1] as TextBox).Text) ? "0" : (item.Cells[0].Controls[1] as TextBox).Text);
+            if (!ValidateQuantities()) return;
 
-                featureList.Add(new Tuple<int, int>(featureId, quantity));
-            }
-
+            var featureList = ExtractFeatureAndQuantities();
             using (var license = new LicenseManager())
             {
 
@@ -98,15 +93,61 @@ namespace AdminSite
                 {
                     license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
 
-                    var script = string.Format(@"
+                    var script = $@"
                         <script>
-                            parent.location.href='editaccount.aspx?account_id={0}&tab=4';
+                            parent.location.href='editaccount.aspx?account_id={Request["accountId"]}&tab=4';
                         </script>
-                    ", Request["accountId"]);
+                    ";
 
                     ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
                 }
             }
+        }
+
+        /// <summary>
+        /// Check that no quantities are zero.
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidateQuantities()
+        {
+            var offendingLines = new StringBuilder();
+
+            foreach (TableRow item in table.Rows)
+            {
+                var txtQty = item.Cells[0].Controls[1] as TextBox;
+                if (txtQty == null) continue;
+                var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
+                if (quantity > 0) continue;
+
+                var featureName = item.Cells[0].Controls[0] as Label;
+                if (featureName != null)
+                {
+                    offendingLines.AppendFormat("{0} Quantity is required and cannot be zero <br/>", featureName.Text);
+                }
+            }
+
+            if (offendingLines.Length == 0) return true;
+
+            errorLabel.InnerHtml = offendingLines.ToString();
+            errorLabel.Visible = true;
+
+            return false;
+        }
+
+        private List<Tuple<int, int>> ExtractFeatureAndQuantities()
+        {
+            List<Tuple<int, int>> featureList = new List<Tuple<int, int>>();
+
+            foreach (TableRow item in table.Rows)
+            {
+                var featureId = Convert.ToInt32(item.Cells[0].Controls[0].ID);
+                var txtQty = item.Cells[0].Controls[1] as TextBox;
+                if (txtQty == null) continue;
+                var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
+                featureList.Add(new Tuple<int, int>(featureId, quantity));
+            }
+
+            return featureList;
         }
 
         protected void DropDownProductCatalog_SelectedIndexChanged(object sender, EventArgs e)

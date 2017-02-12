@@ -19,7 +19,7 @@ namespace OnlineLicensing.Api
         /// </summary>
         /// <param name="accountRef">The account reference number.</param>
         /// <returns>Return an IEnumerable<LicenseOrder> containing all the active licenses in the account.</returns>
-        public static IEnumerable<LicenseOder> GetAllActiveLicenses(int accountRef)
+        public static IEnumerable<LicenseOrder> GetAllActiveLicenses(int accountRef)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
@@ -41,7 +41,7 @@ namespace OnlineLicensing.Api
                         featureDetails.Append("<br />");
                     }
 
-                    yield return new LicenseOder
+                    yield return new LicenseOrder
                     { 
                         ProductId = Convert.ToInt32(item.product_id),
                         Product = productName,
@@ -140,7 +140,7 @@ namespace OnlineLicensing.Api
     /// <summary>
     /// Class to represent the purchased licenses in an account.
     /// </summary>
-    public class LicenseOder
+    public class LicenseOrder
     {
         public int ProductId { get; set; }
         public string Product { get; set; }
@@ -151,7 +151,7 @@ namespace OnlineLicensing.Api
     /// <summary>
     /// Class to represent the available features in a product.
     /// </summary>
-    public class FeatureList
+    public class LicenseFeature
     {
         public int Id { get; set; }
         public string Name { get; set; }
