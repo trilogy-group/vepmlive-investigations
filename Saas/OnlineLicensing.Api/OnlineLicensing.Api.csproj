@@ -60,6 +60,7 @@
     <Compile Include="Data\DetailType.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\ILicensingModel.cs" />
     <Compile Include="Data\LicenseDetail.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
@@ -94,7 +95,6 @@
     </Compile>
     <Compile Include="Exceptions\LicenseProductInUseException.cs" />
     <Compile Include="Exceptions\LicensingException.cs" />
-    <Compile Include="LicenseFrequencyType.cs" />
     <Compile Include="ProductCatalogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

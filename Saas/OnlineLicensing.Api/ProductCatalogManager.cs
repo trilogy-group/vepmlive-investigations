@@ -78,9 +78,9 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
-        public static bool CheckForSkuDuplicate(string sku)
+        public bool CheckForSkuDuplicate(string sku)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.sku.Equals(sku));
                 return existingProduct != null;
