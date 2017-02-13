@@ -1,11 +1,11 @@
-﻿using OnlineLicensing.Api.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using EPMLive.OnlineLicensing.Api.Data;
 
-namespace OnlineLicensing.Api
+namespace EPMLive.OnlineLicensing.Api
 {
     /// <summary>
     /// Class to manage all the license related options.
@@ -15,26 +15,31 @@ namespace OnlineLicensing.Api
         protected bool Disposed { get; private set; }
 
         /// <summary>
-        /// Gets all the licences currently active in the account. Tere should only be one license active per product in the account.
+        /// Gets all the licences currently active in the account. There should only be one license active per product in the account.
         /// </summary>
         /// <param name="accountRef">The account reference number.</param>
-        /// <returns>Return an IEnumerable<LicenseOrder> containing all the active licenses in the account.</returns>
+        /// <returns>Return an <see cref="IEnumerable{LicenseOrder}"/> containing all the active licenses in the account.</returns>
         public static IEnumerable<LicenseOrder> GetAllActiveLicenses(int accountRef)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var orders = context.ORDERS.Where(l => l.account_ref == accountRef && l.enabled == true &&  l.activation <= DateTime.Now && l.expiration > DateTime.Now).ToList();
+                var orders = context.Orders.Include(o => o.LicenseProduct).Where(l => l.account_ref == accountRef && l.enabled == true && l.activation <= DateTime.Now && l.expiration > DateTime.Now).ToList();
 
                 foreach (var item in orders)
                 {
-                    var productName = item.product_id != null ? context.LICENSEPRODUCTS.SingleOrDefault(l => l.product_id == item.product_id).name ?? string.Empty : string.Empty;
+                    var productId = item.product_id ?? 0;
+                    var productName = item.LicenseProduct != null ? item.LicenseProduct.name : string.Empty;
 
                     var featureDetails = new StringBuilder();
 
-                    foreach (var itemDetails in context.ORDERDETAILs.Where(o => o.order_id == item.order_id).ToList())
+                    foreach (var itemDetails in context.OrderDetails.Where(o => o.order_id == item.order_id).ToList())
                     {
-                        var featureName = context.DETAILTYPES.SingleOrDefault(d => d.detail_type_id == itemDetails.detail_type_id).detail_name;
-                        featureDetails.Append(featureName);
+                        var matchingDetailType = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == itemDetails.detail_type_id);
+                        if (matchingDetailType != null)
+                        {
+                            var featureName = matchingDetailType.detail_name;
+                            featureDetails.Append(featureName);
+                        }
                         featureDetails.Append(":");
                         featureDetails.Append(' ', 90);
                         featureDetails.Append(itemDetails.quantity);
@@ -42,15 +47,22 @@ namespace OnlineLicensing.Api
                     }
 
                     yield return new LicenseOrder
-                    { 
-                        ProductId = Convert.ToInt32(item.product_id),
+                    {
+                        ProductId = productId,
                         Product = productName,
                         Features = featureDetails.ToString(),
                         ExpirationDate = item.expiration.ToShortDateString()
                     };
                 }
+            }
+        }
 
 
+        public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                return context.ContractLevelTitles.Include(clt => clt.ContractLevels).Where(c=>c.DETAIL_ID != null).Select(c => new LicenseContract { ContractId = c.ContractLevels.FirstOrDefault().contractId, ContractName = c.TITLE, }).ToList().AsEnumerable();
             }
         }
 
@@ -61,34 +73,34 @@ namespace OnlineLicensing.Api
         /// <param name="activationDate">The date of activation of the license.</param>
         /// <param name="expirationDate">The date of expiration of the license.</param>
         /// <param name="productId">The id of the purchased product.</param>
-        /// <param name="FeatureList">Contains the quantity of seats for every product feature.</param>
-        public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, int productId,List<Tuple<int,int>> FeatureList)
+        /// <param name="contractid"></param>
+        /// <param name="featureList">Contains the quantity of seats for every product feature.</param>
+        public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, int productId, string contractid, List<Tuple<int, int>> featureList)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var orderToAdd = new ORDER()
+                var orderToAdd = new Order()
                 {
                     order_id = Guid.NewGuid(),
-                    account_ref = accountRef, 
-                    activation = activationDate, 
+                    account_ref = accountRef,
+                    activation = activationDate,
                     expiration = expirationDate,
                     product_id = productId,
-                     
-                    contractid = "50000010",
+                    contractid = contractid,
                     plimusReferenceNumber = "00000",
-                    dtcreated = DateTime.Now, 
+                    dtcreated = DateTime.Now,
                     quantity = 1,
                     version = 2,
                     enabled = true,
                     billingsystem = 3
-            };
+                };
 
-                foreach (var item in FeatureList)
+                foreach (var item in featureList)
                 {
-                    orderToAdd.ORDERDETAILs.Add(AddLicenseDetails(orderToAdd.order_id, item));
+                    orderToAdd.OrderDetails.Add(AddLicenseDetails(orderToAdd.order_id, item));
                 }
-                
-                context.ORDERS.Add(orderToAdd);
+
+                context.Orders.Add(orderToAdd);
                 context.SaveChanges();
 
             }
@@ -100,14 +112,14 @@ namespace OnlineLicensing.Api
         /// <param name="orderId">The id of the related order</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
         /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
-        public ORDERDETAIL AddLicenseDetails(Guid orderId, Tuple<int,int> Feature )
+        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> Feature)
         {
-            return new ORDERDETAIL
+            return new OrderDetail
             {
                 order_detail_id = Guid.NewGuid(),
                 order_id = orderId,
-                detail_type_id = Feature.Item1, 
-                quantity = Feature.Item2 
+                detail_type_id = Feature.Item1,
+                quantity = Feature.Item2
             };
         }
 
@@ -155,5 +167,14 @@ namespace OnlineLicensing.Api
     {
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// a License Contract: Ultimtate, Professional, etc.
+    /// </summary>
+    public class LicenseContract
+    {
+        public string ContractName { get; set; }
+        public string ContractId { get; set; }
     }
 }

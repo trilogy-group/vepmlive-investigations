@@ -7,8 +7,8 @@
     <ProjectGuid>{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OnlineLicensing.Api</RootNamespace>
-    <AssemblyName>OnlineLicensing.Api</AssemblyName>
+    <RootNamespace>EPMLive.OnlineLicensing.Api</RootNamespace>
+    <AssemblyName>EPMLive.OnlineLicensing.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -54,19 +54,26 @@
   <ItemGroup>
     <Compile Include="AccountManager.cs" />
     <Compile Include="AppPermissions.cs" />
-    <Compile Include="Data\ACCOUNT.cs">
+    <Compile Include="Data\Account.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ConnectionHelper.cs" />
-    <Compile Include="Data\DETAILTYPE.cs">
+    <Compile Include="Data\ContractLevel.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\LICENSEDETAIL.cs">
+    <Compile Include="Data\ContractLevelTitle.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\LICENSEPRODUCT.cs">
+    <Compile Include="Data\DetailType.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\LicenseDetail.cs">
+      <DependentUpon>LicensingModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\LicenseProduct.cs">
+      <DependentUpon>LicensingModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\LicenseProduct.Partial.cs" />
     <Compile Include="Data\LicensingModel.Partial.cs" />
     <Compile Include="Data\LicensingModel.Context.cs">
       <AutoGen>True</AutoGen>
@@ -83,16 +90,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LicensingModel.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Data\ORDER.cs">
+    <Compile Include="Data\Order.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\ORDERDETAIL.cs">
+    <Compile Include="Data\OrderDetail.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\vwAccountOrder.cs">
+    <Compile Include="Data\vwActiveOrder.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="LicenseFrequencyType.cs" />
+    <Compile Include="Exceptions\LicenseProductInUseException.cs" />
+    <Compile Include="Exceptions\LicensingException.cs" />
     <Compile Include="LicenseManager.cs" />
     <Compile Include="ProductCatalogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

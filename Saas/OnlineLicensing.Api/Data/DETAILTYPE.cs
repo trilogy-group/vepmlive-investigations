@@ -7,17 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class DETAILTYPE
+    public partial class DetailType
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public DETAILTYPE()
+        public DetailType()
         {
-            this.LICENSEDETAILs = new HashSet<LICENSEDETAIL>();
+            this.LicenseDetails = new HashSet<LicenseDetail>();
         }
     
         public int detail_type_id { get; set; }
@@ -25,6 +25,6 @@ namespace OnlineLicensing.Api.Data
         public Nullable<bool> externalusers { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LICENSEDETAIL> LICENSEDETAILs { get; set; }
+        public virtual ICollection<LicenseDetail> LicenseDetails { get; set; }
     }
 }

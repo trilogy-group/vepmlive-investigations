@@ -59,6 +59,10 @@
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -87,6 +91,9 @@
     <Content Include="addkey.aspx" />
     <Content Include="addorder.aspx" />
     <Content Include="addproduct.aspx" />
+    <Content Include="addproductfeature.aspx" />
+    <Content Include="appfeature.aspx" />
+    <Content Include="manageproducts.aspx" />
     <Content Include="addpubkey.aspx" />
     <Content Include="addticket.aspx" />
     <Content Include="adduserstotrial.aspx" />
@@ -266,7 +273,10 @@
     <Content Include="style\menu_sel.png" />
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
-    <Content Include="WebControls\Product\AddProduct.ascx" />
+    <Content Include="WebControls\BaseWebControl.ascx" />
+    <Content Include="WebControls\Product\AddEditProduct.ascx" />
+    <Content Include="WebControls\Product\AddProductFeature.ascx" />
+    <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
@@ -407,6 +417,27 @@
     </Compile>
     <Compile Include="addproduct.aspx.designer.cs">
       <DependentUpon>addproduct.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addproductfeature.aspx.cs">
+      <DependentUpon>addproductfeature.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addproductfeature.aspx.designer.cs">
+      <DependentUpon>addproductfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="appfeature.aspx.cs">
+      <DependentUpon>appfeature.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="appfeature.aspx.designer.cs">
+      <DependentUpon>appfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="manageproducts.aspx.cs">
+      <DependentUpon>manageproducts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="manageproducts.aspx.designer.cs">
+      <DependentUpon>manageproducts.aspx</DependentUpon>
     </Compile>
     <Compile Include="addpubkey.aspx.cs">
       <DependentUpon>addpubkey.aspx</DependentUpon>
@@ -665,12 +696,33 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="WebControls\Product\AddProduct.ascx.cs">
-      <DependentUpon>AddProduct.ascx</DependentUpon>
+    <Compile Include="WebControls\BaseWebControl.ascx.cs">
+      <DependentUpon>BaseWebControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebControls\Product\AddProduct.ascx.designer.cs">
-      <DependentUpon>AddProduct.ascx</DependentUpon>
+    <Compile Include="WebControls\BaseWebControl.ascx.designer.cs">
+      <DependentUpon>BaseWebControl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\AddEditProduct.ascx.cs">
+      <DependentUpon>AddEditProduct.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\AddEditProduct.ascx.designer.cs">
+      <DependentUpon>AddEditProduct.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\AddProductFeature.ascx.cs">
+      <DependentUpon>AddProductFeature.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\AddProductFeature.ascx.designer.cs">
+      <DependentUpon>AddProductFeature.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProductFeatures.ascx.cs">
+      <DependentUpon>ListProductFeatures.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProductFeatures.ascx.designer.cs">
+      <DependentUpon>ListProductFeatures.ascx</DependentUpon>
     </Compile>
     <Compile Include="WebControls\Product\ListProducts.ascx.cs">
       <DependentUpon>ListProducts.ascx</DependentUpon>

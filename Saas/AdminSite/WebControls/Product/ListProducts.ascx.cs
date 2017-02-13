@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using EPMLive.OnlineLicensing.Api;
 
 namespace AdminSite.WebControls.Product
 {
-    public partial class ListProducts : System.Web.UI.UserControl
+    public partial class ListProducts : BaseWebControl
     {
-        protected readonly StringBuilder ProductRows = new StringBuilder();
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!IsPostBack)
+            {
+                grdProducts.DataSource = ProductCatalogManager.GetAllProducts();
+                grdProducts.DataBind();
+            }
         }
+
     }
 }

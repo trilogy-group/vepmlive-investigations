@@ -1,11 +1,8 @@
-﻿using OnlineLicensing.Api.Data;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EPMLive.OnlineLicensing.Api.Data;
 
-namespace OnlineLicensing.Api
+namespace EPMLive.OnlineLicensing.Api
 {
     /// <summary>
     /// Class to manage all the acount related options.
@@ -21,8 +18,11 @@ namespace OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.ACCOUNTs.SingleOrDefault(a => a.account_id == accountId).account_ref;
+                var account = context.Accounts.SingleOrDefault(a => a.account_id == accountId);
+                if (account != null)
+                    return account.account_ref;
             }
+            return 0;
         }
     }
 }

@@ -7,26 +7,24 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class vwAccountOrder
+    public partial class vwActiveOrder
     {
+        public System.Guid order_id { get; set; }
+        public int account_ref { get; set; }
         public string plimusReferenceNumber { get; set; }
         public int quantity { get; set; }
-        public string expiration { get; set; }
-        public Nullable<int> contractlevel { get; set; }
-        public System.Guid account_id { get; set; }
-        public int account_ref { get; set; }
-        public Nullable<int> storage { get; set; }
-        public Nullable<int> ProjectLimit { get; set; }
+        public Nullable<int> diskspace { get; set; }
+        public System.DateTime expiration { get; set; }
         public int plimusAccountId { get; set; }
+        public Nullable<int> version { get; set; }
         public Nullable<System.DateTime> dtcreated { get; set; }
-        public Nullable<int> billsystem { get; set; }
-        public Nullable<bool> enabled { get; set; }
-        public string BillingSys { get; set; }
-        public System.Guid order_id { get; set; }
+        public Nullable<System.Guid> poId { get; set; }
+        public Nullable<System.Guid> crmuid { get; set; }
+        public string crmorderid { get; set; }
     }
 }

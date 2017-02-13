@@ -7,18 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class ORDERDETAIL
+    public partial class OrderDetail
     {
         public System.Guid order_detail_id { get; set; }
         public Nullable<System.Guid> order_id { get; set; }
         public Nullable<int> detail_type_id { get; set; }
         public Nullable<int> quantity { get; set; }
     
-        public virtual ORDER ORDER { get; set; }
+        public virtual Order Order { get; set; }
     }
 }

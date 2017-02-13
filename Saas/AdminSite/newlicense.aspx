@@ -41,7 +41,11 @@
             <asp:DropDownList ID="DropDownProductCatalog" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownProductCatalog_SelectedIndexChanged"></asp:DropDownList>
 
             <br />
+            
+            <asp:Label ID="lblContract" runat="server" Text="Contract:"></asp:Label>
+            <asp:DropDownList ID="ddlContract" runat="server"></asp:DropDownList>
 
+            <br />
             <asp:Label ID="Label2" runat="server" Text="Activation Date"></asp:Label>
             <input type="text" class="datepicker readonly" runat="server" id="TxtActivationDate" required="required" />
            

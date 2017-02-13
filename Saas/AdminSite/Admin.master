@@ -1,4 +1,4 @@
-<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Admin.master.cs" Inherits="MasterPage" %>
+    <%@ Master Language="C#" AutoEventWireup="true" CodeFile="Admin.master.cs" Inherits="MasterPage" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -31,6 +31,7 @@
                 <li><a class="<%=strMenus[11] %>" href="sites.aspx" title="">Sites</a></li>
                 <li><a class="<%=strMenus[14] %>" href="signups.aspx" title="">Trial Signups</a></li>
                 <li><a class="<%=strMenus[3] %>" href="oldsignups.aspx" title="">OLD Trial Signups</a></li>
+                  <li><a class="<%=strMenus[15] %>" href="manageproducts.aspx" title="">Manage License Products</a></li>
               </ul>
             <!-- rounded corners - bottom **** -->
             <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>

@@ -1,4 +1,4 @@
-﻿namespace AdminSite
+﻿namespace EPMLive.OnlineLicensing.Api
 {
     public enum AppPermissions
     {

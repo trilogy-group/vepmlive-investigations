@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OnlineLicensing.Api.Data
+namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
     using System.Data.Entity;
@@ -25,12 +25,14 @@ namespace OnlineLicensing.Api.Data
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<DETAILTYPE> DETAILTYPES { get; set; }
-        public virtual DbSet<LICENSEDETAIL> LICENSEDETAILs { get; set; }
-        public virtual DbSet<LICENSEPRODUCT> LICENSEPRODUCTS { get; set; }
-        public virtual DbSet<ORDERDETAIL> ORDERDETAILs { get; set; }
-        public virtual DbSet<ORDER> ORDERS { get; set; }
-        public virtual DbSet<ACCOUNT> ACCOUNTs { get; set; }
-        public virtual DbSet<vwAccountOrder> vwAccountOrders { get; set; }
+        public virtual DbSet<LicenseDetail> LicenseDetails { get; set; }
+        public virtual DbSet<LicenseProduct> LicenseProducts { get; set; }
+        public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<vwActiveOrder> vwActiveOrders { get; set; }
+        public virtual DbSet<ContractLevelTitle> ContractLevelTitles { get; set; }
+        public virtual DbSet<ContractLevel> ContractLevels { get; set; }
+        public virtual DbSet<DetailType> DetailTypes { get; set; }
     }
 }

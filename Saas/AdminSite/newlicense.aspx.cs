@@ -1,11 +1,11 @@
-﻿using OnlineLicensing.Api;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using EPMLive.OnlineLicensing.Api;
 
 namespace AdminSite
 {
@@ -17,7 +17,7 @@ namespace AdminSite
         {
             if (!IsPostBack)
             {
-                PopulateProductCatalog();
+                PopulateProductCatalogAndContracts();
             }
 
             PopulateFeatureList();
@@ -26,7 +26,7 @@ namespace AdminSite
         /// <summary>
         /// Populates the product catalog drop down list with active products.
         /// </summary>
-        private void PopulateProductCatalog()
+        private void PopulateProductCatalogAndContracts()
         {
             var products = ProductCatalogManager.GetAllActiveProducts();
 
@@ -38,6 +38,21 @@ namespace AdminSite
                     Value = item.product_id.ToString()
                 });
             }
+
+            var contracts = LicenseManager.GetAllContractLevelTitles();
+            foreach (var contract in contracts)
+            {
+                ddlContract.Items.Add(new ListItem
+                {
+                    Text = contract.ContractName,
+                    Value = contract.ContractId
+                });
+            }
+            ddlContract.Items.Insert(0, new ListItem
+            {
+                Text = "[Select Contract]",
+                Value = ""
+            });
         }
 
         /// <summary>
@@ -45,9 +60,9 @@ namespace AdminSite
         /// </summary>
         private void PopulateFeatureList()
         {
-            var featureList = ProductCatalogManager.GetLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
+            var featureList = ProductCatalogManager.GetEnabledLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
 
-            table.ID = "Table1";
+            table.ID = "productFeaturesTable";
 
             foreach (var item in featureList)
             {
@@ -77,13 +92,15 @@ namespace AdminSite
             var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
+            var contractId = ddlContract.SelectedValue;
 
             if (!ValidateQuantities()) return;
+            if (!ValidLicensePeriod(activationDate, expirationDate)) return;
+            if (!ValidContract(contractId)) return;
 
-            var featureList = ExtractFeatureAndQuantities();
+            var featureList = ExtractFeaturesAndQuantities();
             using (var license = new LicenseManager())
             {
-
                 if (license.ValidateSingleActiveLicenseForProduct(productId, accountRef))
                 {
                     errorLabel.InnerText = $"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }";
@@ -91,7 +108,7 @@ namespace AdminSite
                 }
                 else
                 {
-                    license.AddLicense(accountRef, activationDate, expirationDate, productId, featureList);
+                    license.AddLicense(accountRef, activationDate, expirationDate, productId, contractId, featureList);
 
                     var script = $@"
                         <script>
@@ -102,6 +119,27 @@ namespace AdminSite
                     ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
                 }
             }
+        }
+
+        private bool ValidContract(string contractId)
+        {
+            if (!string.IsNullOrWhiteSpace(contractId)) return true;
+            errorLabel.InnerText = "Please select a valid Contract for this account.";
+            errorLabel.Visible = true;
+            return false;
+        }
+
+        /// <summary>
+        /// Checks that license is at least 1 day.
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidLicensePeriod(DateTime activationDate, DateTime expirationDate)
+        {
+            var validPeriod = expirationDate > activationDate && (expirationDate.DayOfYear - activationDate.DayOfYear) >= 1;
+            if (validPeriod) return true;
+            errorLabel.InnerText = "License period must be at least 1 day.";
+            errorLabel.Visible = true;
+            return false;
         }
 
         /// <summary>
@@ -134,7 +172,7 @@ namespace AdminSite
             return false;
         }
 
-        private List<Tuple<int, int>> ExtractFeatureAndQuantities()
+        private List<Tuple<int, int>> ExtractFeaturesAndQuantities()
         {
             List<Tuple<int, int>> featureList = new List<Tuple<int, int>>();
 

@@ -5,17 +5,20 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="a87c74c5854f4c0e865cd8c7bc474232" Name="Diagram1">
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.DETAILTYPE" Width="1.5" PointX="0.75" PointY="5.125" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.LICENSEDETAIL" Width="1.5" PointX="3" PointY="0.875" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.LICENSEPRODUCT" Width="1.5" PointX="0.75" PointY="1.125" />
-        <AssociationConnector Association="OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" />
-        <AssociationConnector Association="OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.ORDERDETAIL" Width="1.5" PointX="5.25" PointY="6.625" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.ORDER" Width="1.5" PointX="3" PointY="5" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.ACCOUNT" Width="1.5" PointX="5.375" PointY="0.75" />
-        <EntityTypeShape EntityType="OnlineLicensing.Api.Data.vwAccountOrder" Width="1.5" PointX="7.375" PointY="0.75" />
-        <AssociationConnector Association="OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" />
-        <AssociationConnector Association="OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.LicenseDetail" Width="1.5" PointX="3" PointY="7.25" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" Width="1.5" PointX="0.75" PointY="4.125" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" Width="1.5" PointX="5.25" PointY="2.875" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.Order" Width="1.5" PointX="3" PointY="1.25" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.Account" Width="1.5" PointX="5.75" PointY="5.75" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.vwActiveOrder" Width="1.5" PointX="7.75" PointY="0.75" />
+        <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" />
+        <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" />
+        <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.ContractLevelTitle" Width="1.5" PointX="8.375" PointY="5.75" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.ContractLevel" Width="1.5" PointX="8.375" PointY="9.75" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.DetailType" Width="1.5" PointX="10.375" PointY="0.875" />
+        <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" />
+        <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_CONTRACTLEVELS_CONTRACTLEVEL_TITLES" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
