@@ -260,7 +260,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <EntitySet Name="OrderDetails" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" />
           <EntitySet Name="Orders" EntityType="EPMLive.OnlineLicensing.Api.Data.Order" />
           <EntitySet Name="Accounts" EntityType="EPMLive.OnlineLicensing.Api.Data.Account" />
-          <EntitySet Name="vwAccountOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.vwAccountOrder" />
+          <EntitySet Name="VwAccountOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.VwAccountOrder" />
           <AssociationSet Name="FK_ORDERS_LICENSEPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS">
             <End Role="LicenseProduct" EntitySet="LicenseProducts" />
             <End Role="ORDER" EntitySet="Orders" />
@@ -387,7 +387,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
           <Property Name="internalemail" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="SalesForceId" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="vwAccountOrder">
+        <EntityType Name="VwAccountOrder">
           <Key>
             <PropertyRef Name="plimusReferenceNumber" />
             <PropertyRef Name="quantity" />
@@ -532,8 +532,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwAccountOrders' does not have a pri
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="vwAccountOrders">
-            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.vwAccountOrder">
+          <EntitySetMapping Name="VwAccountOrders">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.VwAccountOrder">
               <MappingFragment StoreEntitySet="vwAccountOrders">
                 <ScalarProperty Name="order_id" ColumnName="order_id" />
                 <ScalarProperty Name="BillingSys" ColumnName="BillingSys" />

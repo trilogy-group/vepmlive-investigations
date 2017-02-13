@@ -12,7 +12,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class vwAccountOrder
+    public partial class VwAccountOrder
     {
         public string plimusReferenceNumber { get; set; }
         public int quantity { get; set; }

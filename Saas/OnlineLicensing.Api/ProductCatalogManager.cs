@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using EPMLive.OnlineLicensing.Api.Data;
@@ -8,11 +9,18 @@ namespace EPMLive.OnlineLicensing.Api
 {
     public class ProductCatalogManager
     {
-        public static IEnumerable<LicenseProduct> GetAllProducts()
+        private readonly Func<ILicensingModel> _dataModelFunc;
+
+        public ProductCatalogManager(Func<ILicensingModel> dataModelFunc)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            this._dataModelFunc = dataModelFunc;
+        }
+
+        public IEnumerable<LicenseProduct> GetAllProducts()
+        {
+            using (var context = _dataModelFunc())
             {
-                return context.LicenseProducts.Include(o => o.Orders).Include(d=>d.LicenseDetails).OrderBy(x => x.sku).ToList().AsEnumerable();
+                return context.LicenseProducts.Include(o => o.Orders).Include(d => d.LicenseDetails).OrderBy(x => x.sku).ToList().AsEnumerable();
             }
         }
 
@@ -21,9 +29,9 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public static LicenseProduct GetProduct(int productId)
+        public LicenseProduct GetProduct(int productId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 return context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
             }
@@ -36,9 +44,9 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="sku"></param>
         /// <param name="name"></param>
         /// <param name="active"></param>
-        public static void AddProduct(string sku, string name, bool active)
+        public void AddProduct(string sku, string name, bool active)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var newProduct = new LicenseProduct { sku = sku, name = name, active = active };
                 context.LicenseProducts.Add(newProduct);
@@ -52,9 +60,10 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="productId"></param>
         /// <param name="name"></param>
-        public static void UpdateProduct(int productId, string name, bool active)
+        /// <param name="active"></param>
+        public void UpdateProduct(int productId, string name, bool active)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
 
                 var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
@@ -63,7 +72,7 @@ namespace EPMLive.OnlineLicensing.Api
                     existingProduct.name = name;
                     existingProduct.active = active;
                     context.LicenseProducts.Attach(existingProduct);
-                    context.Entry(existingProduct).State = EntityState.Modified;
+                    context.MarkAsModified(existingProduct);
                 }
                 context.SaveChanges();
             }
@@ -78,14 +87,14 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
-        public static void DeleteProduct(int productId)
+        public void DeleteProduct(int productId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var existingOrdersForProduct = context.Orders.FirstOrDefault(o => o.product_id == productId);
                 if (existingOrdersForProduct != null) throw new LicenseProductInUseException();
                 var existingProduct = context.LicenseProducts.SingleOrDefault(p => p.product_id == productId);
-                context.Entry(existingProduct).State = EntityState.Deleted;
+                context.MarkAsDeleted(existingProduct);
                 context.SaveChanges();
             }
         }
@@ -96,17 +105,17 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public static IEnumerable<LicenseDetail> GetLicenseProductFeatures(int productId)
+        public IEnumerable<LicenseDetail> GetLicenseProductFeatures(int productId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
-                return context.LicenseDetails.Include(o=>o.DetailType).Include(l=>l.LicenseProduct).Where(f=>f.product_id == productId).ToList().AsEnumerable();
+                return context.LicenseDetails.Include(o => o.DetailType).Include(l => l.LicenseProduct).Where(f => f.product_id == productId).ToList().AsEnumerable();
             }
         }
 
-        public static IEnumerable<DetailType> GetAllDetailTypes()
+        public IEnumerable<DetailType> GetAllDetailTypes()
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 return context.DetailTypes.ToList().AsEnumerable();
             }
@@ -119,18 +128,18 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="productId"></param>
         /// <param name="detailTypeId"></param>
         /// <returns></returns>
-        public static bool CheckForFeatureDuplicate(int productId, int detailTypeId)
+        public bool CheckForFeatureDuplicate(int productId, int detailTypeId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var existingProduct = context.LicenseDetails.SingleOrDefault(p => p.detail_type_id == detailTypeId && p.product_id == productId);
                 return existingProduct != null;
             }
         }
 
-        public static void AddProductFeature(int productId, int detailTypeId)
+        public void AddProductFeature(int productId, int detailTypeId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var newProductFeature = new LicenseDetail { product_id = productId, detail_type_id = detailTypeId };
                 context.LicenseDetails.Add(newProductFeature);
@@ -142,12 +151,12 @@ namespace EPMLive.OnlineLicensing.Api
         /// Delete a feature from a License product.
         /// </summary>
         /// <param name="licenseFeatureId"></param>
-        public static void DeleteProductFeature(int licenseFeatureId)
+        public void DeleteProductFeature(int licenseFeatureId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            using (var context = _dataModelFunc())
             {
                 var existingProductFeature = context.LicenseDetails.SingleOrDefault(p => p.license_detail_id == licenseFeatureId);
-                context.Entry(existingProductFeature).State = EntityState.Deleted;
+                context.MarkAsDeleted(existingProductFeature);
                 context.SaveChanges();
             }
         }

@@ -31,6 +31,6 @@ namespace EPMLive.OnlineLicensing.Api.Data
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Account> Accounts { get; set; }
-        public virtual DbSet<vwAccountOrder> vwAccountOrders { get; set; }
+        public virtual DbSet<VwAccountOrder> VwAccountOrders { get; set; }
     }
 }
