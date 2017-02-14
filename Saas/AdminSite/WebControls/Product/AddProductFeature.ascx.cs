@@ -1,5 +1,6 @@
 ﻿using System;
 using EPMLive.OnlineLicensing.Api;
+using EPMLive.OnlineLicensing.Api.Data;
 
 namespace AdminSite.WebControls.Product
 {
@@ -19,13 +20,13 @@ namespace AdminSite.WebControls.Product
         {
             try
             {
-                ProductCatalogManager.DeleteProductFeature(CurrentFeatureId);
+                new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).DeleteProductFeature(CurrentFeatureId);
                 Response.Redirect($"addproduct.aspx?id={CurrentProductId}&edit=1&tab=2");
             }
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error deleting this product: " + ex.Message;
-                Logger.WarnFormat("There was an error deleting this product: {0}", ex.Message);
+                Logger.WarnFormat("There was an error deleting this product: {0}", ex.ToString());
             }
         }
 
@@ -33,7 +34,7 @@ namespace AdminSite.WebControls.Product
         {
             ddlDetailType.DataTextField = "detail_name";
             ddlDetailType.DataValueField = "detail_type_id";
-            ddlDetailType.DataSource = ProductCatalogManager.GetAllDetailTypes();
+            ddlDetailType.DataSource = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetAllDetailTypes();
             ddlDetailType.DataBind();
         }
 
@@ -54,14 +55,14 @@ namespace AdminSite.WebControls.Product
             try
             {
                 var detailTypeId = Convert.ToInt32(ddlDetailType.SelectedValue);
-
-                if (ProductCatalogManager.CheckForFeatureDuplicate(CurrentProductId, detailTypeId)) { lblMessage.Text = $"The License feature: {ddlDetailType.SelectedItem.Text} is already part of the features for this product. "; return false; }
-                ProductCatalogManager.AddProductFeature(CurrentProductId, detailTypeId);
+                var prodManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+                if (prodManager.CheckForFeatureDuplicate(CurrentProductId, detailTypeId)) { lblMessage.Text = $"The License feature: {ddlDetailType.SelectedItem.Text} is already part of the features for this product. "; return false; }
+                prodManager.AddProductFeature(CurrentProductId, detailTypeId);
             }
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error adding feature to product: " + ex.Message;
-
+                Logger.WarnFormat("There was an error adding feature to product: {0}", ex.ToString());
                 return false;
             }
             return true;

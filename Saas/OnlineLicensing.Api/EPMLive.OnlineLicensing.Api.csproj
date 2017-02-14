@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EPMLive.OnlineLicensing.Api</RootNamespace>
     <AssemblyName>EPMLive.OnlineLicensing.Api</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,19 +59,23 @@
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ConnectionHelper.cs" />
-    <Compile Include="Data\ContractLevel.cs">
+    <Compile Include="Data\DetailType.cs">
+      <DependentUpon>LicensingModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ILicensingModel.cs" />
+    <Compile Include="Data\LicenseDetail.cs">
+      <DependentUpon>LicensingModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\LicenseProduct.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ContractLevelTitle.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\DetailType.cs">
+    <Compile Include="Data\ContractLevel.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\LicenseDetail.cs">
-      <DependentUpon>LicensingModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\LicenseProduct.cs">
+    <Compile Include="Data\VwActiveOrder.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\LicenseProduct.Partial.cs" />
@@ -94,9 +99,6 @@
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\OrderDetail.cs">
-      <DependentUpon>LicensingModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\vwActiveOrder.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Exceptions\LicenseProductInUseException.cs" />

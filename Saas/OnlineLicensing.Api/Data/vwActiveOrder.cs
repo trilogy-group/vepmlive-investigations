@@ -12,7 +12,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class vwActiveOrder
+    public partial class VwActiveOrder
     {
         public System.Guid order_id { get; set; }
         public int account_ref { get; set; }
