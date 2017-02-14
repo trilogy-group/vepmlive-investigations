@@ -79,13 +79,18 @@ namespace AdminSite
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
             var contractId = "50000010";
 
-            if (!ValidateQuantities()) return;
+            if (!ValidateQuantitiesCannotBeAllZero())
+            {
+                ShowErrorMessage("At least one feature should be different that zero.");
+                return;
+            }
             if (!ValidLicensePeriod(activationDate, expirationDate))
             {
                 ShowErrorMessage("License period must be at least 1 day.");
+                return;
             };
            
-            var featureList = ExtractFeaturesAndQuantities();
+            var featureList = GetFeaturesAndQuantities();
 
             using (var license = new LicenseManager())
             {
@@ -114,51 +119,26 @@ namespace AdminSite
         /// <returns></returns>
         private bool ValidLicensePeriod(DateTime activationDate, DateTime expirationDate)
         {
-            var validPeriod = expirationDate > activationDate && (expirationDate.DayOfYear - activationDate.DayOfYear) >= 1;
-            if (validPeriod) return true;
-
-            return false;
-            
+            return ((expirationDate > activationDate) && (expirationDate >= activationDate.AddDays(1)));
         }
 
         private void ShowErrorMessage(string message)
         {
             errorLabel.InnerText = message;
             errorLabel.Visible = true;
-            return;
         }
 
         /// <summary>
         /// Check that no quantities are zero.
         /// </summary>
         /// <returns></returns>
-        private bool ValidateQuantities()
+        private bool ValidateQuantitiesCannotBeAllZero()
         {
-            var offendingLines = new StringBuilder();
-
-            foreach (TableRow item in table.Rows)
-            {
-                var txtQty = item.Cells[0].Controls[1] as TextBox;
-                if (txtQty == null) continue;
-                var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
-                if (quantity > 0) continue;
-
-                var featureName = item.Cells[0].Controls[0] as Label;
-                if (featureName != null)
-                {
-                    offendingLines.AppendFormat("{0} Quantity is required and cannot be zero <br/>", featureName.Text);
-                }
-            }
-
-            if (offendingLines.Length == 0) return true;
-
-            errorLabel.InnerHtml = offendingLines.ToString();
-            errorLabel.Visible = true;
-
-            return false;
+            var featuresAndQuantities = GetFeaturesAndQuantities();
+            return featuresAndQuantities.Any(fq => fq.Item2 > 0);
         }
 
-        private List<Tuple<int, int>> ExtractFeaturesAndQuantities()
+        private List<Tuple<int, int>> GetFeaturesAndQuantities()
         {
             List<Tuple<int, int>> featureList = new List<Tuple<int, int>>();
 
@@ -166,9 +146,15 @@ namespace AdminSite
             {
                 var featureId = Convert.ToInt32(item.Cells[0].Controls[0].ID);
                 var txtQty = item.Cells[0].Controls[1] as TextBox;
-                if (txtQty == null) continue;
-                var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
-                featureList.Add(new Tuple<int, int>(featureId, quantity));
+                if (txtQty != null)
+                {
+                    var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
+
+                    if (quantity > 0)
+                    {
+                        featureList.Add(new Tuple<int, int>(featureId, quantity));
+                    }
+                };
             }
 
             return featureList;

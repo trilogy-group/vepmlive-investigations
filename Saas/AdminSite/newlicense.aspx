@@ -42,7 +42,7 @@
 
             <br />
 
-1            <asp:Label ID="Label2" runat="server" Text="Activation Date"></asp:Label>
+            <asp:Label ID="Label2" runat="server" Text="Activation Date"></asp:Label>
             <input type="text" class="datepicker readonly" runat="server" id="TxtActivationDate" required="required" />
            
             <br />
