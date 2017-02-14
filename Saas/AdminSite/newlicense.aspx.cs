@@ -78,25 +78,27 @@ namespace AdminSite
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
             var contractId = "50000010";
-
-            if (!ValidateQuantitiesCannotBeAllZero())
-            {
-                ShowErrorMessage("At least one feature should be different that zero.");
-                return;
-            }
-            if (!ValidLicensePeriod(activationDate, expirationDate))
-            {
-                ShowErrorMessage("License period must be at least 1 day.");
-                return;
-            };
            
             var featureList = GetFeaturesAndQuantities();
 
             using (var license = new LicenseManager())
             {
+                if (!license.ValidLicensePeriod(activationDate, expirationDate))
+                {
+                    ShowErrorMessage("License period must be at least 1 day.");
+                    return;
+                };
+
+                if (!license.ValidateQuantitiesCannotBeAllZero(GetFeaturesAndQuantities()))
+                {
+                    ShowErrorMessage("At least one feature should be different that zero.");
+                    return;
+                }
+
                 if (license.ValidateSingleActiveLicenseForProduct(productId, accountRef))
                 {
                     ShowErrorMessage($"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }");
+                    return;
                 }
                 else
                 {
@@ -113,29 +115,10 @@ namespace AdminSite
             }
         }
 
-        /// <summary>
-        /// Checks that license is at least 1 day.
-        /// </summary>
-        /// <returns></returns>
-        private bool ValidLicensePeriod(DateTime activationDate, DateTime expirationDate)
-        {
-            return ((expirationDate > activationDate) && (expirationDate >= activationDate.AddDays(1)));
-        }
-
         private void ShowErrorMessage(string message)
         {
             errorLabel.InnerText = message;
             errorLabel.Visible = true;
-        }
-
-        /// <summary>
-        /// Check that no quantities are zero.
-        /// </summary>
-        /// <returns></returns>
-        private bool ValidateQuantitiesCannotBeAllZero()
-        {
-            var featuresAndQuantities = GetFeaturesAndQuantities();
-            return featuresAndQuantities.Any(fq => fq.Item2 > 0);
         }
 
         private List<Tuple<int, int>> GetFeaturesAndQuantities()

@@ -57,7 +57,6 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
-
         public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -132,6 +131,24 @@ namespace EPMLive.OnlineLicensing.Api
         public bool ValidateSingleActiveLicenseForProduct(int ProductID, int accountRef)
         {
             return GetAllActiveLicenses(accountRef).Any(al => al.ProductId == ProductID);
+        }
+
+        /// <summary>
+        /// Checks that license is at least 1 day.
+        /// </summary>
+        /// <returns>Returns false if there is not a valid license period, returns true if the license period is valid</returns>
+        public bool ValidLicensePeriod(DateTime activationDate, DateTime expirationDate)
+        {
+            return ((expirationDate > activationDate) && (expirationDate >= activationDate.AddDays(1)));
+        }
+
+        /// <summary>
+        /// Check that no quantities are zero.
+        /// </summary>
+        /// <returns>Returns false if there is quantities for the features are all zero, returns true otherwise.</returns>
+        public bool ValidateQuantitiesCannotBeAllZero(List<Tuple<int, int>> featuresAndQuantities)
+        {
+            return featuresAndQuantities.Any(fq => fq.Item2 > 0);
         }
 
         /// <summary>
