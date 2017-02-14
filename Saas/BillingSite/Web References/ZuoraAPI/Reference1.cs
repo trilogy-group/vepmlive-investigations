@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace AdminSite.ZuoraAPI {
+namespace BillingSite.ZuoraAPI {
     using System;
     using System.Web.Services;
     using System.Diagnostics;
@@ -45,6 +45,8 @@ namespace AdminSite.ZuoraAPI {
         
         private System.Threading.SendOrPostCallback deleteOperationCompleted;
         
+        private System.Threading.SendOrPostCallback executeOperationCompleted;
+        
         private System.Threading.SendOrPostCallback queryOperationCompleted;
         
         private System.Threading.SendOrPostCallback getUserInfoOperationCompleted;
@@ -55,7 +57,7 @@ namespace AdminSite.ZuoraAPI {
         
         /// <remarks/>
         public ZuoraService() {
-            this.Url = global::AdminSite.Properties.Settings.Default.AdminSite_ZuoraAPI_ZuoraService;
+            this.Url = global::BillingSite.Properties.Settings.Default.BillingSite_ZuoraAPI_ZuoraService;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;
@@ -124,6 +126,9 @@ namespace AdminSite.ZuoraAPI {
         
         /// <remarks/>
         public event deleteCompletedEventHandler deleteCompleted;
+        
+        /// <remarks/>
+        public event executeCompletedEventHandler executeCompleted;
         
         /// <remarks/>
         public event queryCompletedEventHandler queryCompleted;
@@ -321,6 +326,41 @@ namespace AdminSite.ZuoraAPI {
             if ((this.deleteCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.deleteCompleted(this, new deleteCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapHeaderAttribute("SessionHeaderValue")]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("", RequestNamespace="http://api.zuora.com/", ResponseNamespace="http://api.zuora.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute("result")]
+        public ExecuteResult[] execute(string type, bool synchronous, [System.Xml.Serialization.XmlElementAttribute("ids")] string[] ids) {
+            object[] results = this.Invoke("execute", new object[] {
+                        type,
+                        synchronous,
+                        ids});
+            return ((ExecuteResult[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void executeAsync(string type, bool synchronous, string[] ids) {
+            this.executeAsync(type, synchronous, ids, null);
+        }
+        
+        /// <remarks/>
+        public void executeAsync(string type, bool synchronous, string[] ids, object userState) {
+            if ((this.executeOperationCompleted == null)) {
+                this.executeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnexecuteOperationCompleted);
+            }
+            this.InvokeAsync("execute", new object[] {
+                        type,
+                        synchronous,
+                        ids}, this.executeOperationCompleted, userState);
+        }
+        
+        private void OnexecuteOperationCompleted(object arg) {
+            if ((this.executeCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.executeCompleted(this, new executeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -809,6 +849,10 @@ namespace AdminSite.ZuoraAPI {
         
         private bool refundAmountFieldSpecified;
         
+        private System.Nullable<bool> regenerateInvoicePDFField;
+        
+        private bool regenerateInvoicePDFFieldSpecified;
+        
         private string statusField;
         
         private System.Nullable<System.DateTime> targetDateField;
@@ -1177,6 +1221,28 @@ namespace AdminSite.ZuoraAPI {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> RegenerateInvoicePDF {
+            get {
+                return this.regenerateInvoicePDFField;
+            }
+            set {
+                this.regenerateInvoicePDFField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool RegenerateInvoicePDFSpecified {
+            get {
+                return this.regenerateInvoicePDFFieldSpecified;
+            }
+            set {
+                this.regenerateInvoicePDFFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string Status {
             get {
                 return this.statusField;
@@ -1256,6 +1322,7 @@ namespace AdminSite.ZuoraAPI {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(CommunicationProfile))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Export))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Import))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Usage))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Subscription))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProductRatePlanChargeTier))]
@@ -1676,6 +1743,249 @@ namespace AdminSite.ZuoraAPI {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://object.api.zuora.com/")]
+    public partial class Import : zObject {
+        
+        private string createdByIdField;
+        
+        private System.Nullable<System.DateTime> createdDateField;
+        
+        private bool createdDateFieldSpecified;
+        
+        private byte[] fileContentField;
+        
+        private System.Nullable<int> importedCountField;
+        
+        private bool importedCountFieldSpecified;
+        
+        private string importTypeField;
+        
+        private string md5Field;
+        
+        private string nameField;
+        
+        private string originalResourceUrlField;
+        
+        private string resultResourceUrlField;
+        
+        private string statusField;
+        
+        private string statusReasonField;
+        
+        private System.Nullable<int> totalCountField;
+        
+        private bool totalCountFieldSpecified;
+        
+        private string updatedByIdField;
+        
+        private System.Nullable<System.DateTime> updatedDateField;
+        
+        private bool updatedDateFieldSpecified;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string CreatedById {
+            get {
+                return this.createdByIdField;
+            }
+            set {
+                this.createdByIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<System.DateTime> CreatedDate {
+            get {
+                return this.createdDateField;
+            }
+            set {
+                this.createdDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool CreatedDateSpecified {
+            get {
+                return this.createdDateFieldSpecified;
+            }
+            set {
+                this.createdDateFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary", IsNullable=true)]
+        public byte[] FileContent {
+            get {
+                return this.fileContentField;
+            }
+            set {
+                this.fileContentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> ImportedCount {
+            get {
+                return this.importedCountField;
+            }
+            set {
+                this.importedCountField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool ImportedCountSpecified {
+            get {
+                return this.importedCountFieldSpecified;
+            }
+            set {
+                this.importedCountFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string ImportType {
+            get {
+                return this.importTypeField;
+            }
+            set {
+                this.importTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string Md5 {
+            get {
+                return this.md5Field;
+            }
+            set {
+                this.md5Field = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string Name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string OriginalResourceUrl {
+            get {
+                return this.originalResourceUrlField;
+            }
+            set {
+                this.originalResourceUrlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string ResultResourceUrl {
+            get {
+                return this.resultResourceUrlField;
+            }
+            set {
+                this.resultResourceUrlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string Status {
+            get {
+                return this.statusField;
+            }
+            set {
+                this.statusField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string StatusReason {
+            get {
+                return this.statusReasonField;
+            }
+            set {
+                this.statusReasonField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<int> TotalCount {
+            get {
+                return this.totalCountField;
+            }
+            set {
+                this.totalCountField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool TotalCountSpecified {
+            get {
+                return this.totalCountFieldSpecified;
+            }
+            set {
+                this.totalCountFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string UpdatedById {
+            get {
+                return this.updatedByIdField;
+            }
+            set {
+                this.updatedByIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<System.DateTime> UpdatedDate {
+            get {
+                return this.updatedDateField;
+            }
+            set {
+                this.updatedDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool UpdatedDateSpecified {
+            get {
+                return this.updatedDateFieldSpecified;
+            }
+            set {
+                this.updatedDateFieldSpecified = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1590.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://object.api.zuora.com/")]
     public partial class Usage : zObject {
         
         private string accountIdField;
@@ -1697,6 +2007,8 @@ namespace AdminSite.ZuoraAPI {
         private System.Nullable<System.DateTime> endDateTimeField;
         
         private bool endDateTimeFieldSpecified;
+        
+        private string importIdField;
         
         private string invoiceIdField;
         
@@ -1839,6 +2151,17 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.endDateTimeFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string ImportId {
+            get {
+                return this.importIdField;
+            }
+            set {
+                this.importIdField = value;
             }
         }
         
@@ -2062,8 +2385,6 @@ namespace AdminSite.ZuoraAPI {
         
         private bool createdDateFieldSpecified;
         
-        private string currencyField;
-        
         private System.Nullable<int> initialTermField;
         
         private bool initialTermFieldSpecified;
@@ -2121,8 +2442,6 @@ namespace AdminSite.ZuoraAPI {
         private System.Nullable<int> versionField;
         
         private bool versionFieldSpecified;
-        
-        private string pO__cField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
@@ -2253,17 +2572,6 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.createdDateFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string Currency {
-            get {
-                return this.currencyField;
-            }
-            set {
-                this.currencyField = value;
             }
         }
         
@@ -2583,17 +2891,6 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.versionFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string PO__c {
-            get {
-                return this.pO__cField;
-            }
-            set {
-                this.pO__cField = value;
             }
         }
     }
@@ -2968,7 +3265,11 @@ namespace AdminSite.ZuoraAPI {
         
         private bool updatedDateFieldSpecified;
         
-        private string hidden__cField;
+        private System.Nullable<bool> useDiscountSpecificAccountingCodeField;
+        
+        private bool useDiscountSpecificAccountingCodeFieldSpecified;
+        
+        private string detailId__cField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
@@ -3413,12 +3714,34 @@ namespace AdminSite.ZuoraAPI {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string Hidden__c {
+        public System.Nullable<bool> UseDiscountSpecificAccountingCode {
             get {
-                return this.hidden__cField;
+                return this.useDiscountSpecificAccountingCodeField;
             }
             set {
-                this.hidden__cField = value;
+                this.useDiscountSpecificAccountingCodeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool UseDiscountSpecificAccountingCodeSpecified {
+            get {
+                return this.useDiscountSpecificAccountingCodeFieldSpecified;
+            }
+            set {
+                this.useDiscountSpecificAccountingCodeFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string DetailId__c {
+            get {
+                return this.detailId__cField;
+            }
+            set {
+                this.detailId__cField = value;
             }
         }
     }
@@ -3460,6 +3783,8 @@ namespace AdminSite.ZuoraAPI {
         private string displayName__cField;
         
         private string displayOrder__cField;
+        
+        private string contractId__cField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
@@ -3623,6 +3948,17 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.displayOrder__cField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string ContractId__c {
+            get {
+                return this.contractId__cField;
+            }
+            set {
+                this.contractId__cField = value;
             }
         }
     }
@@ -7537,6 +7873,12 @@ namespace AdminSite.ZuoraAPI {
         
         private bool upToPeriodsFieldSpecified;
         
+        private string usageRecordRatingOptionField;
+        
+        private System.Nullable<bool> useDiscountSpecificAccountingCodeField;
+        
+        private bool useDiscountSpecificAccountingCodeFieldSpecified;
+        
         private System.Nullable<long> versionField;
         
         private bool versionFieldSpecified;
@@ -8297,6 +8639,39 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.upToPeriodsFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string UsageRecordRatingOption {
+            get {
+                return this.usageRecordRatingOptionField;
+            }
+            set {
+                this.usageRecordRatingOptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<bool> UseDiscountSpecificAccountingCode {
+            get {
+                return this.useDiscountSpecificAccountingCodeField;
+            }
+            set {
+                this.useDiscountSpecificAccountingCodeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool UseDiscountSpecificAccountingCodeSpecified {
+            get {
+                return this.useDiscountSpecificAccountingCodeFieldSpecified;
+            }
+            set {
+                this.useDiscountSpecificAccountingCodeFieldSpecified = value;
             }
         }
         
@@ -9752,8 +10127,6 @@ namespace AdminSite.ZuoraAPI {
         
         private string accountNumberField;
         
-        private string accountRef__cField;
-        
         private string additionalEmailAddressesField;
         
         private System.Nullable<bool> allowInvoiceEditField;
@@ -9830,6 +10203,8 @@ namespace AdminSite.ZuoraAPI {
         
         private bool updatedDateFieldSpecified;
         
+        private string accountRef__cField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public string AccountNumber {
@@ -9838,17 +10213,6 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.accountNumberField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string AccountRef__c {
-            get {
-                return this.accountRef__cField;
-            }
-            set {
-                this.accountRef__cField = value;
             }
         }
         
@@ -10268,6 +10632,17 @@ namespace AdminSite.ZuoraAPI {
                 this.updatedDateFieldSpecified = value;
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string AccountRef__c {
+            get {
+                return this.accountRef__cField;
+            }
+            set {
+                this.accountRef__cField = value;
+            }
+        }
     }
     
     /// <remarks/>
@@ -10543,6 +10918,66 @@ namespace AdminSite.ZuoraAPI {
             }
             set {
                 this.sizeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.6.1590.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://api.zuora.com/")]
+    public partial class ExecuteResult {
+        
+        private Error[] errorsField;
+        
+        private string idField;
+        
+        private bool successField;
+        
+        private bool successFieldSpecified;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Errors", IsNullable=true)]
+        public Error[] Errors {
+            get {
+                return this.errorsField;
+            }
+            set {
+                this.errorsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string Id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Success {
+            get {
+                return this.successField;
+            }
+            set {
+                this.successField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool SuccessSpecified {
+            get {
+                return this.successFieldSpecified;
+            }
+            set {
+                this.successFieldSpecified = value;
             }
         }
     }
@@ -11361,6 +11796,32 @@ namespace AdminSite.ZuoraAPI {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((DeleteResult[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1590.0")]
+    public delegate void executeCompletedEventHandler(object sender, executeCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1590.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class executeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal executeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ExecuteResult[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ExecuteResult[])(this.results[0]));
             }
         }
     }
