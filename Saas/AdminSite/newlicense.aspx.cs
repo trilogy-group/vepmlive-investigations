@@ -17,7 +17,7 @@ namespace AdminSite
         {
             if (!IsPostBack)
             {
-                PopulateProductCatalogAndContracts();
+                PopulateProductCatalog();
             }
 
             PopulateFeatureList();
@@ -26,7 +26,7 @@ namespace AdminSite
         /// <summary>
         /// Populates the product catalog drop down list with active products.
         /// </summary>
-        private void PopulateProductCatalogAndContracts()
+        private void PopulateProductCatalog()
         {
             var products = ProductCatalogManager.GetAllActiveProducts();
 
@@ -38,21 +38,6 @@ namespace AdminSite
                     Value = item.product_id.ToString()
                 });
             }
-
-            var contracts = LicenseManager.GetAllContractLevelTitles();
-            foreach (var contract in contracts)
-            {
-                ddlContract.Items.Add(new ListItem
-                {
-                    Text = contract.ContractName,
-                    Value = contract.ContractId
-                });
-            }
-            ddlContract.Items.Insert(0, new ListItem
-            {
-                Text = "[Select Contract]",
-                Value = ""
-            });
         }
 
         /// <summary>
@@ -92,19 +77,21 @@ namespace AdminSite
             var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
-            var contractId = ddlContract.SelectedValue;
+            var contractId = "50000010";
 
             if (!ValidateQuantities()) return;
-            if (!ValidLicensePeriod(activationDate, expirationDate)) return;
-            if (!ValidContract(contractId)) return;
-
+            if (!ValidLicensePeriod(activationDate, expirationDate))
+            {
+                ShowErrorMessage("License period must be at least 1 day.");
+            };
+           
             var featureList = ExtractFeaturesAndQuantities();
+
             using (var license = new LicenseManager())
             {
                 if (license.ValidateSingleActiveLicenseForProduct(productId, accountRef))
                 {
-                    errorLabel.InnerText = $"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }";
-                    errorLabel.Visible = true;
+                    ShowErrorMessage($"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }");
                 }
                 else
                 {
@@ -121,14 +108,6 @@ namespace AdminSite
             }
         }
 
-        private bool ValidContract(string contractId)
-        {
-            if (!string.IsNullOrWhiteSpace(contractId)) return true;
-            errorLabel.InnerText = "Please select a valid Contract for this account.";
-            errorLabel.Visible = true;
-            return false;
-        }
-
         /// <summary>
         /// Checks that license is at least 1 day.
         /// </summary>
@@ -137,9 +116,16 @@ namespace AdminSite
         {
             var validPeriod = expirationDate > activationDate && (expirationDate.DayOfYear - activationDate.DayOfYear) >= 1;
             if (validPeriod) return true;
-            errorLabel.InnerText = "License period must be at least 1 day.";
-            errorLabel.Visible = true;
+
             return false;
+            
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            errorLabel.InnerText = message;
+            errorLabel.Visible = true;
+            return;
         }
 
         /// <summary>

@@ -49,24 +49,6 @@ namespace AdminSite {
         protected global::System.Web.UI.WebControls.DropDownList DropDownProductCatalog;
         
         /// <summary>
-        /// lblContract control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblContract;
-        
-        /// <summary>
-        /// ddlContract control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlContract;
-        
-        /// <summary>
         /// Label2 control.
         /// </summary>
         /// <remarks>
