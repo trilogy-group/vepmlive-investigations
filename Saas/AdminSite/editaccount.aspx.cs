@@ -111,11 +111,8 @@ namespace AdminSite
 
             DateTime dtCreated = Convert.ToDateTime("1/1/1900");
             int months = 1;
-            try
-            {
-                int.TryParse(dr["monthsfree"].ToString(), out months);
-            }
-            catch { }
+            int.TryParse(dr["monthsfree"].ToString(), out months);
+
             try
             {
                 dtCreated = Convert.ToDateTime(dr["dtcreated"].ToString());

@@ -272,12 +272,12 @@
     <Content Include="style\menu_sel.png" />
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
+    <Content Include="packages.config" />
     <Content Include="WebControls\BaseWebControl.ascx" />
     <Content Include="WebControls\Product\AddEditProduct.ascx" />
     <Content Include="WebControls\Product\AddProductFeature.ascx" />
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
-    <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -790,9 +790,9 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OnlineLicensing.Api\OnlineLicensing.Api.csproj">
+    <ProjectReference Include="..\OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj">
       <Project>{6fbe6f92-e82b-4d6f-b805-6465d92f63f3}</Project>
-      <Name>OnlineLicensing.Api</Name>
+      <Name>EPMLive.OnlineLicensing.Api</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

@@ -26,7 +26,7 @@ namespace AdminSite.WebControls.Product
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error deleting this product: " + ex.Message;
-                Logger.WarnFormat("There was an error deleting this product: {0}", ex.Message);
+                Logger.WarnFormat("There was an error deleting this product: {0}", ex.ToString());
             }
         }
 
@@ -62,7 +62,7 @@ namespace AdminSite.WebControls.Product
             catch (Exception ex)
             {
                 lblMessage.Text = "There was an error adding feature to product: " + ex.Message;
-
+                Logger.WarnFormat("There was an error adding feature to product: {0}", ex.ToString());
                 return false;
             }
             return true;

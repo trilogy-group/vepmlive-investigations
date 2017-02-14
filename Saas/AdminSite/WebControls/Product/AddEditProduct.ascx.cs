@@ -57,7 +57,7 @@ namespace AdminSite.WebControls.Product
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error saving the new product: " + ex.Message;
-                    Logger.WarnFormat("There was an error saving the new product: {0}", ex.Message);
+                    Logger.WarnFormat("There was an error saving the new product: {0}", ex.ToString());
                     return false;
                 }
             }
@@ -68,16 +68,16 @@ namespace AdminSite.WebControls.Product
                     new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).DeleteProduct(Convert.ToInt32(lblProductId.Text));
                     Logger.InfoFormat("{0} deleted a License product: {1}[{2}]", CurrentUserName, txtName.Text, txtSKU.Text);
                 }
-                catch (LicenseProductInUseException)
+                catch (LicenseProductInUseException ex)
                 {
                     lblMessage.Text = "Cannot delete this product because it is in use. ";
-                    Logger.WarnFormat("Cannot delete this product because it is in use: {0}", txtName.Text);
+                    Logger.WarnFormat("Cannot delete this product because it is in use: {0}, details: {1}", txtName.Text,ex.ToString());
                     return false;
                 }
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error deleting this product: " + ex.Message;
-                    Logger.WarnFormat("There was an error deleting this product: {0}", ex.Message);
+                    Logger.WarnFormat("There was an error deleting this product: {0}", ex.ToString());
                     return false;
                 }
             }
@@ -92,7 +92,7 @@ namespace AdminSite.WebControls.Product
                 catch (Exception ex)
                 {
                     lblMessage.Text = "There was an error saving the product changes: " + ex.Message;
-                    Logger.WarnFormat("TThere was an error saving the product changes: {0}", ex.Message);
+                    Logger.WarnFormat("TThere was an error saving the product changes: {0}", ex.ToString());
                     return false;
                 }
             }

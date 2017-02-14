@@ -90,7 +90,7 @@
     <Compile Include="Data\OrderDetail.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\vwAccountOrder.cs">
+    <Compile Include="Data\VwAccountOrder.cs">
       <DependentUpon>LicensingModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Exceptions\LicenseProductInUseException.cs" />
