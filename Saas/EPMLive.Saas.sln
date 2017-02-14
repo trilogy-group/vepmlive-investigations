@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminSite", "AdminSite\Admi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingSite", "BillingSite\BillingSite.csproj", "{F5D36B2E-9977-4A2B-A9EB-4D0038D18061}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLicensing.Api", "OnlineLicensing.Api\OnlineLicensing.Api.csproj", "{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.OnlineLicensing.Api", "OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj", "{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLicensing.ApiTests", "OnlineLicensing.ApiTests\OnlineLicensing.ApiTests.csproj", "{14B55B29-55AC-4BC0-87A4-910E6739E178}"
 EndProject

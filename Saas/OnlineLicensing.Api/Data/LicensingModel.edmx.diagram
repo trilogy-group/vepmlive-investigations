@@ -10,7 +10,7 @@
         <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" Width="1.5" PointX="5.25" PointY="2.875" />
         <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.Order" Width="1.5" PointX="3" PointY="1.25" />
         <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.Account" Width="1.5" PointX="5.75" PointY="5.75" />
-        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.vwActiveOrder" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="EPMLive.OnlineLicensing.Api.Data.VwActiveOrder" Width="1.5" PointX="7.75" PointY="0.75" />
         <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" />
         <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" />
         <AssociationConnector Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" />

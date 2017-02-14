@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPMLive.OnlineLicensing.Api;
+using EPMLive.OnlineLicensing.Api.Data;
 
 namespace AdminSite
 {
@@ -28,7 +29,7 @@ namespace AdminSite
         /// </summary>
         private void PopulateProductCatalogAndContracts()
         {
-            var products = ProductCatalogManager.GetAllActiveProducts();
+            var products = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetAllActiveProducts();
 
             foreach (var item in products)
             {
@@ -60,7 +61,7 @@ namespace AdminSite
         /// </summary>
         private void PopulateFeatureList()
         {
-            var featureList = ProductCatalogManager.GetEnabledLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
+            var featureList = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetEnabledLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
 
             table.ID = "productFeaturesTable";
 

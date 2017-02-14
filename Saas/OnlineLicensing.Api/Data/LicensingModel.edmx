@@ -288,7 +288,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <EntitySet Name="OrderDetails" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" />
           <EntitySet Name="Orders" EntityType="EPMLive.OnlineLicensing.Api.Data.Order" />
           <EntitySet Name="Accounts" EntityType="EPMLive.OnlineLicensing.Api.Data.Account" />
-          <EntitySet Name="vwActiveOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.vwActiveOrder" />
+          <EntitySet Name="VwActiveOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.VwActiveOrder" />
           <AssociationSet Name="FK_PRODPLANS_HOSTEDPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS">
             <End Role="LICENSEPRODUCT" EntitySet="LicenseProducts" />
             <End Role="LICENSEDETAIL" EntitySet="LicenseDetails" />
@@ -397,7 +397,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <Property Name="internalemail" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="SalesForceId" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="vwActiveOrder">
+        <EntityType Name="VwActiveOrder">
           <Key>
             <PropertyRef Name="order_id" />
             <PropertyRef Name="account_ref" />
@@ -601,8 +601,8 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="vwActiveOrders">
-            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.vwActiveOrder">
+          <EntitySetMapping Name="VwActiveOrders">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.VwActiveOrder">
               <MappingFragment StoreEntitySet="vwActiveOrders">
                 <ScalarProperty Name="crmorderid" ColumnName="crmorderid" />
                 <ScalarProperty Name="crmuid" ColumnName="crmuid" />
