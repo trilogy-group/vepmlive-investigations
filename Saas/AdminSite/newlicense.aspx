@@ -31,7 +31,7 @@
 <body>
     <form id="newLicenseForm" runat="server">
     <div>
-        <label  ID="errorLabel" runat="server" Visible="false" style="color:red"></label>
+        <label  id="errorLabel" runat="server" visible="false" style="color:red"></label>
         <br />
         <fieldset>
             <legend>License Details</legend>
@@ -65,7 +65,7 @@
         <br />
 
         <asp:Button ID="Button1" runat="server" Text="Add License"  OnClick="btnSubmit_Click" />
-        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseAddLicenseModal()"/>
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseLicenseModal()"/>
     </div>
     </form>
 </body>

@@ -64,7 +64,7 @@
         ShowModal('modalLicenseManagement', 'iframeAddLicense', url)
     };
 
-    function CloseAddLicenseModal()
+    function CloseLicenseModal()
     {
         HideModal('modalLicenseManagement')
     }

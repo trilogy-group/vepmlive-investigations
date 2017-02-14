@@ -122,6 +122,16 @@ namespace EPMLive.OnlineLicensing.Api
             };
         }
 
+        public void RenewLicense(Guid orderId, DateTime expirationDate)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var order = context.Orders.Single(o => o.order_id == orderId);
+                order.expiration = expirationDate;
+                context.SaveChanges();
+            }
+        }
+
         /// <summary>
         /// Validates whether an account have an active license for the specified product.
         /// </summary>
@@ -149,6 +159,15 @@ namespace EPMLive.OnlineLicensing.Api
         public bool ValidateQuantitiesCannotBeAllZero(List<Tuple<int, int>> featuresAndQuantities)
         {
             return featuresAndQuantities.Any(fq => fq.Item2 > 0);
+        }
+
+        public bool ValidateNewLicenseExtension(Guid orderId, DateTime newExpirationDate)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var order = context.Orders.SingleOrDefault(o => o.order_id == orderId);
+                return order.expiration < newExpirationDate;
+            }
         }
 
         /// <summary>
