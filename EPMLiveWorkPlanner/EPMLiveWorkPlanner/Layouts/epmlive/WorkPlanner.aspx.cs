@@ -814,6 +814,17 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 catch { }
 
+                try
+                {
+                    if (props.Length > 12)
+                    {
+                        sb.Append("colsWidths: \"");
+                        sb.Append(props[12]);
+                        sb.Append("\",");
+                    }
+                }
+                catch { }
+
                 if (bAgile)
                 {
                     try

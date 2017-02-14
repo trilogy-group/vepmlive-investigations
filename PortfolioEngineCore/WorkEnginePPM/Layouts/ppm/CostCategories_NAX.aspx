@@ -208,6 +208,7 @@ html, body {
         Grids.OnFocus = GridsOnFocus;
         Grids.OnAfterValueChanged = GridsOnAfterValueChanged;
         Grids.OnCanDrop = GridsOnCanDrop;
+        Grids.OnEndDrag = GridsOnEndDrag;
         tgrid1_selectedRow = 0;
         OnResize();
     };
@@ -245,6 +246,50 @@ html, body {
                 break;
         }
     };
+    function GridsOnEndDrag(grid, row, togrid, torow, type, X, Y, copy, rows) {
+        var childrow = null;
+        if (type == 2) {
+            if (torow.childNodes.length > 0) {
+                if (torow.firstChild.CA_NAME == row.CA_NAME) {
+                    alert("Role with name :  " + row.CA_NAME + " is already exists under " + torow.CA_NAME);
+                    return 0;
+                }
+                for (var i = 0; i < torow.childNodes.length; i++) {
+                    if (childrow == null) {
+                        childrow = torow.firstChild.nextSibling;
+                    }
+                    else {
+                        childrow = childrow.nextSibling;
+                    }
+                    if (childrow == null)
+                        continue;
+
+                    if (childrow.CA_NAME == row.CA_NAME) {
+                        alert("Role with name :  " + row.CA_NAME + " is already exists");
+                        return 0;
+                    }
+                }
+            }
+        }
+        else {
+            while (true) {
+                if (childrow == null) {
+                    childrow = torow.parentNode.firstChild;
+                }
+                else {
+                    childrow = childrow.nextSibling;
+                }
+                if (childrow == null)
+                    return;
+
+                if (childrow.CA_NAME == row.CA_NAME) {
+                    alert("Role with name :  " + row.CA_NAME + " is already exists under");
+                    return 0;
+                }
+            }
+
+        }
+    }
     function GridsOnAfterValueChanged(grid, row, col, val) {
         switch (grid.id) {
             case tgridFTEs.id:
@@ -254,6 +299,24 @@ html, body {
                 else
                     toolbarFTEs.disableItem("btnSaveFTEs");
                 break;
+        }
+        var childrow = null;
+
+        while (true) {
+            if (childrow == null) {
+                childrow = row.parentNode.firstChild;
+            }
+            else {
+                childrow = childrow.nextSibling;
+            }
+            if (childrow == null)
+                return;
+
+            if (childrow.CA_NAME == row.CA_NAME && childrow.CA_UID != row.CA_UID) {
+                alert("Role with name :  " + row.CA_NAME + " is already exists.");
+                grid.SetValue(row, "CA_NAME", row.CA_NAME + "1", 1);
+                return 0;
+            }
         }
     };
     function GridsOnCanDrop(grid, row, togrid, torow, type, copy) {

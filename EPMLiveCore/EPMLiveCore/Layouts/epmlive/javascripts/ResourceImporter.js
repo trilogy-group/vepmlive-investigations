@@ -85,7 +85,6 @@ var ImportResourceStatusClient = (function () {
                         },
                         error: function (data) {
                             window.setTimeout(getStatus, 500);
-                            //location.reload();
                         }
                     });
                 }

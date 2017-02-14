@@ -91,8 +91,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="FakeClass.cs" />
+    <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCheck.cs" />
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\EPM Live Core.fakes">
@@ -146,6 +147,9 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\System.Data.fakes" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

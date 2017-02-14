@@ -91,6 +91,11 @@ namespace PortfolioEngineCore
             {
                 hours = 0;
             }
+            DayOfWeek dayofweek = targetdate.DayOfWeek;
+            if (dayofweek != DayOfWeek.Saturday && dayofweek != DayOfWeek.Sunday)
+            {
+                hours = 0;
+            }
             return hours;
         }
 

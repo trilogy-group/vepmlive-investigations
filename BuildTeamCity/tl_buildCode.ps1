@@ -1,5 +1,4 @@
 # Build script for EPMLive
-# 2016.02.24 - Made changes to work with the build post-removal of circular dependencies
 
 # ### Define user adjustable parameters
 

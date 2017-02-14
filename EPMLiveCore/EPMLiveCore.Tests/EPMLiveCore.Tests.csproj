@@ -83,13 +83,16 @@
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
+    <Compile Include="API\APITeamTests.cs" />
     <Compile Include="API\MyWork\MyWorkTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
+    <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportHelper\EPMDataTest.cs" />
+    <Compile Include="ReportHelper\ReportDataTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
