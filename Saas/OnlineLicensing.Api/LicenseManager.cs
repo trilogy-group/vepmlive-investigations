@@ -58,6 +58,14 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
+        public Order GetOrder(Guid orderId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                return context.Orders.SingleOrDefault(o => o.order_id == orderId);
+            }
+        }
+
         public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
         {
             using (var context = ConnectionHelper.CreateLicensingModel())

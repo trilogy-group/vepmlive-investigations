@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="addeditlicense.aspx.cs" Inherits="AdminSite.newlicense" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="editlicense.aspx.cs" Inherits="AdminSite.editlicense" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -33,11 +33,11 @@
         <label  id="errorLabel" runat="server" visible="false" style="color:red"></label>
         <br />
         <fieldset>
-            <legend>License Details</legend>
+            <legend>License Details Edit</legend>
             <br />
 
             <asp:Label ID="Label1" runat="server" Text="Select Product"></asp:Label>
-            <asp:DropDownList ID="DropDownProductCatalog" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownProductCatalog_SelectedIndexChanged"></asp:DropDownList>
+            <asp:DropDownList ID="DropDownProductCatalog" runat="server" AutoPostBack="true"></asp:DropDownList>
 
             <br />
 
@@ -54,7 +54,7 @@
         <br />
 
         <fieldset>
-            <legend>License Features</legend>
+            <legend>License Features Edit</legend>
             <br />
             
             <div id="featureListInnerDiv" runat="server"></div>
@@ -63,8 +63,8 @@
         
         <br />
 
-        <asp:Button ID="Button1" runat="server" Text="Add License"  OnClick="btnSubmit_Click" />
-        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseAddLicenseModal()"/>
+        <asp:Button ID="Button1" runat="server" Text="Add License" />
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseEditLicenseModal()"/>
     </div>
     </form>
 </body>

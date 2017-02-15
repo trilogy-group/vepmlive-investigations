@@ -93,6 +93,7 @@
     <Content Include="addproduct.aspx" />
     <Content Include="addproductfeature.aspx" />
     <Content Include="appfeature.aspx" />
+    <Content Include="editlicense.aspx" />
     <Content Include="manageproducts.aspx" />
     <Content Include="addpubkey.aspx" />
     <Content Include="addticket.aspx" />
@@ -432,6 +433,13 @@
     </Compile>
     <Compile Include="appfeature.aspx.designer.cs">
       <DependentUpon>appfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editlicense.aspx.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editlicense.aspx.designer.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="manageproducts.aspx.cs">
       <DependentUpon>manageproducts.aspx</DependentUpon>
