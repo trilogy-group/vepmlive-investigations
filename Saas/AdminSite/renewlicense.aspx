@@ -36,7 +36,7 @@
     </div>
         <br />
         <asp:Button ID="btnRenew" runat="server" Text="Renew" OnClick="btnRenew_Click" />
-        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseLicenseModal()"/>
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseRenewLicenseModal()"/>
     </form>
 </body>
 </html>

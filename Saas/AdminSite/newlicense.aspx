@@ -65,7 +65,7 @@
         <br />
 
         <asp:Button ID="Button1" runat="server" Text="Add License"  OnClick="btnSubmit_Click" />
-        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseLicenseModal()"/>
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseAddLicenseModal()"/>
     </div>
     </form>
 </body>
