@@ -31,7 +31,7 @@
 <body>
     <form id="newLicenseForm" runat="server">
     <div>
-        <label  ID="errorLabel" runat="server" Visible="false" style="color:red"></label>
+        <label  id="errorLabel" runat="server" visible="false" style="color:red"></label>
         <br />
         <fieldset>
             <legend>License Details</legend>

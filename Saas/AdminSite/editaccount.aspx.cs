@@ -82,8 +82,6 @@ namespace AdminSite
             DataSet ds = new DataSet();
             da.Fill(ds);
 
-
-
             DataRow dr = ds.Tables[0].Rows[0];
 
             lblUsername.Text = dr["username"].ToString();

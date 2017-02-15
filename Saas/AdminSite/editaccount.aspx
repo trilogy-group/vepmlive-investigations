@@ -43,12 +43,12 @@
             var ticket = prompt("Enter Ticket Number", "");
             if (ticket != "") {
                 var url = "addticket.aspx?account_id=<%=Request["account_id"] %>&ticket=" + ticket;
-            location.href = url;
+                location.href = url;
+            }
         }
-    }
-    function changeowner(key_id) {
-        sm('divresetkey', 400, 100);
-        var url = "changeowner.aspx?account_id=<%=Request["account_id"] %>";
+        function changeowner(key_id) {
+            sm('divresetkey', 400, 100);
+            var url = "changeowner.aspx?account_id=<%=Request["account_id"] %>";
         document.getElementById("iframeresetkey").src = url;
         document.getElementById("iframeresetkey").style.height = 90;
 
@@ -59,25 +59,27 @@
 
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'addeditlicense.aspx?accountId=' + accountId
-        ShowModal('modalLicenseManagement', 'iframeAddEditLicense', url)
+        var url = 'newlicense.aspx?accountId=' + accountId
+        ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
     };
-    
-    function EditLicense(orderId) {
-        var edit = true;
+
+    function RenewLicense(orderId) {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'addeditlicense.aspx?accountId=' + accountId
-        ShowModal('modalLicenseManagement', 'iframeAddEditLicense', url)
+        var url = 'renewlicense.aspx?accountId=' + accountId + '&orderId=' + orderId
+        ShowModal('modalRenewLicenseManagement', 'iframeRenewLicense', url, 500, 100)
     }
 
-    function CloseAddLicenseModal()
-    {
-        HideModal('modalLicenseManagement')
+    function CloseAddLicenseModal() {
+        HideModal('modalAddLicenseManagement')
     }
 
-    function ShowModal(div, iframe, url) {
+    function CloseRenewLicenseModal() {
+        HideModal('modalRenewLicenseManagement')
+    }
+
+    function ShowModal(div, iframe, url, height, width) {
         document.getElementById(iframe).src = url;
-        sm(div, 500, 450);
+        sm(div, height, width);
     }
 
     function HideModal(modal) {
@@ -343,7 +345,6 @@
                 <br />
                 <asp:GridView Width="96%" RowStyle-HorizontalAlign="Left" ID="GridViewActiveLicenses" runat="server" AutoGenerateColumns="False" CellPadding="4" ForeColor="Black" GridLines="Vertical" BackColor="White" BorderColor="#DEDFDE" BorderWidth="1px">
                     <Columns>
-
                         <asp:BoundField DataField="product" HeaderText="Product">
                             <ItemStyle HorizontalAlign="left" />
                         </asp:BoundField>
@@ -360,12 +361,12 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Extend" onclick="EditLicense()" />
+                                <input type="button" value="Extend" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Renew" />
+                                <input type="button" value="Renew" onclick="<%# "RenewLicense('" + Eval("OrderId") + "')" %>" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
@@ -456,8 +457,11 @@
         <iframe id="iframeresetkey" width="100%" height="100" frameborder="0"></iframe>
     </div>
 
-    <div id="modalLicenseManagement" class="dialog">
-        <iframe id="iframeAddEditLicense" width="100%" height="450" frameborder="0"></iframe>
+    <div id="modalAddLicenseManagement" class="dialog">
+        <iframe id="iframeAddLicense" width="100%" height="450" frameborder="0"></iframe>
+    </div>
+    <div id="modalRenewLicenseManagement" class="dialog">
+        <iframe id="iframeRenewLicense" width="100%" height="300" frameborder="0"></iframe>
     </div>
     <script language="javascript">
         initmb();

@@ -49,6 +49,7 @@ namespace EPMLive.OnlineLicensing.Api
                     yield return new LicenseOrder
                     {
                         ProductId = productId,
+                        OrderId = item.order_id.ToString(),
                         Product = productName,
                         Features = featureDetails.ToString(),
                         ExpirationDate = item.expiration.ToShortDateString()
@@ -122,6 +123,16 @@ namespace EPMLive.OnlineLicensing.Api
             };
         }
 
+        public void RenewLicense(Guid orderId, DateTime expirationDate)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var order = context.Orders.Single(o => o.order_id == orderId);
+                order.expiration = expirationDate;
+                context.SaveChanges();
+            }
+        }
+
         /// <summary>
         /// Validates whether an account have an active license for the specified product.
         /// </summary>
@@ -151,6 +162,15 @@ namespace EPMLive.OnlineLicensing.Api
             return featuresAndQuantities.Any(fq => fq.Item2 > 0);
         }
 
+        public bool ValidateNewLicenseExtension(Guid orderId, DateTime newExpirationDate)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var order = context.Orders.SingleOrDefault(o => o.order_id == orderId);
+                return order.expiration < newExpirationDate;
+            }
+        }
+
         /// <summary>
         /// Disposes object to the Garbage Collector.
         /// </summary>
@@ -172,6 +192,7 @@ namespace EPMLive.OnlineLicensing.Api
     public class LicenseOrder
     {
         public int ProductId { get; set; }
+        public string OrderId { get; set; }
         public string Product { get; set; }
         public string Features { get; set; }
         public string ExpirationDate { get; set; }

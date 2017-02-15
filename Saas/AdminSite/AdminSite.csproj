@@ -255,6 +255,7 @@
     <Content Include="partnerrequests.aspx" />
     <Content Include="perms.aspx" />
     <Content Include="pubsupport.aspx" />
+    <Content Include="renewlicense.aspx" />
     <Content Include="reports.aspx" />
     <Content Include="resetfkey.aspx" />
     <Content Include="resetkey.aspx" />
@@ -604,6 +605,13 @@
     </Compile>
     <Compile Include="pubsupport.aspx.designer.cs">
       <DependentUpon>pubsupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="renewlicense.aspx.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="renewlicense.aspx.designer.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="reports.aspx.cs">
       <DependentUpon>reports.aspx</DependentUpon>
