@@ -59,9 +59,16 @@
 
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'newlicense.aspx?accountId=' + accountId
+        var url = 'addeditlicense.aspx?accountId=' + accountId
         ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
     };
+
+    function ExtendLicense(orderId) {
+        var editMode = true;
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'addeditlicense.aspx?accountId=' + accountId
+        ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
+    }
 
     function RenewLicense(orderId) {
         var accountId = '<%=Request["account_id"] %>'
@@ -361,7 +368,7 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Extend" />
+                                <input type="button" value="Extend" onclick="<%# "ExtendLicense('" + Eval("OrderId") + "')" %>" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
