@@ -18,7 +18,7 @@ namespace AdminSite
         protected void btnRenew_Click(object sender, EventArgs e)
         {
             var newExpirationDate = TxtExpirationDate.Value;
-            var orderId = "A0CD98F9-7DDD-4F15-886B-761AB7183E4D";
+            var orderId = Request["orderId"];
 
             using (var license = new LicenseManager())
             {

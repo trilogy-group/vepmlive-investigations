@@ -49,6 +49,7 @@ namespace EPMLive.OnlineLicensing.Api
                     yield return new LicenseOrder
                     {
                         ProductId = productId,
+                        OrderId = item.order_id.ToString(),
                         Product = productName,
                         Features = featureDetails.ToString(),
                         ExpirationDate = item.expiration.ToShortDateString()
@@ -191,6 +192,7 @@ namespace EPMLive.OnlineLicensing.Api
     public class LicenseOrder
     {
         public int ProductId { get; set; }
+        public string OrderId { get; set; }
         public string Product { get; set; }
         public string Features { get; set; }
         public string ExpirationDate { get; set; }

@@ -57,16 +57,15 @@
         hm('divresetkey');
     }
 
-
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
         var url = 'newlicense.aspx?accountId=' + accountId
         ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
     };
 
-        function RenewLicense() {
+    function RenewLicense(orderId) {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'renewlicense.aspx?accountId=' + accountId + '&orderId='
+        var url = 'renewlicense.aspx?accountId=' + accountId + '&orderId=' + orderId
         ShowModal('modalRenewLicenseManagement', 'iframeRenewLicense', url, 500, 100)
     }
 
@@ -346,7 +345,6 @@
                 <br />
                 <asp:GridView Width="96%" RowStyle-HorizontalAlign="Left" ID="GridViewActiveLicenses" runat="server" AutoGenerateColumns="False" CellPadding="4" ForeColor="Black" GridLines="Vertical" BackColor="White" BorderColor="#DEDFDE" BorderWidth="1px">
                     <Columns>
-
                         <asp:BoundField DataField="product" HeaderText="Product">
                             <ItemStyle HorizontalAlign="left" />
                         </asp:BoundField>
@@ -368,7 +366,7 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Renew" onclick="RenewLicense()" />
+                                <input type="button" value="Renew" onclick="<%# "RenewLicense('" + Eval("OrderId") + "')" %>" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
