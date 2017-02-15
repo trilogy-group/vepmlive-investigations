@@ -57,12 +57,18 @@
         hm('divresetkey');
     }
 
-
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'newlicense.aspx?accountId=' + accountId
-        ShowModal('modalLicenseManagement', 'iframeAddLicense', url)
+        var url = 'addeditlicense.aspx?accountId=' + accountId
+        ShowModal('modalLicenseManagement', 'iframeAddEditLicense', url)
     };
+    
+    function EditLicense(orderId) {
+        var edit = true;
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'addeditlicense.aspx?accountId=' + accountId
+        ShowModal('modalLicenseManagement', 'iframeAddEditLicense', url)
+    }
 
     function CloseAddLicenseModal()
     {
@@ -354,7 +360,7 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Extend" />
+                                <input type="button" value="Extend" onclick="EditLicense()" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
@@ -451,7 +457,7 @@
     </div>
 
     <div id="modalLicenseManagement" class="dialog">
-        <iframe id="iframeAddLicense" width="100%" height="450" frameborder="0"></iframe>
+        <iframe id="iframeAddEditLicense" width="100%" height="450" frameborder="0"></iframe>
     </div>
     <script language="javascript">
         initmb();

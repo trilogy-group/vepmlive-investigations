@@ -249,7 +249,7 @@
     <Content Include="modal\modalmain.css" />
     <Content Include="modal\overlay.png" />
     <Content Include="modal\pencil.gif" />
-    <Content Include="newlicense.aspx" />
+    <Content Include="addeditlicense.aspx" />
     <Content Include="newzuoraorder.aspx" />
     <Content Include="oldsignups.aspx" />
     <Content Include="partnerrequests.aspx" />
@@ -563,12 +563,12 @@
     <Compile Include="linksite.aspx.designer.cs">
       <DependentUpon>linksite.aspx</DependentUpon>
     </Compile>
-    <Compile Include="newlicense.aspx.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
+    <Compile Include="addeditlicense.aspx.cs">
+      <DependentUpon>addeditlicense.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="newlicense.aspx.designer.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
+    <Compile Include="addeditlicense.aspx.designer.cs">
+      <DependentUpon>addeditlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="newzuoraorder.aspx.cs">
       <DependentUpon>newzuoraorder.aspx</DependentUpon>
