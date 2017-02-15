@@ -20,6 +20,8 @@
                   minDate: 0
               });
 
+              $("#TxtActivationDate").datepicker('setDate', new Date());;
+
               $(".readonly").keydown(function (e) {
                   e.preventDefault();
               });
