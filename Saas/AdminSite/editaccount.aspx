@@ -83,6 +83,10 @@
         HideModal('modalRenewLicenseManagement')
     }
 
+    function CloseEditLicenseModal() {
+        HideModal('modalEditLicenseManagement')
+    }
+
     function ShowModal(div, iframe, url, height, width) {
         document.getElementById(iframe).src = url;
         sm(div, height, width);
@@ -470,7 +474,7 @@
         <iframe id="iframeRenewLicense" width="100%" height="300" frameborder="0"></iframe>
     </div>
     <div id="modalEditLicenseManagement" class="dialog">
-        <iframe id="iframeEditLicense" width="100%" height="300" frameborder="0"></iframe>
+        <iframe id="iframeEditLicense" width="100%" height="450" frameborder="0"></iframe>
     </div>
     <script language="javascript">
         initmb();

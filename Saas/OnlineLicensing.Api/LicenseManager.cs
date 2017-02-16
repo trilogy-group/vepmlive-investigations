@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using EPMLive.OnlineLicensing.Api.Data;
+using System.Collections;
 
 namespace EPMLive.OnlineLicensing.Api
 {
@@ -65,6 +66,25 @@ namespace EPMLive.OnlineLicensing.Api
                 return context.Orders.SingleOrDefault(o => o.order_id == orderId);
             }
         }
+        public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var orderdetails = context.OrderDetails.Where(o => o.order_id == orderId);
+               
+                foreach (var item in orderdetails.ToList())
+                {
+                    var feature = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.detail_type_id);
+
+                    yield return new LicenseFeature
+                    {
+                        Id = Convert.ToInt32(item.detail_type_id),
+                        Name = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.detail_type_id).detail_name,
+                        Value = Convert.ToInt32(item.quantity)
+                    };
+                }
+            }
+        }
 
         public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
         {
@@ -110,7 +130,6 @@ namespace EPMLive.OnlineLicensing.Api
 
                 context.Orders.Add(orderToAdd);
                 context.SaveChanges();
-
             }
         }
 
@@ -120,14 +139,14 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="orderId">The id of the related order</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
         /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
-        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> Feature)
+        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> feature)
         {
             return new OrderDetail
             {
                 order_detail_id = Guid.NewGuid(),
                 order_id = orderId,
-                detail_type_id = Feature.Item1,
-                quantity = Feature.Item2
+                detail_type_id = feature.Item1,
+                quantity = feature.Item2
             };
         }
 
@@ -138,6 +157,36 @@ namespace EPMLive.OnlineLicensing.Api
                 var order = context.Orders.Single(o => o.order_id == orderId);
                 order.expiration = expirationDate;
                 context.SaveChanges();
+            }
+        }
+
+        public void ExtendLicense(Guid orderId, DateTime newActivationDate, DateTime newExpirationDate, IEnumerable<Tuple<int, int>> features)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var license = context.Orders.SingleOrDefault(o => o.order_id == orderId);
+
+                license.activation = newActivationDate;
+                license.expiration = newExpirationDate;
+                license.OrderDetails = ExtendLicenseDetail(features, license.order_id);
+
+                context.Entry(license).State = EntityState.Modified;
+                context.SaveChanges();
+            }
+        }
+
+        private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, Guid orderId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var originalLicenseDetails = context.OrderDetails.Where(o => o.order_id == orderId);
+
+                foreach (var item in originalLicenseDetails)
+                {
+                    item.quantity = features.SingleOrDefault(f => f.Item1 == item.detail_type_id).Item2;
+                }
+
+                return originalLicenseDetails as ICollection<OrderDetail>;
             }
         }
 
@@ -213,6 +262,7 @@ namespace EPMLive.OnlineLicensing.Api
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int Value { get; set; }
     }
 
     /// <summary>

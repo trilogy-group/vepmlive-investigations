@@ -18,7 +18,7 @@ namespace AdminSite
             {
                 PopulateProductCatalog();
             }
-            
+
             PopulateFeatureList();
         }
 
@@ -77,7 +77,7 @@ namespace AdminSite
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
             var contractId = "50000010";
-           
+
             var featureList = GetFeaturesAndQuantities();
 
             using (var license = new LicenseManager())
@@ -99,18 +99,17 @@ namespace AdminSite
                     ShowErrorMessage($"There is already an active license for the product: { DropDownProductCatalog.SelectedItem.Text }");
                     return;
                 }
-                else
-                {
-                    license.AddLicense(accountRef, activationDate, expirationDate, productId, contractId, featureList);
 
-                    var script = $@"
+                license.AddLicense(accountRef, activationDate, expirationDate, productId, contractId, featureList);
+
+                var script = $@"
                         <script>
                             parent.location.href='editaccount.aspx?account_id={Request["accountId"]}&tab=4';
                         </script>
                     ";
 
-                    ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
-                }
+                ClientScript.RegisterStartupScript(this.GetType(), "AddLicense", script);
+
             }
         }
 

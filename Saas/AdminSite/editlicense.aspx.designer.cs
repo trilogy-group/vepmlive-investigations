@@ -58,13 +58,13 @@ namespace AdminSite {
         protected global::System.Web.UI.WebControls.Label Label2;
         
         /// <summary>
-        /// TxtActivationDate control.
+        /// TxtNewActivationDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtActivationDate;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtNewActivationDate;
         
         /// <summary>
         /// Label3 control.
@@ -76,13 +76,13 @@ namespace AdminSite {
         protected global::System.Web.UI.WebControls.Label Label3;
         
         /// <summary>
-        /// TxtExpirationDate control.
+        /// TxtNewExpirationDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtExpirationDate;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText TxtNewExpirationDate;
         
         /// <summary>
         /// featureListInnerDiv control.
@@ -94,13 +94,13 @@ namespace AdminSite {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl featureListInnerDiv;
         
         /// <summary>
-        /// Button1 control.
+        /// btnSubmit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button1;
+        protected global::System.Web.UI.WebControls.Button btnSubmit;
         
         /// <summary>
         /// Button2 control.
