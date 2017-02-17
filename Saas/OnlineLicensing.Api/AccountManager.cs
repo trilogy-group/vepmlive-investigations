@@ -14,7 +14,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="accountId">The guid of the account to get the reference from.</param>
         /// <returns>Returns the account reference number.</returns>
-        public int GetAccountReference(Guid accountId)
+        public static int GetAccountReference(Guid accountId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {

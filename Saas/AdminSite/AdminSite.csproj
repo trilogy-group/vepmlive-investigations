@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AdminSite</RootNamespace>
     <AssemblyName>AdminSite</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -277,6 +277,7 @@
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
     <Content Include="WebControls\BaseWebControl.ascx" />
+    <Content Include="WebControls\Licensing\InactiveLicenses.ascx" />
     <Content Include="WebControls\Product\AddEditProduct.ascx" />
     <Content Include="WebControls\Product\AddProductFeature.ascx" />
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
@@ -727,6 +728,13 @@
     <Compile Include="WebControls\BaseWebControl.ascx.designer.cs">
       <DependentUpon>BaseWebControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.designer.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+    </Compile>
     <Compile Include="WebControls\Product\AddEditProduct.ascx.cs">
       <DependentUpon>AddEditProduct.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -759,7 +767,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="WebControls\Licensing\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Admin.master" />

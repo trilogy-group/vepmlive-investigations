@@ -11,6 +11,8 @@ namespace EPMLive.OnlineLicensing.Api.Data
         DbSet<OrderDetail> OrderDetails { get; set; }
         DbSet<Order> Orders { get; set; }
         DbSet<Account> Accounts { get; set; }
+        DbSet<OrderHistory> OrderHistories { get; set; }
+        DbSet<OrderDetailHistory> OrderDetailHistories { get; set; }
 
         void MarkAsModified<TEntity>(TEntity item) where TEntity : class, new();
         void MarkAsDeleted<TEntity>(TEntity item) where TEntity : class, new();

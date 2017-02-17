@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using EPMLive.OnlineLicensing.Api.Data;
+using EPMLive.OnlineLicensing.Api.Exceptions;
 using System.Collections;
 using System.Data.Entity.Infrastructure;
 
@@ -59,7 +60,6 @@ namespace EPMLive.OnlineLicensing.Api
                 }
             }
         }
-
         /// <summary>
         /// Gets one specific order / license based on the id of the order.
         /// </summary>
@@ -82,7 +82,10 @@ namespace EPMLive.OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var orderFeatures = ProductCatalogManager.GetEnabledLicenseProductFeatures(productId);
+                ILicensingModel licensingModel = new LicensingModel();
+               
+                var productCatalogManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+                var orderFeatures = productCatalogManager.GetEnabledLicenseProductFeatures(productId);
 
                 foreach (var item in orderFeatures)
                 {
@@ -96,6 +99,77 @@ namespace EPMLive.OnlineLicensing.Api
                         Value = orderDetails != null ? Convert.ToInt32(orderDetails.quantity) : 0
                     };
                 }
+            }
+        }
+
+        //public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
+
+        /// <summary>
+        /// Gets all the licences currently active in the account. There should only be one license active per product in the account.
+        /// </summary>
+        /// <param name="accountRef">The account reference number.</param>
+        /// <returns>Return an <see cref="IEnumerable{LicenseOrder}"/> containing all the active licenses in the account.</returns>
+        public static IEnumerable<LicenseOrder> GetAllInactiveLicenses(int accountRef)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var orders = context.OrderHistories.Include(o => o.LicenseProduct).Where(l => l.account_ref == accountRef).ToList();
+
+                foreach (var item in orders)
+                {
+                    var productId = item.product_id ?? 0;
+                    var productName = item.LicenseProduct != null ? item.LicenseProduct.name : string.Empty;
+                    var reason = GetArchiveReason(item.reason);
+                    var reasonComment = item.reason_comment;
+                    var featureDetails = new StringBuilder();
+
+                    foreach (var itemDetails in context.OrderDetailHistories.Where(o => o.order_id == item.order_id).ToList())
+                    {
+                        var matchingDetailType = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == itemDetails.detail_type_id);
+                        if (matchingDetailType != null)
+                        {
+                            var featureName = matchingDetailType.detail_name;
+                            featureDetails.Append(featureName);
+                        }
+                        featureDetails.Append(":");
+                        featureDetails.Append(' ', 90);
+                        featureDetails.Append(itemDetails.quantity);
+                        featureDetails.Append("<br />");
+                    }
+
+                    yield return new InactiveLicenseOrder
+                    {
+                        ProductId = productId,
+                        Product = productName,
+                        Features = featureDetails.ToString(),
+                        ExpirationDate = item.expiration.ToShortDateString(),
+                        ReasonText = reason,
+                        Comment = reasonComment
+                    };
+                }
+            }
+        }
+
+        private static string GetArchiveReason(int itemReason)
+        {
+            var reasonValue = (LicenseArchiveReasons)itemReason;
+            switch (reasonValue)
+            {
+                case LicenseArchiveReasons.Revoked:
+                    return "Revoked";
+                case LicenseArchiveReasons.Expired:
+                    return "Expired";
+                default:
+                    throw new InvalidArchiveReasonEnumException();
+            }
+        }
+
+
+        public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                return context.ContractLevelTitles.Include(clt => clt.ContractLevels).Where(c => c.DETAIL_ID != null).Select(c => new LicenseContract { ContractId = c.ContractLevels.FirstOrDefault().contractId, ContractName = c.TITLE, }).ToList().AsEnumerable();
             }
         }
 
@@ -135,23 +209,24 @@ namespace EPMLive.OnlineLicensing.Api
 
                 context.Orders.Add(orderToAdd);
                 context.SaveChanges();
+
             }
         }
 
         /// <summary>
         /// Adds a new order detail to an order. The order details contains the information of how many seats are purchased for that license.
         /// </summary>
-        /// <param name="orderId">The Id of the related order.</param>
+        /// <param name="orderId">The id of the related order</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
-        /// <returns>Returns an <see cref="OrderDetail"/> item to be added to the License/Order object to be created.</returns>
-        private OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> feature)
+        /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
+        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> Feature)
         {
             return new OrderDetail
             {
                 order_detail_id = Guid.NewGuid(),
                 order_id = orderId,
-                detail_type_id = feature.Item1,
-                quantity = feature.Item2
+                detail_type_id = Feature.Item1,
+                quantity = Feature.Item2
             };
         }
 
@@ -264,12 +339,12 @@ namespace EPMLive.OnlineLicensing.Api
         /// <summary>
         /// Validates whether an account have an active license for the specified product.
         /// </summary>
-        /// <param name="ProductID">The id of the product to check for existance.</param>
+        /// <param name="productId">The id of the product to check for existance.</param>
         /// <param name="accountRef">The reference to the account with active licenses.</param>
         /// <returns>Returns true if there is already an active license for that product. Returns false if there isn't an active license for that product.</returns>
-        public bool ValidateSingleActiveLicenseForProduct(int ProductID, int accountRef)
+        public bool ValidateSingleActiveLicenseForProduct(int productId, int accountRef)
         {
-            return GetAllActiveLicenses(accountRef).Any(al => al.ProductId == ProductID);
+            return GetAllActiveLicenses(accountRef).Any(al => al.ProductId == productId);
         }
 
         /// <summary>
@@ -330,6 +405,13 @@ namespace EPMLive.OnlineLicensing.Api
         public string Product { get; set; }
         public string Features { get; set; }
         public string ExpirationDate { get; set; }
+    }
+
+
+    public class InactiveLicenseOrder : LicenseOrder
+    {
+        public string ReasonText { get; set; }
+        public string Comment { get; set; }
     }
 
     /// <summary>

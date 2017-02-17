@@ -63,7 +63,8 @@ namespace AdminSite
             var licenseManager = new LicenseManager();
             var license = licenseManager.GetOrder(Guid.Parse(Request["orderId"] ?? string.Empty));
 
-            var products = ProductCatalogManager.GetAllActiveProducts();
+            var productCatalogManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+            var products = productCatalogManager.GetAllActiveProducts();
 
             foreach (var item in products)
             {
