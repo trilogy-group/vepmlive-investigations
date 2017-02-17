@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="addeditlicense.aspx.cs" Inherits="AdminSite.newlicense" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="addlicense.aspx.cs" Inherits="AdminSite.newlicense" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">

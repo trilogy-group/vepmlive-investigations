@@ -59,7 +59,7 @@
 
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'addeditlicense.aspx?accountId=' + accountId + "&addMode=add"
+        var url = 'addlicense.aspx?accountId=' + accountId + "&addMode=add"
         ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
     };
 

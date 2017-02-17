@@ -20,7 +20,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="accountRef">The account reference number.</param>
         /// <returns>Return an <see cref="IEnumerable{LicenseOrder}"/> containing all the active licenses in the account.</returns>
-        public static IEnumerable<LicenseOrder> GetAllActiveLicenses(int accountRef)
+        public IEnumerable<LicenseOrder> GetAllActiveLicenses(int accountRef)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
@@ -59,6 +59,11 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Gets one specific order / license based on the id of the order.
+        /// </summary>
+        /// <param name="orderId">The Id of the license to return.</param>
+        /// <returns>Returns an <see cref="Order"/> license.</returns>
         public Order GetOrder(Guid orderId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -66,6 +71,12 @@ namespace EPMLive.OnlineLicensing.Api
                 return context.Orders.SingleOrDefault(o => o.order_id == orderId);
             }
         }
+
+        /// <summary>
+        /// Gets all the order details for a particular order / license.
+        /// </summary>
+        /// <param name="orderId">The Id of the license to get the details from.</param>
+        /// <returns>Return an <see cref="IEnumerable{LicenseFeature}"/> with all the features and quantities set for that order.</returns>
         public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -83,14 +94,6 @@ namespace EPMLive.OnlineLicensing.Api
                         Value = Convert.ToInt32(item.quantity)
                     };
                 }
-            }
-        }
-
-        public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
-        {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                return context.ContractLevelTitles.Include(clt => clt.ContractLevels).Where(c=>c.DETAIL_ID != null).Select(c => new LicenseContract { ContractId = c.ContractLevels.FirstOrDefault().contractId, ContractName = c.TITLE, }).ToList().AsEnumerable();
             }
         }
 
@@ -136,10 +139,10 @@ namespace EPMLive.OnlineLicensing.Api
         /// <summary>
         /// Adds a new order detail to an order. The order details contains the information of how many seats are purchased for that license.
         /// </summary>
-        /// <param name="orderId">The id of the related order</param>
+        /// <param name="orderId">The Id of the related order.</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
-        /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
-        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> feature)
+        /// <returns>Returns an <see cref="OrderDetail"/> item to be added to the License/Order object to be created.</returns>
+        private OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> feature)
         {
             return new OrderDetail
             {
@@ -150,6 +153,11 @@ namespace EPMLive.OnlineLicensing.Api
             };
         }
 
+        /// <summary>
+        /// Renews the license by creating a new license, setting the values to the current license and increasing the expiration date.
+        /// </summary>
+        /// <param name="orderId">The Id of the license to extend.</param>
+        /// <param name="expirationDate">The new expiration date to set. The new date should be greater that the current date for the license.</param>
         public void RenewLicense(Guid orderId, DateTime expirationDate)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -160,6 +168,13 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Extends the license by editing its properties.
+        /// </summary>
+        /// <param name="orderId">The Id of the license to be edited.</param>
+        /// <param name="newActivationDate">The new activation date for the order. The activation date should be lower than the expiration date.</param>
+        /// <param name="newExpirationDate">The new expiration date for the order. The expiration date should be greater than the activation date.</param>
+        /// <param name="features">The list of the features with the quanities set for the order.</param>
         public void ExtendLicense(Guid orderId, DateTime newActivationDate, DateTime newExpirationDate, IEnumerable<Tuple<int, int>> features)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -175,6 +190,12 @@ namespace EPMLive.OnlineLicensing.Api
             }
         }
 
+        /// <summary>
+        /// Edits an order details of an order. the order detals contains de information of how many seats are purchased for that license.
+        /// </summary>
+        /// <param name="features">The Id of the related order.</param>
+        /// <param name="orderDetails">The collection of features containing the features and quantity of seats purchased for that product.</param>
+        /// <returns>Returns a <see cref="ICollection{OrderDetail}"/>> collection to be edited to the order / license being edited.</returns>
         private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, ICollection<OrderDetail> orderDetails)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
@@ -220,6 +241,12 @@ namespace EPMLive.OnlineLicensing.Api
             return featuresAndQuantities.Any(fq => fq.Item2 > 0);
         }
 
+        /// <summary>
+        /// Validates that the new expiration date proposed is greater than the current expiration date.
+        /// </summary>
+        /// <param name="orderId">The Id of the license to renew.</param>
+        /// <param name="newExpirationDate">The new expiration date proposed.</param>
+        /// <returns>Returns true if the current expiration date is lower than the proposed expiration date. Returns false otherwise.</returns>
         public bool ValidateNewLicenseExtension(Guid orderId, DateTime newExpirationDate)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())

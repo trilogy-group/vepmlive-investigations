@@ -33,7 +33,7 @@ namespace AdminSite
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
                 var licenseManager = new LicenseManager();
-
+                
                 if (!licenseManager.ValidLicensePeriod(newActivationDate, newExpirationDate))
                 {
                     ShowErrorMessage("License period must be at least 1 day.");
