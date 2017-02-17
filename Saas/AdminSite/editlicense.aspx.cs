@@ -33,7 +33,7 @@ namespace AdminSite
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
                 var licenseManager = new LicenseManager();
-                
+
                 if (!licenseManager.ValidLicensePeriod(newActivationDate, newExpirationDate))
                 {
                     ShowErrorMessage("License period must be at least 1 day.");
@@ -45,7 +45,7 @@ namespace AdminSite
                     ShowErrorMessage("At least one feature should be different that zero.");
                     return;
                 }
-               
+
                 licenseManager.ExtendLicense(orderId, newActivationDate, newExpirationDate, GetFeaturesAndQuantities());
 
                 var script = $@"
@@ -85,7 +85,7 @@ namespace AdminSite
             var licenseManager = new LicenseManager();
             var license = licenseManager.GetOrder(orderId);
 
-            var orderDetails = licenseManager.GetOrderDetails(orderId);
+            var orderDetails = licenseManager.GetOrderDetails(orderId, Convert.ToInt32(license.product_id));
 
             foreach (var item in orderDetails)
             {
@@ -128,11 +128,7 @@ namespace AdminSite
                 if (txtQty != null)
                 {
                     var quantity = string.IsNullOrEmpty(txtQty.Text) ? 0 : Convert.ToInt32(txtQty.Text);
-
-                    if (quantity > 0)
-                    {
-                        featureList.Add(new Tuple<int, int>(featureId, quantity));
-                    }
+                    featureList.Add(new Tuple<int, int>(featureId, quantity));
                 };
             }
 

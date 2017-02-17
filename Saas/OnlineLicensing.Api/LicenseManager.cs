@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using EPMLive.OnlineLicensing.Api.Data;
 using System.Collections;
+using System.Data.Entity.Infrastructure;
 
 namespace EPMLive.OnlineLicensing.Api
 {
@@ -68,7 +69,7 @@ namespace EPMLive.OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                return context.Orders.SingleOrDefault(o => o.order_id == orderId);
+                return context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
             }
         }
 
@@ -77,21 +78,22 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="orderId">The Id of the license to get the details from.</param>
         /// <returns>Return an <see cref="IEnumerable{LicenseFeature}"/> with all the features and quantities set for that order.</returns>
-        public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId)
+        public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId, int productId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var orderdetails = context.OrderDetails.Where(o => o.order_id == orderId);
-               
-                foreach (var item in orderdetails.ToList())
+                var orderFeatures = ProductCatalogManager.GetEnabledLicenseProductFeatures(productId);
+
+                foreach (var item in orderFeatures)
                 {
-                    var feature = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.detail_type_id);
+                    var feature = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.Id);
+                    var orderDetails = (context.OrderDetails.SingleOrDefault(o => o.order_id == orderId && o.detail_type_id == item.Id));
 
                     yield return new LicenseFeature
                     {
-                        Id = Convert.ToInt32(item.detail_type_id),
-                        Name = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.detail_type_id).detail_name,
-                        Value = Convert.ToInt32(item.quantity)
+                        Id = Convert.ToInt32(item.Id),
+                        Name = item.Name,
+                        Value = orderDetails != null ? Convert.ToInt32(orderDetails.quantity) : 0
                     };
                 }
             }
@@ -160,13 +162,41 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="expirationDate">The new expiration date to set. The new date should be greater that the current date for the license.</param>
         public void RenewLicense(Guid orderId, DateTime expirationDate)
         {
+            var order = GetOrder(orderId);
+
+            var orderfeatures = new List<Tuple<int, int>>();
+
+            foreach (var item in order.OrderDetails)
+            {
+                orderfeatures.Add(new Tuple<int, int>(Convert.ToInt32(item.detail_type_id), Convert.ToInt32(item.quantity)));
+            }
+
+            AddLicense(order.account_ref, order.activation.Value, expirationDate, order.product_id.Value, order.contractid, orderfeatures);
+            DeleteLicense(order.order_id);
+
+            //TODO: log the changes to the Account_log table
+        }
+
+        private void DeleteLicense(Guid orderId)
+        {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var order = context.Orders.Single(o => o.order_id == orderId);
-                order.expiration = expirationDate;
+                var order = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
+
+                //TODO: add the order to the order history table before deleting it
+
+                context.Orders.Remove(order);
+
                 context.SaveChanges();
             }
         }
+
+        private void AddOrderHistory(Order order, LicensingModel context)
+        {
+
+        }
+
+        private void AddOrderDetailsHistory() { }
 
         /// <summary>
         /// Extends the license by editing its properties.
@@ -179,11 +209,11 @@ namespace EPMLive.OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var license = context.Orders.Where(o => o.order_id == orderId).Include("OrderDetails").SingleOrDefault();
+                var license = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
 
                 license.activation = newActivationDate;
                 license.expiration = newExpirationDate;
-                license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails);
+                license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails, license.order_id);
 
                 context.Entry(license).State = EntityState.Modified;
                 context.SaveChanges();
@@ -196,20 +226,39 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="features">The Id of the related order.</param>
         /// <param name="orderDetails">The collection of features containing the features and quantity of seats purchased for that product.</param>
         /// <returns>Returns a <see cref="ICollection{OrderDetail}"/>> collection to be edited to the order / license being edited.</returns>
-        private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, ICollection<OrderDetail> orderDetails)
+        private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, ICollection<OrderDetail> orderDetails, Guid orderId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            if (features.Count() > 0)
             {
-                if (orderDetails.Count() > 0)
+                foreach (var item in features)
                 {
-                    foreach (var item in orderDetails)
+                    var orderDetail = orderDetails.SingleOrDefault(o => o.detail_type_id == item.Item1);
+
+                    if (item.Item2 > 0)
                     {
-                        item.quantity = features.SingleOrDefault(f => f.Item1 == item.detail_type_id).Item2;
+                        if (orderDetail != null)
+                        {
+                            orderDetail.quantity = item.Item2;
+                        }
+                        else
+                        {
+                            orderDetails.Add(new OrderDetail
+                            {
+                                order_detail_id = Guid.NewGuid(),
+                                order_id = orderId,
+                                detail_type_id = item.Item1,
+                                quantity = item.Item2
+                            });
+                        }
+                    }
+                    else
+                    {
+                        orderDetails.Remove(orderDetail);
                     }
                 }
-
-                return orderDetails;
             }
+
+            return orderDetails;
         }
 
         /// <summary>
