@@ -164,29 +164,30 @@ namespace EPMLive.OnlineLicensing.Api
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var license = context.Orders.SingleOrDefault(o => o.order_id == orderId);
+                var license = context.Orders.Where(o => o.order_id == orderId).Include("OrderDetails").SingleOrDefault();
 
                 license.activation = newActivationDate;
                 license.expiration = newExpirationDate;
-                license.OrderDetails = ExtendLicenseDetail(features, license.order_id);
+                license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails);
 
                 context.Entry(license).State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
 
-        private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, Guid orderId)
+        private ICollection<OrderDetail> ExtendLicenseDetail(IEnumerable<Tuple<int, int>> features, ICollection<OrderDetail> orderDetails)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
-                var originalLicenseDetails = context.OrderDetails.Where(o => o.order_id == orderId);
-
-                foreach (var item in originalLicenseDetails)
+                if (orderDetails.Count() > 0)
                 {
-                    item.quantity = features.SingleOrDefault(f => f.Item1 == item.detail_type_id).Item2;
+                    foreach (var item in orderDetails)
+                    {
+                        item.quantity = features.SingleOrDefault(f => f.Item1 == item.detail_type_id).Item2;
+                    }
                 }
 
-                return originalLicenseDetails as ICollection<OrderDetail>;
+                return orderDetails;
             }
         }
 
