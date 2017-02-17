@@ -1,4 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Admin.master" AutoEventWireup="true" CodeBehind="editaccount.aspx.cs" Inherits="AdminSite.editaccount" %>
+<%@ Register TagPrefix="lic" TagName="InactiveLicenses" Src="WebControls/Licensing/InactiveLicenses.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolderMain" runat="server">
 
@@ -380,7 +381,8 @@
                 <br />
 
                 <input type="button" id="AddLicenseButton" value="New License" onclick="AddNewLicense()" />
-
+                
+                <lic:InactiveLicenses runat="server" />
             </div>
         </div>
         <div id="a5" name="Users" width="90px">

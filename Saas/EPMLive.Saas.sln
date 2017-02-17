@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingSite", "BillingSite\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.OnlineLicensing.Api", "OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj", "{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLicensing.ApiTests", "OnlineLicensing.ApiTests\OnlineLicensing.ApiTests.csproj", "{14B55B29-55AC-4BC0-87A4-910E6739E178}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.OnlineLicensing.ApiTests", "OnlineLicensing.ApiTests\EPMLive.OnlineLicensing.ApiTests.csproj", "{14B55B29-55AC-4BC0-87A4-910E6739E178}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

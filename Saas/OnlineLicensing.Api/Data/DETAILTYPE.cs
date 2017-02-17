@@ -18,6 +18,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
         public DetailType()
         {
             this.LicenseDetails = new HashSet<LicenseDetail>();
+            this.OrderDetailHistories = new HashSet<OrderDetailHistory>();
         }
     
         public int detail_type_id { get; set; }
@@ -26,5 +27,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LicenseDetail> LicenseDetails { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<OrderDetailHistory> OrderDetailHistories { get; set; }
     }
 }

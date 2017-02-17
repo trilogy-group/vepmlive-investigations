@@ -5,13 +5,9 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="OnlineLicensing.Api.Data.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'epmlivedb.dbo.ACCOUNT' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACCOUNT">
           <Key>
             <PropertyRef Name="account_id" />
-            <PropertyRef Name="account_ref" />
-            <PropertyRef Name="dedicated" />
           </Key>
           <Property Name="account_id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="account_ref" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
@@ -72,15 +68,6 @@ warning 6002: The table/view 'epmlivedb.dbo.ACCOUNT' does not have a primary key
           <Property Name="detail_type_id" Type="int" />
           <Property Name="contract_id" Type="int" />
         </EntityType>
-        <EntityType Name="LICENSEFREQ">
-          <Key>
-            <PropertyRef Name="frequency_id" />
-          </Key>
-          <Property Name="frequency_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="duration" Type="int" Nullable="false" />
-          <Property Name="duration_type" Type="int" Nullable="false" />
-        </EntityType>
         <EntityType Name="LICENSEPRODUCTS">
           <Key>
             <PropertyRef Name="product_id" />
@@ -98,6 +85,45 @@ warning 6002: The table/view 'epmlivedb.dbo.ACCOUNT' does not have a primary key
           <Property Name="order_id" Type="uniqueidentifier" />
           <Property Name="detail_type_id" Type="int" />
           <Property Name="quantity" Type="int" />
+        </EntityType>
+        <EntityType Name="ORDERDETAILHIST">
+          <Key>
+            <PropertyRef Name="history_id" />
+            <PropertyRef Name="order_detail_id" />
+          </Key>
+          <Property Name="history_id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="order_detail_id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="order_id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="detail_type_id" Type="int" />
+          <Property Name="quantity" Type="int" />
+        </EntityType>
+        <EntityType Name="ORDERHISTORY">
+          <Key>
+            <PropertyRef Name="history_id" />
+          </Key>
+          <Property Name="history_id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="order_id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="account_ref" Type="int" Nullable="false" />
+          <Property Name="plimusReferenceNumber" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="quantity" Type="int" Nullable="false" />
+          <Property Name="diskspace" Type="int" />
+          <Property Name="projects" Type="int" />
+          <Property Name="activation" Type="datetime" />
+          <Property Name="expiration" Type="datetime" Nullable="false" />
+          <Property Name="plimusAccountId" Type="int" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="dtcreated" Type="datetime" />
+          <Property Name="poId" Type="uniqueidentifier" />
+          <Property Name="crmuid" Type="uniqueidentifier" />
+          <Property Name="crmorderid" Type="varchar" MaxLength="255" />
+          <Property Name="crmorderuid" Type="uniqueidentifier" />
+          <Property Name="crminvoiceuid" Type="uniqueidentifier" />
+          <Property Name="enabled" Type="bit" />
+          <Property Name="contractid" Type="varchar" MaxLength="50" />
+          <Property Name="billingsystem" Type="int" />
+          <Property Name="product_id" Type="int" />
+          <Property Name="reason" Type="int" Nullable="false" />
+          <Property Name="reason_comment" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ORDERS">
           <Key>
@@ -186,6 +212,42 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ORDERDETAILHIST_DETAILTYPES">
+          <End Role="DETAILTYPES" Type="Self.DETAILTYPES" Multiplicity="0..1" />
+          <End Role="ORDERDETAILHIST" Type="Self.ORDERDETAILHIST" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DETAILTYPES">
+              <PropertyRef Name="detail_type_id" />
+            </Principal>
+            <Dependent Role="ORDERDETAILHIST">
+              <PropertyRef Name="detail_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ORDERDETAILHIST_ORDERHISTORY">
+          <End Role="ORDERHISTORY" Type="Self.ORDERHISTORY" Multiplicity="1" />
+          <End Role="ORDERDETAILHIST" Type="Self.ORDERDETAILHIST" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ORDERHISTORY">
+              <PropertyRef Name="history_id" />
+            </Principal>
+            <Dependent Role="ORDERDETAILHIST">
+              <PropertyRef Name="history_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ORDERHISTORY_LICENSEPRODUCTS">
+          <End Role="LICENSEPRODUCTS" Type="Self.LICENSEPRODUCTS" Multiplicity="0..1" />
+          <End Role="ORDERHISTORY" Type="Self.ORDERHISTORY" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LICENSEPRODUCTS">
+              <PropertyRef Name="product_id" />
+            </Principal>
+            <Dependent Role="ORDERHISTORY">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ORDERS_LICENSEPRODUCTS">
           <End Role="LICENSEPRODUCTS" Type="Self.LICENSEPRODUCTS" Multiplicity="0..1" />
           <End Role="ORDERS" Type="Self.ORDERS" Multiplicity="*" />
@@ -211,36 +273,16 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="OnlineLicensingApiDataStoreContainer">
+          <EntitySet Name="ACCOUNT" EntityType="Self.ACCOUNT" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CONTRACTLEVEL_TITLES" EntityType="Self.CONTRACTLEVEL_TITLES" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CONTRACTLEVELS" EntityType="Self.CONTRACTLEVELS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DETAILTYPES" EntityType="Self.DETAILTYPES" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LICENSEDETAIL" EntityType="Self.LICENSEDETAIL" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="LICENSEFREQ" EntityType="Self.LICENSEFREQ" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LICENSEPRODUCTS" EntityType="Self.LICENSEPRODUCTS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ORDERDETAIL" EntityType="Self.ORDERDETAIL" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ORDERDETAILHIST" EntityType="Self.ORDERDETAILHIST" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ORDERHISTORY" EntityType="Self.ORDERHISTORY" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ORDERS" EntityType="Self.ORDERS" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ACCOUNT" EntityType="Self.ACCOUNT" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [ACCOUNT].[account_id] AS [account_id], 
-    [ACCOUNT].[account_ref] AS [account_ref], 
-    [ACCOUNT].[owner_id] AS [owner_id], 
-    [ACCOUNT].[maxusers] AS [maxusers], 
-    [ACCOUNT].[dtCreated] AS [dtCreated], 
-    [ACCOUNT].[creator_id] AS [creator_id], 
-    [ACCOUNT].[inTrial] AS [inTrial], 
-    [ACCOUNT].[version] AS [version], 
-    [ACCOUNT].[monthsfree] AS [monthsfree], 
-    [ACCOUNT].[diskquota] AS [diskquota], 
-    [ACCOUNT].[billingType] AS [billingType], 
-    [ACCOUNT].[crmaccountuid] AS [crmaccountuid], 
-    [ACCOUNT].[accountDescription] AS [accountDescription], 
-    [ACCOUNT].[partnerid] AS [partnerid], 
-    [ACCOUNT].[dedicated] AS [dedicated], 
-    [ACCOUNT].[lockusers] AS [lockusers], 
-    [ACCOUNT].[internalemail] AS [internalemail], 
-    [ACCOUNT].[SalesForceId] AS [SalesForceId]
-    FROM [dbo].[ACCOUNT] AS [ACCOUNT]</DefiningQuery>
-          </EntitySet>
           <EntitySet Name="vwActiveOrders" EntityType="Self.vwActiveOrders" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vwActiveOrders].[order_id] AS [order_id], 
@@ -269,6 +311,18 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
             <End Role="ORDERS" EntitySet="ORDERS" />
             <End Role="ORDERDETAIL" EntitySet="ORDERDETAIL" />
           </AssociationSet>
+          <AssociationSet Name="FK_ORDERDETAILHIST_DETAILTYPES" Association="Self.FK_ORDERDETAILHIST_DETAILTYPES">
+            <End Role="DETAILTYPES" EntitySet="DETAILTYPES" />
+            <End Role="ORDERDETAILHIST" EntitySet="ORDERDETAILHIST" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ORDERDETAILHIST_ORDERHISTORY" Association="Self.FK_ORDERDETAILHIST_ORDERHISTORY">
+            <End Role="ORDERHISTORY" EntitySet="ORDERHISTORY" />
+            <End Role="ORDERDETAILHIST" EntitySet="ORDERDETAILHIST" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ORDERHISTORY_LICENSEPRODUCTS" Association="Self.FK_ORDERHISTORY_LICENSEPRODUCTS">
+            <End Role="LICENSEPRODUCTS" EntitySet="LICENSEPRODUCTS" />
+            <End Role="ORDERHISTORY" EntitySet="ORDERHISTORY" />
+          </AssociationSet>
           <AssociationSet Name="FK_ORDERS_LICENSEPRODUCTS" Association="Self.FK_ORDERS_LICENSEPRODUCTS">
             <End Role="LICENSEPRODUCTS" EntitySet="LICENSEPRODUCTS" />
             <End Role="ORDERS" EntitySet="ORDERS" />
@@ -287,7 +341,6 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <EntitySet Name="LicenseProducts" EntityType="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" />
           <EntitySet Name="OrderDetails" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetail" />
           <EntitySet Name="Orders" EntityType="EPMLive.OnlineLicensing.Api.Data.Order" />
-          <EntitySet Name="Accounts" EntityType="EPMLive.OnlineLicensing.Api.Data.Account" />
           <EntitySet Name="VwActiveOrders" EntityType="EPMLive.OnlineLicensing.Api.Data.VwActiveOrder" />
           <AssociationSet Name="FK_PRODPLANS_HOSTEDPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS">
             <End Role="LICENSEPRODUCT" EntitySet="LicenseProducts" />
@@ -312,6 +365,21 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
             <End Role="ContractLevelTitle" EntitySet="ContractLevelTitles" />
             <End Role="ContractLevel" EntitySet="ContractLevels" />
           </AssociationSet>
+          <EntitySet Name="OrderDetailHistories" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderDetailHistory" />
+          <EntitySet Name="OrderHistories" EntityType="EPMLive.OnlineLicensing.Api.Data.OrderHistory" />
+          <AssociationSet Name="FK_ORDERDETAILHIST_ORDERHISTORY" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_ORDERHISTORY">
+            <End Role="ORDERHISTORY" EntitySet="OrderHistories" />
+            <End Role="ORDERDETAILHIST" EntitySet="OrderDetailHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ORDERHISTORY_LICENSEPRODUCTS" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERHISTORY_LICENSEPRODUCTS">
+            <End Role="LicenseProduct" EntitySet="LicenseProducts" />
+            <End Role="OrderHistory" EntitySet="OrderHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ORDERDETAILHIST_DETAILTYPES" Association="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_DETAILTYPES">
+            <End Role="DetailType" EntitySet="DetailTypes" />
+            <End Role="OrderDetailHistory" EntitySet="OrderDetailHistories" />
+          </AssociationSet>
+          <EntitySet Name="Accounts" EntityType="EPMLive.OnlineLicensing.Api.Data.Account" />
         </EntityContainer>
         <EntityType Name="LicenseDetail">
           <Key>
@@ -334,6 +402,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <Property Name="active" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="LicenseDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="LICENSEDETAIL" />
           <NavigationProperty Name="Orders" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="ORDER" />
+          <NavigationProperty Name="ORDERHISTORies" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERHISTORY_LICENSEPRODUCTS" FromRole="LicenseProduct" ToRole="OrderHistory" />
         </EntityType>
         <EntityType Name="OrderDetail">
           <Key>
@@ -371,31 +440,6 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <Property Name="product_id" Type="Int32" />
           <NavigationProperty Name="LicenseProduct" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="ORDER" ToRole="LICENSEPRODUCT" />
           <NavigationProperty Name="OrderDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAIL_ORDERS" FromRole="ORDER" ToRole="ORDERDETAIL" />
-        </EntityType>
-        <EntityType Name="Account">
-          <Key>
-            <PropertyRef Name="account_id" />
-            <PropertyRef Name="account_ref" />
-            <PropertyRef Name="dedicated" />
-          </Key>
-          <Property Name="account_id" Type="Guid" Nullable="false" />
-          <Property Name="account_ref" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="owner_id" Type="Guid" />
-          <Property Name="maxusers" Type="Int32" />
-          <Property Name="dtCreated" Type="DateTime" Precision="3" />
-          <Property Name="creator_id" Type="Guid" />
-          <Property Name="inTrial" Type="Boolean" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="monthsfree" Type="Int32" />
-          <Property Name="diskquota" Type="Int32" />
-          <Property Name="billingType" Type="Int32" />
-          <Property Name="crmaccountuid" Type="Guid" />
-          <Property Name="accountDescription" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
-          <Property Name="partnerid" Type="Int32" />
-          <Property Name="dedicated" Type="Boolean" Nullable="false" />
-          <Property Name="lockusers" Type="Boolean" />
-          <Property Name="internalemail" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="SalesForceId" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="VwActiveOrder">
           <Key>
@@ -490,6 +534,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <Property Name="detail_name" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="externalusers" Type="Boolean" />
           <NavigationProperty Name="LicenseDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_LICENSEDETAIL_DETAILTYPES" FromRole="DETAILTYPE" ToRole="LicenseDetail" />
+          <NavigationProperty Name="OrderDetailHistories" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_DETAILTYPES" FromRole="DetailType" ToRole="OrderDetailHistory" />
         </EntityType>
         <Association Name="FK_LICENSEDETAIL_DETAILTYPES">
           <End Type="EPMLive.OnlineLicensing.Api.Data.DetailType" Role="DETAILTYPE" Multiplicity="0..1" />
@@ -515,6 +560,108 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="OrderDetailHistory">
+          <Key>
+            <PropertyRef Name="history_id" />
+            <PropertyRef Name="order_detail_id" />
+          </Key>
+          <Property Name="history_id" Type="Guid" Nullable="false" />
+          <Property Name="order_detail_id" Type="Guid" Nullable="false" />
+          <Property Name="order_id" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="OrderHistory" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_ORDERHISTORY" FromRole="ORDERDETAILHIST" ToRole="ORDERHISTORY" />
+          <Property Name="detail_type_id" Type="Int32" />
+          <NavigationProperty Name="DetailType" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_DETAILTYPES" FromRole="OrderDetailHistory" ToRole="DetailType" />
+          <Property Name="quantity" Type="Int32" />
+        </EntityType>
+        <EntityType Name="OrderHistory">
+          <Key>
+            <PropertyRef Name="history_id" />
+          </Key>
+          <Property Name="history_id" Type="Guid" Nullable="false" />
+          <Property Name="order_id" Type="Guid" Nullable="false" />
+          <Property Name="account_ref" Type="Int32" Nullable="false" />
+          <Property Name="plimusReferenceNumber" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="quantity" Type="Int32" Nullable="false" />
+          <Property Name="projects" Type="Int32" />
+          <Property Name="activation" Type="DateTime" Precision="3" />
+          <Property Name="expiration" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="plimusAccountId" Type="Int32" Nullable="false" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="dtcreated" Type="DateTime" Precision="3" />
+          <Property Name="poId" Type="Guid" />
+          <Property Name="crmuid" Type="Guid" />
+          <Property Name="crmorderid" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="crmorderuid" Type="Guid" />
+          <Property Name="crminvoiceuid" Type="Guid" />
+          <Property Name="enabled" Type="Boolean" />
+          <Property Name="contractid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="billingsystem" Type="Int32" />
+          <Property Name="product_id" Type="Int32" />
+          <NavigationProperty Name="OrderDetailHistories" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERDETAILHIST_ORDERHISTORY" FromRole="ORDERHISTORY" ToRole="ORDERDETAILHIST" />
+          <Property Name="reason" Type="Int32" Nullable="false" />
+          <Property Name="reason_comment" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LicenseProduct" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERHISTORY_LICENSEPRODUCTS" FromRole="OrderHistory" ToRole="LicenseProduct" />
+          <Property Name="diskspace" Type="Int32" />
+        </EntityType>
+        <Association Name="FK_ORDERDETAILHIST_ORDERHISTORY">
+          <End Type="EPMLive.OnlineLicensing.Api.Data.OrderHistory" Role="ORDERHISTORY" Multiplicity="1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.OrderDetailHistory" Role="ORDERDETAILHIST" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ORDERHISTORY">
+              <PropertyRef Name="history_id" />
+            </Principal>
+            <Dependent Role="ORDERDETAILHIST">
+              <PropertyRef Name="history_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ORDERHISTORY_LICENSEPRODUCTS">
+          <End Type="EPMLive.OnlineLicensing.Api.Data.LicenseProduct" Role="LicenseProduct" Multiplicity="0..1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.OrderHistory" Role="OrderHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LicenseProduct">
+              <PropertyRef Name="product_id" />
+            </Principal>
+            <Dependent Role="OrderHistory">
+              <PropertyRef Name="product_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ORDERDETAILHIST_DETAILTYPES">
+          <End Type="EPMLive.OnlineLicensing.Api.Data.DetailType" Role="DetailType" Multiplicity="0..1" />
+          <End Type="EPMLive.OnlineLicensing.Api.Data.OrderDetailHistory" Role="OrderDetailHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DetailType">
+              <PropertyRef Name="detail_type_id" />
+            </Principal>
+            <Dependent Role="OrderDetailHistory">
+              <PropertyRef Name="detail_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Account">
+          <Key>
+            <PropertyRef Name="account_id" />
+          </Key>
+          <Property Name="account_id" Type="Guid" Nullable="false" />
+          <Property Name="account_ref" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="owner_id" Type="Guid" />
+          <Property Name="maxusers" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Precision="3" />
+          <Property Name="creator_id" Type="Guid" />
+          <Property Name="inTrial" Type="Boolean" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="monthsfree" Type="Int32" />
+          <Property Name="diskquota" Type="Int32" />
+          <Property Name="billingType" Type="Int32" />
+          <Property Name="crmaccountuid" Type="Guid" />
+          <Property Name="accountDescription" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="partnerid" Type="Int32" />
+          <Property Name="dedicated" Type="Boolean" Nullable="false" />
+          <Property Name="lockusers" Type="Boolean" />
+          <Property Name="internalemail" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="SalesForceId" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -577,30 +724,6 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Accounts">
-            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.Account">
-              <MappingFragment StoreEntitySet="ACCOUNT">
-                <ScalarProperty Name="SalesForceId" ColumnName="SalesForceId" />
-                <ScalarProperty Name="internalemail" ColumnName="internalemail" />
-                <ScalarProperty Name="lockusers" ColumnName="lockusers" />
-                <ScalarProperty Name="dedicated" ColumnName="dedicated" />
-                <ScalarProperty Name="partnerid" ColumnName="partnerid" />
-                <ScalarProperty Name="accountDescription" ColumnName="accountDescription" />
-                <ScalarProperty Name="crmaccountuid" ColumnName="crmaccountuid" />
-                <ScalarProperty Name="billingType" ColumnName="billingType" />
-                <ScalarProperty Name="diskquota" ColumnName="diskquota" />
-                <ScalarProperty Name="monthsfree" ColumnName="monthsfree" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="inTrial" ColumnName="inTrial" />
-                <ScalarProperty Name="creator_id" ColumnName="creator_id" />
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-                <ScalarProperty Name="maxusers" ColumnName="maxusers" />
-                <ScalarProperty Name="owner_id" ColumnName="owner_id" />
-                <ScalarProperty Name="account_ref" ColumnName="account_ref" />
-                <ScalarProperty Name="account_id" ColumnName="account_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="VwActiveOrders">
             <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.VwActiveOrder">
               <MappingFragment StoreEntitySet="vwActiveOrders">
@@ -650,6 +773,70 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
                 <ScalarProperty Name="externalusers" ColumnName="externalusers" />
                 <ScalarProperty Name="detail_name" ColumnName="detail_name" />
                 <ScalarProperty Name="detail_type_id" ColumnName="detail_type_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderDetailHistories">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.OrderDetailHistory">
+              <MappingFragment StoreEntitySet="ORDERDETAILHIST">
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="detail_type_id" ColumnName="detail_type_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="order_detail_id" ColumnName="order_detail_id" />
+                <ScalarProperty Name="history_id" ColumnName="history_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderHistories">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.OrderHistory">
+              <MappingFragment StoreEntitySet="ORDERHISTORY">
+                <ScalarProperty Name="diskspace" ColumnName="diskspace" />
+                <ScalarProperty Name="reason_comment" ColumnName="reason_comment" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="billingsystem" ColumnName="billingsystem" />
+                <ScalarProperty Name="contractid" ColumnName="contractid" />
+                <ScalarProperty Name="enabled" ColumnName="enabled" />
+                <ScalarProperty Name="crminvoiceuid" ColumnName="crminvoiceuid" />
+                <ScalarProperty Name="crmorderuid" ColumnName="crmorderuid" />
+                <ScalarProperty Name="crmorderid" ColumnName="crmorderid" />
+                <ScalarProperty Name="crmuid" ColumnName="crmuid" />
+                <ScalarProperty Name="poId" ColumnName="poId" />
+                <ScalarProperty Name="dtcreated" ColumnName="dtcreated" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="plimusAccountId" ColumnName="plimusAccountId" />
+                <ScalarProperty Name="expiration" ColumnName="expiration" />
+                <ScalarProperty Name="activation" ColumnName="activation" />
+                <ScalarProperty Name="projects" ColumnName="projects" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="plimusReferenceNumber" ColumnName="plimusReferenceNumber" />
+                <ScalarProperty Name="account_ref" ColumnName="account_ref" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="history_id" ColumnName="history_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Accounts">
+            <EntityTypeMapping TypeName="EPMLive.OnlineLicensing.Api.Data.Account">
+              <MappingFragment StoreEntitySet="ACCOUNT">
+                <ScalarProperty Name="SalesForceId" ColumnName="SalesForceId" />
+                <ScalarProperty Name="internalemail" ColumnName="internalemail" />
+                <ScalarProperty Name="lockusers" ColumnName="lockusers" />
+                <ScalarProperty Name="dedicated" ColumnName="dedicated" />
+                <ScalarProperty Name="partnerid" ColumnName="partnerid" />
+                <ScalarProperty Name="accountDescription" ColumnName="accountDescription" />
+                <ScalarProperty Name="crmaccountuid" ColumnName="crmaccountuid" />
+                <ScalarProperty Name="billingType" ColumnName="billingType" />
+                <ScalarProperty Name="diskquota" ColumnName="diskquota" />
+                <ScalarProperty Name="monthsfree" ColumnName="monthsfree" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="inTrial" ColumnName="inTrial" />
+                <ScalarProperty Name="creator_id" ColumnName="creator_id" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="maxusers" ColumnName="maxusers" />
+                <ScalarProperty Name="owner_id" ColumnName="owner_id" />
+                <ScalarProperty Name="account_ref" ColumnName="account_ref" />
+                <ScalarProperty Name="account_id" ColumnName="account_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
