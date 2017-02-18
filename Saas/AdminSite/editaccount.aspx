@@ -59,15 +59,14 @@
 
     function AddNewLicense() {
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'addeditlicense.aspx?accountId=' + accountId
+        var url = 'addlicense.aspx?accountId=' + accountId + "&addMode=add"
         ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
     };
 
     function ExtendLicense(orderId) {
-        var editMode = true;
         var accountId = '<%=Request["account_id"] %>'
-        var url = 'addeditlicense.aspx?accountId=' + accountId
-        ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
+        var url = 'editlicense.aspx?accountId=' + accountId + "&orderId=" + orderId
+        ShowModal('modalEditLicenseManagement', 'iframeEditLicense', url, 500, 450)
     }
 
     function RenewLicense(orderId) {
@@ -82,6 +81,10 @@
 
     function CloseRenewLicenseModal() {
         HideModal('modalRenewLicenseManagement')
+    }
+
+    function CloseEditLicenseModal() {
+        HideModal('modalEditLicenseManagement')
     }
 
     function ShowModal(div, iframe, url, height, width) {
@@ -469,6 +472,9 @@
     </div>
     <div id="modalRenewLicenseManagement" class="dialog">
         <iframe id="iframeRenewLicense" width="100%" height="300" frameborder="0"></iframe>
+    </div>
+    <div id="modalEditLicenseManagement" class="dialog">
+        <iframe id="iframeEditLicense" width="100%" height="450" frameborder="0"></iframe>
     </div>
     <script language="javascript">
         initmb();

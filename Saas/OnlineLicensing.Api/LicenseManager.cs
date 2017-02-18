@@ -172,10 +172,31 @@ namespace EPMLive.OnlineLicensing.Api
             }
 
             AddLicense(order.account_ref, order.activation.Value, expirationDate, order.product_id.Value, order.contractid, orderfeatures);
-
-            //TODO: add the order to the order history table before deleting it
             DeleteLicense(order.order_id);
+
+            //TODO: log the changes to the Account_log table
         }
+
+        private void DeleteLicense(Guid orderId)
+        {
+            using (var context = ConnectionHelper.CreateLicensingModel())
+            {
+                var order = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
+
+                //TODO: add the order to the order history table before deleting it
+
+                context.Orders.Remove(order);
+
+                context.SaveChanges();
+            }
+        }
+
+        private void AddOrderHistory(Order order, LicensingModel context)
+        {
+
+        }
+
+        private void AddOrderDetailsHistory() { }
 
         /// <summary>
         /// Extends the license by editing its properties.
@@ -196,8 +217,6 @@ namespace EPMLive.OnlineLicensing.Api
 
                 context.Entry(license).State = EntityState.Modified;
                 context.SaveChanges();
-
-                //TODO: add a log for the update
             }
         }
 
@@ -241,29 +260,6 @@ namespace EPMLive.OnlineLicensing.Api
 
             return orderDetails;
         }
-
-        /// <summary>
-        /// Deletes an active license
-        /// </summary>
-        /// <param name="orderId">The Id of the order to delete.</param>
-        /// <param name="comment">Optional parameter to denote the reason for deletion.</param>
-        public void DeleteLicense(Guid orderId, string comment = "")
-        {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                var order = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
-
-                //TODO: add the order to the order history table before deleting it
-
-                context.Orders.Remove(order);
-
-                context.SaveChanges();
-            }
-        }
-        //TODO: implement add order history
-        private void AddOrderHistory(Order order, LicensingModel context) { }
-
-        private void AddOrderDetailsHistory() { } //Maybe not needed
 
         /// <summary>
         /// Validates whether an account have an active license for the specified product.

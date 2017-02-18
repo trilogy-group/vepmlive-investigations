@@ -466,9 +466,12 @@ namespace AdminSite
         /// </summary>
         private void FillLicensesTab()
         {
-            var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
-            GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(accountRef); //get the reference number from the account number
-            GridViewActiveLicenses.DataBind();
+            using (var licenseManager = new LicenseManager())
+            {
+                var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
+                GridViewActiveLicenses.DataSource = licenseManager.GetAllActiveLicenses(accountRef);
+                GridViewActiveLicenses.DataBind();
+            }
         }
 
        

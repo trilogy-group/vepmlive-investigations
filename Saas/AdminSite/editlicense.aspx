@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="addeditlicense.aspx.cs" Inherits="AdminSite.newlicense" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="editlicense.aspx.cs" Inherits="AdminSite.editlicense" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -20,12 +20,9 @@
                   minDate: 0
               });
 
-              $("#TxtActivationDate").datepicker('setDate', new Date());;
-
               $(".readonly").keydown(function (e) {
                   e.preventDefault();
               });
-
           } );
     </script>
 
@@ -36,28 +33,28 @@
         <label  id="errorLabel" runat="server" visible="false" style="color:red"></label>
         <br />
         <fieldset>
-            <legend>License Details</legend>
+            <legend>License Details Edit</legend>
             <br />
 
             <asp:Label ID="Label1" runat="server" Text="Select Product"></asp:Label>
-            <asp:DropDownList ID="DropDownProductCatalog" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownProductCatalog_SelectedIndexChanged"></asp:DropDownList>
+            <asp:DropDownList ID="DropDownProductCatalog" runat="server" Enabled="false"></asp:DropDownList>
 
             <br />
 
             <asp:Label ID="Label2" runat="server" Text="Activation Date"></asp:Label>
-            <input type="text" class="datepicker readonly" runat="server" id="TxtActivationDate" required="required" />
+            <input type="text" class="datepicker readonly" runat="server" id="TxtNewActivationDate" required="required" />
            
             <br />
 
             <asp:Label ID="Label3" runat="server" Text="Expiration Date"></asp:Label>
-            <input type="text" class="datepicker readonly" runat="server" id="TxtExpirationDate" required="required" />
+            <input type="text" class="datepicker readonly" runat="server" id="TxtNewExpirationDate" required="required" />
 
         </fieldset>
 
         <br />
 
         <fieldset>
-            <legend>License Features</legend>
+            <legend>License Features Edit</legend>
             <br />
             
             <div id="featureListInnerDiv" runat="server"></div>
@@ -66,8 +63,8 @@
         
         <br />
 
-        <asp:Button ID="Button1" runat="server" Text="Add License"  OnClick="btnSubmit_Click" />
-        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseAddLicenseModal()"/>
+        <asp:Button ID="btnSubmit" runat="server" Text="Extend License" OnClick="btnSubmit_Click" />
+        <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseEditLicenseModal()"/>
     </div>
     </form>
 </body>
