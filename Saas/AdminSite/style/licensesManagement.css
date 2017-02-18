@@ -36,9 +36,14 @@ br {
 input[type=submit], input.button {
     background: #605D58;
     border: 0px;
-    padding: 1px;
+    padding: 3px;
     color: #FFF;
     width: 64px;
     cursor: pointer;
     margin: 5px;
+}
+
+#deleteLicenseForm textarea {
+    width: 300px;
+    resize: none;
 }
