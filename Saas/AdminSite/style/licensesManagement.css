@@ -44,6 +44,6 @@ input[type=submit], input.button {
 }
 
 #deleteLicenseForm textarea {
-    width: 300px;
+    width: 470px;
     resize: none;
 }

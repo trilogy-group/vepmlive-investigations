@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EPMLive.OnlineLicensing.Api;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,6 +13,24 @@ namespace AdminSite
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            var comment = txaComments.Value;
+
+            using (var licenseManager = new LicenseManager())
+            {
+                licenseManager.DeleteLicense(Guid.Parse(Request["orderId"]));
+            }
+
+            var script = $@"
+                        <script>
+                            parent.location.href='editaccount.aspx?account_id={Request["accountId"]}&tab=4';
+                        </script>
+                    ";
+
+            ClientScript.RegisterStartupScript(this.GetType(), "RenewLicense", script);
         }
     }
 }

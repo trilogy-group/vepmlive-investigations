@@ -177,7 +177,7 @@ namespace EPMLive.OnlineLicensing.Api
             //TODO: log the changes to the Account_log table
         }
 
-        private void DeleteLicense(Guid orderId)
+        public void DeleteLicense(Guid orderId)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {

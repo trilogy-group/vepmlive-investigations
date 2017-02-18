@@ -15,7 +15,7 @@
     </div>
         <br />
 
-        <asp:Button ID="Button1" runat="server" Text="Revoke"  />
+        <asp:Button ID="btnSubmit" runat="server" Text="Revoke" OnClick="btnSubmit_Click" />
         <asp:Button id="Button2" runat="server" Text="Cancel" OnClientClick="parent.CloseDeleteLicenseModal()"/>
     </form>
 </body>
