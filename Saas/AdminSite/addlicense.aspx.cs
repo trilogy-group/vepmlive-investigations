@@ -72,7 +72,8 @@ namespace AdminSite
         {
             Guid accountId = Guid.Parse(Request["accountId"]);
 
-            var accountRef = AccountManager.GetAccountReference(accountId);
+            var accountManager = new AccountManager();
+            var accountRef = accountManager.GetAccountReference(accountId);
             var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
