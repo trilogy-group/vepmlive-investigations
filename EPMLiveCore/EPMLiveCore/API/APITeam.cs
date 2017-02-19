@@ -1985,7 +1985,7 @@ namespace EPMLiveCore.API
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     SPGroup group = (SPGroup)assn.Member;
-
+                                   
                                     string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
                                     SPList myList = oWeb.Lists["Resources"];
                                     SPQuery curQry = new SPQuery();
