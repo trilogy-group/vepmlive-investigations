@@ -22,6 +22,8 @@ namespace AdminSite
         protected int TotalTicketUsage;
         protected int TotalTickets;
         protected StringBuilder sbOrders = new StringBuilder();
+        protected readonly StringBuilder sbActiveLicenses = new StringBuilder();
+        protected readonly StringBuilder sbInactiveLicenses = new StringBuilder();
         protected bool usingNewBilling = true;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -31,10 +33,10 @@ namespace AdminSite
                 strTab = Request["tab"].ToString();
             }
             catch { strTab = ""; }
-            if(strTab == "")
+            if (strTab == "")
                 strTab = "1";
 
-            if(!IsPostBack)
+            if (!IsPostBack)
                 fillGrid();
         }
 
@@ -42,9 +44,9 @@ namespace AdminSite
         {
             StringBuilder sbT = new StringBuilder();
             sbT.Append("<table width=\"100%\" border=\"0\" cellpadding=\"3\" style=\"border: #dedfde 1px solid; background-color: white; width: 100%;\" ><tr style=\"background-color: #6b696b; color: white; font-weight: bold;\"><td>Billing System</td><td>Ref #</td><td>Exp/Renewal Date</td><td>Users</td><td>Storage</td>");
-            if(isPE )
+            if (isPE)
                 sbT.Append("<td>Projects</td>");
-            
+
             sbT.Append("<td>Actions</td></tr>");
 
             return sbT.ToString();
@@ -63,7 +65,7 @@ namespace AdminSite
             SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ToString());
             cn.Open();
 
-            if(Request["delorder"] != null && Request["delorder"] != "")
+            if (Request["delorder"] != null && Request["delorder"] != "")
             {
                 SqlCommand c = new SqlCommand("delete from orders where order_id=@order_id", cn);
                 c.Parameters.AddWithValue("@order_id", Request["delorder"]);
@@ -91,16 +93,12 @@ namespace AdminSite
             txtEditPhone.Text = dr["phone"].ToString();
             txtEditTitle.Text = dr["title"].ToString();
 
-            try
-            {
-                chkLockUsers.Checked = bool.Parse(dr["lockusers"].ToString());
-            }
-            catch { }
+            bool lockusers;
+            bool.TryParse(dr["lockusers"].ToString(), out lockusers);
+            chkLockUsers.Checked = lockusers;
 
-            if(dr["dedicated"].ToString() == "True")
-                chkDedicated.Checked = true;
-            else
-                chkDedicated.Checked = false;
+
+            chkDedicated.Checked = dr["dedicated"].ToString() == "True";
 
 
             txtDesc.Text = dr["accountdescription"].ToString();
@@ -113,11 +111,8 @@ namespace AdminSite
 
             DateTime dtCreated = Convert.ToDateTime("1/1/1900");
             int months = 1;
-            try
-            {
-                months = int.Parse(dr["monthsfree"].ToString());
-            }
-            catch { }
+            int.TryParse(dr["monthsfree"].ToString(), out months);
+
             try
             {
                 dtCreated = Convert.ToDateTime(dr["dtcreated"].ToString());
@@ -127,28 +122,6 @@ namespace AdminSite
             lblExpiration.Text = dtCreated.AddMonths(months).ToShortDateString();
 
             ddlBillingType.SelectedValue = dr["billingType"].ToString();
-
-
-
-
-            //=============Zuora Account============
-            ZuoraHelper zuora = new ZuoraHelper();
-
-            ZuoraAPI.QueryResult qrAccount = zuora.RunQuery("SELECT BillToId, ID from ACCOUNT where accountref__c = '" + lblAccountRef.Text + "'");
-
-            if(qrAccount.records.Length > 0 && qrAccount.records[0] != null)
-            {
-                string accountid = qrAccount.records[0].Id;
-
-                lblZuoraLink.Text = "<A target=\"_blank\" href=\"https://www.zuora.com/apps/CustomerAccount.do?method=view&id=" + accountid + "\">View Zuora Account</a>";
-            }
-            else
-            {
-                lblZuoraLink.Text = "<A target=\"_blank\" href=\"createzuoraaccount.aspx?accountid=" + strAccountId + "\">Create</a>";
-            }
-            //======================================
-
-
 
             cmdGetSites = new SqlCommand("Select * from CONTRACTLEVEL_TITLES", cn);
             cmdGetSites.CommandType = CommandType.Text;
@@ -163,30 +136,29 @@ namespace AdminSite
             bool bCanExtendMonths = Helper.checkPermissions(12, cn);
             bool bCanExtendUsers = Helper.checkPermissions(13, cn);
 
-            foreach(DataRow drLevel in dsCLevels.Tables[0].Rows)
+            foreach (DataRow drLevel in dsCLevels.Tables[0].Rows)
             {
                 StringBuilder sbLevel = new StringBuilder();
-                
+
                 cmdGetSites = new SqlCommand("Select * from vwAccountOrders where account_ref=@accountref and contractlevel=@clevel", cn);
                 cmdGetSites.CommandType = CommandType.Text;
                 cmdGetSites.Parameters.AddWithValue("@AccountRef", lblAccountRef.Text);
                 cmdGetSites.Parameters.AddWithValue("@clevel", drLevel["contractlevel"].ToString());
-                //SqlDataReader drLevelOrders = cmdGetSites.ExecuteReader();
                 SqlDataAdapter da2 = new SqlDataAdapter(cmdGetSites);
                 DataSet ds2 = new DataSet();
                 da2.Fill(ds2);
 
-                foreach(DataRow drLevelOrders in ds2.Tables[0].Rows)
+                foreach (DataRow drLevelOrders in ds2.Tables[0].Rows)
                 {
 
-                    if(int.Parse(drLevelOrders[10].ToString()) != 2)
+                    if (int.Parse(drLevelOrders[10].ToString()) != 2)
                         usingNewBilling = false;
 
                     sbLevel.Append("<tr style=\"background-color: #f7f7de;\">");
                     sbLevel.Append("<td>");
                     sbLevel.Append(drLevelOrders[12].ToString());
                     sbLevel.Append("</td>");
-                    if(int.Parse(drLevelOrders[10].ToString()) == 2)
+                    if (int.Parse(drLevelOrders[10].ToString()) == 2)
                     {
                         sbLevel.Append("<td><a target=\"_blank\" href=\"https://www.zuora.com/apps/Subscription.do?method=view&id=");
                         sbLevel.Append(drLevelOrders[0].ToString());
@@ -217,7 +189,7 @@ namespace AdminSite
                         cmdGetSites.CommandType = CommandType.Text;
                         cmdGetSites.Parameters.AddWithValue("@orderid", drLevelOrders[13].ToString());
                         SqlDataReader drreader = cmdGetSites.ExecuteReader();
-                        while(drreader.Read())
+                        while (drreader.Read())
                         {
                             sbLevel.Append(drreader.GetString(2) + ": " + drreader.GetInt32(1).ToString() + "<br>");
                             bHasDetail = true;
@@ -225,9 +197,9 @@ namespace AdminSite
                         drreader.Close();
                     }
 
-                    if(!bHasDetail)
+                    if (!bHasDetail)
                     {
-                        if(int.Parse(drLevelOrders[1].ToString()) == -1)
+                        if (int.Parse(drLevelOrders[1].ToString()) == -1)
                             sbLevel.Append("Unlimited");
                         else
                             sbLevel.Append(drLevelOrders[1].ToString());
@@ -236,16 +208,16 @@ namespace AdminSite
                     sbLevel.Append("</td>");
 
                     sbLevel.Append("<td>");
-                    if(int.Parse(drLevelOrders[6].ToString()) == -1)
+                    if (int.Parse(drLevelOrders[6].ToString()) == -1)
                         sbLevel.Append("Unlimited");
                     else
                         sbLevel.Append(drLevelOrders[6].ToString());
                     sbLevel.Append("GB </td>");
 
-                    if(drLevel["contractlevel"].ToString() == "3")
+                    if (drLevel["contractlevel"].ToString() == "3")
                     {
                         sbLevel.Append("<td>");
-                        if(int.Parse(drLevelOrders[7].ToString()) == -1)
+                        if (int.Parse(drLevelOrders[7].ToString()) == -1)
                             sbLevel.Append("Unlimited");
                         else
                             sbLevel.Append(drLevelOrders[7].ToString());
@@ -254,26 +226,28 @@ namespace AdminSite
                     sbLevel.Append("<td>");
                     sbLevel.Append("<a href=\"editaccount.aspx?account_id=" + strAccountId + "&delorder=" + drLevelOrders[13].ToString() + "&tab=3\">Delete</a>");
 
-                    try{
-                        if(int.Parse(drLevelOrders[10].ToString()) == 4)
+                    try
+                    {
+                        if (int.Parse(drLevelOrders[10].ToString()) == 4)
                         {
-                            if(bCanExtendMonths)
+                            if (bCanExtendMonths)
                                 sbLevel.Append("<br><a href=\"extendtrial.aspx?orderid=" + drLevelOrders[13].ToString() + "&account_id=" + strAccountId + "\">Extend 1 Month</a>");
-                            if(bCanExtendUsers)
+                            if (bCanExtendUsers)
                                 sbLevel.Append("<br><a href=\"adduserstotrial.aspx?orderid=" + drLevelOrders[13].ToString() + "&account_id=" + strAccountId + "\">Update Quantity</a>");
                         }
-                    }catch{}
+                    }
+                    catch { }
                     sbLevel.Append("</td>");
                     sbLevel.Append("</tr>");
                 }
                 //drLevelOrders.Close();
 
-                if(sbLevel.ToString() != "")
+                if (sbLevel.ToString() != "")
                 {
                     sbOrders.Append("<b>");
                     sbOrders.Append(drLevel["TITLE"].ToString());
                     sbOrders.Append("</b><br>");
-                    if(drLevel["contractlevel"].ToString() == "3")
+                    if (drLevel["contractlevel"].ToString() == "3")
                         sbOrders.Append(ordertabletop(true));
                     else
                         sbOrders.Append(ordertabletop(false));
@@ -302,10 +276,10 @@ namespace AdminSite
             cmdGetSites.CommandType = CommandType.Text;
             SqlDataReader drOrders = cmdGetSites.ExecuteReader();
 
-            while(drOrders.Read())
+            while (drOrders.Read())
             {
                 string type = "";
-                switch(drOrders.GetInt32(6))
+                switch (drOrders.GetInt32(6))
                 {
                     case 2:
                         type = "Online";
@@ -315,10 +289,10 @@ namespace AdminSite
                         break;
                 };
 
-                if(drOrders.IsDBNull(0))
+                if (drOrders.IsDBNull(0))
                 {
 
-                    if(drOrders.GetInt32(5) > 1)
+                    if (drOrders.GetInt32(5) > 1)
                     {
                         dtOrders.Rows.Add(new object[] { drOrders.GetDateTime(1).ToShortDateString(), drOrders.GetDateTime(2).ToShortDateString(), drOrders.GetInt32(3).ToString(), "", "none", drOrders.GetString(4), "Plimus", type, drOrders.GetGuid(7).ToString() });
                     }
@@ -334,7 +308,7 @@ namespace AdminSite
             }
 
             drOrders.Close();
-            
+
             GridView2.DataSource = dtOrders;
             GridView2.DataBind();
             //======================================================================
@@ -383,7 +357,7 @@ namespace AdminSite
             cmdGetSites.CommandType = CommandType.Text;
             SqlDataReader drTickets = cmdGetSites.ExecuteReader();
 
-            if(drTickets.Read() && !drTickets.IsDBNull(0))
+            if (drTickets.Read() && !drTickets.IsDBNull(0))
                 TotalTickets = drTickets.GetInt32(0);
             else
                 TotalTickets = 0;
@@ -397,7 +371,7 @@ namespace AdminSite
             ds = new DataSet();
             da.Fill(ds);
 
-            foreach(DataRow drSite in ds.Tables[0].Rows)
+            foreach (DataRow drSite in ds.Tables[0].Rows)
             {
 
                 cmdGetSites = new SqlCommand("spGetEnterpriseUsers", cn);
@@ -474,17 +448,17 @@ namespace AdminSite
             gvLog.DataSource = ds.Tables[0];
             gvLog.DataBind();
 
-            
+
             strUid = dr["uid"].ToString();
 
             cn.Close();
         }
 
-        
+
 
         protected void gvTickets_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if(e.CommandName == "remove")
+            if (e.CommandName == "remove")
             {
                 SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ToString());
 
@@ -544,7 +518,7 @@ namespace AdminSite
 
                 return invoices.BusinessEntities;
             }
-            catch(System.Web.Services.Protocols.SoapException ex)
+            catch (System.Web.Services.Protocols.SoapException ex)
             {
                 Response.Write("Error Finding Orders: " + ex.Message + ex.Detail.OuterXml);
             }
@@ -591,8 +565,8 @@ namespace AdminSite
                 cmdUpdateUser.Parameters.AddWithValue("@dedicated", chkDedicated.Checked);
                 cmdUpdateUser.Parameters.AddWithValue("@lockusers", chkLockUsers.Checked);
                 cmdUpdateUser.Parameters.AddWithValue("@accountdescription", txtDesc.Text);
-                
-                if(txtPartnerId.Text != "")
+
+                if (txtPartnerId.Text != "")
                     cmdUpdateUser.Parameters.AddWithValue("@partnerid", txtPartnerId.Text);
                 else
                     cmdUpdateUser.Parameters.AddWithValue("@partnerid", DBNull.Value);
@@ -608,7 +582,7 @@ namespace AdminSite
 
                 Response.Redirect("editaccount.aspx?account_id=" + Request["account_id"]);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 pnlEditFailure.Visible = true;
                 lblError.Text = ex.Message.ToString() + "<br>" + ex.StackTrace;
@@ -641,7 +615,7 @@ namespace AdminSite
             public void InstantiateIn(System.Web.UI.Control container)
             {
 
-                switch(_rowType)
+                switch (_rowType)
                 {
 
                     case DataControlRowType.Header:
