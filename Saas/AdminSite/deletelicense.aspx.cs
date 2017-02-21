@@ -21,7 +21,7 @@ namespace AdminSite
 
             using (var licenseManager = new LicenseManager())
             {
-                licenseManager.DeleteLicense(Guid.Parse(Request["orderId"]));
+                licenseManager.DeleteLicense(Guid.Parse(Request["orderId"]), comment);
             }
 
             var script = $@"
