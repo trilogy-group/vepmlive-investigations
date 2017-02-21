@@ -60,6 +60,7 @@ namespace EPMLive.OnlineLicensing.Api
                 }
             }
         }
+        
         /// <summary>
         /// Gets one specific order / license based on the id of the order.
         /// </summary>
@@ -83,7 +84,7 @@ namespace EPMLive.OnlineLicensing.Api
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
                 ILicensingModel licensingModel = new LicensingModel();
-               
+
                 var productCatalogManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
                 var orderFeatures = productCatalogManager.GetEnabledLicenseProductFeatures(productId);
 
@@ -101,8 +102,6 @@ namespace EPMLive.OnlineLicensing.Api
                 }
             }
         }
-
-        //public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
 
         /// <summary>
         /// Gets all the licences currently active in the account. There should only be one license active per product in the account.
@@ -163,7 +162,6 @@ namespace EPMLive.OnlineLicensing.Api
                     throw new InvalidArchiveReasonEnumException();
             }
         }
-
 
         public static IEnumerable<LicenseContract> GetAllContractLevelTitles()
         {
@@ -247,31 +245,84 @@ namespace EPMLive.OnlineLicensing.Api
             }
 
             AddLicense(order.account_ref, order.activation.Value, expirationDate, order.product_id.Value, order.contractid, orderfeatures);
-            DeleteLicense(order.order_id);
+            DeleteLicense(order.order_id, string.Empty, LicenseArchiveReasons.Expired);
 
             //TODO: log the changes to the Account_log table
         }
 
-        public void DeleteLicense(Guid orderId)
+        /// <summary>
+        /// Removes an order from the active licenses list and adds it to the inactive licences list.
+        /// </summary>
+        /// <param name="orderId">The Id of the order to delete.</param>
+        /// <param name="comment">A comment describing a reason for deletion.</param>
+        /// <param name="reason">The reason for deletion, either expiration or revocation.</param>
+        public void DeleteLicense(Guid orderId, string comment, LicenseArchiveReasons reason = LicenseArchiveReasons.Revoked)
         {
             using (var context = ConnectionHelper.CreateLicensingModel())
             {
                 var order = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
 
-                //TODO: add the order to the order history table before deleting it
+                AddOrderHistory(order, context, comment, reason);
 
                 context.Orders.Remove(order);
-
                 context.SaveChanges();
             }
         }
 
-        private void AddOrderHistory(Order order, LicensingModel context)
+        /// <summary>
+        /// Adds an order to the order history table.
+        /// </summary>
+        /// <param name="order">The order to add.</param>
+        /// <param name="context">The current context of the database.</param>
+        /// <param name="comment">A comment describing the reason for adding it to the history table.</param>
+        /// <param name="reason">The reason for adding it, either expiration or revocation.</param>
+        private void AddOrderHistory(Order order, LicensingModel context, string comment, LicenseArchiveReasons reason)
         {
+            var orderHistory = new OrderHistory
+            {
+                history_id = Guid.NewGuid(),
+                order_id = order.order_id,
+                account_ref = order.account_ref,
+                activation = order.activation,
+                expiration = order.expiration,
+                product_id = order.product_id,
+                contractid = order.contractid,
+                plimusReferenceNumber = order.plimusReferenceNumber,
+                dtcreated = order.dtcreated,
+                quantity = order.quantity,
+                version = order.version,
+                enabled = false,
+                billingsystem = order.billingsystem,
+                reason_comment = comment,
+                reason = (int)reason
+            };
 
+            context.OrderHistories.Add(orderHistory);
+
+            AddOrderDetailsHistory(order.OrderDetails, context);
         }
 
-        private void AddOrderDetailsHistory() { }
+        /// <summary>
+        /// Adding the order details to the history table.
+        /// </summary>
+        /// <param name="orderDetail">The details of the features being added to the history table.</param>
+        /// <param name="context">The current context of the database.</param>
+        private void AddOrderDetailsHistory(ICollection<OrderDetail> orderDetail, LicensingModel context)
+        {
+            foreach (var item in orderDetail)
+            {
+                var orderDetailHistory = new OrderDetailHistory
+                {
+                    history_id = Guid.NewGuid(),
+                    order_detail_id = item.order_detail_id,
+                    order_id = (Guid)item.order_id,
+                    detail_type_id = item.detail_type_id,
+                    quantity = item.quantity
+                };
+
+                context.OrderDetailHistories.Add(orderDetailHistory);
+            }
+        }
 
         /// <summary>
         /// Extends the license by editing its properties.
