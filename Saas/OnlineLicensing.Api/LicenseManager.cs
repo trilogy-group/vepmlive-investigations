@@ -60,7 +60,7 @@ namespace EPMLive.OnlineLicensing.Api
                 }
             }
         }
-        
+
         /// <summary>
         /// Gets one specific order / license based on the id of the order.
         /// </summary>
@@ -202,7 +202,7 @@ namespace EPMLive.OnlineLicensing.Api
 
                 foreach (var item in featureList)
                 {
-                    orderToAdd.OrderDetails.Add(AddLicenseDetails(orderToAdd.order_id, item));
+                    orderToAdd.OrderDetails.Add(FormatLicenseDetails(orderToAdd.order_id, item));
                 }
 
                 context.Orders.Add(orderToAdd);
@@ -217,7 +217,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="orderId">The id of the related order</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
         /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
-        public OrderDetail AddLicenseDetails(Guid orderId, Tuple<int, int> Feature)
+        public OrderDetail FormatLicenseDetails(Guid orderId, Tuple<int, int> Feature)
         {
             return new OrderDetail
             {
@@ -297,9 +297,13 @@ namespace EPMLive.OnlineLicensing.Api
                 reason = (int)reason
             };
 
-            context.OrderHistories.Add(orderHistory);
+            foreach (var item in order.OrderDetails)
+            {
+                orderHistory.OrderDetailHistories.Add(FormatOrderDetailsHistory(item));
+            }
 
-            AddOrderDetailsHistory(order.OrderDetails, context);
+            context.OrderHistories.Add(orderHistory);
+            context.SaveChanges();
         }
 
         /// <summary>
@@ -307,21 +311,16 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="orderDetail">The details of the features being added to the history table.</param>
         /// <param name="context">The current context of the database.</param>
-        private void AddOrderDetailsHistory(ICollection<OrderDetail> orderDetail, LicensingModel context)
+        private OrderDetailHistory FormatOrderDetailsHistory(OrderDetail orderDetail)
         {
-            foreach (var item in orderDetail)
+            return new OrderDetailHistory
             {
-                var orderDetailHistory = new OrderDetailHistory
-                {
-                    history_id = Guid.NewGuid(),
-                    order_detail_id = item.order_detail_id,
-                    order_id = (Guid)item.order_id,
-                    detail_type_id = item.detail_type_id,
-                    quantity = item.quantity
-                };
-
-                context.OrderDetailHistories.Add(orderDetailHistory);
-            }
+                history_id = Guid.NewGuid(),
+                order_detail_id = orderDetail.order_detail_id,
+                order_id = (Guid)orderDetail.order_id,
+                detail_type_id = orderDetail.detail_type_id,
+                quantity = orderDetail.quantity
+            }; ;
         }
 
         /// <summary>
