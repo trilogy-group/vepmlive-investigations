@@ -407,7 +407,6 @@ namespace EPMLive.OnlineLicensing.Api
         public string ExpirationDate { get; set; }
     }
 
-
     public class InactiveLicenseOrder : LicenseOrder
     {
         public string ReasonText { get; set; }
