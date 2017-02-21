@@ -375,11 +375,11 @@
                         <asp:BoundField DataField="expirationdate" HeaderText="Expiration Date">
                             <ItemStyle HorizontalAlign="left" />
                         </asp:BoundField>
-                        <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+                        <%--<asp:TemplateField ItemStyle-HorizontalAlign="Center">
                             <ItemTemplate>
                                 <input type="button" value="View" />
                             </ItemTemplate>
-                        </asp:TemplateField>
+                        </asp:TemplateField>--%>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
                                 <input type="button" value="Extend" onclick="<%# "ExtendLicense('" + Eval("OrderId") + "')" %>" />
@@ -409,6 +409,8 @@
 
                 <input type="button" id="AddLicenseButton" value="New License" onclick="AddNewLicense()" />
                 
+                <br /><br /><br />
+
                 <lic:InactiveLicenses runat="server" />
             </div>
         </div>
