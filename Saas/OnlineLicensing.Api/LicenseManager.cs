@@ -217,7 +217,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="orderId">The id of the related order</param>
         /// <param name="Feature">A tuple of the product feature and the quantity of seats purchased for that product.</param>
         /// <returns>Returns an OrderDetail item to be added to the License/Order object to be created.</returns>
-        public OrderDetail FormatLicenseDetails(Guid orderId, Tuple<int, int> Feature)
+        private OrderDetail FormatLicenseDetails(Guid orderId, Tuple<int, int> Feature)
         {
             return new OrderDetail
             {
@@ -401,7 +401,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// Checks that license is at least 1 day.
         /// </summary>
         /// <returns>Returns false if there is not a valid license period, returns true if the license period is valid</returns>
-        public bool ValidLicensePeriod(DateTime activationDate, DateTime expirationDate)
+        public bool ValidateLicensePeriod(DateTime activationDate, DateTime expirationDate)
         {
             return ((expirationDate > activationDate) && (expirationDate >= activationDate.AddDays(1)));
         }

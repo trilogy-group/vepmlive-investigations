@@ -24,7 +24,6 @@ namespace EPMLive.OnlineLicensing.ApiTests
 
         }
 
-
         public TestLicensingModel GenerateLicensingModelWithSampleProductsAndFeatures()
         {
             var licModel = GenerateLicensingModelWithSampleProducts();

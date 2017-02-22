@@ -83,7 +83,7 @@ namespace AdminSite
 
             using (var license = new LicenseManager())
             {
-                if (!license.ValidLicensePeriod(activationDate, expirationDate))
+                if (!license.ValidateLicensePeriod(activationDate, expirationDate))
                 {
                     ShowErrorMessage("License period must be at least 1 day.");
                     return;
