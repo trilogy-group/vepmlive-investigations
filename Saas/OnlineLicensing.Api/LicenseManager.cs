@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using EPMLive.OnlineLicensing.Api.Data;
 using EPMLive.OnlineLicensing.Api.Exceptions;
-using System.Collections;
-using System.Data.Entity.Infrastructure;
 
 namespace EPMLive.OnlineLicensing.Api
 {
@@ -15,7 +13,18 @@ namespace EPMLive.OnlineLicensing.Api
     /// </summary>
     public class LicenseManager : IDisposable
     {
+        protected ILicensingModel _context;
         protected bool Disposed { get; private set; }
+
+        public LicenseManager()
+        {
+            _context = ConnectionHelper.CreateLicensingModel();
+        }
+
+        public LicenseManager(ILicensingModel context)
+        {
+            _context = context;
+        }
 
         /// <summary>
         /// Gets all the licences currently active in the account. There should only be one license active per product in the account.
@@ -24,40 +33,37 @@ namespace EPMLive.OnlineLicensing.Api
         /// <returns>Return an <see cref="IEnumerable{LicenseOrder}"/> containing all the active licenses in the account.</returns>
         public IEnumerable<LicenseOrder> GetAllActiveLicenses(int accountRef)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            var orders = _context.Orders.Include(o => o.LicenseProduct).Where(l => l.account_ref == accountRef && l.enabled == true && l.activation <= DateTime.Now && l.expiration > DateTime.Now).ToList();
+
+            foreach (var item in orders)
             {
-                var orders = context.Orders.Include(o => o.LicenseProduct).Where(l => l.account_ref == accountRef && l.enabled == true && l.activation <= DateTime.Now && l.expiration > DateTime.Now).ToList();
+                var productId = item.product_id ?? 0;
+                var productName = item.LicenseProduct != null ? item.LicenseProduct.name : string.Empty;
 
-                foreach (var item in orders)
+                var featureDetails = new StringBuilder();
+
+                foreach (var itemDetails in _context.OrderDetails.Where(o => o.order_id == item.order_id).ToList())
                 {
-                    var productId = item.product_id ?? 0;
-                    var productName = item.LicenseProduct != null ? item.LicenseProduct.name : string.Empty;
-
-                    var featureDetails = new StringBuilder();
-
-                    foreach (var itemDetails in context.OrderDetails.Where(o => o.order_id == item.order_id).ToList())
+                    var matchingDetailType = _context.DetailTypes.SingleOrDefault(d => d.detail_type_id == itemDetails.detail_type_id);
+                    if (matchingDetailType != null)
                     {
-                        var matchingDetailType = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == itemDetails.detail_type_id);
-                        if (matchingDetailType != null)
-                        {
-                            var featureName = matchingDetailType.detail_name;
-                            featureDetails.Append(featureName);
-                        }
-                        featureDetails.Append(":");
-                        featureDetails.Append(' ', 90);
-                        featureDetails.Append(itemDetails.quantity);
-                        featureDetails.Append("<br />");
+                        var featureName = matchingDetailType.detail_name;
+                        featureDetails.Append(featureName);
                     }
-
-                    yield return new LicenseOrder
-                    {
-                        ProductId = productId,
-                        OrderId = item.order_id.ToString(),
-                        Product = productName,
-                        Features = featureDetails.ToString(),
-                        ExpirationDate = item.expiration.ToShortDateString()
-                    };
+                    featureDetails.Append(":");
+                    featureDetails.Append(' ', 90);
+                    featureDetails.Append(itemDetails.quantity);
+                    featureDetails.Append("<br />");
                 }
+
+                yield return new LicenseOrder
+                {
+                    ProductId = productId,
+                    OrderId = item.order_id.ToString(),
+                    Product = productName,
+                    Features = featureDetails.ToString(),
+                    ExpirationDate = item.expiration.ToShortDateString()
+                };
             }
         }
 
@@ -68,10 +74,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// <returns>Returns an <see cref="Order"/> license.</returns>
         public Order GetOrder(Guid orderId)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                return context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
-            }
+            return _context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
         }
 
         /// <summary>
@@ -79,27 +82,21 @@ namespace EPMLive.OnlineLicensing.Api
         /// </summary>
         /// <param name="orderId">The Id of the license to get the details from.</param>
         /// <returns>Return an <see cref="IEnumerable{LicenseFeature}"/> with all the features and quantities set for that order.</returns>
-        public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId, int productId)
+        public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId, IEnumerable<LicenseFeature> orderFeatures)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            ILicensingModel licensingModel = new LicensingModel();
+
+            foreach (var item in orderFeatures)
             {
-                ILicensingModel licensingModel = new LicensingModel();
+                var feature = _context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.Id);
+                var orderDetails = (_context.OrderDetails.SingleOrDefault(o => o.order_id == orderId && o.detail_type_id == item.Id));
 
-                var productCatalogManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
-                var orderFeatures = productCatalogManager.GetEnabledLicenseProductFeatures(productId);
-
-                foreach (var item in orderFeatures)
+                yield return new LicenseFeature
                 {
-                    var feature = context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.Id);
-                    var orderDetails = (context.OrderDetails.SingleOrDefault(o => o.order_id == orderId && o.detail_type_id == item.Id));
-
-                    yield return new LicenseFeature
-                    {
-                        Id = Convert.ToInt32(item.Id),
-                        Name = item.Name,
-                        Value = orderDetails != null ? Convert.ToInt32(orderDetails.quantity) : 0
-                    };
-                }
+                    Id = Convert.ToInt32(item.Id),
+                    Name = item.Name,
+                    Value = orderDetails != null ? Convert.ToInt32(orderDetails.quantity) : 0
+                };
             }
         }
 
@@ -182,33 +179,30 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="featureList">Contains the quantity of seats for every product feature.</param>
         public void AddLicense(int accountRef, DateTime activationDate, DateTime expirationDate, int productId, string contractid, List<Tuple<int, int>> featureList)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
+            var orderToAdd = new Order()
             {
-                var orderToAdd = new Order()
-                {
-                    order_id = Guid.NewGuid(),
-                    account_ref = accountRef,
-                    activation = activationDate,
-                    expiration = expirationDate,
-                    product_id = productId,
-                    contractid = contractid,
-                    plimusReferenceNumber = "00000",
-                    dtcreated = DateTime.Now,
-                    quantity = 1,
-                    version = 2,
-                    enabled = true,
-                    billingsystem = 3
-                };
+                order_id = Guid.NewGuid(),
+                account_ref = accountRef,
+                activation = activationDate,
+                expiration = expirationDate,
+                product_id = productId,
+                contractid = contractid,
+                plimusReferenceNumber = "00000",
+                dtcreated = DateTime.Now,
+                quantity = 1,
+                version = 2,
+                enabled = true,
+                billingsystem = 3
+            };
 
-                foreach (var item in featureList)
-                {
-                    orderToAdd.OrderDetails.Add(FormatLicenseDetails(orderToAdd.order_id, item));
-                }
-
-                context.Orders.Add(orderToAdd);
-                context.SaveChanges();
-
+            foreach (var item in featureList)
+            {
+                orderToAdd.OrderDetails.Add(FormatLicenseDetails(orderToAdd.order_id, item));
             }
+
+            _context.Orders.Add(orderToAdd);
+            _context.SaveChanges();
+
         }
 
         /// <summary>
@@ -258,15 +252,12 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="reason">The reason for deletion, either expiration or revocation.</param>
         public void DeleteLicense(Guid orderId, string comment, LicenseArchiveReasons reason = LicenseArchiveReasons.Revoked)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                var order = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
+            var order = _context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
 
-                AddOrderHistory(order, context, comment, reason);
+            AddOrderHistory(order, _context, comment, reason);
 
-                context.Orders.Remove(order);
-                context.SaveChanges();
-            }
+            _context.Orders.Remove(order);
+            _context.SaveChanges();
         }
 
         /// <summary>
@@ -276,7 +267,7 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="context">The current context of the database.</param>
         /// <param name="comment">A comment describing the reason for adding it to the history table.</param>
         /// <param name="reason">The reason for adding it, either expiration or revocation.</param>
-        private void AddOrderHistory(Order order, LicensingModel context, string comment, LicenseArchiveReasons reason)
+        private void AddOrderHistory(Order order, ILicensingModel context, string comment, LicenseArchiveReasons reason)
         {
             var orderHistory = new OrderHistory
             {
@@ -332,17 +323,13 @@ namespace EPMLive.OnlineLicensing.Api
         /// <param name="features">The list of the features with the quanities set for the order.</param>
         public void ExtendLicense(Guid orderId, DateTime newActivationDate, DateTime newExpirationDate, IEnumerable<Tuple<int, int>> features)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                var license = context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
+            var license = _context.Orders.Include("OrderDetails").SingleOrDefault(o => o.order_id == orderId);
 
-                license.activation = newActivationDate;
-                license.expiration = newExpirationDate;
-                license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails, license.order_id);
+            license.activation = newActivationDate;
+            license.expiration = newExpirationDate;
+            license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails, license.order_id);
 
-                context.Entry(license).State = EntityState.Modified;
-                context.SaveChanges();
-            }
+            _context.SaveChanges();
         }
 
         /// <summary>
@@ -423,11 +410,8 @@ namespace EPMLive.OnlineLicensing.Api
         /// <returns>Returns true if the current expiration date is lower than the proposed expiration date. Returns false otherwise.</returns>
         public bool ValidateNewLicenseExtension(Guid orderId, DateTime newExpirationDate)
         {
-            using (var context = ConnectionHelper.CreateLicensingModel())
-            {
-                var order = context.Orders.SingleOrDefault(o => o.order_id == orderId);
-                return order.expiration < newExpirationDate;
-            }
+            var order = _context.Orders.SingleOrDefault(o => o.order_id == orderId);
+            return order.expiration < newExpirationDate;
         }
 
         /// <summary>

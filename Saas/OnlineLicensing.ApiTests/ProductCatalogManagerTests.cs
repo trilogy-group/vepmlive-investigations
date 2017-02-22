@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using EPMLive.OnlineLicensing.Api;
-using EPMLive.OnlineLicensing.Api.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLive.OnlineLicensing.ApiTests

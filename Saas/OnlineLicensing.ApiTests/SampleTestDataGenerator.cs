@@ -1,4 +1,5 @@
 ﻿using EPMLive.OnlineLicensing.Api.Data;
+using System;
 
 namespace EPMLive.OnlineLicensing.ApiTests
 {
@@ -67,6 +68,105 @@ namespace EPMLive.OnlineLicensing.ApiTests
                 detail_name = "External user",
                 externalusers = true
             });
+
+            return licModel;
+        }
+
+        public TestLicensingModel GenerateLicensingModelWithSampleActiveOrder()
+        {
+            var licModel = new TestLicensingModel();
+
+            licModel.Orders.Add(new Order
+            {
+                order_id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                account_ref = 11111,
+                activation = DateTime.Parse("01/17/2016"),
+                expiration = DateTime.Parse("01/17/2018"),
+                product_id = 9,
+                contractid = "50000010",
+                plimusReferenceNumber = "00000",
+                dtcreated = DateTime.Now,
+                quantity = 1,
+                version = 2,
+                enabled = true,
+                billingsystem = 3
+            });
+
+            return licModel;
+        }
+
+        public TestLicensingModel GenerateLicensingModelWithSampleActiveOrderAndDetails()
+        {
+            var licModel = new TestLicensingModel();
+
+            licModel.Orders.Add(new Order
+            {
+                order_id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                account_ref = 11111,
+                activation = DateTime.Parse("01/17/2016"),
+                expiration = DateTime.Parse("01/17/2018"),
+                product_id = 9,
+                contractid = "50000010",
+                plimusReferenceNumber = "00000",
+                dtcreated = DateTime.Now,
+                quantity = 1,
+                version = 2,
+                enabled = true,
+                billingsystem = 3
+            });
+
+            licModel.OrderDetails.Add(
+                new OrderDetail
+                {
+                    order_detail_id = Guid.NewGuid(),
+                    order_id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                    detail_type_id = 1,
+                    quantity = 5
+                });
+
+            licModel.OrderDetails.Add(
+                           new OrderDetail
+                           {
+                               order_detail_id = Guid.NewGuid(),
+                               order_id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                               detail_type_id = 3,
+                               quantity = 10
+                           });
+         
+
+            return licModel;
+        }
+
+        public TestLicensingModel GenerateLicensingModelWithSampleProductsEnabled()
+        {
+            var licModel = new TestLicensingModel();
+
+            licModel.LicenseProducts.Add(
+                new LicenseProduct
+                {
+                    product_id = 9,
+                    name = "EPM Live Online",
+                    active = true,
+                    sku = "Test SKU",
+                });
+
+            licModel.LicenseDetails.Add(
+                new LicenseDetail
+                {
+                    product_id = 9,
+                    contract_id = 000001,
+                    detail_type_id = 1,
+                    license_detail_id = 1
+                });
+
+            licModel.LicenseDetails.Add(
+                new LicenseDetail
+                {
+                    product_id = 9,
+                    contract_id = 000003,
+                    detail_type_id = 3,
+                    license_detail_id = 2
+                });
 
             return licModel;
         }

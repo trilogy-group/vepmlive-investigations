@@ -13,15 +13,10 @@
 // 
 #pragma warning disable 1591
 
-namespace AdminSite.emailservice {
-    using System;
-    using System.Web.Services;
-    using System.Diagnostics;
-    using System.Web.Services.Protocols;
-    using System.Xml.Serialization;
-    using System.ComponentModel;
-    
-    
+namespace AdminSite.emailservice
+{
+
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1055.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]

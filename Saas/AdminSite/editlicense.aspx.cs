@@ -2,9 +2,6 @@
 using EPMLive.OnlineLicensing.Api.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace AdminSite
@@ -86,7 +83,10 @@ namespace AdminSite
             var licenseManager = new LicenseManager();
             var license = licenseManager.GetOrder(orderId);
 
-            var orderDetails = licenseManager.GetOrderDetails(orderId, Convert.ToInt32(license.product_id));
+            var productCatalogManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+            var orderFeatures = productCatalogManager.GetEnabledLicenseProductFeatures(Convert.ToInt32(license.product_id));
+
+            var orderDetails = licenseManager.GetOrderDetails(orderId, orderFeatures);
 
             foreach (var item in orderDetails)
             {

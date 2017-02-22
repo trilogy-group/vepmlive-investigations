@@ -9,10 +9,9 @@
 
 namespace EPMLive.OnlineLicensing.Api.Data
 {
-    using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    
+
     public partial class LicensingModel : DbContext
     {
         public LicensingModel()
