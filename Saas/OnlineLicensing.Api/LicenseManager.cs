@@ -84,11 +84,8 @@ namespace EPMLive.OnlineLicensing.Api
         /// <returns>Return an <see cref="IEnumerable{LicenseFeature}"/> with all the features and quantities set for that order.</returns>
         public IEnumerable<LicenseFeature> GetOrderDetails(Guid orderId, IEnumerable<LicenseFeature> orderFeatures)
         {
-            ILicensingModel licensingModel = new LicensingModel();
-
             foreach (var item in orderFeatures)
             {
-                var feature = _context.DetailTypes.SingleOrDefault(d => d.detail_type_id == item.Id);
                 var orderDetails = (_context.OrderDetails.SingleOrDefault(o => o.order_id == orderId && o.detail_type_id == item.Id));
 
                 yield return new LicenseFeature

@@ -136,39 +136,5 @@ namespace EPMLive.OnlineLicensing.ApiTests
 
             return licModel;
         }
-
-        public TestLicensingModel GenerateLicensingModelWithSampleProductsEnabled()
-        {
-            var licModel = new TestLicensingModel();
-
-            licModel.LicenseProducts.Add(
-                new LicenseProduct
-                {
-                    product_id = 9,
-                    name = "EPM Live Online",
-                    active = true,
-                    sku = "Test SKU",
-                });
-
-            licModel.LicenseDetails.Add(
-                new LicenseDetail
-                {
-                    product_id = 9,
-                    contract_id = 000001,
-                    detail_type_id = 1,
-                    license_detail_id = 1
-                });
-
-            licModel.LicenseDetails.Add(
-                new LicenseDetail
-                {
-                    product_id = 9,
-                    contract_id = 000003,
-                    detail_type_id = 3,
-                    license_detail_id = 2
-                });
-
-            return licModel;
-        }
     }
 }

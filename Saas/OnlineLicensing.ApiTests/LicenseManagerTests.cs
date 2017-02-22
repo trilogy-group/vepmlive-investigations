@@ -48,18 +48,29 @@ namespace EPMLive.OnlineLicensing.ApiTests
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrderAndDetails();
             var licenseManager = new LicenseManager(context);
-            var productCatalogManager = new ProductCatalogManager(new SampleTestDataGenerator().GenerateLicensingModelWithSampleProductsEnabled);
-            var OrderFeatures = productCatalogManager.GetEnabledLicenseProductFeatures(9);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
+            var orderFeatures = new List<LicenseFeature>
+            {
+                new LicenseFeature
+                {
+                    Id = 1,
+                    Name = "Team Member"
+                },
+
+                new LicenseFeature
+                {
+                    Id = 3,
+                    Name = "Full User"
+                }
+            };
+
 
             //act 
-            //var result = licenseManager.GetOrderDetails(OrderId, orderFeatures);
+            var result = licenseManager.GetOrderDetails(OrderId, orderFeatures);
 
             //assert
-            //Assert.IsNotNull(result);
-            //Assert.IsTrue(result.Count() > 0);
-
-            Assert.Fail();
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Count() > 0);
         }
 
         [TestMethod]
