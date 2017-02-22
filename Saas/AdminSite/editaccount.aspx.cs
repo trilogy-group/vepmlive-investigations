@@ -454,7 +454,8 @@ namespace AdminSite
         {
             using (var licenseManager = new LicenseManager())
             {
-                var accountRef = AccountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
+                var accountManager = new AccountManager();
+                var accountRef = accountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
                 GridViewActiveLicenses.DataSource = licenseManager.GetAllActiveLicenses(accountRef);
                 GridViewActiveLicenses.DataBind();
             }

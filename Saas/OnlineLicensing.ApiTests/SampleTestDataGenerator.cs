@@ -136,5 +136,21 @@ namespace EPMLive.OnlineLicensing.ApiTests
 
             return licModel;
         }
+
+        public TestLicensingModel GenerateLicensingModelWithSampleAccount()
+        {
+            var licModel = new TestLicensingModel();
+
+            licModel.Accounts.Add(new Account
+            {
+                account_id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                account_ref = 11111,
+                accountDescription = "Test account",
+                dtCreated = DateTime.Now
+            });
+
+            return licModel;
+
+        }
     }
 }
