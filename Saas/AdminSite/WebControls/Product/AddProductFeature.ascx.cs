@@ -20,7 +20,7 @@ namespace AdminSite.WebControls.Product
         {
             try
             {
-                new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).DeleteProductFeature(CurrentFeatureId);
+                new ProductRepository(ConnectionHelper.CreateLicensingModel()).DeleteProductFeature(CurrentFeatureId);
                 Response.Redirect($"addproduct.aspx?id={CurrentProductId}&edit=1&tab=2");
             }
             catch (Exception ex)
@@ -34,7 +34,7 @@ namespace AdminSite.WebControls.Product
         {
             ddlDetailType.DataTextField = "detail_name";
             ddlDetailType.DataValueField = "detail_type_id";
-            ddlDetailType.DataSource = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetAllDetailTypes();
+            ddlDetailType.DataSource = new ProductRepository(ConnectionHelper.CreateLicensingModel()).GetAllDetailTypes();
             ddlDetailType.DataBind();
         }
 
@@ -55,7 +55,7 @@ namespace AdminSite.WebControls.Product
             try
             {
                 var detailTypeId = Convert.ToInt32(ddlDetailType.SelectedValue);
-                var prodManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+                var prodManager = new ProductRepository(ConnectionHelper.CreateLicensingModel());
                 if (prodManager.CheckForFeatureDuplicate(CurrentProductId, detailTypeId)) { lblMessage.Text = $"The License feature: {ddlDetailType.SelectedItem.Text} is already part of the features for this product. "; return false; }
                 prodManager.AddProductFeature(CurrentProductId, detailTypeId);
             }

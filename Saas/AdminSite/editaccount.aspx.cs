@@ -10,6 +10,8 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Text;
+using System.Collections.Generic;
+using EPMLive.OnlineLicensing.Api;
 
 namespace AdminSite
 {
@@ -258,7 +260,7 @@ namespace AdminSite
                 }
             }
 
-
+            FillLicensesTab();
 
             //Plimus
             DataTable dtOrders = new DataTable();
@@ -454,7 +456,15 @@ namespace AdminSite
             cn.Close();
         }
 
-
+        /// <summary>
+        /// Fills the licenses tab with active licenses
+        /// </summary>
+        private void FillLicensesTab()
+        {
+            var accountRef = AccountRepository.GetAccountReference(Guid.Parse(Request["account_id"]));
+            GridViewActiveLicenses.DataSource = LicenseManager.GetAllActiveLicenses(accountRef); //get the reference number from the account number
+            GridViewActiveLicenses.DataBind();
+        }
 
         protected void gvTickets_RowCommand(object sender, GridViewCommandEventArgs e)
         {
@@ -600,8 +610,6 @@ namespace AdminSite
             string _uid;
 
             DataControlRowType _rowType;
-
-
 
             public DynamicGridViewURLTemplate(string uid, DataControlRowType RowType)
             {

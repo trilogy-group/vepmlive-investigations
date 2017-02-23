@@ -1,8 +1,7 @@
-﻿using System;
 using System.Data.Entity;
 using EPMLive.OnlineLicensing.Api.Data;
 
-namespace OnlineLicensing.ApiTests
+namespace EPMLive.OnlineLicensing.ApiTests
 {
     /// <summary>
     /// 
@@ -17,8 +16,8 @@ namespace OnlineLicensing.ApiTests
             Orders = new TestDbSet<Order>();
             OrderDetails = new TestDbSet<OrderDetail>();
             Accounts = new TestDbSet<Account>();
-            VwAccountOrders = new TestDbSet<VwAccountOrder>();
-
+            OrderHistories = new TestDbSet<OrderHistory>();
+            OrderDetailHistories = new TestDbSet<OrderDetailHistory>();
         }
         public DbSet<DetailType> DetailTypes { get; set; }
         public DbSet<LicenseDetail> LicenseDetails { get; set; }
@@ -26,20 +25,20 @@ namespace OnlineLicensing.ApiTests
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<VwAccountOrder> VwAccountOrders { get; set; }
+        public DbSet<OrderHistory> OrderHistories { get; set; }
+        public DbSet<OrderDetailHistory> OrderDetailHistories { get; set; }
         public void MarkAsModified<TEntity>(TEntity item) where TEntity : class, new()
         {
-            throw new NotImplementedException();
         }
 
         public void MarkAsDeleted<TEntity>(TEntity item) where TEntity : class, new()
         {
-            throw new NotImplementedException();
+            //
         }
 
         public int SaveChanges()
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
         public void Dispose()

@@ -13,8 +13,30 @@
 
     <script language="javascript">
 
-        function Del(id) {
+        $(function () {
+            someFunction();
 
+            $("#ctl00_PlaceHolderMain_GridView1").sortable({
+                items: 'tr:not(tr:first-child)',
+                cursor: 'pointer',
+                axis: 'y',
+                dropOnEmpty: false,
+                receive: function (e, ui) {
+                    $(this).find("tbody").append(ui.item);
+
+                    //save the new order in order to make changes permanent
+                    someFunction()
+                }
+            });
+        });
+
+        function someFunction() {
+            console.log("Im Inside some function");
+            var ctx = new SP.ClientContext.get_current();
+            console.log(ctx);
+        }
+
+        function Del(id) {
             if (confirm('Are you sure you want to delete that Applicaton?')) 
             {
 

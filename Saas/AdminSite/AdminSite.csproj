@@ -265,6 +265,7 @@
     <Content Include="style\arrow.png" />
     <Content Include="style\arrow_select.png" />
     <Content Include="style\gallery.jpg" />
+    <Content Include="style\licensesManagement.css" />
     <Content Include="style\logo.gif" />
     <Content Include="style\logo.jpg" />
     <Content Include="style\main.png" />
@@ -272,12 +273,13 @@
     <Content Include="style\menu_sel.png" />
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
-    <Content Include="packages.config" />
     <Content Include="WebControls\BaseWebControl.ascx" />
+    <Content Include="WebControls\Licensing\InactiveLicenses.ascx" />
     <Content Include="WebControls\Product\AddEditProduct.ascx" />
     <Content Include="WebControls\Product\AddProductFeature.ascx" />
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
+    <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -702,6 +704,13 @@
     <Compile Include="WebControls\BaseWebControl.ascx.designer.cs">
       <DependentUpon>BaseWebControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.designer.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+    </Compile>
     <Compile Include="WebControls\Product\AddEditProduct.ascx.cs">
       <DependentUpon>AddEditProduct.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -734,7 +743,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="WebControls\Licensing\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Admin.master" />

@@ -12,14 +12,15 @@ namespace EPMLive.OnlineLicensing.Api.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class LicenseDetail
+    public partial class OrderDetailHistory
     {
-        public int license_detail_id { get; set; }
-        public int product_id { get; set; }
+        public System.Guid history_id { get; set; }
+        public System.Guid order_detail_id { get; set; }
+        public System.Guid order_id { get; set; }
         public Nullable<int> detail_type_id { get; set; }
-        public Nullable<int> contract_id { get; set; }
+        public Nullable<int> quantity { get; set; }
     
-        public virtual LicenseProduct LicenseProduct { get; set; }
+        public virtual OrderHistory OrderHistory { get; set; }
         public virtual DetailType DetailType { get; set; }
     }
 }
