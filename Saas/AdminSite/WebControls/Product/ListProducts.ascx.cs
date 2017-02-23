@@ -10,7 +10,7 @@ namespace AdminSite.WebControls.Product
         {
             if (!IsPostBack)
             {
-                grdProducts.DataSource = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetAllProducts();
+                grdProducts.DataSource = new ProductRepository(ConnectionHelper.CreateLicensingModel()).GetAllProducts();
                 grdProducts.DataBind();
             }
         }

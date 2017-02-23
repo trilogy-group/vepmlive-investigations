@@ -10,7 +10,8 @@
 namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
-
+    using System.Collections.Generic;
+    
     public partial class OrderDetailHistory
     {
         public System.Guid history_id { get; set; }

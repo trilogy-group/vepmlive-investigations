@@ -402,7 +402,7 @@ warning 6002: The table/view 'epmlivedb.dbo.vwActiveOrders' does not have a prim
           <Property Name="active" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="LicenseDetails" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_PRODPLANS_HOSTEDPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="LICENSEDETAIL" />
           <NavigationProperty Name="Orders" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERS_LICENSEPRODUCTS" FromRole="LICENSEPRODUCT" ToRole="ORDER" />
-          <NavigationProperty Name="ORDERHISTORies" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERHISTORY_LICENSEPRODUCTS" FromRole="LicenseProduct" ToRole="OrderHistory" />
+          <NavigationProperty Name="OrderHistories" Relationship="EPMLive.OnlineLicensing.Api.Data.FK_ORDERHISTORY_LICENSEPRODUCTS" FromRole="LicenseProduct" ToRole="OrderHistory" />
         </EntityType>
         <EntityType Name="OrderDetail">
           <Key>

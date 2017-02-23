@@ -101,12 +101,6 @@
     </Fakes>
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Web.fakes" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
@@ -134,9 +128,6 @@
     <Fakes Include="Fakes\EPMLiveWebParts.fakes" />
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\System.fakes" />
-  </ItemGroup>
-  <ItemGroup>
     <Fakes Include="Fakes\mscorlib.fakes" />
   </ItemGroup>
   <ItemGroup>
@@ -147,8 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\System.Data.fakes" />
-  </ItemGroup>
-  <ItemGroup>
+    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
+    <Fakes Include="Fakes\System.Web.fakes" />
+    <Fakes Include="Fakes\System.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

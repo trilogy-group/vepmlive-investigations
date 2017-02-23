@@ -5,7 +5,7 @@ namespace AdminSite.WebControls.Licensing
 {
     public partial class InactiveLicenses : BaseWebControl
     {
-        protected int AccountRef => new AccountManager().GetAccountReference(Guid.Parse(Request["account_id"]));
+        protected int AccountRef => AccountRepository.GetAccountReference(Guid.Parse(Request["account_id"]));
 
         protected void Page_Load(object sender, EventArgs e)
         {

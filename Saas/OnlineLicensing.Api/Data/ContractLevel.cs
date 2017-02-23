@@ -10,7 +10,8 @@
 namespace EPMLive.OnlineLicensing.Api.Data
 {
     using System;
-
+    using System.Collections.Generic;
+    
     public partial class ContractLevel
     {
         public System.Guid contractlevelid { get; set; }

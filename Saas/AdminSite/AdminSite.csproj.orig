@@ -1,0 +1,875 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{73451560-EDC6-4B91-98B0-4C226586E82E}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AdminSite</RootNamespace>
+    <AssemblyName>AdminSite</AssemblyName>
+<<<<<<< HEAD
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+=======
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+>>>>>>> a2285ce46dba71a5bf624ed4c5db19037c47cc7b
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="accessdenied.aspx" />
+    <Content Include="activatekey.aspx" />
+    <Content Include="activepartners.aspx" />
+    <Content Include="addcustomer.aspx" />
+    <Content Include="addemail.aspx" />
+    <Content Include="addfeature.aspx" />
+    <Content Include="addkey.aspx" />
+    <Content Include="addorder.aspx" />
+    <Content Include="addproduct.aspx" />
+    <Content Include="addproductfeature.aspx" />
+    <Content Include="appfeature.aspx" />
+<<<<<<< HEAD
+    <Content Include="deletelicense.aspx" />
+    <Content Include="editlicense.aspx" />
+=======
+>>>>>>> a2285ce46dba71a5bf624ed4c5db19037c47cc7b
+    <Content Include="manageproducts.aspx" />
+    <Content Include="addpubkey.aspx" />
+    <Content Include="addticket.aspx" />
+    <Content Include="adduserstotrial.aspx" />
+    <Content Include="BillingSite.sln" />
+    <Content Include="changeowner.aspx" />
+    <Content Include="createaccount.aspx" />
+    <Content Include="createsite.aspx" />
+    <Content Include="createzuoraaccount.aspx" />
+    <Content Include="customers.aspx" />
+    <Content Include="Default.aspx" />
+    <Content Include="dhtmlxtab\dhtmlxcommon.js" />
+    <Content Include="dhtmlxtab\dhtmlxtabbar.css" />
+    <Content Include="dhtmlxtab\dhtmlxtabbar.js" />
+    <Content Include="dhtmlxtab\dhtmlxtabbar_start.js" />
+    <Content Include="dhtmlxtab\dhtmlxtree.css" />
+    <Content Include="dhtmlxtab\dhtmlxtree.js" />
+    <Content Include="dhtmlxtab\ext\dhtmlxtabbar_wins.js" />
+    <Content Include="dhtmlxtab\imgs\blank.html" />
+    <Content Include="dhtmlxtab\imgs\bottom\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\modern\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\p_left_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\p_right_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\bottom\silver\sample.gif" />
+    <Content Include="dhtmlxtab\imgs\close.png" />
+    <Content Include="dhtmlxtab\imgs\left\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\left\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\left\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\left\modern\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\left\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\left\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\left\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\loading.gif" />
+    <Content Include="dhtmlxtab\imgs\right\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\right\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\right\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\right\modern\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\right\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\right\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\right\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\scrl_b.gif" />
+    <Content Include="dhtmlxtab\imgs\scrl_l.gif" />
+    <Content Include="dhtmlxtab\imgs\scrl_r.gif" />
+    <Content Include="dhtmlxtab\imgs\scrl_t.gif" />
+    <Content Include="dhtmlxtab\imgs\top\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\blue\close.gif" />
+    <Content Include="dhtmlxtab\imgs\top\blue\c_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\c_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\l_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\l_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\r_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\r_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\blue\scrl_l.gif" />
+    <Content Include="dhtmlxtab\imgs\top\blue\scrl_r.gif" />
+    <Content Include="dhtmlxtab\imgs\top\blue\tabs-light.png" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\circuses\_p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\top\dark\close.gif" />
+    <Content Include="dhtmlxtab\imgs\top\dark\c_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\c_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\l_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\l_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\r_a.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\r_p.png" />
+    <Content Include="dhtmlxtab\imgs\top\dark\scrl_l.gif" />
+    <Content Include="dhtmlxtab\imgs\top\dark\scrl_r.gif" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\a_left.png" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\a_middle.png" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\a_right.png" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\p_left.png" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\p_middle.png" />
+    <Content Include="dhtmlxtab\imgs\top\dhxgrid_glassy_blue\p_right.png" />
+    <Content Include="dhtmlxtab\imgs\top\modern\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\top\modern\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\p_left_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\top\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\p_right_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\silver\sample.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\a_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\a_left_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\a_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\a_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\a_right_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_left.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_left_skos.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_middle.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_middle_over.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_right.gif" />
+    <Content Include="dhtmlxtab\imgs\top\with_bg\p_right_skos.gif" />
+    <Content Include="editaccount.aspx" />
+    <Content Include="editcustomer.aspx" />
+    <Content Include="edituser.aspx" />
+    <Content Include="emailtemplates.aspx" />
+    <Content Include="extendtrial.aspx" />
+    <Content Include="fullfill.aspx" />
+    <Content Include="images\blank.gif" />
+    <Content Include="images\divider.JPG" />
+    <Content Include="images\dlmax.gif" />
+    <Content Include="images\dlmin.gif" />
+    <Content Include="linkaccount.aspx" />
+    <Content Include="linksite.aspx" />
+    <Content Include="modal\modal.css" />
+    <Content Include="modal\modal.js" />
+    <Content Include="modal\modalmain.css" />
+    <Content Include="modal\overlay.png" />
+    <Content Include="modal\pencil.gif" />
+    <Content Include="addlicense.aspx" />
+    <Content Include="newzuoraorder.aspx" />
+    <Content Include="oldsignups.aspx" />
+    <Content Include="partnerrequests.aspx" />
+    <Content Include="perms.aspx" />
+    <Content Include="pubsupport.aspx" />
+    <Content Include="renewlicense.aspx" />
+    <Content Include="reports.aspx" />
+    <Content Include="resetfkey.aspx" />
+    <Content Include="resetkey.aspx" />
+    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.1.js" />
+    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="signups.aspx" />
+    <Content Include="style\arrow.png" />
+    <Content Include="style\arrow_select.png" />
+    <Content Include="style\gallery.jpg" />
+    <Content Include="style\licensesManagement.css" />
+    <Content Include="style\logo.gif" />
+    <Content Include="style\logo.jpg" />
+    <Content Include="style\main.png" />
+    <Content Include="style\menu.png" />
+    <Content Include="style\menu_sel.png" />
+    <Content Include="style\pattern.png" />
+    <Content Include="style\style.css" />
+    <Content Include="WebControls\BaseWebControl.ascx" />
+    <Content Include="WebControls\Licensing\InactiveLicenses.ascx" />
+    <Content Include="WebControls\Product\AddEditProduct.ascx" />
+    <Content Include="WebControls\Product\AddProductFeature.ascx" />
+    <Content Include="WebControls\Product\ListProductFeatures.ascx" />
+    <Content Include="WebControls\Product\ListProducts.ascx" />
+    <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\qq11.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\accountsSvc\LookUpList.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\accountsSvc\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\accountsSvc\service.disco" />
+    <None Include="Web References\emailservice\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\emailservice\service.disco" />
+    <Content Include="tksupport.aspx" />
+    <Content Include="updateorder.aspx" />
+    <Content Include="users.aspx" />
+    <Content Include="versions.aspx" />
+    <Content Include="viewkeyinfo.aspx" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <None Include="Web References\accountsSvc\SiteInfo.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\emailservice\service.wsdl" />
+    <None Include="Web References\MSCRM\BusinessEntity.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\MSCRM\BusinessEntityCollection.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\MSCRM\CrmServiceWsdl.wsdl" />
+    <None Include="Web References\MSCRM\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\MSCRM\Response.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\AmendResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\DeleteResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\getUserInfoResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\LoginResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\QueryResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\ZuoraAPI\SaveResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\SubscribeResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\ZuoraAPI\zuora.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="accessdenied.aspx.cs">
+      <DependentUpon>accessdenied.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="accessdenied.aspx.designer.cs">
+      <DependentUpon>accessdenied.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="activatekey.aspx.cs">
+      <DependentUpon>activatekey.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="activatekey.aspx.designer.cs">
+      <DependentUpon>activatekey.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="activepartners.aspx.cs">
+      <DependentUpon>activepartners.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="activepartners.aspx.designer.cs">
+      <DependentUpon>activepartners.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addcustomer.aspx.cs">
+      <DependentUpon>addcustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addcustomer.aspx.designer.cs">
+      <DependentUpon>addcustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addemail.aspx.cs">
+      <DependentUpon>addemail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addemail.aspx.designer.cs">
+      <DependentUpon>addemail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addfeature.aspx.cs">
+      <DependentUpon>addfeature.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addfeature.aspx.designer.cs">
+      <DependentUpon>addfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addkey.aspx.cs">
+      <DependentUpon>addkey.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addkey.aspx.designer.cs">
+      <DependentUpon>addkey.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addorder.aspx.cs">
+      <DependentUpon>addorder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addorder.aspx.designer.cs">
+      <DependentUpon>addorder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addproduct.aspx.cs">
+      <DependentUpon>addproduct.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addproduct.aspx.designer.cs">
+      <DependentUpon>addproduct.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addproductfeature.aspx.cs">
+      <DependentUpon>addproductfeature.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addproductfeature.aspx.designer.cs">
+      <DependentUpon>addproductfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="appfeature.aspx.cs">
+      <DependentUpon>appfeature.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="appfeature.aspx.designer.cs">
+      <DependentUpon>appfeature.aspx</DependentUpon>
+    </Compile>
+<<<<<<< HEAD
+    <Compile Include="deletelicense.aspx.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="deletelicense.aspx.designer.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editlicense.aspx.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editlicense.aspx.designer.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
+    </Compile>
+=======
+>>>>>>> a2285ce46dba71a5bf624ed4c5db19037c47cc7b
+    <Compile Include="manageproducts.aspx.cs">
+      <DependentUpon>manageproducts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="manageproducts.aspx.designer.cs">
+      <DependentUpon>manageproducts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addpubkey.aspx.cs">
+      <DependentUpon>addpubkey.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addpubkey.aspx.designer.cs">
+      <DependentUpon>addpubkey.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addticket.aspx.cs">
+      <DependentUpon>addticket.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addticket.aspx.designer.cs">
+      <DependentUpon>addticket.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="adduserstotrial.aspx.cs">
+      <DependentUpon>adduserstotrial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="adduserstotrial.aspx.designer.cs">
+      <DependentUpon>adduserstotrial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin.master.cs">
+      <DependentUpon>Admin.master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="changeowner.aspx.cs">
+      <DependentUpon>changeowner.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="changeowner.aspx.designer.cs">
+      <DependentUpon>changeowner.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="createaccount.aspx.cs">
+      <DependentUpon>createaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="createaccount.aspx.designer.cs">
+      <DependentUpon>createaccount.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="createsite.aspx.cs">
+      <DependentUpon>createsite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="createsite.aspx.designer.cs">
+      <DependentUpon>createsite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="createzuoraaccount.aspx.cs">
+      <DependentUpon>createzuoraaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="createzuoraaccount.aspx.designer.cs">
+      <DependentUpon>createzuoraaccount.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="customers.aspx.cs">
+      <DependentUpon>customers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="customers.aspx.designer.cs">
+      <DependentUpon>customers.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editaccount.aspx.cs">
+      <DependentUpon>editaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editaccount.aspx.designer.cs">
+      <DependentUpon>editaccount.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editcustomer.aspx.cs">
+      <DependentUpon>editcustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editcustomer.aspx.designer.cs">
+      <DependentUpon>editcustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="edituser.aspx.cs">
+      <DependentUpon>edituser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="edituser.aspx.designer.cs">
+      <DependentUpon>edituser.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="emailtemplates.aspx.cs">
+      <DependentUpon>emailtemplates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="emailtemplates.aspx.designer.cs">
+      <DependentUpon>emailtemplates.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="extendtrial.aspx.cs">
+      <DependentUpon>extendtrial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="extendtrial.aspx.designer.cs">
+      <DependentUpon>extendtrial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="fullfill.aspx.cs">
+      <DependentUpon>fullfill.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="fullfill.aspx.designer.cs">
+      <DependentUpon>fullfill.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Helper.cs" />
+    <Compile Include="linkaccount.aspx.cs">
+      <DependentUpon>linkaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="linkaccount.aspx.designer.cs">
+      <DependentUpon>linkaccount.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="linksite.aspx.cs">
+      <DependentUpon>linksite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="linksite.aspx.designer.cs">
+      <DependentUpon>linksite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="addlicense.aspx.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addlicense.aspx.designer.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="newzuoraorder.aspx.cs">
+      <DependentUpon>newzuoraorder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="newzuoraorder.aspx.designer.cs">
+      <DependentUpon>newzuoraorder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="oldsignups.aspx.cs">
+      <DependentUpon>oldsignups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="oldsignups.aspx.designer.cs">
+      <DependentUpon>oldsignups.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="partnerrequests.aspx.cs">
+      <DependentUpon>partnerrequests.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="partnerrequests.aspx.designer.cs">
+      <DependentUpon>partnerrequests.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="perms.aspx.cs">
+      <DependentUpon>perms.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="perms.aspx.designer.cs">
+      <DependentUpon>perms.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="pubsupport.aspx.cs">
+      <DependentUpon>pubsupport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pubsupport.aspx.designer.cs">
+      <DependentUpon>pubsupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="renewlicense.aspx.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="renewlicense.aspx.designer.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="reports.aspx.cs">
+      <DependentUpon>reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="reports.aspx.designer.cs">
+      <DependentUpon>reports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="resetfkey.aspx.cs">
+      <DependentUpon>resetfkey.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="resetfkey.aspx.designer.cs">
+      <DependentUpon>resetfkey.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="resetkey.aspx.cs">
+      <DependentUpon>resetkey.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="resetkey.aspx.designer.cs">
+      <DependentUpon>resetkey.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="signups.aspx.cs">
+      <DependentUpon>signups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="signups.aspx.designer.cs">
+      <DependentUpon>signups.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="tksupport.aspx.cs">
+      <DependentUpon>tksupport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="tksupport.aspx.designer.cs">
+      <DependentUpon>tksupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="updateorder.aspx.cs">
+      <DependentUpon>updateorder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="updateorder.aspx.designer.cs">
+      <DependentUpon>updateorder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users.aspx.cs">
+      <DependentUpon>users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users.aspx.designer.cs">
+      <DependentUpon>users.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="versions.aspx.cs">
+      <DependentUpon>versions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="versions.aspx.designer.cs">
+      <DependentUpon>versions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="viewkeyinfo.aspx.cs">
+      <DependentUpon>viewkeyinfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="viewkeyinfo.aspx.designer.cs">
+      <DependentUpon>viewkeyinfo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\accountsSvc\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\emailservice\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\MSCRM\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="CrmHelper.cs" />
+    <Compile Include="App_Code\IdentityImpersonation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\ZuoraAPI\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\BaseWebControl.ascx.cs">
+      <DependentUpon>BaseWebControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\BaseWebControl.ascx.designer.cs">
+      <DependentUpon>BaseWebControl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.designer.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\AddEditProduct.ascx.cs">
+      <DependentUpon>AddEditProduct.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\AddEditProduct.ascx.designer.cs">
+      <DependentUpon>AddEditProduct.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\AddProductFeature.ascx.cs">
+      <DependentUpon>AddProductFeature.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\AddProductFeature.ascx.designer.cs">
+      <DependentUpon>AddProductFeature.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProductFeatures.ascx.cs">
+      <DependentUpon>ListProductFeatures.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProductFeatures.ascx.designer.cs">
+      <DependentUpon>ListProductFeatures.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProducts.ascx.cs">
+      <DependentUpon>ListProducts.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Product\ListProducts.ascx.designer.cs">
+      <DependentUpon>ListProducts.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="ZuoraHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Admin.master" />
+    <None Include="Web References\accountsSvc\service.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="C:\epmlive\Toolkit4.0\AdminSite\MSCRM\CrmServiceWsdl.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\MSCRM\</RelPath>
+      <UpdateFromURL>C:\epmlive\Toolkit4.0\AdminSite\MSCRM\CrmServiceWsdl.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>AdminSite_MSCRM_CrmService</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\epmlive\Zuora\Zuora\App_Data\zuora.a.33.0.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\ZuoraAPI\</RelPath>
+      <UpdateFromURL>C:\epmlive\Zuora\Zuora\App_Data\zuora.a.33.0.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>AdminSite_ZuoraAPI_ZuoraService</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\accountsSvc\</RelPath>
+      <UpdateFromURL>https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>AdminSite_accountsSvc_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="https://my.epmlive.com/_vti_bin/epmlive/emailservice/service.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\emailservice\</RelPath>
+      <UpdateFromURL>https://my.epmlive.com/_vti_bin/epmlive/emailservice/service.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>AdminSite_emailservice_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj">
+      <Project>{6fbe6f92-e82b-4d6f-b805-6465d92f63f3}</Project>
+      <Name>EPMLive.OnlineLicensing.Api</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>63502</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost/AdminSite</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>del $(TargetDir)\Microsoft.Sharepoint.Sandbox.dll</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

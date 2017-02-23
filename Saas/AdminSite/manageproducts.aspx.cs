@@ -11,7 +11,7 @@ namespace AdminSite
 
         private void LoadProducts()
         {
-            //grdProducts.DataSource = ProductCatalogManager.GetAllProducts();
+            //grdProducts.DataSource = ProductRepository.GetAllProducts();
         }
     }
 }

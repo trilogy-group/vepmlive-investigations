@@ -23,7 +23,7 @@ namespace AdminSite.WebControls.Product
         private void LoadProduct(int productId)
         {
             if (productId == 0) return;
-            var prod = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetProduct(productId);
+            var prod = new ProductRepository(ConnectionHelper.CreateLicensingModel()).GetProduct(productId);
             if (prod == null) return;
             lblProductId.Text = prod.product_id.ToString();
             txtSKU.Text = prod.sku;
@@ -49,7 +49,7 @@ namespace AdminSite.WebControls.Product
                 try
                 {
 
-                    var prodManager = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel);
+                    var prodManager = new ProductRepository(ConnectionHelper.CreateLicensingModel());
                     if (prodManager.CheckForSkuDuplicate(txtSKU.Text)) { lblMessage.Text = "The SKU entered already exists for another product. "; return false; }
                     prodManager.AddProduct(txtSKU.Text, txtName.Text, chkActive.Checked);
                     Logger.InfoFormat("{0} created a new License product: {1}[{2}]", CurrentUserName, txtName.Text,txtSKU.Text);
@@ -65,7 +65,7 @@ namespace AdminSite.WebControls.Product
             {
                 try
                 {
-                    new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).DeleteProduct(Convert.ToInt32(lblProductId.Text));
+                    new ProductRepository(ConnectionHelper.CreateLicensingModel()).DeleteProduct(Convert.ToInt32(lblProductId.Text));
                     Logger.InfoFormat("{0} deleted a License product: {1}[{2}]", CurrentUserName, txtName.Text, txtSKU.Text);
                 }
                 catch (LicenseProductInUseException ex)
@@ -86,7 +86,7 @@ namespace AdminSite.WebControls.Product
 
                 try
                 {
-                    new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).UpdateProduct(Convert.ToInt32(lblProductId.Text), txtName.Text, chkActive.Checked);
+                    new ProductRepository(ConnectionHelper.CreateLicensingModel()).UpdateProduct(Convert.ToInt32(lblProductId.Text), txtName.Text, chkActive.Checked);
                     Logger.InfoFormat("{0} updated License product: {1}[{2}]", CurrentUserName, txtName.Text, txtSKU.Text);
                 }
                 catch (Exception ex)
