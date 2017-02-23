@@ -19,7 +19,7 @@ namespace AdminSite.WebControls.Product
 
         private void LoadProductDetails()
         {
-            Features = ProductCatalogManager.GetLicenseProductFeatures(CurrentProductId);
+            Features = new ProductRepository(ConnectionHelper.CreateLicensingModel()).GetLicenseProductFeatures(CurrentProductId);
             grdProductFeatures.DataSource = Features;
             grdProductFeatures.DataBind();
         }
