@@ -283,16 +283,11 @@
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
     <Content Include="packages.config" />
-    <Content Include="Admin.master.cs.orig" />
-    <Content Include="AdminSite.csproj.orig" />
-    <Content Include="editaccount.aspx.cs.orig" />
-    <Content Include="editaccount.aspx.orig" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="style\licensesManagement.css.orig" />
     <None Include="Web References\accountsSvc\LookUpList.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>

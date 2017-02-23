@@ -134,7 +134,6 @@
     <None Include="Data\LicensingModel.edmx.diagram">
       <DependentUpon>LicensingModel.edmx</DependentUpon>
     </None>
-    <None Include="LicenseManager.cs.orig" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -148,7 +147,6 @@
       <DependentUpon>LicensingModel.edmx</DependentUpon>
       <LastGenOutput>LicensingModel.cs</LastGenOutput>
     </Content>
-    <Content Include="OnlineLicensing.Api.csproj.user" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
