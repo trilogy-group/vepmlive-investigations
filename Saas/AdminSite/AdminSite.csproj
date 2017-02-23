@@ -89,10 +89,13 @@
     <Content Include="addemail.aspx" />
     <Content Include="addfeature.aspx" />
     <Content Include="addkey.aspx" />
+    <Content Include="addlicense.aspx" />
     <Content Include="addorder.aspx" />
     <Content Include="addproduct.aspx" />
     <Content Include="addproductfeature.aspx" />
     <Content Include="appfeature.aspx" />
+    <Content Include="deletelicense.aspx" />
+    <Content Include="editlicense.aspx" />
     <Content Include="manageproducts.aspx" />
     <Content Include="addpubkey.aspx" />
     <Content Include="addticket.aspx" />
@@ -249,12 +252,12 @@
     <Content Include="modal\modalmain.css" />
     <Content Include="modal\overlay.png" />
     <Content Include="modal\pencil.gif" />
-    <Content Include="newlicense.aspx" />
     <Content Include="newzuoraorder.aspx" />
     <Content Include="oldsignups.aspx" />
     <Content Include="partnerrequests.aspx" />
     <Content Include="perms.aspx" />
     <Content Include="pubsupport.aspx" />
+    <Content Include="renewlicense.aspx" />
     <Content Include="reports.aspx" />
     <Content Include="resetfkey.aspx" />
     <Content Include="resetkey.aspx" />
@@ -280,11 +283,16 @@
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
     <Content Include="packages.config" />
+    <Content Include="Admin.master.cs.orig" />
+    <Content Include="AdminSite.csproj.orig" />
+    <Content Include="editaccount.aspx.cs.orig" />
+    <Content Include="editaccount.aspx.orig" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="style\licensesManagement.css.orig" />
     <None Include="Web References\accountsSvc\LookUpList.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -405,6 +413,13 @@
     <Compile Include="addkey.aspx.designer.cs">
       <DependentUpon>addkey.aspx</DependentUpon>
     </Compile>
+    <Compile Include="addlicense.aspx.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addlicense.aspx.designer.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+    </Compile>
     <Compile Include="addorder.aspx.cs">
       <DependentUpon>addorder.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -432,6 +447,20 @@
     </Compile>
     <Compile Include="appfeature.aspx.designer.cs">
       <DependentUpon>appfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="deletelicense.aspx.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="deletelicense.aspx.designer.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editlicense.aspx.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editlicense.aspx.designer.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="manageproducts.aspx.cs">
       <DependentUpon>manageproducts.aspx</DependentUpon>
@@ -564,13 +593,6 @@
     <Compile Include="linksite.aspx.designer.cs">
       <DependentUpon>linksite.aspx</DependentUpon>
     </Compile>
-    <Compile Include="newlicense.aspx.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="newlicense.aspx.designer.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
-    </Compile>
     <Compile Include="newzuoraorder.aspx.cs">
       <DependentUpon>newzuoraorder.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -605,6 +627,13 @@
     </Compile>
     <Compile Include="pubsupport.aspx.designer.cs">
       <DependentUpon>pubsupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="renewlicense.aspx.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="renewlicense.aspx.designer.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="reports.aspx.cs">
       <DependentUpon>reports.aspx</DependentUpon>

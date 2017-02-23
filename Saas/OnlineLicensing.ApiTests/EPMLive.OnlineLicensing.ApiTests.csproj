@@ -54,7 +54,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AcccountManagerTests.cs" />
+    <Compile Include="LicenseManagerTests.cs" />
     <Compile Include="ProductCatalogManagerTests.cs" />
+    <Compile Include="ProductRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleTestDataGenerator.cs" />
     <Compile Include="TestDbSet.cs" />
@@ -62,12 +65,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="EPMLive.OnlineLicensing.ApiTests.csproj.orig" />
+    <None Include="packages.config" />
+    <None Include="ProductCatalogManagerTests.cs.orig" />
+    <None Include="SampleTestDataGenerator.cs.orig" />
+    <None Include="TestLicensingModel.cs.orig" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj">
       <Project>{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}</Project>
       <Name>EPMLive.OnlineLicensing.Api</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="OnlineLicensing.ApiTests.csproj.user" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

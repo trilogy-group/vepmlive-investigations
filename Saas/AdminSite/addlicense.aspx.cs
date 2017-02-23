@@ -6,7 +6,7 @@ using EPMLive.OnlineLicensing.Api.Data;
 
 namespace AdminSite
 {
-    public partial class newlicense : System.Web.UI.Page
+    public partial class addlicense : System.Web.UI.Page
     {
         Table table = new Table();
         protected void Page_Load(object sender, EventArgs e)

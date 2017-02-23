@@ -10,7 +10,7 @@
 namespace AdminSite {
     
     
-    public partial class newlicense {
+    public partial class addlicense {
         
         /// <summary>
         /// newLicenseForm control.
