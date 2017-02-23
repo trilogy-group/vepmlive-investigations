@@ -133,7 +133,7 @@ namespace TimeSheets.Tests
                 TimesheetAPI.RoleChecker = new TestRoleChecker();
 
                 var result = TimesheetAPI.ShowApprovalNotification(data, web);
-                Assert.AreEqual(result, "<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"True\" IsProjectManager=\"True\">2</ApprovalNotification>");
+                Assert.AreEqual("<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"True\" IsProjectManager=\"False\">2</ApprovalNotification>", result);
             }
         }
     }

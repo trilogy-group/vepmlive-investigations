@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPMLive.OnlineLicensing.Api;
+using EPMLive.OnlineLicensing.Api.Data;
 
 namespace AdminSite
 {
-    public partial class newlicense : System.Web.UI.Page
+    public partial class addlicense : System.Web.UI.Page
     {
         Table table = new Table();
         protected void Page_Load(object sender, EventArgs e)
@@ -27,7 +24,7 @@ namespace AdminSite
         /// </summary>
         private void PopulateProductCatalog()
         {
-            var products = ProductCatalogManager.GetAllActiveProducts();
+            var products = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetAllActiveProducts();
 
             foreach (var item in products)
             {
@@ -44,7 +41,7 @@ namespace AdminSite
         /// </summary>
         private void PopulateFeatureList()
         {
-            var featureList = ProductCatalogManager.GetEnabledLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
+            var featureList = new ProductCatalogManager(ConnectionHelper.CreateLicensingModel).GetEnabledLicenseProductFeatures(Convert.ToInt32(DropDownProductCatalog.SelectedValue));
 
             table.ID = "productFeaturesTable";
 
@@ -70,9 +67,9 @@ namespace AdminSite
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
-            Guid accountId = Guid.Parse(Request["accountId"]);
-
-            var accountRef = AccountManager.GetAccountReference(accountId);
+            var accountId = Guid.Parse(Request["accountId"]);
+            var accountManager = new AccountManager();
+            var accountRef = accountManager.GetAccountReference(accountId);
             var activationDate = Convert.ToDateTime(TxtActivationDate.Value);
             var expirationDate = Convert.ToDateTime(TxtExpirationDate.Value);
             var productId = Convert.ToInt32(DropDownProductCatalog.SelectedValue);
@@ -82,7 +79,7 @@ namespace AdminSite
 
             using (var license = new LicenseManager())
             {
-                if (!license.ValidLicensePeriod(activationDate, expirationDate))
+                if (!license.ValidateLicensePeriod(activationDate, expirationDate))
                 {
                     ShowErrorMessage("License period must be at least 1 day.");
                     return;

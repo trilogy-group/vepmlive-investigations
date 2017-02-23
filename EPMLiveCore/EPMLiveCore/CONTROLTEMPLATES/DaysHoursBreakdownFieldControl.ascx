@@ -51,8 +51,8 @@
 
                             var postBackMarkerTextBox = $('input[title=DaysHoursBreakdownPostBackMarker]').first();
 
-                            var startDateField = $('input[id$=DateTimeFieldDate][title=' + info[0] + ']').first();
-                            var finishDateField = $('input[id$=DateTimeFieldDate][title=' + info[1] + ']').first();
+                            var startDateField = $('input[id$=DateTimeFieldDate][title^=' + info[0] + ']').first();
+                            var finishDateField = $('input[id$=DateTimeFieldDate][title^=' + info[1] + ']').first();
 
                             $('input[id$=NumberField][title=' + info[2] + ']').first().attr('disabled', 'disabled');
 

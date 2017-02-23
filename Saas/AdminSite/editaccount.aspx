@@ -1,4 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Admin.master" AutoEventWireup="true" CodeBehind="editaccount.aspx.cs" Inherits="AdminSite.editaccount" %>
+<%@ Register TagPrefix="lic" TagName="InactiveLicenses" Src="WebControls/Licensing/InactiveLicenses.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolderMain" runat="server">
 
@@ -75,6 +76,12 @@
         ShowModal('modalRenewLicenseManagement', 'iframeRenewLicense', url, 500, 100)
     }
 
+    function RevokeLicense(orderId) {
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'deletelicense.aspx?accountId=' + accountId + '&orderId=' + orderId
+        ShowModal('modalDeleteLicenseManagement', 'iframeDeleteLicense', url, 500, 200)
+    }
+
     function CloseAddLicenseModal() {
         HideModal('modalAddLicenseManagement')
     }
@@ -85,6 +92,10 @@
 
     function CloseEditLicenseModal() {
         HideModal('modalEditLicenseManagement')
+    }
+
+    function CloseDeleteLicenseModal() {
+        HideModal('modalRevokeLicenseManagement')
     }
 
     function ShowModal(div, iframe, url, height, width) {
@@ -364,11 +375,11 @@
                         <asp:BoundField DataField="expirationdate" HeaderText="Expiration Date">
                             <ItemStyle HorizontalAlign="left" />
                         </asp:BoundField>
-                        <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+                        <%--<asp:TemplateField ItemStyle-HorizontalAlign="Center">
                             <ItemTemplate>
                                 <input type="button" value="View" />
                             </ItemTemplate>
-                        </asp:TemplateField>
+                        </asp:TemplateField>--%>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
                                 <input type="button" value="Extend" onclick="<%# "ExtendLicense('" + Eval("OrderId") + "')" %>" />
@@ -381,7 +392,7 @@
                         </asp:TemplateField>
                         <asp:TemplateField ItemStyle-HorizontalAlign="Left">
                             <ItemTemplate>
-                                <input type="button" value="Revoke" />
+                                <input type="button" value="Revoke" onclick="<%# "RevokeLicense('" + Eval("OrderId") + "')" %>" />
                                 <%--<asp:LinkButton ID="DeleteLicenses" runat="server" CausesValidation="false" CommandName="DeleteLicense" Text="Delete" OnClientClick="return confirm('Are you certain you want to delete this item?');"></asp:LinkButton>--%>
                             </ItemTemplate>
                         </asp:TemplateField>
@@ -397,7 +408,10 @@
                 <br />
 
                 <input type="button" id="AddLicenseButton" value="New License" onclick="AddNewLicense()" />
+                
+                <br /><br /><br />
 
+                <lic:InactiveLicenses runat="server" />
             </div>
         </div>
         <div id="a5" name="Users" width="90px">
@@ -475,6 +489,9 @@
     </div>
     <div id="modalEditLicenseManagement" class="dialog">
         <iframe id="iframeEditLicense" width="100%" height="450" frameborder="0"></iframe>
+    </div>
+    <div id="modalDeleteLicenseManagement" class="dialog">
+        <iframe id="iframeDeleteLicense" width="100%" height="450" frameborder="0"></iframe>
     </div>
     <script language="javascript">
         initmb();

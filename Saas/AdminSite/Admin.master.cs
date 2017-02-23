@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using System.IO;
 using System.Data.SqlClient;
+using AdminSite;
 using EPMLive.OnlineLicensing.Api;
 
 public partial class MasterPage : System.Web.UI.MasterPage

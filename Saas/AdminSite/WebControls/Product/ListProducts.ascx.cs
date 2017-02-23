@@ -1,5 +1,6 @@
 ﻿using System;
 using EPMLive.OnlineLicensing.Api;
+using EPMLive.OnlineLicensing.Api.Data;
 
 namespace AdminSite.WebControls.Product
 {
@@ -9,7 +10,7 @@ namespace AdminSite.WebControls.Product
         {
             if (!IsPostBack)
             {
-                grdProducts.DataSource = ProductCatalogManager.GetAllProducts();
+                grdProducts.DataSource = new ProductRepository(ConnectionHelper.CreateLicensingModel()).GetAllProducts();
                 grdProducts.DataBind();
             }
         }

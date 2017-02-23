@@ -9,10 +9,9 @@
 
 namespace EPMLive.OnlineLicensing.Api.Data
 {
-    using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    
+
     public partial class LicensingModel : DbContext
     {
         public LicensingModel()
@@ -29,10 +28,12 @@ namespace EPMLive.OnlineLicensing.Api.Data
         public virtual DbSet<LicenseProduct> LicenseProducts { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
-        public virtual DbSet<Account> Accounts { get; set; }
-        public virtual DbSet<vwActiveOrder> vwActiveOrders { get; set; }
+        public virtual DbSet<VwActiveOrder> VwActiveOrders { get; set; }
         public virtual DbSet<ContractLevelTitle> ContractLevelTitles { get; set; }
         public virtual DbSet<ContractLevel> ContractLevels { get; set; }
         public virtual DbSet<DetailType> DetailTypes { get; set; }
+        public virtual DbSet<OrderDetailHistory> OrderDetailHistories { get; set; }
+        public virtual DbSet<OrderHistory> OrderHistories { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; }
     }
 }

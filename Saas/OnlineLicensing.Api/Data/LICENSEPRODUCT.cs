@@ -19,6 +19,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
         {
             this.LicenseDetails = new HashSet<LicenseDetail>();
             this.Orders = new HashSet<Order>();
+            this.OrderHistories = new HashSet<OrderHistory>();
         }
     
         public int product_id { get; set; }
@@ -30,5 +31,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
         public virtual ICollection<LicenseDetail> LicenseDetails { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Order> Orders { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<OrderHistory> OrderHistories { get; set; }
     }
 }
