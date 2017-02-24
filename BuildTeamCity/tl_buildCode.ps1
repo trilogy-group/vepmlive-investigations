@@ -17,7 +17,7 @@ param (
 
 $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegrationService",
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
-                            "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
+                            "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM", "AdminSite", "BillingSite")
  
 $projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
 $projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
