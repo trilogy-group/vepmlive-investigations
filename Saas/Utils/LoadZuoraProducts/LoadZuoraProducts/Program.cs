@@ -29,14 +29,14 @@ namespace LoadZuoraProducts
 
                 if (!CommandLine.Parser.Default.ParseArguments(args, options)) return;
 
-                if (!File.Exists(options.InputFile))
+                if (!File.Exists(options.ExportFile))
                 {
-                    WriteToConsole($"ERROR! Could not find file: {options.InputFile}.\nEnsure that file is inside same folder of this executable or you provided full path.", MessageType.Error);
+                    WriteToConsole($"ERROR! Could not find file: {options.ExportFile}.\nEnsure that file is inside same folder of this executable or you provided full path.", MessageType.Error);
                     return;
                 }
 
                 WriteToConsole("Reading xlsx file...");
-                var xlsxFile = new FileInfo(options.InputFile);
+                var xlsxFile = new FileInfo(options.ExportFile);
 
                 using (var package = new ExcelPackage(xlsxFile))
                 {
@@ -51,7 +51,7 @@ namespace LoadZuoraProducts
                         if (skuID != -1 && productNameID != -1)
                         {
                             WriteToConsole("Updating database...");
-                            UpdatedDb(dtb, skuID, productNameID, options.LicenseScript);
+                            UpdatedDb(dtb, skuID, productNameID, options.LicenseScript, CreateConnString(options));
                             WriteToConsole("SUCESS!", MessageType.Sucess);
                         }
                         else
@@ -97,11 +97,11 @@ namespace LoadZuoraProducts
         private const string _SkuEPMLiveOnline = "SKU-00000020";
         private const string _LicenseScriptPath = "Scripts/LicenseScript.sql";
 
-        private static void UpdatedDb(DataTable dtb, int skuId, int productNameId, string licenseScriptPath)
+        private static void UpdatedDb(DataTable dtb, int skuId, int productNameId, string licenseScriptPath, string connString)
         {
             using (var scope = new TransactionScope())
             {
-                using (var cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ToString()))
+                using (var cn = new SqlConnection(connString))
                 {
                     cn.Open();
 
@@ -113,7 +113,7 @@ namespace LoadZuoraProducts
                         var active = dtb.Rows[i][productNameId]?.ToString().Trim().ToUpper() == "EPM LIVE ONLINE"
                             ? 1
                             : 0;
-                        cmdText += $"IF EXISTS (SELECT * FROM [LICENSEPRODUCTS] WHERE sku='{dtb.Rows[i][skuId]}') UPDATE [LICENSEPRODUCTS] SET name='{dtb.Rows[i][productNameId]}', active=1 where sku='{dtb.Rows[i][skuId]}'; ELSE INSERT [dbo].[LICENSEPRODUCTS] ([sku], [name], [active]) VALUES (N'{dtb.Rows[i][skuId]}', N'{dtb.Rows[i][productNameId]}', {active}); ";
+                        cmdText += $"IF EXISTS (SELECT * FROM [LICENSEPRODUCTS] WHERE sku='{dtb.Rows[i][skuId]}') UPDATE [LICENSEPRODUCTS] SET name='{dtb.Rows[i][productNameId]}', active={active} where sku='{dtb.Rows[i][skuId]}'; ELSE INSERT [dbo].[LICENSEPRODUCTS] ([sku], [name], [active]) VALUES (N'{dtb.Rows[i][skuId]}', N'{dtb.Rows[i][productNameId]}', {active}); ";
                     }
 
                     var cmd = new SqlCommand(cmdText, cn) {CommandType = CommandType.Text};
@@ -135,6 +135,11 @@ namespace LoadZuoraProducts
 
                 scope.Complete();
             }
+        }
+
+        private static string CreateConnString(Options opt)
+        {
+            return $"server={opt.Server};database={opt.Database};User ID={opt.User};Password={opt.Password}";
         }
 
         private static int GetColumnIndex(DataRow row, string columnName, int columnsCount)
@@ -169,13 +174,29 @@ namespace LoadZuoraProducts
         }
         private class Options
         {
-            [Option('f', "file", Required = true,
-              HelpText = "Path to the Input file to be processed.")]
-            public string InputFile { get; set; }
+            [Option('e', "exportFile", Required = true,
+              HelpText = "Path to product catalog exported file.")]
+            public string ExportFile { get; set; }
 
             [Option('l', "licensescript", Required = false,
               HelpText = "Path to the license script.")]
             public string LicenseScript { get; set; }
+
+            [Option('s', "server", Required = true,
+              HelpText = "Database server name.")]
+            public string Server { get; set; }
+
+            [Option('d', "database", Required = true,
+              HelpText = "Database name.")]
+            public string Database { get; set; }
+
+            [Option('u', "user", Required = true,
+              HelpText = "Database username.")]
+            public string User { get; set; }
+
+            [Option('p', "password", Required = true,
+              HelpText = "Database password. WARNING: the password should be passed inside \"quotations marks\". Example: -p \"abc1234!@#\"")]
+            public string Password { get; set; }
 
             [Option('v', "verbose", DefaultValue = true,
               HelpText = "Prints all messages to standard output.")]

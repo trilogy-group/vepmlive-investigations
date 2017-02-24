@@ -1,4 +1,4 @@
-UPDATE [epmlivedb].[dbo].[ORDERS]
+UPDATE [ORDERS]
 SET [activation]=[dtcreated]
 where [dtcreated] is not null and [activation] is null;
 
