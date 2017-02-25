@@ -28,7 +28,9 @@ namespace EPMLive.OnlineLicensing.Api
                     Convert.ToInt32(ConfigurationManager.AppSettings["SmtpPort"]),
                     ConfigurationManager.AppSettings["SmtpUserName"],
                     ConfigurationManager.AppSettings["SmtpPassword"],
-                    Convert.ToBoolean(ConfigurationManager.AppSettings["SmtpEnableSsl"])
+                    Convert.ToBoolean(ConfigurationManager.AppSettings["SmtpEnableSsl"]),
+                    ConfigurationManager.AppSettings["EmailLicenseEventsSender"],
+                    ConfigurationManager.AppSettings["EmailLicenseEventsReceivers"].Split(',')
                 );
         }
 
@@ -212,10 +214,8 @@ namespace EPMLive.OnlineLicensing.Api
             _context.Orders.Add(orderToAdd);
             _context.SaveChanges();
 
-            var messageFrom = ConfigurationManager.AppSettings["EmailLicenseEventsSender"];
-            var messageTo = ConfigurationManager.AppSettings["EmailLicenseEventsReceivers"].Split(',');
             var title = "A new license order was added to this account";
-            _emailService.SendMail(messageFrom, messageTo, "New License Order Created", title, accountRef.ToString());
+            _emailService.SendMail("New License Order Created", title, accountRef.ToString());
         }
 
         /// <summary>
@@ -254,10 +254,8 @@ namespace EPMLive.OnlineLicensing.Api
             AddLicense(order.account_ref, order.activation.Value, expirationDate, order.product_id.Value, order.contractid, orderfeatures);
             DeleteLicense(order.order_id, string.Empty, LicenseArchiveReasons.Expired);
 
-            var messageFrom = ConfigurationManager.AppSettings["EmailLicenseEventsSender"];
-            var messageTo = ConfigurationManager.AppSettings["EmailLicenseEventsReceivers"].Split(',');
             var title = "A new license order was added to this account";
-            _emailService.SendMail(messageFrom, messageTo, "License Order Renewed", title, order.account_ref.ToString());
+            _emailService.SendMail("License Order Renewed", title, order.account_ref.ToString());
         }
 
         /// <summary>
@@ -346,11 +344,9 @@ namespace EPMLive.OnlineLicensing.Api
             license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails, license.order_id);
 
             _context.SaveChanges();
-
-            var messageFrom = ConfigurationManager.AppSettings["EmailLicenseEventsSender"];
-            var messageTo = ConfigurationManager.AppSettings["EmailLicenseEventsReceivers"].Split(',');
+           
             var title = "The active license order was updated for this account";
-            _emailService.SendMail(messageFrom, messageTo, "License Order Information Updated", title, license.account_ref.ToString());
+            _emailService.SendMail("License Order Information Updated", title, license.account_ref.ToString());
         }
 
         /// <summary>

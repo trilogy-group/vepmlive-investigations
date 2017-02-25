@@ -8,6 +8,6 @@ namespace EPMLive.OnlineLicensing.Api.Services
 {
     public interface IEmailService
     {
-        bool SendMail(string messageFrom, string[] messageTo, string subject, string title, string accountRef);
+        bool SendMail(string subject, string title, string accountRef);
     }
 }

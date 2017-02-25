@@ -17,31 +17,35 @@ namespace EPMLive.OnlineLicensing.Api.Services
         private string _user;
         private string _password;
         private bool _enableSsl;
+        private string _messageFrom;
+        private string[] _messageTo;
        
-        public EmailService(string host, int port, string user, string password, bool enableSsl)
+        public EmailService(string host, int port, string user, string password, bool enableSsl, string messageFrom, string[] messageTo)
         {
             _host = host;
             _port = port;
             _user = user;
             _password = password;
             _enableSsl = enableSsl;
+            _messageFrom = messageFrom;
+            _messageTo = messageTo;
         }
 
         /// <summary>
         /// Sends out emails based on some events
         /// </summary>
         /// <returns>Rerurns true if the email was sent. returns false otherwise.</returns>
-        public bool SendMail(string messageFrom, string[] messageTo, string subject, string title, string accountRef)
+        public bool SendMail(string subject, string title, string accountRef)
         {
             //TODO: make a body template for updating license
             MailMessage message = new MailMessage
             {
                 IsBodyHtml = true,
-                From = new MailAddress(messageFrom),
+                From = new MailAddress(_messageFrom),
                 Subject = subject
             };
            
-            foreach (var item in messageTo)
+            foreach (var item in _messageTo)
             {
                 message.To.Add(item);
             }

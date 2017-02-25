@@ -15,7 +15,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
             _validConfigValues = validaConfigValues;
         }
 
-       public bool SendMail(string messageFrom, string[] messageTo, string subject, string title, string accountRef)
+       public bool SendMail(string subject, string title, string accountRef)
         {
             return _validConfigValues;
         }
