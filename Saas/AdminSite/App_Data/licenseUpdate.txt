@@ -1,0 +1,44 @@
+﻿<html>
+
+<body leftmargin="0" rightmargin="0" bottommargin="0" topmargin="0">
+<table style="width: 100%" bgcolor="#D8E6F8">
+	<tr>
+		<td rowspan="3" width="20%">&nbsp;</td>
+		<td width="60%">&nbsp;</td>
+		<td rowspan="3" width="20%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td bgcolor="FFFFFF">
+			<table width="100%" cellpadding="10" cellspacing="0" border="0" height="100%">
+			<tr>
+			<td style="font-family:Tahoma,sans-serif;font-size:10pt;color:#505050;">
+			
+			{0}			
+			<br />
+			<br />
+			<strong>Account Reference Number: </strong> {1}
+			<br />
+			<br />
+			
+			<p style="font-family:Tahoma,sans-serif;font-size:7pt;color:#505050">
+			
+			Please do not reply to this message. This e-mail address is not monitored and replies cannot be responded to. 
+			<br />
+			EPM Live
+			<br />
+			Copyright EPM Live. All rights reserved
+			
+			</p>
+			
+			</td>
+			</tr>
+			</table>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+</body>
+</html>

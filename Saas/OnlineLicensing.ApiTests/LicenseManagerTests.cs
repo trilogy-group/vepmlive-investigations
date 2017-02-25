@@ -15,7 +15,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrder();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var accountRef = 11111;
 
             //act
@@ -31,7 +32,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrder();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
 
             //act
@@ -47,7 +49,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrderAndDetails();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             var orderFeatures = new List<LicenseFeature>
             {
@@ -77,7 +80,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void AddLicense()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(true));
             var accountRef = 11111;
             var activationDate = DateTime.Now;
             var expirationDate = DateTime.Now.AddMonths(5);
@@ -103,7 +106,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrderAndDetails();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             var expirationDate = DateTime.Parse("01/17/2020");
            
@@ -120,7 +124,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrderAndDetails();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             
             //act
@@ -136,7 +141,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrderAndDetails();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             var activationDate = DateTime.Parse("02/17/2016");
             var expirationDate = DateTime.Parse("02/17/2021");
@@ -166,7 +172,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrder();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var productId = 9;
             var accountRef = 11111;
 
@@ -181,7 +188,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void ValidateSingleActiveLicenseForProduct_ReturnsTrueWhenNoOtherLicenseExistsForTheProduct()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(false));
             var productId = 9;
             var accountRef = 11111;
 
@@ -196,7 +203,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void ValidLicensePeriod_ReturnsFalseIfExpirationDateNotGreaterThanActivationDate()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(false));
             var activationDate = DateTime.Now;
             var expirationDate = DateTime.Now;
 
@@ -211,7 +218,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void ValidLicensePeriod_ReturnsTrueIfExpirationDateIsGreaterThanActivationDate()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(false));
             var activationDate = DateTime.Now;
             var expirationDate = DateTime.Now.AddDays(1);
 
@@ -226,7 +233,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void ValidateQuantitiesCannotBeAllZero_ReturnsFalseWhenAllQuantitiesAreZero()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(false));
             var features = new List<Tuple<int, int>>
             {
                 new Tuple<int, int>(1, 0),
@@ -245,7 +252,7 @@ namespace EPMLive.OnlineLicensing.ApiTests
         public void ValidateQuantitiesCannotBeAllZero_ReturnsTrueWhenAtLeastOneQuantityIsNotZero()
         {
             //arrange
-            var licenseManager = new LicenseManager(new TestLicensingModel());
+            var licenseManager = new LicenseManager(new TestLicensingModel(), new TestEmailSender(false));
             var features = new List<Tuple<int, int>>
             {
                 new Tuple<int, int>(1, 0),
@@ -265,7 +272,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrder();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             var expirationDate = DateTime.Parse("01/01/2010");
 
@@ -281,7 +289,8 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             //arrange
             var context = new SampleTestDataGenerator().GenerateLicensingModelWithSampleActiveOrder();
-            var licenseManager = new LicenseManager(context);
+            var emailServices = new TestEmailSender(false);
+            var licenseManager = new LicenseManager(context, emailServices);
             var OrderId = Guid.Parse("00000000-0000-0000-0000-000000000000");
             var expirationDate = DateTime.Parse("01/01/2020");
 

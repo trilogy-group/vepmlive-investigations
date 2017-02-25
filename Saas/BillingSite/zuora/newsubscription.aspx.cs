@@ -168,6 +168,7 @@ namespace BillingSite.zuora
 
                     }
 
+                    //TODO: move this email service to the licensing Api, email sent on new license created
                     System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                     message.To.Add("jhughes@epmlive.com");
                     message.To.Add("tognall@epmlive.com");
