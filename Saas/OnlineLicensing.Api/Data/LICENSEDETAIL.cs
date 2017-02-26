@@ -19,7 +19,7 @@ namespace EPMLive.OnlineLicensing.Api.Data
         public Nullable<int> detail_type_id { get; set; }
         public Nullable<int> contract_id { get; set; }
     
-        public virtual DetailType DetailType { get; set; }
         public virtual LicenseProduct LicenseProduct { get; set; }
+        public virtual DetailType DetailType { get; set; }
     }
 }

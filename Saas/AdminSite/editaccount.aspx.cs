@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Text;
+using EPMLive.OnlineLicensing.Api;
 
 namespace AdminSite
 {
@@ -79,8 +74,6 @@ namespace AdminSite
             SqlDataAdapter da = new SqlDataAdapter(cmdGetSites);
             DataSet ds = new DataSet();
             da.Fill(ds);
-
-
 
             DataRow dr = ds.Tables[0].Rows[0];
 
@@ -258,7 +251,7 @@ namespace AdminSite
                 }
             }
 
-
+            FillLicensesTab();
 
             //Plimus
             DataTable dtOrders = new DataTable();
@@ -454,7 +447,19 @@ namespace AdminSite
             cn.Close();
         }
 
-
+        /// <summary>
+        /// Fills the licenses tab with active licenses
+        /// </summary>
+        private void FillLicensesTab()
+        {
+            using (var licenseManager = new LicenseManager())
+            {
+                var accountManager = new AccountManager();
+                var accountRef = accountManager.GetAccountReference(Guid.Parse(Request["account_id"]));
+                GridViewActiveLicenses.DataSource = licenseManager.GetAllActiveLicenses(accountRef);
+                GridViewActiveLicenses.DataBind();
+            }
+        }
 
         protected void gvTickets_RowCommand(object sender, GridViewCommandEventArgs e)
         {
@@ -600,8 +605,6 @@ namespace AdminSite
             string _uid;
 
             DataControlRowType _rowType;
-
-
 
             public DynamicGridViewURLTemplate(string uid, DataControlRowType RowType)
             {

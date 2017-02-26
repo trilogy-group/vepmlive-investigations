@@ -89,10 +89,13 @@
     <Content Include="addemail.aspx" />
     <Content Include="addfeature.aspx" />
     <Content Include="addkey.aspx" />
+    <Content Include="addlicense.aspx" />
     <Content Include="addorder.aspx" />
     <Content Include="addproduct.aspx" />
     <Content Include="addproductfeature.aspx" />
     <Content Include="appfeature.aspx" />
+    <Content Include="deletelicense.aspx" />
+    <Content Include="editlicense.aspx" />
     <Content Include="manageproducts.aspx" />
     <Content Include="addpubkey.aspx" />
     <Content Include="addticket.aspx" />
@@ -249,12 +252,12 @@
     <Content Include="modal\modalmain.css" />
     <Content Include="modal\overlay.png" />
     <Content Include="modal\pencil.gif" />
-    <Content Include="newlicense.aspx" />
     <Content Include="newzuoraorder.aspx" />
     <Content Include="oldsignups.aspx" />
     <Content Include="partnerrequests.aspx" />
     <Content Include="perms.aspx" />
     <Content Include="pubsupport.aspx" />
+    <Content Include="renewlicense.aspx" />
     <Content Include="reports.aspx" />
     <Content Include="resetfkey.aspx" />
     <Content Include="resetkey.aspx" />
@@ -265,6 +268,7 @@
     <Content Include="style\arrow.png" />
     <Content Include="style\arrow_select.png" />
     <Content Include="style\gallery.jpg" />
+    <Content Include="style\licensesManagement.css" />
     <Content Include="style\logo.gif" />
     <Content Include="style\logo.jpg" />
     <Content Include="style\main.png" />
@@ -272,12 +276,13 @@
     <Content Include="style\menu_sel.png" />
     <Content Include="style\pattern.png" />
     <Content Include="style\style.css" />
-    <Content Include="packages.config" />
     <Content Include="WebControls\BaseWebControl.ascx" />
+    <Content Include="WebControls\Licensing\InactiveLicenses.ascx" />
     <Content Include="WebControls\Product\AddEditProduct.ascx" />
     <Content Include="WebControls\Product\AddProductFeature.ascx" />
     <Content Include="WebControls\Product\ListProductFeatures.ascx" />
     <Content Include="WebControls\Product\ListProducts.ascx" />
+    <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\qq11.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -403,6 +408,13 @@
     <Compile Include="addkey.aspx.designer.cs">
       <DependentUpon>addkey.aspx</DependentUpon>
     </Compile>
+    <Compile Include="addlicense.aspx.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="addlicense.aspx.designer.cs">
+      <DependentUpon>addlicense.aspx</DependentUpon>
+    </Compile>
     <Compile Include="addorder.aspx.cs">
       <DependentUpon>addorder.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -430,6 +442,20 @@
     </Compile>
     <Compile Include="appfeature.aspx.designer.cs">
       <DependentUpon>appfeature.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="deletelicense.aspx.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="deletelicense.aspx.designer.cs">
+      <DependentUpon>deletelicense.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="editlicense.aspx.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="editlicense.aspx.designer.cs">
+      <DependentUpon>editlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="manageproducts.aspx.cs">
       <DependentUpon>manageproducts.aspx</DependentUpon>
@@ -562,13 +588,6 @@
     <Compile Include="linksite.aspx.designer.cs">
       <DependentUpon>linksite.aspx</DependentUpon>
     </Compile>
-    <Compile Include="newlicense.aspx.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="newlicense.aspx.designer.cs">
-      <DependentUpon>newlicense.aspx</DependentUpon>
-    </Compile>
     <Compile Include="newzuoraorder.aspx.cs">
       <DependentUpon>newzuoraorder.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -603,6 +622,13 @@
     </Compile>
     <Compile Include="pubsupport.aspx.designer.cs">
       <DependentUpon>pubsupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="renewlicense.aspx.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="renewlicense.aspx.designer.cs">
+      <DependentUpon>renewlicense.aspx</DependentUpon>
     </Compile>
     <Compile Include="reports.aspx.cs">
       <DependentUpon>reports.aspx</DependentUpon>
@@ -702,6 +728,13 @@
     <Compile Include="WebControls\BaseWebControl.ascx.designer.cs">
       <DependentUpon>BaseWebControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebControls\Licensing\InactiveLicenses.ascx.designer.cs">
+      <DependentUpon>InactiveLicenses.ascx</DependentUpon>
+    </Compile>
     <Compile Include="WebControls\Product\AddEditProduct.ascx.cs">
       <DependentUpon>AddEditProduct.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -734,7 +767,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="WebControls\Licensing\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Admin.master" />

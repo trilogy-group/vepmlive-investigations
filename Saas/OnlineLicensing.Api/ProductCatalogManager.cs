@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -21,6 +21,25 @@ namespace EPMLive.OnlineLicensing.Api
             using (var context = _dataModelFunc())
             {
                 return context.LicenseProducts.Include(o => o.Orders).Include(d => d.LicenseDetails).OrderBy(x => x.sku).ToList().AsEnumerable();
+            }
+        }
+
+        /// <summary>
+        /// Gets all the enabled features for a particular product.
+        /// </summary>
+        /// <param name="productId">The id of the product to get the features from</param>
+        /// <returns>Returns an <see cref="IEnumerable{LicenseFeature}"/> containing all the features in a product.</returns>
+        public IEnumerable<LicenseFeature> GetEnabledLicenseProductFeatures(int productId)
+        {
+            var enabledFeatures = GetLicenseProductFeatures(productId);
+
+            foreach (var item in enabledFeatures)
+            {
+                yield return new LicenseFeature
+                {
+                    Id = item.detail_type_id ?? 0,
+                    Name = item.DetailType.detail_name
+                };
             }
         }
 
@@ -158,6 +177,19 @@ namespace EPMLive.OnlineLicensing.Api
                 var existingProductFeature = context.LicenseDetails.SingleOrDefault(p => p.license_detail_id == licenseFeatureId);
                 context.MarkAsDeleted(existingProductFeature);
                 context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Gets all the active products.
+        /// </summary>
+        /// <returns>Returns an <see cref="IEnumerable{LicenseProduct}"/> containing all the active products.</returns>
+        public  IEnumerable<LicenseProduct> GetAllActiveProducts()
+        {
+            using (var context = _dataModelFunc())
+            {
+                return context.LicenseProducts.Where(p => p.active == true).ToList().AsEnumerable();
+
             }
         }
     }

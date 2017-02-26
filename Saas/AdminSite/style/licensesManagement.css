@@ -1,0 +1,49 @@
+﻿
+#newLicenseForm {
+    padding: 10px;
+}
+
+    #newLicenseForm span, #newLicenseForm input {
+        display: block;
+        width: 150px; /*change to percent, 100 maybe*/
+        float: left;
+        margin-bottom: 10px;
+    }
+
+    #newLicenseForm span {
+        text-align: right;
+        padding-right: 20px;
+    }
+
+   span.QtyValidator {
+        position: absolute !important;
+        right: -15px !important;
+        z-index: 5 !important;
+    }
+
+    #newLicenseForm fieldset {
+        background-color: #F7F7DE;
+    }
+
+        #newLicenseForm fieldset legend {
+            font-weight: bold;
+        }
+
+br {
+    clear: left;
+}
+
+input[type=submit], input.button {
+    background: #605D58;
+    border: 0px;
+    padding: 3px;
+    color: #FFF;
+    width: 64px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+#deleteLicenseForm textarea {
+    width: 470px;
+    resize: none;
+}

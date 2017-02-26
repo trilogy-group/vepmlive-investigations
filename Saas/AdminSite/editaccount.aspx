@@ -1,53 +1,112 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Admin.master" AutoEventWireup="true" CodeBehind="editaccount.aspx.cs" Inherits="AdminSite.editaccount" %>
+<%@ Register TagPrefix="lic" TagName="InactiveLicenses" Src="WebControls/Licensing/InactiveLicenses.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolderMain" runat="server">
 
     <link rel="STYLESHEET" type="text/css" href="modal/modal.css">
     <link rel="STYLESHEET" type="text/css" href="dhtmlxtab/dhtmlxtabbar.css" />
+    <style>
+        input[type=button] {
+            background: #605D58;
+            border: 0px;
+            padding: 4px;
+            color: #FFF;
+            width: 65px;
+            cursor: pointer;
+        }
+
+        #AddLicenseButton {
+            width: 100px;
+        }
+    </style>
+
     <script src="dhtmlxtab/dhtmlxcommon.js"></script>
     <script src="dhtmlxtab/dhtmlxtabbar.js"></script>
     <script src="dhtmlxtab/dhtmlxtabbar_start.js"></script>
     <script src="modal/modal.js"></script>
     <script>
-    function viewCRMAccount(account)
-    {
-        var h = screen.height - 200;
-        var w = screen.width - 300;        
-        window.open('http://crm.epmlive.com/EPMLive/sfa/accts/edit.aspx?id=%7b' + account + '%7d','account','status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
-    }
-    function viewCRMInvoice(invoice)
-    {
-        var h = screen.height - 200;
-        var w = screen.width - 300;        
-        window.open('http://crm.epmlive.com/EPMLive/sfa/invoice/edit.aspx?id=%7b' + invoice + '%7d','invoice','status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
-    }
-    function viewCRMOrder(order)
-    {
-        var h = screen.height - 200;
-        var w = screen.width - 300;        
-        window.open('http://crm.epmlive.com/EPMLive/sfa/salesorder/edit.aspx?id=%7b' + order + '%7d','invoice','status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
-    }
-    function addTicket(key_id)
-    {
-        var ticket = prompt("Enter Ticket Number","");
-        if(ticket != "")
-        {
-            var url = "addticket.aspx?account_id=<%=Request["account_id"] %>&ticket=" + ticket;
-            location.href=url;
+        function viewCRMAccount(account) {
+            var h = screen.height - 200;
+            var w = screen.width - 300;
+            window.open('http://crm.epmlive.com/EPMLive/sfa/accts/edit.aspx?id=%7b' + account + '%7d', 'account', 'status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
         }
+        function viewCRMInvoice(invoice) {
+            var h = screen.height - 200;
+            var w = screen.width - 300;
+            window.open('http://crm.epmlive.com/EPMLive/sfa/invoice/edit.aspx?id=%7b' + invoice + '%7d', 'invoice', 'status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
+        }
+        function viewCRMOrder(order) {
+            var h = screen.height - 200;
+            var w = screen.width - 300;
+            window.open('http://crm.epmlive.com/EPMLive/sfa/salesorder/edit.aspx?id=%7b' + order + '%7d', 'invoice', 'status=false,toolbar=false,scrollbar=false,width=' + w + ',height=' + h + ',top=100,left=150');
+        }
+        function addTicket(key_id) {
+            var ticket = prompt("Enter Ticket Number", "");
+            if (ticket != "") {
+                var url = "addticket.aspx?account_id=<%=Request["account_id"] %>&ticket=" + ticket;
+                location.href = url;
+            }
+        }
+        function changeowner(key_id) {
+            sm('divresetkey', 400, 100);
+            var url = "changeowner.aspx?account_id=<%=Request["account_id"] %>";
+        document.getElementById("iframeresetkey").src = url;
+        document.getElementById("iframeresetkey").style.height = 90;
+
     }
-    function changeowner(key_id)
-    {
-        sm('divresetkey',400,100);
-        var url = "changeowner.aspx?account_id=<%=Request["account_id"] %>";
-        document.getElementById("iframeresetkey").src=url;
-        document.getElementById("iframeresetkey").style.height=90;
-        
-    }
-    function closereset()
-    {
+    function closereset() {
         hm('divresetkey');
     }
+
+    function AddNewLicense() {
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'addlicense.aspx?accountId=' + accountId + "&addMode=add"
+        ShowModal('modalAddLicenseManagement', 'iframeAddLicense', url, 500, 450)
+    };
+
+    function ExtendLicense(orderId) {
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'editlicense.aspx?accountId=' + accountId + "&orderId=" + orderId
+        ShowModal('modalEditLicenseManagement', 'iframeEditLicense', url, 500, 450)
+    }
+
+    function RenewLicense(orderId) {
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'renewlicense.aspx?accountId=' + accountId + '&orderId=' + orderId
+        ShowModal('modalRenewLicenseManagement', 'iframeRenewLicense', url, 500, 100)
+    }
+
+    function RevokeLicense(orderId) {
+        var accountId = '<%=Request["account_id"] %>'
+        var url = 'deletelicense.aspx?accountId=' + accountId + '&orderId=' + orderId
+        ShowModal('modalDeleteLicenseManagement', 'iframeDeleteLicense', url, 500, 200)
+    }
+
+    function CloseAddLicenseModal() {
+        HideModal('modalAddLicenseManagement')
+    }
+
+    function CloseRenewLicenseModal() {
+        HideModal('modalRenewLicenseManagement')
+    }
+
+    function CloseEditLicenseModal() {
+        HideModal('modalEditLicenseManagement')
+    }
+
+    function CloseDeleteLicenseModal() {
+        HideModal('modalRevokeLicenseManagement')
+    }
+
+    function ShowModal(div, iframe, url, height, width) {
+        document.getElementById(iframe).src = url;
+        sm(div, height, width);
+    }
+
+    function HideModal(modal) {
+        hm(modal);
+    }
+
     </script>
     <div id="a_tabbar" class="dhtmlxTabBar" select="a<%=strTab %>" imgpath="dhtmlxtab/imgs/" style="width: 100%; height: 500px;" skincolors="#FCFBFC,#F4F3EE">
         <div id="a1" name="Account Information" width="140px">
@@ -300,9 +359,59 @@
         </div>
         <div id="a4" name="Licenses" width="90px">
             <div style="padding: 5px">
-                <%=sbActiveLicenses.ToString()%>
-                <a href="newlicense.aspx?account_id=<%=strAccountId %>">[Add License]</a>
-                <%=sbInactiveLicenses.ToString()%>
+                <br />
+
+                <b>Active Licenses</b>
+                <br />
+                <br />
+                <asp:GridView Width="96%" RowStyle-HorizontalAlign="Left" ID="GridViewActiveLicenses" runat="server" AutoGenerateColumns="False" CellPadding="4" ForeColor="Black" GridLines="Vertical" BackColor="White" BorderColor="#DEDFDE" BorderWidth="1px">
+                    <Columns>
+                        <asp:BoundField DataField="product" HeaderText="Product">
+                            <ItemStyle HorizontalAlign="left" />
+                        </asp:BoundField>
+                        <asp:BoundField DataField="features" HeaderText="Features" HtmlEncode="false">
+                            <ItemStyle HorizontalAlign="left" />
+                        </asp:BoundField>
+                        <asp:BoundField DataField="expirationdate" HeaderText="Expiration Date">
+                            <ItemStyle HorizontalAlign="left" />
+                        </asp:BoundField>
+                        <%--<asp:TemplateField ItemStyle-HorizontalAlign="Center">
+                            <ItemTemplate>
+                                <input type="button" value="View" />
+                            </ItemTemplate>
+                        </asp:TemplateField>--%>
+                        <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                            <ItemTemplate>
+                                <input type="button" value="Extend" onclick="<%# "ExtendLicense('" + Eval("OrderId") + "')" %>" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                            <ItemTemplate>
+                                <input type="button" value="Renew" onclick="<%# "RenewLicense('" + Eval("OrderId") + "')" %>" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField ItemStyle-HorizontalAlign="Left">
+                            <ItemTemplate>
+                                <input type="button" value="Revoke" onclick="<%# "RevokeLicense('" + Eval("OrderId") + "')" %>" />
+                                <%--<asp:LinkButton ID="DeleteLicenses" runat="server" CausesValidation="false" CommandName="DeleteLicense" Text="Delete" OnClientClick="return confirm('Are you certain you want to delete this item?');"></asp:LinkButton>--%>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                    <FooterStyle BackColor="#CCCC99" />
+                    <RowStyle BackColor="#F7F7DE" HorizontalAlign="Center" />
+                    <PagerStyle BackColor="#F7F7DE" ForeColor="Black" HorizontalAlign="Right" />
+                    <SelectedRowStyle BackColor="#CE5D5A" Font-Bold="True" ForeColor="White" />
+                    <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />
+                    <AlternatingRowStyle BackColor="White" HorizontalAlign="Center" />
+                </asp:GridView>
+
+                <br />
+
+                <input type="button" id="AddLicenseButton" value="New License" onclick="AddNewLicense()" />
+                
+                <br /><br /><br />
+
+                <lic:InactiveLicenses runat="server" />
             </div>
         </div>
         <div id="a5" name="Users" width="90px">
@@ -371,7 +480,20 @@
     <div id="divresetkey" class="dialog">
         <iframe id="iframeresetkey" width="100%" height="100" frameborder="0"></iframe>
     </div>
+
+    <div id="modalAddLicenseManagement" class="dialog">
+        <iframe id="iframeAddLicense" width="100%" height="450" frameborder="0"></iframe>
+    </div>
+    <div id="modalRenewLicenseManagement" class="dialog">
+        <iframe id="iframeRenewLicense" width="100%" height="300" frameborder="0"></iframe>
+    </div>
+    <div id="modalEditLicenseManagement" class="dialog">
+        <iframe id="iframeEditLicense" width="100%" height="450" frameborder="0"></iframe>
+    </div>
+    <div id="modalDeleteLicenseManagement" class="dialog">
+        <iframe id="iframeDeleteLicense" width="100%" height="450" frameborder="0"></iframe>
+    </div>
     <script language="javascript">
-    initmb();
+        initmb();
     </script>
 </asp:Content>

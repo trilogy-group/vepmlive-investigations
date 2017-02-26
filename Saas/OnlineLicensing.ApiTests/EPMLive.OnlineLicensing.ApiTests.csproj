@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -51,8 +54,24 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AcccountManagerTests.cs" />
+    <Compile Include="LicenseManagerTests.cs" />
     <Compile Include="ProductCatalogManagerTests.cs" />
+    <Compile Include="ProductRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleTestDataGenerator.cs" />
+    <Compile Include="TestDbSet.cs" />
+    <Compile Include="TestLicensingModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OnlineLicensing.Api\EPMLive.OnlineLicensing.Api.csproj">
+      <Project>{6FBE6F92-E82B-4D6F-B805-6465D92F63F3}</Project>
+      <Name>EPMLive.OnlineLicensing.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

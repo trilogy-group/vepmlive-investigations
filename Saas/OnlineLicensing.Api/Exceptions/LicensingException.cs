@@ -14,5 +14,5 @@ namespace EPMLive.OnlineLicensing.Api.Exceptions
 
         public LicensingException(string message, Exception innerException)
         : base(message, innerException) { }
-    }
+	}
 }
