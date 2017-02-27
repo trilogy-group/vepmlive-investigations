@@ -80,10 +80,6 @@ public partial class MasterPage : System.Web.UI.MasterPage
                 checkPermissions(AppPermissions.OnsiteCustomerCreateOrEdit);
                 strMenus[13] = "current";
                 break;
-            case "newzuoraorder.aspx":
-                checkPermissions(AppPermissions.CreateZuoraOrders);
-                strMenus[0] = "current";
-                break;
             case "manageproducts.aspx":
                 checkPermissions(AppPermissions.AdminSitePermissions);
                 strMenus[15] = "current";

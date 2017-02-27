@@ -12,7 +12,6 @@
         ViewReports=8,
         OnsiteCustomerCreateOrEdit=9,
         TrialSignups=10,
-        CreateZuoraOrders=11,
         ExtendTrialExpiration=12,
         ExtendTrialUsers = 13,
     }

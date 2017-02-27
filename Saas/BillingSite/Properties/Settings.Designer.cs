@@ -32,15 +32,5 @@ namespace BillingSite.Properties {
                 return ((string)(this["BillingSite_PortalLists_Lists"]));
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.zuora.com/apps/services/a/40.0")]
-        public string BillingSite_ZuoraAPI_ZuoraService {
-            get {
-                return ((string)(this["BillingSite_ZuoraAPI_ZuoraService"]));
-            }
-        }
     }
 }

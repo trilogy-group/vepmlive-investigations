@@ -165,11 +165,6 @@
                         <asp:Label ID="lblLink" runat="server"></asp:Label></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Linked Zuora Account:</td>
-                    <td>
-                        <asp:Label ID="lblZuoraLink" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
                     <td width="100" bgcolor="#c9c9c9" nowrap>Lock Users:</td>
                     <td>
                         <asp:CheckBox ID="chkLockUsers" runat="server" />
@@ -293,60 +288,6 @@
                         <asp:BoundField DataFormatString="{0:d}" DataField="timecreated" HeaderText="Created">
                             <ItemStyle Font-Size="X-Small" />
                         </asp:BoundField>
-                    </Columns>
-                    <FooterStyle BackColor="#CCCC99" />
-                    <RowStyle BackColor="#F7F7DE" HorizontalAlign="Center" />
-                    <PagerStyle BackColor="#F7F7DE" ForeColor="Black" HorizontalAlign="Right" />
-                    <SelectedRowStyle BackColor="#CE5D5A" Font-Bold="True" ForeColor="White" />
-                    <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />
-                    <AlternatingRowStyle BackColor="White" HorizontalAlign="Center" />
-                </asp:GridView>
-            </div>
-        </div>
-        <div id="a3" name="Orders" width="90px">
-
-
-            <div style="padding: 5px">
-
-                <%=sbOrders.ToString()%>
-                <br />
-                <%if (usingNewBilling)
-                    {%>
-                <a href="newzuoraorder.aspx?account_id=<%=strAccountId %>">[Add Zuora Order]</a>
-                <%} %>
-                <hr />
-                <b>Old Order System</b>
-                <asp:Panel ID="pnlAddOrder" runat="server"><a href="addorder.aspx?account_id=<%=strAccountId %>">[Add Order]</a></asp:Panel>
-                <asp:GridView Width="100%" ID="GridView2" runat="server" AutoGenerateColumns="False" CellPadding="4" ForeColor="Black" GridLines="Vertical" BackColor="White" BorderColor="#DEDFDE" BorderWidth="1px">
-                    <Columns>
-                        <asp:BoundField DataField="version" HeaderText="Type">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:BoundField DataFormatString="{0:d}" DataField="dtcreated" HeaderText="Order Date">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:BoundField DataFormatString="{0:d}" DataField="expiration" HeaderText="Expiration">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:BoundField DataField="quantity" HeaderText="Quantity">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:BoundField DataField="ref" HeaderText="Ref #">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:BoundField DataField="type" HeaderText="Order Location">
-                            <ItemStyle Font-Size="X-Small" />
-                        </asp:BoundField>
-                        <asp:TemplateField HeaderText="View CRM Order" ItemStyle-HorizontalAlign="Left">
-                            <ItemTemplate>
-                                <a href="javascript:viewCRMOrder('<%# Eval("order_id") %>');" style="display: <%# Eval("linked") %>">View Order</a> <a href="updateorder.aspx?account_id=<%=strAccountId %>&order_id=<%# Eval("order_id") %>&r_order_id=<%# Eval("r_order_id") %>" style="display: <%# Eval("linked") %>">[Update Order]</a>
-                            </ItemTemplate>
-                        </asp:TemplateField>
-                        <asp:TemplateField HeaderText="Delete" ItemStyle-HorizontalAlign="Left">
-                            <ItemTemplate>
-                                <a href="editaccount.aspx?account_id=<%=strAccountId%>&delorder=<%# Eval("r_order_id") %>&tab=3">Delete</a>
-                            </ItemTemplate>
-                        </asp:TemplateField>
                     </Columns>
                     <FooterStyle BackColor="#CCCC99" />
                     <RowStyle BackColor="#F7F7DE" HorizontalAlign="Center" />
