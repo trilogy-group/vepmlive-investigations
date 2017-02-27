@@ -21,6 +21,7 @@ namespace LoadZuoraProducts
 {
     class Program
     {
+        private const string _LicenseScriptPath = "Scripts/LicenseScript.sql";
         static void Main(string[] args)
         {
             try
@@ -29,36 +30,18 @@ namespace LoadZuoraProducts
 
                 if (!CommandLine.Parser.Default.ParseArguments(args, options)) return;
 
-                if (!File.Exists(options.ExportFile))
-                {
-                    WriteToConsole($"ERROR! Could not find file: {options.ExportFile}.\nEnsure that file is inside same folder of this executable or you provided full path.", MessageType.Error);
-                    return;
-                }
-
+                if (!ValidateInputFilesPath(options.ExportFile, options.LicenseScript)) return;
+                
                 WriteToConsole("Reading xlsx file...");
-                var xlsxFile = new FileInfo(options.ExportFile);
 
+                var xlsxFile = new FileInfo(options.ExportFile);
                 using (var package = new ExcelPackage(xlsxFile))
                 {
-                    var worksheet = package.Workbook.Worksheets["Product"];
-                    var dtb = WorksheetToDataTable(worksheet);
-
-                    if (dtb.Rows.Count > 0)
-                    {
-                        var skuID = GetColumnIndex(dtb.Rows[0], "SKU", dtb.Columns.Count);
-                        var productNameID = GetColumnIndex(dtb.Rows[0], "PRODUCT NAME", dtb.Columns.Count);
-
-                        if (skuID != -1 && productNameID != -1)
-                        {
-                            WriteToConsole("Updating database...");
-                            UpdatedDb(dtb, skuID, productNameID, options.LicenseScript, CreateConnString(options));
-                            WriteToConsole("SUCESS!", MessageType.Sucess);
-                        }
-                        else
-                            WriteToConsole("ERROR! Could not find columns named as 'Sku' and 'Product Name' in xlsx file, 'Product' sheet.", MessageType.Error);
-                    }
-                    else
-                        WriteToConsole("ERROR! Could not find lines in 'Product' sheet from xlsx file.");
+                    var excelValues = GetExcelValues(package);
+                    
+                    WriteToConsole("Updating database...");
+                    UpdatedDb(excelValues.ValuesList, excelValues.SKUIndex, excelValues.ProducNameIndex, options.LicenseScript, CreateConnString(options));
+                    WriteToConsole("SUCESS!", MessageType.Sucess);
                 }
             }
             catch (Exception exc)
@@ -70,6 +53,61 @@ namespace LoadZuoraProducts
                 Console.WriteLine("Press any key to exit.");
                 Console.ReadKey();
             }
+        }
+
+        private static ExcelProperties GetExcelValues(ExcelPackage package)
+        {
+            if (package.Workbook.Worksheets["Product"] == null)
+                throw new Exception($"ERROR! Could not find a sheet named as 'Product' in excel file provided.");
+
+            var worksheet = package.Workbook.Worksheets["Product"];
+            var dtb = WorksheetToDataTable(worksheet);
+
+            if (dtb.Rows.Count == 0)
+                throw new Exception("ERROR! Could not find lines in 'Product' sheet from xlsx file.");
+
+            var skuId = GetColumnIndex(dtb.Rows[0], "SKU", dtb.Columns.Count);
+            var productNameId = GetColumnIndex(dtb.Rows[0], "PRODUCT NAME", dtb.Columns.Count);
+
+            if (skuId == -1)
+                throw  new Exception("ERROR! Could not find columns named as 'Sku' in xlsx file, 'Product' sheet.");
+
+            if (productNameId == -1)
+                throw new Exception("ERROR! Could not find columns named as 'Product Name' in xlsx file, 'Product' sheet.");
+
+            return new ExcelProperties()
+            {
+                ProducNameIndex = productNameId,
+                SKUIndex = skuId,
+                ValuesList = dtb
+            };
+        }
+
+        private static bool ValidateInputFilesPath(string exportFilePath, string licenseFilePath)
+        {
+            if (!File.Exists(exportFilePath))
+            {
+                WriteToConsole($"ERROR! Could not find input product catalog file: {exportFilePath}.\nEnsure that file is inside same folder of this executable or you provided full path.", MessageType.Error);
+                return false;
+            }
+
+            string fileExtension = Path.GetExtension(exportFilePath)?.ToUpper().Trim();
+            if (fileExtension != ".XLSX")
+            {
+                WriteToConsole($"ERROR! File has '{fileExtension}' as extension but expected 'XLSX'.", MessageType.Error);
+                return false;
+            }
+
+            licenseFilePath = string.IsNullOrEmpty(licenseFilePath)
+                                ? Program._LicenseScriptPath
+                                : licenseFilePath;
+            if (!File.Exists(licenseFilePath))
+            {
+                WriteToConsole($"ERROR! Could not find file license script: {licenseFilePath}.\nEnsure that file is inside 'Script' folder or you provided full path.", MessageType.Error);
+                return false;
+            }
+
+            return true;
         }
 
         private static void WriteToConsole(string message, MessageType type = MessageType.Default)
@@ -84,20 +122,13 @@ namespace LoadZuoraProducts
                 case MessageType.Sucess:
                     Console.ForegroundColor = ConsoleColor.Green;
                     break;
-                case MessageType.Default:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
             Console.WriteLine(message);
             Console.ResetColor();
         }
-
-        private const string _SkuEPMLiveOnline = "SKU-00000020";
-        private const string _LicenseScriptPath = "Scripts/LicenseScript.sql";
-
-        private static void UpdatedDb(DataTable dtb, int skuId, int productNameId, string licenseScriptPath, string connString)
+        
+        private static void UpdatedDb(DataTable dtb, int skuId, int productNameId, string licenseScriptPath, string connString, string skuEPMLiveOnline = "SKU-00000020")
         {
             using (var scope = new TransactionScope())
             {
@@ -121,7 +152,7 @@ namespace LoadZuoraProducts
 
                     // will permite to throw exception case there are more than 1 'EPM Live Online' product.
                     cmdText =
-                        $"UPDATE [ORDERS] SET product_id=(SELECT product_id FROM [LICENSEPRODUCTS] WHERE sku='{_SkuEPMLiveOnline}') WHERE product_id IS NULL;";
+                        $"UPDATE [ORDERS] SET product_id=(SELECT product_id FROM [LICENSEPRODUCTS] WHERE sku='{skuEPMLiveOnline}') WHERE product_id IS NULL;";
                     cmd = new SqlCommand(cmdText, cn) {CommandType = CommandType.Text};
                     cmd.ExecuteNonQuery();
 
@@ -211,6 +242,13 @@ namespace LoadZuoraProducts
                 return HelpText.AutoBuild(this,
                   (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
             }
+        }
+
+        private class ExcelProperties
+        {
+            public int SKUIndex;
+            public int ProducNameIndex;
+            public DataTable ValuesList;
         }
 
         private enum MessageType
