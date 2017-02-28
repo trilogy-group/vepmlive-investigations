@@ -54,12 +54,8 @@ namespace EPMLiveCore.Layouts.epmlive.applications
             dt.Columns.Add("Default");
 
             SPQuery query = new SPQuery();
-            //query.Query = "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
-            query.Query = "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where>";
-
-
-
-
+            query.Query = "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
+          
             foreach (SPListItem li in oList.GetItems(query))
             {
                 string icon = GetProperty(oList, li, "Icon");
