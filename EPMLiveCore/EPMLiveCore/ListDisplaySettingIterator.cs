@@ -1056,7 +1056,7 @@ namespace EPMLiveCore
                         {
                             if (dControls.ContainsKey("Generic"))
                             {
-                                writer.WriteLine("function PreSaveAction(){");
+                                writer.WriteLine("function CustomPreSaveAction(){");
                                 writer.WriteLine("  if(!document.getElementById('" + dControls["Generic"] + "').checked){");
                                 writer.WriteLine("      var f = document.getElementById('" + dControls["FirstName"] + "').value;");
                                 writer.WriteLine("      var l = document.getElementById('" + dControls["LastName"] + "').value;");
@@ -1083,7 +1083,7 @@ namespace EPMLiveCore
                 {
                     //this method is required when lookup field is disable in any list for all special character
                     writer.WriteLine("<script language=\"javascript\">");
-                    writer.WriteLine("function PreSaveAction(){");
+                    writer.WriteLine("function CustomPreSaveAction(){");
                     writer.WriteLine("var tags = document.getElementsByTagName('input');");
                     writer.WriteLine("for (var i = 0; i < tags.length; i++) {");
                     writer.WriteLine("var tagIdStr = tags[i].id;");
