@@ -1480,13 +1480,23 @@ function GEInit() {
             return true;
         }
 
+        window.CustomPreSave = function () {
+            try {
+                return CustomPreSaveAction();
+            } catch (e) {
+                console.log(e);
+                return true;
+            }
+        }
+
         window.PreSaveAction = function () {
             var multiOk = PostDataBackToMultiSelectLookup();
             var updateOk = UpdateAllSingleSelectValsBeforeSafe();
             var singleOk = PostDataBackToSingleSelectLookup();
+            var customAction = CustomPreSave();
             CleanPeopleEditorVals();
             var titleOk = IsTitleValid();
-            if (multiOk && updateOk && singleOk && titleOk) {
+            if (multiOk && updateOk && singleOk && titleOk && customAction) {
                 return true;
             } else {
                 return false;
