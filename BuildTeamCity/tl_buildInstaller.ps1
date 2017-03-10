@@ -126,6 +126,16 @@ $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
+
+Log-Section "Downloading Nuget . . ."
+$nugetPath = $SourcesDirectory + "\nuget.exe"
+Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
+
+Log-Section "Restoring missing packages . . ."
+& $nugetPath restore "$SourcesDirectory"
+& $nugetPath restore "$SourcesDirectory\Saas"
+& $nugetPath restore "$SourcesDirectory\ProjectPublisher2016"
+
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
 $langversion = "Default"
