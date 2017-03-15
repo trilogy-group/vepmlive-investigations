@@ -103,13 +103,6 @@ namespace EPMLiveCore.Layouts.epmlive.applications
             MyPersonalization.SetPersonalizations(customOrder, oWeb.CurrentUser.ID.ToString(), 0, oList.ID, oWeb.ID, oWeb.Site.ID, oWeb.Site.Url);
         }
 
-        private void UpdateCustomOrder(string key, string newValue, SPWeb oWeb, SPList oList)
-        {
-            var updateValues = new Dictionary<string, string> { { key, newValue } };
-
-            //MyPersonalization.SetPersonalizations(updateValues, oWeb.CurrentUser.ID.ToString(), 0, oList.ID, oWeb.ID, oWeb.Site.ID, oWeb.Site.Url);
-        }
-
         private string GetSortOrder(string id, SPWeb oWeb, SPList oList)
         {
             return MyPersonalization.GetPersonalizationValue(id, oWeb, oList);

@@ -349,6 +349,15 @@ namespace EPMLiveCore.API
             return result;
         }
 
+        /// <summary>
+        /// Update personalization values given the keys
+        /// </summary>
+        /// <param name="keyValuePair"></param>
+        /// <param name="userId"></param>
+        /// <param name="listId"></param>
+        /// <param name="webId"></param>
+        /// <param name="siteId"></param>
+        /// <param name="siteUrl"></param>
         internal static void UpdatePersonalizationValue(Dictionary<string, string> keyValuePair, string userId, Guid listId, Guid webId, Guid siteId, string siteUrl)
         {
             foreach (var item in keyValuePair)
@@ -395,6 +404,15 @@ namespace EPMLiveCore.API
             }
         }
 
+        /// <summary>
+        /// Delete a personalization entry
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="userId"></param>
+        /// <param name="listId"></param>
+        /// <param name="webId"></param>
+        /// <param name="siteId"></param>
+        /// <param name="siteUrl"></param>
         internal static void DeletePersonalization(string key, string userId, Guid listId, Guid webId, Guid siteId, string siteUrl)
         {
             using (var spSite = new SPSite(siteUrl))
