@@ -317,6 +317,123 @@ namespace EPMLiveCore.API
             }
         }
 
+        /// <summary>
+        /// Gets the value for one specific  
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string GetPersonalizationValue(string key, SPWeb oWeb, SPList oList)
+        {
+            var result = "";
+
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                cmd.Parameters.AddWithValue("@userid", oWeb.CurrentUser.ID.ToString());
+                cmd.Parameters.AddWithValue("@key", key);
+                cmd.Parameters.AddWithValue("@listid", oList.ID);
+                cmd.ExecuteNonQuery();
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                {
+                    result = dr.GetString(0);
+                }
+                dr.Close();
+                cn.Close();
+
+            });
+
+            return result;
+        }
+
+        internal static void UpdatePersonalizationValue(Dictionary<string, string> keyValuePair, string userId, Guid listId, Guid webId, Guid siteId, string siteUrl)
+        {
+            foreach (var item in keyValuePair)
+            {
+                using (var spSite = new SPSite(siteUrl))
+                {
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(spSite.WebApplication.Id)))
+                    {
+                        try
+                        {
+                            var query = @"UPDATE PERSONALIZATIONS SET Value = @value WHERE [Key] = @key AND UserId = @userId AND ListId = @listId AND WebId = @webId AND SiteId = @siteId";
+
+                            using (var sqlCommand = new SqlCommand(query, sqlConnection))
+                            {
+                                sqlCommand.Parameters.AddWithValue("@key", item.Key);
+                                sqlCommand.Parameters.AddWithValue("@value", item.Value);
+                                sqlCommand.Parameters.AddWithValue("@userId", userId);
+                                sqlCommand.Parameters.AddWithValue("@listId", listId);
+                                sqlCommand.Parameters.AddWithValue("@webId", webId);
+                                sqlCommand.Parameters.AddWithValue("@siteId", siteId);
+
+                                SPSecurity.RunWithElevatedPrivileges(() =>
+                                {
+                                    sqlConnection.Open();
+                                    sqlCommand.ExecuteNonQuery();
+                                });
+
+
+                            }
+                        }
+
+                        catch (Exception)
+                        {
+
+                            throw;
+                        }
+
+                        finally
+                        {
+                            sqlConnection.Close();
+                        }
+                    }
+                }
+            }
+        }
+
+        internal static void DeletePersonalization(string key, string userId, Guid listId, Guid webId, Guid siteId, string siteUrl)
+        {
+            using (var spSite = new SPSite(siteUrl))
+            {
+                using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(spSite.WebApplication.Id)))
+                {
+                    try
+                    {
+                        var query = @"DELETE FROM PERSONALIZATIONS WHERE [Key] = @key AND UserId = @userId AND ListId = @listId AND WebId = @webId AND SiteId = @siteId";
+
+                        using (var sqlCommand = new SqlCommand(query, sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@key", key);
+                            sqlCommand.Parameters.AddWithValue("@userId", userId);
+                            sqlCommand.Parameters.AddWithValue("@listId", listId);
+                            sqlCommand.Parameters.AddWithValue("@webId", webId);
+                            sqlCommand.Parameters.AddWithValue("@siteId", siteId);
+
+                            SPSecurity.RunWithElevatedPrivileges(() =>
+                            {
+                                sqlConnection.Open();
+                                sqlCommand.ExecuteNonQuery();
+                            });
+                        }
+                    }
+
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    finally
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+            }
+        }
+
         // Internal Methods (2) 
 
         /// <summary>
@@ -332,7 +449,7 @@ namespace EPMLiveCore.API
                 result.Add(new XElement("MyPersonalization"));
 
                 string username = SPContext.Current.Web.CurrentUser.LoginName;
-                var keys = new string[] {};
+                var keys = new string[] { };
                 int itemId = 0;
                 var listId = new Guid();
                 var webId = new Guid();
