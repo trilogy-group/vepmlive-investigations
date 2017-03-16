@@ -418,6 +418,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     string pct = docRes.FirstChild.FirstChild.Attributes["PercentComplete"].Value;
                     string time = docRes.FirstChild.FirstChild.Attributes["TimeFinished"].Value;
 
+                    SPWeb web = SPContext.Current.Web;
+                    SPUser currentUser = web.CurrentUser;
+                    SPRegionalSettings currentContextRegionalSettings = currentUser.RegionalSettings ?? web.RegionalSettings;
+                    var date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time)).ToString();
+
                     switch (pubStatus)
                     {
                         case "Queued":
@@ -428,9 +433,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             break;
                         case "Complete":
                             if (result != "No Errors")
-                                output = "true|true|Last Published at: " + time + " with errors. <a href=\"Javascript:PublishLog();\">[View Log]</a>";
+                                output = "true|true|Last Published at: " + date + " with errors. <a href=\"Javascript:PublishLog();\">[View Log]</a>";
                             else
-                                output = "true|false|Last Published at: " + time + ". <a href=\"Javascript:PublishLog();\">[View Log]</a>";
+                                output = "true|false|Last Published at: " + date + ". <a href=\"Javascript:PublishLog();\">[View Log]</a>";
                             break;
                     }
                 }
