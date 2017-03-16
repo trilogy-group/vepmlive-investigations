@@ -80,7 +80,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                     string url = "";
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite site = new SPSite(web.Site.ID))
                         {
@@ -143,7 +143,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             SPWeb web = SPContext.Current.Web;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(web.Site.ID))
                 {
@@ -421,7 +421,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     SPWeb web = SPContext.Current.Web;
                     SPUser currentUser = web.CurrentUser;
                     SPRegionalSettings currentContextRegionalSettings = currentUser.RegionalSettings ?? web.RegionalSettings;
-                    var date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time)).ToString();
+                    var date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time).ToUniversalTime()).ToString();
 
                     switch (pubStatus)
                     {
@@ -471,7 +471,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             SPWeb sweb = SPContext.Current.Web;
             if (EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
 
                     using (SPSite site = new SPSite(sweb.Site.ID))
@@ -558,7 +558,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             if (EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
 
                     using (SPSite site = new SPSite(sweb.Site.ID))
