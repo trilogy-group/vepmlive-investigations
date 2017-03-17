@@ -94,6 +94,7 @@
     <Content Include="addproduct.aspx" />
     <Content Include="addproductfeature.aspx" />
     <Content Include="appfeature.aspx" />
+    <Content Include="App_Data\licenseUpdate.txt" />
     <Content Include="deletelicense.aspx" />
     <Content Include="editlicense.aspx" />
     <Content Include="manageproducts.aspx" />
@@ -717,9 +718,7 @@
       <DependentUpon>ListProducts.ascx</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Admin.master" />
     <None Include="Web References\accountsSvc\service.wsdl" />

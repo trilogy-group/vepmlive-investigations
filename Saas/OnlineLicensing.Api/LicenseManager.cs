@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using EPMLive.OnlineLicensing.Api.Data;
 using EPMLive.OnlineLicensing.Api.Exceptions;
+using EPMLive.OnlineLicensing.Api.Services;
+using System.Configuration;
 
 namespace EPMLive.OnlineLicensing.Api
 {
@@ -14,16 +16,28 @@ namespace EPMLive.OnlineLicensing.Api
     public class LicenseManager : IDisposable
     {
         protected ILicensingModel _context;
+        protected IEmailService _emailService;
         protected bool Disposed { get; private set; }
 
         public LicenseManager()
         {
             _context = ConnectionHelper.CreateLicensingModel();
+            _emailService = new EmailService
+                (
+                    ConfigurationManager.AppSettings["SmtpHost"],
+                    Convert.ToInt32(ConfigurationManager.AppSettings["SmtpPort"]),
+                    ConfigurationManager.AppSettings["SmtpUserName"],
+                    ConfigurationManager.AppSettings["SmtpPassword"],
+                    Convert.ToBoolean(ConfigurationManager.AppSettings["SmtpEnableSsl"]),
+                    ConfigurationManager.AppSettings["EmailLicenseEventsSender"],
+                    ConfigurationManager.AppSettings["EmailLicenseEventsReceivers"].Split(',')
+                );
         }
 
-        public LicenseManager(ILicensingModel context)
+        public LicenseManager(ILicensingModel context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -200,6 +214,8 @@ namespace EPMLive.OnlineLicensing.Api
             _context.Orders.Add(orderToAdd);
             _context.SaveChanges();
 
+            var title = "A new license order was added to this account";
+            _emailService.SendMail("New License Order Created", title, accountRef.ToString());
         }
 
         /// <summary>
@@ -238,7 +254,8 @@ namespace EPMLive.OnlineLicensing.Api
             AddLicense(order.account_ref, order.activation.Value, expirationDate, order.product_id.Value, order.contractid, orderfeatures);
             DeleteLicense(order.order_id, string.Empty, LicenseArchiveReasons.Expired);
 
-            //TODO: log the changes to the Account_log table
+            var title = "A new license order was added to this account";
+            _emailService.SendMail("License Order Renewed", title, order.account_ref.ToString());
         }
 
         /// <summary>
@@ -327,6 +344,9 @@ namespace EPMLive.OnlineLicensing.Api
             license.OrderDetails = ExtendLicenseDetail(features, license.OrderDetails, license.order_id);
 
             _context.SaveChanges();
+           
+            var title = "The active license order was updated for this account";
+            _emailService.SendMail("License Order Information Updated", title, license.account_ref.ToString());
         }
 
         /// <summary>
