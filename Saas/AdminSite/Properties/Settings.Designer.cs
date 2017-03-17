@@ -52,15 +52,5 @@ namespace AdminSite.Properties {
                 return ((string)(this["AdminSite_MSCRM_CrmService"]));
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://apisandbox.zuora.com/apps/services/a/33.0")]
-        public string AdminSite_ZuoraAPI_ZuoraService {
-            get {
-                return ((string)(this["AdminSite_ZuoraAPI_ZuoraService"]));
-            }
-        }
     }
 }

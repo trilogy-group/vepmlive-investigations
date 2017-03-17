@@ -5,8 +5,5 @@
     <Setting Name="BillingSite_PortalLists_Lists" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://portal.epmlive.com/_vti_bin/lists.asmx</Value>
     </Setting>
-    <Setting Name="BillingSite_ZuoraAPI_ZuoraService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">https://www.zuora.com/apps/services/a/40.0</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

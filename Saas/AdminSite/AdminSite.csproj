@@ -105,7 +105,6 @@
     <Content Include="changeowner.aspx" />
     <Content Include="createaccount.aspx" />
     <Content Include="createsite.aspx" />
-    <Content Include="createzuoraaccount.aspx" />
     <Content Include="customers.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="dhtmlxtab\dhtmlxcommon.js" />
@@ -253,7 +252,6 @@
     <Content Include="modal\modalmain.css" />
     <Content Include="modal\overlay.png" />
     <Content Include="modal\pencil.gif" />
-    <Content Include="newzuoraorder.aspx" />
     <Content Include="oldsignups.aspx" />
     <Content Include="partnerrequests.aspx" />
     <Content Include="perms.aspx" />
@@ -332,32 +330,6 @@
     <None Include="Web References\MSCRM\Response.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\ZuoraAPI\AmendResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\DeleteResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\getUserInfoResponse.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\LoginResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\QueryResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Web References\ZuoraAPI\SaveResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\SubscribeResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\ZuoraAPI\zuora.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="accessdenied.aspx.cs">
@@ -511,13 +483,6 @@
     <Compile Include="createsite.aspx.designer.cs">
       <DependentUpon>createsite.aspx</DependentUpon>
     </Compile>
-    <Compile Include="createzuoraaccount.aspx.cs">
-      <DependentUpon>createzuoraaccount.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="createzuoraaccount.aspx.designer.cs">
-      <DependentUpon>createzuoraaccount.aspx</DependentUpon>
-    </Compile>
     <Compile Include="customers.aspx.cs">
       <DependentUpon>customers.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -588,13 +553,6 @@
     </Compile>
     <Compile Include="linksite.aspx.designer.cs">
       <DependentUpon>linksite.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="newzuoraorder.aspx.cs">
-      <DependentUpon>newzuoraorder.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="newzuoraorder.aspx.designer.cs">
-      <DependentUpon>newzuoraorder.aspx</DependentUpon>
     </Compile>
     <Compile Include="oldsignups.aspx.cs">
       <DependentUpon>oldsignups.aspx</DependentUpon>
@@ -717,11 +675,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Web References\ZuoraAPI\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Compile Include="WebControls\BaseWebControl.ascx.cs">
       <DependentUpon>BaseWebControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -764,7 +717,6 @@
     <Compile Include="WebControls\Product\ListProducts.ascx.designer.cs">
       <DependentUpon>ListProducts.ascx</DependentUpon>
     </Compile>
-    <Compile Include="ZuoraHelper.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -785,17 +737,6 @@
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>AdminSite_MSCRM_CrmService</CachedSettingsPropName>
-    </WebReferenceUrl>
-    <WebReferenceUrl Include="C:\epmlive\Zuora\Zuora\App_Data\zuora.a.33.0.wsdl">
-      <UrlBehavior>Dynamic</UrlBehavior>
-      <RelPath>Web References\ZuoraAPI\</RelPath>
-      <UpdateFromURL>C:\epmlive\Zuora\Zuora\App_Data\zuora.a.33.0.wsdl</UpdateFromURL>
-      <ServiceLocationURL>
-      </ServiceLocationURL>
-      <CachedDynamicPropName>
-      </CachedDynamicPropName>
-      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>AdminSite_ZuoraAPI_ZuoraService</CachedSettingsPropName>
     </WebReferenceUrl>
     <WebReferenceUrl Include="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
