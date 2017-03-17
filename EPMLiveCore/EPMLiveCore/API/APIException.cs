@@ -12,6 +12,12 @@ namespace EPMLiveCore.API
             ExceptionNumber = exceptionNumber;
         }
 
+        public APIException(int exceptionNumber, string message, Exception exception)
+            : base(message, exception)
+        {
+            ExceptionNumber = exceptionNumber;
+        }
+
         #endregion Constructors 
 
         #region Properties (1) 

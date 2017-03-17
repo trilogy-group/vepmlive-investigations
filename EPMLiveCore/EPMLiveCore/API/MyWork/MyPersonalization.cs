@@ -350,7 +350,7 @@ namespace EPMLiveCore.API
                     }
                     catch (Exception exception)
                     {
-                        throw new APIException(7000, exception.Message);
+                        throw new APIException(7000, exception.Message, exception);
                     }
                 }
             });
@@ -398,7 +398,7 @@ namespace EPMLiveCore.API
 
                         catch (Exception exception)
                         {
-                            throw new APIException(7000, exception.Message);
+                            throw new APIException(7000, exception.Message, exception);
                         }
                     }
                 }
@@ -442,7 +442,7 @@ namespace EPMLiveCore.API
 
                     catch (Exception exception)
                     {
-                        throw new APIException(7000, exception.Message);
+                        throw new APIException(7000, exception.Message, exception);
                     }
                 }
             }
