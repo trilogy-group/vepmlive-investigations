@@ -328,22 +328,31 @@ namespace EPMLiveCore.API
 
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
-                cmd.Parameters.AddWithValue("@userid", oWeb.CurrentUser.ID.ToString());
-                cmd.Parameters.AddWithValue("@key", key);
-                cmd.Parameters.AddWithValue("@listid", oList.ID);
-                cmd.ExecuteNonQuery();
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    result = dr.GetString(0);
-                }
-                dr.Close();
-                cn.Close();
+                    cn.Open();
 
+                    try
+                    {
+                        SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                        cmd.Parameters.AddWithValue("@userid", oWeb.CurrentUser.ID.ToString());
+                        cmd.Parameters.AddWithValue("@key", key);
+                        cmd.Parameters.AddWithValue("@listid", oList.ID);
+                        cmd.ExecuteNonQuery();
+
+                        using (var dr = cmd.ExecuteReader())
+                        {
+                            if (dr.Read())
+                            {
+                                result = dr.GetString(0);
+                            }
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        throw new APIException(7000, exception.Message);
+                    }
+                }
             });
 
             return result;
@@ -384,20 +393,12 @@ namespace EPMLiveCore.API
                                     sqlConnection.Open();
                                     sqlCommand.ExecuteNonQuery();
                                 });
-
-
                             }
                         }
 
-                        catch (Exception)
+                        catch (Exception exception)
                         {
-
-                            throw;
-                        }
-
-                        finally
-                        {
-                            sqlConnection.Close();
+                            throw new APIException(7000, exception.Message);
                         }
                     }
                 }
@@ -439,14 +440,9 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    catch (Exception)
+                    catch (Exception exception)
                     {
-                        throw;
-                    }
-
-                    finally
-                    {
-                        sqlConnection.Close();
+                        throw new APIException(7000, exception.Message);
                     }
                 }
             }
