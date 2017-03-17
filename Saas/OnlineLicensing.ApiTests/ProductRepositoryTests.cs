@@ -20,7 +20,6 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             var enabledLicenseProductFeatures = new ProductRepository(new SampleTestDataGenerator().GenerateLicensingModelWithSampleProductsAndFeatures()).GetEnabledLicenseProductFeatures(1);
             Assert.IsNotNull(enabledLicenseProductFeatures);
-            Assert.IsTrue(enabledLicenseProductFeatures.Any(), "no product features found.");
         }
 
         [TestMethod()]
@@ -44,7 +43,6 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             var allDetailTypes = new ProductRepository(new SampleTestDataGenerator().GenerateLicensingModelWithSampleDetailTypes()).GetAllProducts();
             Assert.IsNotNull(allDetailTypes);
-            Assert.IsTrue(allDetailTypes.Any(), "No sample products found.");
         }
 
         [TestMethod()]
@@ -52,7 +50,6 @@ namespace EPMLive.OnlineLicensing.ApiTests
         {
             var activeProducts = new ProductRepository(new SampleTestDataGenerator().GenerateLicensingModelWithSampleProducts()).GetAllActiveProducts();
             Assert.IsNotNull(activeProducts);
-            Assert.IsTrue(activeProducts.Any(), "No active products found.");
         }
     }
 }
