@@ -421,8 +421,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     SPWeb web = SPContext.Current.Web;
                     SPUser currentUser = web.CurrentUser;
                     SPRegionalSettings currentContextRegionalSettings = currentUser.RegionalSettings ?? web.RegionalSettings;
-                    var date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time).ToUniversalTime()).ToString();
+                    var date = "";
 
+                    if (!string.IsNullOrEmpty(time))
+                    {
+                        date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time).ToUniversalTime()).ToString();
+                    }
+                        
                     switch (pubStatus)
                     {
                         case "Queued":
