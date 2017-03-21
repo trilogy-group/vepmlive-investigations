@@ -87,7 +87,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
                 string spTzName = spTimeZone.Description.Replace(" and ", " & ");
 
                 TimeZoneInfo timeZone = (from tz in TimeZoneInfo.GetSystemTimeZones()
-                    let tzName = tz.DisplayName.Replace(" and ", " & ")
+                    let tzName = tz.DisplayName.Replace(" and ", " & ").Replace("(UTC+00:00)", "(UTC)")
                     where tzName.Equals(spTzName)
                     select tz).First();
 
