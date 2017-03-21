@@ -307,6 +307,8 @@ Get-ChildItem -Path ($LibrariesDirectory + "\*")  -Include "UplandIntegrations.d
 #Copy EPMLiveTimerService to output folder and Rename EPMLiveTimerService.exe -> TimerService.exe
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.exe" | Copy-Item -Destination $ProductOutput -Force  
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
+Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.exe.config" | Copy-Item -Destination $ProductOutput -Force  
+Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe.config" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
 
 
 Log-Section "Zipping"
