@@ -2179,7 +2179,12 @@ function SaveTypes(event) {
 
             var fVal = GetDecimalFromTime(sVal);
 
-            if (fVal != "NaN" && fVal != 0) {
+            if (fVal == null || fVal.toString() == 'NaN') {
+                alert("This is not a valid entry");
+                return;
+            }
+
+            if (fVal != 0) {
                 newTypeVal += "," + iType + ": " + fVal;
 
                 fTotal += fVal;
