@@ -376,7 +376,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_58CE5DD6FB374E55B872B8909D8C2309"
             {
-            "SourcePath" = "8:..\\ProjectPublisher2016\\bin\\Release\\ProjectPublisher2016.dll.manifest"
+            "SourcePath" = "8:..\\ProjectPublisher2016\\bin\\x86\\Release\\ProjectPublisher2016.dll.manifest"
             "TargetName" = "8:ProjectPublisher2016.dll.manifest"
             "Tag" = "8:"
             "Folder" = "8:_58F0798C95764E599F103755E9EB3910"
@@ -458,7 +458,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9BB72F08469E450BBDBBBB5C174DEBC6"
             {
-            "SourcePath" = "8:..\\ProjectPublisher2016\\bin\\Release\\ProjectPublisher2016.vsto"
+            "SourcePath" = "8:..\\ProjectPublisher2016\\bin\\x86\\Release\\ProjectPublisher2016.vsto"
             "TargetName" = "8:ProjectPublisher2016.vsto"
             "Tag" = "8:"
             "Folder" = "8:_58F0798C95764E599F103755E9EB3910"
@@ -602,7 +602,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.4.8900"
+        "ProductVersion" = "8:6.1.0"
         "Manufacturer" = "8:EPM Live"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -92,8 +92,9 @@ if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 }
 
 
-$MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
-$VSExec = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.com"
+$MSBuildExec = "c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
+$VSExec = "c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.com"
+$signtool = "c:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe"
 
 $BuildDirectory = "$ScriptDir\..\..\"
 
@@ -261,6 +262,13 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
         throw "Project build failed with exit code: $LastExitCode."
     }
 
+    &$signtool sign /n "EPM Live, Inc." `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" 
+    &$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" 
+
     $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016x86.vdproj") -Recurse
 
     Log-SubSection "Building 'PublisherSetup2016x86.vdproj'..."
@@ -271,11 +279,19 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
         throw "Project build failed with exit code: $LastExitCode."
     }
 
+    &$signtool sign /n "EPM Live, Inc." `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\PublisherSetup2016x86.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" 
+    &$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\PublisherSetup2016x86.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" 
 
 Log-Section "Copying Files..."
 
-Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+#Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
 # Extend the script to copy the Dll, wsp, .exe file to InstallShield build dependencies folder in order to run final installer
 $ProductOutput = Join-Path $OutputDirectory "ProductOutput"
