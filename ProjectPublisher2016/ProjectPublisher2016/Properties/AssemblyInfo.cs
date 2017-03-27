@@ -6,12 +6,12 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Project Publisher 2010")]
+[assembly: AssemblyTitle("Project Publisher 2016")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EPM Live")]
-[assembly: AssemblyProduct("Project Publisher 2010")]
-[assembly: AssemblyCopyright("Copyright © EPM Live 2010")]
+[assembly: AssemblyProduct("Project Publisher 2016")]
+[assembly: AssemblyCopyright("Copyright © EPM Live 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,5 +33,5 @@ using System.Security;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.4.8.900")]
-[assembly: AssemblyFileVersion("4.4.8.900")]
+[assembly: AssemblyVersion("6.1.0.900")]
+[assembly: AssemblyFileVersion("6.1.0.900")]
