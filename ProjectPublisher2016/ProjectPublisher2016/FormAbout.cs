@@ -83,7 +83,7 @@ namespace ProjectPublisher2016
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(288, 16);
             this.label1.TabIndex = 6;
-            this.label1.Text = "Project Publisher 2010";
+            this.label1.Text = "Project Publisher 2016";
             // 
             // label3
             // 
@@ -109,7 +109,7 @@ namespace ProjectPublisher2016
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(288, 17);
             this.label2.TabIndex = 15;
-            this.label2.Text = "EPM Live, Copyright 2010";
+            this.label2.Text = "EPM Live, Copyright 2017";
             // 
             // FormAbout
             // 
