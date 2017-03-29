@@ -19,10 +19,10 @@ namespace UplandIntegrations.ServiceNow
                     Message = "APIUrl is required for integration. Please contact administrator.";
                     return false;
                 }
-                //using (ServiceNowService serviceNowService = new ServiceNowService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
-                //{
-                //    serviceNowService.InstallWebhook((string)WebProps.Properties["Object"], IntegrationKey, (string)WebProps.Properties["Username"], (string)WebProps.Properties["Password"], APIUrl);
-                //}
+                using (ServiceNowService serviceNowService = new ServiceNowService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
+                {
+                    serviceNowService.InstallWebhook((string)WebProps.Properties["Object"], IntegrationKey, (string)WebProps.Properties["Username"], (string)WebProps.Properties["Password"], APIUrl);
+                }
             }
             catch (Exception ex)
             {
@@ -38,10 +38,10 @@ namespace UplandIntegrations.ServiceNow
             {
                 Message = "";
                 CheckWebProps(WebProps, true);
-                //using (ServiceNowService serviceNowService = new ServiceNowService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
-                //{
-                //    serviceNowService.RemoveWebhook((string)WebProps.Properties["Object"], Convert.ToString(WebProps.Properties["ServerUrl"]), IntegrationKey);
-                //}
+                using (ServiceNowService serviceNowService = new ServiceNowService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
+                {
+                    serviceNowService.RemoveWebhook((string)WebProps.Properties["Object"], Convert.ToString(WebProps.Properties["ServerUrl"]), IntegrationKey);
+                }
             }
             catch (Exception ex)
             {
@@ -150,6 +150,10 @@ namespace UplandIntegrations.ServiceNow
                 foreach (DataRow item in Items.Rows)
                 {
                     string curId = item["ID"].ToString();
+
+                    if (!item.Table.Columns.Contains("SPID"))
+                        return transactionTable;
+
                     string spId = item["SPID"].ToString();
                     try
                     {
@@ -209,6 +213,11 @@ namespace UplandIntegrations.ServiceNow
                 {
                     serviceNowService.GetObjectItems((string)WebProps.Properties["Object"], Items, LastSynchDate, false);
                 }
+
+                foreach(DataRow dr in Items.Rows)
+                    if (WebProps.Properties["IDColumn"] != null && WebProps.Properties["IDColumn"].ToString() != "")
+                        dr["ID"] = dr[WebProps.Properties["IDColumn"].ToString()];
+
             }
             catch (Exception ex)
             {
