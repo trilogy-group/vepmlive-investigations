@@ -1,0 +1,114 @@
+﻿.pebox
+{
+    float: left;
+    width: 220px;
+    height: 250px;
+    border: 1px solid #999;
+    background-color: #efefef;
+    margin:10px;
+    text-align:center;
+	font-family:Helvetica, Verdana, sans-serif;
+	padding: 5px;
+}
+
+.pebox h1
+{
+	margin: 0;
+	padding: 0;
+	font-size: 34px;
+	font-weight: bold;
+}
+
+.pebox h2
+{
+	margin: 0 0 2px 0;
+	padding: 0;
+	font-size: 20px;
+	font-weight: normal;
+	letter-spacing: normal;
+}
+
+.pebox h3
+{
+	margin: 0 0 15px 0;
+	padding: 0 0 7px 0;
+	font-size: 14px;
+	font-weight: bold;
+	text-transform: uppercase;
+	border-bottom: 1px solid #ccc;
+	font-family: Helvetica, Verdana, sans-serif;
+	color: #73a1c7;
+}
+
+.pebox ul
+{
+	padding:0px;
+	list-style: none;
+	margin-bottom: 3px;
+	font-size: 20px;
+	line-height: 1em;
+}
+
+.pebox li
+{
+	padding:2px;
+}
+
+
+
+
+.webox
+{
+    float: left;
+    width: 220px;
+    height: 330px;
+    border: 1px solid #999;
+    background-color: #efefef;
+    margin:10px;
+    text-align:center;
+	font-family:Helvetica, Verdana, sans-serif;
+	padding: 5px;
+}
+
+.webox h1
+{
+	margin: 0;
+	padding: 0;
+	font-size: 34px;
+	font-weight: bold;
+}
+
+.webox h2
+{
+	margin: 0 0 2px 0;
+	padding: 0;
+	font-size: 20px;
+	font-weight: normal;
+	letter-spacing: normal;
+}
+
+.webox h3
+{
+	margin: 0 0 15px 0;
+	padding: 0 0 7px 0;
+	font-size: 14px;
+	font-weight: bold;
+	text-transform: uppercase;
+	border-bottom: 1px solid #ccc;
+	font-family: Helvetica, Verdana, sans-serif;
+	color: #73a1c7;
+}
+
+.webox ul
+{
+	padding:0px;
+	list-style: none;
+	margin-bottom: 3px;
+	font-size: 20px;
+	line-height: 1em;
+}
+
+.webox li
+{
+	padding:2px;
+}

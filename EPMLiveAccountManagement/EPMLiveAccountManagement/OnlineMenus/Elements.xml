@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+	<CustomAction
+			Id="EPMLive.Workgroup.Admin.Templates"
+			GroupId="EPMLive.Workgroup.Admin"
+			Location="Microsoft.SharePoint.SiteSettings"
+			Sequence="2020"
+			Title="Online Settings">
+		<UrlAction Url="_layouts/epmlive/onlinesettings.aspx" />
+	</CustomAction>
+
+	<CustomAction
+		Id="EPMLive.Workgroup.Admin.editaccount"
+		Location="Microsoft.SharePoint.StandardMenu"
+		GroupId="PersonalActions"
+		Sequence="1"
+		Title="EPM Live Account Settings"
+		 Description="Manage your account and billing information"
+		ImageUrl="{SiteUrl}/_layouts/images/epmlivelogo.GIF"
+		ControlAssembly="EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"
+		ControlClass="EPMLiveAccountManagement.EPMLiveAccInfo"
+		/>
+	
+</Elements>
