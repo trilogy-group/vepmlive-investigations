@@ -1,0 +1,539 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0BE0A222-251D-43A0-9F13-21D41138007C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EPMLiveAccountManagement</RootNamespace>
+    <AssemblyName>EPMLiveAccountManagement</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <ProjectMode>SharePointCustomization</ProjectMode>
+    <TargetOfficeVersion>16.0</TargetOfficeVersion>
+    <MinimumOfficeToolsVersion>14.6</MinimumOfficeToolsVersion>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Schema, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Microsoft.Office.Project.Schema.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Server.Events.Receivers, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Microsoft Office Servers\14.0\Bin\Microsoft.Office.Project.Server.Events.Receivers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Server.Library, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Microsoft Office Servers\14.0\Bin\Microsoft.Office.Project.Server.Library.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Shared, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Microsoft Office Servers\14.0\Bin\Microsoft.Office.Project.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountManagement.cs" />
+    <Compile Include="AccountManagementInstaller.cs" />
+    <Compile Include="AccountModule.cs" />
+    <Compile Include="EPMLiveAccInfo.cs" />
+    <Compile Include="FindOrCreateAccount.cs" />
+    <Compile Include="Layouts\epmlive\addmember.aspx.cs">
+      <DependentUpon>addmember.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\addmember.aspx.designer.cs">
+      <DependentUpon>addmember.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\adduser.aspx.cs">
+      <DependentUpon>adduser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\adduser.aspx.designer.cs">
+      <DependentUpon>adduser.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\amerror.aspx.cs">
+      <DependentUpon>amerror.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\amerror.aspx.designer.cs">
+      <DependentUpon>amerror.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\addaccount.aspx.cs">
+      <DependentUpon>addaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\addaccount.aspx.designer.cs">
+      <DependentUpon>addaccount.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsite2.aspx.cs">
+      <DependentUpon>createsite2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsite2.aspx.designer.cs">
+      <DependentUpon>createsite2.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateApplication.aspx.cs">
+      <DependentUpon>CreateApplication.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateApplication.aspx.designer.cs">
+      <DependentUpon>CreateApplication.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\v2licensing.aspx.cs">
+      <DependentUpon>v2licensing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\v2licensing.aspx.designer.cs">
+      <DependentUpon>v2licensing.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\v2sales.aspx.cs">
+      <DependentUpon>v2sales.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\v2sales.aspx.designer.cs">
+      <DependentUpon>v2sales.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsite.aspx.cs">
+      <DependentUpon>createsite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsite.aspx.designer.cs">
+      <DependentUpon>createsite.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsitecollection.aspx.cs">
+      <DependentUpon>createsitecollection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\createsitecollection.aspx.designer.cs">
+      <DependentUpon>createsitecollection.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ManageAccount.aspx.cs">
+      <DependentUpon>ManageAccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ManageAccount.aspx.designer.cs">
+      <DependentUpon>ManageAccount.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\manageaccountdeleteuser.aspx.cs">
+      <DependentUpon>manageaccountdeleteuser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\manageaccountdeleteuser.aspx.designer.cs">
+      <DependentUpon>manageaccountdeleteuser.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\manageaccountusers.aspx.cs">
+      <DependentUpon>manageaccountusers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\manageaccountusers.aspx.designer.cs">
+      <DependentUpon>manageaccountusers.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\editpersonal.aspx.cs">
+      <DependentUpon>editpersonal.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\editpersonal.aspx.designer.cs">
+      <DependentUpon>editpersonal.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\expired.aspx.cs">
+      <DependentUpon>expired.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\expired.aspx.designer.cs">
+      <DependentUpon>expired.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newsitecollection.aspx.cs">
+      <DependentUpon>newsitecollection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newsitecollection.aspx.designer.cs">
+      <DependentUpon>newsitecollection.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\nolink.aspx.cs">
+      <DependentUpon>nolink.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\nolink.aspx.designer.cs">
+      <DependentUpon>nolink.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notinaccount.aspx.cs">
+      <DependentUpon>notinaccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notinaccount.aspx.designer.cs">
+      <DependentUpon>notinaccount.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\onlinesettings.aspx.cs">
+      <DependentUpon>onlinesettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\onlinesettings.aspx.designer.cs">
+      <DependentUpon>onlinesettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\penopurchase.aspx.cs">
+      <DependentUpon>penopurchase.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\penopurchase.aspx.designer.cs">
+      <DependentUpon>penopurchase.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\people.aspx.cs">
+      <DependentUpon>people.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\people.aspx.designer.cs">
+      <DependentUpon>people.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Purchase.aspx.cs">
+      <DependentUpon>Purchase.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Purchase.aspx.designer.cs">
+      <DependentUpon>Purchase.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\userrequests.aspx.cs">
+      <DependentUpon>userrequests.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\userrequests.aspx.designer.cs">
+      <DependentUpon>userrequests.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManageAccount\ManageAccount.cs" />
+    <Compile Include="ManageAccount\ManageAccountUserControl.ascx.cs">
+      <DependentUpon>ManageAccountUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ManageAccount\ManageAccountUserControl.ascx.designer.cs">
+      <DependentUpon>ManageAccountUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectServerAccountEvents.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PSEventsInstaller.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SiteCollectionList\SiteCollectionList.cs" />
+    <Compile Include="Web References\accounts\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\emailservice\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\WebSvcEvents\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AccountManagement\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6c135bbe-0a6e-4103-bdd6-5bba27a7ef09}</SharePointProjectItemId>
+    </None>
+    <None Include="CONFIG\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3854abcb-6bde-49ab-bd50-38da530eb0f6}</SharePointProjectItemId>
+    </None>
+    <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3aab860f-2ade-4c50-af30-14b7d6ec28df}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveLists.snk" />
+    <None Include="Features\Feature1\Feature1.feature">
+      <FeatureId>{35919047-a003-4492-b8dd-ed6f970afe81}</FeatureId>
+    </None>
+    <None Include="Features\Feature2\Feature2.feature">
+      <FeatureId>{a5b265ce-1c4b-422a-901e-dce3ad0582fc}</FeatureId>
+    </None>
+    <None Include="Features\OnlineMenus\OnlineMenus.feature">
+      <FeatureId>{85f304fa-8659-4914-a7c7-cc0ddc88fd20}</FeatureId>
+    </None>
+    <None Include="Features\Project Server Account Management\Project Server Account Management.feature">
+      <FeatureId>{9f147511-ac42-4c0b-8068-f3a57e0b0437}</FeatureId>
+    </None>
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{564bca6d-c9b4-4061-96dc-2162ab4e2109}</SharePointProjectItemId>
+    </None>
+    <None Include="ManageAccount\ManageAccount.webpart" />
+    <None Include="ManageAccount\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c414276b-c062-45c0-9106-953ad7ce05be}</SharePointProjectItemId>
+    </None>
+    <None Include="OnlineMenus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{491baa70-2a5c-47f7-a313-b667de9a4395}</SharePointProjectItemId>
+    </None>
+    <None Include="Package\Package.package">
+      <PackageId>{bccc1710-a18a-41a3-b517-62a8454dd0ba}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="SiteCollectionList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fcf15a2a-35d9-4d30-97bc-593c2ffd7608}</SharePointProjectItemId>
+    </None>
+    <None Include="SiteCollectionList\SiteCollectionList.webpart" />
+    <None Include="Web References\accounts\LookUpList.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\accounts\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\accounts\service.wsdl" />
+    <None Include="Web References\accounts\SiteInfo.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\emailservice\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\emailservice\service.wsdl" />
+    <None Include="Web References\WebSvcEvents\EventHandlersDataSet.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\WebSvcEvents\events.wsdl" />
+    <None Include="Web References\WebSvcEvents\EventsDataSet.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\WebSvcEvents\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AccountManagement\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Features\Feature1\Feature1.Template.xml">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\Feature2\Feature2.Template.xml">
+      <DependentUpon>Feature2.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\OnlineMenus\OnlineMenus.Template.xml">
+      <DependentUpon>OnlineMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\Project Server Account Management\Project Server Account Management.Template.xml">
+      <DependentUpon>Project Server Account Management.feature</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\addmember.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\adduser.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\amerror.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\addaccount.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\images\contactemail.png" />
+    <Content Include="Layouts\epmlive\images\contactphone.png" />
+    <Content Include="Layouts\epmlive\V2ProductPlan.css" />
+    <Content Include="Layouts\epmlive\createsite2.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\CreateApplication.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\CreateApplication.js" />
+    <Content Include="Layouts\epmlive\images\BlankTemplateIcon.png" />
+    <Content Include="Layouts\epmlive\images\Magnifier24x24.png" />
+    <Content Include="Layouts\epmlive\v2licensing.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\v2sales.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\images\buyaccounts.gif" />
+    <Content Include="Layouts\epmlive\images\chooseplan.png" />
+    <Content Include="Layouts\epmlive\createsite.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\createsitecollection.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\images\american_express_64.png" />
+    <Content Include="Layouts\epmlive\images\cancel.gif" />
+    <Content Include="Layouts\epmlive\images\credit_card-amex.png" />
+    <Content Include="Layouts\epmlive\images\credit_card-master_card.png" />
+    <Content Include="Layouts\epmlive\images\credit_card-security_code.png" />
+    <Content Include="Layouts\epmlive\images\credit_card-visa.png" />
+    <Content Include="Layouts\epmlive\images\discover_64.png" />
+    <Content Include="Layouts\epmlive\images\form_bg.jpg" />
+    <Content Include="Layouts\epmlive\images\icon-lock.png" />
+    <Content Include="Layouts\epmlive\images\mastercard_64.png" />
+    <Content Include="Layouts\epmlive\images\thanks.png" />
+    <Content Include="Layouts\epmlive\images\upgrade.gif" />
+    <Content Include="Layouts\epmlive\images\visa_64.png" />
+    <Content Include="Layouts\epmlive\images\warning.jpg" />
+    <Content Include="Layouts\epmlive\ManageAccount.aspx" />
+    <Content Include="Layouts\epmlive\manageaccountdeleteuser.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\manageaccountusers.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\editpersonal.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\expired.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\images\blank.gif" />
+    <Content Include="Layouts\epmlive\images\buy.gif" />
+    <Content Include="Layouts\epmlive\images\buymore.gif" />
+    <Content Include="Layouts\epmlive\images\createaccount.gif" />
+    <Content Include="Layouts\epmlive\images\editaccount.gif" />
+    <Content Include="Layouts\epmlive\newsitecollection.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\nolink.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\notinaccount.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\onlinesettings.aspx" />
+    <Content Include="Layouts\epmlive\penopurchase.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\people.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\ProductPlan.css" />
+    <Content Include="Layouts\epmlive\Purchase.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\epmlive\userrequests.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ManageAccount\Elements.xml" />
+    <Content Include="ManageAccount\ManageAccountUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="OnlineMenus\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SiteCollectionList\Elements.xml" />
+    <None Include="Web References\emailservice\service.disco" />
+    <None Include="Web References\accounts\service.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://jasondev2008/pwa/_vti_bin/psi/events.asmx%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WebSvcEvents\</RelPath>
+      <UpdateFromURL>http://jasondev2008/pwa/_vti_bin/psi/events.asmx%3fwsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\accounts\</RelPath>
+      <UpdateFromURL>https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="https://my.epmlive.com/_vti_bin/epmlive/emailservice/service.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\emailservice\</RelPath>
+      <UpdateFromURL>https://my.epmlive.com/_vti_bin/epmlive/emailservice/service.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="false" />
+</Project>
