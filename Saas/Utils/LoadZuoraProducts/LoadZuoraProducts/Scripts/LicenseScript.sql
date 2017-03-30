@@ -27,8 +27,7 @@ SELECT newid() as 'history_id'
 	  ,'' as 'reason_comment'
 INTO #EXPIREDORDERS
 FROM [ORDERS]
-WHERE [expiration] < GETDATE()
-	and [order_id] not in (select distinct([order_id]) from [ORDERHISTORY]);
+WHERE ([expiration] < GETDATE() or [enabled]=0);
 
 INSERT INTO [dbo].[ORDERHISTORY]
 		   ([history_id]
@@ -54,7 +53,8 @@ INSERT INTO [dbo].[ORDERHISTORY]
 		   ,[product_id]
 		   ,[reason]
 		   ,[reason_comment])
-SELECT * FROM #EXPIREDORDERS;
+SELECT * FROM #EXPIREDORDERS
+WHERE [order_id] not in (select distinct([order_id]) from [ORDERHISTORY]);
 
 INSERT INTO [dbo].[ORDERDETAILHIST]
 		   ([history_id]
@@ -67,7 +67,8 @@ INSERT INTO [dbo].[ORDERDETAILHIST]
 		   ,od.[order_id]
 		   ,od.[detail_type_id]
 		   ,od.[quantity]
-	FROM [ORDERDETAIL] od inner join #EXPIREDORDERS eo on od.[order_id]=eo.[order_id];
+	FROM [ORDERDETAIL] od inner join #EXPIREDORDERS eo on od.[order_id]=eo.[order_id]
+	WHERE eo.[order_id] not in (select distinct([order_id]) from [ORDERHISTORY]);
 
 DELETE FROM [ORDERDETAIL] WHERE [order_id] in (select distinct ([order_id]) from #EXPIREDORDERS);
 DELETE FROM [ORDERS] WHERE [order_id] in (SELECT DISTINCT([order_id]) FROM #EXPIREDORDERS);
