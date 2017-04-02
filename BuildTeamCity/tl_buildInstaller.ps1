@@ -96,7 +96,7 @@ $MSBuildExec = "c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 $VSExec = "c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.com"
 $signtool = "c:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe"
 
-$BuildDirectory = "$ScriptDir\..\..\"
+#$BuildDirectory = "$ScriptDir\..\..\"
 
 $NewReleaseNumber = "6.0.0.0"
 # additional parameters to msbuild
@@ -106,7 +106,7 @@ if (Test-Path env:\build_number) {
 
 
 # Directory for outputs
-$OutputDirectory = Join-Path $BuildDirectory "output"
+$OutputDirectory = Join-Path $SourcesDirectory "output"
 # Initialize Binaries Directory
 $BinariesDirectory = Join-Path $OutputDirectory "binaries"
 # Initialize merged binaries folder
@@ -118,7 +118,7 @@ $LibrariesDirectory = "$OutputDirectory\libraries"
 # Initialize intermediates directory (PDB)
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
 # Initialize logs directory
-$LogsDirectory = "$BuildDirectory\logs"
+$LogsDirectory = "$SourcesDirectory\logs"
 if (!(Test-Path -Path $LogsDirectory )){
     New-Item $LogsDirectory -type Directory
 }
@@ -289,9 +289,9 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
 Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\Libraries\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\packages\Newtonsoft.Json.6.0.8\lib\net45\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
 # Extend the script to copy the Dll, wsp, .exe file to InstallShield build dependencies folder in order to run final installer
 $ProductOutput = Join-Path $OutputDirectory "ProductOutput"
