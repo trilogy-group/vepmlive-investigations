@@ -214,7 +214,7 @@ namespace UplandIntegrations.ServiceNow
                     serviceNowService.GetObjectItems((string)WebProps.Properties["Object"], Items, LastSynchDate, false);
                 }
 
-                foreach(DataRow dr in Items.Rows)
+                foreach (DataRow dr in Items.Rows)
                     if (WebProps.Properties["IDColumn"] != null && WebProps.Properties["IDColumn"].ToString() != "")
                         dr["ID"] = dr[WebProps.Properties["IDColumn"].ToString()];
 
@@ -271,7 +271,7 @@ namespace UplandIntegrations.ServiceNow
                                 Image =string.Format("sn_viewitem.png"),
                                 Window = IntegrationControlWindowStyle.FullWindow
                             }
-                    
+
                         };
 
             }

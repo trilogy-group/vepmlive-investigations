@@ -1,0 +1,1 @@
+﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %><%@ Page Language="C#" AutoEventWireup="true" CodeBehind="createsite.aspx.cs" Inherits="EPMLiveAccountManagement.Layouts.epmlive.createsite" %><%=output%>

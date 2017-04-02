@@ -14,7 +14,7 @@
         public TFake Fake
         {
             [DebuggerStepThrough]
-            get
+            get 
             {
                 TFake result;
                 using (ShimRuntime.AcquireProtectingThreadContext())

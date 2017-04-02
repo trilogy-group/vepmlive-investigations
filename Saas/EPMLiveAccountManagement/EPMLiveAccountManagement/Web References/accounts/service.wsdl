@@ -1,0 +1,1341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://epmlive.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://epmlive.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://epmlive.com/">
+      <s:element name="getLogin">
+        <s:complexType />
+      </s:element>
+      <s:element name="getLoginResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getLoginResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createTrialSite">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="template" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="templateAlias" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createTrialSiteResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="createTrialSiteResult" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createSiteAddUser">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="template" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="templateAlias" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="siteadmin" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createSiteAddUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="createSiteAddUserResult" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createSite">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="template" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="templateAlias" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createSiteResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="createSiteResult" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="isSiteAvailable">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="isSiteAvailableResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="isSiteAvailableResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="cancelSiteSubscription">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="cancelSiteSubscriptionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="cancelSiteSubscriptionResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="enableAccount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="login" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="enable" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="enableAccountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="enableAccountResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getWorkspaceSiteStatistics">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getWorkspaceSiteStatisticsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="projectsCount" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="usersCount" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="diskUsed" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getEnterpriseSiteStatistics">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getEnterpriseSiteStatisticsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="projectsCount" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="pmCount" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="tmCount" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="diskUsed" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getSites">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getSitesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getSitesResult" type="tns:ArrayOfSiteInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSiteInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SiteInfo" nillable="true" type="tns:SiteInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SiteInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="url" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="type" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="createAccount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="firstname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="lastname" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createAccountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="createAccountResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createAccountSilent">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="firstname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="lastname" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createAccountSilentResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="createAccountSilentResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createAccountFromRegister">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="firstname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="lastname" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="createAccountFromRegisterResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="createAccountFromRegisterResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="addPartner">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="addPartnerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="addPartnerResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="error" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="findUser">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="findUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="findUserResult" type="tns:ArrayOfLookUpList" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfLookUpList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="LookUpList" nillable="true" type="tns:LookUpList" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="LookUpList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="uid" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getName">
+        <s:complexType />
+      </s:element>
+      <s:element name="getNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getEmail">
+        <s:complexType />
+      </s:element>
+      <s:element name="getEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getEmailResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="resetPassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="resetPasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="resetPasswordResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="changePassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="oldpassword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="newpassword" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="changePasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="changePasswordResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="changeName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="firstName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="lastName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="changeNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="changeNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="boolean" type="s:boolean" />
+      <s:element name="ArrayOfSiteInfo" nillable="true" type="tns:ArrayOfSiteInfo" />
+      <s:element name="ArrayOfLookUpList" nillable="true" type="tns:ArrayOfLookUpList" />
+      <s:element name="int" type="s:int" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="getLoginSoapIn">
+    <wsdl:part name="parameters" element="tns:getLogin" />
+  </wsdl:message>
+  <wsdl:message name="getLoginSoapOut">
+    <wsdl:part name="parameters" element="tns:getLoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="createTrialSiteSoapIn">
+    <wsdl:part name="parameters" element="tns:createTrialSite" />
+  </wsdl:message>
+  <wsdl:message name="createTrialSiteSoapOut">
+    <wsdl:part name="parameters" element="tns:createTrialSiteResponse" />
+  </wsdl:message>
+  <wsdl:message name="createSiteAddUserSoapIn">
+    <wsdl:part name="parameters" element="tns:createSiteAddUser" />
+  </wsdl:message>
+  <wsdl:message name="createSiteAddUserSoapOut">
+    <wsdl:part name="parameters" element="tns:createSiteAddUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="createSiteSoapIn">
+    <wsdl:part name="parameters" element="tns:createSite" />
+  </wsdl:message>
+  <wsdl:message name="createSiteSoapOut">
+    <wsdl:part name="parameters" element="tns:createSiteResponse" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableSoapIn">
+    <wsdl:part name="parameters" element="tns:isSiteAvailable" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableSoapOut">
+    <wsdl:part name="parameters" element="tns:isSiteAvailableResponse" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionSoapIn">
+    <wsdl:part name="parameters" element="tns:cancelSiteSubscription" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionSoapOut">
+    <wsdl:part name="parameters" element="tns:cancelSiteSubscriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountSoapIn">
+    <wsdl:part name="parameters" element="tns:enableAccount" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountSoapOut">
+    <wsdl:part name="parameters" element="tns:enableAccountResponse" />
+  </wsdl:message>
+  <wsdl:message name="getWorkspaceSiteStatisticsSoapIn">
+    <wsdl:part name="parameters" element="tns:getWorkspaceSiteStatistics" />
+  </wsdl:message>
+  <wsdl:message name="getWorkspaceSiteStatisticsSoapOut">
+    <wsdl:part name="parameters" element="tns:getWorkspaceSiteStatisticsResponse" />
+  </wsdl:message>
+  <wsdl:message name="getEnterpriseSiteStatisticsSoapIn">
+    <wsdl:part name="parameters" element="tns:getEnterpriseSiteStatistics" />
+  </wsdl:message>
+  <wsdl:message name="getEnterpriseSiteStatisticsSoapOut">
+    <wsdl:part name="parameters" element="tns:getEnterpriseSiteStatisticsResponse" />
+  </wsdl:message>
+  <wsdl:message name="getSitesSoapIn">
+    <wsdl:part name="parameters" element="tns:getSites" />
+  </wsdl:message>
+  <wsdl:message name="getSitesSoapOut">
+    <wsdl:part name="parameters" element="tns:getSitesResponse" />
+  </wsdl:message>
+  <wsdl:message name="createAccountSoapIn">
+    <wsdl:part name="parameters" element="tns:createAccount" />
+  </wsdl:message>
+  <wsdl:message name="createAccountSoapOut">
+    <wsdl:part name="parameters" element="tns:createAccountResponse" />
+  </wsdl:message>
+  <wsdl:message name="createAccountSilentSoapIn">
+    <wsdl:part name="parameters" element="tns:createAccountSilent" />
+  </wsdl:message>
+  <wsdl:message name="createAccountSilentSoapOut">
+    <wsdl:part name="parameters" element="tns:createAccountSilentResponse" />
+  </wsdl:message>
+  <wsdl:message name="createAccountFromRegisterSoapIn">
+    <wsdl:part name="parameters" element="tns:createAccountFromRegister" />
+  </wsdl:message>
+  <wsdl:message name="createAccountFromRegisterSoapOut">
+    <wsdl:part name="parameters" element="tns:createAccountFromRegisterResponse" />
+  </wsdl:message>
+  <wsdl:message name="addPartnerSoapIn">
+    <wsdl:part name="parameters" element="tns:addPartner" />
+  </wsdl:message>
+  <wsdl:message name="addPartnerSoapOut">
+    <wsdl:part name="parameters" element="tns:addPartnerResponse" />
+  </wsdl:message>
+  <wsdl:message name="findUserSoapIn">
+    <wsdl:part name="parameters" element="tns:findUser" />
+  </wsdl:message>
+  <wsdl:message name="findUserSoapOut">
+    <wsdl:part name="parameters" element="tns:findUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="getNameSoapIn">
+    <wsdl:part name="parameters" element="tns:getName" />
+  </wsdl:message>
+  <wsdl:message name="getNameSoapOut">
+    <wsdl:part name="parameters" element="tns:getNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="getEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:getEmail" />
+  </wsdl:message>
+  <wsdl:message name="getEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:getEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:resetPassword" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:resetPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:changePassword" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:changePasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="changeNameSoapIn">
+    <wsdl:part name="parameters" element="tns:changeName" />
+  </wsdl:message>
+  <wsdl:message name="changeNameSoapOut">
+    <wsdl:part name="parameters" element="tns:changeNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="getLoginHttpGetIn" />
+  <wsdl:message name="getLoginHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableHttpGetIn">
+    <wsdl:part name="url" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionHttpGetIn">
+    <wsdl:part name="url" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountHttpGetIn">
+    <wsdl:part name="login" type="s:string" />
+    <wsdl:part name="enable" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getSitesHttpGetIn">
+    <wsdl:part name="username" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getSitesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSiteInfo" />
+  </wsdl:message>
+  <wsdl:message name="findUserHttpGetIn">
+    <wsdl:part name="email" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="findUserHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfLookUpList" />
+  </wsdl:message>
+  <wsdl:message name="getNameHttpGetIn" />
+  <wsdl:message name="getNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="getEmailHttpGetIn" />
+  <wsdl:message name="getEmailHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordHttpGetIn">
+    <wsdl:part name="email" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordHttpGetOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordHttpGetIn">
+    <wsdl:part name="oldpassword" type="s:string" />
+    <wsdl:part name="newpassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="changeNameHttpGetIn">
+    <wsdl:part name="firstName" type="s:string" />
+    <wsdl:part name="lastName" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="changeNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="getLoginHttpPostIn" />
+  <wsdl:message name="getLoginHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableHttpPostIn">
+    <wsdl:part name="url" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="isSiteAvailableHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionHttpPostIn">
+    <wsdl:part name="url" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="cancelSiteSubscriptionHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountHttpPostIn">
+    <wsdl:part name="login" type="s:string" />
+    <wsdl:part name="enable" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="enableAccountHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getSitesHttpPostIn">
+    <wsdl:part name="username" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getSitesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSiteInfo" />
+  </wsdl:message>
+  <wsdl:message name="findUserHttpPostIn">
+    <wsdl:part name="email" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="findUserHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfLookUpList" />
+  </wsdl:message>
+  <wsdl:message name="getNameHttpPostIn" />
+  <wsdl:message name="getNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="getEmailHttpPostIn" />
+  <wsdl:message name="getEmailHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordHttpPostIn">
+    <wsdl:part name="email" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="resetPasswordHttpPostOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordHttpPostIn">
+    <wsdl:part name="oldpassword" type="s:string" />
+    <wsdl:part name="newpassword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="changePasswordHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="changeNameHttpPostIn">
+    <wsdl:part name="firstName" type="s:string" />
+    <wsdl:part name="lastName" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="changeNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="getLogin">
+      <wsdl:input message="tns:getLoginSoapIn" />
+      <wsdl:output message="tns:getLoginSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createTrialSite">
+      <wsdl:input message="tns:createTrialSiteSoapIn" />
+      <wsdl:output message="tns:createTrialSiteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createSiteAddUser">
+      <wsdl:input message="tns:createSiteAddUserSoapIn" />
+      <wsdl:output message="tns:createSiteAddUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createSite">
+      <wsdl:input message="tns:createSiteSoapIn" />
+      <wsdl:output message="tns:createSiteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <wsdl:input message="tns:isSiteAvailableSoapIn" />
+      <wsdl:output message="tns:isSiteAvailableSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <wsdl:input message="tns:cancelSiteSubscriptionSoapIn" />
+      <wsdl:output message="tns:cancelSiteSubscriptionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <wsdl:input message="tns:enableAccountSoapIn" />
+      <wsdl:output message="tns:enableAccountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getWorkspaceSiteStatistics">
+      <wsdl:input message="tns:getWorkspaceSiteStatisticsSoapIn" />
+      <wsdl:output message="tns:getWorkspaceSiteStatisticsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getEnterpriseSiteStatistics">
+      <wsdl:input message="tns:getEnterpriseSiteStatisticsSoapIn" />
+      <wsdl:output message="tns:getEnterpriseSiteStatisticsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <wsdl:input message="tns:getSitesSoapIn" />
+      <wsdl:output message="tns:getSitesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createAccount">
+      <wsdl:input message="tns:createAccountSoapIn" />
+      <wsdl:output message="tns:createAccountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createAccountSilent">
+      <wsdl:input message="tns:createAccountSilentSoapIn" />
+      <wsdl:output message="tns:createAccountSilentSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="createAccountFromRegister">
+      <wsdl:input message="tns:createAccountFromRegisterSoapIn" />
+      <wsdl:output message="tns:createAccountFromRegisterSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="addPartner">
+      <wsdl:input message="tns:addPartnerSoapIn" />
+      <wsdl:output message="tns:addPartnerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <wsdl:input message="tns:findUserSoapIn" />
+      <wsdl:output message="tns:findUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <wsdl:input message="tns:getNameSoapIn" />
+      <wsdl:output message="tns:getNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <wsdl:input message="tns:getEmailSoapIn" />
+      <wsdl:output message="tns:getEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <wsdl:input message="tns:resetPasswordSoapIn" />
+      <wsdl:output message="tns:resetPasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <wsdl:input message="tns:changePasswordSoapIn" />
+      <wsdl:output message="tns:changePasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <wsdl:input message="tns:changeNameSoapIn" />
+      <wsdl:output message="tns:changeNameSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpGet">
+    <wsdl:operation name="getLogin">
+      <wsdl:input message="tns:getLoginHttpGetIn" />
+      <wsdl:output message="tns:getLoginHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <wsdl:input message="tns:isSiteAvailableHttpGetIn" />
+      <wsdl:output message="tns:isSiteAvailableHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <wsdl:input message="tns:cancelSiteSubscriptionHttpGetIn" />
+      <wsdl:output message="tns:cancelSiteSubscriptionHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <wsdl:input message="tns:enableAccountHttpGetIn" />
+      <wsdl:output message="tns:enableAccountHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <wsdl:input message="tns:getSitesHttpGetIn" />
+      <wsdl:output message="tns:getSitesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <wsdl:input message="tns:findUserHttpGetIn" />
+      <wsdl:output message="tns:findUserHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <wsdl:input message="tns:getNameHttpGetIn" />
+      <wsdl:output message="tns:getNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <wsdl:input message="tns:getEmailHttpGetIn" />
+      <wsdl:output message="tns:getEmailHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <wsdl:input message="tns:resetPasswordHttpGetIn" />
+      <wsdl:output message="tns:resetPasswordHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <wsdl:input message="tns:changePasswordHttpGetIn" />
+      <wsdl:output message="tns:changePasswordHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <wsdl:input message="tns:changeNameHttpGetIn" />
+      <wsdl:output message="tns:changeNameHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpPost">
+    <wsdl:operation name="getLogin">
+      <wsdl:input message="tns:getLoginHttpPostIn" />
+      <wsdl:output message="tns:getLoginHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <wsdl:input message="tns:isSiteAvailableHttpPostIn" />
+      <wsdl:output message="tns:isSiteAvailableHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <wsdl:input message="tns:cancelSiteSubscriptionHttpPostIn" />
+      <wsdl:output message="tns:cancelSiteSubscriptionHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <wsdl:input message="tns:enableAccountHttpPostIn" />
+      <wsdl:output message="tns:enableAccountHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <wsdl:input message="tns:getSitesHttpPostIn" />
+      <wsdl:output message="tns:getSitesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <wsdl:input message="tns:findUserHttpPostIn" />
+      <wsdl:output message="tns:findUserHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <wsdl:input message="tns:getNameHttpPostIn" />
+      <wsdl:output message="tns:getNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <wsdl:input message="tns:getEmailHttpPostIn" />
+      <wsdl:output message="tns:getEmailHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <wsdl:input message="tns:resetPasswordHttpPostIn" />
+      <wsdl:output message="tns:resetPasswordHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <wsdl:input message="tns:changePasswordHttpPostIn" />
+      <wsdl:output message="tns:changePasswordHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <wsdl:input message="tns:changeNameHttpPostIn" />
+      <wsdl:output message="tns:changeNameHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getLogin">
+      <soap:operation soapAction="http://epmlive.com/getLogin" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createTrialSite">
+      <soap:operation soapAction="http://epmlive.com/createTrialSite" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createSiteAddUser">
+      <soap:operation soapAction="http://epmlive.com/createSiteAddUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createSite">
+      <soap:operation soapAction="http://epmlive.com/createSite" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <soap:operation soapAction="http://epmlive.com/isSiteAvailable" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <soap:operation soapAction="http://epmlive.com/cancelSiteSubscription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <soap:operation soapAction="http://epmlive.com/enableAccount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWorkspaceSiteStatistics">
+      <soap:operation soapAction="http://epmlive.com/getWorkspaceSiteStatistics" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterpriseSiteStatistics">
+      <soap:operation soapAction="http://epmlive.com/getEnterpriseSiteStatistics" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <soap:operation soapAction="http://epmlive.com/getSites" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccount">
+      <soap:operation soapAction="http://epmlive.com/createAccount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccountSilent">
+      <soap:operation soapAction="http://epmlive.com/createAccountSilent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccountFromRegister">
+      <soap:operation soapAction="http://epmlive.com/createAccountFromRegister" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addPartner">
+      <soap:operation soapAction="http://epmlive.com/addPartner" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <soap:operation soapAction="http://epmlive.com/findUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <soap:operation soapAction="http://epmlive.com/getName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <soap:operation soapAction="http://epmlive.com/getEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <soap:operation soapAction="http://epmlive.com/resetPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <soap:operation soapAction="http://epmlive.com/changePassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <soap:operation soapAction="http://epmlive.com/changeName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getLogin">
+      <soap12:operation soapAction="http://epmlive.com/getLogin" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createTrialSite">
+      <soap12:operation soapAction="http://epmlive.com/createTrialSite" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createSiteAddUser">
+      <soap12:operation soapAction="http://epmlive.com/createSiteAddUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createSite">
+      <soap12:operation soapAction="http://epmlive.com/createSite" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <soap12:operation soapAction="http://epmlive.com/isSiteAvailable" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <soap12:operation soapAction="http://epmlive.com/cancelSiteSubscription" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <soap12:operation soapAction="http://epmlive.com/enableAccount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWorkspaceSiteStatistics">
+      <soap12:operation soapAction="http://epmlive.com/getWorkspaceSiteStatistics" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterpriseSiteStatistics">
+      <soap12:operation soapAction="http://epmlive.com/getEnterpriseSiteStatistics" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <soap12:operation soapAction="http://epmlive.com/getSites" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccount">
+      <soap12:operation soapAction="http://epmlive.com/createAccount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccountSilent">
+      <soap12:operation soapAction="http://epmlive.com/createAccountSilent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createAccountFromRegister">
+      <soap12:operation soapAction="http://epmlive.com/createAccountFromRegister" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addPartner">
+      <soap12:operation soapAction="http://epmlive.com/addPartner" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <soap12:operation soapAction="http://epmlive.com/findUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <soap12:operation soapAction="http://epmlive.com/getName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <soap12:operation soapAction="http://epmlive.com/getEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <soap12:operation soapAction="http://epmlive.com/resetPassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <soap12:operation soapAction="http://epmlive.com/changePassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <soap12:operation soapAction="http://epmlive.com/changeName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpGet" type="tns:ServiceHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="getLogin">
+      <http:operation location="/getLogin" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <http:operation location="/isSiteAvailable" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <http:operation location="/cancelSiteSubscription" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <http:operation location="/enableAccount" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <http:operation location="/getSites" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <http:operation location="/findUser" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <http:operation location="/getName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <http:operation location="/getEmail" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <http:operation location="/resetPassword" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <http:operation location="/changePassword" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <http:operation location="/changeName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpPost" type="tns:ServiceHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="getLogin">
+      <http:operation location="/getLogin" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="isSiteAvailable">
+      <http:operation location="/isSiteAvailable" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cancelSiteSubscription">
+      <http:operation location="/cancelSiteSubscription" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableAccount">
+      <http:operation location="/enableAccount" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSites">
+      <http:operation location="/getSites" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="findUser">
+      <http:operation location="/findUser" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getName">
+      <http:operation location="/getName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEmail">
+      <http:operation location="/getEmail" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resetPassword">
+      <http:operation location="/resetPassword" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changePassword">
+      <http:operation location="/changePassword" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeName">
+      <http:operation location="/changeName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+      <soap12:address location="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpGet" binding="tns:ServiceHttpGet">
+      <http:address location="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpPost" binding="tns:ServiceHttpPost">
+      <http:address location="https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

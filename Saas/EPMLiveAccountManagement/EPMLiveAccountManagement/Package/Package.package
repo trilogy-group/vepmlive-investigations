@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="bccc1710-a18a-41a3-b517-62a8454dd0ba" solutionId="bccc1710-a18a-41a3-b517-62a8454dd0ba" resetWebServer="false" sharePointProductVersion="16.0" name="EPMLiveAccountManagement" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="35919047-a003-4492-b8dd-ed6f970afe81" />
+    <featureReference itemId="a5b265ce-1c4b-422a-901e-dce3ad0582fc" />
+    <featureReference itemId="9f147511-ac42-4c0b-8068-f3a57e0b0437" />
+    <featureReference itemId="85f304fa-8659-4914-a7c7-cc0ddc88fd20" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="564bca6d-c9b4-4061-96dc-2162ab4e2109" />
+    <projectItemReference itemId="3854abcb-6bde-49ab-bd50-38da530eb0f6" />
+    <projectItemReference itemId="3aab860f-2ade-4c50-af30-14b7d6ec28df" />
+  </projectItems>
+</package>
