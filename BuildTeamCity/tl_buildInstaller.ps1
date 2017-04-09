@@ -134,7 +134,8 @@ Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
 
 Log-Section "Restoring missing packages . . ."
 & $nugetPath restore "$SourcesDirectory"
-& $nugetPath restore "$SourcesDirectory\Saas"
+& $nugetPath restore "$SourcesDirectory\Saas\EPMLive.Saas"
+& $nugetPath restore "$SourcesDirectory\Saas\EPMLiveAccountManagement"
 & $nugetPath restore "$SourcesDirectory\ProjectPublisher2016"
 
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
