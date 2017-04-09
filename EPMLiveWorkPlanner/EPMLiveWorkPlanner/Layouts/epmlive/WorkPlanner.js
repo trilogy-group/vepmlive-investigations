@@ -4043,8 +4043,8 @@ function SetPlannerFieldValue(row, col, val, setVal) {
 
     if (col == "Complete") {
         WEStatusCalculateComplete(grid, row, val);
-        DoAssignmentRollDown(grid, row, 0, "PercentComplete");
-        DoAssignmentRollDown(grid, row, 0, "Status");
+        RollDownAllNodes(grid, row, "PercentComplete", val * 100);
+        RollDownAllNodes(grid, row, "Status", val == 1 ? "Completed" : "Not Started");
         grid.RefreshCell(row, "ScheduleStatus");
     }
 
@@ -4075,6 +4075,18 @@ function SetPlannerFieldValue(row, col, val, setVal) {
             }
         }
     }
+}
+
+function RollDownAllNodes(Grid, node, Col, val) {
+
+    var oChild = node.firstChild;
+
+    while (oChild != null) {       
+        Grid.SetValue(oChild, Col, val, 1); 
+        RollDownAllNodes(Grid, oChild, Col, val);
+        oChild = oChild.nextSibling;
+    }
+
 }
 
 function WEStatusCalculateStatus(grid, row, val) {

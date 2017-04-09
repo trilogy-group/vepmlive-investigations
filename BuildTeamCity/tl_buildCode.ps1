@@ -55,7 +55,7 @@ function Log-Message($msg) {
 }
 
 
-$BuildDirectory = "$ScriptDir\..\..\"
+#$BuildDirectory = "$ScriptDir\..\..\"
 
 # additional parameters to msbuild
 if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
@@ -70,7 +70,7 @@ $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\C
 $SourcesDirectory = "$ScriptDir\..\"
 
 # Directory for outputs
-$OutputDirectory = Join-Path $BuildDirectory "output"
+$OutputDirectory = Join-Path $SourcesDirectory "output"
 # Initialize Binaries Directory
 $BinariesDirectory = Join-Path $OutputDirectory "binaries"
 # Initialize merged binaries folder
@@ -82,7 +82,7 @@ $LibrariesDirectory = "$OutputDirectory\libraries"
 # Initialize intermediates directory (PDB)
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
 # Initialize logs directory
-$LogsDirectory = "$BuildDirectory\logs"
+$LogsDirectory = "$SourcesDirectory\logs"
 if (!(Test-Path -Path $LogsDirectory )){
     New-Item $LogsDirectory -type Directory
 }
