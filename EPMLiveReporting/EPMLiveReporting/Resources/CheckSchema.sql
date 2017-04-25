@@ -835,10 +835,10 @@ BEGIN
                         -- List name
                         DECLARE @LstName nvarchar(100)                              
                         -- Init. table variable
-                        --INSERT INTO @tblListNames(id,listname) SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, ',') Spl 
+                        --INSERT INTO @tblListNames(id,listname) SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, '','') Spl 
 --inner join [RPTList] RPTL on data=listname
                         INSERT INTO @tblListNames (listid, listname,siteid,tablename,tablenamesnapshot)
-                        ( SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, ',') Spl  inner join [RPTList] RPTL on Spl.data=RPTL.ListName WHERE Siteid = @siteID)
+                        ( SELECT distinct RPTL.rptlistid, RPTL.listname, RPTL.Siteid , RPTL.TableName, RPTL.TableNameSnapshot FROM dbo.Split(@ListIDs, '','') Spl  inner join [RPTList] RPTL on Spl.data=RPTL.ListName WHERE Siteid = @siteID)
                         -- Init. list count
                         SET @ListCount = (SELECT COUNT(*) FROM @tblListNames)
                         -- Init. list counter
