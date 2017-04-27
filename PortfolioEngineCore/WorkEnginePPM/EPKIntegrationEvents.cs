@@ -61,7 +61,10 @@ namespace WorkEnginePPM
         public override void ItemUpdating(SPItemEventProperties properties)
         {
             processItem(properties);
-            UpdateProject(properties);
+            if (properties.List.Fields.ContainsFieldWithInternalName("Title"))
+            {
+                UpdateProject(properties);
+            }
         }
         /// <summary>
         /// Updating Project Name in EPG_RPT_Cost and EPG_RPT_Cost
