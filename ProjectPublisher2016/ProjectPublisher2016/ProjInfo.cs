@@ -712,14 +712,18 @@ namespace ProjectPublisher2016
 				{
 					if(item.OuterXml.Trim().Replace("&nbsp;"," ") != "")
 					{
-						try
-						{
-							ResourceItem ri = new ResourceItem();
-							ri.name = item.Attributes["ows_" + field].Value;
-							ri.index =  int.Parse(item.Attributes["ows_ID"].Value);
-							cbo.Items.Add(ri);
-						}
-						catch{}
+                        try
+                        {
+                            ResourceItem ri = new ResourceItem();
+
+                            if (item.Attributes["ows_" + field].Value == "string;#")
+                                continue;
+
+                            ri.name = item.Attributes["ows_" + field].Value.Replace("string;#", "");
+                            ri.index = int.Parse(item.Attributes["ows_ID"].Value);
+                            cbo.Items.Add(ri);
+                        }
+                        catch { }
 					}
 				}
 			}
