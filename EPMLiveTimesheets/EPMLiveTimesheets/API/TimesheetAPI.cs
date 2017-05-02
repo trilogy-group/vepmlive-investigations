@@ -500,6 +500,9 @@ namespace TimeSheets
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
                         cmd.ExecuteNonQuery();
 
+                        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
+                        CheckNonTeamMemberAllocation(oWeb, tsuid, cn);
+
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
                         if (settings.DisableApprovals)
@@ -520,6 +523,38 @@ namespace TimeSheets
             catch (Exception ex)
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
+            }
+        }
+
+        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
+        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, SqlConnection cn)
+        {
+            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
+            var sql = string.Empty;
+            var tblProjects = new DataTable();
+            var membersIDs = new List<string>();
+            var ownerID = -1;
+
+            var cmd = new SqlCommand("select distinct(project_id) from TSITEM where TS_UID = @tsuid", cn);
+            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+
+            var dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                sql = string.Format(@"SELECT [AssignedToID], [OwnerID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", dr.GetString(0));
+                tblProjects = rptData.ExecuteSql(sql);
+
+                if (tblProjects?.Rows?.Count > 0)
+                {
+                    membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
+                    ownerID = (int)(tblProjects.Rows[0][1] ?? -1);
+
+                    if (membersIDs != null && !membersIDs.Contains(oWeb.CurrentUser.ID.ToString()) // is not in assignedTo field.
+                        && ownerID != oWeb.CurrentUser.ID) // is not the owner.
+                    {
+                        // TODO: here we should put notification code
+                    }
+                }
             }
         }
 
