@@ -2,13 +2,14 @@ $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 
 Remove-Item "SilentInstaller" -Force -Recurse
 New-Item "SilentInstaller" -type directory -Force
+New-Item "SilentInstaller\Files" -type directory -Force
 
 $outputFolder = "..\output"
 $outputFolder2 = "..\InstallShield\Build Dependencies"
 
 foreach ($component in $config.Components)
 {
-    $folderName = "SilentInstaller\"+$component.name
+    $folderName = "SilentInstaller\Files\"+$component.name
     New-Item $folderName -type directory -Force
 
     foreach ($file in $component.files)
@@ -23,3 +24,4 @@ foreach ($component in $config.Components)
             ForEach-Object {Copy-Item -Path $_.Fullname -Destination $folderName -Force}
     }    
 }
+
