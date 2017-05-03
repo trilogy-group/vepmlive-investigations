@@ -25,3 +25,5 @@ foreach ($component in $config.Components)
     }    
 }
 
+Copy-Item -Path "config.json" -Destination "SilentInstaller\Files\config.json" -Force
+

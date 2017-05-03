@@ -3,11 +3,13 @@
 		{
 			"name": "API", 
 			"files": ["api.zip"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013",
+			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
 		{
 			"name": "AllOtherFiles2", 
-			"files": ["0Tables01.sql", "1Views01.sql", "2SPs01.sql", "9Data01.sql"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\sql\\PS"			},
+			"files": ["0Tables01.sql","0Tables02.sql", "1Views01.sql", "2SPs01.sql", "9Data01.sql", "9Data02.sql"],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\sql\\PS",
+			"runSQL": "true"		},
 		{
 			"name": "DocumentFormat.OpenXml.dll", 
 			"files": ["DocumentFormat.OpenXml.dll"],
@@ -42,16 +44,24 @@
 			"files": [
 				"WorkEngineCore.wsp", 
 				"WorkEngineDashboards.wsp", 
-				"WorkEngineEnterprise.wsp", 
 				"WorkEnginePfE.wsp", 
-				"WorkEngineReporting.wsp", 
-				"WorkEngineSynch.wsp", 
 				"WorkEngineTimesheets.wsp",
 				"WorkEngineWebParts.wsp",
-				"WorkEngineWorkPlanner.wsp",
 				"WorkEngineForms.wsp"
 				],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\webparts"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\webparts",
+			"deployWSP": "web"		},
+		{
+			"name": "SPFiles2",
+			"files": [
+				"WorkEngineEnterprise.wsp", 
+				"WorkEngineReporting.wsp", 
+				"WorkEngineSynch.wsp",
+				"WorkEngineWorkPlanner.wsp"
+				],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\webparts",
+			"deployWSP": "farm"
+		},
 		{
 			"name": "TemplateFilesPortfolioEngine", 
 			"files": ["PortfolioEngine.wsp"],
@@ -59,7 +69,8 @@
 		{
 			"name": "UplandAnalytics", 
 			"files": "UplandAnalytics.zip",
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013",
+			"unzip": "[ProgramFilesFolder]EPM Live\\EPM Live 2013"		},
 		{
 			"name": "UplandIntegrations.dll", 
 			"files": ["UplandIntegrations.dll"],
