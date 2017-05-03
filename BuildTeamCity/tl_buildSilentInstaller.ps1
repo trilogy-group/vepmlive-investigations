@@ -1,7 +1,7 @@
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 
-Remove-Item "SilentInstaller" -Force -Recurse
 New-Item "SilentInstaller" -type directory -Force
+Remove-Item "SilentInstaller\Files" -Force -Recurse
 New-Item "SilentInstaller\Files" -type directory -Force
 
 $outputFolder = "..\output"

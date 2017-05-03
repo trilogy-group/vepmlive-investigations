@@ -278,3 +278,4 @@ paket-files/
 /CoverageReports
 /opencovertests.xml
 /BuildTeamCity/SilentInstaller/Files
+/InstallShield/Build Dependencies/PS/*.sql
