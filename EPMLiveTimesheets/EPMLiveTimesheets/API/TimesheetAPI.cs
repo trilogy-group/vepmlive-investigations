@@ -493,7 +493,6 @@ namespace TimeSheets
                     }
                     else
                     {
-
                         cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
                         cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
                         cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
