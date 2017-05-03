@@ -541,13 +541,14 @@ namespace TimeSheets
             var dr = cmd.ExecuteReader();
             while (dr.Read())
             {
-                sql = string.Format(@"SELECT [AssignedToID], [OwnerID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", dr.GetString(0));
+                sql = string.Format(@"SELECT [AssignedToID], [OwnerID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", dr.GetInt32(0));
                 tblProjects = rptData.ExecuteSql(sql);
 
                 if (tblProjects?.Rows?.Count > 0)
                 {
                     membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
-                    ownerID = (int)(tblProjects.Rows[0][1] ?? -1);
+                    if (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() !=  string.Empty)
+                        ownerID = (int)(tblProjects.Rows[0][1]);
 
                     if (membersIDs != null && !membersIDs.Contains(oWeb.CurrentUser.ID.ToString()) // is not in assignedTo field.
                         && ownerID != oWeb.CurrentUser.ID) // is not the owner.
