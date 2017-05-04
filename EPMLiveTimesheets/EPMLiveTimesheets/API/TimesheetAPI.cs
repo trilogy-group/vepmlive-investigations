@@ -537,26 +537,43 @@ namespace TimeSheets
 
             var cmd = new SqlCommand("select distinct(project_id) from TSITEM where TS_UID = @tsuid", cn);
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
+            int projectID = -1;
+            string projectName = string.Empty;
 
             var dr = cmd.ExecuteReader();
             while (dr.Read())
             {
-                sql = string.Format(@"SELECT [AssignedToID], [OwnerID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", dr.GetInt32(0));
+                projectID = dr.GetInt32(0);
+                sql = string.Format(@"SELECT [AssignedToID], [OwnerID], [Title] FROM dbo.LSTProjectCenter WHERE [id] = {0}", projectID);
                 tblProjects = rptData.ExecuteSql(sql);
 
                 if (tblProjects?.Rows?.Count > 0)
                 {
                     membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
-                    if (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() !=  string.Empty)
+                    projectName = tblProjects.Rows[0][2]?.ToString();
+                    if (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() != string.Empty)
                         ownerID = (int)(tblProjects.Rows[0][1]);
 
-                    if (membersIDs != null && !membersIDs.Contains(oWeb.CurrentUser.ID.ToString()) // is not in assignedTo field.
-                        && ownerID != oWeb.CurrentUser.ID) // is not the owner.
+                    if (!((membersIDs != null && membersIDs.Contains(oWeb.CurrentUser.ID.ToString())) || // is in assignedTo field.
+                         ownerID == oWeb.CurrentUser.ID || // is the owner.
+                         PartOfProjectGroups(oWeb, projectName))) // is member of project groups
                     {
                         // TODO: here we should put notification code
                     }
                 }
             }
+        }
+
+        private static bool PartOfProjectGroups(SPWeb oWeb, string projectName)
+        {
+            var projectUserGroups = from g in oWeb.CurrentUser.Groups.OfType<SPGroup>()
+                                    where g.Name != null &&
+                                          g.Name.ToUpper().Trim().Contains(projectName.Trim().ToUpper())
+                                    select g.Name;
+
+            return (projectUserGroups.Any(i => i.Contains("Owner")) ||
+                    projectUserGroups.Any(i => i.Contains("Member")) ||
+                    projectUserGroups.Any(i => i.Contains("Visitor")));
         }
 
         public static string SaveTimesheet(string data, SPWeb oWeb)
