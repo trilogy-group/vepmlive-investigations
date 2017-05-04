@@ -6,7 +6,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         public static bool ColumnExist(this SqlConnection sqlConnection, string tableName, string columnName)
         {
-            var sql = $@"IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'{columnName}' AND [object_id] = OBJECT_ID(N'{tableName}'))
+            var sql =
+                $@"IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'{columnName}' AND [object_id] = OBJECT_ID(N'{tableName}'))
 BEGIN
     SELECT 1
 END
@@ -14,10 +15,10 @@ ELSE SELECT 0";
 
             using (var sqlCommand = new SqlCommand(sql, sqlConnection))
             {
-                SqlDataReader reader = sqlCommand.ExecuteReader();
-                while (reader.Read())
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    return reader.GetInt32(0) != 1;
+                    while (reader.Read())
+                        return reader.GetInt32(0) != 1;
                 }
             }
 
