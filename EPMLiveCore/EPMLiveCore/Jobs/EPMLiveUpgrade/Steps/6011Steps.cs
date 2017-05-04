@@ -52,9 +52,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             {
                                 LogMessage("LastSubmittedByUser column already exists in TSTIMESHEET table", MessageKind.SKIPPED, 4);
                             }
-
-                            // add report table fields? or table.
-
                         }
                         finally
                         {
@@ -74,5 +71,5 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
             return true;
         }         
-    }     
+    }
 }
