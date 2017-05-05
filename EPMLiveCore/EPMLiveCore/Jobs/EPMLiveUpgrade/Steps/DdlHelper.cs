@@ -49,16 +49,26 @@ ELSE SELECT 0";
             }
         }
 
-        public static string GetViewDefinition(this SqlConnection sqlConnection, string viewName)
+        public static string GetDefinition(this SqlConnection sqlConnection, string objectName, string objType)
         {
             var sql =
-                $"select definition from sys.objects o join sys.sql_modules m on m.object_id = o.object_id where o.object_id = object_id('{viewName}')  and o.type = 'V'";
+                $"select definition from sys.objects o join sys.sql_modules m on m.object_id = o.object_id where o.object_id = object_id('{objectName}')  and o.type = '{objType}'";
             return ExecuteReader(sqlConnection, sql, reader =>
             {
                 if (reader.Read())
                     return reader.GetString(0);
                 return null;
             });
+        }
+
+        public static string GetViewDefinition(this SqlConnection sqlConnection, string viewName)
+        {
+            return GetDefinition(sqlConnection, viewName, "V");
+        }
+
+        public static string GetSpDefinition(this SqlConnection sqlConnection, string spName)
+        {
+            return GetDefinition(sqlConnection, spName, "P");
         }
     }
 }

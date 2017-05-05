@@ -31,19 +31,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             epmLiveCn.Open();
 
                             var metaViewDefinition = epmLiveCn.GetViewDefinition("dbo.vwMeta");
-                            var versionMarker = "v6.0.1.2";
+                            var versionMarker = "v6.0.1";
                             if (metaViewDefinition != null && !metaViewDefinition.Contains(versionMarker))
                             {
                                 #region ViewCode
-                                epmLiveCn.ExecuteNonQuery($@"/****** Object:  View [dbo].[vwMeta]    Script Date: 5/4/2017 12:45:30 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-ALTER VIEW [dbo].[vwMeta]
-AS
+                                epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
 -- {versionMarker}
 SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
                       dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ListName + '_' + dbo.TSMETA.ColumnName, 'TempColumn') 
@@ -104,8 +96,7 @@ FROM         dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                       dbo.TSPERIOD AS TSPERIOD_1 ON TSTIMESHEET_1.PERIOD_ID = TSPERIOD_1.PERIOD_ID AND 
                       TSTIMESHEET_1.SITE_UID = TSPERIOD_1.SITE_ID LEFT OUTER JOIN
                       dbo.TSNOTES ON TSITEMHOURS_1.TS_ITEM_DATE = dbo.TSNOTES.TS_ITEM_DATE AND TSITEM_1.TS_ITEM_UID = dbo.TSNOTES.TS_ITEM_UID LEFT OUTER JOIN
-                      dbo.TSTYPE AS TSTYPE_1 ON TSTIMESHEET_1.SITE_UID = TSTYPE_1.SITE_UID AND TSITEMHOURS_1.TS_ITEM_TYPE_ID = TSTYPE_1.TSTYPE_ID
-GO");
+                      dbo.TSTYPE AS TSTYPE_1 ON TSTIMESHEET_1.SITE_UID = TSTYPE_1.SITE_UID AND TSITEMHOURS_1.TS_ITEM_TYPE_ID = TSTYPE_1.TSTYPE_ID");
                                 #endregion
 
                                 LogMessage("LastSubmittedByName, LastSubmittedByUser columns added to the vwMeta view", MessageKind.SUCCESS, 4);
