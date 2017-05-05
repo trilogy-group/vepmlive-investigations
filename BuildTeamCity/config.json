@@ -34,7 +34,12 @@
 		{
 			"name": "QueueService", 
 			"files": ["WE_QueueMgr.exe"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"installAsService": {
+				"name": "PFEQueue",
+				"displayname": "PortfolioEngine Queue",
+				"description": " "
+			}		},
 		{
 			"name": "RestSharp.dll", 
 			"files": ["RestSharp.dll"],
@@ -78,8 +83,18 @@
 		},
 		{
 			"name": "WETimer", 
-			"files": ["TimerService.exe.config", "TimerService.exe"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\Timer"		},
+			"files": ["TimerService.exe"],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\Timer",
+			"installAsService": {
+				"name": "WorkEngineTimer",
+				"displayname": "Work Engine Timer Service",
+				"description": " "
+			}		},
+		{
+			"name": "WETimerConfig", 
+			"files": ["TimerService.exe.config"],
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\Timer"
+		},
 		{	"name": "WE_CSRequest.dll", 
 			"files": ["WE_CSRequest.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
@@ -106,27 +121,33 @@
 		{
 			"name": "WE_DBASvr.dll", 
 			"files": ["WE_DBASvr.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_FA.dll", 
 			"files": ["WE_FA.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_PDSExt.dll", 
 			"files": ["WE_PDSExt.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_RSVP.dll", 
 			"files": ["WE_RSVP.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_Security.dll", 
 			"files": ["WE_Security.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_Util.ocx", 
 			"files": ["WE_Util.ocx"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},
+			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
+			"registerCOM": "true"		},
 		{
 			"name": "WE_WEI.dll", 
 			"files": ["WE_WEI.dll"],
@@ -146,8 +167,11 @@
 		{
 			"name": "WE_WSSAdmin.dll", 
 			"files": ["WE_WSSAdmin.dll"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
-			"complus": "{_9E3ABD82_916F_4B55_BC80_581D307471E0_} [ProgramFilesFolder]COMPlus Applications\\{9E3ABD82-916F-4B55-BC80-581D307471E0}"		},
+			"destination": "[ProgramFilesFolder]COMPlus Applications\\{9E3ABD82-916F-4B55-BC80-581D307471E0}",
+			"registerCOMplus": {
+				"ID": "{9E3ABD82-916F-4B55-BC80-581D307471E0}",
+				"Name": "WssAdmin"
+				}		},
 		{
 			"name": "workenginesetup.exe", 
 			"files": ["workenginesetup.exe"],

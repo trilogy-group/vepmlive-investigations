@@ -90,3 +90,89 @@ function DeployWSP()
         start-sleep -s 5
     }
 }
+
+function Test-ADCredential {
+    Param
+    (
+        [string]$UserName,
+        [string]$Password
+    )
+    if (!($UserName) -or !($Password)) {
+        Write-Warning 'Test-ADCredential: Please specify both user name and password'
+    } else {
+        Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+        $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('domain')
+        $DS.ValidateCredentials($UserName, $Password)
+    }
+}
+
+function Install-Service()
+{
+    Param
+    (
+        [string]$serviceName,
+        [string]$displayName,
+        [string]$description,
+        [string]$path,
+        [string]$UserName,
+        [string]$Password
+    )
+
+    Write-Host "Delete service: $serviceName"
+    (Get-WmiObject Win32_Service -filter "name='$serviceName'").Delete()
+
+    $passwordSec = $Password | ConvertTo-SecureString -asPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential($UserName,$passwordSec)
+
+    Write-Host "Install service: $serviceName"
+    New-Service -Name $serviceName -DisplayName "$displayName" -Description "$description" -BinaryPathName "$path" -StartupType Automatic -Credential $credential -Confirm:$false
+    Write-Host "Start service: $serviceName"
+    Start-Service $serviceName
+}
+
+function Register-File 
+{
+	param (
+		[ValidateScript({ Test-Path -Path $_ -PathType 'Leaf' })]
+		[string]$FilePath
+	)
+	process {
+		try {
+			$Result = Start-Process -FilePath 'regsvr32.exe' -Args "/s $FilePath" -Wait -NoNewWindow -PassThru
+		} catch {
+			Write-Error $_.Exception.Message
+			$false
+		}
+	}
+}
+
+function Register-COMPlus
+{
+	param (
+		[ValidateScript({ Test-Path -Path $_ -PathType 'Leaf' })]
+		[string]$FilePath,
+        [string]$id,
+        [string]$appName,
+        [string]$UserName,
+        [string]$Password
+	)
+    Write-Host "Install COM+ Application: $appName"
+    $comAdmin = New-Object -com ("COMAdmin.COMAdminCatalog.1")
+    $applications = $comAdmin.GetCollection("Applications") 
+    $applications.Populate() 
+
+    $app = $applications.add()
+    $app.Value("ID") = $id
+    $app.Value("Name") = $appName
+    $app.Value("Activation") = 1
+    $app.Value("ApplicationAccessChecksEnabled") = 0
+    $app.Value("Description") = " "
+    $app.Value("Identity") = $UserName
+    $app.Value("Password") = $Password
+    $app.Value("RunForever") = $True
+
+    $applications.SaveChanges()
+
+    $comAdmin.InstallComponent($appName, $FilePath, "", "")
+    $comAdmin.StartApplication($appName)
+}
