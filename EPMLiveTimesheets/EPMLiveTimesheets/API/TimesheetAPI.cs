@@ -502,7 +502,7 @@ namespace TimeSheets
                         cmd.ExecuteNonQuery();
 
                         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
-                        //CheckNonTeamMemberAllocation(oWeb, tsuid, cn);
+                        CheckNonTeamMemberAllocation(oWeb, tsuid, cn);
 
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
@@ -561,7 +561,7 @@ namespace TimeSheets
                     if (!((membersIDs != null && membersIDs.Contains(oWeb.CurrentUser.ID.ToString())) || // is in assignedTo field.
                          ownerID == oWeb.CurrentUser.ID || // is the owner.
                          PartOfProjectGroups(oWeb, projectName))) // is member of project groups
-                    {                    
+                    {
                         SendEmailNotification(oWeb, projectName, projectPlannersGroup, projectManagersGroup, ownerID);
                         // TODO: here we should put notification code
                     }
@@ -616,7 +616,7 @@ namespace TimeSheets
             if (emailToList.Count > 0)
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID, 
                     new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) } }, 
-                    emailToList, string.Empty, oWeb, false);
+                    emailToList, string.Empty, oWeb, true);
         }
 
         private static string GetEmailFromDB(int iD, SPWeb oWeb)
