@@ -9,6 +9,7 @@ using System.Data;
 using System.Collections;
 using EPMLiveCore.ReportingProxy;
 using System.Globalization;
+using EPMLiveCore.API;
 
 namespace TimeSheets
 {
@@ -499,6 +500,9 @@ namespace TimeSheets
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
                         cmd.ExecuteNonQuery();
 
+                        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
+                        CheckNonTeamMemberAllocation(oWeb, tsuid, cn);
+
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
                         if (settings.DisableApprovals)
@@ -521,6 +525,122 @@ namespace TimeSheets
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
         }
+
+        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
+        public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, SqlConnection cn)
+        {
+            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
+            var sql = string.Empty;
+            var tblProjects = new DataTable();
+            var membersIDs = new List<string>();
+            int? ownerID = null;
+
+            var cmd = new SqlCommand("select distinct(project_id) from TSITEM where TS_UID = @tsuid", cn);
+            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+            int projectID = -1;
+            string projectName = string.Empty;
+            string projectPlannersGroup = string.Empty;
+            string projectManagersGroup = string.Empty;
+
+            var dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                projectID = dr.GetInt32(0);
+                sql = string.Format(@"SELECT [AssignedToID], [OwnerID], [Title], [PlannersID], [ProjectManagersID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", projectID);
+                tblProjects = rptData.ExecuteSql(sql);
+
+                if (tblProjects?.Rows?.Count > 0)
+                {
+                    membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
+                    ownerID = (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() != string.Empty) ? (int?)tblProjects.Rows[0][1] : null;
+                    projectName = tblProjects.Rows[0][2]?.ToString();
+                    projectPlannersGroup = tblProjects.Rows[0][3]?.ToString();
+                    projectManagersGroup = tblProjects.Rows[0][4]?.ToString();
+
+                    if (!((membersIDs != null && membersIDs.Contains(oWeb.CurrentUser.ID.ToString())) || // is in assignedTo field.
+                         ownerID == oWeb.CurrentUser.ID || // is the owner.
+                         PartOfProjectGroups(oWeb, projectName))) // is member of project groups
+                    {
+                        SendEmailNotification(oWeb, projectName, projectPlannersGroup, projectManagersGroup, ownerID);
+                        // TODO: here we should put notification code
+                    }
+                }
+            }
+        }
+
+        private const int NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID = 16;
+        public static void SendEmailNotification(SPWeb oWeb, string projectName, string projectPlannersGroup, string projectManagersGroup, int? ownerID)
+        {
+            var emailToList = new List<string>();
+            var usersIDs = new List<int>();
+            int projectPlannersGroupID;
+            int projectManagersGroupID;
+
+            var projectUserOwnerGroup = (from g in oWeb.CurrentUser.Groups.OfType<SPGroup>()
+                                    where g.Name != null &&
+                                          g.Name.ToUpper().Trim().Contains(projectName.Trim().ToUpper()) &&
+                                          g.Name.ToUpper().Trim().Contains("OWNER")
+                                    select g).FirstOrDefault();
+
+            if (projectUserOwnerGroup != null)
+                projectUserOwnerGroup.Users.OfType<SPUser>().ToList().ForEach(i => usersIDs.Add(i.ID));
+            
+            if (projectPlannersGroup != null && projectPlannersGroup.Trim() != string.Empty && int.TryParse(projectPlannersGroup, out projectPlannersGroupID))
+                oWeb.SiteGroups.GetByID(projectPlannersGroupID)?.Users?.OfType<SPUser>().ToList()?.ForEach(i => usersIDs.Add(i.ID));
+            
+            if (projectManagersGroup != null && projectManagersGroup.Trim() != string.Empty && int.TryParse(projectManagersGroup, out projectManagersGroupID))
+                oWeb.SiteGroups.GetByID(projectManagersGroupID)?.Users?.OfType<SPUser>().ToList()?.ForEach(i => usersIDs.Add(i.ID));
+
+            usersIDs = usersIDs.Distinct().ToList();
+
+            SPUser userAux = null;
+            usersIDs.ForEach(i =>
+            {
+                userAux = oWeb.SiteUsers.GetByID(i);
+                if (userAux != null)
+                {
+                    if (string.IsNullOrWhiteSpace(userAux.Email))
+                        emailToList.Add(GetEmailFromDB(userAux.ID, oWeb));
+                    else
+                        emailToList.Add(userAux.Email);
+                }
+            });
+                        
+            if (ownerID != null && ((userAux = oWeb.Users.GetByID(ownerID.Value)) != null))
+                emailToList.Add(userAux.Email);
+
+            emailToList = emailToList.Distinct().ToList();
+            emailToList = emailToList.Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
+
+            if (emailToList.Count > 0)
+                APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID, 
+                    new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) } }, 
+                    emailToList, string.Empty, oWeb, true);
+        }
+
+        private static string GetEmailFromDB(int iD, SPWeb oWeb)
+        {
+            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
+            var sql = string.Format(@"Select [Email] from [LSTResourcepool] WHERE [SharePointAccountID] = {0}", iD);
+            var tblEmail = rptData.ExecuteSql(sql);
+
+            if (tblEmail?.Rows?.Count > 0 && tblEmail.Rows[0][0] != null)
+                return tblEmail.Rows[0][0].ToString();
+            else
+                return string.Empty;
+        }
+
+        private static bool PartOfProjectGroups(SPWeb oWeb, string projectName)
+        {
+            var projectUserGroups = from g in oWeb.CurrentUser.Groups.OfType<SPGroup>()
+                                    where g.Name != null &&
+                                          g.Name.ToUpper().Trim().Contains(projectName.Trim().ToUpper())
+                                    select g.Name;
+
+            return ((projectUserGroups.Any(i => i.Contains("Owner")) ||
+                    projectUserGroups.Any(i => i.Contains("Member")) ||
+                    projectUserGroups.Any(i => i.Contains("Visitor"))));
+        } 
 
         public static string SaveTimesheet(string data, SPWeb oWeb)
         {
