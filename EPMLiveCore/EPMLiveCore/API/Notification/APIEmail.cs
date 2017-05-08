@@ -751,7 +751,9 @@ namespace EPMLiveCore.API
                     }
 
                     SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
-                    string sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Address;
+                    string sMailSvr = spWebAdmin.OutboundMailServiceInstance?.Server.Address;
+
+                    if (string.IsNullOrEmpty(sMailSvr)) return;
 
                     System.Net.Mail.MailMessage mailMsg = new MailMessage();
                     if (hideFrom)
