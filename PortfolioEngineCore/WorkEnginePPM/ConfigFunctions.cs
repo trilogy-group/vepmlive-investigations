@@ -1032,6 +1032,8 @@ namespace WorkEnginePPM
                         return "Task Center";
                     case "EPMLivePSWebAppEnable":
                         return "True";
+                    case "EPMLiveEnableNonTeamNotf":
+                        return "False";
                 };
             }
 

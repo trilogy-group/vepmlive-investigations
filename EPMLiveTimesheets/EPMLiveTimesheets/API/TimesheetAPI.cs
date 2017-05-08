@@ -567,8 +567,7 @@ namespace TimeSheets
                              PartOfProjectGroups(oWeb, projectName))) // is member of project groups
                         {
                             var allocatedHours = GetAllocatedHours(data, projectName,cn.ConnectionString);
-                            SendNotifications(oWeb, projectName, projectPlannersGroup, projectManagersGroup, ownerID, allocatedHours, projectID);
-                            // TODO: here we should put notification code
+                            SendNotifications(oWeb, projectName, projectPlannersGroup, projectManagersGroup, ownerID, allocatedHours, projectID);                            
                         }
                     }
                 }
@@ -709,7 +708,8 @@ namespace TimeSheets
 
             if (emailToList.Count > 0)
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID,
-                    new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) } },
+                    new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) },
+                    { "Qty_Hours", allocatedHours } },
                     emailToList, string.Empty, oWeb, true);
         }
 
@@ -781,7 +781,8 @@ namespace TimeSheets
                     if (status == 3)
                     {
                         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
-                        CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
+                        if (bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))                        
+                            CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
 
                         cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);

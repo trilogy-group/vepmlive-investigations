@@ -21,6 +21,7 @@ namespace TimeSheets
         public bool ShowLiveHours = false;
         public bool AllowStopWatch = false;
         public ArrayList TimesheetFields = new ArrayList();
+        public bool EnableNonTeamNotf = false;
 
         public TimesheetSettings(SPWeb oWeb)
         {
@@ -54,6 +55,9 @@ namespace TimeSheets
                     {
                         UseCurrentData = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSUseCurrent"));
                     }
+                    catch { }
+
+                    try { EnableNonTeamNotf = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf")); }
                     catch { }
 
                     NonWorkList = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSNonWork");

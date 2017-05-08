@@ -78,9 +78,10 @@ namespace TimeSheets
 
         protected CheckBox chkCurrentData;
 
+        protected CheckBox chkEnableNonTeamNotf;
+
         protected void Page_Load(object sender, EventArgs e)
         {
-
             EPMLiveCore.Act act = new EPMLiveCore.Act(Web);
             int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.Timesheets);
             if (activation != 0)
@@ -224,6 +225,8 @@ namespace TimeSheets
                                             txtSaturdayMax.Text = daySettings[20];
                                         }
                                         chkCurrentData.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSUseCurrent"));
+                                        try { chkEnableNonTeamNotf.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf")); }
+                                        catch { }
                                     }
                                 }
                                 SqlConnection cn = null;
@@ -476,6 +479,7 @@ namespace TimeSheets
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSLiveHours", chkShowLiveHours.Checked.ToString());
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSMyFields", hdnTSFields.Value);
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSAllowStopWatch", chkAllowStopWatch.Checked.ToString());
+                        EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveEnableNonTeamNotf", chkEnableNonTeamNotf.Checked.ToString());
 
                         string daySettings = "";
                         daySettings += chkSunday.Checked.ToString() + "|" + txtSundayMin.Text + "|" + txtSundayMax.Text + "|";
