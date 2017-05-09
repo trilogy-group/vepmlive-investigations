@@ -14,7 +14,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V5610,
         V5612,
         V600,
-        GENERIC
+        GENERIC,
+        V601
     }
 
     internal enum MessageKind
