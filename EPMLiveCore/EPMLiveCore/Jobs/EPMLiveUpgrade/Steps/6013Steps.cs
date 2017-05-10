@@ -5,12 +5,12 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V601, Order = 3.0, Description = "New columns LastSubmittedByName and LastSubmittedByUser added to reporting source sp")]
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 3.0,
+        Description = "New columns LastSubmittedByName and LastSubmittedByUser added to reporting source sp")]
     internal class NewLastSubmitedColumnsAddedToReportingSourceSp : UpgradeStep
     {
         public NewLastSubmitedColumnsAddedToReportingSourceSp(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
-
         }
 
         public override bool Perform()
@@ -26,16 +26,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     string epmLiveCnStr = CoreFunctions.getConnectionString(webAppId);
                     using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
                     {
-                        try
-                        {
-                            epmLiveCn.Open();
+                        epmLiveCn.Open();
 
-                            var definition = epmLiveCn.GetSpDefinition("dbo.spTSAllData");
-                            var versionMarker = "v6.0.1";
-                            if (definition != null && !definition.Contains(versionMarker))
-                            {
-                                #region ViewCode
-                                epmLiveCn.ExecuteNonQuery($@"ALTER PROC [dbo].[spTSAllData]
+                        var definition = epmLiveCn.GetSpDefinition("dbo.spTSAllData");
+                        var versionMarker = "v6.1.0";
+                        if (definition != null && !definition.Contains(versionMarker))
+                        {
+                            #region ViewCode
+
+                            epmLiveCn.ExecuteNonQuery($@"ALTER PROC [dbo].[spTSAllData]
 	@siteuid uniqueidentifier
 AS
 BEGIN
@@ -100,18 +99,14 @@ end
 
 exec(@sql)
 END");
-                                #endregion
 
-                                LogMessage("LastSubmittedByName columns added to the spTSAllData", MessageKind.SUCCESS, 4);
-                            }
-                            else
-                            {
-                                LogMessage("LastSubmittedByName columns already exists in the spTSAllData", MessageKind.SKIPPED, 4);
-                            }
+                            #endregion
+
+                            LogMessage("LastSubmittedByName columns added to the spTSAllData", MessageKind.SUCCESS, 4);
                         }
-                        finally
+                        else
                         {
-                            epmLiveCn.Close();
+                            LogMessage("LastSubmittedByName columns already exists in the spTSAllData", MessageKind.SKIPPED, 4);
                         }
                     }
                 }

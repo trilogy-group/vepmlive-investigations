@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Data;
 using System.Data.SqlClient;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V601, Order = 1.0, Description = "New columns LastSubmittedByName and LastSubmittedByUser added to Timesheets table")]
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 1.0,
+        Description = "New columns LastSubmittedByName and LastSubmittedByUser added to Timesheets table")]
     internal class NewLastSubmitedColumns : UpgradeStep
     {
         public NewLastSubmitedColumns(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
-
         }
 
         public override bool Perform()
@@ -27,35 +26,28 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     string epmLiveCnStr = CoreFunctions.getConnectionString(webAppId);
                     using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
                     {
-                        try
+                        epmLiveCn.Open();
+
+                        // add LastSubmittedByName column
+                        if (!epmLiveCn.ColumnExist("dbo.TSTIMESHEET", "LastSubmittedByName"))
                         {
-                            epmLiveCn.Open();
-
-                            // add LastSubmittedByName column
-                            if (!epmLiveCn.ColumnExist("dbo.TSTIMESHEET", "LastSubmittedByName"))
-                            {
-                                epmLiveCn.AddColumn("dbo.TSTIMESHEET", "LastSubmittedByName [varchar](255) NULL");
-                                LogMessage("LastSubmittedByName column added to TSTIMESHEET table", MessageKind.SUCCESS, 4);
-                            }
-                            else
-                            {
-                                LogMessage("LastSubmittedByName column already exists in TSTIMESHEET table", MessageKind.SKIPPED, 4);
-                            }
-
-                            // add LastSubmittedByUser column
-                            if (!epmLiveCn.ColumnExist("dbo.TSTIMESHEET", "LastSubmittedByUser"))
-                            {
-                                epmLiveCn.AddColumn("dbo.TSTIMESHEET", "LastSubmittedByUser [varchar](255) NULL");
-                                LogMessage("LastSubmittedByUser column added to TSTIMESHEET table", MessageKind.SUCCESS, 4);
-                            }
-                            else
-                            {
-                                LogMessage("LastSubmittedByUser column already exists in TSTIMESHEET table", MessageKind.SKIPPED, 4);
-                            }
+                            epmLiveCn.AddColumn("dbo.TSTIMESHEET", "LastSubmittedByName [varchar](255) NULL");
+                            LogMessage("LastSubmittedByName column added to TSTIMESHEET table", MessageKind.SUCCESS, 4);
                         }
-                        finally
+                        else
                         {
-                            epmLiveCn.Close();
+                            LogMessage("LastSubmittedByName column already exists in TSTIMESHEET table", MessageKind.SKIPPED, 4);
+                        }
+
+                        // add LastSubmittedByUser column
+                        if (!epmLiveCn.ColumnExist("dbo.TSTIMESHEET", "LastSubmittedByUser"))
+                        {
+                            epmLiveCn.AddColumn("dbo.TSTIMESHEET", "LastSubmittedByUser [varchar](255) NULL");
+                            LogMessage("LastSubmittedByUser column added to TSTIMESHEET table", MessageKind.SUCCESS, 4);
+                        }
+                        else
+                        {
+                            LogMessage("LastSubmittedByUser column already exists in TSTIMESHEET table", MessageKind.SKIPPED, 4);
                         }
                     }
                 }
@@ -70,6 +62,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             });
 
             return true;
-        }         
+        }
     }
 }

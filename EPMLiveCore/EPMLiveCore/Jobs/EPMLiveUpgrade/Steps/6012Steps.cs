@@ -5,12 +5,12 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V601, Order = 2.0, Description = "New columns LastSubmittedByName and LastSubmittedByUser added to reporting source view")]
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 2.0,
+        Description = "New columns LastSubmittedByName and LastSubmittedByUser added to reporting source view")]
     internal class NewLastSubmitedColumnsAddedToReportingSourceView : UpgradeStep
     {
         public NewLastSubmitedColumnsAddedToReportingSourceView(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
-
         }
 
         public override bool Perform()
@@ -26,16 +26,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     string epmLiveCnStr = CoreFunctions.getConnectionString(webAppId);
                     using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
                     {
-                        try
-                        {
-                            epmLiveCn.Open();
+                        epmLiveCn.Open();
 
-                            var metaViewDefinition = epmLiveCn.GetViewDefinition("dbo.vwMeta");
-                            var versionMarker = "v6.0.1";
-                            if (metaViewDefinition != null && !metaViewDefinition.Contains(versionMarker))
-                            {
-                                #region ViewCode
-                                epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
+                        var metaViewDefinition = epmLiveCn.GetViewDefinition("dbo.vwMeta");
+                        var versionMarker = "v6.1.0";
+                        if (metaViewDefinition != null && !metaViewDefinition.Contains(versionMarker))
+                        {
+                            #region ViewCode
+
+                            epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
 -- {versionMarker}
 SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
                       dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ListName + '_' + dbo.TSMETA.ColumnName, 'TempColumn') 
@@ -97,18 +96,14 @@ FROM         dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                       TSTIMESHEET_1.SITE_UID = TSPERIOD_1.SITE_ID LEFT OUTER JOIN
                       dbo.TSNOTES ON TSITEMHOURS_1.TS_ITEM_DATE = dbo.TSNOTES.TS_ITEM_DATE AND TSITEM_1.TS_ITEM_UID = dbo.TSNOTES.TS_ITEM_UID LEFT OUTER JOIN
                       dbo.TSTYPE AS TSTYPE_1 ON TSTIMESHEET_1.SITE_UID = TSTYPE_1.SITE_UID AND TSITEMHOURS_1.TS_ITEM_TYPE_ID = TSTYPE_1.TSTYPE_ID");
-                                #endregion
 
-                                LogMessage("LastSubmittedByName, LastSubmittedByUser columns added to the vwMeta view", MessageKind.SUCCESS, 4);
-                            }
-                            else
-                            {
-                                LogMessage("LastSubmittedByName, LastSubmittedByUser columns already exists in the vwMeta view", MessageKind.SKIPPED, 4);
-                            }
+                            #endregion
+
+                            LogMessage("LastSubmittedByName, LastSubmittedByUser columns added to the vwMeta view", MessageKind.SUCCESS, 4);
                         }
-                        finally
+                        else
                         {
-                            epmLiveCn.Close();
+                            LogMessage("LastSubmittedByName, LastSubmittedByUser columns already exists in the vwMeta view", MessageKind.SKIPPED, 4);
                         }
                     }
                 }
