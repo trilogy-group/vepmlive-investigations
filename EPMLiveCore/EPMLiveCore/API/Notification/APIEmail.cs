@@ -773,11 +773,11 @@ namespace EPMLiveCore.API
                     mailMsg.Body = body;
                     mailMsg.IsBodyHtml = true;
 
-                    SmtpClient smtpClient = new SmtpClient();
-
-                    smtpClient.Host = sMailSvr;
-
-                    smtpClient.Send(mailMsg);
+                    using (SmtpClient smtpClient = new SmtpClient())
+                    {
+                        smtpClient.Host = sMailSvr;
+                        smtpClient.Send(mailMsg);
+                    }
                 }
             });            
         }
