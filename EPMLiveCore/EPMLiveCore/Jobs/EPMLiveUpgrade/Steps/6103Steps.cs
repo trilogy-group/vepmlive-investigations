@@ -17,9 +17,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         {
             Guid webAppId = Web.Site.WebApplication.Id;
 
-            SPSecurity.RunWithElevatedPrivileges(() =>
+            try
             {
-                try
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     LogMessage("Connecting to the database . . .", 2);
 
@@ -109,18 +109,20 @@ END");
                             LogMessage("LastSubmittedByName columns already exists in the spTSAllData", MessageKind.SKIPPED, 4);
                         }
                     }
-                }
-                catch (Exception exception)
-                {
-                    string message = exception.InnerException != null
-                        ? exception.InnerException.Message
-                        : exception.Message;
+                });
 
-                    LogMessage(message, MessageKind.FAILURE, 4);
-                }
-            });
+                return true;
+            }
+            catch (Exception exception)
+            {
+                string message = exception.InnerException != null
+                    ? exception.InnerException.Message
+                    : exception.Message;
 
-            return true;
+                LogMessage(message, MessageKind.FAILURE, 4);
+
+                return false;
+            }
         }
     }
 }

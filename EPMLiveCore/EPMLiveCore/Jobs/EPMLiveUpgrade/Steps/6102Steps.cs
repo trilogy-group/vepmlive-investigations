@@ -17,9 +17,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         {
             Guid webAppId = Web.Site.WebApplication.Id;
 
-            SPSecurity.RunWithElevatedPrivileges(() =>
+            try
             {
-                try
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     LogMessage("Connecting to the database . . .", 2);
 
@@ -106,18 +106,19 @@ FROM         dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                             LogMessage("LastSubmittedByName, LastSubmittedByUser columns already exists in the vwMeta view", MessageKind.SKIPPED, 4);
                         }
                     }
-                }
-                catch (Exception exception)
-                {
-                    string message = exception.InnerException != null
-                        ? exception.InnerException.Message
-                        : exception.Message;
+                });
 
-                    LogMessage(message, MessageKind.FAILURE, 4);
-                }
-            });
+                return true;
+            }
+            catch (Exception exception)
+            {
+                string message = exception.InnerException != null
+                    ? exception.InnerException.Message
+                    : exception.Message;
 
-            return true;
+                LogMessage(message, MessageKind.FAILURE, 4);
+                return false;
+            }
         }
     }
 }
