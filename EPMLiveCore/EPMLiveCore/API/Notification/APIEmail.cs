@@ -755,7 +755,7 @@ namespace EPMLiveCore.API
 
                     if (string.IsNullOrEmpty(sMailSvr)) return;
 
-                    using (System.Net.Mail.MailMessage mailMsg = new MailMessage())
+                    using (MailMessage mailMsg = new MailMessage())
                     {
 
 
