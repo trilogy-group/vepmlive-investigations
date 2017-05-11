@@ -129,6 +129,7 @@
       <DependentUpon>WorkLog.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\TimeSheetItem.cs" />
+    <Compile Include="Logger\Logger.cs" />
     <Compile Include="MyTimesheet\MyTimesheet.cs" />
     <Compile Include="PMApprovals\PMApprovals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
