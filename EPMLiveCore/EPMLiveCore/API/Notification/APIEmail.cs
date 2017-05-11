@@ -755,29 +755,31 @@ namespace EPMLiveCore.API
 
                     if (string.IsNullOrEmpty(sMailSvr)) return;
 
-                    System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                    if (hideFrom)
+                    using (System.Net.Mail.MailMessage mailMsg = new MailMessage())
                     {
-                        mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
-                    }
-                    else
-                    {
-                        if (string.IsNullOrEmpty(emailFrom))
-                            mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, oWeb.CurrentUser.Name);
+                        if (hideFrom)
+                        {
+                            mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
+                        }
                         else
-                            mailMsg.From = new MailAddress(oWeb.CurrentUser.Email, oWeb.CurrentUser.Name);
+                        {
+                            if (string.IsNullOrEmpty(emailFrom))
+                                mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, oWeb.CurrentUser.Name);
+                            else
+                                mailMsg.From = new MailAddress(oWeb.CurrentUser.Email, oWeb.CurrentUser.Name);
+                        }
+
+                        emailTo.ForEach(i => mailMsg.To.Add(i));
+                        mailMsg.Subject = subject;
+                        mailMsg.Body = body;
+                        mailMsg.IsBodyHtml = true;
+
+                        using (SmtpClient smtpClient = new SmtpClient())
+                        {
+                            smtpClient.Host = sMailSvr;
+                            smtpClient.Send(mailMsg);
+                        }
                     }
-
-                    emailTo.ForEach(i => mailMsg.To.Add(i));
-                    mailMsg.Subject = subject;
-                    mailMsg.Body = body;
-                    mailMsg.IsBodyHtml = true;
-
-                    SmtpClient smtpClient = new SmtpClient();
-
-                    smtpClient.Host = sMailSvr;
-
-                    smtpClient.Send(mailMsg);
                 }
             });            
         }
