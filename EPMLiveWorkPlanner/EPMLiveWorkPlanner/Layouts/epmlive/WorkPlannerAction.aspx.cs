@@ -594,8 +594,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             sb.Append(Request["summary"]);
                             sb.Append("|");
                             sb.Append(Request["allocation"]);
-                            sb.Append("|");
-                            sb.Append(Request["colsWidths"]);
+                          
 
                             if (!String.IsNullOrEmpty(Request["agileleft"]))
                             {

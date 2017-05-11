@@ -14,8 +14,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V5610,
         V5612,
         V600,
-        GENERIC,
-        V601
+        V610,
+        GENERIC
     }
 
     internal enum MessageKind
@@ -70,6 +70,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                         break;
                     case EPMLiveVersion.V600:
                         version = "6.0.0";
+                        break;
+                    case EPMLiveVersion.V610:
+                        version = "6.1.0";
                         break;
                     case EPMLiveVersion.GENERIC:
                         version = "GENERIC";
