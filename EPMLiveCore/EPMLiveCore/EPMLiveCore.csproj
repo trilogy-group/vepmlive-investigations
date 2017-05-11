@@ -438,6 +438,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\568Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\569Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\600Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6020Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6101Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6103Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\DdlHelper.cs" />

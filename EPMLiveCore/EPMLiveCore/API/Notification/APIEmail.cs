@@ -728,5 +728,60 @@ namespace EPMLiveCore.API
             }
             catch (Exception Exception){throw new Exception(Exception.Message); }
         }
+
+        public static void sendEmail(int templateID, Hashtable additionalParams, List<String> emailTo, string emailFrom, SPWeb oWeb, bool hideFrom)
+        {
+            string body = "";
+            string subject = "";
+
+            Guid siteid = SPContext.Current.Site.ID;
+            Guid webid = SPContext.Current.Web.ID;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+                {
+                    cn.Open();
+
+                    GetCoreInformation(cn, templateID, out body, out subject, oWeb, oWeb.CurrentUser);
+
+                    foreach (string s in additionalParams.Keys)
+                    {
+                        body = body.Replace("{" + s + "}", additionalParams[s].ToString());
+                        subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
+                    }
+
+                    SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
+                    string sMailSvr = spWebAdmin.OutboundMailServiceInstance?.Server.Address;
+
+                    if (string.IsNullOrEmpty(sMailSvr)) return;
+
+                    using (System.Net.Mail.MailMessage mailMsg = new MailMessage())
+                    {
+                        if (hideFrom)
+                        {
+                            mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(emailFrom))
+                                mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, oWeb.CurrentUser.Name);
+                            else
+                                mailMsg.From = new MailAddress(oWeb.CurrentUser.Email, oWeb.CurrentUser.Name);
+                        }
+
+                        emailTo.ForEach(i => mailMsg.To.Add(i));
+                        mailMsg.Subject = subject;
+                        mailMsg.Body = body;
+                        mailMsg.IsBodyHtml = true;
+
+                        using (SmtpClient smtpClient = new SmtpClient())
+                        {
+                            smtpClient.Host = sMailSvr;
+                            smtpClient.Send(mailMsg);
+                        }
+                    }
+                }
+            });            
+        }
     }
 }
