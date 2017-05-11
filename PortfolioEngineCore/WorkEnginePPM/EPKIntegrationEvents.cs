@@ -9,10 +9,12 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using PortfolioEngineCore;
+using EPMLiveCore;
+using System.Data.SqlClient;
 
 namespace WorkEnginePPM
 {
-    public class EPKIntegrationEvents : SPItemEventReceiver 
+    public class EPKIntegrationEvents : SPItemEventReceiver
     {
 
         public override void ItemAdded(SPItemEventProperties properties)
@@ -59,34 +61,61 @@ namespace WorkEnginePPM
         public override void ItemUpdating(SPItemEventProperties properties)
         {
             processItem(properties);
+            if (properties.List.Fields.ContainsFieldWithInternalName("Title"))
+            {
+                UpdateProject(properties);
+            }
         }
+        /// <summary>
+        /// Updating Project Name in EPG_RPT_Cost and EPG_RPT_Cost
+        /// </summary>
+        /// <param name="properties"></param>
+        public void UpdateProject(SPItemEventProperties properties)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                string connectionString = CoreFunctions.getReportingConnectionString(properties.Web.Site.WebApplication.Id, properties.Web.Site.ID);
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                        con.Open();
+                        SqlCommand oCommand = new SqlCommand("Update [EPG_RPT_Cost] set [Project Name] = @projectname where ProjectId=@projectid", con);
+                        oCommand.Parameters.AddWithValue("@projectname", properties.AfterProperties["Title"]);
+                        oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                        oCommand.ExecuteNonQuery();
 
+                        oCommand = new SqlCommand("Update [EPG_RPT_Projects] set [Project Name] = @projectname where ProjectId=@projectid", con);
+                        oCommand.Parameters.AddWithValue("@projectname", properties.AfterProperties["Title"]);
+                        oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                        oCommand.ExecuteNonQuery();
+                }
+            });
+        }
         private void processItem(SPItemEventProperties properties)
         {
             //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99900, "WorkEnginePPM", "processItem", "Entry", "");
-            if(properties.ListItem != null)
+            if (properties.ListItem != null)
             {
                 Hashtable hshFields = new Hashtable();
                 Hashtable hshFields2 = new Hashtable();
                 try
                 {
-                    if(properties.AfterProperties["ExternalID"].ToString() != "")
+                    if (properties.AfterProperties["ExternalID"].ToString() != "")
                         return;
                 }
                 catch { }
                 try
                 {
-                    using(SPSite site = new SPSite(properties.SiteId))
+                    using (SPSite site = new SPSite(properties.SiteId))
                     {
 
-                        string fields = ConfigFunctions.getConfigSetting(site.RootWeb, "EPK" + properties.List.Title.Replace(" ","") + "_fields");
-                        
-                        if(fields == "")
+                        string fields = ConfigFunctions.getConfigSetting(site.RootWeb, "EPK" + properties.List.Title.Replace(" ", "") + "_fields");
+
+                        if (fields == "")
                             fields = ConfigFunctions.getConfigSetting(site.RootWeb, "epkportfoliofields");
 
-                        if(fields != "")
+                        if (fields != "")
                         {
-                            foreach(string field in fields.Split('|'))
+                            foreach (string field in fields.Split('|'))
                             {
                                 string[] spField = field.Split(',');
                                 if (spField[2] == "2" || spField[2] == "3")
@@ -112,148 +141,148 @@ namespace WorkEnginePPM
 
                         //if(ndStatus != null)
                         //{
-                        if(xmlDoc.FirstChild.SelectSingleNode("//Item[@ItemId='" + properties.Web.ID + "." + properties.ListId + "." + properties.ListItemId + "']").Attributes["Error"].Value != "0")
+                        if (xmlDoc.FirstChild.SelectSingleNode("//Item[@ItemId='" + properties.Web.ID + "." + properties.ListId + "." + properties.ListItemId + "']").Attributes["Error"].Value != "0")
                         {
                             properties.Cancel = true;
                             properties.ErrorMessage = "Error processing item: " + xmlDoc.FirstChild.SelectSingleNode("//Item[@ItemId='" + properties.Web.ID + "." + properties.ListId + "." + properties.ListItemId + "']").InnerText;
                             return;
                         }
 
-                            CStruct xReply = new CStruct();
-                            xReply.LoadXML("<Return>" + ret + "</Return>");
-                            
-                            // the reply xml contains the "UpdateItems" xml sent back from PE
+                        CStruct xReply = new CStruct();
+                        xReply.LoadXML("<Return>" + ret + "</Return>");
 
-                            CStruct xUpdatePortfolioItems = xReply.GetSubStruct("UpdatePortfolioItems");
-                            if (xUpdatePortfolioItems != null)
+                        // the reply xml contains the "UpdateItems" xml sent back from PE
+
+                        CStruct xUpdatePortfolioItems = xReply.GetSubStruct("UpdatePortfolioItems");
+                        if (xUpdatePortfolioItems != null)
+                        {
+                            SPList list = properties.ListItem.ParentList;
+                            string sItemID = list.ParentWeb.ID + "." + list.ID + "." + properties.ListItem.ID;
+                            // <Item ItemId="cda5677f-08b8-44ab-8c63-f287d6200cd9.ec269b62-7fe5-47c9-8614-bb9752d4b8e8.3" ID="2" Error="2" ErrorText="Field Name 20017 not found"/>
+                            // look for any item errors
+                            List<CStruct> lstItems = xUpdatePortfolioItems.GetList("Item");
+                            foreach (CStruct xItem in lstItems)
                             {
-                                SPList list = properties.ListItem.ParentList;
-                                string sItemID = list.ParentWeb.ID + "." + list.ID + "." + properties.ListItem.ID;
-                                // <Item ItemId="cda5677f-08b8-44ab-8c63-f287d6200cd9.ec269b62-7fe5-47c9-8614-bb9752d4b8e8.3" ID="2" Error="2" ErrorText="Field Name 20017 not found"/>
-                                // look for any item errors
-                                List<CStruct> lstItems = xUpdatePortfolioItems.GetList("Item");
-                                foreach (CStruct xItem in lstItems)
+                                if (xItem.GetStringAttr("ItemId") == sItemID)
                                 {
-                                    if (xItem.GetStringAttr("ItemId") == sItemID)
+                                    int nError = xItem.GetIntAttr("Error");
+                                    if (nError != 0)
                                     {
-                                        int nError = xItem.GetIntAttr("Error");
-                                        if (nError != 0)
-                                        {
-                                            properties.Cancel = true;
-                                            properties.ErrorMessage = "Error processing item: " + nError.ToString() + " - " + xItem.GetStringAttr("ErrorText");
-                                            //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99902, "WorkEnginePPM", "processItem", "error1", properties.ErrorMessage);
-                                            return;
-                                        }
+                                        properties.Cancel = true;
+                                        properties.ErrorMessage = "Error processing item: " + nError.ToString() + " - " + xItem.GetStringAttr("ErrorText");
+                                        //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99902, "WorkEnginePPM", "processItem", "error1", properties.ErrorMessage);
+                                        return;
                                     }
                                 }
+                            }
 
 
-                                CStruct xPortfolioItems = xUpdatePortfolioItems.GetSubStruct("PortfolioItems");
-                                List<CStruct> lstPortfolioItems = xPortfolioItems.GetList("PortfolioItem");
+                            CStruct xPortfolioItems = xUpdatePortfolioItems.GetSubStruct("PortfolioItems");
+                            List<CStruct> lstPortfolioItems = xPortfolioItems.GetList("PortfolioItem");
 
 
-                                SPItemEventDataCollection afterProperties = properties.AfterProperties;
-                                foreach (CStruct xPortfolioItem in lstPortfolioItems)
+                            SPItemEventDataCollection afterProperties = properties.AfterProperties;
+                            foreach (CStruct xPortfolioItem in lstPortfolioItems)
+                            {
+                                if (xPortfolioItem.GetStringAttr("ItemID") == sItemID)
                                 {
-                                    if (xPortfolioItem.GetStringAttr("ItemID") == sItemID)
+
+                                    List<CStruct> lstFields = xPortfolioItem.GetList("Field");
+                                    //foreach (CStruct xField in lstFields)
+                                    //{
+                                    //    string sField = xField.GetStringAttr("ID");
+                                    //    string sValue = xField.GetStringAttr("Value");
+                                    //    if (hshFields.ContainsKey(sField))
+                                    //    //if (list.Fields.ContainsField(sField))
+                                    //    {
+                                    //        string s = hshFields.Values.[sField];
+                                    //        afterProperties[sField] = sValue;
+                                    //    }
+                                    //}
+
+                                    foreach (DictionaryEntry field in hshFields2)
                                     {
+                                        string spfield = field.Value.ToString();
+                                        string epkfield = field.Key.ToString();
 
-                                        List<CStruct> lstFields = xPortfolioItem.GetList("Field");
-                                        //foreach (CStruct xField in lstFields)
-                                        //{
-                                        //    string sField = xField.GetStringAttr("ID");
-                                        //    string sValue = xField.GetStringAttr("Value");
-                                        //    if (hshFields.ContainsKey(sField))
-                                        //    //if (list.Fields.ContainsField(sField))
-                                        //    {
-                                        //        string s = hshFields.Values.[sField];
-                                        //        afterProperties[sField] = sValue;
-                                        //    }
-                                        //}
-
-                                        foreach (DictionaryEntry field in hshFields2)
+                                        CStruct xCurrentEPKField = null;
+                                        foreach (CStruct xField in lstFields)
                                         {
-                                            string spfield = field.Value.ToString();
-                                            string epkfield = field.Key.ToString();
-
-                                            CStruct xCurrentEPKField = null;
-                                            foreach (CStruct xField in lstFields)
+                                            if (xField.GetStringAttr("ID") == epkfield)
                                             {
-                                                if (xField.GetStringAttr("ID") == epkfield)
-                                                {
-                                                    xCurrentEPKField = xField;
-                                                    break;
-                                                }
+                                                xCurrentEPKField = xField;
+                                                break;
                                             }
+                                        }
 
-                                            if (xCurrentEPKField != null)
+                                        if (xCurrentEPKField != null)
+                                        {
+                                            string sValue = xCurrentEPKField.GetStringAttr("Value");
+                                            SPField oField = null;
+                                            try
                                             {
-                                                string sValue = xCurrentEPKField.GetStringAttr("Value");
-                                                SPField oField = null;
+                                                oField = list.Fields.GetFieldByInternalName(spfield);
+                                            }
+                                            catch { }
+
+                                            if (oField != null)
+                                            {
                                                 try
                                                 {
-                                                    oField = list.Fields.GetFieldByInternalName(spfield);
-                                                }
-                                                catch { }
-
-                                                if (oField != null)
-                                                {
-                                                    try
+                                                    if (oField.Type == SPFieldType.DateTime)
                                                     {
-                                                        if (oField.Type == SPFieldType.DateTime)
-                                                        {
-                                                            try
-                                                            {
-                                                                afterProperties[spfield] = sValue;
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        else if (oField.Type == SPFieldType.User)
-                                                        {
-                                                            try
-                                                            {
-                                                                //SPUser user = web.AllUsers.GetByID(int.Parse(afterProperties[spfield].ToString().Split(';')[0]));
-                                                                //val = EPMLiveCore.CoreFunctions.GetRealUserName(user.LoginName);
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        else if (oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
-                                                        {
-                                                            try
-                                                            {
-                                                                afterProperties[spfield] = sValue;
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        else if (oField.Type == SPFieldType.Boolean)
-                                                        {
-                                                            try
-                                                            {
-                                                                afterProperties[spfield] = sValue;
-                                                            }
-                                                            catch { }
-
-                                                        }
-                                                        else if (oField.Type == SPFieldType.Calculated)
+                                                        try
                                                         {
                                                             afterProperties[spfield] = sValue;
                                                         }
-                                                        else
-                                                        {
-                                                            try
-                                                            {
-                                                                afterProperties[spfield] = sValue;
-                                                            }
-                                                            catch { }
-                                                        }
+                                                        catch { }
                                                     }
-                                                    catch { }
+                                                    else if (oField.Type == SPFieldType.User)
+                                                    {
+                                                        try
+                                                        {
+                                                            //SPUser user = web.AllUsers.GetByID(int.Parse(afterProperties[spfield].ToString().Split(';')[0]));
+                                                            //val = EPMLiveCore.CoreFunctions.GetRealUserName(user.LoginName);
+                                                        }
+                                                        catch { }
+                                                    }
+                                                    else if (oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
+                                                    {
+                                                        try
+                                                        {
+                                                            afterProperties[spfield] = sValue;
+                                                        }
+                                                        catch { }
+                                                    }
+                                                    else if (oField.Type == SPFieldType.Boolean)
+                                                    {
+                                                        try
+                                                        {
+                                                            afterProperties[spfield] = sValue;
+                                                        }
+                                                        catch { }
+
+                                                    }
+                                                    else if (oField.Type == SPFieldType.Calculated)
+                                                    {
+                                                        afterProperties[spfield] = sValue;
+                                                    }
+                                                    else
+                                                    {
+                                                        try
+                                                        {
+                                                            afterProperties[spfield] = sValue;
+                                                        }
+                                                        catch { }
+                                                    }
                                                 }
+                                                catch { }
                                             }
                                         }
                                     }
                                 }
                             }
+                        }
 
 
                         //}
@@ -265,7 +294,7 @@ namespace WorkEnginePPM
                         //}
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     properties.Cancel = true;
                     properties.ErrorMessage = "General error processing item: " + ex.Message;
@@ -277,7 +306,7 @@ namespace WorkEnginePPM
         private string UpdateItemXml(string xml, SPWeb web)
         {
             string username = ConfigFunctions.GetCleanUsername(web);
-            
+
 
             SPWeb rootWeb = web.Site.RootWeb;
 
@@ -288,7 +317,7 @@ namespace WorkEnginePPM
 
             PortfolioEngineCore.PortfolioItems.PortfolioItems we = new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
             string ret = "";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 ret = we.UpdatePortfolioItems(xml);
             });
@@ -309,7 +338,7 @@ namespace WorkEnginePPM
             PortfolioEngineCore.PortfolioItems.PortfolioItems we = new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
 
             string ret = "";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 ret = we.ClosePortfolioItems(xml);
             });

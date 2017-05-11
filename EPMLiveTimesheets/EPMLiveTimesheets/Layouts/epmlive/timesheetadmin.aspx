@@ -429,6 +429,21 @@
 			        </wssuc:InputFormControl>
 		        </Template_InputFormControls>
 	        </wssuc:InputFormSection>
+
+            <wssuc:InputFormSection Title="Non-project team member timesheet allocation notification"
+		        Description=""
+		        runat="server">
+		        <Template_Description>
+		            This notification alerts the Project Manager, Planners and any project owners that a resource not in the project team has allocated time to a task on the project.<br />
+		        </Template_Description>
+		        <Template_InputFormControls>
+			        <wssuc:InputFormControl LabelText="Enable Notification:" runat="server">
+				         <Template_Control>
+                            <asp:CheckBox runat="server" ID="chkEnableNonTeamNotf" />
+				         </Template_Control>
+			        </wssuc:InputFormControl>
+		        </Template_InputFormControls>
+	        </wssuc:InputFormSection>
 	        
 	        <wssuc:ButtonSection runat="server">
 		        <Template_Buttons>

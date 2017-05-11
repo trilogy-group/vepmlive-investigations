@@ -12,6 +12,8 @@ using EPMLiveCore.ReportingProxy;
 using System.Globalization;
 using EPMLiveCore.API;
 using TimeSheets.Models;
+using System.ComponentModel;
+using TimeSheets.Log;
 
 namespace TimeSheets
 {
@@ -22,14 +24,6 @@ namespace TimeSheets
         static TimesheetAPI()
         {
             RoleChecker = new SPRoleChecker();
-        }
-
-        private static void WriteLog(SPWeb web, string message, EPMLiveCore.Infrastructure.Logging.LogKind logKind)
-        {
-            using (EPMLiveCore.Infrastructure.ILogger logger = new EPMLiveCore.Infrastructure.Logging.Logger(web))
-            {
-                logger.LogMessage(message, "TimesheetAPI", logKind);
-            }
         }
 
         public static ISPRoleChecker RoleChecker { get; set; }
@@ -52,25 +46,21 @@ namespace TimeSheets
                 TimesheetSettings settings = new TimesheetSettings(oWeb);
 
                 ArrayList arrLookups = new ArrayList();
+                
+                SPList lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
 
-                try
+                if (lstMyWork != null)
                 {
-                    SPList lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
-
-                    if (lstMyWork != null)
+                    foreach (SPField field in lstMyWork.Fields)
                     {
-                        foreach (SPField field in lstMyWork.Fields)
+                        if (field.Type == SPFieldType.Lookup)
                         {
-                            if (field.Type == SPFieldType.Lookup)
-                            {
 
-                                arrLookups.Add(field.InternalName + "Text");
+                            arrLookups.Add(field.InternalName + "Text");
 
-                            }
                         }
                     }
-                }
-                catch { }
+                }                
 
                 SqlConnection cn = null;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
@@ -504,10 +494,12 @@ namespace TimeSheets
                     }
                     else
                     {
-                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
+                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn);
                         cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
                         cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
                         cmd.ExecuteNonQuery();
 
                         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
@@ -539,55 +531,86 @@ namespace TimeSheets
         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of.
         public static void CheckNonTeamMemberAllocation(SPWeb oWeb, string tsuid, SqlConnection cn, string data)
         {
+            var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
+            var sql = string.Empty;
+            var tblProjects = new DataTable();
+            var membersIDs = new List<string>();
+            int? ownerID = null;
 
-            try
+            var cmd = new SqlCommand("select distinct(project_id) from TSITEM where TS_UID = @tsuid", cn);
+            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+            int projectID = -1;
+            string projectName = string.Empty;
+            var projectPlanners = new List<SPUser>();
+            var projectManagers = new List<SPUser>();
+
+            using (SqlDataReader dr = cmd.ExecuteReader())
             {
-                var rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
-                var sql = string.Empty;
-                var tblProjects = new DataTable();
-                var membersIDs = new List<string>();
-                int? ownerID = null;
-
-                var cmd = new SqlCommand("select distinct(project_id) from TSITEM where TS_UID = @tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                int projectID = -1;
-                string projectName = string.Empty;
-                string projectPlannersGroup = string.Empty;
-                string projectManagersGroup = string.Empty;
-
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                while (dr.Read())
                 {
-                    while (dr.Read())
+                    projectID = dr.GetInt32(0);
+                    sql = string.Format(@"SELECT [AssignedToID], [OwnerID], [Title], [PlannersID], [ProjectManagersID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", projectID);
+                    tblProjects = rptData.ExecuteSql(sql);
+
+                    if (tblProjects?.Rows?.Count > 0)
                     {
-                        projectID = dr.GetInt32(0);
-                        sql = string.Format(@"SELECT [AssignedToID], [OwnerID], [Title], [PlannersID], [ProjectManagersID] FROM dbo.LSTProjectCenter WHERE [id] = {0}", projectID);
-                        tblProjects = rptData.ExecuteSql(sql);
+                        membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
+                        ownerID = (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() != string.Empty) ? (int?)tblProjects.Rows[0][1] : null;
+                        projectName = tblProjects.Rows[0][2]?.ToString();
 
-                        if (tblProjects?.Rows?.Count > 0)
+                        projectPlanners = GetUserFromField(tblProjects.Rows[0][3]?.ToString(), oWeb);
+                        projectManagers = GetUserFromField(tblProjects.Rows[0][4]?.ToString(), oWeb);
+
+                        if (!((membersIDs != null && membersIDs.Contains(oWeb.CurrentUser.ID.ToString())) || // is in assignedTo field.
+                             ownerID == oWeb.CurrentUser.ID || // is the owner.
+                             PartOfProjectGroups(oWeb, projectName))) // is member of project groups
                         {
-                            membersIDs = (tblProjects.Rows[0][0]?.ToString()).Split(',')?.ToList();
-                            ownerID = (tblProjects.Rows[0][1] != null && tblProjects.Rows[0][1].ToString().Trim() != string.Empty) ? (int?)tblProjects.Rows[0][1] : null;
-                            projectName = tblProjects.Rows[0][2]?.ToString();
-                            projectPlannersGroup = tblProjects.Rows[0][3]?.ToString();
-                            projectManagersGroup = tblProjects.Rows[0][4]?.ToString();
-
-                            if (!((membersIDs != null && membersIDs.Contains(oWeb.CurrentUser.ID.ToString())) || // is in assignedTo field.
-                                 ownerID == oWeb.CurrentUser.ID || // is the owner.
-                                 PartOfProjectGroups(oWeb, projectName))) // is member of project groups
-                            {
-                                var allocatedHours = GetAllocatedHours(data, projectName, cn.ConnectionString);
-                                SendNotifications(oWeb, projectName, projectPlannersGroup, projectManagersGroup, ownerID, allocatedHours, projectID);
-                                // TODO: here we should put notification code
-                            }
+                            var allocatedHours = GetAllocatedHours(data, projectName, cn.ConnectionString);
+                            if (allocatedHours > 0)
+                                SendNotifications(oWeb, projectName, projectPlanners, projectManagers, ownerID, allocatedHours, projectID);
                         }
                     }
                 }
             }
-            catch (Exception ex) { WriteLog(oWeb, ex.Message, EPMLiveCore.Infrastructure.Logging.LogKind.Error); }
-
         }
 
-        private static double GetAllocatedHours(string data, string projectName, string connectionString)
+        private static List<SPUser> GetUserFromField(string value, SPWeb oWeb)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return new List<SPUser>();
+
+            var splitedIDs = value.Split(',').ToList();
+            var returnList = new List<SPUser>();     
+            int id = -1;
+            SPUser auxUser = null;
+
+            splitedIDs.ForEach(i =>
+            {
+                auxUser = null;
+                if (!string.IsNullOrWhiteSpace(i) && int.TryParse(i, out id))
+                {
+                    try // try-catch inside a loop is terrible but there is no other way, since exception will be thrown if the user does not exists.
+                    {
+                        auxUser = oWeb.SiteUsers.GetByID(id);
+                        if (auxUser != null)
+                            returnList.Add(auxUser);
+                    } 
+                    catch (SPException exc)
+                    {
+                        if (exc.Message != null && exc.Message.ToUpper().Contains("CANNOT BE FOUND"))
+                            oWeb.SiteGroups.GetByID(id)?.Users?.OfType<SPUser>()?.ToList()
+                            .Where(x => x.Name != "System Account").ToList()
+                            .ForEach(x => returnList.Add(x));
+                        else
+                            throw exc;
+                    }
+                }
+            });
+                   
+            return returnList;
+        }
+
+        private static double GetAllocatedHours(string data,string projectName,string connectionString)
         {
             double result = 0;
 
@@ -610,53 +633,49 @@ namespace TimeSheets
 
                                   }).ToList();
 
-            SqlConnection cn = null;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                cn = new SqlConnection(connectionString);
-                cn.Open();
-            });
-
-
-            timeSheetItems.ForEach(timeSheetItem =>
+                using (SqlConnection cn = new SqlConnection(connectionString))
                 {
-                    List<TimeSheetHourItem> dbHourItems = new List<TimeSheetHourItem>();
-                    SqlCommand cmd = new SqlCommand("SELECT TS_ITEM_DATE,TS_ITEM_HOURS  FROM TSITEMHOURS where TS_ITEM_UID=@tsitemuid", cn);
-                    cmd.Parameters.AddWithValue("@tsitemuid", timeSheetItem.Uid);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    cn.Open();
+
+                    timeSheetItems.ForEach(timeSheetItem =>
                     {
-                        while (dr.Read())
+                        List<TimeSheetHourItem> dbHourItems = new List<TimeSheetHourItem>();
+                        SqlCommand cmd = new SqlCommand("SELECT TS_ITEM_DATE,TS_ITEM_HOURS  FROM TSITEMHOURS where TS_ITEM_UID=@tsitemuid", cn);
+                        cmd.Parameters.AddWithValue("@tsitemuid", timeSheetItem.Uid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            dbHourItems.Add(new TimeSheetHourItem()
+                            while (dr.Read())
                             {
-                                Date = dr.GetDateTime(0),
-                                Hour = dr.GetDouble(1)
-                            });
+                                dbHourItems.Add(new TimeSheetHourItem()
+                                {
+                                    Date = dr.GetDateTime(0),
+                                    Hour = dr.GetDouble(1)
+                                });
+                            }
                         }
-                    }
 
-                    timeSheetItem.Hours.ForEach(hourItem =>
-                    {
-                        var dbItem = dbHourItems.FirstOrDefault(x => x.Date == hourItem.Date);
-                        if (dbItem == null || dbItem.Hour != hourItem.Hour)
-                            result += hourItem.Hour;
+                        timeSheetItem.Hours.ForEach(hourItem =>
+                        {
+                            var dbItem = dbHourItems.FirstOrDefault(x => x.Date == hourItem.Date);
+                            if (dbItem == null || dbItem.Hour != hourItem.Hour)
+                                result += hourItem.Hour;
+                        });
                     });
-                });
-                        
-            cn.Dispose();
-
+                }
+            });
+            
             result = Math.Round(result * 4, 0) / 4;
 
             return result;
         }
         private const int NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION_TEMPLATE_ID = 17;
-        public static void SendNotifications(SPWeb oWeb, string projectName, string projectPlannersGroup, string projectManagersGroup, int? ownerID, double allocatedHours, int projectId)
+        public static void SendNotifications(SPWeb oWeb, string projectName, List<SPUser> projectPlanners, List<SPUser> projectManagers, int? ownerID, double allocatedHours,int projectId)
         {
             var emailToList = new List<string>();
-            var usersIDs = new List<int>();
-            int projectPlannersGroupID;
-            int projectManagersGroupID;
+            var usersIDs = new List<SPUser>();
 
             var projectUserOwnerGroup = (from g in oWeb.CurrentUser.Groups.OfType<SPGroup>()
                                          where g.Name != null &&
@@ -665,54 +684,40 @@ namespace TimeSheets
                                          select g).FirstOrDefault();
 
             if (projectUserOwnerGroup != null)
-                projectUserOwnerGroup.Users.OfType<SPUser>().ToList().ForEach(user =>
+                projectUserOwnerGroup?.Users?.OfType<SPUser>().ToList().ForEach(user =>
                 {
-                    if (user.Name != "System Account") usersIDs.Add(user.ID);
+                    if (user.Name != "System Account") usersIDs.Add(user);
                 });
 
-            if (projectPlannersGroup != null && projectPlannersGroup.Trim() != string.Empty && int.TryParse(projectPlannersGroup, out projectPlannersGroupID))
-                oWeb.SiteGroups.GetByID(projectPlannersGroupID)?.Users?.OfType<SPUser>().ToList()?.ForEach(user =>
+            if (projectPlanners != null)
+                projectPlanners?.ForEach(user =>
                 {
-                    if (user.Name != "System Account") usersIDs.Add(user.ID);
+                    if (user.Name != "System Account") usersIDs.Add(user);
                 });
 
-            if (projectManagersGroup != null && projectManagersGroup.Trim() != string.Empty && int.TryParse(projectManagersGroup, out projectManagersGroupID))
-                oWeb.SiteGroups.GetByID(projectManagersGroupID)?.Users?.OfType<SPUser>().ToList()?.ForEach(user =>
+            if (projectManagers != null)
+                projectManagers?.ForEach(user =>
                 {
-                    if (user.Name != "System Account") usersIDs.Add(user.ID);
+                    if (user.Name != "System Account") usersIDs.Add(user);
                 });
 
             usersIDs = usersIDs.Distinct().ToList();
-
-            try
+            
+            if (usersIDs.Count > 0 && allocatedHours>0)
             {
-                if (usersIDs.Count > 0 && allocatedHours > 0)
-                {
-                    var projecturl = string.Format("{0}?ID={1}", oWeb.Lists["Project Center"].DefaultDisplayFormUrl, projectId);
-                    Hashtable hshProps = new Hashtable();
-                    hshProps.Add("Project_Name", projectName);
-                    hshProps.Add("Hours", allocatedHours);
-                    hshProps.Add("Project_Url", projecturl);
-                    hshProps.Add("CurUser_Email", oWeb.CurrentUser.Email);
+                var projecturl = string.Format("{0}?ID={1}", oWeb.Lists["Project Center"].DefaultDisplayFormUrl, projectId);
+                Hashtable hshProps = new Hashtable();
+                hshProps.Add("Project_Name", projectName);
+                hshProps.Add("Hours", allocatedHours);
+                hshProps.Add("Project_Url", projecturl);
+                hshProps.Add("CurUser_Email", oWeb.CurrentUser.Email);
 
-                    APIEmail.QueueItemMessage(17, false, hshProps, usersIDs.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
-                }
+                APIEmail.QueueItemMessage(17, false, hshProps, usersIDs.Select(x=>x.ID.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
             }
-            catch (Exception ex) { WriteLog(oWeb, ex.Message, EPMLiveCore.Infrastructure.Logging.LogKind.Error); }
+            
+            usersIDs.ForEach(i => emailToList.Add(string.IsNullOrWhiteSpace(i.Email) ? GetEmailFromDB(i.ID, oWeb) : i.Email));
 
             SPUser userAux = null;
-            usersIDs.ForEach(i =>
-            {
-                userAux = oWeb.SiteUsers.GetByID(i);
-                if (userAux != null)
-                {
-                    if (string.IsNullOrWhiteSpace(userAux.Email))
-                        emailToList.Add(GetEmailFromDB(userAux.ID, oWeb));
-                    else
-                        emailToList.Add(userAux.Email);
-                }
-            });
-
             if (ownerID != null && ((userAux = oWeb.Users.GetByID(ownerID.Value)) != null))
                 emailToList.Add(userAux.Email);
 
@@ -721,7 +726,8 @@ namespace TimeSheets
 
             if (emailToList.Count > 0)
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_TEMPLATE_ID,
-                    new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) } },
+                    new Hashtable() { { "Project_Name", projectName }, { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) },
+                    { "Qty_Hours", allocatedHours } },
                     emailToList, string.Empty, oWeb, true);
         }
 
@@ -793,7 +799,8 @@ namespace TimeSheets
                     if (status == 3)
                     {
                         // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
-                        CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
+                        if (bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))                        
+                            CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
 
                         cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -3319,12 +3326,36 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows.Count > 0)
                             {
-                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+                                //Old Code  We had issue with Column sequence In select state we manually defined column sequence 
+                                //ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+
+                                //New Code 
+                                DataRow dr = ds.Tables[myworktableid].NewRow();
+                                foreach (DataColumn item in myWorkDataTable.Columns)
+                                {
+                                    try
+                                    {
+                                        dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                            }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                        }
+                    }
+                                ds.Tables[myworktableid].Rows.Add(dr);
                             }
                         }
                     }
-
+                    try
+                    {
                     drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
+                }
+                    catch (Exception ex)
+                    {
+
+                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+            }
+
                 }
             }
 
@@ -3766,11 +3797,11 @@ namespace TimeSheets
 
             if (!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
             }
             else if (bOtherWork)
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);
             }
             else if (bNonWork)
             {
@@ -3798,7 +3829,7 @@ namespace TimeSheets
             }
             else
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
             }
 
 
