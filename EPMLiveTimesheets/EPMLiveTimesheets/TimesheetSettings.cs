@@ -57,8 +57,7 @@ namespace TimeSheets
                     }
                     catch { }
 
-                    try { EnableNonTeamNotf = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf")); }
-                    catch { }
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf"), out EnableNonTeamNotf);
 
                     NonWorkList = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSNonWork");
 
