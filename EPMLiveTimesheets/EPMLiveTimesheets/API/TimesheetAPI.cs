@@ -9,6 +9,7 @@ using System.Data;
 using System.Collections;
 using EPMLiveCore.ReportingProxy;
 using System.Globalization;
+using TimeSheets.Log;
 
 namespace TimeSheets
 {
@@ -3092,12 +3093,36 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows.Count > 0)
                             {
-                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+                                //Old Code  We had issue with Column sequence In select state we manually defined column sequence 
+                                //ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+
+                                //New Code 
+                                DataRow dr = ds.Tables[myworktableid].NewRow();
+                                foreach (DataColumn item in myWorkDataTable.Columns)
+                                {
+                                    try
+                                    {
+                                        dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                                    }
+                                }
+                                ds.Tables[myworktableid].Rows.Add(dr);
                             }
                         }
                     }
+                    try
+                    {
+                        drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
+                    }
+                    catch (Exception ex)
+                    {
 
-                    drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
+                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                    }
+
                 }
             }
 
