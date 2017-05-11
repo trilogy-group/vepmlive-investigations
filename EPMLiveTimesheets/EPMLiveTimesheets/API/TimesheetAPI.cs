@@ -494,10 +494,12 @@ namespace TimeSheets
                     else
                     {
 
-                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
+                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn);
                         cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
                         cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
                         cmd.ExecuteNonQuery();
 
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
