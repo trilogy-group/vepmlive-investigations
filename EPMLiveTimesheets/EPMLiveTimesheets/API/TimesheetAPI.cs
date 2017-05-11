@@ -3537,11 +3537,11 @@ namespace TimeSheets
 
             if (!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
             }
             else if (bOtherWork)
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);
             }
             else if (bNonWork)
             {
@@ -3569,7 +3569,7 @@ namespace TimeSheets
             }
             else
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
+                sql = string.Format(@"SELECT distinct * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
             }
 
 
