@@ -277,3 +277,11 @@ paket-files/
 /InstallShield/Build Dependencies/EPMLiveIntegration.dll
 /CoverageReports
 /opencovertests.xml
+/BuildTeamCity/SilentInstaller/Files
+/InstallShield/Build Dependencies/PS/*.sql
+/BuildTeamCity/SilentInstaller/config.json
+/output/libraries
+/output/ProductOutput
+/output/binaries
+/Saas/BillingSite/_vti_pvt
+/BuildTeamCity/SilentInstaller/*.zip
