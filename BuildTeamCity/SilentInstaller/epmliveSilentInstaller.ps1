@@ -10,7 +10,7 @@ Param(
 
 . ".\routines.ps1"
 
-if (!(Test-ADCredential $UserName $Password))
+if (!(Test-ADCredential $inUserName $inPassword))
 {
     Write-Host "Wrong credentials"
     return

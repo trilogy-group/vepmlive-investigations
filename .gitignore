@@ -284,3 +284,4 @@ paket-files/
 /output/ProductOutput
 /output/binaries
 /Saas/BillingSite/_vti_pvt
+/BuildTeamCity/SilentInstaller/*.zip

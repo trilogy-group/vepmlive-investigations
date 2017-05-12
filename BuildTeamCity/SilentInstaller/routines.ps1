@@ -76,11 +76,11 @@ function DeployWSP()
  
     if (![string]::IsNullOrEmpty($webAppName))
     {
-        install-spsolution -identity $name -gacdeployment  -CompatibilityLevel 15 -WebApplication $webAppName -Force
+        install-spsolution -identity $name -gacdeployment  -CompatibilityLevel {14,15} -WebApplication $webAppName -Force
     }
     else
     {
-        install-spsolution -identity $name -gacdeployment  -CompatibilityLevel 15 -Force
+        install-spsolution -identity $name -gacdeployment  -CompatibilityLevel {14,15} -Force
     }
  
     while($sln.JobExists)
