@@ -17,5 +17,6 @@ namespace TimeSheets.Models
     {
         public DateTime Date { get; set; }
         public double Hour { get; set; }
+
     }
 }
