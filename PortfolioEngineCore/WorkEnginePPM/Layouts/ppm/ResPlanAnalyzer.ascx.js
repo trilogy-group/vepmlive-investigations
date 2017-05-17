@@ -3412,7 +3412,7 @@
     }
 
 
-    ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid) {
+    ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid, type) {
 
         if (Grid.id == "g_1") {
 
@@ -3459,10 +3459,12 @@
                 WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsFilteredFlag", sb.toString(), HandleRefreshDelegate);
 
             this.LastFilterString = sb.toString();
-
+            if (Grid.Group != "" && Grid.Grouping == 1)
+                this.HideUnusedGroupRowsAsync();
             return;
         }
     }
+
 
 
     ResPlanAnalyzer.prototype.GetSelectedView = function () {
@@ -5138,16 +5140,16 @@
                     imagePath: this.imagePath,
                     showstate: "false",
                     sections: [
-					 {
-					     name: "General",
-					     columns: [
-							{
-							    items: [
-									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('Chart_Close');" }
-							    ]
-							}
-					     ]
-					 }
+                     {
+                         name: "General",
+                         columns: [
+                            {
+                                items: [
+                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('Chart_Close');" }
+                                ]
+                            }
+                         ]
+                     }
 
                     ]
                 };
@@ -5236,43 +5238,43 @@
             imagePath: this.imagePath,
             showstate: "false",
             sections: [
-					 {
-					     name: "General",
-					     columns: [
-							{
-							    items: [
-									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('CSEdit_Close');" }
-							    ]
-							},
-							{
-							    items: [
-									{ type: "bigbutton", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('CSEdit_Save');" }
-							    ]
-							}
-					     ]
-					 },
-					 {
-					     name: "Mode",
-					     columns: [
-							{
-							    items: [
-									{ type: "text", name: "Display Mode" },
-									{ type: "select", id: "idCSEdit_SelMode", onchange: "dialogEvent('CSEdit_SelMode_Changed')", options: "<option value='1'>Hours</option><option value='2'>FTEs</option>", width: "90px" }
-							    ]
-							}
-					     ]
-					 },
-					{
-					    name: "Tools",
-					    columns: [
-							{
-							    items: [
-									{ type: "smallbutton", id: "SpreadBtn", name: "Allocate Values", img: "spread.gif", tooltip: "Allocate Values", onclick: "dialogEvent('CSEdit_Spread');" },
-									{ type: "smallbutton", id: "LoadUpBtn", name: "Populate from Totals", img: "spread.gif", tooltip: "Populate from Totals", onclick: "dialogEvent('CSEdit_LoadUp');" }
-							    ]
-							}
-					    ]
-					}
+                     {
+                         name: "General",
+                         columns: [
+                            {
+                                items: [
+                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('CSEdit_Close');" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "bigbutton", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('CSEdit_Save');" }
+                                ]
+                            }
+                         ]
+                     },
+                     {
+                         name: "Mode",
+                         columns: [
+                            {
+                                items: [
+                                    { type: "text", name: "Display Mode" },
+                                    { type: "select", id: "idCSEdit_SelMode", onchange: "dialogEvent('CSEdit_SelMode_Changed')", options: "<option value='1'>Hours</option><option value='2'>FTEs</option>", width: "90px" }
+                                ]
+                            }
+                         ]
+                     },
+                    {
+                        name: "Tools",
+                        columns: [
+                            {
+                                items: [
+                                    { type: "smallbutton", id: "SpreadBtn", name: "Allocate Values", img: "spread.gif", tooltip: "Allocate Values", onclick: "dialogEvent('CSEdit_Spread');" },
+                                    { type: "smallbutton", id: "LoadUpBtn", name: "Populate from Totals", img: "spread.gif", tooltip: "Populate from Totals", onclick: "dialogEvent('CSEdit_LoadUp');" }
+                                ]
+                            }
+                        ]
+                    }
 
             ]
         };
@@ -8230,7 +8232,13 @@
             alert("Create Graph error:" + e.toString());
         }
     }
-
+    ResPlanAnalyzer.prototype.HideUnusedGroupRowsAsync = function () {
+        //window.setTimeout(function () { var grid = Grids["g_Res"]; var row = grid.GetFirst(null, 0); HideUnusedGroupRows(grid, row); }, 100);
+        var grid = Grids["g_1"];
+        var row = grid.GetFirst(null, 0);
+        HideUnusedGroupRows(grid, row, 0);
+        grid.Render();
+    };
     ResPlanAnalyzer.prototype.InitVars = function () {
         this.fromresource = "";
         // Initialised fields
@@ -8568,3 +8576,26 @@
     }
 
 }
+
+function HideUnusedGroupRows(grid, row, level) {
+
+    while (row != null) {
+        //if (row.Visible == 1) {
+        var stype = row.id.toString();
+        if (stype.substr(0, 2) === "GR") {
+            if (row.firstChild.Visible == false) {
+                grid.HideRow(row);
+                row.Visible = false;
+                HideUnusedGroupRows(grid, row.firstChild, level + 1);
+            }
+            else if (row.firstChild.Visible == true) {
+                grid.ShowRow(row);
+                row.Visible = true;
+                HideUnusedGroupRows(grid, row.firstChild, level + 1);
+            }
+        }
+        row = row.nextSibling;
+    }
+};
+
+
