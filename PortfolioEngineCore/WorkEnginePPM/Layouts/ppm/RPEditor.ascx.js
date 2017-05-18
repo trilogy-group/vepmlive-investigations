@@ -3588,6 +3588,8 @@
             else
                 resgrid.RenderBody();
         }
+        //resgrid.RenderBody(); is not wokring so I am using following code  to refresh the grid 
+        resgrid.ChangeSort("");
         this.SetPaddingWidth();
         this.HideUnusedGroupRowsAsync();
     };
