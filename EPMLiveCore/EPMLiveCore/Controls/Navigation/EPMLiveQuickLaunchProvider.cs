@@ -131,11 +131,19 @@ namespace EPMLiveCore.Controls.Navigation
             PopulateCommunityLinks();
 
             if (node.Title.Equals("Quick launch"))
-            {
-                foreach (var community in _communityLinks)
+            {               
+                foreach (var community in _communityLinks.OrderBy(c => c.Key))
                 {
-                    nodes.Add(new SiteMapNode(this, community.Key) {Title = community.Key});
+                    string title = community.Key;
+                    if (title.Contains(";"))
+                        title = title.Split(';')[1];
+                    
+                    nodes.Add(new SiteMapNode(this, community.Key) {Title = title});
                 }
+
+                var orderedNodes = nodes.Cast<SiteMapNode>().OrderBy(n => n.Title);
+
+                var collection = new SiteMapNodeCollection(orderedNodes.ToArray());
 
                 return nodes;
             }
@@ -195,8 +203,8 @@ namespace EPMLiveCore.Controls.Navigation
 
                                     var query = new SPQuery
                                     {
-                                        Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where>",
-                                        ViewFields = @"<FieldRef Name='Title' /><FieldRef Name='QuickLaunch' />"
+                                        Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where><OrderBy><FieldRef Name='QuickLaunchOrder'/></OrderBy>",
+                                        ViewFields = @"<FieldRef Name='Title' /><FieldRef Name='QuickLaunch' /><FieldRef Name='QuickLaunchOrder' />"
                                     };
 
                                     SPListItemCollection communities = installedAppsList.GetItems(query);
@@ -209,6 +217,8 @@ namespace EPMLiveCore.Controls.Navigation
                                             select Task.Factory.StartNew(() =>
                                             {
                                                 var communityName = (string) (c["Title"] ?? string.Empty);
+                                                string quickLaunchOrder = (!c.Fields.ContainsField("QuickLaunchOrder") || c["QuickLaunchOrder"] == null || c["QuickLaunchOrder"].ToString() == "")?
+                                                 "" : c["QuickLaunchOrder"].ToString();
                                                 if (string.IsNullOrEmpty(communityName)) return;
 
                                                 var ql = (string) (c["QuickLaunch"] ?? string.Empty);
@@ -217,17 +227,17 @@ namespace EPMLiveCore.Controls.Navigation
                                                 foreach (
                                                     string id in ql.Split(',').Select(linkId => linkId.Split(':')[0]))
                                                 {
-                                                    if (!communityLinks.ContainsKey(communityName))
+                                                    if (!communityLinks.ContainsKey(communityName) && !communityLinks.ContainsKey(quickLaunchOrder + ";" + communityName))
                                                     {
                                                         lock (locker)
                                                         {
-                                                            communityLinks.Add(communityName, new List<string>());
+                                                            communityLinks.Add(quickLaunchOrder + ";" + communityName, new List<string>());
                                                         }
                                                     }
 
                                                     lock (locker)
                                                     {
-                                                        communityLinks[communityName].Add(id);
+                                                        communityLinks[quickLaunchOrder + ";" + communityName].Add(id);
                                                     }
 
                                                     if (linkNodes.ContainsKey(id)) continue;
