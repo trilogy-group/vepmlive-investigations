@@ -92,19 +92,27 @@ namespace WorkEnginePPM
                         if (reader.Read())
                             projectNameDB = reader["Title"]?.ToString();
                     }
-
+                    
                     if (!string.IsNullOrWhiteSpace(projectNameNew) &&
                         !string.IsNullOrWhiteSpace(projectNameDB) &&
                         projectNameDB != projectNameNew)
                     {
-                        UpdateGroupsNames(properties, projectNameDB, projectNameNew);
-                        SetPreviousProjectName(properties, con);
+                        UpdateGroupsNames(properties, projectNameDB, projectNameNew);                        
                         UpdateMicrosoftProject(properties, projectNameDB, projectNameNew);
+                        UpdateDB(properties, con, projectNameNew);
+                        SetPreviousProjectName(properties, con);
                     }
                 }
             });
         }
-
+        private void UpdateDB(SPItemEventProperties properties, SqlConnection con, string projectNameNew)
+        {
+            var oCommand = new SqlCommand("UPDATE LSTTaskCenter SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE LSTMyWork SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;", con);
+            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+            oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
+            oCommand.ExecuteNonQuery();
+        }
         private const string PROJECT_SCHEDULES_FOLDER_NAME = "Project Schedules";
         private const string MSPROJECT_FOLDER_NAME = "MSProject";
         private const string MSPROJECT_FILE_EXTENSION = "mpp";
@@ -114,19 +122,20 @@ namespace WorkEnginePPM
                                 .SubFolders[MSPROJECT_FOLDER_NAME]?
                                 .Files[$"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}"]?
                                 .Item;
-            
+
             if (projectItem != null)
             {
                 if (projectItem.File.CheckOutType != SPFile.SPCheckOutType.None)
                     projectItem.File.UndoCheckOut();
                 if (projectItem.File.LockType != SPFile.SPLockType.None)
                     projectItem.File.ReleaseLock(projectItem.File.LockId);
-                
+
+                properties.Web.AllowUnsafeUpdates = true;
                 projectItem.File.CheckOut();
                 projectItem["Name"] = $"{projectNameNew}.mpp";
-                projectItem["Title"] = projectNameNew;
+                projectItem["Title"] = projectNameNew;                
                 projectItem.Update();
-                projectItem.File.CheckIn("File name has been changed.");
+                projectItem.File.CheckIn("File name has been changed.");                
             }
         }
         private void SetPreviousProjectName(SPItemEventProperties properties, SqlConnection con)
