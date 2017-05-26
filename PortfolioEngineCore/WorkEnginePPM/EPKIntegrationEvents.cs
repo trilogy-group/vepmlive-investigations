@@ -58,6 +58,7 @@ namespace WorkEnginePPM
             }
         }
 
+        private const string PROJECT_CENTER_TITLE = "PROJECT CENTER";
         public override void ItemUpdating(SPItemEventProperties properties)
         {
             processItem(properties);
@@ -65,6 +66,103 @@ namespace WorkEnginePPM
             {
                 UpdateProject(properties);
             }
+
+            if (properties.ListTitle?.ToUpper().Trim() == PROJECT_CENTER_TITLE)
+                CheckProjectNameChange(properties);
+        }
+        /// <summary>
+        /// If project name has been changed, then rename every associated items. 
+        /// </summary>
+        private void CheckProjectNameChange(SPItemEventProperties properties)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                var connectionString = CoreFunctions.getReportingConnectionString(properties.Web.Site.WebApplication.Id, properties.Web.Site.ID);
+                using (var con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    var oCommand = new SqlCommand("SELECT * FROM [LSTProjectCenter] WHERE ID=@projectid", con);
+                    oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+
+                    string projectNameDB = null;
+                    string projectNameNew = properties.AfterProperties["Title"]?.ToString();
+
+                    using (var reader = oCommand.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            projectNameDB = reader["Title"]?.ToString();
+                    }
+                    
+                    if (!string.IsNullOrWhiteSpace(projectNameNew) &&
+                        !string.IsNullOrWhiteSpace(projectNameDB) &&
+                        projectNameDB != projectNameNew)
+                    {
+                        UpdateGroupsNames(properties, projectNameDB, projectNameNew);                        
+                        UpdateMicrosoftProject(properties, projectNameDB, projectNameNew);
+                        UpdateDB(properties, con, projectNameNew);
+                        SetPreviousProjectName(properties, con);
+                    }
+                }
+            });
+        }
+        private void UpdateDB(SPItemEventProperties properties, SqlConnection con, string projectNameNew)
+        {
+            var oCommand = new SqlCommand("UPDATE LSTTaskCenter SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE LSTMyWork SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;", con);
+            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+            oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
+            oCommand.ExecuteNonQuery();
+        }
+        private const string PROJECT_SCHEDULES_FOLDER_NAME = "Project Schedules";
+        private const string MSPROJECT_FOLDER_NAME = "MSProject";
+        private const string MSPROJECT_FILE_EXTENSION = "mpp";
+        private void UpdateMicrosoftProject(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
+        {
+            var projectItem = properties.Web.Folders[PROJECT_SCHEDULES_FOLDER_NAME]?
+                                .SubFolders[MSPROJECT_FOLDER_NAME]?
+                                .Files[$"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}"]?
+                                .Item;
+
+            if (projectItem != null)
+            {
+                if (projectItem.File.CheckOutType != SPFile.SPCheckOutType.None)
+                    projectItem.File.UndoCheckOut();
+                if (projectItem.File.LockType != SPFile.SPLockType.None)
+                    projectItem.File.ReleaseLock(projectItem.File.LockId);
+
+                properties.Web.AllowUnsafeUpdates = true;
+                projectItem.File.CheckOut();
+                projectItem["Name"] = $"{projectNameNew}.mpp";
+                projectItem["Title"] = projectNameNew;                
+                projectItem.Update();
+                projectItem.File.CheckIn("File name has been changed.");                
+            }
+        }
+        private void SetPreviousProjectName(SPItemEventProperties properties, SqlConnection con)
+        {
+            var oCommand = new SqlCommand("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE ID=@projectid", con);
+            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+            oCommand.ExecuteNonQuery();
+        }
+        private void UpdateGroupsNames(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
+        {
+            properties.ListItem.RoleAssignments.OfType<SPRoleAssignment>()?.ToList()?.ForEach(role =>
+            {
+                if (role != null && role.Member != null &&
+                    role.Member is SPGroup && role.Member.Name != null)
+                {
+                    if (role.Member.Name.ToUpper().Contains("VISITOR"))
+                        role.Member.Name = projectNameNew + " Visitor";
+                    else if (role.Member.Name.ToUpper().Contains("OWNER"))
+                        role.Member.Name = projectNameNew + " Owner";
+                    else if (role.Member.Name.ToUpper().Contains("MEMBER"))
+                        role.Member.Name = projectNameNew + " Member";
+                    else
+                        role.Member.Name = role.Member.Name.Replace(projectNameDB, projectNameNew);
+
+                    ((SPGroup)role.Member).Update();
+                }
+            });
         }
         /// <summary>
         /// Updating Project Name in EPG_RPT_Cost and EPG_RPT_Cost
