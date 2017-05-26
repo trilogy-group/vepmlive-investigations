@@ -100,15 +100,26 @@ namespace WorkEnginePPM
                         UpdateGroupsNames(properties, projectNameDB, projectNameNew);                        
                         UpdateMicrosoftProject(properties, projectNameDB, projectNameNew);
                         UpdateDB(properties, con, projectNameNew);
-                        SetPreviousProjectName(properties, con);
                     }
                 }
             });
         }
         private void UpdateDB(SPItemEventProperties properties, SqlConnection con, string projectNameNew)
         {
-            var oCommand = new SqlCommand("UPDATE LSTTaskCenter SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE LSTMyWork SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;", con);
+            var oCommand = new SqlCommand("UPDATE [LSTChanges] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTChangesSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTIssues] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTIssuesSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTMyWork] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTMyWorkSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTProjectDocuments] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTProjectDocumentsSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTRisks] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTRisksSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTTaskCenter] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTTaskCenterSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;", con);
+
             oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
             oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
             oCommand.ExecuteNonQuery();
@@ -137,12 +148,6 @@ namespace WorkEnginePPM
                 projectItem.Update();
                 projectItem.File.CheckIn("File name has been changed.");                
             }
-        }
-        private void SetPreviousProjectName(SPItemEventProperties properties, SqlConnection con)
-        {
-            var oCommand = new SqlCommand("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE ID=@projectid", con);
-            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
-            oCommand.ExecuteNonQuery();
         }
         private void UpdateGroupsNames(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
         {
