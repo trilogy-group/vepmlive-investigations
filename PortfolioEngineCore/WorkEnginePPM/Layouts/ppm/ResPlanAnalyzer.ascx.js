@@ -3412,7 +3412,7 @@
     }
 
 
-    ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid, type) {
+    ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid) {
 
         if (Grid.id == "g_1") {
 
