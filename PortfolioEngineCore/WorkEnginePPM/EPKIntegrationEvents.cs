@@ -131,7 +131,8 @@ namespace WorkEnginePPM
         {
             var projectItem = properties.Web.Folders[PROJECT_SCHEDULES_FOLDER_NAME]?
                                 .SubFolders[MSPROJECT_FOLDER_NAME]?
-                                .Files[$"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}"]?
+                                .Files?.OfType<SPFile>()
+                                .Where(x => x.Name == $"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}").FirstOrDefault()?
                                 .Item;
 
             if (projectItem != null)
