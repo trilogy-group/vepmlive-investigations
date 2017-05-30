@@ -1,5 +1,11 @@
-public partial class ReportList : System.Web.UI.Page {
-  protected override void OnPreInit(System.EventArgs e) {
-    ASP.global_asax.CustomAdHocConfig.InitializeReporting();
-  }
+public partial class ReportList : System.Web.UI.Page
+{
+    protected override void OnPreInit(System.EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionurl"]))
+        {
+            ASP.global_asax.CustomAdHocConfig.sitecollectionname = Request.QueryString["sitecollectionurl"];
+        }
+        ASP.global_asax.CustomAdHocConfig.InitializeReporting();
+    }
 }

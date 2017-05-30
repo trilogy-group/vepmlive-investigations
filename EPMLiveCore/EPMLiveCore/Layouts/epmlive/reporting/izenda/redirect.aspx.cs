@@ -15,7 +15,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 string username = CoreFunctions.GetJustUsername(SPContext.Current.Web.CurrentUser.LoginName);
                 Guid gAuth = Guid.NewGuid();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
 
                     SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
@@ -41,7 +41,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 if (reportsurl != "")
                 {
-                    url = reportsurl + "/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64;
+                    url = reportsurl + "/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64 + "&sitecollectionurl=" + SPContext.Current.Web.Title;
                 }
 
                 if (url != "")

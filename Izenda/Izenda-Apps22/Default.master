@@ -55,7 +55,13 @@
 </head>
 
 <body style="margin: 0px; padding: 0px;">
-    <%if (HttpContext.Current.Session["Role"] != null && HttpContext.Current.Session["Role"].ToString() != "Report Writers")
+    <%
+        string sitecollectionname = string.Empty;
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionurl"]))
+        {
+            sitecollectionname = Request.QueryString["sitecollectionurl"];
+        }
+        if (HttpContext.Current.Session[sitecollectionname +"Role"] != null && HttpContext.Current.Session[sitecollectionname+"Role"].ToString() != "Report Writers")
         {%>
     <style>
         .designer-only {
@@ -67,19 +73,19 @@
         }
     </style>
     <%}%>
-    <style>
+    
         <%if (HttpContext.Current.Session["InFrame"] == "1")
-        {
-            %> .header;
-
+        { %> 
+    <style>
+         .header
         {
             display: none;
         }
-
+         </style>   
         <%
         }
         %>
-    </style>
+    
 
     <div class="layout">
         <div class="header applyStyles" id="whiteHeader" style="display: none !important">
@@ -132,17 +138,17 @@
         <div class="top-nav applyStyles" id="blueHeader">
             <div class="page">
                 <ul id="topnav" style="margin: 0px; padding: 0px;">
-                    <li class="top-nav-item"><a href="ReportList.aspx">Reports</a></li>
-                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1" onclick="ShowRlToDbLoading();">Dashboards</a></li>
+                    <li class="top-nav-item"><a href="ReportList.aspx?sitecollectionurl=<%sitecollectionname.ToString();%>">Reports</a></li>
+                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1&sitecollectionurl=<%sitecollectionname.ToString();%>" onclick="ShowRlToDbLoading();">Dashboards</a></li>
                     <li class="top-nav-item designer-only btn-group">
-                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources"><span class="plus">+</span> New</a>
+                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectionurl=<%sitecollectionname.ToString();%>"><span class="plus">+</span> New</a>
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources">Report</a></li>
-                            <li runat="server" id="irItem"><a href="InstantReport.aspx">Instant Report</a></li>
-                            <li><a href="DashboardDesigner.aspx?clear=1">Dashboard</a></li>
+                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectionurl=<%sitecollectionname.ToString();%>">Report</a></li>
+                            <li runat="server" id="irItem"><a href="InstantReport.aspx?sitecollectionurl=<%sitecollectionurl.ToString();%>">Instant Report</a></li>
+                            <li><a href="DashboardDesigner.aspx?clear=1&sitecollectionurl=<%sitecollectionname.ToString();%>">Dashboard</a></li>
                         </ul>
                     </li>
 
