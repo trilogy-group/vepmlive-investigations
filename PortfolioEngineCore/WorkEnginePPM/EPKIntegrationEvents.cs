@@ -118,7 +118,14 @@ namespace WorkEnginePPM
                                           "UPDATE [LSTRisksSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
                                           "UPDATE [LSTTaskCenter] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
                                           "UPDATE [LSTTaskCenterSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;", con);
+                                          "UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;" +
+                                          "UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [EPG_RPT_CapacityPlanner] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [EPG_RPT_Cost] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [EPG_RPT_Projects] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTMyTimesheet] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
+                                          "UPDATE [LSTMyTimesheetSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;"
+                                          , con);
 
             oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
             oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
@@ -129,10 +136,9 @@ namespace WorkEnginePPM
         private const string MSPROJECT_FILE_EXTENSION = "mpp";
         private void UpdateMicrosoftProject(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
         {
-            var projectItem = properties.Web.Folders[PROJECT_SCHEDULES_FOLDER_NAME]?
-                                .SubFolders[MSPROJECT_FOLDER_NAME]?
-                                .Files?.OfType<SPFile>()
-                                .Where(x => x.Name == $"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}").FirstOrDefault()?
+            var projectItem = properties.Web.Folders?.OfType<SPFolder>().Where(x => x.Name == PROJECT_SCHEDULES_FOLDER_NAME).FirstOrDefault()?
+                                .SubFolders?.OfType<SPFolder>().Where(x => x.Name == MSPROJECT_FOLDER_NAME).FirstOrDefault()?
+                                .Files?.OfType<SPFile>().Where(x => x.Name == $"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}").FirstOrDefault()?
                                 .Item;
 
             if (projectItem != null)
