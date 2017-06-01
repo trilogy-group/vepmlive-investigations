@@ -2,12 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EPMLiveCore.ReportHelper;
 using EPMLiveCore.ReportHelper.Fakes;
-using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Administration.Fakes;
-using EPMLiveCore.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Data;
-using EPMLive.TestFakes;
+using EPMLiveCore.Tests;
 
 namespace EPMLiveCore.Tests.ReportHelper
 {

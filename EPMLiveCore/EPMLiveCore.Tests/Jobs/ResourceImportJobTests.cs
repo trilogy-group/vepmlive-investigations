@@ -3,7 +3,7 @@ using System.Data.SqlClient.Fakes;
 using EPMLiveCore.Jobs.Fakes;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.API;
-using EPMLive.TestFakes;
+using EPMLiveCore.Tests;
 
 namespace EPMLiveCore.Jobs.Tests
 {

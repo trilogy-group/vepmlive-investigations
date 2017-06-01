@@ -75,10 +75,6 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\WorkEnginePPM\bin\Debug\WorkEnginePPM.dll</HintPath>
-    </Reference>
     <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
@@ -108,13 +104,13 @@
     <Compile Include="HelperFunctionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
-      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
-      <Name>EPMLive.TestFakes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
+      <Name>WorkEnginePPM</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
