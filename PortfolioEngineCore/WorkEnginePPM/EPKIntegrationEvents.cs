@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using PortfolioEngineCore;
 using EPMLiveCore;
 using System.Data.SqlClient;
+using System.Transactions;
 
 namespace WorkEnginePPM
 {
@@ -106,30 +107,29 @@ namespace WorkEnginePPM
         }
         private void UpdateDB(SPItemEventProperties properties, SqlConnection con, string projectNameNew)
         {
-            var oCommand = new SqlCommand("UPDATE [LSTChanges] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTChangesSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTIssues] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTIssuesSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTMyWork] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTMyWorkSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTProjectDocuments] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTProjectDocumentsSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTRisks] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTRisksSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTTaskCenter] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTTaskCenterSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;" +
-                                          "UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [EPG_RPT_CapacityPlanner] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [EPG_RPT_Cost] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [EPG_RPT_Projects] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTMyTimesheet] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE [LSTMyTimesheetSnapshot] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;"
-                                          , con);
+            using (TransactionScope scope = new TransactionScope())
+            {
+                var tablesToUpdateProjectText = new List<string>() { "LSTChanges", "LSTChangesSnapshot", "LSTIssues", "LSTIssuesSnapshot",
+                                                                 "LSTMyWork", "LSTMyWorkSnapshot", "LSTProjectDocuments", "LSTProjectDocumentsSnapshot",
+                                                                 "LSTRisks", "LSTRisksSnapshot", "LSTTaskCenter", "LSTTaskCenterSnapshot",
+                                                                 "LSTMyTimesheet", "LSTMyTimesheetSnapshot"};
 
-            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
-            oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
-            oCommand.ExecuteNonQuery();
+                var tablesToUpdateProjectName = new List<string>() { "EPG_RPT_CapacityPlanner", "EPG_RPT_Cost", "EPG_RPT_Projects" };
+
+                StringBuilder query = new StringBuilder();
+                tablesToUpdateProjectText.ForEach(table => query.Append($"UPDATE [{table}] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;"));
+                tablesToUpdateProjectName.ForEach(table => query.Append($"UPDATE [{table}] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;"));
+                query.Append("UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;");
+                query.Append("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;");
+
+                var oCommand = new SqlCommand(query.ToString(), con);
+
+                oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
+                oCommand.ExecuteNonQuery();
+
+                scope.Complete();
+            }
         }
         private const string PROJECT_SCHEDULES_FOLDER_NAME = "Project Schedules";
         private const string MSPROJECT_FOLDER_NAME = "MSProject";
