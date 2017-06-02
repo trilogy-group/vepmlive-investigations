@@ -290,7 +290,7 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
 Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+#Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\Libraries\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\packages\Newtonsoft.Json.6.0.8\lib\net45\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
@@ -319,7 +319,7 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "*.wsp" | Get-ChildItem -F
 #Rename WorkEnginePPM.wsp -> WorkEnginePfE.wsp
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "WorkEnginePPM.wsp" | Rename-Item -NewName {$_.name -replace ‘WorkEnginePPM’,’WorkEnginePfE’ }
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "PortfolioEngineCore.dll"  -Recurse | Copy-Item -Destination $ProductOutput -Force
-Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $ProductOutput -Force
+Get-ChildItem -Path ($LibrariesDirectory + "\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $ProductOutput -Force
 
 #Copy EPMLiveTimerService to output folder and Rename EPMLiveTimerService.exe -> TimerService.exe
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.exe" | Copy-Item -Destination $ProductOutput -Force  
