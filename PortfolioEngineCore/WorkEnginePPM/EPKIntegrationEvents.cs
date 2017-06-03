@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using PortfolioEngineCore;
 using EPMLiveCore;
 using System.Data.SqlClient;
+using System.Transactions;
 
 namespace WorkEnginePPM
 {
@@ -100,27 +101,44 @@ namespace WorkEnginePPM
                         UpdateGroupsNames(properties, projectNameDB, projectNameNew);                        
                         UpdateMicrosoftProject(properties, projectNameDB, projectNameNew);
                         UpdateDB(properties, con, projectNameNew);
-                        SetPreviousProjectName(properties, con);
                     }
                 }
             });
         }
         private void UpdateDB(SPItemEventProperties properties, SqlConnection con, string projectNameNew)
         {
-            var oCommand = new SqlCommand("UPDATE LSTTaskCenter SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;" +
-                                          "UPDATE LSTMyWork SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;", con);
-            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
-            oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
-            oCommand.ExecuteNonQuery();
+            using (TransactionScope scope = new TransactionScope())
+            {
+                var tablesToUpdateProjectText = new List<string>() { "LSTChanges", "LSTChangesSnapshot", "LSTIssues", "LSTIssuesSnapshot",
+                                                                 "LSTMyWork", "LSTMyWorkSnapshot", "LSTProjectDocuments", "LSTProjectDocumentsSnapshot",
+                                                                 "LSTRisks", "LSTRisksSnapshot", "LSTTaskCenter", "LSTTaskCenterSnapshot",
+                                                                 "LSTMyTimesheet", "LSTMyTimesheetSnapshot"};
+
+                var tablesToUpdateProjectName = new List<string>() { "EPG_RPT_CapacityPlanner", "EPG_RPT_Cost", "EPG_RPT_Projects" };
+
+                StringBuilder query = new StringBuilder();
+                tablesToUpdateProjectText.ForEach(table => query.Append($"UPDATE [{table}] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;"));
+                tablesToUpdateProjectName.ForEach(table => query.Append($"UPDATE [{table}] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;"));
+                query.Append("UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;");
+                query.Append("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;");
+
+                var oCommand = new SqlCommand(query.ToString(), con);
+
+                oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
+                oCommand.ExecuteNonQuery();
+
+                scope.Complete();
+            }
         }
         private const string PROJECT_SCHEDULES_FOLDER_NAME = "Project Schedules";
         private const string MSPROJECT_FOLDER_NAME = "MSProject";
         private const string MSPROJECT_FILE_EXTENSION = "mpp";
         private void UpdateMicrosoftProject(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
         {
-            var projectItem = properties.Web.Folders[PROJECT_SCHEDULES_FOLDER_NAME]?
-                                .SubFolders[MSPROJECT_FOLDER_NAME]?
-                                .Files[$"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}"]?
+            var projectItem = properties.Web.Folders?.OfType<SPFolder>().Where(x => x.Name == PROJECT_SCHEDULES_FOLDER_NAME).FirstOrDefault()?
+                                .SubFolders?.OfType<SPFolder>().Where(x => x.Name == MSPROJECT_FOLDER_NAME).FirstOrDefault()?
+                                .Files?.OfType<SPFile>().Where(x => x.Name == $"{projectNameDB}.{MSPROJECT_FILE_EXTENSION}").FirstOrDefault()?
                                 .Item;
 
             if (projectItem != null)
@@ -137,12 +155,6 @@ namespace WorkEnginePPM
                 projectItem.Update();
                 projectItem.File.CheckIn("File name has been changed.");                
             }
-        }
-        private void SetPreviousProjectName(SPItemEventProperties properties, SqlConnection con)
-        {
-            var oCommand = new SqlCommand("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE ID=@projectid", con);
-            oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
-            oCommand.ExecuteNonQuery();
         }
         private void UpdateGroupsNames(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
         {
