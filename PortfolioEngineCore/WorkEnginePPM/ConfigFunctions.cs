@@ -1034,6 +1034,8 @@ namespace WorkEnginePPM
                         return "True";
                     case "EPMLiveEnableNonTeamNotf":
                         return "False";
+                    case "EPMPortManagerColumn":
+                        return "OwnerID";
                 };
             }
 

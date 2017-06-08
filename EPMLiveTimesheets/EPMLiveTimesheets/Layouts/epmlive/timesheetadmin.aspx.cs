@@ -80,6 +80,8 @@ namespace TimeSheets
 
         protected CheckBox chkEnableNonTeamNotf;
 
+        protected TextBox txtPortManagerColumn;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             EPMLiveCore.Act act = new EPMLiveCore.Act(Web);
@@ -227,6 +229,7 @@ namespace TimeSheets
                                         chkCurrentData.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSUseCurrent"));
                                         try { chkEnableNonTeamNotf.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf")); }
                                         catch { }
+                                        txtPortManagerColumn.Text = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMPortManagerColumn");
                                     }
                                 }
                                 SqlConnection cn = null;
@@ -480,6 +483,7 @@ namespace TimeSheets
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSMyFields", hdnTSFields.Value);
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSAllowStopWatch", chkAllowStopWatch.Checked.ToString());
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveEnableNonTeamNotf", chkEnableNonTeamNotf.Checked.ToString());
+                        EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMPortManagerColumn", txtPortManagerColumn.Text.Trim());
 
                         string daySettings = "";
                         daySettings += chkSunday.Checked.ToString() + "|" + txtSundayMin.Text + "|" + txtSundayMax.Text + "|";
