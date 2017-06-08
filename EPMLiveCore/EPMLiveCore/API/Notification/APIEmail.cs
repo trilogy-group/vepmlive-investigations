@@ -779,7 +779,7 @@ namespace EPMLiveCore.API
                         using (SmtpClient smtpClient = new SmtpClient())
                         {
                             smtpClient.Host = sMailSvr;
-                            smtpClient.Send(mailMsg);                            
+                            smtpClient.Send(mailMsg);
                         }
                     }
                 }
