@@ -778,16 +778,8 @@ namespace EPMLiveCore.API
 
                         using (SmtpClient smtpClient = new SmtpClient())
                         {
-                            //smtpClient.Host = sMailSvr;
-                            //smtpClient.Send(mailMsg);
-
-                            smtpClient.Host = "smtp.gmail.com";
-                            smtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
-                            smtpClient.UseDefaultCredentials = false;
-                            smtpClient.EnableSsl = true;
-                            smtpClient.Port = 587;
-                            smtpClient.Credentials = new System.Net.NetworkCredential("alberttest85@gmail.com", "123456789test");
-                            smtpClient.Send(mailMsg);
+                            smtpClient.Host = sMailSvr;
+                            smtpClient.Send(mailMsg);                            
                         }
                     }
                 }
