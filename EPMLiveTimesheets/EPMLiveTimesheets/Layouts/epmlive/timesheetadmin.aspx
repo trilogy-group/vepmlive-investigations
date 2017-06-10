@@ -444,6 +444,21 @@
 			        </wssuc:InputFormControl>
 		        </Template_InputFormControls>
 	        </wssuc:InputFormSection>
+
+            <wssuc:InputFormSection Title="Portfolio Managers"
+		        Description=""
+		        runat="server">
+		        <Template_Description>
+		            Enter the column name where we have defined the Portfolio manager. It is utilized to send notifications, case the item above is (Enable Notification) is selected.<br />
+		        </Template_Description>
+		        <Template_InputFormControls>
+			        <wssuc:InputFormControl LabelText="Column name:" runat="server">
+				         <Template_Control>
+                            <asp:TextBox ID="txtPortManagerColumn" runat="server" Width="200"></asp:TextBox>                            
+				         </Template_Control>
+			        </wssuc:InputFormControl>
+		        </Template_InputFormControls>
+	        </wssuc:InputFormSection>
 	        
 	        <wssuc:ButtonSection runat="server">
 		        <Template_Buttons>
