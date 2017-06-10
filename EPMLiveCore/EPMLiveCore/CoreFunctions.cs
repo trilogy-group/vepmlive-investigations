@@ -2986,6 +2986,8 @@ namespace EPMLiveCore
                         return "Start,Finish,Duration,BaselineDuration,PercentComplete,BaselineStart,BaselineFinish,ActualStart,ActualFinish,ActualDuration,Work,ActualWork,RemainingWork,BaselineWork,TimesheetHours,Cost,ActualCost,RemainingCost,BaselineCost,WorkspaceUrl,ProjectUpdate";
                     case "EPMLiveEnableNonTeamNotf":
                         return "False";
+                    case "EPMPortManagerColumn":
+                        return "OwnerID";
                 };
             }
 

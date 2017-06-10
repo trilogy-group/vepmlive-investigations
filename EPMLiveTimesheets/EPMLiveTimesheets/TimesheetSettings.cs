@@ -22,6 +22,7 @@ namespace TimeSheets
         public bool AllowStopWatch = false;
         public ArrayList TimesheetFields = new ArrayList();
         public bool EnableNonTeamNotf = false;
+        public string PortManagerColumn = string.Empty;
 
         public TimesheetSettings(SPWeb oWeb)
         {
@@ -58,6 +59,8 @@ namespace TimeSheets
                     catch { }
 
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveEnableNonTeamNotf"), out EnableNonTeamNotf);
+
+                    PortManagerColumn = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMPortManagerColumn");
 
                     NonWorkList = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPMLiveTSNonWork");
 

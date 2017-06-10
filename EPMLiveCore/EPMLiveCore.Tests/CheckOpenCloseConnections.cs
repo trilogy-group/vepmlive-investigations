@@ -2,7 +2,7 @@
 using System;
 using System.Data.SqlClient.Fakes;
 
-namespace EPMLive.TestFakes
+namespace EPMLiveCore.Tests
 {
     internal class CheckOpenCloseConnections : IDisposable
     {
