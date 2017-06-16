@@ -85,6 +85,7 @@ namespace PortfolioEngineCore.Setup
                     try
                     {
                         cmd = new SqlCommand("CREATE DATABASE " + DB, _CN);
+                        cmd.CommandTimeout = 180;
                         cmd.ExecuteNonQuery();
                         _message += "...Success";
                     }
