@@ -14,6 +14,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
     {
         private string webUrl = string.Empty;
         private string itemUrl = string.Empty;
+        private bool isNativeMode = false;
 
         private ReportingService2006 _srs2006;
         private string _reportingServicesUrl = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
@@ -31,11 +32,32 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 itemUrl = Request["itemurl"];
             }
 
+            if (!string.IsNullOrEmpty(Request["isNativeMode"]))
+            {
+                bool.TryParse(Request["isNativeMode"], out isNativeMode);
+            }
 
             Redirect();
         }
 
         private void Redirect()
+        {
+            if (!string.IsNullOrEmpty(itemUrl))
+            {
+                if (isNativeMode)
+                    RedirectNativeMode();
+                else
+                    RedirectIntegratedMode();
+            }            
+        }
+
+        private void RedirectNativeMode()
+        {
+            if (!string.IsNullOrEmpty(itemUrl))
+                HttpContext.Current.Response.Redirect($"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
+        }
+
+        private void RedirectIntegratedMode()
         {
             if (!string.IsNullOrEmpty(webUrl) && !string.IsNullOrEmpty(itemUrl))
             {
@@ -55,11 +77,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 var urlim = getReportParameters(SPUrlUtility.CombineUrl(webUrl, itemUrl));
                 var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
-                
+
                 //var sRedirectUrl = sServerReelativeUrl +
                 //                   "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
                 //                   sServerReelativeUrl + "/" + itemUrl + urlim + "&rv:HeaderArea=none";
-                
+
                 if (Request.QueryString["rp:Resources"] != null)
                 {
                     var queString = Convert.ToString(Request.QueryString["rp:Resources"]).Split(',');
