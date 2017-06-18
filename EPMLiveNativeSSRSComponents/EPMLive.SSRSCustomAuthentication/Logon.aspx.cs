@@ -23,8 +23,9 @@ namespace EPMLive.SSRSCustomAuthentication
         {
             var userName = txtUserName.Text.Trim();
             var password = txtPassword.Text.Trim();
+            var error = string.Empty;
 
-            var passwordVerified = authenticationProvider.VerifyPassword(userName, password);
+            var passwordVerified = authenticationProvider.VerifyPassword(userName, password, out error);
 
             if (passwordVerified)
             {
