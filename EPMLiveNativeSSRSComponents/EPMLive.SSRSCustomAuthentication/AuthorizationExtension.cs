@@ -213,94 +213,108 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public StringCollection GetPermissions(string userName, IntPtr userToken, SecurityItemType itemType, byte[] secDesc)
         {
-            var permissions = new StringCollection();
             if (usernames.Split(',').ToList().Contains(userName))
             {
-                foreach (CatalogOperation operation in catalogOperation.Keys)
-                {
-                    if (!permissions.Contains((string)catalogOperation[operation]))
-                        permissions.Add((string)catalogOperation[operation]);
-                }
-                foreach (ModelItemOperation operation in modelItemOperations.Keys)
-                {
-                    if (!permissions.Contains((string)modelItemOperations[operation]))
-                        permissions.Add((string)modelItemOperations[operation]);
-                }
-                foreach (ModelOperation operation in modelOperations.Keys)
-                {
-                    if (!permissions.Contains((string)modelOperations[operation]))
-                        permissions.Add((string)modelOperations[operation]);
-                }
-                foreach (CatalogOperation operation in catalogOperation.Keys)
-                {
-                    if (!permissions.Contains((string)catalogOperation[operation]))
-                        permissions.Add((string)catalogOperation[operation]);
-                }
-                foreach (ReportOperation operation in reportOperations.Keys)
-                {
-                    if (!permissions.Contains((string)reportOperations[operation]))
-                        permissions.Add((string)reportOperations[operation]);
-                }
-                foreach (FolderOperation operation in folderOperations.Keys)
-                {
-                    if (!permissions.Contains((string)folderOperations[operation]))
-                        permissions.Add((string)folderOperations[operation]);
-                }
-                foreach (ResourceOperation operation in resourceOperations.Keys)
-                {
-                    if (!permissions.Contains((string)resourceOperations[operation]))
-                        permissions.Add((string)resourceOperations[operation]);
-                }
-                foreach (DatasourceOperation operation in datasourceOperations.Keys)
-                {
-                    if (!permissions.Contains((string)datasourceOperations[operation]))
-                        permissions.Add((string)datasourceOperations[operation]);
-                }
+                return CreateAdminPermissionSet();
             }
             else
             {
-                var acl = DeserializeAcl(secDesc);
-                foreach (AceStruct ace in acl)
+                return CreateUserPermissionSet(userName, secDesc);
+            }
+        }
+
+        private StringCollection CreateUserPermissionSet(string userName, byte[] secDesc)
+        {
+            var permissions = new StringCollection();
+            var acl = DeserializeAcl(secDesc);
+            foreach (AceStruct ace in acl)
+            {
+                if (0 == string.Compare(userName, ace.PrincipalName, true, CultureInfo.CurrentCulture))
                 {
-                    if (0 == string.Compare(userName, ace.PrincipalName, true, CultureInfo.CurrentCulture))
+                    foreach (ModelItemOperation aclOperation in ace.ModelItemOperations)
                     {
-                        foreach (ModelItemOperation aclOperation in ace.ModelItemOperations)
-                        {
-                            if (!permissions.Contains((string)modelItemOperations[aclOperation]))
-                                permissions.Add((string)modelItemOperations[aclOperation]);
-                        }
-                        foreach (ModelOperation aclOperation in ace.ModelOperations)
-                        {
-                            if (!permissions.Contains((string)modelOperations[aclOperation]))
-                                permissions.Add((string)modelOperations[aclOperation]);
-                        }
-                        foreach (CatalogOperation aclOperation in ace.CatalogOperations)
-                        {
-                            if (!permissions.Contains((string)catalogOperation[aclOperation]))
-                                permissions.Add((string)catalogOperation[aclOperation]);
-                        }
-                        foreach (ReportOperation aclOperation in ace.ReportOperations)
-                        {
-                            if (!permissions.Contains((string)reportOperations[aclOperation]))
-                                permissions.Add((string)reportOperations[aclOperation]);
-                        }
-                        foreach (FolderOperation aclOperation in ace.FolderOperations)
-                        {
-                            if (!permissions.Contains((string)folderOperations[aclOperation]))
-                                permissions.Add((string)folderOperations[aclOperation]);
-                        }
-                        foreach (ResourceOperation aclOperation in ace.ResourceOperations)
-                        {
-                            if (!permissions.Contains((string)resourceOperations[aclOperation]))
-                                permissions.Add((string)resourceOperations[aclOperation]);
-                        }
-                        foreach (DatasourceOperation aclOperation in ace.DatasourceOperations)
-                        {
-                            if (!permissions.Contains((string)datasourceOperations[aclOperation]))
-                                permissions.Add((string)datasourceOperations[aclOperation]);
-                        }
+                        if (!permissions.Contains((string)modelItemOperations[aclOperation]))
+                            permissions.Add((string)modelItemOperations[aclOperation]);
+                    }
+                    foreach (ModelOperation aclOperation in ace.ModelOperations)
+                    {
+                        if (!permissions.Contains((string)modelOperations[aclOperation]))
+                            permissions.Add((string)modelOperations[aclOperation]);
+                    }
+                    foreach (CatalogOperation aclOperation in ace.CatalogOperations)
+                    {
+                        if (!permissions.Contains((string)catalogOperation[aclOperation]))
+                            permissions.Add((string)catalogOperation[aclOperation]);
+                    }
+                    foreach (ReportOperation aclOperation in ace.ReportOperations)
+                    {
+                        if (!permissions.Contains((string)reportOperations[aclOperation]))
+                            permissions.Add((string)reportOperations[aclOperation]);
+                    }
+                    foreach (FolderOperation aclOperation in ace.FolderOperations)
+                    {
+                        if (!permissions.Contains((string)folderOperations[aclOperation]))
+                            permissions.Add((string)folderOperations[aclOperation]);
+                    }
+                    foreach (ResourceOperation aclOperation in ace.ResourceOperations)
+                    {
+                        if (!permissions.Contains((string)resourceOperations[aclOperation]))
+                            permissions.Add((string)resourceOperations[aclOperation]);
+                    }
+                    foreach (DatasourceOperation aclOperation in ace.DatasourceOperations)
+                    {
+                        if (!permissions.Contains((string)datasourceOperations[aclOperation]))
+                            permissions.Add((string)datasourceOperations[aclOperation]);
                     }
                 }
+            }
+
+            return permissions;
+        }
+
+        private StringCollection CreateAdminPermissionSet()
+        {
+            var permissions = new StringCollection();
+
+            foreach (CatalogOperation operation in catalogOperation.Keys)
+            {
+                if (!permissions.Contains((string)catalogOperation[operation]))
+                    permissions.Add((string)catalogOperation[operation]);
+            }
+            foreach (ModelItemOperation operation in modelItemOperations.Keys)
+            {
+                if (!permissions.Contains((string)modelItemOperations[operation]))
+                    permissions.Add((string)modelItemOperations[operation]);
+            }
+            foreach (ModelOperation operation in modelOperations.Keys)
+            {
+                if (!permissions.Contains((string)modelOperations[operation]))
+                    permissions.Add((string)modelOperations[operation]);
+            }
+            foreach (CatalogOperation operation in catalogOperation.Keys)
+            {
+                if (!permissions.Contains((string)catalogOperation[operation]))
+                    permissions.Add((string)catalogOperation[operation]);
+            }
+            foreach (ReportOperation operation in reportOperations.Keys)
+            {
+                if (!permissions.Contains((string)reportOperations[operation]))
+                    permissions.Add((string)reportOperations[operation]);
+            }
+            foreach (FolderOperation operation in folderOperations.Keys)
+            {
+                if (!permissions.Contains((string)folderOperations[operation]))
+                    permissions.Add((string)folderOperations[operation]);
+            }
+            foreach (ResourceOperation operation in resourceOperations.Keys)
+            {
+                if (!permissions.Contains((string)resourceOperations[operation]))
+                    permissions.Add((string)resourceOperations[operation]);
+            }
+            foreach (DatasourceOperation operation in datasourceOperations.Keys)
+            {
+                if (!permissions.Contains((string)datasourceOperations[operation]))
+                    permissions.Add((string)datasourceOperations[operation]);
             }
 
             return permissions;
