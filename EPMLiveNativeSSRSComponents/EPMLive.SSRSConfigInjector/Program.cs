@@ -8,18 +8,20 @@ namespace EPMLive.SSRSConfigInjector
     {
         static void Main(string[] args)
         {
-            //CopyCustomAuthBinaries();
-            ModifyReportServerConfig();
-            ModifyReportServerPolicyConfig();
-            ModifyReportServerWebConfig();
-            ModifyReportingServicesPortalConfig();
-        }
-
-        private static void CopyCustomAuthBinaries()
-        {
+            var validationKey = "9347D98F2686891ECEFB2065F1DF9F5228888B4322D6784A57E38F8A85BF711D";
+            var machineKey = "96179BBFEBC4746C988483F8F30762A5EF0B77E08AF10B455953FA1284757A1E";
             var reportServerBasePath = "C:\\Program Files\\Microsoft SQL Server\\MSRS13.MSSQLSERVER";
             var libraryPath = "..\\..\\EPMLive.SSRSCustomAuthentication\\bin\\Debug\\EPMLive.SSRSCustomAuthentication.";
 
+            CopyCustomAuthBinaries(libraryPath, reportServerBasePath);
+            ModifyReportServerConfig();
+            ModifyReportServerPolicyConfig(reportServerBasePath);
+            ModifyReportServerWebConfig(validationKey, machineKey);
+            ModifyReportingServicesPortalConfig();
+        }
+
+        private static void CopyCustomAuthBinaries(string libraryPath, string reportServerBasePath)
+        {
             if (File.Exists(libraryPath + "dll"))
             {
                 var ssrsBinPath = Path.Combine(reportServerBasePath, "Reporting Services\\ReportServer\bin");
@@ -30,42 +32,74 @@ namespace EPMLive.SSRSConfigInjector
 
         private static void ModifyReportingServicesPortalConfig()
         {
-            throw new NotImplementedException();
+            var xmlDocument = GetXmlDocument("web.config");
         }
 
-        private static void ModifyReportServerWebConfig()
+        private static void ModifyReportServerWebConfig(string validationKey, string machineKey)
         {
-            throw new NotImplementedException();
+            var xmlDocument = GetXmlDocument("web.config");
+
+            var authNode = xmlDocument.SelectSingleNode("//configuration/system.web/authentication");
+            authNode.Attributes["mode"].Value = "Forms";
+            var fragement = xmlDocument.CreateDocumentFragment();
+            fragement.InnerXml = "<forms loginUrl=\"Logon.aspx\" name=\"sqlAuthCookie\" timeout=\"60\" path=\"/\"></forms>";
+            authNode.AppendChild(fragement);
+
+            var authorizeNode = xmlDocument.CreateDocumentFragment();
+            authNode.InnerXml = "<authorization><deny users=\"?\"/></authorization>";
+            xmlDocument.SelectSingleNode("//configuration/system.web").InsertAfter(authorizeNode, authNode);
+
+            var identityNode = xmlDocument.SelectSingleNode("//configuration/system.web/identity");
+            identityNode.Attributes["impersonate"].Value = "false";
+
+            var machineKeyEntryNode = xmlDocument.CreateDocumentFragment();
+            machineKeyEntryNode.InnerXml = "<machineKey validationKey=\"" + validationKey + "\" decryptionKey=\"" + machineKey + "\" validation=\"AES\" decryption=\"AES\" />";
+
+            xmlDocument.SelectSingleNode("//configuration/system.web").AppendChild(machineKeyEntryNode);
+
+            SaveXmlDocument("web.config", xmlDocument);
         }
 
-        private static void ModifyReportServerPolicyConfig()
+        private static void ModifyReportServerPolicyConfig(string reportServerBasePath)
         {
-            var fileName = ".\\..\\..\\Samples\\rsreportserver.config";
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load(fileName);
-            var customNode = xmlDocument.CreateElement("Custom");
-            var authenticationNode = xmlDocument.SelectSingleNode("/Configuration/Authentication/AuthenticationTypes");
-            authenticationNode.RemoveAll();
-            authenticationNode.AppendChild(customNode);
+            var binary = Path.Combine(reportServerBasePath, "Reporting Services\\ReportServer\\bin", "EPMLive.SSRSCustomAuthentication.dll");
+            var xmlDocument = GetXmlDocument("rssrvpolicy.config");
+
+            var fragment = xmlDocument.CreateDocumentFragment();
+            fragment.InnerXml = "<CodeGroup class=\"UnionCodeGroup\" version=\"1\" Name=\"SecurityExtensionCodeGroup\" Description=\"Code group for the sample security extension\" PermissionSetName=\"FullTrust\"><IMembershipCondition class=\"UrlMembershipCondition\" version=\"1\" Url=\"" + binary + "\" /></CodeGroup>";
+
+            var codegenNode = xmlDocument.SelectSingleNode("//CodeGroup/IMembershipCondition[@Url='$CodeGen$/*']");
+            codegenNode.ParentNode.ParentNode.InsertAfter(fragment, codegenNode.ParentNode);
+
+            SaveXmlDocument("rssrvpolicy.config", xmlDocument);
+        }
+
+        private static void SaveXmlDocument(string fileName, XmlDocument xmlDocument)
+        {
+            fileName = ".\\..\\..\\Samples\\" + fileName;
             var settings = new XmlWriterSettings { Indent = true };
             var writer = XmlWriter.Create(fileName, settings);
             xmlDocument.Save(writer);
         }
 
-        private static void ModifyReportServerConfig()
+        private static XmlDocument GetXmlDocument(string fileName)
         {
-            var fileName = ".\\..\\..\\Samples\\rsreportserver.config";
+            fileName = ".\\..\\..\\Samples\\" + fileName;
             var xmlDocument = new XmlDocument();
             xmlDocument.Load(fileName);
+            return xmlDocument;
+        }
+
+        private static void ModifyReportServerConfig()
+        {
+            var xmlDocument = GetXmlDocument("rsreportserver.config");
 
             AddAuthNode(xmlDocument);
             AddExistingUiNode(xmlDocument);
             AddExistingSecurityExtNode(xmlDocument);
             AddExistingAuthExtNode(xmlDocument);
 
-            var settings = new XmlWriterSettings { Indent = true };
-            var writer = XmlWriter.Create(fileName, settings);
-            xmlDocument.Save(writer);
+            SaveXmlDocument("rsreportserver.config", xmlDocument);
         }
 
         private static void AddExistingAuthExtNode(XmlDocument xmlDocument)
