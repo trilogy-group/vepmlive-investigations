@@ -17,7 +17,7 @@ namespace EPMLive.SSRSConfigInjector
             ModifyReportServerConfig();
             ModifyReportServerPolicyConfig(reportServerBasePath);
             ModifyReportServerWebConfig(validationKey, machineKey);
-            ModifyReportingServicesPortalConfig();
+            ModifyReportingServicesPortalConfig(validationKey, machineKey);
         }
 
         private static void CopyCustomAuthBinaries(string libraryPath, string reportServerBasePath)
@@ -30,9 +30,16 @@ namespace EPMLive.SSRSConfigInjector
             }
         }
 
-        private static void ModifyReportingServicesPortalConfig()
+        private static void ModifyReportingServicesPortalConfig(string validationKey, string machineKey)
         {
-            var xmlDocument = GetXmlDocument("web.config");
+            var xmlDocument = GetXmlDocument("Microsoft.ReportingServices.Portal.WebHost.exe.config");
+
+            var machineKeyEntryNode = xmlDocument.CreateDocumentFragment();
+            machineKeyEntryNode.InnerXml = "<system.web><machineKey validationKey=\"" + validationKey + "\" decryptionKey=\"" + machineKey + "\" validation=\"AES\" decryption=\"AES\" /></system.web>";
+
+            xmlDocument.SelectSingleNode("//configuration").AppendChild(machineKeyEntryNode);
+
+            SaveXmlDocument("Microsoft.ReportingServices.Portal.WebHost.exe.config", xmlDocument);
         }
 
         private static void ModifyReportServerWebConfig(string validationKey, string machineKey)
