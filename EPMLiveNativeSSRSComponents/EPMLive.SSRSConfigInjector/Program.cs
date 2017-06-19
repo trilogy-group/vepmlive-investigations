@@ -214,7 +214,7 @@ namespace EPMLive.SSRSConfigInjector
         {
             if (File.Exists(destFilename) && !restore)
             {
-                throw new IOException(sourceFilename + " alread exists, please delete manually and re-run the program.");
+                throw new IOException(destFilename + " already exists, please delete manually and re-run the program.");
             }
 
             using (var inputFile = new FileStream(
