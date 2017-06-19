@@ -1,0 +1,523 @@
+﻿<%@ Master Language="C#" %>
+<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Import Namespace="Microsoft.SharePoint" %> <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:o="urn:schemas-microsoft-com:office:office" runat="server" lang="<%$Resources:wss,language_value%>" dir="<%$Resources:wss,multipages_direction_dir_value%>">
+<head runat="server">
+	<meta name="GENERATOR" content="Microsoft SharePoint" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Expires" content="0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
+	<SharePoint:IEVersionMetaTag runat="server"/>
+	<meta name="ROBOTS" content="NOHTMLINDEX" />
+	<SharePoint:PageTitle runat="server"><asp:ContentPlaceHolder id="PlaceHolderPageTitle" runat="server"/></SharePoint:PageTitle>
+	<SharePoint:CssLink runat="server" Alternate="false" Version="15"/>
+	
+	<SharePoint:CssRegistration name="error.css" EnableCssTheming="false" runat="server" />
+	<SharePoint:ULSClientConfig runat="server"/>
+	<SharePoint:ScriptLink language="javascript" name="core.js" OnDemand="true" EnableCustomActions="false" Localizable="false" runat="server" />
+	<asp:ContentPlaceHolder id="PlaceHolderAdditionalPageHead" runat="server"/>
+	<link rel="shortcut icon" href="/_layouts/images/epmlive.ico" />
+	<!--<link rel="shortcut icon" href="/_layouts/15/images/favicon.ico?rev=23" type="image/vnd.microsoft.icon" />-->
+	<asp:ContentPlaceHolder id="PlaceHolderBodyAreaClass" runat="server"/>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+        
+        <link rel="shortcut icon" href="/_layouts/images/epmlive.ico" />
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+
+        <!--[if lte IE 8]> <html class="ie8"> <![endif]-->
+	<!--[if IE 9]> <html class="ie9"> <![endif]-->
+
+
+<style>
+
+
+body {
+background-color:#0090CA;
+font-family:Open Sans;
+
+}
+
+input {
+    -webkit-appearance: none;
+    border-radius: 0;
+}
+
+
+#SslWarning {
+    display: none;
+}
+
+#ms-error-header {
+display:none;
+}
+
+#ms-error-body {
+width:100% !important;
+}
+
+label {
+    color: #606060;
+    font-size: 0.9em;
+    margin-top: -2px;
+    padding-left: 5px;
+    position: relative;
+    top: -2px;
+}
+
+#login-wrapper {
+	margin-left: auto;
+    margin-right: auto;
+    position:relative;
+	height: 400px;
+	width: 855px;
+	top:50px;
+	display: block;
+	box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);	
+}
+
+#ad-text-wrapper {
+	background-color: #FFFFFF;
+    border-radius: 5px 5px 5px 5px;
+    color: #FFFFFF;
+    height: 200px;
+    margin-left: 115px;
+    margin-top: -295px;
+    opacity: 0.9;
+    position: absolute;
+    text-align:center;
+}
+
+#ad-text {
+padding:15px;
+color:#555555;
+line-height: 27px;
+}
+
+#ad-text-box span {
+	color:#555555;
+	font-size:18px;
+	padding:15px;
+}
+
+#login-ad-content img {
+
+margin-top:12px;
+height:376px;
+border-radius: 5px 5px 5px 5px;
+}
+
+
+#login-ad-content {
+	width:455px;
+	height: 400px;
+}
+
+#login-ad-main {
+	background-color:#ffffff;
+	float:right;
+	border-radius: 0px 3px 3px 0px;
+ }
+
+#login-main {
+border-radius: 3px 0px 0px 3px;
+    background-color: #ffffff;
+    /*border: 2px solid #269BC9;*/ 
+    text-align: center;
+    width: 400px;
+	float:left;
+	height: 400px;
+}
+
+#login-logo {
+    margin-top: 20px;
+    width: 250px;
+}
+
+.input-img {
+border: 2px solid #DDDDDD;
+transition: all 0.4s ease-out 0s;
+background-color: #F0F0F0;
+border-bottom: 2px solid #DDDDDD;
+border-left: 2px solid #DDDDDD;
+border-radius: 3px 0 0 3px !important;
+border-right: medium none !important;
+border-top: 2px solid #DDDDDD;
+display: inline-block;
+float: left;
+height: 50px;
+left: 32px;
+margin-top: 15px;
+position: relative;
+width: 60px;
+line-height:42px;
+}
+
+.placeholder { 
+font-family:Open Sans !important;
+color:#C9C9C9 !important;
+font-size: 22px !important;
+}
+
+.password-img {
+margin-top:10px;
+}
+
+.password-input {
+margin-top:10px;
+left: -2px;
+}
+
+.username-img  span{
+transition: all 0.4s ease-out 0s;
+color:#9E9E9E;
+font-size:2.3em;
+position: relative;
+top:7px;
+left:0px;
+}
+
+.ie9 .username-img  span{
+top:6px;
+}
+
+.password-img  span{
+transition: all 0.4s ease-out 0s;
+color:#9E9E9E;
+font-size:2.0em;
+position: relative;
+top:7px;
+left:0px;
+}
+
+.ie9 .password-img  span{
+top:3px;
+}
+
+.username-input {
+margin-top: 15px; 
+left: -2px; 
+border: 2px solid rgb(221, 221, 221);
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    border: 2px solid #DDDDDD;
+    border-radius: 0 3px 3px 0;
+    font-size: 25px;
+    height: 45px;
+    line-height: normal;
+    line-height:40px\9;
+    outline: medium none;
+    overflow: hidden;
+    padding-bottom: 2px;
+    padding-left: 8px;
+    padding-top: 3px;
+    position: relative;
+    transition: all 0.4s ease-out 0s;
+    width: 66%;
+}
+
+#login-content {
+width:100%;
+}
+
+.login-button {
+margin-top:10px;
+font-size:16px;
+cursor:pointer;
+background: none repeat scroll 0 0 #0090CA;
+border: 1px solid transparent;
+border-radius: 5px 5px 5px 5px;
+color: #FFFFFF;
+cursor: pointer;
+display: block;
+font-size: 1.5em;
+font-weight: 400;
+margin: 10px auto;
+overflow: hidden;
+padding-bottom: 10px;
+padding-top: 10px;
+position: relative;
+text-align: center;
+text-decoration: none;
+top: 0;
+width: 84%;
+}
+
+.login-button:hover {
+background-color:#0083B7 !important;
+}
+
+#footer-content {
+margin-top:10px;
+}
+
+#footer-content a {
+color: #0072C6;
+font-family:Open Sans;
+text-decoration: none;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:#C9C9C9;
+	font-size: 22px;
+	padding-top:2px;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:#9B9B9B;
+	font-size: 22px;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:#9B9B9B;
+	font-size: 22px;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:#CCCCCC;
+    font-size: 22px;
+
+}
+
+.ie8 #Username {
+  line-height: 43px !important;
+}
+
+.ie8 #Password  {
+  line-height: 43px !important;
+}
+
+
+.ie8 .login-button {
+padding-top:10px !important;
+padding-bottom:10px !important;
+}
+
+
+span.callout {
+	height: 80px;
+	width: 200px;
+	float: left;
+}
+
+span.callout {
+	background-color: #444;
+	background-image: -moz-linear-gradient(top, #444, #444);
+	position: absolute;
+	color: #ccc;
+	padding: 10px;
+	border-radius: 3px;
+	margin: 25px;
+	min-height: 50px;
+	border: 1px solid #333;
+	text-shadow: 0 0 1px #000;
+	font-family:Open Sans;
+  	display:none;
+	z-index:1000;
+	font-size:15px;
+	text-align:center;
+	/*box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;*/
+}
+
+.callout::before {
+	content: "";
+	width: 0px;
+	height: 0px;
+	border: 0.8em solid transparent;
+	position: absolute;
+}
+
+.callout.left::before {
+	right: -20px;
+	top: 40%;
+	border-left: 10px solid #444;
+}
+
+.button {
+  font-family:Open Sans;
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.428571429;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+       -o-user-select: none;
+          user-select: none;
+}
+
+.button:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+.button:hover,
+.button:focus {
+  color: #333333;
+  text-decoration: none;
+}
+
+.button:active,
+.button.active {
+  background-image: none;
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+/* had to add because it seemed Firefox didn't align the text correctly */
+@-moz-document url-prefix() {
+  .button-xs {
+    padding: 1px 5px 1px;
+   }
+    .button-sm {
+        padding-bottom: 5px;
+        
+    }
+	.button-reg {
+    padding-bottom:8px;
+}
+}
+
+.button-success {
+  color: #ffffff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.button-success:hover,
+.button-success:focus,
+.button-success:active,
+.button-success.active,
+.open .dropdown-toggle.button-success {
+  color: #ffffff;
+  background-color: #47a447;
+  border-color: #398439;
+}
+
+.button-success:active,
+.button-success.active,
+.open .dropdown-toggle.button-success {
+  background-image: none;
+}
+
+.button-success.disabled,
+.button-success[disabled],
+fieldset[disabled] .button-success,
+.button-success.disabled:hover,
+.button-success[disabled]:hover,
+fieldset[disabled] .button-success:hover,
+.button-success.disabled:focus,
+.button-success[disabled]:focus,
+fieldset[disabled] .button-success:focus,
+.button-success.disabled:active,
+.button-success[disabled]:active,
+fieldset[disabled] .button-success:active,
+.button-success.disabled.active,
+.button-success[disabled].active,
+fieldset[disabled] .button-success.active {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+
+@media screen and (max-width: 880px) {
+    #login-ad-main {
+		display:none;
+	}
+	#login-wrapper {
+		width:400px;
+	}
+	#login-main {
+		border-radius: 3px 3px 3px 3px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	#login-ad-main {
+		display:none;
+	}
+	#login-wrapper {
+		width:300px;
+		top:0px;
+	}
+	#login-main {
+		border-radius: 3px 3px 3px 3px;
+		width:300px;
+	}
+	.input-img {
+		display:none;
+	}
+	input[type="text"], input[type="email"], input[type="password"] {
+		border-radius:6px 6px 6px 6px;
+	}
+	.login-button {
+		width:75%;
+	}
+	#login-custom-title {
+		display:none;
+	}
+}
+
+#login-custom-title {
+
+font-family:Open Sans;
+font-size:35px;
+text-align:center;
+position:relative;
+color:#ffffff;
+top:35px;
+font-weight:300;
+
+}
+
+
+
+
+</style>
+
+
+
+
+
+</head>
+<body id="ms-error-body" onload="if (typeof(_spBodyOnLoadWrapper) != 'undefined') _spBodyOnLoadWrapper();">
+	<form runat="server" onsubmit="if (typeof(_spFormOnSubmitWrapper) != 'undefined') {return _spFormOnSubmitWrapper();} else {return true;}">
+	<asp:ScriptManager id="ScriptManager" runat="server" EnablePageMethods="false" EnablePartialRendering="true" EnableScriptGlobalization="false" EnableScriptLocalization="true" />
+	<div id="ms-error-header" class="ms-pr">
+		<h1 class="ms-core-pageTitle">
+			<asp:ContentPlaceHolder id="PlaceHolderPageTitleInTitleArea" runat="server" />
+		</h1>
+		<div>
+			<asp:ContentPlaceHolder id="PlaceHolderHelpButton" runat="server" />
+		</div>
+	</div>
+	<div id="ms-error">
+		<div id="ms-error-top">
+			<asp:ContentPlaceHolder id="PlaceHolderSimpleCloseX" runat="server" />
+		</div>
+		<div id="ms-error-content">
+			<div id="ms-error-error-content">
+				<SharePoint:AjaxDelta id="DeltaPlaceHolderMain" BlockElement="true" runat="server">
+					<asp:ContentPlaceHolder id="PlaceHolderMain" runat="server" />
+				</SharePoint:AjaxDelta>
+			</div>
+			<asp:ContentPlaceHolder id="PlaceHolderGoBackLink" runat="server">
+				<div id="ms-error-gobackcont" class="ms-calloutLink">
+					<SharePoint:ReturnLink Text="<%$Resources:wss,multipages_back_to_site%>" Id="idSimpleGoBackToHome" runat="server"/>
+				</div>
+			</asp:ContentPlaceHolder>
+		</div>
+	</div>
+</form>
+</body>
+</html>
