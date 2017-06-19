@@ -9,7 +9,10 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using EPMLiveCore;
 using EPMLiveWebParts.SSRS2006;
+using EPMLiveWebParts.SSRS2010;
 using Microsoft.SharePoint;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace EPMLiveWebParts
 {
@@ -21,7 +24,8 @@ namespace EPMLiveWebParts
         private string _reportingServicesUrl;
         private bool _isIntegrated;
         private string _reportsFolderName;
-        private ReportingService2006 _srs2006;
+        //private ReportingService2006 _srs2006;
+        private ReportingService2010 _srs2010;
         private bool _isSsrs;
 
         //TODO: This should probably be a handler and not a web form so we dont have the overhead of the page lifecycle.
@@ -234,7 +238,18 @@ namespace EPMLiveWebParts
             }
 
             if (string.IsNullOrEmpty(_reportingServicesUrl)) return;
-            
+
+            var curWeb = SPContext.Current.Web;
+            var web = curWeb.Site.RootWeb;
+
+            if (_isIntegrated)
+                GetItemsIntegratedMode(ref node, web);
+            else
+                GetItemsNativeMode(ref node, web);
+        }
+
+        private void GetItemsNativeMode(ref TreeNode node, SPWeb web)
+        {
             var username = "";
             var password = "";
             var chrono = SPContext.Current.Site.WebApplication.GetChild<ReportAuth>("ReportAuth");
@@ -244,30 +259,91 @@ namespace EPMLiveWebParts
                 password = CoreFunctions.Decrypt(chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
             }
 
-            if (!_isIntegrated) return;
-
-            _srs2006 = new ReportingService2006 {UseDefaultCredentials = true};
-            var rptWs = _reportingServicesUrl + "/ReportService2006.asmx";
-            _srs2006.Url = rptWs;
-
-            var curWeb = SPContext.Current.Web;
-            var web = curWeb.Site.RootWeb;
+            _srs2010 = new ReportingService2010 { UseDefaultCredentials = true };
+            var rptWs = _reportingServicesUrl + "/ReportService2010.asmx";
+            _srs2010.Url = rptWs;
 
             SPSecurity.RunWithElevatedPrivileges(delegate
-                                                        {
-                                                                if (password == "") return;
-                                                                _srs2006.UseDefaultCredentials = false;
-                                                                if (username.Contains("\\"))
-                                                                {
-                                                                    _srs2006.Credentials = new NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
-                                                                }
-                                                                else
-                                                                {
-                                                                    _srs2006.Credentials = new NetworkCredential(username, password);
-                                                                }
-                                                        });
+            {
+                if (password == "") return;
+                _srs2010.UseDefaultCredentials = false;
+                if (username.Contains("\\"))
+                    _srs2010.Credentials = new NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
+                else
+                    _srs2010.Credentials = new NetworkCredential(username, password);
+            });
 
+            var catalogItems = _srs2010.ListChildren($"/{web.Site.ID.ToString()}", true);
+            
+            // Create a top-level node to start things off
+            var tn = new TreeNode("RootNode", "0");
 
+            // Pass the new node by reference, nodes will be added as children
+            if (catalogItems != null)
+            {
+                var catalogItemsTree = new List<CatalogItemTreeView>();
+                catalogItems.ToList().ForEach(x => catalogItemsTree.Add(new CatalogItemTreeView() { CatalogTreeItem = x, AddedToTree = false }));
+                PopulateTreeNativeMode(catalogItemsTree, ref tn, web);
+            }
+
+            node = tn;
+        }
+
+        private const string  FOLDER_TYPE_NAME = "Folder";
+        private const string REPORT_TYPE_NAME = "Report";        
+        private void PopulateTreeNativeMode(List<CatalogItemTreeView> catalogItems, ref TreeNode tn, SPWeb web)
+        {
+            foreach (var item in catalogItems)
+            {
+                TreeNode tnAdd;
+                try
+                {
+                    tnAdd = new TreeNode(item.CatalogTreeItem.Name, item.CatalogTreeItem.ID.ToString());
+
+                    // Find out if the item has a title and use it
+                    tnAdd.Text = item.CatalogTreeItem.Name;
+                    
+                    if (item.CatalogTreeItem.TypeName == FOLDER_TYPE_NAME)
+                    {
+                        tnAdd.SelectAction = TreeNodeSelectAction.None;
+                        tnAdd.ImageUrl = "/_layouts/images/16fold.gif";
+                        
+                        var folderItems = catalogItems?.ToList()?.Where(x => x.CatalogTreeItem.Path.StartsWith($"{item.CatalogTreeItem.Path}/"))?.ToList();                        
+                        if (folderItems?.Count > 0)
+                        {
+                            PopulateTreeNativeMode(folderItems, ref tnAdd, web);
+                        }
+                    }
+                    else if (item.CatalogTreeItem.TypeName == REPORT_TYPE_NAME)
+                    {
+                        tnAdd.Text = item.CatalogTreeItem.Name;
+                        tnAdd.ImageUrl = "/_layouts/images/16doc.gif";
+                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?isNativeMode=True" +
+                            "&itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
+                            "&weburl = " + HttpUtility.UrlEncode(web.Url);                                                
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tnAdd = new TreeNode("Report Error", Guid.NewGuid().ToString())
+                    {
+                        ImageUrl = "/_layouts/images/16doc.gif",
+                        Text = item.CatalogTreeItem.Name + " <img src=\"/_layouts/epmlive/images/warning.png\" alt=\"" +
+                                           HttpUtility.HtmlEncode(ex.Message) + "\">",
+                        NavigateUrl = ""
+                    };
+                }
+
+                if (!string.IsNullOrEmpty(tnAdd.ImageUrl) && !item.AddedToTree)
+                {
+                    tn.ChildNodes.Add(tnAdd);
+                    item.AddedToTree = true;
+                }
+            }
+        }
+        
+        private void GetItemsIntegratedMode(ref TreeNode node, SPWeb web)
+        {
             SPDocumentLibrary doc;
 
             try
@@ -427,37 +503,37 @@ namespace EPMLiveWebParts
             }
         }
 
-        private string getReportParameters(string url)
-        {
-            var parameters = "";
+        //private string getReportParameters(string url)
+        //{
+        //    var parameters = "";
 
-            var parametersSSRS2006 = _srs2006.GetReportParameters(url, null, null, null);
+        //    var parametersSSRS2006 = _srs2006.GetReportParameters(url, null, null, null);
 
-            foreach (var rp in parametersSSRS2006)
-            {
-                if (rp.Prompt != "") continue;
+        //    foreach (var rp in parametersSSRS2006)
+        //    {
+        //        if (rp.Prompt != "") continue;
                 
-                switch (rp.Name)
-                {
-                    case "URL":
-                        parameters += "&rp:URL=" + HttpUtility.UrlEncode(SPContext.Current.Web.ServerRelativeUrl);
-                        break;
-                    case "SiteId":
-                        parameters += "&rp:SiteId=" + SPContext.Current.Site.ID;
-                        break;
-                    case "WebId":
-                        parameters += "&rp:WebId=" + SPContext.Current.Web.ID;
-                        break;
-                    case "UserId":
-                        parameters += "&rp:UserId=" + SPContext.Current.Web.CurrentUser.ID;
-                        break;
-                    case "Username":
-                        parameters += "&rp:Username=" + HttpContext.Current.User.Identity.Name;
-                        break;
-                }
-            }
-            return (parameters);
-        }
+        //        switch (rp.Name)
+        //        {
+        //            case "URL":
+        //                parameters += "&rp:URL=" + HttpUtility.UrlEncode(SPContext.Current.Web.ServerRelativeUrl);
+        //                break;
+        //            case "SiteId":
+        //                parameters += "&rp:SiteId=" + SPContext.Current.Site.ID;
+        //                break;
+        //            case "WebId":
+        //                parameters += "&rp:WebId=" + SPContext.Current.Web.ID;
+        //                break;
+        //            case "UserId":
+        //                parameters += "&rp:UserId=" + SPContext.Current.Web.CurrentUser.ID;
+        //                break;
+        //            case "Username":
+        //                parameters += "&rp:Username=" + HttpContext.Current.User.Identity.Name;
+        //                break;
+        //        }
+        //    }
+        //    return (parameters);
+        //}
 
         private static NetworkCredential GetCredentials()
         {
@@ -482,6 +558,12 @@ namespace EPMLiveWebParts
             }
 
             return credential;
+        }
+
+        private class CatalogItemTreeView
+        {
+            public SSRS2010.CatalogItem CatalogTreeItem { get; set; }
+            public bool AddedToTree { get; set; }
         }
     }
 }
