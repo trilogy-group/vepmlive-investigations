@@ -1,4 +1,5 @@
-﻿using Microsoft.ReportingServices.Interfaces;
+﻿using EPMLive.SSRSCustomAuthentication.Exceptions;
+using Microsoft.ReportingServices.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Specialized;
@@ -11,13 +12,13 @@ namespace EPMLive.SSRSCustomAuthentication
 {
     public class AuthorizationExtension : IAuthorizationExtension
     {
-        private Hashtable modelItemOperations;
-        private Hashtable modelOperations;
-        private Hashtable catalogOperation;
-        private Hashtable folderOperations;
-        private Hashtable reportOperations;
-        private Hashtable resourceOperations;
-        private Hashtable datasourceOperations;
+        private static Hashtable modelItemOperations;
+        private static Hashtable modelOperations;
+        private static Hashtable catalogOperation;
+        private static Hashtable folderOperations;
+        private static Hashtable reportOperations;
+        private static Hashtable resourceOperations;
+        private static Hashtable datasourceOperations;
 
         private const int reportOperationsCount = 27;
         private const int folderOperationsCount = 10;
@@ -28,6 +29,11 @@ namespace EPMLive.SSRSCustomAuthentication
         private const int modelItemOperationsCount = 1;
 
         private string usernames = string.Empty;
+
+        static AuthorizationExtension()
+        {
+            InitializeMaps();
+        }
 
         public string LocalizedName
         {
@@ -326,7 +332,7 @@ namespace EPMLive.SSRSCustomAuthentication
             usernames = "admin1,admin2";
         }
 
-        private void InitializeMaps()
+        private static void InitializeMaps()
         {
             MapModelItemOperation();
             MapModelOperations();
@@ -337,7 +343,7 @@ namespace EPMLive.SSRSCustomAuthentication
             MapDatasourceOperations();
         }
 
-        private void MapDatasourceOperations()
+        private static void MapDatasourceOperations()
         {
             datasourceOperations = new Hashtable();
             datasourceOperations.Add(DatasourceOperation.Delete, OperationNames.OperDelete);
@@ -349,11 +355,11 @@ namespace EPMLive.SSRSCustomAuthentication
             datasourceOperations.Add(DatasourceOperation.UpdateDeleteAuthorizationPolicy, OperationNames.OperUpdateDeleteAuthorizationPolicy);
             if (datasourceOperations.Count != datasourceOperationsCount)
             {
-                throw new Exception("Datasource operations not mapped correctly.");
+                throw new IncorrectMappingException("Datasource operations not mapped correctly.");
             }
         }
 
-        private void MapResourceOperations()
+        private static void MapResourceOperations()
         {
             resourceOperations = new Hashtable();
             resourceOperations.Add(ResourceOperation.Delete, OperationNames.OperDelete);
@@ -366,11 +372,11 @@ namespace EPMLive.SSRSCustomAuthentication
 
             if (resourceOperations.Count != resourceOperationsCount)
             {
-                throw new Exception("Resource operations not mapped correctly.");
+                throw new IncorrectMappingException("Resource operations not mapped correctly.");
             }
         }
 
-        private void MapReportOperations()
+        private static void MapReportOperations()
         {
             reportOperations = new Hashtable();
             reportOperations.Add(ReportOperation.Delete, OperationNames.OperDelete);
@@ -403,11 +409,11 @@ namespace EPMLive.SSRSCustomAuthentication
 
             if (reportOperations.Count != reportOperationsCount)
             {
-                throw new Exception("Report operations not mapped correctly.");
+                throw new IncorrectMappingException("Report operations not mapped correctly.");
             }
         }
 
-        private void MapFolderOperations()
+        private static void MapFolderOperations()
         {
             folderOperations = new Hashtable();
             folderOperations.Add(FolderOperation.CreateFolder, OperationNames.OperCreateFolder);
@@ -422,11 +428,11 @@ namespace EPMLive.SSRSCustomAuthentication
             folderOperations.Add(FolderOperation.CreateModel, OperationNames.OperCreateModel);
             if (folderOperations.Count != folderOperationsCount)
             {
-                throw new Exception("Folder operations not mapped correctly.");
+                throw new IncorrectMappingException("Folder operations not mapped correctly.");
             }
         }
 
-        private void MapCatalogOperations()
+        private static void MapCatalogOperations()
         {
             catalogOperation = new Hashtable();
             catalogOperation.Add(CatalogOperation.CreateRoles, OperationNames.OperCreateRoles);
@@ -447,11 +453,11 @@ namespace EPMLive.SSRSCustomAuthentication
             catalogOperation.Add(CatalogOperation.ExecuteReportDefinition, OperationNames.ExecuteReportDefinition);
             if (catalogOperation.Count != catalogOperationsCount)
             {
-                throw new Exception("Catalog operations not mapped correctly.");
+                throw new IncorrectMappingException("Catalog operations not mapped correctly.");
             }
         }
 
-        private void MapModelOperations()
+        private static void MapModelOperations()
         {
             modelOperations = new Hashtable();
             modelOperations.Add(ModelOperation.Delete, OperationNames.OperDelete);
@@ -468,18 +474,18 @@ namespace EPMLive.SSRSCustomAuthentication
 
             if (modelOperations.Count != modelOperationsCount)
             {
-                throw new Exception("Model operations not mapped correctly.");
+                throw new IncorrectMappingException("Model operations not mapped correctly.");
             }
         }
 
-        private void MapModelItemOperation()
+        private static void MapModelItemOperation()
         {
             modelItemOperations = new Hashtable();
             modelItemOperations.Add(ModelItemOperation.ReadProperties, OperationNames.OperReadProperties);
 
             if (modelItemOperations.Count != modelItemOperationsCount)
             {
-                throw new Exception("Model item operations not mapped correctly.");
+                throw new IncorrectMappingException("Model item operations not mapped correctly.");
             }
         }
 

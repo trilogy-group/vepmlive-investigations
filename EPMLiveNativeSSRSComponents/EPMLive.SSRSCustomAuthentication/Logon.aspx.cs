@@ -11,21 +11,15 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public Logon()
         {
-            authenticationProvider = new ADAuthenticationProvider();
-        }
-
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
+            authenticationProvider = new AdAuthenticationProvider();
         }
 
         protected void Login_Click(object sender, EventArgs e)
         {
             var userName = txtUserName.Text.Trim();
             var password = txtPassword.Text.Trim();
-            var error = string.Empty;
 
-            var passwordVerified = authenticationProvider.VerifyPassword(userName, password, out error);
+            var passwordVerified = authenticationProvider.VerifyPassword(userName, password);
 
             if (passwordVerified)
             {

@@ -285,3 +285,4 @@ paket-files/
 /output/binaries
 /Saas/BillingSite/_vti_pvt
 /BuildTeamCity/SilentInstaller/*.zip
+/EPMLiveNativeSSRSComponents/.sonarqube

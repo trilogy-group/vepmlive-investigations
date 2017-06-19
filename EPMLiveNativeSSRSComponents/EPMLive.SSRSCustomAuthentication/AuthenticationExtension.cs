@@ -12,7 +12,7 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public AuthenticationExtension()
         {
-            authProvider = new ADAuthenticationProvider();
+            authProvider = new AdAuthenticationProvider();
         }
 
         public string LocalizedName
@@ -56,13 +56,12 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool LogonUser(string userName, string password, string authority)
         {
-            var error = string.Empty;
-            return authProvider.VerifyPassword(userName, password, out error);
+            return authProvider.VerifyPassword(userName, password);
         }
 
         public void SetConfiguration(string configuration)
         {
-            
+            // Nothing to set in configuration
         }
     }
 }

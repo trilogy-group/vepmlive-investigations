@@ -48,9 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationExtension.cs" />
-    <Compile Include="AuthenticationProvider\ADAuthenticationProvider.cs" />
+    <Compile Include="AuthenticationProvider\AdAuthenticationProvider.cs" />
     <Compile Include="AuthenticationProvider\IAuthenticationProvider.cs" />
     <Compile Include="AuthorizationExtension.cs" />
+    <Compile Include="Exceptions\IncorrectMappingException.cs" />
     <Compile Include="Logon.aspx.cs">
       <DependentUpon>Logon.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

@@ -4,6 +4,6 @@
     {
         bool VerifyUser(string principalName);
 
-        bool VerifyPassword(string userName, string password, out string error);
+        bool VerifyPassword(string userName, string password);
     }
 }
