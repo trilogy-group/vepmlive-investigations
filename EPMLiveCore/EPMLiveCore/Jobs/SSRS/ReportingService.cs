@@ -1,7 +1,7 @@
 ﻿using EPMLiveCore.SSRS2010;
 using System.Linq;
 
-namespace EPMLiveCore.Integrations.SSRS
+namespace EPMLiveCore.Jobs.SSRS
 {
     public class ReportingService : IReportingService
     {
@@ -16,14 +16,14 @@ namespace EPMLiveCore.Integrations.SSRS
             this.reportServerUrl = reportServerUrl;
         }
 
-        public void CreateFolders(string webApplicationId, string siteCollectionId)
+        public void CreateSiteCollectionMappedFolder(string webApplicationId, string siteCollectionId)
         {
             var client = GetClient();            
             var parentFolderItem = GetOrCreateParentFolder(webApplicationId, client);
             client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
         }        
 
-        public void DeleteSiteCollection(string webApplicationId, string siteCollectionId)
+        public void DeleteSiteCollectionMappedFolder(string webApplicationId, string siteCollectionId)
         {
             var client = GetClient();
             client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
