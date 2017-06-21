@@ -22,6 +22,28 @@ namespace EPMLiveCore.Integrations.SSRS
 
         public void CreateFolders(string webApplicationId, string siteCollectionId)
         {
+            var client = GetClient();
+
+            var children = client.ListChildren("/", false).ToList();
+
+            CatalogItem parentFolderItem;
+
+            if (!children.Exists(x => x.Name == webApplicationId))
+            {
+                parentFolderItem = client.CreateFolder(webApplicationId, "/", null);
+            }
+            else
+            {
+                parentFolderItem = children.Where(x => x.Name == webApplicationId).First();
+            }
+
+            parentFolderItem = client.CreateFolder(webApplicationId, "/", null);
+
+            client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
+        }
+
+        private ReportingService2010 GetClient()
+        {
             var client = new ReportingService2010()
             {
                 Url = reportServerUrl
@@ -29,9 +51,14 @@ namespace EPMLiveCore.Integrations.SSRS
 
             client.LogonUser(username, password, null);
 
-            var parentFolderItem = client.CreateFolder(webApplicationId, "/", null);
+            return client;
+        }
 
-            client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
+        public void DeleteSiteCollection(string webApplicationId, string siteCollectionId)
+        {
+            var client = GetClient();
+
+            client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
         }
     }
 }

@@ -8,9 +8,25 @@ namespace EPMLiveCore.Integrations.SSRS
 {
     public class FolderIntegrator : IIntegrator
     {
-        public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
+        public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog log)
         {
-            throw new NotImplementedException();
+            using (var site = new SPSite(Convert.ToString(WebProps.Properties["SITE_URL"])))
+            {
+                try
+                {
+                    IReportingService reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
+                                                                Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]),
+                                                                Convert.ToString(WebProps.Properties["RPT_SRV_URL"]));
+
+                    reportingService.DeleteSiteCollection(WebProps.Properties["WEB_ID"].ToString(), WebProps.Site.ID.ToString());
+                }
+                catch (Exception exception)
+                {
+                    log.LogMessage(exception.ToString(), IntegrationLogType.Error);
+                }
+            }
+
+            return new TransactionTable();
         }
 
         public List<ColumnProperty> GetColumns(WebProperties WebProps, IntegrationLog Log, string ListName)
@@ -58,7 +74,7 @@ namespace EPMLiveCore.Integrations.SSRS
                     {
                         try
                         {
-                            var reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
+                            IReportingService reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
                                                                         Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]), 
                                                                         Convert.ToString(WebProps.Properties["RPT_SRV_URL"]));
 
