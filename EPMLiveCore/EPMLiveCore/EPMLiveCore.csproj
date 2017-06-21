@@ -410,7 +410,9 @@
     <Compile Include="Integrations\Salesforce\SalesforceServiceResponse.cs" />
     <Compile Include="Integrations\Salesforce\SfMedadataService.cs" />
     <Compile Include="Integrations\Salesforce\SfService.cs" />
-    <Compile Include="Integrations\SSRS\SSRSFolderIntegrator.cs" />
+    <Compile Include="Integrations\SSRS\IReportingService.cs" />
+    <Compile Include="Integrations\SSRS\ReportingService.cs" />
+    <Compile Include="Integrations\SSRS\FolderIntegrator.cs" />
     <Compile Include="ISAPI\Lic\Licensing.asmx.cs">
       <DependentUpon>Licensing.asmx</DependentUpon>
       <SubType>Component</SubType>

@@ -6,7 +6,7 @@ using System.Data;
 
 namespace EPMLiveCore.Integrations.SSRS
 {
-    public class SSRSFolderIntegrator : IIntegrator
+    public class FolderIntegrator : IIntegrator
     {
         public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
@@ -50,27 +50,19 @@ namespace EPMLiveCore.Integrations.SSRS
 
         public TransactionTable UpdateItems(WebProperties WebProps, DataTable Items, IntegrationLog log)
         {
-            var transactionTable = new TransactionTable();
-
-            var siteId = WebProps.Site.ID;
-
-            var webappId = WebProps.Properties["WEB_ID"];
-
-            var webAppurl = Convert.ToString(WebProps.Properties["SITE_URL"]);
-
-            using (var site = new SPSite(webAppurl))
+            using (var site = new SPSite(Convert.ToString(WebProps.Properties["SITE_URL"])))
             {
-                var username = Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]);
-
-                var password = Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]);
-
                 using (var web = site.OpenWeb())
                 {
                     if (web.Properties["epmlivessrsfoldersyncts"] == null)
                     {
                         try
                         {
-                            // Cal SSRS api here and create folder
+                            var reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
+                                                                        Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]), 
+                                                                        Convert.ToString(WebProps.Properties["RPT_SRV_URL"]));
+
+                            reportingService.CreateFolders(WebProps.Properties["WEB_ID"].ToString(), WebProps.Site.ID.ToString());
 
                             web.Properties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
                         }
@@ -82,7 +74,7 @@ namespace EPMLiveCore.Integrations.SSRS
                 }
             }
 
-            return transactionTable;
+            return new TransactionTable();
         }
     }
 }
