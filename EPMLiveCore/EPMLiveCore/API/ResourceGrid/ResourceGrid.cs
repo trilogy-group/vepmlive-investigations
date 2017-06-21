@@ -1054,16 +1054,15 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
-                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
+                return GetDataGrid(data, web);
             }
-            catch (APIException)
+            catch (APIException ex)
             {
-                throw;
+                throw ex;
             }
             catch (Exception e)
             {
-                throw new APIException((int)Errors.GetResourcePoolDataGrid, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolDataGrid, e.ToString());
             }
         }
 
@@ -1211,8 +1210,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Layout"),
-                    new CacheStoreCategory(web).ResourceGrid, () => GetLayoutGrid(data).Zip()).Value).Unzip();
+                return GetLayoutGrid(data);
             }
             catch (APIException)
             {
@@ -1234,16 +1232,15 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Views"),
-                    new CacheStoreCategory(web).ResourceGrid, () => GetViews().Zip()).Value).Unzip();
+                return GetViews();
             }
-            catch (APIException)
+            catch (APIException ex)
             {
-                throw;
+                throw ex;
             }
             catch (Exception e)
             {
-                throw new APIException((int)Errors.GetResourcePoolViews, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolViews, e.ToString());
             }
         }
 

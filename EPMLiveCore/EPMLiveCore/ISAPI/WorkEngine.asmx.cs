@@ -1255,7 +1255,7 @@ namespace EPMLiveCore
             }
             catch (APIException ex)
             {
-                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.ToString()));
             }
         }
 
@@ -1314,7 +1314,7 @@ namespace EPMLiveCore
             }
             catch (APIException ex)
             {
-                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.ToString()));
             }
         }
 
