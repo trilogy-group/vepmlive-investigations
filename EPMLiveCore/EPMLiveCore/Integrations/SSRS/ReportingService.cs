@@ -26,7 +26,6 @@ namespace EPMLiveCore.Integrations.SSRS
         public void DeleteSiteCollection(string webApplicationId, string siteCollectionId)
         {
             var client = GetClient();
-
             client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
         }
 

@@ -17,7 +17,6 @@ namespace EPMLiveCore.Integrations.SSRS
                     IReportingService reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
                                                                 Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]),
                                                                 Convert.ToString(WebProps.Properties["RPT_SRV_URL"]));
-
                     reportingService.DeleteSiteCollection(WebProps.Properties["WEB_ID"].ToString(), WebProps.Site.ID.ToString());
                 }
                 catch (Exception exception)
@@ -77,9 +76,7 @@ namespace EPMLiveCore.Integrations.SSRS
                             IReportingService reportingService = new ReportingService(Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminUsername"]),
                                                                         Convert.ToString(site.RootWeb.Properties["SSRSNativeAdminPassword"]), 
                                                                         Convert.ToString(WebProps.Properties["RPT_SRV_URL"]));
-
                             reportingService.CreateFolders(WebProps.Properties["WEB_ID"].ToString(), WebProps.Site.ID.ToString());
-
                             web.Properties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
                         }
                         catch (Exception exception)
