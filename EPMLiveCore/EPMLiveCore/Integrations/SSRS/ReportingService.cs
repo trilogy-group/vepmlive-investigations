@@ -1,9 +1,5 @@
 ﻿using EPMLiveCore.SSRS2010;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPMLiveCore.Integrations.SSRS
 {
@@ -22,24 +18,29 @@ namespace EPMLiveCore.Integrations.SSRS
 
         public void CreateFolders(string webApplicationId, string siteCollectionId)
         {
+            var client = GetClient();            
+            var parentFolderItem = GetOrCreateParentFolder(webApplicationId, client);
+            client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
+        }        
+
+        public void DeleteSiteCollection(string webApplicationId, string siteCollectionId)
+        {
             var client = GetClient();
 
+            client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
+        }
+
+        private CatalogItem GetOrCreateParentFolder(string webApplicationId, ReportingService2010 client)
+        {
             var children = client.ListChildren("/", false).ToList();
-
-            CatalogItem parentFolderItem;
-
             if (!children.Exists(x => x.Name == webApplicationId))
             {
-                parentFolderItem = client.CreateFolder(webApplicationId, "/", null);
+                return client.CreateFolder(webApplicationId, "/", null);
             }
             else
             {
-                parentFolderItem = children.Where(x => x.Name == webApplicationId).First();
+                return children.Where(x => x.Name == webApplicationId).First();
             }
-
-            parentFolderItem = client.CreateFolder(webApplicationId, "/", null);
-
-            client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
         }
 
         private ReportingService2010 GetClient()
@@ -48,17 +49,8 @@ namespace EPMLiveCore.Integrations.SSRS
             {
                 Url = reportServerUrl
             };
-
             client.LogonUser(username, password, null);
-
             return client;
-        }
-
-        public void DeleteSiteCollection(string webApplicationId, string siteCollectionId)
-        {
-            var client = GetClient();
-
-            client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
         }
     }
 }
