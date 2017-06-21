@@ -7,13 +7,15 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveWebParts.SSRS2006;
+using System.Web.Services;
+using System.Web.Script.Serialization;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
     public partial class SSRSReportRedirect : LayoutsPageBase
     {
         private string webUrl = string.Empty;
-        private string itemUrl = string.Empty;
+        private static string itemUrl = string.Empty;
         private bool isNativeMode = false;
 
         private ReportingService2006 _srs2006;
@@ -40,21 +42,28 @@ namespace EPMLiveWebParts.Layouts.epmlive
             Redirect();
         }
 
+        [WebMethod]
+        public static string GetRegs()
+        {
+            var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
+            var addresses = $"{$"{reportURL}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render"}|reportbuilder:Action=Edit&ItemPath={itemUrl}&Endpoint={reportURL}";
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            return json.Serialize(addresses);
+        }
         private void Redirect()
         {
             if (!string.IsNullOrEmpty(itemUrl))
             {
-                if (isNativeMode)
-                    RedirectNativeMode();
-                else
+                if (!isNativeMode)                    
                     RedirectIntegratedMode();
             }            
         }
 
         private void RedirectNativeMode()
         {
-            if (!string.IsNullOrEmpty(itemUrl))
-                HttpContext.Current.Response.Redirect($"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
+            //ReportFrame.Attributes.Add("src", $"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
+            //if (!string.IsNullOrEmpty(itemUrl))
+            //    HttpContext.Current.Response.Redirect($"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
         }
 
         private void RedirectIntegratedMode()
