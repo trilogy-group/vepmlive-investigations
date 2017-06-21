@@ -7,7 +7,7 @@ namespace EPMLive.SSRSConfigInjector
 {
     public class Program
     {
-        private static string reportServerBasePath = "C:\\Program Files\\Microsoft SQL Server\\MSRS13.MSSQLSERVER";
+        private static string reportServerBasePath = "C:\\Program Files\\Microsoft SQL Server\\MSRS13.MSSQLSERVERRS";
 
         private static IPathResolver pathResolver = new PathResolver(reportServerBasePath);
 
@@ -68,7 +68,7 @@ namespace EPMLive.SSRSConfigInjector
             }
             else if (folderType == "wa")
             {
-                CopyFile(pathResolver.GetReportWebAppPath(filename + ".bkp"), pathResolver.GetReportingServicePath(filename), true);
+                CopyFile(pathResolver.GetReportWebAppPath(filename + ".bkp"), pathResolver.GetReportWebAppPath(filename), true);
                 File.Delete(pathResolver.GetReportWebAppPath(filename + ".bkp"));
             }            
         }
