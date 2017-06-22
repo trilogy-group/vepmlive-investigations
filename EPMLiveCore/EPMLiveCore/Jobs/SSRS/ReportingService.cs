@@ -19,14 +19,13 @@ namespace EPMLiveCore.Jobs.SSRS
             this.reportServerUrl = reportServerUrl;
         }
 
-        public void CreateSiteCollectionMappedFolder(string webApplicationId, string siteCollectionId)
+        public void CreateSiteCollectionMappedFolder(string siteCollectionId)
         {
             var client = GetClient();
-            var parentFolderItem = GetOrCreateParentFolder(webApplicationId, client);
-            client.CreateFolder(siteCollectionId, parentFolderItem.Path, null);
-        }        
+            client.CreateFolder(siteCollectionId, "/", null);
+        }
 
-        public void DeleteSiteCollectionMappedFolder(string webApplicationId, string siteCollectionId)
+        public void DeleteSiteCollectionMappedFolder(string siteCollectionId)
         {
             var client = GetClient();
             client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
