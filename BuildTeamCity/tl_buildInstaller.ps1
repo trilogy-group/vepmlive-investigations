@@ -290,7 +290,7 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
 Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
-#Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\Libraries\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\packages\Newtonsoft.Json.6.0.8\lib\net45\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
@@ -329,6 +329,9 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe.c
 
 
 Log-Section "Zipping"
+if (Test-Path "$BinariesDirectory\_PublishedWebsites\api") {
+	Remove-Item -Recurse -Force "$BinariesDirectory\_PublishedWebsites\api"
+}
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\"
