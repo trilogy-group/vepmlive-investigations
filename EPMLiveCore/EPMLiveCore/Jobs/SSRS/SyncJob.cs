@@ -7,7 +7,6 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         public void execute(SPSite site, SPWeb web, string data)
         {
-            DeleteSiteCollectionMappedFolder(site, web);
             CreateSiteCollectionMappedFolder(site, web);
         }
 
