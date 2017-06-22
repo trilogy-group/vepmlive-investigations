@@ -15,7 +15,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
     public partial class SSRSReportRedirect : LayoutsPageBase
     {
         private string webUrl = string.Empty;
-        private static string itemUrl = string.Empty;
+        private string itemUrl = string.Empty;
         private bool isNativeMode = false;
 
         private ReportingService2006 _srs2006;
@@ -45,8 +45,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [WebMethod]
         public static string GetRegs()
         {
+            var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
             var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
-            var addresses = $"{$"{reportURL}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render"}|reportbuilder:Action=Edit&ItemPath={itemUrl}&Endpoint={reportURL}";
+            var addresses = $"{$"{reportURL}/Pages/ReportViewer.aspx?{itemUrlRequest}&rs:Command=Render"}|reportbuilder:Action=Edit&ItemPath={itemUrlRequest}&Endpoint={reportURL}";
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(addresses);
         }
@@ -57,13 +58,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 if (!isNativeMode)                    
                     RedirectIntegratedMode();
             }            
-        }
-
-        private void RedirectNativeMode()
-        {
-            //ReportFrame.Attributes.Add("src", $"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
-            //if (!string.IsNullOrEmpty(itemUrl))
-            //    HttpContext.Current.Response.Redirect($"{_reportingServicesUrl}/Pages/ReportViewer.aspx?{itemUrl}&rs:Command=Render");
         }
 
         private void RedirectIntegratedMode()

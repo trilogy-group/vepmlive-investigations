@@ -78,9 +78,10 @@
 	    });
 
 	    $(document).ready(function () {
+	        var qString = "?" + window.location.href.split("?")[1];
 	        $.ajax({
 	            type: "POST",
-	            url: 'SSRSReportRedirect.aspx/GetRegs',
+	            url: "SSRSReportRedirect.aspx/GetRegs" + qString,
 	            data: {},
 	            contentType: "application/json; charset=utf-8",
 	            dataType: 'json',
