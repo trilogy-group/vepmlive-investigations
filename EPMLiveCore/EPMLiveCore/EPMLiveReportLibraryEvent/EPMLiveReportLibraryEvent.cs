@@ -1,17 +1,26 @@
 ﻿using Microsoft.SharePoint;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
-namespace EPMLiveCore.EPMLiveReportLibrary
+namespace EPMLiveCore
 {
-    /// <summary>
-    /// List Item Events
-    /// </summary>
-    public class EPMLiveReportLibrary : SPItemEventReceiver
+    [Guid("88FC38A2-03C2-414C-9BD8-E6C36C13E448")]
+    public class EPMLiveReportLibraryEvent : SPItemEventReceiver
     {
         private string eventLogSource = "EPM Live Report Center Events";
         private string eventLogName = "EPM Live";
         private string @event = "";
+
+        public override void ItemAdded(SPItemEventProperties properties)
+        {
+            base.ItemAdded(properties);
+        }
+
+        public override void ItemAdding(SPItemEventProperties properties)
+        {
+            base.ItemAdding(properties);
+        }
 
         /// <summary>
         /// An item was updated.

@@ -340,7 +340,7 @@
     <Compile Include="EPMLivePCForm\PCFieldIterator.cs" />
     <Compile Include="EPMLivePCForm\TCFieldIterator.cs" />
     <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.cs" />
-    <Compile Include="EPMLiveReportLibrary\EPMLiveReportLibrary.cs" />
+    <Compile Include="EPMLiveReportLibraryEvent\EPMLiveReportLibraryEvent.cs" />
     <Compile Include="EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.cs" />
     <Compile Include="EPMLiveTimePhased.cs">
       <SubType>Component</SubType>
@@ -1632,7 +1632,7 @@
     <None Include="EPMLiveProjectCenter\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{aac5b62a-fc79-4c81-8b82-85a3bdc03cca}</SharePointProjectItemId>
     </None>
-    <None Include="EPMLiveReportLibrary\SharePointProjectItem.spdata">
+    <None Include="EPMLiveReportLibraryEvent\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a2eab436-e579-4b56-8998-41076cabbee1}</SharePointProjectItemId>
     </None>
     <None Include="EPMLiveRollupFields\SharePointProjectItem.spdata">
@@ -1724,6 +1724,9 @@
     </None>
     <None Include="Features\EPMLiveLogging\EPMLiveLogging.feature">
       <FeatureId>{767ccedc-be93-4210-be70-c7a7fa7db0e9}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveReportLibraryEvent\EPMLiveReportLibraryEvent.feature">
+      <FeatureId>{86df2028-6c15-432e-8f04-b718af40845a}</FeatureId>
     </None>
     <None Include="Features\SocialStream\SocialStream.feature">
       <FeatureId>{41772821-ddd2-4ea4-9150-bb95eae4f875}</FeatureId>
@@ -2359,7 +2362,7 @@
     <Content Include="EPMLiveProjectCenterRollup\Schema.xml" />
     <Content Include="EPMLiveProjectCenter\Elements.xml" />
     <Content Include="EPMLiveProjectCenter\Schema.xml" />
-    <Content Include="EPMLiveReportLibrary\Elements.xml" />
+    <Content Include="EPMLiveReportLibraryEvent\Elements.xml" />
     <Content Include="EPMLiveRollupFields\Elements.xml" />
     <Content Include="EPMLiveRollupFields\Schema.xml" />
     <Content Include="EPMLiveTaskCenterEvent\Elements.xml" />
@@ -2436,6 +2439,9 @@
     </Content>
     <Content Include="Features\EPMLiveLogging\EPMLiveLogging.Template.xml">
       <DependentUpon>EPMLiveLogging.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveReportLibraryEvent\EPMLiveReportLibraryEvent.Template.xml">
+      <DependentUpon>EPMLiveReportLibraryEvent.feature</DependentUpon>
     </Content>
     <Content Include="Features\SocialStream\SocialStream.Template.xml">
       <DependentUpon>SocialStream.feature</DependentUpon>
