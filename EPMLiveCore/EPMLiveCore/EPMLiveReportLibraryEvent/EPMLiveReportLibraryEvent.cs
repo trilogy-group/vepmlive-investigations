@@ -12,16 +12,6 @@ namespace EPMLiveCore
         private string eventLogName = "EPM Live";
         private string @event = "";
 
-        public override void ItemAdded(SPItemEventProperties properties)
-        {
-            base.ItemAdded(properties);
-        }
-
-        public override void ItemAdding(SPItemEventProperties properties)
-        {
-            base.ItemAdding(properties);
-        }
-
         /// <summary>
         /// An item was updated.
         /// </summary>
