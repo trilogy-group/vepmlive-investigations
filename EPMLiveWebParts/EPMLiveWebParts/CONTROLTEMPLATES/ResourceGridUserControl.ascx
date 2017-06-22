@@ -9,7 +9,7 @@
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ResourceGridUserControl.ascx.cs" Inherits="EPMLiveWebParts.ResourceGridUserControl" %>
-
+<%--<link href="../../_layouts/epmlive/treegrid/grid/grid.css" rel="stylesheet" />--%>
 <asp:Panel ID="pnlGrid" runat="server">
     <SharePoint:StyleBlock runat="server">
         input[type=text]::-ms-clear {
@@ -204,6 +204,7 @@
      }
 
     </SharePoint:StyleBlock>
+    
     <div id="test"></div>
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
@@ -215,10 +216,7 @@
                             <span class="s4-clust" style="height: 16px; width: 16px; position: relative; display: inline-block; overflow: hidden;">
                                 <img class="ms-dlgCloseBtnImg" style="left: -0px !important; top: -661px !important; position: absolute;" alt="Maximize" src="/_layouts/15/images/fgimg.png?rev=23">
                             </span>
-                        </span>
-                    </a>
-                </span>
-                <h1 title="Dialog" class="ms-dlgTitleText ms-accentText ms-dlg-heading" id="dialogTitleSpan" style="width: 0px;">Dialog</h1>
+                        &nbsp;&nbsp;&nbsp;&nbsp;</span></a></span><h1 title="Dialog" class="ms-dlgTitleText ms-accentText ms-dlg-heading" id="dialogTitleSpan" style="width: 0px;">Dialog</h1>
             </div>
             <div class="ms-dlgFrameContainer">
                 <div style="width: 327px; height: 133px;">
@@ -227,7 +225,7 @@
                             <span style="padding-top: 6px; padding-right: 10px;">
                                 <img src="/_layouts/15/images/gears_anv4.gif?rev=23" title="This animation indicates the operation is in progress. Click to remove this animated image.">
                             </span>
-                            <span class="ms-core-pageTitle ms-accentText">Working on it...</span>
+                            &nbsp;&nbsp;&nbsp; <span class="ms-core-pageTitle ms-accentText">Working on it...</span>
                         </div>
                         <div class="ms-textXLarge ms-alignCenter"></div>
                     </div>
@@ -294,7 +292,8 @@
                     epmLiveResourceGrid.LaunchInForm=<%=LaunchInForm.ToString().ToLower()%>;
                     epmLiveResourceGrid.UserHaveResourceCenterPermission = <%= CurrentUserHaveResourceCenterPermission(SPBasePermissions.AddListItems).ToString(CultureInfo.InvariantCulture).ToLower() %>;
 
-                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_repeat="3" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_repeat="3" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
+                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_method="Soap" data_timeout="0" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute"  layout_namespace="workengine.com"  layout_param_function="GetResourcePoolLayoutGrid"  layout_param_dataxml="<%= LayoutXml %>"  suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
+
                 }, true);
 
                 window.epmLiveResourceGrid.actions.getNewFormUrl = epmLive.currentWebFullUrl + '/' + '<%=NewFormUrl %>';

@@ -876,7 +876,7 @@ namespace EPMLiveCore.API
             cfgElement.Add(new XAttribute("id", idElement.Value));
 
             cfgElement.Add(new XAttribute("CSS",
-                string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.css",
+                string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.min.css",
                     SPContext.Current.Web.SafeServerRelativeUrl())),
                 new XAttribute("Style", "GM"));
 
@@ -917,7 +917,7 @@ namespace EPMLiveCore.API
                         string deleteResourceCheckMessage = string.Empty;
                         string deleteResourceCheckStatus = string.Empty;
 
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             SPWeb oWeb = SPContext.Current.Web;
                             oWeb.AllowUnsafeUpdates = true;
@@ -1054,15 +1054,16 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return GetDataGrid(data, web);
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
             }
-            catch (APIException ex)
+            catch (APIException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception e)
             {
-                throw new APIException((int)Errors.GetResourcePoolDataGrid, e.ToString());
+                throw new APIException((int)Errors.GetResourcePoolDataGrid, e.Message);
             }
         }
 
@@ -1210,7 +1211,8 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return GetLayoutGrid(data);
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Layout"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetLayoutGrid(data).Zip()).Value).Unzip();
             }
             catch (APIException)
             {
@@ -1232,15 +1234,16 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return GetViews();
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Views"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetViews().Zip()).Value).Unzip();
             }
-            catch (APIException ex)
+            catch (APIException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception e)
             {
-                throw new APIException((int)Errors.GetResourcePoolViews, e.ToString());
+                throw new APIException((int)Errors.GetResourcePoolViews, e.Message);
             }
         }
 
@@ -1393,7 +1396,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                 
+
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";
