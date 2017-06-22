@@ -917,7 +917,7 @@ namespace EPMLiveCore.API
                         string deleteResourceCheckMessage = string.Empty;
                         string deleteResourceCheckStatus = string.Empty;
 
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
                             SPWeb oWeb = SPContext.Current.Web;
                             oWeb.AllowUnsafeUpdates = true;
@@ -1396,7 +1396,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-
+                 
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";
