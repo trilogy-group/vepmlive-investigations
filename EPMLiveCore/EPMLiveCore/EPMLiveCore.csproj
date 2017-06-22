@@ -340,6 +340,7 @@
     <Compile Include="EPMLivePCForm\PCFieldIterator.cs" />
     <Compile Include="EPMLivePCForm\TCFieldIterator.cs" />
     <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.cs" />
+    <Compile Include="EPMLiveReportLibrary\EPMLiveReportLibrary.cs" />
     <Compile Include="EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.cs" />
     <Compile Include="EPMLiveTimePhased.cs">
       <SubType>Component</SubType>
@@ -1631,6 +1632,9 @@
     <None Include="EPMLiveProjectCenter\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{aac5b62a-fc79-4c81-8b82-85a3bdc03cca}</SharePointProjectItemId>
     </None>
+    <None Include="EPMLiveReportLibrary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a2eab436-e579-4b56-8998-41076cabbee1}</SharePointProjectItemId>
+    </None>
     <None Include="EPMLiveRollupFields\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{23ac5233-31c5-4abc-b0b3-8d06db401c39}</SharePointProjectItemId>
     </None>
@@ -2355,6 +2359,7 @@
     <Content Include="EPMLiveProjectCenterRollup\Schema.xml" />
     <Content Include="EPMLiveProjectCenter\Elements.xml" />
     <Content Include="EPMLiveProjectCenter\Schema.xml" />
+    <Content Include="EPMLiveReportLibrary\Elements.xml" />
     <Content Include="EPMLiveRollupFields\Elements.xml" />
     <Content Include="EPMLiveRollupFields\Schema.xml" />
     <Content Include="EPMLiveTaskCenterEvent\Elements.xml" />
