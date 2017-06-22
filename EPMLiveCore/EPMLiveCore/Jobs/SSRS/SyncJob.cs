@@ -17,10 +17,17 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 try
                 {
+                    var errors = string.Empty;
                     IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
                                                                 Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
                                                                 Convert.ToString(web.Properties["RPT_SRV_URL"]));
-                    reportingService.SyncReports(site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary);
+                    reportingService.SyncReports(site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary, out errors);
+
+                    if(!string.IsNullOrEmpty(errors))
+                    {
+                        bErrors = true;
+                        sErrors += errors;
+                    }
                 }
                 catch (Exception exception)
                 {

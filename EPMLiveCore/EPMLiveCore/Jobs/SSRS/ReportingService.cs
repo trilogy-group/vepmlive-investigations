@@ -1,5 +1,6 @@
 ﻿using EPMLiveCore.SSRS2010;
 using Microsoft.SharePoint;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,11 +31,11 @@ namespace EPMLiveCore.Jobs.SSRS
             client.DeleteItem($"/{siteCollectionId}");
         }
 
-        public void SyncReports(string siteCollectionId, SPDocumentLibrary reportLibrary)
+        public void SyncReports(string siteCollectionId, SPDocumentLibrary reportLibrary, out string errors)
         {
             var client = GetClient();
             DeleteNonExistingReportsFromReportServer(siteCollectionId, reportLibrary, client);
-            SyncReportsFromSpToReportServer(siteCollectionId, reportLibrary, client);
+            SyncReportsFromSpToReportServer(siteCollectionId, reportLibrary, client, out errors);
         }
 
         private ReportingService2010 GetClient()
@@ -65,29 +66,43 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private static void SyncReportsFromSpToReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service)
+        private void SyncReportsFromSpToReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service, out string errors)
         {
+            errors = string.Empty;
+
             foreach (SPListItem item in reportLibrary.Items)
             {
-                var reportItem = new ReportItem()
+                if(Convert.ToBoolean(item.Fields["Synchronized"]) == false)
                 {
-                    FileName = item.File.Name,
-                    LastModified = item.File.TimeLastModified,
-                    Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
-                    BinaryData = item.File.OpenBinary()
-                };
-                CreateFoldersIfNotExist(service, siteCollectionId, reportItem.Folder);
-                UploadReport(service, siteCollectionId, reportItem);
+                    var reportItem = new ReportItem()
+                    {
+                        FileName = item.File.Name,
+                        LastModified = item.File.TimeLastModified,
+                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
+                        BinaryData = item.File.OpenBinary()
+                    };
+                    try
+                    {
+                        CreateFoldersIfNotExist(service, siteCollectionId, reportItem.Folder);
+                        UploadReport(service, siteCollectionId, reportItem);
+                        item["Synchronized"] = true;
+                        item.Update();
+                    }
+                    catch (Exception exception)
+                    {
+                        errors += exception.ToString();
+                    }
+                }
             }
         }
 
-        private static void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
+        private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
             service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
         }
 
-        private static void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
+        private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
         {
             var children = service.ListChildren($"/{siteCollectionId}", true).ToList();
             var folders = folder.Split('/').ToList();
