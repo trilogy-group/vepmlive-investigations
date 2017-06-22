@@ -31,11 +31,11 @@ namespace EPMLiveCore.Jobs.SSRS
             client.DeleteItem($"/{siteCollectionId}");
         }
 
-        public void SyncReports(string siteCollectionId, SPDocumentLibrary reportLibrary, out string errors)
+        public void SyncReports(Guid siteCollectionId, SPDocumentLibrary reportLibrary, out string errors)
         {
             var client = GetClient();
-            DeleteNonExistingReportsFromReportServer(siteCollectionId, reportLibrary, client);
-            SyncReportsFromSpToReportServer(siteCollectionId, reportLibrary, client, out errors);
+            DeleteNonExistingReportsFromReportServer(siteCollectionId.ToString(), reportLibrary, client);
+            SyncReportsFromSpToReportServer(siteCollectionId.ToString(), reportLibrary, client, out errors);
         }
 
         private ReportingService2010 GetClient()

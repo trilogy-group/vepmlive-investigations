@@ -21,7 +21,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
                                                                 Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
                                                                 Convert.ToString(web.Properties["RPT_SRV_URL"]));
-                    reportingService.SyncReports(site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary, out errors);
+                    reportingService.SyncReports(site.ID, web.Lists["Report Library"] as SPDocumentLibrary, out errors);
 
                     if(!string.IsNullOrEmpty(errors))
                     {
