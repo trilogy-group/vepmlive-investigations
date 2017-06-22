@@ -8,6 +8,31 @@ namespace EPMLiveCore.Jobs.SSRS
         public void execute(SPSite site, SPWeb web, string data)
         {
             CreateSiteCollectionMappedFolder(site, web);
+            SyncReports(site, web);
+        }
+
+        private void SyncReports(SPSite site, SPWeb web)
+        {
+            try
+            {
+                try
+                {
+                    IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
+                                                                Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
+                                                                Convert.ToString(web.Properties["RPT_SRV_URL"]));
+                    reportingService.SyncReports(web.ID.ToString(), site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary);
+                }
+                catch (Exception exception)
+                {
+                    bErrors = true;
+                    sErrors += exception.ToString();
+                }
+            }
+            catch (Exception exception)
+            {
+                bErrors = true;
+                sErrors += exception.ToString();
+            }
         }
 
         private void CreateSiteCollectionMappedFolder(SPSite site, SPWeb web)

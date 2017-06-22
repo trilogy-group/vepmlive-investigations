@@ -456,6 +456,7 @@
     <Compile Include="Jobs\ResourcePlan.cs" />
     <Compile Include="Jobs\RollupJob.cs" />
     <Compile Include="Jobs\SecurityUpdate.cs" />
+    <Compile Include="Jobs\SSRS\ReportItem.cs" />
     <Compile Include="Jobs\SSRS\SyncJob.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
     <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />
