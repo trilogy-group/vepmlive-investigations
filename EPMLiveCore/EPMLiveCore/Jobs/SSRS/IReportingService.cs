@@ -6,6 +6,6 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         void CreateSiteCollectionMappedFolder(string siteCollectionId);
         void DeleteSiteCollectionMappedFolder(string siteCollectionId);
-        void SyncReports(string webApplicationId, string siteCollectionId, SPDocumentLibrary reportLibrary);
+        void SyncReports(string siteCollectionId, SPDocumentLibrary reportLibrary);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using EPMLiveCore.SSRS2010;
-using System.Linq;
-using System;
 using Microsoft.SharePoint;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -28,27 +27,14 @@ namespace EPMLiveCore.Jobs.SSRS
         public void DeleteSiteCollectionMappedFolder(string siteCollectionId)
         {
             var client = GetClient();
-            client.DeleteItem($"{webApplicationId}/{siteCollectionId}");
+            client.DeleteItem($"/{siteCollectionId}");
         }
 
-        public void SyncReports(string webApplicationId, string siteCollectionId, SPDocumentLibrary reportLibrary)
+        public void SyncReports(string siteCollectionId, SPDocumentLibrary reportLibrary)
         {
             var client = GetClient();
-            DeleteNonExistingReportsFromReportServer(webApplicationId, siteCollectionId, reportLibrary, client);
-            SyncReportsFromSpToReportServer(webApplicationId, siteCollectionId, reportLibrary, client);
-        }
-
-        private CatalogItem GetOrCreateParentFolder(string webApplicationId, ReportingService2010 client)
-        {
-            var children = client.ListChildren("/", false).ToList();
-            if (!children.Exists(x => x.Name == webApplicationId))
-            {
-                return client.CreateFolder(webApplicationId, "/", null);
-            }
-            else
-            {
-                return children.Where(x => x.Name == webApplicationId).First();
-            }
+            DeleteNonExistingReportsFromReportServer(siteCollectionId, reportLibrary, client);
+            SyncReportsFromSpToReportServer(siteCollectionId, reportLibrary, client);
         }
 
         private ReportingService2010 GetClient()
@@ -61,9 +47,9 @@ namespace EPMLiveCore.Jobs.SSRS
             return client;
         }
 
-        private void DeleteNonExistingReportsFromReportServer(string webApplicationId, string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 client)
+        private void DeleteNonExistingReportsFromReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 client)
         {
-            var children = client.ListChildren($"/{webApplicationId}/{siteCollectionId}", true).ToList().Where(x => x.TypeName == "Report");
+            var children = client.ListChildren($"/{siteCollectionId}", true).ToList().Where(x => x.TypeName == "Report");
             var reports = new List<string>();
             foreach (SPListItem item in reportLibrary.Items)
             {
@@ -71,7 +57,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
             foreach (var report in children)
             {
-                var mappedReport = "Report Library" + report.Path.Replace($"{webApplicationId}/{siteCollectionId}/", string.Empty);
+                var mappedReport = "Report Library" + report.Path.Replace($"{siteCollectionId}/", string.Empty);
                 if (!reports.Exists(x => x == mappedReport))
                 {
                     client.DeleteItem(report.Path);
@@ -79,7 +65,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private static void SyncReportsFromSpToReportServer(string webApplicationId, string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service)
+        private static void SyncReportsFromSpToReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service)
         {
             foreach (SPListItem item in reportLibrary.Items)
             {
@@ -90,22 +76,22 @@ namespace EPMLiveCore.Jobs.SSRS
                     Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
                     BinaryData = item.File.OpenBinary()
                 };
-                CreateFoldersIfNotExist(service, webApplicationId, siteCollectionId, reportItem.Folder);
-                UploadReport(service, webApplicationId, siteCollectionId, reportItem);
+                CreateFoldersIfNotExist(service, siteCollectionId, reportItem.Folder);
+                UploadReport(service, siteCollectionId, reportItem);
             }
         }
 
-        private static void UploadReport(ReportingService2010 service, string webApplicationId, string siteCollectionId, ReportItem report)
+        private static void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
-            service.CreateCatalogItem("Report", report.FileName, $"/{webApplicationId}/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
         }
 
-        private static void CreateFoldersIfNotExist(ReportingService2010 service, string webApplicationId, string siteCollectionId, string folder)
+        private static void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
         {
-            var children = service.ListChildren($"/{webApplicationId}/{siteCollectionId}", true).ToList();
+            var children = service.ListChildren($"/{siteCollectionId}", true).ToList();
             var folders = folder.Split('/').ToList();
-            var folderToCheck = $"/{webApplicationId}/{siteCollectionId}";
+            var folderToCheck = $"/{siteCollectionId}";
             for (int i = 0; i < folders.Count; i++)
             {
                 if (!string.IsNullOrEmpty(folders[i]))
@@ -115,7 +101,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     if (!children.Exists(x => x.Path == folderToCheck))
                     {
                         service.CreateFolder(folders[i], parentFolder, null);
-                        children = service.ListChildren($"/{webApplicationId}/{siteCollectionId}", true).ToList();
+                        children = service.ListChildren($"/{siteCollectionId}", true).ToList();
                     }
                 }
             }

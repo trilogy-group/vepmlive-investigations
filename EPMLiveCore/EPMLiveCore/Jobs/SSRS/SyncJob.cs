@@ -20,7 +20,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
                                                                 Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
                                                                 Convert.ToString(web.Properties["RPT_SRV_URL"]));
-                    reportingService.SyncReports(web.ID.ToString(), site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary);
+                    reportingService.SyncReports(site.ID.ToString(), web.Lists["Report Library"] as SPDocumentLibrary);
                 }
                 catch (Exception exception)
                 {
