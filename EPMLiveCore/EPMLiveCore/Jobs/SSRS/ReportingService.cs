@@ -1,4 +1,5 @@
 ﻿using EPMLiveCore.SSRS2010;
+using System;
 using System.Linq;
 
 namespace EPMLiveCore.Jobs.SSRS
@@ -16,13 +17,13 @@ namespace EPMLiveCore.Jobs.SSRS
             this.reportServerUrl = reportServerUrl;
         }
 
-        public void CreateSiteCollectionMappedFolder(string siteCollectionId)
+        public void CreateSiteCollectionMappedFolder(Guid siteCollectionId)
         {
             var client = GetClient();
-            client.CreateFolder(siteCollectionId, "/", null);
+            client.CreateFolder(siteCollectionId.ToString(), "/", null);
         }
 
-        public void DeleteSiteCollectionMappedFolder(string siteCollectionId)
+        public void DeleteSiteCollectionMappedFolder(Guid siteCollectionId)
         {
             var client = GetClient();
             client.DeleteItem($"/{siteCollectionId}");
