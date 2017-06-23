@@ -55,6 +55,7 @@ namespace EPMLiveCore.Jobs.SSRS
                                                                     Convert.ToString(web.AllProperties["ReportServerUrl"]));
                         reportingService.CreateSiteCollectionMappedFolder(site.ID);
                         web.AllProperties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
+                        web.Update();
                     }
                     catch (Exception exception)
                     {
