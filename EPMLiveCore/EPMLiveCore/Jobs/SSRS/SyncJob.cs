@@ -18,9 +18,9 @@ namespace EPMLiveCore.Jobs.SSRS
                 try
                 {
                     var errors = string.Empty;
-                    IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
-                                                                Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
-                                                                Convert.ToString(web.Properties["RPT_SRV_URL"]));
+                    IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
+                                                                Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
+                                                                Convert.ToString(web.AllProperties["RPT_SRV_URL"]));
                     reportingService.SyncReports(site.ID, web.Lists["Report Library"] as SPDocumentLibrary, out errors);
 
                     if(!string.IsNullOrEmpty(errors))
@@ -46,15 +46,15 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             try
             {
-                if (web.Properties["epmlivessrsfoldersyncts"] == null)
+                if (web.AllProperties["epmlivessrsfoldersyncts"] == null)
                 {
                     try
                     {
-                        IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
-                                                                    Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
-                                                                    Convert.ToString(web.Properties["ReportServerUrl"]));
+                        IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
+                                                                    Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
+                                                                    Convert.ToString(web.AllProperties["ReportServerUrl"]));
                         reportingService.CreateSiteCollectionMappedFolder(site.ID);
-                        web.Properties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
+                        web.AllProperties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
                     }
                     catch (Exception exception)
                     {
@@ -74,9 +74,9 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             try
             {
-                IReportingService reportingService = new ReportingService(Convert.ToString(web.Properties["SSRSNativeAdminUsername"]),
-                                                            Convert.ToString(web.Properties["SSRSNativeAdminPassword"]),
-                                                            Convert.ToString(web.Properties["ReportServerUrl"]));
+                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
+                                                            Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
+                                                            Convert.ToString(web.AllProperties["ReportServerUrl"]));
                 reportingService.DeleteSiteCollectionMappedFolder(site.ID);
             }
             catch (Exception exception)
