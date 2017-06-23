@@ -3,6 +3,7 @@ using Microsoft.SharePoint;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -11,12 +12,14 @@ namespace EPMLiveCore.Jobs.SSRS
         private readonly string password;
         private readonly string reportServerUrl;
         private readonly string username;
+        private readonly string authenticationType;
 
-        public ReportingService(string username, string password, string reportServerUrl)
+        public ReportingService(string username, string password, string reportServerUrl, string authenticationType)
         {
             this.username = username;
             this.password = password;
             this.reportServerUrl = reportServerUrl;
+            this.authenticationType = authenticationType;
         }
 
         public void CreateSiteCollectionMappedFolder(Guid siteCollectionId)
@@ -44,7 +47,14 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 Url = reportServerUrl
             };
-            client.LogonUser(username, password, null);
+            if (authenticationType == "WindowsAuthentication")
+            {
+                client.Credentials = new NetworkCredential(username, password);
+            }
+            else if(authenticationType == "FormsBasedAuthentication")
+            {
+                client.LogonUser(username, password, null);
+            }                
             return client;
         }
 
@@ -72,7 +82,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
             foreach (SPListItem item in reportLibrary.Items)
             {
-                if(Convert.ToBoolean(item.Fields["Synchronized"]) == false)
+                if (Convert.ToBoolean(item.Fields["Synchronized"]) == false)
                 {
                     var reportItem = new ReportItem()
                     {
