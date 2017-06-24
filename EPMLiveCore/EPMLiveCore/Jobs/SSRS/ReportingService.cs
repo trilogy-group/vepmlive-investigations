@@ -51,10 +51,10 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 client.Credentials = new NetworkCredential(username, password);
             }
-            else if(authenticationType == "FormsBasedAuthentication")
+            else if (authenticationType == "FormsBasedAuthentication")
             {
                 client.LogonUser(username, password, null);
-            }                
+            }
             return client;
         }
 
@@ -82,7 +82,9 @@ namespace EPMLiveCore.Jobs.SSRS
 
             foreach (SPListItem item in reportLibrary.Items)
             {
-                if (Convert.ToBoolean(item.Fields["Synchronized"]) == false)
+                var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
+                var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
+                if (!synchronized)
                 {
                     var reportItem = new ReportItem()
                     {
