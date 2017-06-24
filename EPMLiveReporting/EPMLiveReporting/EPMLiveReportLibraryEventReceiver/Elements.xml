@@ -8,5 +8,12 @@
         <Class>EPMLiveReportsAdmin.EPMLiveReportLibraryEventReceiver</Class>
         <SequenceNumber>10000</SequenceNumber>
       </Receiver>
+    <Receiver>
+      <Name>EPMLiveReportLibraryEventReceiverItemDeleting</Name>
+      <Type>ItemDeleting</Type>
+      <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+      <Class>EPMLiveReportsAdmin.EPMLiveReportLibraryEventReceiver</Class>
+      <SequenceNumber>10000</SequenceNumber>
+    </Receiver>
   </Receivers>
 </Elements>

@@ -1,7 +1,6 @@
 ﻿using EPMLiveCore.SSRS2010;
 using Microsoft.SharePoint;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -37,8 +36,15 @@ namespace EPMLiveCore.Jobs.SSRS
         public void SyncReports(Guid siteCollectionId, SPDocumentLibrary reportLibrary, out string errors)
         {
             var client = GetClient();
-            DeleteNonExistingReportsFromReportServer(siteCollectionId.ToString(), reportLibrary, client);
             SyncReportsFromSpToReportServer(siteCollectionId.ToString(), reportLibrary, client, out errors);
+        }
+
+        public void DeleteReport(Guid siteCollectionId, string data)
+        {
+            var report = data.Split(':')[1];
+            var folder = data.Split(':')[2];
+            var client = GetClient();
+            client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
         }
 
         private ReportingService2010 GetClient()
@@ -56,24 +62,6 @@ namespace EPMLiveCore.Jobs.SSRS
                 client.LogonUser(username, password, null);
             }
             return client;
-        }
-
-        private void DeleteNonExistingReportsFromReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 client)
-        {
-            var children = client.ListChildren($"/{siteCollectionId}", true).ToList().Where(x => x.TypeName == "Report");
-            var reports = new List<string>();
-            foreach (SPListItem item in reportLibrary.Items)
-            {
-                reports.Add(item.File.ParentFolder.Url + "/" + item.File.Name);
-            }
-            foreach (var report in children)
-            {
-                var mappedReport = "Report Library" + report.Path.Replace($"{siteCollectionId}/", string.Empty);
-                if (!reports.Exists(x => x == mappedReport))
-                {
-                    client.DeleteItem(report.Path);
-                }
-            }
         }
 
         private void SyncReportsFromSpToReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service, out string errors)

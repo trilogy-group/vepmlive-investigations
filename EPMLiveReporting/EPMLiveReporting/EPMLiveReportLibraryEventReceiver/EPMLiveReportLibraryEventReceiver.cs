@@ -1,7 +1,7 @@
-﻿using Microsoft.SharePoint;
+﻿using EPMLiveCore.Jobs.SSRS;
+using Microsoft.SharePoint;
 using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace EPMLiveReportsAdmin
 {
@@ -15,7 +15,6 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         public override void ItemUpdated(SPItemEventProperties properties)
         {
-            Debugger.Launch();
             if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == false
                 && Convert.ToBoolean(properties.AfterProperties["Synchronized"]) == true)
             {
@@ -26,10 +25,23 @@ namespace EPMLiveReportsAdmin
                 if (properties.ListItem["Synchronized"] == null || Convert.ToBoolean(properties.ListItem["Synchronized"]) == true)
                 {
                     properties.ListItem["Synchronized"] = false;
-                    properties.ListItem.SystemUpdate();                    
+                    properties.ListItem.SystemUpdate();
                 }
                 base.ItemUpdated(properties);
-            }            
+            }
+        }
+
+        public override void ItemDeleting(SPItemEventProperties properties)
+        {
+            base.ItemDeleting(properties);
+            using (var site = new SPSite(properties.SiteId))
+            {
+                using (SPWeb web = site.OpenWeb(properties.Web.ID))
+                {
+                    var syncJob = new SyncJob();
+                    syncJob.execute(site, web, $"deletereport:{properties.ListItem.Name}:{properties.ListItem.File.ParentFolder.Url}");
+                }
+            }
         }
     }
 }

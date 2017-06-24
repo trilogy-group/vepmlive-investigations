@@ -9,5 +9,6 @@ namespace EPMLiveCore.Jobs.SSRS
         void CreateSiteCollectionMappedFolder(Guid siteCollectionId);
         void DeleteSiteCollectionMappedFolder(Guid siteCollectionId);
         void SyncReports(Guid siteCollectionId, SPDocumentLibrary reportLibrary, out string errors);
+        void DeleteReport(Guid siteCollectionId, string data);
     }
 }
