@@ -20,7 +20,8 @@ namespace EPMLiveCore.Jobs.SSRS
                     var errors = string.Empty;
                     IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
                                                                 Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
-                                                                Convert.ToString(web.AllProperties["ReportServerUrl"]));
+                                                                Convert.ToString(web.AllProperties["ReportServerUrl"]),
+                                                                Convert.ToString(web.AllProperties["AuthenticationType"]));
                     reportingService.SyncReports(site.ID, web.Lists["Report Library"] as SPDocumentLibrary, out errors);
                     if(!string.IsNullOrEmpty(errors))
                     {
@@ -50,8 +51,9 @@ namespace EPMLiveCore.Jobs.SSRS
                     try
                     {
                         IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
-                                                                    Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
-                                                                    Convert.ToString(web.AllProperties["ReportServerUrl"]));
+                                                                Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
+                                                                Convert.ToString(web.AllProperties["ReportServerUrl"]),
+                                                                Convert.ToString(web.AllProperties["AuthenticationType"]));
                         reportingService.CreateSiteCollectionMappedFolder(site.ID);
                         web.AllProperties.Add("epmlivessrsfoldersyncts", DateTime.Now.ToString());
                         web.Update();
@@ -75,8 +77,9 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSNativeAdminUsername"]),
-                                                            Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
-                                                            Convert.ToString(web.AllProperties["ReportServerUrl"]));
+                                                                Convert.ToString(web.AllProperties["SSRSNativeAdminPassword"]),
+                                                                Convert.ToString(web.AllProperties["ReportServerUrl"]),
+                                                                Convert.ToString(web.AllProperties["AuthenticationType"]));
                 reportingService.DeleteSiteCollectionMappedFolder(site.ID);
             }
             catch (Exception exception)
