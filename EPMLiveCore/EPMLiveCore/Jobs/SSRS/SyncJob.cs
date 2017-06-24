@@ -56,7 +56,7 @@ namespace EPMLiveCore.Jobs.SSRS
                                                                 Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
                         reportingService.CreateSiteCollectionMappedFolder(site.ID);
                         web.AllProperties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
-                        web.Update();
+                        web.Update();                        
                     }
                     catch (Exception exception)
                     {
