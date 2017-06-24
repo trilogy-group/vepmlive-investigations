@@ -35,7 +35,10 @@ namespace WorkEnginePPM
             catch { }
             try
             {
-                Work = (float.Parse(li["Work"].ToString()) / arrResourceExtIds.Count).ToString();
+                if ((bool)li["Summary"])
+                    Work = "0";
+                else
+                    Work = (float.Parse(li["Work"].ToString()) / arrResourceExtIds.Count).ToString();
             }
             catch { }
 
