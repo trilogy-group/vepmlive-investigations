@@ -86,7 +86,7 @@ namespace EPMLiveCore.Jobs.SSRS
                         CreateFoldersIfNotExist(service, siteCollectionId, reportItem.Folder);
                         UploadReport(service, siteCollectionId, reportItem);
                         item["Synchronized"] = true;
-                        item.Update();
+                        item.SystemUpdate();
                     }
                     catch (Exception exception)
                     {

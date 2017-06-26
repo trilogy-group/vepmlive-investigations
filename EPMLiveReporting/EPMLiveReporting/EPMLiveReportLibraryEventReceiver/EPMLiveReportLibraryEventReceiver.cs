@@ -1,6 +1,7 @@
 ﻿using EPMLiveCore.Jobs.SSRS;
 using Microsoft.SharePoint;
 using System;
+using System.Diagnostics;
 
 namespace EPMLiveReportsAdmin
 {
@@ -14,20 +15,23 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         public override void ItemUpdated(SPItemEventProperties properties)
         {
-            if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == false
-                && Convert.ToBoolean(properties.AfterProperties["Synchronized"]) == true)
+            if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == true)
             {
-                base.ItemUpdated(properties);
-            }
-            else
-            {
-                if (properties.ListItem["Synchronized"] == null || Convert.ToBoolean(properties.ListItem["Synchronized"]) == true)
+                base.EventFiringEnabled = false;
+                try
                 {
                     properties.ListItem["Synchronized"] = false;
-                    properties.ListItem.SystemUpdate();
+                    properties.ListItem.SystemUpdate(false);
                 }
-                base.ItemUpdated(properties);
+                catch
+                {
+                }
+                finally
+                {
+                    base.EventFiringEnabled = true;
+                }
             }
+            base.ItemUpdated(properties);
         }
 
         public override void ItemDeleting(SPItemEventProperties properties)
