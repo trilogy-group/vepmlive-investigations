@@ -318,9 +318,8 @@ namespace EPMLiveWebParts
                     {
                         tnAdd.Text = item.CatalogTreeItem.Name;
                         tnAdd.ImageUrl = "/_layouts/images/16doc.gif";
-                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?isNativeMode=True" +
-                            "&itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
-                            "&weburl = " + HttpUtility.UrlEncode(web.Url);                                                
+                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
+                            "&weburl = " + HttpUtility.UrlEncode(web.Url); ;                               
                     }
                 }
                 catch (Exception ex)

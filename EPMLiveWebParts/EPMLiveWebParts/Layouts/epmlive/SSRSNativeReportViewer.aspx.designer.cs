@@ -10,15 +10,6 @@
 namespace EPMLiveWebParts.Layouts.epmlive {
     
     
-    public partial class SSRSReportRedirect {
-        
-        /// <summary>
-        /// SubscriptionsManager control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl SubscriptionsManager;
+    public partial class SSRSNativeReportViewer {
     }
 }
