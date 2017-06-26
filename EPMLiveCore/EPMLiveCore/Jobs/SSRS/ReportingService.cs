@@ -35,8 +35,34 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(Guid siteCollectionId, SPDocumentLibrary reportLibrary, out string errors)
         {
+            errors = string.Empty;
             var client = GetClient();
-            SyncReportsFromSpToReportServer(siteCollectionId.ToString(), reportLibrary, client, out errors);
+            foreach (SPListItem item in reportLibrary.Items)
+            {
+                var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
+                var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
+                if (!synchronized)
+                {
+                    var reportItem = new ReportItem()
+                    {
+                        FileName = item.File.Name,
+                        LastModified = item.File.TimeLastModified,
+                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
+                        BinaryData = item.File.OpenBinary()
+                    };
+                    try
+                    {
+                        CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
+                        UploadReport(client, siteCollectionId.ToString(), reportItem);
+                        item["Synchronized"] = true;
+                        item.SystemUpdate();
+                    }
+                    catch (Exception exception)
+                    {
+                        errors += exception.ToString();
+                    }
+                }
+            }
         }
 
         public void DeleteReport(Guid siteCollectionId, string data)
@@ -62,38 +88,6 @@ namespace EPMLiveCore.Jobs.SSRS
                 client.LogonUser(username, password, null);
             }
             return client;
-        }
-
-        private void SyncReportsFromSpToReportServer(string siteCollectionId, SPDocumentLibrary reportLibrary, ReportingService2010 service, out string errors)
-        {
-            errors = string.Empty;
-
-            foreach (SPListItem item in reportLibrary.Items)
-            {
-                var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
-                var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
-                if (!synchronized)
-                {
-                    var reportItem = new ReportItem()
-                    {
-                        FileName = item.File.Name,
-                        LastModified = item.File.TimeLastModified,
-                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
-                        BinaryData = item.File.OpenBinary()
-                    };
-                    try
-                    {
-                        CreateFoldersIfNotExist(service, siteCollectionId, reportItem.Folder);
-                        UploadReport(service, siteCollectionId, reportItem);
-                        item["Synchronized"] = true;
-                        item.SystemUpdate();
-                    }
-                    catch (Exception exception)
-                    {
-                        errors += exception.ToString();
-                    }
-                }
-            }
         }
 
         private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
