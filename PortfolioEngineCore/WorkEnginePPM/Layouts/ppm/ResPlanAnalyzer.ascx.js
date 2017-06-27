@@ -20,6 +20,7 @@
             Grids.OnAfterValueChanged = GridsOnAfterValueChangedDelegate;
 
             Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
+            Grids.OnFilter = GridsOnFilterDelegate;
             Grids.OnClickCell = GridsOnClickCellDelegate;
             Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
             Grids.OnReady = GridsOnReadyDelegate;
@@ -3411,11 +3412,20 @@
 
     }
 
-
+    ResPlanAnalyzer.prototype.GridsOnFilter = function (Grid) {
+        if (Grid.id == "g_1") {
+            for (var irow in Grid.Rows) {
+                var _row = this.GetGridRow(Grid, irow);
+                if (!_row.Visible && _row.Kind == "Data") {
+                    Grid.ShowRow(_row);
+                    _row.Visible = true;
+                }
+            }
+        }
+    }
     ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid) {
 
         if (Grid.id == "g_1") {
-
             this.FilteredTop = new Array();
             var fcnt = 0;
 
@@ -5810,7 +5820,6 @@
             } catch (e) {
             }
             try {
-
                 var g_1 = Grids["g_1"];
                 var grouping = this.selectedView["g_1"]['Grouping'].split('|');
                 g_1.DoGrouping(grouping[1]);
@@ -5818,7 +5827,7 @@
             } catch (e) {
                 console.log(e);
             }
-           
+
             if (this.AnalyzerShowBarschecked == true) {
                 this.viewTab.setButtonStateOn("idAnalyzerShowBars");
             } else {
@@ -6444,7 +6453,7 @@
                 case "AnalyzerTab_SelView_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
                     this.SetViewChanged(null);
-                    
+
                     break;
 
 
@@ -8532,6 +8541,7 @@
 
 
         GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+        GridsOnFilterDelegate = MakeDelegate(this, this.GridsOnFilter);
         var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
 
 
