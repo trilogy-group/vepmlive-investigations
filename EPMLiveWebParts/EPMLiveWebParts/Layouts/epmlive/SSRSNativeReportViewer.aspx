@@ -92,7 +92,7 @@
             background-color: #dddddd;
         }
 
-        #AddSubscriptionForm span{
+        #AddSubscriptionTable span{
             font-size: 11px;
             color: darkgray;
         }
@@ -195,8 +195,17 @@
             });
         }
 
+        function BackToSubsManager() {
+            $("#AddSubscriptionForm").fadeOut("slow", function () {                
+                $("#SubscribeManagerDiv").fadeIn();
+            });
+        }
+
+
         function RedirectAddSubscription() {
-            $("#SubscriptionsTable").fadeOut("slow", function () {
+            $("#SubscribeManagerDiv").fadeOut("slow", function () {
+
+                $("#ReportParameters").empty();
 
                 $("#AddSubscriptionForm").css("visibility", "visible");
                 $("#AddSubscriptionForm").fadeIn();
@@ -220,7 +229,7 @@
                         //$("#LoadingDiv").fadeOut();
 
                         var objdata = $.parseJSON(data.d);
-                        $("#SubscriptionsTable").append(objdata);
+                        $("#ReportParameters").append(objdata);
                     },
                     error: function (XHR, errStatus, errorThrown) {
                         //$("#LoadingDiv").fadeOut();
@@ -229,6 +238,28 @@
                     }
                 });
             });
+        }
+
+        function EnterFieldChange(fieldID) {
+
+            var valueFieldName = "ValueFieldID" + fieldID;
+            var enterFieldName = "EnterFieldID" + fieldID;
+
+            var enterValue = document.getElementById(enterFieldName).value;
+            if (enterValue == "enter")
+                $("#" + valueFieldName).prop('disabled', false);
+            else {
+                $("#" + valueFieldName).prop('disabled', true);
+                if (document.getElementById(valueFieldName).nodeName == "INPUT")
+                    document.getElementById(valueFieldName).defaultValue = document.getElementById(valueFieldName).getAttribute("defaultValue");
+                else if (document.getElementById(valueFieldName).nodeName == "SELECT") {
+                    var selectElement = document.getElementById(valueFieldName);
+                    for (i = 0; i < selectElement.length; i++) {
+                        if (selectElement.options[i].defaultSelected)
+                            selectElement.options[i].selected = 'selected';
+                    }
+                }
+            }
         }
     </script>
 
@@ -247,7 +278,7 @@
         <iframe id="ReportFrame" width="100%" height="100%" src=""></iframe>
     </div>
     <div id="SubscribeManagerDiv" style="visibility:hidden">    
-        <div id="upperSubscription">
+        <div id="upperSubscriptionManager">
 	        <ul>
                 <li><a href="javascript:RedirectAddSubscription()">Add Subscription</a></li>
                 <li><a href="javascript:void(0)">Add Data-Driven Subscription</a></li>
@@ -268,7 +299,16 @@
                 <th>Last Run</th>
             </tr>
         </table>
-        <table id="AddSubscriptionForm" style="width:100%; visibility:hidden">
+    </div>
+    <div id="AddSubscriptionForm" style="visibility:hidden">
+        <div id="upperAddSubscription">
+	        <ul>
+                <li><a href="javascript:void(0)">Save</a></li>
+                <li><a href="javascript:BackToSubsManager()">Cancel</a></li>
+                <li style="float:right;background-color:#4CAF50"><a href="javascript:BackToSubsManager()">Back</a></li>
+            </ul>
+        </div>
+        <table id="AddSubscriptionTable" style="width:100%;>
             <tr><td colspan="2"><p>Use this page to edit the delivery options for a subscription.</p></td></tr>
             <tr>
                 <td><p>Description<br /><span>Specify a description for this subscription.</span></p></td>
@@ -325,8 +365,7 @@
                     <input type="radio" name="overwriteoptions" value="donotoverwrite">Do not overwrite the file if a previous version exists<br/>
                     <input type="radio" name="overwriteoptions" value="increment">Increment file names as newer versions are added
                 </td>
-            </tr>
-            <tr><td colspan="2"><input type="submit" value="Save"><input type="submit" value="Cancel"></td></tr>
+            </tr>            
         </table>
         <div id="ReportParameters"></div>
     </div>    

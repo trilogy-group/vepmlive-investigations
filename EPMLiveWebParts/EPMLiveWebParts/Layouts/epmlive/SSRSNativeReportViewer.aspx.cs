@@ -12,6 +12,8 @@ using System.Web.Script.Serialization;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using System.Data;
+using System.Text;
+using System.Linq;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -122,23 +124,72 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             //all the parameters of the report will be filled to out parameter 'itemParameter'
             var itemParameters = srs2010.GetItemParameters(itemUrlRequest, null, true, null, null);
-            string htmlToLoad = "<table><tr><th>Parameter</th><th>Source of Value</th><th>Value/Field</th></tr>";
+            StringBuilder htmlToLoad = new StringBuilder();
+            htmlToLoad.Append("<table><tr><th>Parameter</th><th>Source of Value</th><th>Value/Field</th></tr>");
 
+            //string fieldValueHtml = string.Empty;
             //iterate through parameters
+            int i = 0;
             foreach (var ip in itemParameters)
-            {
-                htmlToLoad += "<tr>";
+            {                         
+                htmlToLoad.Append("<tr>");
 
-                htmlToLoad += $"<td><p>{ip.Prompt}</p></td>";
+                htmlToLoad.Append($"<td><p>{ip.Prompt}</p></td>");
 
-                htmlToLoad += $"<td><select {(ip.DefaultValues == null ? "disabled" : string.Empty)}>"+
-                    $"<option value=\"enter\" {(ip.DefaultValues == null ? "selected" : string.Empty)}>Enter value</option>" +
-                    $"<option value=\"default\" {(ip.DefaultValues != null ? "selected" : string.Empty)}>Use default value</option>" +
-                    "</select></td>";
+                htmlToLoad.Append($"<td><select {(ip.DefaultValues == null ? "disabled" : string.Empty)} id=\"EnterFieldID{i}\" name=\"EnterFieldID{i}\" onchange=\"EnterFieldChange('{i}')\">");
+                htmlToLoad.Append($"<option value=\"enter\" {(ip.DefaultValues == null ? "selected" : string.Empty)}>Enter value</option>");
+                htmlToLoad.Append($"<option value=\"default\" {(ip.DefaultValues != null ? "selected" : string.Empty)}>Use default value</option>");
+                htmlToLoad.Append("</select></td>");
 
-                htmlToLoad += "<td></td>";
+                htmlToLoad.Append("<td>");
 
-                htmlToLoad += "</tr>";
+                var isDefaultValue = false;
+                switch (ip.ParameterTypeName.ToUpper())
+                {
+                    case "BOOLEAN":
+                        htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)} id=\"ValueFieldID{i}\" name=\"ValueFieldID{i}\">");
+
+                        isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(x => x != null && x.ToUpper() == "TRUE"));
+                        htmlToLoad.Append($"<option value=\"true\" ");
+                        htmlToLoad.Append(isDefaultValue ? "selected" : string.Empty);
+                        htmlToLoad.Append(">True</option>");
+
+                        isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(x => x != null && x.ToUpper() == "FALSE"));
+                        htmlToLoad.Append($"<option value=\"false\" ");
+                        htmlToLoad.Append(isDefaultValue ? "selected" : string.Empty);
+                        htmlToLoad.Append(">False</option>");
+
+                        htmlToLoad.Append("</select>");
+                        break;
+                    case "STRING":
+                    case "INTEGER":
+                    case "FLOAT":
+                    case "DATETIME":
+                        if (ip.ValidValues != null)
+                        {
+                            htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)}>");
+                            ip.ValidValues?.ToList().ForEach(x =>
+                            {
+                                isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(defValue => defValue != null && defValue.ToUpper() == x.Value));
+
+                                htmlToLoad.Append($"<option value=\"{x.Value}\" ");
+                                htmlToLoad.Append(ip.DefaultValues != null && isDefaultValue ? "selected" : string.Empty);
+                                htmlToLoad.Append($">{x.Value}</option>");
+                            });
+                            htmlToLoad.Append("</select>");
+                        }
+                        else
+                        {
+                            var defaultValues = string.Empty;
+                            ip.DefaultValues?.ToList().ForEach(x => defaultValues += x + "||");
+                            htmlToLoad.Append($"<input type=\"{(ip.ParameterTypeName.ToUpper() == "DATETIME" ? "datetime-local" : "text")}\" defaultValue=\"{defaultValues}\"/>");
+                        }
+                        break;
+                }
+
+                htmlToLoad.Append("</td>");
+
+                htmlToLoad.Append("</tr>");
 
                 ////check for the parameter I want to get default and available values for
                 ////if (pName == ip.Name)
@@ -155,9 +206,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 //        //ddlParamValues.Items.Add(new ListItem(vValue.Label, vValue.Value));
                 //    }
                 //}
+
+                i++;
             }
 
-            htmlToLoad += "</table>";
+            htmlToLoad.Append("</table>");
             //var serverReport = new Microsoft.Reporting.WebForms.ServerReport()
             //{
             //    ReportServerUrl = new Uri(reportURL),
@@ -166,7 +219,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //};
 
             JavaScriptSerializer json = new JavaScriptSerializer();
-            return json.Serialize(htmlToLoad);
+            return json.Serialize(htmlToLoad.ToString());
             //var parameters = serverReport.GetParameters();
 
             //var extensions = srs2010.ListExtensionTypes();
