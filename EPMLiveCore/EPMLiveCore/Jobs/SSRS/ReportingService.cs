@@ -1,6 +1,7 @@
 ﻿using EPMLiveCore.SSRS2010;
 using Microsoft.SharePoint;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -71,6 +72,67 @@ namespace EPMLiveCore.Jobs.SSRS
             var folder = data.Split(':')[2];
             var client = GetClient();
             client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
+        }
+
+        public void AssignRoleMapping(Guid siteCollectionId, List<SPGroup> groups, SPList userList)
+        {
+            var client = GetClient();
+            var roles = client.ListRoles("Catalog", "");
+            var contentManagers = AssignContentManagerRole(siteCollectionId, groups, userList, client, roles.GetRole("Content Manager"));
+            AssignReportViewerRole(siteCollectionId, groups, userList, client, roles.GetRole("Report Viewer"), contentManagers);
+        }
+
+        private void AssignReportViewerRole(Guid siteCollectionId, List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers)
+        {
+            var reportViewers = groups.Single(x => x.Name == "Report Viewers").Users.OfType<SPUser>().ToList();
+            foreach (SPUser user in reportViewers)
+            {
+                var extendedList = userList.Items.GetItemById(user.ID);
+                EnsureFieldExists(extendedList);
+                if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
+                    && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
+                {
+                    AssignRole(siteCollectionId, client, role, user.LoginName);
+                    extendedList["Synchronized"] = true;
+                }
+            }
+        }
+
+        private List<SPUser> AssignContentManagerRole(Guid siteCollectionId, List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role)
+        {
+            var contentManagers = groups.Single(x => x.Name == "Administrators").Users.OfType<SPUser>().ToList();
+            foreach (SPUser user in contentManagers.Where(x => x.Name != "System Account"))
+            {
+                var extendedList = userList.Items.GetItemById(user.ID);
+                EnsureFieldExists(extendedList);
+                if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
+                    && user.Name != "System Account")
+                {
+                    AssignRole(siteCollectionId, client, role, user.LoginName);
+                    extendedList["Synchronized"] = true;
+                }
+            }
+
+            return contentManagers;
+        }
+
+        private static void EnsureFieldExists(SPListItem extendedList)
+        {
+            if (extendedList["Synchronized"] == null)
+            {
+                extendedList.Fields.Add("Synchronized", SPFieldType.Boolean, false);
+            }
+        }
+
+        private void AssignRole(Guid siteCollectionId, ReportingService2010 client, Role role, string loginName)
+        {
+            var policies = new List<Policy>();
+            policies.Add(new Policy
+            {
+                GroupUserName = loginName,
+                Roles = new Role[] { role }
+            });
+            client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
         }
 
         private ReportingService2010 GetClient()

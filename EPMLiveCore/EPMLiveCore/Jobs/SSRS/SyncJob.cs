@@ -1,5 +1,6 @@
 ﻿using Microsoft.SharePoint;
 using System;
+using System.Linq;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -89,6 +90,23 @@ namespace EPMLiveCore.Jobs.SSRS
                                                                 Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
                                                                 Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
                 reportingService.DeleteSiteCollectionMappedFolder(site.ID);
+            }
+            catch (Exception exception)
+            {
+                bErrors = true;
+                sErrors += exception.ToString();
+            }
+        }
+
+        private void AssignRoleMapping(SPSite site, SPWeb web)
+        {
+            try
+            {
+                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
+                                                                Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
+                                                                Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
+                                                                Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                reportingService.AssignRoleMapping(site.ID, web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
             }
             catch (Exception exception)
             {
