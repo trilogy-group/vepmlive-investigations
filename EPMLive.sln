@@ -119,6 +119,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveTimerService.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioEngineCore.Tests", "PortfolioEngineCore\PortfolioEngineCore.Tests\PortfolioEngineCore.Tests.csproj", "{5166C5BC-FD8B-4E0E-AE81-C187B4154915}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveTimerJobs", "EPMLiveTimerJobs\EPMLiveTimerJobs.csproj", "{24057497-EA35-4FFF-B4D3-496FBD919DEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -481,6 +483,24 @@ Global
 		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x64.Build.0 = Release|Any CPU
 		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x86.ActiveCfg = Release|Any CPU
 		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x86.Build.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x64.Build.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x86.Build.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x64.ActiveCfg = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x64.Build.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x64.Deploy.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x86.ActiveCfg = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x86.Build.0 = Release|Any CPU
+		{24057497-EA35-4FFF-B4D3-496FBD919DEE}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

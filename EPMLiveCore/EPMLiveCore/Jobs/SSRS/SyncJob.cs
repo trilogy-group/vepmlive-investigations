@@ -24,10 +24,10 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             try
             {
-                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
-                                                                Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                 reportingService.DeleteReport(site.ID, data);
             }
             catch (Exception exception)
@@ -42,10 +42,10 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 var errors = string.Empty;
-                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
-                                                            Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
-                                                            Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
-                                                            Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                 reportingService.SyncReports(site.ID, web.Lists["Report Library"] as SPDocumentLibrary, out errors);
                 if (!string.IsNullOrEmpty(errors))
                 {
@@ -62,16 +62,16 @@ namespace EPMLiveCore.Jobs.SSRS
 
         private void CreateSiteCollectionMappedFolder(SPSite site, SPWeb web)
         {
-            if (web.AllProperties["SSRSSyncSiteCollectionTimestamp"] == null)
+            if (site.WebApplication.Properties["SSRSSyncSiteCollectionTimestamp"] == null)
             {
                 try
                 {
-                    IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
-                                                            Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
-                                                            Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
-                                                            Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                    IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                            Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                     reportingService.CreateSiteCollectionMappedFolder(site.ID);
-                    web.AllProperties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
+                    site.WebApplication.Properties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
                     web.Update();
                 }
                 catch (Exception exception)
@@ -86,10 +86,10 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             try
             {
-                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
-                                                                Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                 reportingService.DeleteSiteCollectionMappedFolder(site.ID);
             }
             catch (Exception exception)
@@ -103,10 +103,10 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             try
             {
-                IReportingService reportingService = new ReportingService(Convert.ToString(web.AllProperties["SSRSAdminUsername"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAdminPassword"]),
-                                                                Convert.ToString(web.AllProperties["SSRSReportServerUrl"]),
-                                                                Convert.ToString(web.AllProperties["SSRSAuthenticationType"]));
+                IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                 reportingService.AssignRoleMapping(site.ID, web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
             }
             catch (Exception exception)

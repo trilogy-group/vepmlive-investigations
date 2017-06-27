@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="707727d3-350c-4898-907d-6bfbc0d40c5b" solutionId="707727d3-350c-4898-907d-6bfbc0d40c5b" resetWebServer="false" sharePointProductVersion="16.0" name="EPMLiveTimerJobs" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="86057822-90e8-44bf-97c2-52e94c4c8f1c" />
+  </features>
+</package>
