@@ -523,6 +523,28 @@ namespace ProjectPublisher2016
 				worker.Start();
 			}
 
+            var displayAlerts = app.DisplayAlerts;
+            try
+            {
+                app.DisplayAlerts = false;
+                Microsoft.Office.Interop.MSProject.Project pj = app.ActiveProject;
+                var title = Connection.getProjectName(pj);
+                if (!string.IsNullOrWhiteSpace(title) && title != pj.Title)
+                {
+                    pj.Title = title;
+                    if (!pj.ReadOnly)
+                        app.FileSave();                    
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Error when trying to rename project title. Error message: " + ex.Message.ToString());
+            }
+            finally
+            {
+                app.DisplayAlerts = displayAlerts;
+            }
+
 			runTimer();
 
 		}

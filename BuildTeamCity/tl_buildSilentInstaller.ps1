@@ -7,6 +7,14 @@ New-Item "SilentInstaller\Files" -type directory -Force
 $outputFolder = "..\output"
 $outputFolder2 = "..\InstallShield\Build Dependencies"
 
+function ZipFiles( $zipfilename, $sourcedir )
+{
+   If(Test-path $zipfilename) {Remove-item $zipfilename}
+   $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+   Add-Type -Assembly System.IO.Compression.FileSystem
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,  $zipfilename, $compressionLevel,  $false)
+}
+
 foreach ($component in $config.Components)
 {
     $folderName = "SilentInstaller\Files\"+$component.name
@@ -27,3 +35,4 @@ foreach ($component in $config.Components)
 
 Copy-Item -Path "config.json" -Destination "SilentInstaller\config.json" -Force
 
+ZipFiles "SilentInstaller.zip" "SilentInstaller"

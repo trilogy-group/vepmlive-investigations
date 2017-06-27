@@ -1,0 +1,380 @@
+﻿<%@ Master Language="C#" %>
+<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Import Namespace="Microsoft.SharePoint" %> <%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:o="urn:schemas-microsoft-com:office:office" runat="server" lang="<%$Resources:wss,language_value%>" dir="<%$Resources:wss,multipages_direction_dir_value%>">
+<head runat="server">
+	<meta name="GENERATOR" content="Microsoft SharePoint" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Expires" content="0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<SharePoint:IEVersionMetaTag runat="server"/>
+	<meta name="ROBOTS" content="NOHTMLINDEX" />
+	<SharePoint:PageTitle runat="server"><asp:ContentPlaceHolder id="PlaceHolderPageTitle" runat="server"/></SharePoint:PageTitle>
+	<SharePoint:CssLink runat="server" Alternate="false" Version="15"/>
+	
+	<SharePoint:CssRegistration name="error.css" EnableCssTheming="false" runat="server" />
+	<SharePoint:ULSClientConfig runat="server"/>
+	<SharePoint:ScriptLink language="javascript" name="core.js" OnDemand="true" EnableCustomActions="false" Localizable="false" runat="server" />
+	<asp:ContentPlaceHolder id="PlaceHolderAdditionalPageHead" runat="server"/>
+	<link rel="shortcut icon" href="/_layouts/images/epmlive.ico" />
+	<!--<link rel="shortcut icon" href="/_layouts/15/images/favicon.ico?rev=23" type="image/vnd.microsoft.icon" />-->
+	<asp:ContentPlaceHolder id="PlaceHolderBodyAreaClass" runat="server"/>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+        
+        <link rel="shortcut icon" href="/_layouts/images/epmlive.ico" />
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+        <!--[if lte IE 8]> <html class="ie8"> <![endif]-->
+	<!--[if IE 9]> <html class="ie9"> <![endif]-->
+
+
+<style>
+
+.alert  {
+ font-family:Source Sans Pro;
+ margin:0px auto;
+ width:300px;
+}
+
+
+#ms-error-gobackcont {
+margin-top:-36px !important;
+}
+
+body
+{
+    background-color: #F6F6F6;
+}
+
+.mainLogin
+{
+  width: 400px;
+  height: 415px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color:#ffffff;
+  border-radius:5px;
+  border:2px solid #DDDDDD;
+  text-align:center;
+  margin-top:-80px;
+}
+
+.mainLoginReset
+{
+  width: 400px;
+  height: 350px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color:#ffffff;
+  border-radius:5px;
+  border:2px solid #DDDDDD;
+  text-align:center;
+  margin-top:-80px;
+}
+
+
+
+input[type="text"], input[type="email"], input[type="password"] {
+    border: 2px solid #DDDDDD;
+    border-radius: 0px 6px 6px 0px;
+    font-size: 25px;
+    font-weight: 300;
+    height: 45px;
+    line-height: normal;
+    outline: medium none;
+    overflow: hidden;
+    padding-top:3px;
+    padding-bottom:2px;
+    padding-left:8px;
+    transition: all 0.4s ease-out 0s;
+    font-family:Source Sans Pro;
+    width: 66%;
+    position:relative;
+}
+
+.imgDiv
+{
+    border: 2px solid #DDDDDD;
+    display: inline-block;
+    float: left;
+    height: 50px;
+    left: 32px;
+    margin-top: 15px;
+    position: relative;
+    width: 60px;
+    border-right:none !important;
+    border-radius: 6px 0px 0px 6px !important;
+    background-color:#F0F0F0;
+}
+
+
+
+.bg
+{
+    width:30px !important;
+    border-right:none !important;
+    border-radius: 6px 0px 0px 6px !important;
+}
+
+.pwdBackground
+{
+    background-image:url('lock.png');
+    background-repeat:no-repeat;
+    background-position: 20px 11px;
+}
+
+.unBackground
+{
+    background-image:url('user.png');
+    background-repeat:no-repeat;
+    background-position: 17px 14px;
+
+}
+
+.resetBackground
+{
+    background-image:url('mail.png');
+    background-repeat:no-repeat;
+    background-position: 16px 16px;
+
+}
+
+.flip-button {
+	border: 1px solid transparent !important;
+	border-bottom: 1px solid transparent !important;
+	display: block !important;
+	/*line-height: 1.00 !important;*/
+	overflow: hidden !important;
+	text-decoration: none !important;
+	width: 84% !important;
+	cursor:pointer !important;
+	margin: 0 auto !important;
+	background: #3bc492 !important;
+	border-radius: 6px !important;
+	color: #fff !important;
+	font-size:1.5em !important;
+	font-family:Source Sans Pro !important;
+	text-align: center !important;
+	font-weight: 400 !important;
+	position: relative !important;
+	top: 0 !important;
+	padding-bottom:10px !important;
+	padding-top:10px !important;
+	margin-bottom:10px !important;
+        margin-top:10px !important;
+}
+
+label {
+    font-family: Source Sans Pro;
+    font-size: 0.9em;
+    margin-top: -2px;
+    padding-left: 5px;
+    position: relative;
+    top: -2px;
+    color: #606060;
+}
+
+.flip-button:hover
+{
+    background-color:#37BA8A !important;   
+    
+}
+
+.loginImg
+{
+    width:250px;
+    margin-top:20px;
+}
+
+
+
+.buttonLabel
+{
+color: #fff;
+font-weight: 300;
+font-size:1em;
+font-family:Source Sans Pro;
+position: relative;
+top: 0;
+}
+
+#ms-error-gobackcont {
+    margin-left: 360px;
+    margin-top: -43px;
+    position: relative;
+    color: #0072C6 !important;
+    text-decoration: none !important;
+    font-family:Source Sans Pro;
+}
+
+.ms-calloutLink  {
+	color: #0072C6 !important;
+text-decoration: none !important;
+
+}
+
+.footerSection
+{
+   margin-top:20px;
+   margin:0 auto;
+   width:100%;
+   margin-top:7px;
+}
+
+.footerSection a {
+
+    color: #0072C6 !important;
+    text-decoration: none !important;
+    font-family:Source Sans Pro !important;
+}
+
+
+
+
+.circular {
+	width: 50px;
+	height: 50px;
+	border-radius: 150px;
+	-webkit-border-radius: 150px;
+	-moz-border-radius: 150px;
+        margin:0 auto;
+        cursor:pointer;
+}
+
+.twitter {
+	background-color:#00ACED;
+}
+
+.support {
+background-color:#FBA848;
+}
+
+
+
+.placeholder { 
+color: #9B9B9B !important; 
+font-family:Source Sans Pro !important;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #9B9B9B;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #9B9B9B;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #9B9B9B;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #9B9B9B;
+}
+
+
+
+.ie8 #ctl00_PlaceHolderMain_signInControl_UserName {
+  line-height: 43px !important;
+}
+
+.ie8 #ctl00_PlaceHolderMain_signInControl_password  {
+  line-height: 43px !important;
+}
+
+
+.ie9 .flip-button {
+padding-top:10px !important;
+padding-bottom:10px !important;
+}
+
+.ie8 .flip-button {
+padding-top:10px !important;
+padding-bottom:10px !important;
+}
+
+span.callout {
+	height: 80px;
+	width: 200px;
+	float: left;
+}
+
+span.callout {
+	background-color: #444;
+	background-image: -moz-linear-gradient(top, #444, #444);
+	position: absolute;
+	color: #ccc;
+	padding: 10px;
+	border-radius: 3px;
+	margin: 25px;
+	min-height: 50px;
+	border: 1px solid #333;
+	text-shadow: 0 0 1px #000;
+	font-family: Source Sans Pro;
+  	display:none;
+	z-index:1000;
+	/*box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;*/
+}
+
+.callout::before {
+	content: "";
+	width: 0px;
+	height: 0px;
+	border: 0.8em solid transparent;
+	position: absolute;
+}
+
+.callout.left::before {
+	right: -20px;
+	top: 40%;
+	border-left: 10px solid #444;
+}
+
+</style>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47864091-2', 'epmlive.com');
+  ga('send', 'pageview');
+
+</script>
+
+
+</head>
+<body id="ms-error-body" onload="if (typeof(_spBodyOnLoadWrapper) != 'undefined') _spBodyOnLoadWrapper();">
+	<form runat="server" onsubmit="if (typeof(_spFormOnSubmitWrapper) != 'undefined') {return _spFormOnSubmitWrapper();} else {return true;}">
+	<asp:ScriptManager id="ScriptManager" runat="server" EnablePageMethods="false" EnablePartialRendering="true" EnableScriptGlobalization="false" EnableScriptLocalization="true" />
+	<div id="ms-error-header" class="ms-pr">
+		<h1 class="ms-core-pageTitle">
+			<asp:ContentPlaceHolder id="PlaceHolderPageTitleInTitleArea" runat="server" />
+		</h1>
+		<div>
+			<asp:ContentPlaceHolder id="PlaceHolderHelpButton" runat="server" />
+		</div>
+	</div>
+	<div id="ms-error">
+		<div id="ms-error-top">
+			<asp:ContentPlaceHolder id="PlaceHolderSimpleCloseX" runat="server" />
+		</div>
+		<div id="ms-error-content">
+			<div id="ms-error-error-content">
+				<SharePoint:AjaxDelta id="DeltaPlaceHolderMain" BlockElement="true" runat="server">
+					<asp:ContentPlaceHolder id="PlaceHolderMain" runat="server" />
+				</SharePoint:AjaxDelta>
+			</div>
+			<asp:ContentPlaceHolder id="PlaceHolderGoBackLink" runat="server">
+				<div id="ms-error-gobackcont" class="ms-calloutLink">
+					<SharePoint:ReturnLink Text="<%$Resources:wss,multipages_back_to_site%>" Id="idSimpleGoBackToHome" runat="server"/>
+				</div>
+			</asp:ContentPlaceHolder>
+		</div>
+	</div>
+</form>
+</body>
+</html>

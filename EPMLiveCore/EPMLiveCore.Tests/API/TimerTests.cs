@@ -7,7 +7,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 using EPMLiveCore.Fakes;
 using System.Web.Fakes;
 using System.Xml;
-using EPMLive.TestFakes;
+using EPMLiveCore.Tests;
 
 namespace EPMLiveCore.API.Tests
 {

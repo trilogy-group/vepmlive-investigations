@@ -5819,10 +5819,16 @@
                 }
             } catch (e) {
             }
+            try {
+                var g_1 = Grids["g_1"];
+                var grouping = this.selectedView["g_1"]['Grouping'].split('|');
+                g_1.DoGrouping(grouping[1]);
+                g_1.Render();
+            } catch (e) {
+                console.log(e);
+            }
 
-
-           
-            if (this.AnalyzerShowBarschecked == true) {
+          if (this.AnalyzerShowBarschecked == true) {
                 this.viewTab.setButtonStateOn("idAnalyzerShowBars");
             } else {
                 this.viewTab.setButtonStateOff("idAnalyzerShowBars");

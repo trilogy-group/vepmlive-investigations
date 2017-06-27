@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EPMLive.TestFakes
+namespace EPMLiveCore.Tests
 {
     public static class TestCheck
     {

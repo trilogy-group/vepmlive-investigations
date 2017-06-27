@@ -329,6 +329,9 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe.c
 
 
 Log-Section "Zipping"
+if (Test-Path "$BinariesDirectory\_PublishedWebsites\api") {
+	Remove-Item -Recurse -Force "$BinariesDirectory\_PublishedWebsites\api"
+}
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\"
