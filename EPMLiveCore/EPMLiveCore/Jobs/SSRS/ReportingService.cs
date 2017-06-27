@@ -1,5 +1,6 @@
 ﻿using EPMLiveCore.SSRS2010;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration.Claims;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,7 +80,7 @@ namespace EPMLiveCore.Jobs.SSRS
             var client = GetClient();
             var roles = client.ListRoles("Catalog", "");
             var contentManagers = AssignContentManagerRole(siteCollectionId, groups, userList, client, roles.GetRole("Content Manager"));
-            AssignReportViewerRole(siteCollectionId, groups, userList, client, roles.GetRole("Report Viewer"), contentManagers);
+            AssignReportViewerRole(siteCollectionId, groups, userList, client, roles.GetRole("Browser"), contentManagers);
         }
 
         private void AssignReportViewerRole(Guid siteCollectionId, List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers)
@@ -116,9 +117,9 @@ namespace EPMLiveCore.Jobs.SSRS
             return contentManagers;
         }
 
-        private static void EnsureFieldExists(SPListItem extendedList)
+        private void EnsureFieldExists(SPListItem extendedList)
         {
-            if (extendedList["Synchronized"] == null)
+            if (!extendedList.Fields.ContainsField("Synchronized"))
             {
                 extendedList.Fields.Add("Synchronized", SPFieldType.Boolean, false);
             }
@@ -126,12 +127,25 @@ namespace EPMLiveCore.Jobs.SSRS
 
         private void AssignRole(Guid siteCollectionId, ReportingService2010 client, Role role, string loginName)
         {
-            var policies = new List<Policy>();
-            policies.Add(new Policy
+            bool inheritParent;
+            var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
+            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
+            var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
+            if (existingRole == null)
             {
-                GroupUserName = loginName,
-                Roles = new Role[] { role }
-            });
+                policies.Add(new Policy
+                {
+                    GroupUserName = loginName,
+                    Roles = new Role[] { role }
+                });                
+            }
+            else
+            {
+                var roleList = existingRole.Roles.ToList();
+                roleList.Clear();
+                roleList.Add(role);
+                existingRole.Roles = roleList.ToArray();
+            }
             client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
         }
 

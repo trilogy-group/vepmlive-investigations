@@ -12,6 +12,7 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 CreateSiteCollectionMappedFolder(site, web);
                 SyncReports(site, web);
+                AssignRoleMapping(site, web);
             }
             else if (data.StartsWith("deletereport"))
             {

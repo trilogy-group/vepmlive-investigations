@@ -40,9 +40,10 @@ namespace EPMLiveReportsAdmin
             {
                 _stCurrentContext.Session["ViewSession"] = null;
             }
-            catch {
+            catch
+            {
             }
-           
+
             if (properties.Field.InternalName.ToLower() == "today")
             {
                 return;
@@ -60,7 +61,7 @@ namespace EPMLiveReportsAdmin
                 doc.LoadXml(properties.FieldXml);
                 if (doc != null)
                 {
-                    bool isHidden = Convert.ToBoolean(doc.FirstChild.Attributes["Hidden"].Value);
+                    bool isHidden = doc.FirstChild.Attributes["Hidden"] == null || Convert.ToBoolean(doc.FirstChild.Attributes["Hidden"].Value);
                     if (!isHidden)
                     {
                         if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
@@ -71,7 +72,7 @@ namespace EPMLiveReportsAdmin
                         }
                     }
                 }
-            }            
+            }
         }
 
         public override void FieldUpdated(SPListEventProperties properties)
