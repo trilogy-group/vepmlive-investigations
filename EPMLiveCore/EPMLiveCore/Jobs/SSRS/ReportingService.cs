@@ -41,6 +41,7 @@ namespace EPMLiveCore.Jobs.SSRS
             var client = GetClient();
             foreach (SPListItem item in reportLibrary.Items)
             {
+                EnsureFieldExists(item);
                 var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
                 var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
                 if (!synchronized)

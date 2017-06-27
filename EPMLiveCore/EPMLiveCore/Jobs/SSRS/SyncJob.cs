@@ -62,7 +62,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         private void CreateSiteCollectionMappedFolder(SPSite site, SPWeb web)
         {
-            if (site.WebApplication.Properties["SSRSSyncSiteCollectionTimestamp"] == null)
+            if (web.AllProperties["SSRSSyncSiteCollectionTimestamp"] == null)
             {
                 try
                 {
@@ -71,7 +71,7 @@ namespace EPMLiveCore.Jobs.SSRS
                                                             Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
                                                             Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                     reportingService.CreateSiteCollectionMappedFolder(site.ID);
-                    site.WebApplication.Properties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
+                    web.AllProperties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
                     web.Update();
                 }
                 catch (Exception exception)
