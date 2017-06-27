@@ -3416,7 +3416,7 @@
         if (Grid.id == "g_1") {
             for (var irow in Grid.Rows) {
                 var _row = this.GetGridRow(Grid, irow);
-                if (!_row.Visible) {
+                if (!_row.Visible && _row.Kind == "Data") {
                     Grid.ShowRow(_row);
                     _row.Visible = true;
                 }
@@ -5828,7 +5828,7 @@
                 console.log(e);
             }
 
-          if (this.AnalyzerShowBarschecked == true) {
+            if (this.AnalyzerShowBarschecked == true) {
                 this.viewTab.setButtonStateOn("idAnalyzerShowBars");
             } else {
                 this.viewTab.setButtonStateOff("idAnalyzerShowBars");
@@ -6453,7 +6453,7 @@
                 case "AnalyzerTab_SelView_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
                     this.SetViewChanged(null);
-                    
+
                     break;
 
 
