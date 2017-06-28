@@ -57,6 +57,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             srs2010 = new ReportingService2010 { UseDefaultCredentials = true };
             var rptWs = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL") + "/ReportService2010.asmx";
+            srs2010.Credentials = System.Net.CredentialCache.DefaultCredentials;
             srs2010.Url = rptWs;
 
             SPSecurity.RunWithElevatedPrivileges(delegate
@@ -68,7 +69,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 else
                     srs2010.Credentials = new NetworkCredential(username, password);
             });
-            
+
             return srs2010;
         }
 
@@ -90,24 +91,47 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var addresses = $"{reportURL}/{itemUrlRequest}";
 
             var srs2010 = SetupSSRSService();
-            var subsList = srs2010.ListMySubscriptions(itemUrlRequest);
-
+            var subsList = srs2010.ListSubscriptions(itemUrlRequest);
+            
             var ds = new DataSet("Subscriptions");
             System.Data.DataTable table = new System.Data.DataTable("Table");
-            //table.Columns.Add("Check");
             table.Columns.Add("Type");
             table.Columns.Add("DeliveryExtension");
             table.Columns.Add("Description");
             table.Columns.Add("Event");
             table.Columns.Add("LastRun");
+            table.Columns.Add("SubsID");
+            table.Columns.Add("Disabled");
+
 
             foreach (Subscription subsc in subsList)
             {
-                table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status, subsc.LastExecuted);
+                if (SPContext.Current.Web.CurrentUser.LoginName.ToUpper().EndsWith(subsc.Owner.ToUpper()))
+                    table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status, 
+                        subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
+                //SSRS2010.ExtensionSettings extset = null;
+                //string desc, status, eventtype, matchdata;
+                //ParameterValue[] paramss;
+                //ActiveState acs;
+
+                //var aaa = srs2010.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
             }
             //GetAddSubscriptionsFilters();
             ds.Tables.Add(table);
             return DataSetToJSON(ds);
+        }
+
+        [WebMethod]
+        public static string GetDeliveryExtensions()
+        {
+            var srs2010 = SetupSSRSService();
+            var extensions = srs2010.ListExtensions("Delivery");
+            string html = "<option value=\"choose\">Choose a method of delivery</option>";
+
+            extensions?.ToList().ForEach(x => html += $"<option value\"{x.LocalizedName}\">{x.LocalizedName}</option>");
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            return json.Serialize(html);
         }
 
         [WebMethod]
@@ -125,7 +149,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //all the parameters of the report will be filled to out parameter 'itemParameter'
             var itemParameters = srs2010.GetItemParameters(itemUrlRequest, null, true, null, null);
             StringBuilder htmlToLoad = new StringBuilder();
-            htmlToLoad.Append("<table><tr><th>Parameter</th><th>Source of Value</th><th>Value/Field</th></tr>");
+            htmlToLoad.Append("<table style=\"width:100%\"><tr><th>Parameter</th><th>Source of Value</th><th>Value/Field</th></tr>");
 
             //string fieldValueHtml = string.Empty;
             //iterate through parameters
@@ -134,7 +158,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {                         
                 htmlToLoad.Append("<tr>");
 
-                htmlToLoad.Append($"<td><p>{ip.Prompt}</p></td>");
+                htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p></td>");
 
                 htmlToLoad.Append($"<td><select {(ip.DefaultValues == null ? "disabled" : string.Empty)} id=\"EnterFieldID{i}\" name=\"EnterFieldID{i}\" onchange=\"EnterFieldChange('{i}')\">");
                 htmlToLoad.Append($"<option value=\"enter\" {(ip.DefaultValues == null ? "selected" : string.Empty)}>Enter value</option>");
@@ -167,7 +191,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     case "DATETIME":
                         if (ip.ValidValues != null)
                         {
-                            htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)}>");
+                            htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)} id=\"ValueFieldID{i}\" name=\"ValueFieldID{i}\">");
                             ip.ValidValues?.ToList().ForEach(x =>
                             {
                                 isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(defValue => defValue != null && defValue.ToUpper() == x.Value));
@@ -182,7 +206,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         {
                             var defaultValues = string.Empty;
                             ip.DefaultValues?.ToList().ForEach(x => defaultValues += x + "||");
-                            htmlToLoad.Append($"<input type=\"{(ip.ParameterTypeName.ToUpper() == "DATETIME" ? "datetime-local" : "text")}\" defaultValue=\"{defaultValues}\"/>");
+                            htmlToLoad.Append($"<input type=\"{(ip.ParameterTypeName.ToUpper() == "DATETIME" ? "datetime-local" : "text")}\" defaultValue=\"{defaultValues}\"/ id=\"ValueFieldID{i}\" name=\"ValueFieldID{i}\">");
                         }
                         break;
                 }
@@ -191,40 +215,61 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 htmlToLoad.Append("</tr>");
 
-                ////check for the parameter I want to get default and available values for
-                ////if (pName == ip.Name)
-                //{
-                //    //get default values
-                //    string[] defValues = ip.DefaultValues;
-
-                //    //get valid/available values
-                //    ValidValue[] validValues = ip.ValidValues;
-                //    foreach (ValidValue vValue in validValues)
-                //    {
-                //        //ValidValue has Label property and Value property
-                //        //if you check the parameters in report designer, every parameter has Label field and Value field
-                //        //ddlParamValues.Items.Add(new ListItem(vValue.Label, vValue.Value));
-                //    }
-                //}
-
                 i++;
             }
 
             htmlToLoad.Append("</table>");
-            //var serverReport = new Microsoft.Reporting.WebForms.ServerReport()
-            //{
-            //    ReportServerUrl = new Uri(reportURL),
-            //    ReportPath = itemUrlRequest,
-            //    ReportServerCredentials = new 
-            //};
+            htmlToLoad.Append($"<div id=\"QtyParamsDiv\"><input type=\"hidden\" id=\"QtyParams\" name=\"QtyParams\" value =\"{ i }\" /></div>");
 
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(htmlToLoad.ToString());
-            //var parameters = serverReport.GetParameters();
-
-            //var extensions = srs2010.ListExtensionTypes();
         }
-        
+
+        [WebMethod]
+        public static bool SaveSubscription()
+        {
+            //ScheduleDefinition sd = new ScheduleDefinition();
+            //var rp = sd.Item;
+            //rp.
+            //ParameterValue parameters = null;
+            //parameters.
+            //ExtensionSettings extensionSettings = new ExtensionSettings();
+            //extensionSettings.Extension = EXTENSION_FILESHARE;
+            //extensionSettings.ParameterValues = extensionParams;
+
+            return true;
+        }
+
+        [WebMethod]
+        public static void EnableDisableSubscription(string subsIdList, bool enable)
+        {
+            var srs2010 = SetupSSRSService();
+
+            if (!string.IsNullOrWhiteSpace(subsIdList))
+            {
+                var subscriptionsList = subsIdList.Split('|').ToList();
+                subscriptionsList?.Where(x => !string.IsNullOrEmpty(x))?.ToList().ForEach(x => {
+                    if (enable)
+                        srs2010.EnableSubscription(x);
+                    else
+                        srs2010.DisableSubscription(x);
+                });
+            }
+        }
+
+        [WebMethod]
+        public static void DeleteSubscription(string subsIdList)
+        {
+            var srs2010 = SetupSSRSService();
+
+            if (!string.IsNullOrWhiteSpace(subsIdList))
+            {
+                var subscriptionsList = subsIdList.Split('|').ToList();
+                subscriptionsList?.Where(x => !string.IsNullOrEmpty(x))?.ToList().ForEach(x => {
+                    srs2010.DeleteSubscription(x);
+                });
+            }
+        }
 
         public static string DataSetToJSON(DataSet ds)
         {
