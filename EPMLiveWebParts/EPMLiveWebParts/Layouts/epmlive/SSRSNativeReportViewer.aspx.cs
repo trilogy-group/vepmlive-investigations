@@ -109,12 +109,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 if (SPContext.Current.Web.CurrentUser.LoginName.ToUpper().EndsWith(subsc.Owner.ToUpper()))
                     table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status, 
                         subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
-                //SSRS2010.ExtensionSettings extset = null;
-                //string desc, status, eventtype, matchdata;
-                //ParameterValue[] paramss;
-                //ActiveState acs;
+                SSRS2010.ExtensionSettings extset = null;
+                string desc, status, eventtype, matchdata;
+                ParameterValue[] paramss;
+                ActiveState acs;
 
-                //var aaa = srs2010.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
+                var aaa = srs2010.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
             }
             //GetAddSubscriptionsFilters();
             ds.Tables.Add(table);
@@ -289,6 +289,28 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(dict);
+        }
+
+        private RecurrencePattern GetPattern()
+        {
+            DailyRecurrence day = new DailyRecurrence();
+            
+            MonthlyDOWRecurrence pattern = new MonthlyDOWRecurrence();
+            pattern.WhichWeekSpecified = true;
+            pattern.WhichWeek = WeekNumberEnum.LastWeek;
+
+            MonthsOfYearSelector months = new MonthsOfYearSelector();
+            months.March = true;
+            months.June = true;
+            months.September = true;
+            months.December = true;
+            pattern.MonthsOfYear = months;
+
+            DaysOfWeekSelector days = new DaysOfWeekSelector();
+            days.Friday = true;
+            pattern.DaysOfWeek = days;
+
+            return pattern;
         }
     }
 }
