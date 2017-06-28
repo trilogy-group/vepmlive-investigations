@@ -186,13 +186,6 @@
       <DependentUpon>WorkingOnControl.ascx.cs</DependentUpon>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\MyWork\WorkingOnParams.cs" />
-    <Compile Include="CONTROLTEMPLATES\ReportSubscriptions\SubscriptionsManager.ascx.cs">
-      <DependentUpon>SubscriptionsManager.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="CONTROLTEMPLATES\ReportSubscriptions\SubscriptionsManager.ascx.designer.cs">
-      <DependentUpon>SubscriptionsManager.ascx.cs</DependentUpon>
-    </Compile>
     <Compile Include="CONTROLTEMPLATES\ResourceGridUserControl.ascx.cs">
       <DependentUpon>ResourceGridUserControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -998,7 +991,6 @@
       <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
     </Content>
     <Content Include="AssociatedItems\Elements.xml" />
-    <Content Include="CONTROLTEMPLATES\ReportSubscriptions\SubscriptionsManager.ascx" />
     <Content Include="CONTROLTEMPLATES\SocialStream.ascx" />
     <Content Include="FancyDisplayForm\Elements.xml" />
     <Content Include="FancyDisplayForm\FancyDisplayForm.ascx">

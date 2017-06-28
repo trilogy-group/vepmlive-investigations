@@ -49,14 +49,10 @@ namespace EPMLiveCore.Controls.Navigation
 
         protected override void CreateChildControls()
         {
-            try
-            {
-                var control = (CONTROLTEMPLATES.EPMLiveNavigation)Page.LoadControl(ASCX_PATH);
-                control.TopNodes = TopNodes;
-                control.BottomNodes = BottomNodes;
-                Controls.Add(control);
-            }
-            catch { }
+            var control = (CONTROLTEMPLATES.EPMLiveNavigation)Page.LoadControl(ASCX_PATH);
+            control.TopNodes = TopNodes;
+            control.BottomNodes = BottomNodes;
+            Controls.Add(control);           
         }
 
         #endregion
