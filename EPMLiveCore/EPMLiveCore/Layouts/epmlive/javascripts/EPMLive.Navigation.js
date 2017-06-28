@@ -1,25 +1,10 @@
 ﻿(function () {
     'use strict';
-    function authenticate() {
-        console.log("authenticating...")
-        var webAPIHtmlPage = location.href;
-        return $.Deferred(function (d) {
-            //Potentially could make this into a little popup layer 
-            //that shows we are authenticating, and allows for re-authentication if needed
-            var iFrame = $("<iframe></iframe>");
-            iFrame.hide();
-            iFrame.appendTo("body");
-            iFrame.attr('src', webAPIHtmlPage);
-            iFrame.load(function () {
-                iFrame.remove();
-                d.resolve();
-                console.log("authenticated..")
-            });
-        });
-    };
     $(function () {
-        setInterval(function () { authenticate() }, 60000);
-        
+        $.ajaxSetup({
+            beforeSend: function (xhr)
+            { xhr.setRequestHeader('Access-Control-Allow-Origin', location.protocol + "//" + location.host); }
+        });
     });
     function initializeNavigation() {
         $(function () {

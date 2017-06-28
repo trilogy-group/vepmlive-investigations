@@ -58,6 +58,100 @@ namespace WorkEnginePPM.Tests
         //    Assert.IsTrue(result == "<Item ID=\"555\" Error=\"0\"/>");
         //    Assert.IsTrue(!wasUpdated);
         //}
+       
+        [TestMethod]
+        public void AddXml_TestSummaryWork()
+        {
+            string resultXml = ProcessCommonAddXmlData(true);
+            Assert.IsTrue(resultXml.Contains("Hours=\"0\""));
+        }
+
+        [TestMethod]
+        public void AddXml_TestNonSummaryWork()
+        {
+            string resultXml = ProcessCommonAddXmlData(false);
+            Assert.IsTrue(resultXml.Contains("Hours=\"10\""));
+        }
+
+        #region HelperMethods
+
+        private string ProcessCommonAddXmlData(bool bIsSummary)
+        {
+            using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            {
+                var listitem = new ShimSPListItem()
+                {
+                    ItemGetString = (fieldName) =>
+                    {
+                        if (fieldName == "StartDate")
+                            return DateTime.Parse("6/1/2017");
+                        else if (fieldName == "DueDate")
+                            return DateTime.Parse("7/1/2017");
+                        else if (fieldName == "Summary")
+                            return bIsSummary;
+                        else if (fieldName == "Work")
+                            return 10;
+                        return "";
+                    },
+                    ParentListGet = () =>
+                    {
+                        return new ShimSPList()
+                        {
+                            IDGet = () =>
+                            {
+                                return Guid.NewGuid();
+                            }
+                        };
+                    },
+                    ItemGetGuid = (guid) =>
+                    {
+                        return Guid.NewGuid();
+                    },
+                    IDGet = () =>
+                    {
+                        return 1;
+                    },
+                    TitleGet = () =>
+                    {
+                        return "Adam Bar";
+                    },
+                    SystemUpdate = () => { }
+                    ,
+                    FieldNamesGet = () =>
+                    {
+                        return new string[] { "" };
+                    }
+                    ,
+                    FieldsGet = () =>
+                    {
+                        return new ShimSPFieldCollection()
+                        {
+                            GetFieldByInternalNameString = (s) =>
+                            {
+                                return new ShimSPField()
+                                {
+                                    IdGet = () => { return Guid.NewGuid(); }
+                                };
+                            },
+                            ItemGetString = (s) =>
+                            {
+                                return new ShimSPField()
+                                {
+                                    IdGet = () => { return Guid.NewGuid(); }
+                                };
+                            }
+                        };
+                    },
+                    ItemSetGuidObject = (a, b) => { },
+                    Update = () => { }
+                };
+
+                var arrResourceExtIds = new ArrayList();
+                arrResourceExtIds.Add("1");
+
+                return HelperFunctions.AddXml(listitem, arrResourceExtIds);
+            }
+        }
 
         private static string ProcessCommonData(DataTable tblInput, DataTable tblResult, bool shouldUpdate, out bool wasUpdated)
         {
@@ -251,7 +345,7 @@ namespace WorkEnginePPM.Tests
                     return "";
                 };
 
-               
+
 
                 ShimSPField.AllInstances.IdGet = (instance) =>
                 {
@@ -351,8 +445,8 @@ namespace WorkEnginePPM.Tests
                 return message;
             }
         }
-    }
 
-   
+        #endregion
+    }
 }
 

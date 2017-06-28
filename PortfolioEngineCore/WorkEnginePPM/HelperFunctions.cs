@@ -35,7 +35,10 @@ namespace WorkEnginePPM
             catch { }
             try
             {
-                Work = (float.Parse(li["Work"].ToString()) / arrResourceExtIds.Count).ToString();
+                if ((bool)li["Summary"])
+                    Work = "0";
+                else
+                    Work = (float.Parse(li["Work"].ToString()) / arrResourceExtIds.Count).ToString();
             }
             catch { }
 
@@ -472,7 +475,7 @@ namespace WorkEnginePPM
                 }
 
                 if ((li["ExternalID"] == null && externalid != null)
-                    || (li["ExternalID"] != null && li["ExternalID"].ToString() != externalid))
+                    || (li["ExternalID"] != null))
                 {
                     li["ExternalID"] = externalid;
                     updated = true;
@@ -487,6 +490,8 @@ namespace WorkEnginePPM
                         if(updated)
                             li.SystemUpdate();
                     });
+
+                    web.AllowUnsafeUpdates = false;
                 }
 
                 errors = false;
