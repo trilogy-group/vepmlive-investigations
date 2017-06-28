@@ -11,5 +11,6 @@ namespace EPMLiveCore.Jobs.SSRS
         void SyncReports(Guid siteCollectionId, SPDocumentLibrary reportLibrary, out string errors);
         void DeleteReport(Guid siteCollectionId, string data);
         void AssignRoleMapping(Guid siteCollectionId, List<SPGroup> groups, SPList userList);
+        void RemoveRoleMapping(Guid siteCollectionId, string data);
     }
 }

@@ -86,6 +86,38 @@ namespace EPMLiveCore.Jobs.SSRS
             AssignReportViewerRole(siteCollectionId, groups, userList, client, roles.GetRole("Browser"), contentManagers);
         }
 
+        public void RemoveRoleMapping(Guid siteCollectionId, string data)
+        {
+            var loginName = data.Split('~')[1];
+            var group = data.Split('~')[2];
+            var client = GetClient();
+            bool inheritParent;
+            var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
+            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
+            var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
+            if (existingRole != null)
+            {
+                var roleList = existingRole.Roles.ToList();
+                var roleToRemove = roleList.Where(x => x.Name == GetSSRSRole(group)).FirstOrDefault();
+                roleList.Remove(roleToRemove);
+                existingRole.Roles = roleList.ToArray();
+                if(roleList.Count == 0)
+                {
+                    policies.RemoveAll(x => x.GroupUserName.ToLower() == loginName.ToLower());
+                }
+                client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
+            }
+        }
+
+        private string GetSSRSRole(string group)
+        {
+            if (group == "Report Viewers")
+                return "Browser";
+            else if (group == "Administrators")
+                return "Content Managers";
+            return string.Empty;
+        }
+
         private void AssignReportViewerRole(Guid siteCollectionId, List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers)
         {
             var reportViewers = groups.Single(x => x.Name == "Report Viewers").Users.OfType<SPUser>().ToList();
@@ -142,7 +174,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 {
                     GroupUserName = loginName,
                     Roles = new Role[] { role }
-                });                
+                });
             }
             else
             {

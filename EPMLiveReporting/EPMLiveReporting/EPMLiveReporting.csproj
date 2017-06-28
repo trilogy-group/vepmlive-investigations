@@ -114,6 +114,10 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>SetupReportDatabase.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="EPMMenu.cs" />
+    <Compile Include="Features\EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.EventReceiver.cs">
+      <DependentUpon>EPMLiveReportLibraryEventReceiver.feature</DependentUpon>
+    </Compile>
+    <Compile Include="GroupUserEventReceiver.cs" />
     <Compile Include="Jobs\CollectJob.cs" />
     <Compile Include="Jobs\ListDataCleanupJob.cs" />
     <Compile Include="Jobs\RefreshSec.cs" />

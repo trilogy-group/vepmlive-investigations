@@ -18,6 +18,10 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 DeleteReport(site, web, data);
             }
+            else if (data.StartsWith("removerole"))
+            {
+                RemoveRole(site, web, data);
+            }
         }
 
         private void DeleteReport(SPSite site, SPWeb web, string data)
@@ -108,6 +112,23 @@ namespace EPMLiveCore.Jobs.SSRS
                                                                 Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
                 reportingService.AssignRoleMapping(site.ID, web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
+            }
+            catch (Exception exception)
+            {
+                bErrors = true;
+                sErrors += exception.ToString();
+            }
+        }
+
+        private void RemoveRole(SPSite site, SPWeb web, string data)
+        {
+            try
+            {
+                IReportingService reportingService = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
+                reportingService.RemoveRoleMapping(site.ID, data);
             }
             catch (Exception exception)
             {
