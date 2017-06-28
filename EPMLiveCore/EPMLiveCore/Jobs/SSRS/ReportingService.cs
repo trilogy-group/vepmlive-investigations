@@ -41,7 +41,8 @@ namespace EPMLiveCore.Jobs.SSRS
             var client = GetClient();
             foreach (SPListItem item in reportLibrary.Items)
             {
-                EnsureFieldExists(item);
+                EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
+                EnsureFieldExists(item, "UpdatedBy", SPFieldType.Text);
                 var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
                 var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
                 if (!synchronized)
@@ -58,6 +59,7 @@ namespace EPMLiveCore.Jobs.SSRS
                         CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
                         UploadReport(client, siteCollectionId.ToString(), reportItem);
                         item["Synchronized"] = true;
+                        item["UpdatedBy"] = "RS";
                         item.SystemUpdate();
                     }
                     catch (Exception exception)
@@ -90,12 +92,13 @@ namespace EPMLiveCore.Jobs.SSRS
             foreach (SPUser user in reportViewers)
             {
                 var extendedList = userList.Items.GetItemById(user.ID);
-                EnsureFieldExists(extendedList);
+                EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
                 if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                     && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
                 {
                     AssignRole(siteCollectionId, client, role, user.LoginName);
                     extendedList["Synchronized"] = true;
+                    extendedList.Update();
                 }
             }
         }
@@ -106,23 +109,24 @@ namespace EPMLiveCore.Jobs.SSRS
             foreach (SPUser user in contentManagers.Where(x => x.Name != "System Account"))
             {
                 var extendedList = userList.Items.GetItemById(user.ID);
-                EnsureFieldExists(extendedList);
+                EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
                 if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                     && user.Name != "System Account")
                 {
                     AssignRole(siteCollectionId, client, role, user.LoginName);
                     extendedList["Synchronized"] = true;
+                    extendedList.Update();
                 }
             }
 
             return contentManagers;
         }
 
-        private void EnsureFieldExists(SPListItem extendedList)
+        private void EnsureFieldExists(SPListItem extendedList, string fieldName, SPFieldType fieldType)
         {
-            if (!extendedList.Fields.ContainsField("Synchronized"))
+            if (!extendedList.Fields.ContainsField(fieldName))
             {
-                extendedList.Fields.Add("Synchronized", SPFieldType.Boolean, false);
+                extendedList.Fields.Add(fieldName, fieldType, false);
             }
         }
 
