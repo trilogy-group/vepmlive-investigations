@@ -179,8 +179,8 @@
 	        <%=sResGrid%>
 
             TreeGrid(   { 
-                Layout:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridLayout",Dataxml:"<%=sLayoutParam %>" } } ,
-                Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
+                Layout:{ Url:"../../_vti_bin/WorkEngine.asmx",Timeout:0, Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridLayout",Dataxml:"<%=sLayoutParam %>" } } ,
+                Data:{ Url:"../../_vti_bin/WorkEngine.asmx",Timeout:0, Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
                 Debug:"",SuppressMessage:"3"
             }, 
 	        "divTeam" );

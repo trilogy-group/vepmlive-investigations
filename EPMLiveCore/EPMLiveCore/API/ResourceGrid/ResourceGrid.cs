@@ -876,7 +876,7 @@ namespace EPMLiveCore.API
             cfgElement.Add(new XAttribute("id", idElement.Value));
 
             cfgElement.Add(new XAttribute("CSS",
-                string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.css",
+                string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.min.css",
                     SPContext.Current.Web.SafeServerRelativeUrl())),
                 new XAttribute("Style", "GM"));
 

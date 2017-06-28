@@ -234,8 +234,8 @@ namespace EPMLiveCore.Layouts.epmlive
                 {
                     sResPool = Properties.Resources.txtBuildTeamResPool.Replace("#LayoutParam#", sLayoutParam).Replace("#DataParam#", sLayoutParam);
                     sResGrid = @"TreeGrid(   { 
-                    Layout:{ Url:""../../_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridLayout"",Dataxml:""" + sLayoutParam + @""" } } ,
-                    Data:{ Url:""../../_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridData"",Dataxml:""" + sLayoutParam + @""" } }, 
+                    Layout:{ Url:""../../_vti_bin/WorkEngine.asmx"",Timeout:0, Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridLayout"",Dataxml:""" + sLayoutParam + @""" } } ,
+                    Data:{ Url:""../../_vti_bin/WorkEngine.asmx"",Timeout:0, Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridData"",Dataxml:""" + sLayoutParam + @""" } }, 
                     Debug:"""",SuppressMessage:""3""
                     }, 
 	                ""divResPool"" );";
