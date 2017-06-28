@@ -7,6 +7,8 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveWebParts.SSRS2006;
+using System.Web.Services;
+using System.Web.Script.Serialization;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -14,6 +16,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
     {
         private string webUrl = string.Empty;
         private string itemUrl = string.Empty;
+        private bool isNativeMode = false;
 
         private ReportingService2006 _srs2006;
         private string _reportingServicesUrl = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
@@ -31,11 +34,33 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 itemUrl = Request["itemurl"];
             }
 
+            if (!string.IsNullOrEmpty(Request["isNativeMode"]))
+            {
+                bool.TryParse(Request["isNativeMode"], out isNativeMode);
+            }
 
             Redirect();
         }
 
+        [WebMethod]
+        public static string GetRegs()
+        {
+            var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
+            var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
+            var addresses = $"{$"{reportURL}/Pages/ReportViewer.aspx?{itemUrlRequest}&rs:Command=Render"}|reportbuilder:Action=Edit&ItemPath={itemUrlRequest}&Endpoint={reportURL}";
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            return json.Serialize(addresses);
+        }
         private void Redirect()
+        {
+            if (!string.IsNullOrEmpty(itemUrl))
+            {
+                if (!isNativeMode)                    
+                    RedirectIntegratedMode();
+            }            
+        }
+
+        private void RedirectIntegratedMode()
         {
             if (!string.IsNullOrEmpty(webUrl) && !string.IsNullOrEmpty(itemUrl))
             {
@@ -55,11 +80,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 var urlim = getReportParameters(SPUrlUtility.CombineUrl(webUrl, itemUrl));
                 var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
-                
+
                 //var sRedirectUrl = sServerReelativeUrl +
                 //                   "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
                 //                   sServerReelativeUrl + "/" + itemUrl + urlim + "&rv:HeaderArea=none";
-                
+
                 if (Request.QueryString["rp:Resources"] != null)
                 {
                     var queString = Convert.ToString(Request.QueryString["rp:Resources"]).Split(',');
