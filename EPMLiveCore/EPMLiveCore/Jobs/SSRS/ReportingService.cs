@@ -41,33 +41,28 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var errors = string.Empty;
             var client = GetClient();
-            foreach (SPListItem item in reportLibrary.Items)
+            foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
             {
                 EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
                 EnsureFieldExists(item, "UpdatedBy", SPFieldType.Text);
-                var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
-                var synchronized = (bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
-                if (!synchronized)
+                var reportItem = new ReportItem()
                 {
-                    var reportItem = new ReportItem()
-                    {
-                        FileName = item.File.Name,
-                        LastModified = item.File.TimeLastModified,
-                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
-                        BinaryData = item.File.OpenBinary()
-                    };
-                    try
-                    {
-                        CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
-                        UploadReport(client, siteCollectionId.ToString(), reportItem);
-                        item["Synchronized"] = true;
-                        item["UpdatedBy"] = "RS";
-                        item.SystemUpdate();
-                    }
-                    catch (Exception exception)
-                    {
-                        errors += exception.ToString();
-                    }
+                    FileName = item.File.Name,
+                    LastModified = item.File.TimeLastModified,
+                    Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
+                    BinaryData = item.File.OpenBinary()
+                };
+                try
+                {
+                    CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
+                    UploadReport(client, siteCollectionId.ToString(), reportItem);
+                    item["Synchronized"] = true;
+                    item["UpdatedBy"] = "RS";
+                    item.SystemUpdate();
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
                 }
             }
 
@@ -75,6 +70,12 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 throw new Exception(errors);
             }
+        }
+
+        private bool UnsyncedReports(SPListItem item)
+        {
+            var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
+            return !(bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
         }
 
         public void DeleteReport(string data)
