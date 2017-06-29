@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="jquery.soap.js"></script>
+    <script>
+        var url = "http://localhost/ReportServer/ReportService2010.asmx";
+
+        // DEMO 1
+        var pl = new SOAPClientParameters();
+        pl.add("userName", "farmadmin");
+        pl.add("password", "Pass@word1");
+        SOAPClient.invoke(url, "LogonUser", pl, true, HelloWorld_callBack);
+        function HelloWorld_callBack(r) {
+
+        }
+    </script>
+</body>
+</html>
