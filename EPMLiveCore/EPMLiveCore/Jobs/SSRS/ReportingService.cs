@@ -145,7 +145,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     {
                         AssignRole(client, role, user.LoginName);
                         extendedList["Synchronized"] = true;
-                        extendedList.Update();
+                        extendedList.SystemUpdate();
                     }
                 }
                 catch (Exception exception)
@@ -169,7 +169,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     {
                         AssignRole(client, role, user.LoginName);
                         extendedList["Synchronized"] = true;
-                        extendedList.Update();
+                        extendedList.SystemUpdate();
                     }
                 }
                 catch (Exception exception)
