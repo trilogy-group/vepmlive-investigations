@@ -18,37 +18,23 @@ namespace EPMLiveTimerJobs.Features.EPMLiveTimerJobFeature
 
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
-            try
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                {
-                    var parentWebApp = (SPWebApplication)properties.Feature.Parent;
-                    DeleteExistingJob(JobName, parentWebApp);
-                    CreateJob(parentWebApp);
-                });
-            }
-            catch (Exception exception)
-            {
-                throw exception;
-            }
+                var parentWebApp = (SPWebApplication)properties.Feature.Parent;
+                DeleteExistingJob(JobName, parentWebApp);
+                CreateJob(parentWebApp);
+            });
         }
 
         public override void FeatureDeactivating(SPFeatureReceiverProperties properties)
         {
             lock (this)
             {
-                try
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        SPWebApplication parentWebApp = (SPWebApplication)properties.Feature.Parent;
-                        DeleteExistingJob(JobName, parentWebApp);
-                    });
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
+                    SPWebApplication parentWebApp = (SPWebApplication)properties.Feature.Parent;
+                    DeleteExistingJob(JobName, parentWebApp);
+                });
             }
         }
 
