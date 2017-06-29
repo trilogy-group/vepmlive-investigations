@@ -29,7 +29,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                reportingService.DeleteReport(site.ID, data);
+                reportingService.DeleteReport(data);
             }
             catch (Exception exception)
             {
@@ -44,7 +44,7 @@ namespace EPMLiveCore.Jobs.SSRS
             {                
                 IReportingService reportingService = GetReportingServiceInstance(site);
                 var errors = string.Empty;
-                reportingService.SyncReports(site.ID, web.Lists["Report Library"] as SPDocumentLibrary, out errors);
+                reportingService.SyncReports(web.Lists["Report Library"] as SPDocumentLibrary, out errors);
                 if (!string.IsNullOrEmpty(errors))
                 {
                     bErrors = true;
@@ -65,7 +65,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 try
                 {
                     IReportingService reportingService = GetReportingServiceInstance(site);
-                    reportingService.CreateSiteCollectionMappedFolder(site.ID);
+                    reportingService.CreateSiteCollectionMappedFolder();
                     web.AllProperties.Add("SSRSSyncSiteCollectionTimestamp", DateTime.Now.ToString());
                     web.Update();
                 }
@@ -82,7 +82,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                reportingService.DeleteSiteCollectionMappedFolder(site.ID);
+                reportingService.DeleteSiteCollectionMappedFolder();
             }
             catch (Exception exception)
             {
@@ -96,7 +96,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                reportingService.AssignRoleMapping(site.ID, web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
+                reportingService.AssignRoleMapping(web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
             }
             catch (Exception exception)
             {
@@ -110,7 +110,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                reportingService.RemoveRoleMapping(site.ID, data);
+                reportingService.RemoveRoleMapping(data);
             }
             catch (Exception exception)
             {
@@ -124,7 +124,8 @@ namespace EPMLiveCore.Jobs.SSRS
             return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                             Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                             Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
-                                                                            Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]));
+                                                                            Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
+                                                                            site.ID);
         }
     }
 }
