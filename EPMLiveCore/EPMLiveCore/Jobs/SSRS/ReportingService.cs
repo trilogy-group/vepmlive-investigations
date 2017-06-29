@@ -10,37 +10,28 @@ namespace EPMLiveCore.Jobs.SSRS
 {
     public class ReportingService : IReportingService
     {
-        private readonly string password;
-        private readonly string reportServerUrl;
-        private readonly string username;
-        private readonly string authenticationType;
         private readonly string siteCollectionId;
+        private readonly ReportingService2010 client;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
-            this.username = username;
-            this.password = password;
-            this.reportServerUrl = reportServerUrl;
-            this.authenticationType = authenticationType;
+            client = GetClient(username, password, reportServerUrl, authenticationType);
             this.siteCollectionId = siteCollectionId.ToString();
         }
 
         public void CreateSiteCollectionMappedFolder()
         {
-            var client = GetClient();
             client.CreateFolder(siteCollectionId, "/", null);
         }
 
         public void DeleteSiteCollectionMappedFolder()
         {
-            var client = GetClient();
             client.DeleteItem($"/{siteCollectionId}");
         }
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
             var errors = string.Empty;
-            var client = GetClient();
             foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
             {
                 EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
@@ -82,13 +73,11 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var report = data.Split(':')[1];
             var folder = data.Split(':')[2];
-            var client = GetClient();
             client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
         }
 
         public void AssignRoleMapping(List<SPGroup> groups, SPList userList)
         {
-            var client = GetClient();
             var roles = client.ListRoles("Catalog", "");
             var errors = string.Empty;
             var contentManagers = AssignContentManagerRole(groups, userList, client, roles.GetRole("Content Manager"), ref errors);
@@ -103,7 +92,6 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var loginName = data.Split('~')[1];
             var group = data.Split('~')[2];
-            var client = GetClient();
             bool inheritParent;
             var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
             loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
@@ -213,7 +201,7 @@ namespace EPMLiveCore.Jobs.SSRS
             client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
         }
 
-        private ReportingService2010 GetClient()
+        private ReportingService2010 GetClient(string username, string password, string reportServerUrl, string authenticationType)
         {
             var client = new ReportingService2010()
             {
