@@ -8,7 +8,6 @@ namespace EPMLiveReportsAdmin
     {
         public override void GroupUserAdded(SPSecurityEventProperties properties)
         {
-            Debugger.Launch();
             base.GroupUserAdded(properties);
             var group = properties.Web.Groups.GetByID(properties.GroupId);
             if (group.Name == "Report Viewers" || group.Name == "Administrators")
@@ -24,7 +23,6 @@ namespace EPMLiveReportsAdmin
 
         public override void GroupUserDeleted(SPSecurityEventProperties properties)
         {
-            Debugger.Launch();
             base.GroupUserDeleted(properties);
             var group = properties.Web.Groups.GetByID(properties.GroupId);
             if (group.Name == "Report Viewers" || group.Name == "Administrators")
