@@ -43,13 +43,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {                
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                var errors = string.Empty;
-                reportingService.SyncReports(web.Lists["Report Library"] as SPDocumentLibrary, out errors);
-                if (!string.IsNullOrEmpty(errors))
-                {
-                    bErrors = true;
-                    sErrors += errors;
-                }
+                reportingService.SyncReports(web.Lists["Report Library"] as SPDocumentLibrary);
             }
             catch (Exception exception)
             {

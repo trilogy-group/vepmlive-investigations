@@ -37,9 +37,9 @@ namespace EPMLiveCore.Jobs.SSRS
             client.DeleteItem($"/{siteCollectionId}");
         }
 
-        public void SyncReports(SPDocumentLibrary reportLibrary, out string errors)
+        public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            errors = string.Empty;
+            var errors = string.Empty;
             var client = GetClient();
             foreach (SPListItem item in reportLibrary.Items)
             {
@@ -69,6 +69,11 @@ namespace EPMLiveCore.Jobs.SSRS
                         errors += exception.ToString();
                     }
                 }
+            }
+
+            if(string.IsNullOrEmpty(errors))
+            {
+                throw new Exception(errors);
             }
         }
 

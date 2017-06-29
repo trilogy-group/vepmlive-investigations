@@ -8,7 +8,7 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         void CreateSiteCollectionMappedFolder();
         void DeleteSiteCollectionMappedFolder();
-        void SyncReports( SPDocumentLibrary reportLibrary, out string errors);
+        void SyncReports( SPDocumentLibrary reportLibrary);
         void DeleteReport(string data);
         void AssignRoleMapping(List<SPGroup> groups, SPList userList);
         void RemoveRoleMapping(string data);
