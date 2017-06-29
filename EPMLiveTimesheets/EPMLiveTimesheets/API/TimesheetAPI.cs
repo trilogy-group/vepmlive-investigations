@@ -501,7 +501,7 @@ namespace TimeSheets
                         cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
                         cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
                         cmd.ExecuteNonQuery();
-                        
+
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
                         if (settings.DisableApprovals)
@@ -530,13 +530,13 @@ namespace TimeSheets
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-                                
+
             timeSheetItems = GetTimeSheetItems(data, cn.ConnectionString);
             qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn.ConnectionString);
 
             if (qtdAllocatedHours > 0)
                 RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
-                
+
         }
 
         private const string PROJECT_WORK_FIELD_NAME = "Project Center";
@@ -565,7 +565,7 @@ namespace TimeSheets
                             break;
                     }
                 }
-                
+
             });
         }
         private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
@@ -588,8 +588,8 @@ namespace TimeSheets
                         {
                             emailToList.Add(string.IsNullOrWhiteSpace(userItem.Email) ? GetEmailFromDB(userItem.ID, oWeb) : userItem.Email);
                             idToList.Add(userItem.ID);
-                        });                        
-                    });                    
+                        });
+                    });
                 }
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } portfolio",
@@ -637,7 +637,7 @@ namespace TimeSheets
             //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
             var projectItem = oWeb.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
                 .Where(x => x.Name == timeSheetItem.ProjectName).FirstOrDefault();
-            var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID } , PROJECT_WORK_FIELD_NAME);
+            var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
 
             var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
             var emailToList = new List<string>();
@@ -662,10 +662,10 @@ namespace TimeSheets
                     var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, oWeb);
                     emailToList.AddRange(usersToSendNotification.Item1);
                     idToList.AddRange(usersToSendNotification.Item2);
-                });                
+                });
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                    "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated", 
+                    "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated",
                     PROJECT_WORK_FIELD_NAME);
             }
         }
@@ -708,8 +708,8 @@ namespace TimeSheets
                     emailToList.AddRange(usersToSendNotification.Item1);
                     idToList.AddRange(usersToSendNotification.Item2);
                 });
-                
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } programme", 
+
+                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } programme",
                     "an outside", "is not currently assigned to the Programme Team", PROGRAM_WORK_FIELD_NAME);
             }
         }
@@ -738,7 +738,7 @@ namespace TimeSheets
                         userList.ForEach(user => isMember = isMember || user.ID == oWeb.CurrentUser.ID);
                     });
                 }
-                
+
                 if (!isMember && listItem.Fields.OfType<SPField>().Where(x => x.Title == "Owner").Any())
                 {
                     var ownersField = listItem["Owner"]?.ToString().Replace("#", "").Split(';').ToList();
@@ -845,12 +845,12 @@ namespace TimeSheets
                 }
             });
 
-            return Math.Round(result * 4, 0) / 4;            
+            return Math.Round(result * 4, 0) / 4;
         }
 
         private const int NON_TEAM_MEMBER_ALLOCATION_EMAIL = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION = 17;
-        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours, 
+        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
             string itemName, string outOrUnassigned, string reasonMessage, string urlCenter)
         {
             emailToList = emailToList.Distinct().Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
@@ -870,7 +870,7 @@ namespace TimeSheets
                 APIEmail.QueueItemMessage(NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION, false, hshProps,
                     idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
             }
-            
+
             if (emailToList.Count > 0)
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_EMAIL,
                     new Hashtable() { { "Item_Name", itemName },
@@ -892,7 +892,7 @@ namespace TimeSheets
             else
                 return string.Empty;
         }
-        
+
         public static string SaveTimesheet(string data, SPWeb oWeb)
         {
             try
@@ -1464,6 +1464,67 @@ namespace TimeSheets
                                     }
 
                                     outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
+                                    if (ApprovalStatus == "2")
+                                    {
+                                        Guid tuseruid = Guid.Empty;
+                                        int sharepointaccountid = 0;
+                                        string emailto = string.Empty;
+                                        string emailcontent = string.Empty;
+                                        cmd = new SqlCommand("Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid", cn);
+                                        cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                        using (SqlDataReader dr = cmd.ExecuteReader())
+                                        {
+                                            emailcontent = @"<html><body><table width='100%' cellpadding='0' cellspacing='0'><tr><td style='font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>Dear {User_Name},<br></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:15px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>The following timesheet entries were rejected by Project Manager:</u></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:15px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'><ul>";
+                                            if (dr.Read())
+                                            {
+                                                emailcontent = emailcontent.Replace("{User_Name}", Convert.ToString(dr["RESOURCENAME"]));
+                                                tuseruid = Guid.Parse(Convert.ToString(dr["TSUSER_UID"]));
+
+                                            }
+                                        }
+                                        cmd = new SqlCommand("SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid", cn);
+                                        cmd.Parameters.AddWithValue("@tsuser_uid", tuseruid);
+                                        using (SqlDataReader dr = cmd.ExecuteReader())
+                                        {
+                                            if (dr.Read())
+                                            {
+                                                sharepointaccountid = Convert.ToInt32(dr["USER_ID"]);
+                                            }
+                                        }
+                                        //Getting reciepient email address
+                                        SPSecurity.RunWithElevatedPrivileges(() =>
+                                        {
+                                            using (SqlConnection rptcon = new SqlConnection(EPMLiveCore.CoreFunctions.getReportingConnectionString(oWeb.Site.WebApplication.Id, oWeb.Site.ID)))
+                                            {
+                                                rptcon.Open();
+                                                cmd = new SqlCommand("Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid", rptcon);
+                                                cmd.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
+                                                using (SqlDataReader dr = cmd.ExecuteReader())
+                                                {
+                                                    if (dr.Read())
+                                                    {
+                                                        emailto = Convert.ToString(dr["Email"]);
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        //Getting List pf rejected entries
+                                        cmd = new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", cn);
+                                        cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                        using (SqlDataReader dr = cmd.ExecuteReader())
+                                        {
+                                            while (dr.Read())
+                                            {
+                                                emailcontent += "<li>" + dr["Title"] + "</li>";
+                                            }
+                                        }
+
+                                        emailcontent += @"</ul></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:12px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>For help, please visit <a href='http://support.epmlive.com' style='font-size:12px;color:#3366CC;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>http://support.epmlive.com</a></td></tr><tr><td><hr></td></tr><tr><td style='font-size:10px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>Powered by EPM Live :)</td></tr></table></body></html>";
+                                        if (!string.IsNullOrEmpty(emailto))
+                                        {
+                                            APIEmail.sendEmail(emailcontent, "Your timesheet entry was rejected.", emailto, oWeb);
+                                        }
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

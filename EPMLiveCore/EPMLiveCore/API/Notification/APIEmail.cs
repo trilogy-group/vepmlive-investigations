@@ -9,6 +9,7 @@ using System.Collections;
 using System.Data.SqlClient;
 using System.Data;
 using System.Xml;
+using EPMLiveCore.Infrastructure.Logging;
 
 namespace EPMLiveCore.API
 {
@@ -22,34 +23,34 @@ namespace EPMLiveCore.API
             bool del = false;
             bool add = false;
             bool upd = false;
-            
-            SPEventReceiverDefinitionCollection eventColl = list.EventReceivers; 
 
-            foreach(SPEventReceiverDefinition eventDef in eventColl)
+            SPEventReceiverDefinitionCollection eventColl = list.EventReceivers;
+
+            foreach (SPEventReceiverDefinition eventDef in eventColl)
             {
-                if(eventDef.Assembly.Equals(assemblyName) && eventDef.Class.Equals(className))
+                if (eventDef.Assembly.Equals(assemblyName) && eventDef.Class.Equals(className))
                 {
-                    if(eventDef.Type.Equals(SPEventReceiverType.ItemAdded))
+                    if (eventDef.Type.Equals(SPEventReceiverType.ItemAdded))
                         add = true;
 
-                    if(eventDef.Type.Equals(SPEventReceiverType.ItemUpdating))
-                        upd = true;                    
+                    if (eventDef.Type.Equals(SPEventReceiverType.ItemUpdating))
+                        upd = true;
                 }
             }
 
-            if(!add)
+            if (!add)
             {
                 list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
             }
 
-            if(!upd)
+            if (!upd)
             {
                 list.EventReceivers.Add(SPEventReceiverType.ItemUpdating, assemblyName, className);
             }
 
             list.EnableAssignToEmail = false;
 
-            if(!add || !upd || !del)
+            if (!add || !upd || !del)
                 list.Update();
         }
 
@@ -61,17 +62,17 @@ namespace EPMLiveCore.API
             SPEventReceiverDefinitionCollection eventColl = list.EventReceivers;
             List<SPEventReceiverDefinition> listsToDelete = new List<SPEventReceiverDefinition>();
 
-            foreach(SPEventReceiverDefinition eventDef in eventColl)
+            foreach (SPEventReceiverDefinition eventDef in eventColl)
             {
-                if(eventDef.Assembly.Equals(assemblyName) && eventDef.Class.Equals(className))
+                if (eventDef.Assembly.Equals(assemblyName) && eventDef.Class.Equals(className))
                 {
                     listsToDelete.Add(eventDef);
                 }
             }
 
-            if(listsToDelete.Count > 0)
+            if (listsToDelete.Count > 0)
             {
-                foreach(SPEventReceiverDefinition eventDel in listsToDelete)
+                foreach (SPEventReceiverDefinition eventDel in listsToDelete)
                 {
                     eventDel.Delete();
                 }
@@ -89,14 +90,14 @@ namespace EPMLiveCore.API
             SqlCommand cmd = new SqlCommand("SELECT subject,body from EMAILTEMPLATES where emailid=@id", cn);
             cmd.Parameters.AddWithValue("@id", templateid);
             SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            if (dr.Read())
             {
                 subject = dr.GetString(0);
                 body = dr.GetString(1);
                 //shortmessage = dr.GetString(2);
             }
             dr.Close();
-                                
+
             body = body.Replace("{SiteName}", web.Title);
             body = body.Replace("{SiteUrl}", web.Url);
 
@@ -121,7 +122,7 @@ namespace EPMLiveCore.API
 
         public static void QueueItemMessage(int templateid, bool hideFromUser, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPListItem li, SPUser curUser, bool forceNewEntry)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 iQueueItemMessage(templateid, hideFromUser, additionalParams, newusers, delusers, doNotEmail, unmarkread, li, curUser, forceNewEntry);
             });
@@ -129,7 +130,7 @@ namespace EPMLiveCore.API
 
         public static void QueueItemMessage(int templateid, bool hideFromUser, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPWeb web, SPUser curUser, bool forceNewEntry)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 iQueueItemMessage(templateid, hideFromUser, additionalParams, newusers, delusers, doNotEmail, unmarkread, web, curUser, forceNewEntry);
             });
@@ -137,7 +138,7 @@ namespace EPMLiveCore.API
 
         public static void ClearNotificationItem(SPListItem li)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {
@@ -153,7 +154,7 @@ namespace EPMLiveCore.API
 
                     cn.Close();
                 }
-                catch(Exception Exception) { throw new Exception(Exception.Message); }
+                catch (Exception Exception) { throw new Exception(Exception.Message); }
             });
         }
 
@@ -171,45 +172,53 @@ namespace EPMLiveCore.API
             string itemid = "";
             string webid = "";
             string sExternalColumn = "";
-             
+
             try
             {
                 listName = doc.FirstChild.Attributes["ListName"].Value;
-            }catch{}
+            }
+            catch { }
             try
             {
                 listId = doc.FirstChild.Attributes["ListID"].Value;
-            }catch{}
+            }
+            catch { }
             try
             {
                 itemid = doc.FirstChild.Attributes["ItemID"].Value;
-            }catch{}
+            }
+            catch { }
             try
             {
                 webid = doc.FirstChild.Attributes["WebID"].Value;
-            }catch{}
+            }
+            catch { }
 
-            try 
+            try
             {
                 hideFromUser = bool.Parse(doc.FirstChild.Attributes["HideFromUser"].Value);
-            }catch{}
+            }
+            catch { }
             try
             {
                 doNotEmail = bool.Parse(doc.FirstChild.Attributes["DoNotEmail"].Value);
-            }catch{}
+            }
+            catch { }
             try
             {
                 unMarkRead = bool.Parse(doc.FirstChild.Attributes["UnMarkRead"].Value);
-            }catch{}
+            }
+            catch { }
             try
             {
                 forceNewEntry = bool.Parse(doc.FirstChild.Attributes["ForceNewEntry"].Value);
-            }catch{}
+            }
+            catch { }
 
             Hashtable hshParams = new Hashtable();
 
             XmlNode nd = doc.FirstChild.SelectSingleNode("Params");
-            foreach(XmlNode ndParam in nd.SelectNodes("Param"))
+            foreach (XmlNode ndParam in nd.SelectNodes("Param"))
             {
                 hshParams.Add(ndParam.Attributes["Name"].Value, ndParam.InnerText);
             }
@@ -233,16 +242,16 @@ namespace EPMLiveCore.API
             }
             catch { }
 
-            if(sExternalColumn != "")
+            if (sExternalColumn != "")
             {
                 DataTable dtResources = API.APITeam.GetResourcePool("<Get><Columns>" + sExternalColumn + "</Columns></Get>", oWeb);
 
                 ArrayList ArrNewTemp = new ArrayList();
 
-                foreach(string s in ArrNew)
+                foreach (string s in ArrNew)
                 {
                     DataRow[] dr = dtResources.Select(sExternalColumn + " ='" + s + "'");
-                    if(dr.Length > 0)
+                    if (dr.Length > 0)
                     {
                         ArrNewTemp.Add(dr[0]["SPID"].ToString());
                     }
@@ -252,20 +261,21 @@ namespace EPMLiveCore.API
             }
 
             string ret = Response.Failure(30010, "Error: No Item Id specificied");
-            if(itemid != "" && (listId != "" || listName != ""))
+            if (itemid != "" && (listId != "" || listName != ""))
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate(){
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
 
                     SPList oList = null;
                     try
                     {
-                        using(SPSite site = new SPSite(oWeb.Site.ID))
+                        using (SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            if(webid != "")
+                            if (webid != "")
                             {
-                                using(SPWeb tWeb = site.OpenWeb(new Guid(webid)))
+                                using (SPWeb tWeb = site.OpenWeb(new Guid(webid)))
                                 {
-                                    if(listId != "")
+                                    if (listId != "")
                                     {
                                         oList = tWeb.Lists[new Guid(listId)];
                                     }
@@ -274,7 +284,7 @@ namespace EPMLiveCore.API
                                         oList = tWeb.Lists.TryGetList(listName);
                                     }
 
-                                    if(oList != null)
+                                    if (oList != null)
                                     {
                                         SPListItem li = oList.GetItemById(int.Parse(itemid));
 
@@ -286,9 +296,9 @@ namespace EPMLiveCore.API
                             }
                             else
                             {
-                                using(SPWeb web = site.OpenWeb(oWeb.ID))
+                                using (SPWeb web = site.OpenWeb(oWeb.ID))
                                 {
-                                    if(listId != "")
+                                    if (listId != "")
                                     {
                                         oList = web.Lists[new Guid(listId)];
                                     }
@@ -297,7 +307,7 @@ namespace EPMLiveCore.API
                                         oList = web.Lists.TryGetList(listName);
                                     }
 
-                                    if(oList != null)
+                                    if (oList != null)
                                     {
                                         SPListItem li = oList.GetItemById(int.Parse(itemid));
 
@@ -308,15 +318,16 @@ namespace EPMLiveCore.API
                                 }
                             }
 
-                            
-                        }
-                    }catch{}
 
-                    
+                        }
+                    }
+                    catch { }
+
+
                 });
 
                 return ret;
-                
+
             }
             else
             {
@@ -333,11 +344,11 @@ namespace EPMLiveCore.API
         {
             try
             {
-                using(SPSite site = new SPSite(li.ParentList.ParentWeb.Site.ID))
+                using (SPSite site = new SPSite(li.ParentList.ParentWeb.Site.ID))
                 {
                     try
                     {
-                        using(SPWeb web = site.OpenWeb(li.ParentList.ParentWeb.ID))
+                        using (SPWeb web = site.OpenWeb(li.ParentList.ParentWeb.ID))
                         {
                             try
                             {
@@ -350,7 +361,7 @@ namespace EPMLiveCore.API
 
                                 GetCoreInformation(cn, templateid, out body, out subject, web, curUser);
 
-                                foreach(string s in additionalParams.Keys)
+                                foreach (string s in additionalParams.Keys)
                                 {
                                     body = body.Replace("{" + s + "}", additionalParams[s].ToString());
                                     subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
@@ -373,13 +384,13 @@ namespace EPMLiveCore.API
 
                                 string id = null;
 
-                                if(dr.Read())
+                                if (dr.Read())
                                 {
                                     id = dr.GetGuid(0).ToString();
                                 }
                                 dr.Close();
 
-                                if(id == null || forceNewEntry)
+                                if (id == null || forceNewEntry)
                                 {
                                     id = Guid.NewGuid().ToString();
 
@@ -394,7 +405,7 @@ namespace EPMLiveCore.API
                                 cmd.Parameters.AddWithValue("@title", subject);
                                 cmd.Parameters.AddWithValue("@message", body);
                                 cmd.Parameters.AddWithValue("@type", templateid);
-                                if(hidefrom)
+                                if (hidefrom)
                                     cmd.Parameters.AddWithValue("@createdby", 1073741823);
                                 else
                                     cmd.Parameters.AddWithValue("@createdby", curUser.ID);
@@ -411,23 +422,23 @@ namespace EPMLiveCore.API
                                 DataSet ds = new DataSet();
                                 da.Fill(ds);
 
-                                foreach(string user in newusers)
+                                foreach (string user in newusers)
                                 {
-                                    if(user != "")
+                                    if (user != "")
                                     {
                                         bool found = false;
 
-                                        if(ds.Tables.Count > 0)
+                                        if (ds.Tables.Count > 0)
                                         {
                                             DataRow[] drFound = ds.Tables[0].Select("userid='" + user + "'");
 
-                                            if(drFound.Length > 0)
+                                            if (drFound.Length > 0)
                                             {
                                                 found = true;
                                                 ds.Tables[0].Rows.Remove(drFound[0]);
                                             }
                                         }
-                                        if(!found)
+                                        if (!found)
                                         {
                                             cmd = new SqlCommand("INSERT INTO personalizations (FK, [key], value, userid, siteid, webid, listid, itemid) VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)", cn);
                                             cmd.Parameters.AddWithValue("@id", id);
@@ -439,7 +450,7 @@ namespace EPMLiveCore.API
                                             cmd.Parameters.AddWithValue("@itemid", li.ID);
                                             cmd.ExecuteNonQuery();
                                         }
-                                        if(unmarkread)
+                                        if (unmarkread)
                                         {
                                             cmd = new SqlCommand("spNSetBit", cn);
                                             cmd.CommandType = CommandType.StoredProcedure;
@@ -454,9 +465,9 @@ namespace EPMLiveCore.API
                                     }
                                 }
 
-                                if(delusers != null)
+                                if (delusers != null)
                                 {
-                                    foreach(string user in delusers)
+                                    foreach (string user in delusers)
                                     {
                                         cmd = new SqlCommand("delete from personalizations where FK=@id and userid=@userid", cn);
                                         cmd.Parameters.AddWithValue("@id", id);
@@ -467,24 +478,24 @@ namespace EPMLiveCore.API
                                 cn.Close();
 
                             }
-                            catch(Exception Exception) { throw new Exception(Exception.Message); }
+                            catch (Exception Exception) { throw new Exception(Exception.Message); }
                         }
                     }
-                    catch(Exception Exception) { throw new Exception(Exception.Message); }
+                    catch (Exception Exception) { throw new Exception(Exception.Message); }
                 }
             }
-            catch(Exception Exception) { throw new Exception(Exception.Message); }
+            catch (Exception Exception) { throw new Exception(Exception.Message); }
         }
 
         private static void iQueueItemMessage(int templateid, bool hidefrom, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPWeb oWeb, SPUser curUser, bool forceNewEntry)
         {
             try
             {
-                using(SPSite site = new SPSite(oWeb.Site.ID))
+                using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
                     try
                     {
-                        using(SPWeb web = site.OpenWeb(oWeb.ID))
+                        using (SPWeb web = site.OpenWeb(oWeb.ID))
                         {
                             try
                             {
@@ -497,7 +508,7 @@ namespace EPMLiveCore.API
 
                                 GetCoreInformation(cn, templateid, out body, out subject, web, curUser);
 
-                                foreach(string s in additionalParams.Keys)
+                                foreach (string s in additionalParams.Keys)
                                 {
                                     body = body.Replace("{" + s + "}", additionalParams[s].ToString());
                                     subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
@@ -512,13 +523,13 @@ namespace EPMLiveCore.API
 
                                 string id = null;
 
-                                if(dr.Read())
+                                if (dr.Read())
                                 {
                                     id = dr.GetGuid(0).ToString();
                                 }
                                 dr.Close();
 
-                                if(id == null || forceNewEntry)
+                                if (id == null || forceNewEntry)
                                 {
                                     id = Guid.NewGuid().ToString();
 
@@ -533,7 +544,7 @@ namespace EPMLiveCore.API
                                 cmd.Parameters.AddWithValue("@title", subject);
                                 cmd.Parameters.AddWithValue("@message", body);
                                 cmd.Parameters.AddWithValue("@type", templateid);
-                                if(hidefrom)
+                                if (hidefrom)
                                     cmd.Parameters.AddWithValue("@createdby", 1073741823);
                                 else
                                     cmd.Parameters.AddWithValue("@createdby", curUser.ID);
@@ -550,23 +561,23 @@ namespace EPMLiveCore.API
                                 DataSet ds = new DataSet();
                                 da.Fill(ds);
 
-                                foreach(string user in newusers)
+                                foreach (string user in newusers)
                                 {
-                                    if(user != "")
+                                    if (user != "")
                                     {
                                         bool found = false;
 
-                                        if(ds.Tables.Count > 0)
+                                        if (ds.Tables.Count > 0)
                                         {
                                             DataRow[] drFound = ds.Tables[0].Select("userid='" + user + "'");
 
-                                            if(drFound.Length > 0)
+                                            if (drFound.Length > 0)
                                             {
                                                 found = true;
                                                 ds.Tables[0].Rows.Remove(drFound[0]);
                                             }
                                         }
-                                        if(!found)
+                                        if (!found)
                                         {
                                             cmd = new SqlCommand("INSERT INTO personalizations (FK, [key], value, userid, siteid, webid, listid, itemid) VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)", cn);
                                             cmd.Parameters.AddWithValue("@id", id);
@@ -578,7 +589,7 @@ namespace EPMLiveCore.API
                                             cmd.Parameters.AddWithValue("@itemid", DBNull.Value);
                                             cmd.ExecuteNonQuery();
                                         }
-                                        if(unmarkread)
+                                        if (unmarkread)
                                         {
                                             cmd = new SqlCommand("spNSetBit", cn);
                                             cmd.CommandType = CommandType.StoredProcedure;
@@ -593,9 +604,9 @@ namespace EPMLiveCore.API
                                     }
                                 }
 
-                                if(delusers != null)
+                                if (delusers != null)
                                 {
-                                    foreach(string user in delusers)
+                                    foreach (string user in delusers)
                                     {
                                         cmd = new SqlCommand("delete from personalizations where FK=@id and userid=@userid", cn);
                                         cmd.Parameters.AddWithValue("@id", id);
@@ -606,13 +617,13 @@ namespace EPMLiveCore.API
                                 cn.Close();
 
                             }
-                            catch(Exception Exception) { throw new Exception(Exception.Message); }
+                            catch (Exception Exception) { throw new Exception(Exception.Message); }
                         }
                     }
-                    catch(Exception Exception) { throw new Exception(Exception.Message); }
+                    catch (Exception Exception) { throw new Exception(Exception.Message); }
                 }
             }
-            catch(Exception Exception) { throw new Exception(Exception.Message); }
+            catch (Exception Exception) { throw new Exception(Exception.Message); }
         }
 
         public static void sendEmail(int templateid, int userid, Hashtable additionalParams)
@@ -621,7 +632,7 @@ namespace EPMLiveCore.API
             Guid webid = SPContext.Current.Web.ID;
             SPUser curUser = SPContext.Current.Web.CurrentUser;
             SPUser eUser = SPContext.Current.Web.SiteUsers.GetByID(userid);
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 iSendEmail(templateid, false, siteid, webid, curUser, eUser, additionalParams);
             });
@@ -629,7 +640,7 @@ namespace EPMLiveCore.API
 
         public static void sendEmailHideReply(int templateid, Guid site, Guid web, SPUser curUser, SPUser eUser, Hashtable additionalParams)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 iSendEmail(templateid, true, site, web, curUser, eUser, additionalParams);
             });
@@ -637,26 +648,26 @@ namespace EPMLiveCore.API
 
         public static void sendEmail(int templateid, Guid site, Guid web, SPUser curUser, SPUser eUser, Hashtable additionalParams)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 iSendEmail(templateid, false, site, web, curUser, eUser, additionalParams);
             });
         }
 
-        
+
         private static void iSendEmail(int templateid, bool hidefrom, Guid siteid, Guid webid, SPUser curUser, SPUser eUser, Hashtable additionalParams)
         {
             try
             {
-                if(eUser.Email != "")
+                if (eUser.Email != "")
                 {
                     try
                     {
-                        using(SPSite site = new SPSite(siteid))
+                        using (SPSite site = new SPSite(siteid))
                         {
                             try
                             {
-                                using(SPWeb web = site.OpenWeb(webid))
+                                using (SPWeb web = site.OpenWeb(webid))
                                 {
                                     try
                                     {
@@ -668,10 +679,10 @@ namespace EPMLiveCore.API
 
                                         GetCoreInformation(cn, templateid, out body, out subject, web, curUser);
 
-                                        
+
                                         cn.Close();
 
-                                        foreach(string s in additionalParams.Keys)
+                                        foreach (string s in additionalParams.Keys)
                                         {
                                             body = body.Replace("{" + s + "}", additionalParams[s].ToString());
                                             subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
@@ -681,13 +692,13 @@ namespace EPMLiveCore.API
                                         string sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Address;
 
                                         System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                                        if(hidefrom)
+                                        if (hidefrom)
                                         {
                                             mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
                                         }
                                         else
                                         {
-                                            if(curUser.Email == "")
+                                            if (curUser.Email == "")
                                             {
                                                 mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, curUser.Name);
                                             }
@@ -716,17 +727,17 @@ namespace EPMLiveCore.API
 
                                         smtpClient.Send(mailMsg);
                                     }
-                                    catch(Exception Exception) { throw new Exception(Exception.Message); }
+                                    catch (Exception Exception) { throw new Exception(Exception.Message); }
                                 }
                             }
-                            catch (Exception Exception){throw new Exception(Exception.Message); }
+                            catch (Exception Exception) { throw new Exception(Exception.Message); }
                         }
                     }
-                    catch (Exception Exception){throw new Exception(Exception.Message); }
-                    
+                    catch (Exception Exception) { throw new Exception(Exception.Message); }
+
                 }
             }
-            catch (Exception Exception){throw new Exception(Exception.Message); }
+            catch (Exception Exception) { throw new Exception(Exception.Message); }
         }
 
         public static void sendEmail(int templateID, Hashtable additionalParams, List<String> emailTo, string emailFrom, SPWeb oWeb, bool hideFrom)
@@ -783,7 +794,42 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-            });            
+            });
+        }
+
+        public static void sendEmail(string body, string subject, string emailTo, SPWeb oWeb)
+        {
+            try
+            {
+                Guid siteid = SPContext.Current.Site.ID;
+                Guid webid = SPContext.Current.Web.ID;
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
+                    string sMailSvr = spWebAdmin.OutboundMailServiceInstance?.Server.Address;
+
+                    if (string.IsNullOrEmpty(sMailSvr)) return;
+
+                    using (MailMessage mailMsg = new MailMessage())
+                    {
+                        mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, oWeb.CurrentUser.Name);
+                        mailMsg.To.Add(emailTo);
+                        mailMsg.Subject = subject;
+                        mailMsg.Body = body;
+                        mailMsg.IsBodyHtml = true;
+                        using (SmtpClient smtpClient = new SmtpClient())
+                        {
+                            smtpClient.Host = sMailSvr;
+                            smtpClient.Send(mailMsg);
+                        }
+                    }
+
+                });
+            }
+            catch (Exception ex)
+            {
+                LoggingService.WriteTrace("Mail", "TimeSheet Mail", TraceSeverity.Medium, ex.Message);
+            }
         }
     }
 }
