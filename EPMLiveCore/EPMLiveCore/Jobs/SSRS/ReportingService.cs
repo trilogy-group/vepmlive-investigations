@@ -90,8 +90,13 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var client = GetClient();
             var roles = client.ListRoles("Catalog", "");
-            var contentManagers = AssignContentManagerRole(groups, userList, client, roles.GetRole("Content Manager"));
-            AssignReportViewerRole(groups, userList, client, roles.GetRole("Browser"), contentManagers);
+            var errors = string.Empty;
+            var contentManagers = AssignContentManagerRole(groups, userList, client, roles.GetRole("Content Manager"), ref errors);
+            AssignReportViewerRole(groups, userList, client, roles.GetRole("Browser"), contentManagers, ref errors);
+            if(!string.IsNullOrEmpty(errors))
+            {
+                throw new Exception(errors);
+            }
         }
 
         public void RemoveRoleMapping(string data)
@@ -126,36 +131,50 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignReportViewerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers)
+        private void AssignReportViewerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers, ref string errors)
         {
             var reportViewers = groups.Single(x => x.Name == "Report Viewers").Users.OfType<SPUser>().ToList();
             foreach (SPUser user in reportViewers)
             {
-                var extendedList = userList.Items.GetItemById(user.ID);
-                EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
-                if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
-                    && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
+                try
                 {
-                    AssignRole(client, role, user.LoginName);
-                    extendedList["Synchronized"] = true;
-                    extendedList.Update();
+                    var extendedList = userList.Items.GetItemById(user.ID);
+                    EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
+                    if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
+                        && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
+                    {
+                        AssignRole(client, role, user.LoginName);
+                        extendedList["Synchronized"] = true;
+                        extendedList.Update();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
                 }
             }
         }
 
-        private List<SPUser> AssignContentManagerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role)
+        private List<SPUser> AssignContentManagerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, ref string errors)
         {
             var contentManagers = groups.Single(x => x.Name == "Administrators").Users.OfType<SPUser>().ToList();
             foreach (SPUser user in contentManagers.Where(x => x.Name != "System Account"))
             {
-                var extendedList = userList.Items.GetItemById(user.ID);
-                EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
-                if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
-                    && user.Name != "System Account")
+                try
                 {
-                    AssignRole(client, role, user.LoginName);
-                    extendedList["Synchronized"] = true;
-                    extendedList.Update();
+                    var extendedList = userList.Items.GetItemById(user.ID);
+                    EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
+                    if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
+                        && user.Name != "System Account")
+                    {
+                        AssignRole(client, role, user.LoginName);
+                        extendedList["Synchronized"] = true;
+                        extendedList.Update();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
                 }
             }
 
