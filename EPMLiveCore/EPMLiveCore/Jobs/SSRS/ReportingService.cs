@@ -80,7 +80,7 @@ namespace EPMLiveCore.Jobs.SSRS
             client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
         }
 
-        public void AssignRoleMapping(List<SPGroup> groups, SPList userList)
+        public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
         {
             var roles = client.ListRoles("Catalog", "");
             var errors = string.Empty;
@@ -123,10 +123,10 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignReportViewerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers, ref string errors)
+        private void AssignReportViewerRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers, ref string errors)
         {
-            var reportViewers = groups.Single(x => x.Name == "Report Viewers").Users.OfType<SPUser>().ToList();
-            foreach (SPUser user in reportViewers)
+            var reportViewers = groups.GetByName("Report Viewers");
+            foreach (SPUser user in reportViewers.Users)
             {
                 try
                 {
@@ -147,10 +147,11 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private List<SPUser> AssignContentManagerRole(List<SPGroup> groups, SPList userList, ReportingService2010 client, Role role, ref string errors)
+        private List<SPUser> AssignContentManagerRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, ref string errors)
         {
-            var contentManagers = groups.Single(x => x.Name == "Administrators").Users.OfType<SPUser>().ToList();
-            foreach (SPUser user in contentManagers.Where(x => x.Name != "System Account"))
+            var contentManagers = groups.GetByName("Administrators");
+            var users = contentManagers.Users.OfType<SPUser>().ToList();
+            foreach (SPUser user in users.Where(x => x.Name != "System Account"))
             {
                 try
                 {
@@ -170,7 +171,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 }
             }
 
-            return contentManagers;
+            return users;
         }
 
         private void EnsureFieldExists(SPListItem extendedList, string fieldName, SPFieldType fieldType)

@@ -90,7 +90,7 @@ namespace EPMLiveCore.Jobs.SSRS
             try
             {
                 IReportingService reportingService = GetReportingServiceInstance(site);
-                reportingService.AssignRoleMapping(web.SiteGroups.OfType<SPGroup>().ToList(), web.SiteUserInfoList);
+                reportingService.AssignRoleMapping(web.SiteGroups, web.SiteUserInfoList);
             }
             catch (Exception exception)
             {
