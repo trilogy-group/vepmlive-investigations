@@ -42,9 +42,9 @@ namespace EPMLiveReportsAdmin
             }            
         }
 
-        public override void ItemDeleting(SPItemEventProperties properties)
+        public override void ItemDeleted(SPItemEventProperties properties)
         {
-            base.ItemDeleting(properties);
+            base.ItemDeleted(properties);
             using (var site = new SPSite(properties.SiteId))
             {
                 using (SPWeb web = site.OpenWeb(properties.Web.ID))
