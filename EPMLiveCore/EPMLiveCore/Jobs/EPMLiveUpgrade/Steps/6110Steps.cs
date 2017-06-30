@@ -5,7 +5,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 3.0, Description = "New PreviousPName column on LSTProjectCenter table to store previous project name.")]
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 5.0, Description = "New PreviousPName column on LSTProjectCenter table to store previous project name.")]
     internal class NewPreviousProjectNameColumn : UpgradeStep
     {
         public NewPreviousProjectNameColumn(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
@@ -24,13 +24,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 {
                     LogMessage("Connecting to the database . . .", 2);
 
-                    string epmLiveCnStr = CoreFunctions.getConnectionString(webAppId);
-                    using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
-                    {
-                        epmLiveCn.Open();
-
+                    var DAO = new ReportHelper.EPMData(Web.Site.ID);
+                    using (DAO.GetClientReportingConnection)
+                    {                        
                         #region ViewCode
-                        epmLiveCn.ExecuteNonQuery(@"IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'PreviousPName' AND Object_ID = Object_ID(N'LSTProjectCenter'))
+                        DAO.GetClientReportingConnection.ExecuteNonQuery(@"IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'PreviousPName' AND Object_ID = Object_ID(N'LSTProjectCenter'))
                                                     BEGIN
 	                                                    ALTER TABLE [LSTProjectCenter] ADD [PreviousPName] NVARCHAR(512) NULL;
 	                                                    EXEC('UPDATE [LSTProjectCenter] SET [PreviousPName]=[TITLE];');
