@@ -136,6 +136,39 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
+        public Subscription[] ListSubscriptions(string reportPath)
+        {
+            return client.ListSubscriptions(reportPath);
+        }
+
+        public Extension[] ListExtensions(string extensionType)
+        {
+            return client.ListExtensions(extensionType);
+        }
+
+        public ItemParameter[] GetItemParameters(string reportPath)
+        {
+            return client.GetItemParameters(reportPath, null, true, null, null);
+        }
+
+        public void EnableSubscription(string subscriptionID)
+        {
+            client.EnableSubscription(subscriptionID);
+        }
+        public void DisableSubscription(string subscriptionID)
+        {
+            client.DisableSubscription(subscriptionID);
+        }
+        public void DeleteSubscription(string subscriptionID)
+        {
+            client.DeleteSubscription(subscriptionID);
+        }
+
+        public CatalogItem[] ListChildren(string itemPath, bool recursive)
+        {
+            return client.ListChildren(itemPath, recursive);
+        }
+
         private string GetSSRSRole(string group)
         {
             if (group == "Report Viewers")

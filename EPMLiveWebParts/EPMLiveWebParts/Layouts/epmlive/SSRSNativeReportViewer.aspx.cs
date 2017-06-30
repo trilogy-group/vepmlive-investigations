@@ -6,7 +6,6 @@ using EPMLiveCore.Layouts.epmlive;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using EPMLiveWebParts.SSRS2010;
 using System.Web.Services;
 using System.Web.Script.Serialization;
 using System.Collections.Generic;
@@ -14,6 +13,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 using System.Data;
 using System.Text;
 using System.Linq;
+using EPMLiveCore.Jobs.SSRS;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -22,7 +22,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private string webUrl = string.Empty;
         private string itemUrl = string.Empty;
         private bool isNativeMode = false;
-        
+
         private string _reportingServicesUrl = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
 
         protected void Page_Load(object sender, EventArgs e)
@@ -42,37 +42,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 bool.TryParse(Request["isNativeMode"], out isNativeMode);
             }
         }
-
-        private static ReportingService2010 SetupSSRSService()
-        {
-            ReportingService2010 srs2010;
-            var username = "";
-            var password = "";
-            var chrono = SPContext.Current.Site.WebApplication.GetChild<ReportAuth>("ReportAuth");
-            if (chrono != null)
-            {
-                username = chrono.Username;
-                password = CoreFunctions.Decrypt(chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
-            }
-
-            srs2010 = new ReportingService2010 { UseDefaultCredentials = true };
-            var rptWs = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL") + "/ReportService2010.asmx";
-            srs2010.Credentials = System.Net.CredentialCache.DefaultCredentials;
-            srs2010.Url = rptWs;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate
-            {
-                if (password == "") return;
-                srs2010.UseDefaultCredentials = false;
-                if (username.Contains("\\"))
-                    srs2010.Credentials = new NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
-                else
-                    srs2010.Credentials = new NetworkCredential(username, password);
-            });
-
-            return srs2010;
-        }
-
+        
         [WebMethod]
         public static string GetRegs()
         {
@@ -90,9 +60,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
             var addresses = $"{reportURL}/{itemUrlRequest}";
 
-            var srs2010 = SetupSSRSService();
-            var subsList = srs2010.ListSubscriptions(itemUrlRequest);
-            
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
+            var subsList = rs.ListSubscriptions(itemUrlRequest);
+
             var ds = new DataSet("Subscriptions");
             System.Data.DataTable table = new System.Data.DataTable("Table");
             table.Columns.Add("Type");
@@ -104,17 +74,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
             table.Columns.Add("Disabled");
 
 
-            foreach (Subscription subsc in subsList)
+            foreach (EPMLiveCore.SSRS2010.Subscription subsc in subsList)
             {
                 if (SPContext.Current.Web.CurrentUser.LoginName.ToUpper().EndsWith(subsc.Owner.ToUpper()))
-                    table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status, 
+                    table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status,
                         subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
-                SSRS2010.ExtensionSettings extset = null;
-                string desc, status, eventtype, matchdata;
-                ParameterValue[] paramss;
-                ActiveState acs;
-
-                var aaa = srs2010.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
             }
             //GetAddSubscriptionsFilters();
             ds.Tables.Add(table);
@@ -124,8 +88,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [WebMethod]
         public static string GetDeliveryExtensions()
         {
-            var srs2010 = SetupSSRSService();
-            var extensions = srs2010.ListExtensions("Delivery");
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
+            var extensions = rs.ListExtensions("Delivery");
             string html = "<option value=\"choose\">Choose a method of delivery</option>";
 
             extensions?.ToList().ForEach(x => html += $"<option value\"{x.LocalizedName}\">{x.LocalizedName}</option>");
@@ -140,14 +104,14 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
             var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
             var addresses = $"{reportURL}/{itemUrlRequest}";
-            var srs2010 = SetupSSRSService();
-            
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
+
             //string historyId = null;
             //ParameterValue[] parameterValues = null;
             //DataSourceCredentials[] datasourceCred = null;
 
             //all the parameters of the report will be filled to out parameter 'itemParameter'
-            var itemParameters = srs2010.GetItemParameters(itemUrlRequest, null, true, null, null);
+            var itemParameters = rs.GetItemParameters(itemUrlRequest);
             StringBuilder htmlToLoad = new StringBuilder();
             htmlToLoad.Append("<table style=\"width:100%\"><tr><th>Parameter</th><th>Source of Value</th><th>Value/Field</th></tr>");
 
@@ -155,7 +119,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //iterate through parameters
             int i = 0;
             foreach (var ip in itemParameters)
-            {                         
+            {
                 htmlToLoad.Append("<tr>");
 
                 htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p></td>");
@@ -243,16 +207,16 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [WebMethod]
         public static void EnableDisableSubscription(string subsIdList, bool enable)
         {
-            var srs2010 = SetupSSRSService();
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
 
             if (!string.IsNullOrWhiteSpace(subsIdList))
             {
                 var subscriptionsList = subsIdList.Split('|').ToList();
                 subscriptionsList?.Where(x => !string.IsNullOrEmpty(x))?.ToList().ForEach(x => {
                     if (enable)
-                        srs2010.EnableSubscription(x);
+                        rs.EnableSubscription(x);
                     else
-                        srs2010.DisableSubscription(x);
+                        rs.DisableSubscription(x);
                 });
             }
         }
@@ -260,13 +224,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [WebMethod]
         public static void DeleteSubscription(string subsIdList)
         {
-            var srs2010 = SetupSSRSService();
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
 
             if (!string.IsNullOrWhiteSpace(subsIdList))
             {
                 var subscriptionsList = subsIdList.Split('|').ToList();
                 subscriptionsList?.Where(x => !string.IsNullOrEmpty(x))?.ToList().ForEach(x => {
-                    srs2010.DeleteSubscription(x);
+                    rs.DeleteSubscription(x);
                 });
             }
         }
@@ -289,28 +253,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(dict);
-        }
-
-        private RecurrencePattern GetPattern()
-        {
-            DailyRecurrence day = new DailyRecurrence();
-            
-            MonthlyDOWRecurrence pattern = new MonthlyDOWRecurrence();
-            pattern.WhichWeekSpecified = true;
-            pattern.WhichWeek = WeekNumberEnum.LastWeek;
-
-            MonthsOfYearSelector months = new MonthsOfYearSelector();
-            months.March = true;
-            months.June = true;
-            months.September = true;
-            months.December = true;
-            pattern.MonthsOfYear = months;
-
-            DaysOfWeekSelector days = new DaysOfWeekSelector();
-            days.Friday = true;
-            pattern.DaysOfWeek = days;
-
-            return pattern;
         }
     }
 }
