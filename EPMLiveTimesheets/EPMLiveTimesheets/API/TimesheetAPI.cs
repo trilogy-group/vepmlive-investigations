@@ -501,7 +501,7 @@ namespace TimeSheets
                         cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
                         cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
                         cmd.ExecuteNonQuery();
-                        
+
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
                         if (settings.DisableApprovals)
@@ -530,13 +530,13 @@ namespace TimeSheets
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-                                
+
             timeSheetItems = GetTimeSheetItems(data, cn.ConnectionString);
             qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn.ConnectionString);
 
             if (qtdAllocatedHours > 0)
                 RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
-                
+
         }
 
         private const string PROJECT_WORK_FIELD_NAME = "Project Center";
@@ -565,7 +565,7 @@ namespace TimeSheets
                             break;
                     }
                 }
-                
+
             });
         }
         private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
@@ -588,8 +588,8 @@ namespace TimeSheets
                         {
                             emailToList.Add(string.IsNullOrWhiteSpace(userItem.Email) ? GetEmailFromDB(userItem.ID, oWeb) : userItem.Email);
                             idToList.Add(userItem.ID);
-                        });                        
-                    });                    
+                        });
+                    });
                 }
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } portfolio",
@@ -637,7 +637,7 @@ namespace TimeSheets
             //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
             var projectItem = oWeb.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
                 .Where(x => x.Name == timeSheetItem.ProjectName).FirstOrDefault();
-            var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID } , PROJECT_WORK_FIELD_NAME);
+            var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
 
             var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
             var emailToList = new List<string>();
@@ -662,10 +662,10 @@ namespace TimeSheets
                     var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, oWeb);
                     emailToList.AddRange(usersToSendNotification.Item1);
                     idToList.AddRange(usersToSendNotification.Item2);
-                });                
+                });
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                    "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated", 
+                    "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated",
                     PROJECT_WORK_FIELD_NAME);
             }
         }
@@ -708,8 +708,8 @@ namespace TimeSheets
                     emailToList.AddRange(usersToSendNotification.Item1);
                     idToList.AddRange(usersToSendNotification.Item2);
                 });
-                
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } programme", 
+
+                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } programme",
                     "an outside", "is not currently assigned to the Programme Team", PROGRAM_WORK_FIELD_NAME);
             }
         }
@@ -738,7 +738,7 @@ namespace TimeSheets
                         userList.ForEach(user => isMember = isMember || user.ID == oWeb.CurrentUser.ID);
                     });
                 }
-                
+
                 if (!isMember && listItem.Fields.OfType<SPField>().Where(x => x.Title == "Owner").Any())
                 {
                     var ownersField = listItem["Owner"]?.ToString().Replace("#", "").Split(';').ToList();
@@ -845,12 +845,12 @@ namespace TimeSheets
                 }
             });
 
-            return Math.Round(result * 4, 0) / 4;            
+            return Math.Round(result * 4, 0) / 4;
         }
 
         private const int NON_TEAM_MEMBER_ALLOCATION_EMAIL = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION = 17;
-        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours, 
+        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
             string itemName, string outOrUnassigned, string reasonMessage, string urlCenter)
         {
             emailToList = emailToList.Distinct().Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
@@ -870,7 +870,7 @@ namespace TimeSheets
                 APIEmail.QueueItemMessage(NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION, false, hshProps,
                     idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
             }
-            
+
             if (emailToList.Count > 0)
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_EMAIL,
                     new Hashtable() { { "Item_Name", itemName },
@@ -892,7 +892,7 @@ namespace TimeSheets
             else
                 return string.Empty;
         }
-        
+
         public static string SaveTimesheet(string data, SPWeb oWeb)
         {
             try
@@ -1354,7 +1354,7 @@ namespace TimeSheets
         {
             return "";
         }
-
+        private const int TIMESHEET_REJECTION_NOTIFICATION = 18;
         public static string ApproveTimesheets(string data, SPWeb oWeb)
         {
             try
@@ -1398,12 +1398,6 @@ namespace TimeSheets
 
                     //EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
 
-                    SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                        cn.Open();
-                    });
 
                     outData = "<Approve>";
 
@@ -1411,74 +1405,151 @@ namespace TimeSheets
 
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
-                    if (cn != null && cn.State == System.Data.ConnectionState.Open)
+
+                    //string[] tsUids = ndTS.InnerText.Split(',');
+
+                    int status = 3;
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-
-                        //string[] tsUids = ndTS.InnerText.Split(',');
-
-                        int status = 3;
-
-                        foreach (XmlNode TS in ndTS)
+                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                         {
-                            //if (tsUid != "")
+                            cn.Open();
+                            foreach (XmlNode TS in ndTS)
                             {
-                                try
+                                //if (tsUid != "")
                                 {
-                                    //string[] tsData = tsUid.Split('|');
-
-                                    SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
-                                    cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                    cmd.Parameters.AddWithValue("@notes", TS.InnerText);
-                                    cmd.Parameters.AddWithValue("@status", ApprovalStatus);
-                                    cmd.ExecuteNonQuery();
-
-                                    if (!liveHours)
+                                    try
                                     {
-                                        cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                        cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                        //string[] tsData = tsUid.Split('|');
 
-                                        SqlDataReader dr = cmd.ExecuteReader();
-                                        if (dr.Read())
+                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
+                                        cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                        cmd.Parameters.AddWithValue("@notes", TS.InnerText);
+                                        cmd.Parameters.AddWithValue("@status", ApprovalStatus);
+                                        cmd.ExecuteNonQuery();
+
+                                        if (!liveHours)
                                         {
-                                            status = dr.GetInt32(0);
-                                        }
-                                        dr.Close();
+                                            cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
+                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
 
-                                        if (status == 3)
+                                            SqlDataReader dr = cmd.ExecuteReader();
+                                            if (dr.Read())
+                                            {
+                                                status = dr.GetInt32(0);
+                                            }
+                                            dr.Close();
+
+                                            if (status == 3)
+                                            {
+                                                cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
+                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                                cmd.ExecuteNonQuery();
+
+                                                cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
+                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                                cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                                // if (tsData.Length > 1)
+                                                //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
+                                                //else
+                                                cmd.Parameters.AddWithValue("@JOBDATA", "");
+                                                cmd.ExecuteNonQuery();
+
+                                            }
+
+                                        }
+
+                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
+                                        if (ApprovalStatus == "2")
                                         {
-                                            cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                            cmd.ExecuteNonQuery();
+                                            Guid tuseruid = Guid.Empty;
+                                            int sharepointaccountid = 0;
+                                            string emailto = string.Empty;
+                                            string emailcontent = string.Empty;
+                                            string ResourceName = "";
+                                            cmd = new SqlCommand("Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid", cn);
+                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                            {
 
-                                            cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                            cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                            // if (tsData.Length > 1)
-                                            //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
-                                            //else
-                                            cmd.Parameters.AddWithValue("@JOBDATA", "");
-                                            cmd.ExecuteNonQuery();
+                                                if (dr.Read())
+                                                {
+                                                    ResourceName = Convert.ToString(dr["RESOURCENAME"]);
+                                                    tuseruid = Guid.Parse(Convert.ToString(dr["TSUSER_UID"]));
 
+                                                }
+                                            }
+                                            cmd = new SqlCommand("SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid", cn);
+                                            cmd.Parameters.AddWithValue("@tsuser_uid", tuseruid);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                            {
+                                                if (dr.Read())
+                                                {
+                                                    sharepointaccountid = Convert.ToInt32(dr["USER_ID"]);
+                                                }
+                                            }
+                                            //Getting reciepient email address
+                                            SPSecurity.RunWithElevatedPrivileges(() =>
+                                            {
+                                                using (SqlConnection rptcon = new SqlConnection(EPMLiveCore.CoreFunctions.getReportingConnectionString(oWeb.Site.WebApplication.Id, oWeb.Site.ID)))
+                                                {
+                                                    rptcon.Open();
+                                                    cmd = new SqlCommand("Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid", rptcon);
+                                                    cmd.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
+                                                    using (SqlDataReader dr = cmd.ExecuteReader())
+                                                    {
+                                                        if (dr.Read())
+                                                        {
+                                                            emailto = Convert.ToString(dr["Email"]);
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                            //Getting List pf rejected entries
+                                            cmd = new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", cn);
+                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                            {
+                                                while (dr.Read())
+                                                {
+                                                    emailcontent += "<li>" + dr["Title"] + "</li>";
+                                                }
+                                            }
+
+
+                                            if (!string.IsNullOrEmpty(emailto))
+                                            {
+                                                List<string> emaillist = new List<string>();
+                                                emaillist.Add(emailto);
+                                                try
+                                                {
+                                                    APIEmail.sendEmail(TIMESHEET_REJECTION_NOTIFICATION,
+                                                           new Hashtable() { { "TimesheetUser_Name", ResourceName },
+                                      { "Element_Entries", emailcontent } },
+                                                           emaillist, string.Empty, oWeb, true);
+                                                }
+                                                catch (Exception ex)
+                                                {
+
+                                                    Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
+                                                }
+
+                                            }
                                         }
-
                                     }
-
-                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
+                                    catch (Exception ex)
+                                    {
+                                        Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
+                                        errors = true;
+                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
+                                    }
                                 }
-                                catch (Exception ex)
-                                {
-                                    errors = true;
-                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
-                                }
+                                outData += "</Approve>";
                             }
                         }
+                    });
 
-                        cn.Close();
-                    }
-
-                    outData += "</Approve>";
                 }
-
                 if (errors)
                     return EPMLiveCore.API.Response.Failure(90010, outData);
                 else
