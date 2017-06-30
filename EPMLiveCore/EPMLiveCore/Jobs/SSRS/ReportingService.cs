@@ -11,7 +11,6 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
-        private object lockObject = new object();
         private static object lockObjectForSingletion = new object();
         private static IReportingService singletonInstance;
 
@@ -23,7 +22,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            lock(lockObjectForSingletion)
+            lock (lockObjectForSingletion)
             {
                 if (singletonInstance == null)
                 {
@@ -96,27 +95,30 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
         {
-            var roles = client.ListRoles("Catalog", "");
-            var errors = string.Empty;
-            try
+            lock (siteCollectionId)
             {
-                AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators");
-            }
-            catch (Exception exception)
-            {
-                errors += exception.ToString();
-            }
-            try
-            {
-                AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
-            }
-            catch (Exception exception)
-            {
-                errors += exception.ToString();
-            }            
-            if (!string.IsNullOrEmpty(errors))
-            {
-                throw new Exception(errors);
+                var roles = client.ListRoles("Catalog", "");
+                var errors = string.Empty;
+                try
+                {
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators");
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
+                }
+                try
+                {
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
+                }
+                if (!string.IsNullOrEmpty(errors))
+                {
+                    throw new Exception(errors);
+                }
             }
         }
 
