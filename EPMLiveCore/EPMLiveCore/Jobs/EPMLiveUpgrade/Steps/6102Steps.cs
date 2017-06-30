@@ -5,7 +5,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 2.0,
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 3.0,
         Description = "New columns LastSubmittedByName and LastSubmittedByUser added to reporting source view")]
     internal class NewLastSubmitedColumnsAddedToReportingSourceView : UpgradeStep
     {
