@@ -14,7 +14,6 @@ namespace EPMLiveReportsAdmin
             {
                 var addedUser = properties.Web.AllUsers.GetByID(properties.GroupUserId);
                 var extendedList = properties.Web.SiteUserInfoList.Items.GetItemById(addedUser.ID);
-                EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
                 extendedList["Synchronized"] = false;
                 extendedList.Update();
                 QueueAgent.QueueJob(properties.Web.Site.WebApplication, properties.Web.Site);
@@ -30,14 +29,6 @@ namespace EPMLiveReportsAdmin
                 var removedUser = properties.Web.AllUsers.GetByID(properties.GroupUserId);
                 var syncJob = new SyncJob();
                 syncJob.execute(properties.Web.Site, properties.Web, $"removerole~{removedUser.LoginName}~{group.Name}");
-            }
-        }
-
-        private void EnsureFieldExists(SPListItem extendedList, string fieldName, SPFieldType fieldType)
-        {
-            if (!extendedList.Fields.ContainsField(fieldName))
-            {
-                extendedList.Fields.Add(fieldName, fieldType, false);
             }
         }
     }
