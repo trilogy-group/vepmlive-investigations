@@ -1045,7 +1045,16 @@ namespace EPMLiveWebParts
                                                 val += sids[j] + ";#";
                                                 try
                                                 {
-                                                    val += users.GetByID(int.Parse(sids[j])).Name + ";#";
+                                                    if (field.Type == SPFieldType.Lookup)
+                                                    {
+                                                        SPFieldLookup spfield = (SPFieldLookup)field;
+                                                        SPList lookuplist = SPContext.Current.Web.Lists[new Guid(spfield.LookupList)];
+                                                        val += lookuplist.GetItemById(int.Parse(sids[j])).Name + ";#";
+                                                    }
+                                                    else
+                                                    {
+                                                        val += users.GetByID(int.Parse(sids[j])).Name + ";#";
+                                                    }
                                                 }
                                                 catch { }
 
