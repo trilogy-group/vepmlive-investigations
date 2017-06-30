@@ -1,5 +1,6 @@
 ﻿using EPMLive.SSRSConfigInjector.Resolver;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Xml;
 
@@ -7,24 +8,32 @@ namespace EPMLive.SSRSConfigInjector
 {
     public class Program
     {
-        private static string reportServerBasePath = "C:\\Program Files\\Microsoft SQL Server\\MSRS13.MSSQLSERVERRS";
+        private static string reportServerBasePath = ConfigurationManager.AppSettings["ssrspath"];
 
         private static IPathResolver pathResolver = new PathResolver(reportServerBasePath);
 
         public static void Main(string[] args)
         {
+            if(!Directory.Exists(reportServerBasePath))
+            {
+                throw new DirectoryNotFoundException($"{reportServerBasePath} not found.");
+            }
             if (Convert.ToString(args[0]) == "restore")
             {
                 RestoreBackup();
             }
             else if (Convert.ToString(args[0]) == "install")
             {
-                var validationKey = "9347D98F2686891ECEFB2065F1DF9F5228888B4322D6784A57E38F8A85BF711D";
-                var machineKey = "96179BBFEBC4746C988483F8F30762A5EF0B77E08AF10B455953FA1284757A1E";
+                if(args.Length != 2)
+                {
+                    throw new ArgumentNullException("Admin username not found.");
+                }
 
+                var validationKey = ConfigurationManager.AppSettings["validationkey"];
+                var machineKey = ConfigurationManager.AppSettings["machinekey"];
                 MakeBackup();
                 CopyCustomAuthBinaries();
-                ModifyReportServerConfig();
+                ModifyReportServerConfig(Convert.ToString(args[1]));
                 ModifyReportServerPolicyConfig();
                 ModifyReportServerWebConfig(validationKey, machineKey);
                 ModifyReportingServicesPortalConfig(validationKey, machineKey);
@@ -152,13 +161,13 @@ namespace EPMLive.SSRSConfigInjector
             return xmlDocument;
         }
 
-        private static void ModifyReportServerConfig()
+        private static void ModifyReportServerConfig(string adminUsername)
         {
             var xmlDocument = GetXmlDocument(pathResolver.GetReportingServicePath("rsreportserver.config"));
 
             AddAuthNode(xmlDocument);
             AddExistingUiNode(xmlDocument);
-            AddExistingSecurityExtNode(xmlDocument);
+            AddExistingSecurityExtNode(xmlDocument, adminUsername);
             AddExistingAuthExtNode(xmlDocument);
 
             SaveXmlDocument(pathResolver.GetReportingServicePath("rsreportserver.config"), xmlDocument);
@@ -177,7 +186,7 @@ namespace EPMLive.SSRSConfigInjector
             }
         }
 
-        private static void AddExistingSecurityExtNode(XmlDocument xmlDocument)
+        private static void AddExistingSecurityExtNode(XmlDocument xmlDocument, string adminusername)
         {
             var existingsecurityExtNode = xmlDocument.SelectSingleNode("/Configuration/Extensions/Security/Extension[@Type='EPMLive.SSRSCustomAuthentication.AuthenticationExtension, EPMLive.SSRSCustomAuthentication']");
             if (existingsecurityExtNode == null)
@@ -185,7 +194,7 @@ namespace EPMLive.SSRSConfigInjector
                 var securityExtNode = xmlDocument.SelectSingleNode("/Configuration/Extensions/Security");
                 securityExtNode.RemoveAll();
                 var fragment = xmlDocument.CreateDocumentFragment();
-                fragment.InnerXml = "<Extension Name=\"Forms\" Type=\"EPMLive.SSRSCustomAuthentication.AuthorizationExtension, EPMLive.SSRSCustomAuthentication\"><Configuration><AdminConfiguration><UserName>admin</UserName></AdminConfiguration></Configuration></Extension>";
+                fragment.InnerXml = $"<Extension Name=\"Forms\" Type=\"EPMLive.SSRSCustomAuthentication.AuthorizationExtension, EPMLive.SSRSCustomAuthentication\"><Configuration><AdminConfiguration><UserName>{adminusername}</UserName></AdminConfiguration></Configuration></Extension>";
                 securityExtNode.AppendChild(fragment);
             }
         }
