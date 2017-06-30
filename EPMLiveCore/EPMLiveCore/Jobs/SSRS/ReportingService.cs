@@ -217,11 +217,11 @@ namespace EPMLiveCore.Jobs.SSRS
         private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
-            if (report.FileName.EndsWith(".rdl"))
+            if (report.FileName.ToLower().EndsWith(".rdl"))
             {
                 service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
             }
-            else if (report.FileName.EndsWith(".rsds"))
+            else if (report.FileName.ToLower().EndsWith(".rsds"))
             {
                 var doc = new XmlDocument();
                 doc.LoadXml(Encoding.UTF8.GetString(report.BinaryData));
