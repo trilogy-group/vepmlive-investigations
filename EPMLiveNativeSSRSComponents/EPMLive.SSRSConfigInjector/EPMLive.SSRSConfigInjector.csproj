@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -52,9 +51,7 @@
     <Compile Include="Resolver\PathResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
     <None Include="Samples\Microsoft.ReportingServices.Portal.WebHost.exe.config" />
     <None Include="Samples\rsreportserver.config" />
     <None Include="Samples\rssrvpolicy.config" />

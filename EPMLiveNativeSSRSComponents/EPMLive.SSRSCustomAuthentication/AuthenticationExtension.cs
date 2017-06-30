@@ -51,7 +51,7 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool IsValidPrincipalName(string principalName)
         {
-            return true;
+            return authProvider.VerifyUser(principalName);
         }
 
         public bool LogonUser(string userName, string password, string authority)
