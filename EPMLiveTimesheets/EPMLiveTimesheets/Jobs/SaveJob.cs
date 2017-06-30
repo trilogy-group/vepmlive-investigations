@@ -655,10 +655,9 @@ namespace TimeSheets
                         {
                             cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
 
+                            int userid = 0;
                             using (SqlDataReader dr = cmd.ExecuteReader())
                             {
-                                int userid = 0;
-
                                 if (dr.Read())
                                 {
                                     userid = dr.GetInt32(0);

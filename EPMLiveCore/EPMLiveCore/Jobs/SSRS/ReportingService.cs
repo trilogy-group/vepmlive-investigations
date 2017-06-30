@@ -4,6 +4,8 @@ using Microsoft.SharePoint.Administration.Claims;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text;
+using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -11,8 +13,6 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
-        private static object lockObjectForSingletion = new object();
-        private static IReportingService singletonInstance;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
@@ -22,19 +22,11 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            lock (lockObjectForSingletion)
-            {
-                if (singletonInstance == null)
-                {
-                    singletonInstance = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
                                                                                 site.ID);
-                }
-
-                return singletonInstance;
-            }
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -49,7 +41,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock (siteCollectionId)
+            lock (siteCollectionId + "_ReportLibrary")
             {
                 var errors = string.Empty;
                 var spQuery = new SPQuery()
@@ -95,7 +87,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
         {
-            lock (siteCollectionId)
+            lock (siteCollectionId + "_RoleMapping")
             {
                 var roles = client.ListRoles("Catalog", "");
                 var errors = string.Empty;
@@ -225,7 +217,30 @@ namespace EPMLiveCore.Jobs.SSRS
         private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
-            service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            if (report.FileName.ToLower().EndsWith(".rdl"))
+            {
+                service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            }
+            else if (report.FileName.ToLower().EndsWith(".rsds"))
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(Encoding.UTF8.GetString(report.BinaryData));
+                var definition = new DataSourceDefinition()
+                {
+                    CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
+                    ConnectString = doc.GetStringValue("/m:DataSourceDefinition/m:ConnectString"),
+                    Enabled = doc.GetBooleanValue("/m:DataSourceDefinition/m:Enabled"),
+                    Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
+                    ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
+                    OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
+                    Password = doc.GetStringValue("/m:DataSourceDefinition/m:Password"),
+                    Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
+                    UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
+                    UserName = doc.GetStringValue("/m:DataSourceDefinition/m:UserName"),
+                    WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
+                };
+                service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
+            }
         }
 
         private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
