@@ -11,8 +11,6 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
-        private static object lockObjectForSingletion = new object();
-        private static IReportingService singletonInstance;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
@@ -22,19 +20,11 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            lock (lockObjectForSingletion)
-            {
-                if (singletonInstance == null)
-                {
-                    singletonInstance = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
                                                                                 site.ID);
-                }
-
-                return singletonInstance;
-            }
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -49,7 +39,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock (siteCollectionId)
+            lock (siteCollectionId + "_ReportLibrary")
             {
                 var errors = string.Empty;
                 var spQuery = new SPQuery()
@@ -95,7 +85,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
         {
-            lock (siteCollectionId)
+            lock (siteCollectionId + "_RoleMapping")
             {
                 var roles = client.ListRoles("Catalog", "");
                 var errors = string.Empty;
