@@ -14,9 +14,11 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static string GetStringValue(this XmlDocument doc, string path)
         {
-            if(doc.SelectSingleNode(path) != null)
+            var ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("m", "http://schemas.microsoft.com/sqlserver/reporting/2006/03/reportdatasource");
+            if (doc.SelectSingleNode(path, ns) != null)
             {
-                return doc.SelectSingleNode(path).InnerText;
+                return doc.SelectSingleNode(path, ns).InnerText;
             }
 
             return string.Empty;
@@ -24,9 +26,11 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static bool GetBooleanValue(this XmlDocument doc, string path)
         {
-            if (doc.SelectSingleNode(path) != null)
+            var ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("m", "http://schemas.microsoft.com/sqlserver/reporting/2006/03/reportdatasource");
+            if (doc.SelectSingleNode(path, ns) != null)
             {
-                return Convert.ToBoolean(doc.SelectSingleNode(path).InnerText);
+                return Convert.ToBoolean(doc.SelectSingleNode(path, ns).InnerText);
             }
 
             return false;

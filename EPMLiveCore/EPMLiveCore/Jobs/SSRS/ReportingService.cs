@@ -227,17 +227,17 @@ namespace EPMLiveCore.Jobs.SSRS
                 doc.LoadXml(Encoding.UTF8.GetString(report.BinaryData));
                 var definition = new DataSourceDefinition()
                 {
-                    CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.SelectSingleNode("/DataSourceDefinition/CredentialRetrieval").InnerText),
-                    ConnectString = doc.GetStringValue("/DataSourceDefinition/ConnectString"),
-                    Enabled = doc.GetBooleanValue("/DataSourceDefinition/Enabled"),
-                    Extension = doc.GetStringValue("/DataSourceDefinition/Extension"),
-                    ImpersonateUser = doc.GetBooleanValue("/DataSourceDefinition/ImpersonateUser"),
-                    OriginalConnectStringExpressionBased = doc.GetBooleanValue("/DataSourceDefinition/OriginalConnectStringExpressionBased"),
-                    Password = doc.GetStringValue("/DataSourceDefinition/Password"),
-                    Prompt = doc.GetStringValue("/DataSourceDefinition/Prompt"),
-                    UseOriginalConnectString = doc.GetBooleanValue("/DataSourceDefinition/UseOriginalConnectString"),
-                    UserName = doc.GetStringValue("/DataSourceDefinition/UserName"),
-                    WindowsCredentials = doc.GetBooleanValue("/DataSourceDefinition/WindowsCredentials")
+                    CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
+                    ConnectString = doc.GetStringValue("/m:DataSourceDefinition/m:ConnectString"),
+                    Enabled = doc.GetBooleanValue("/m:DataSourceDefinition/m:Enabled"),
+                    Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
+                    ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
+                    OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
+                    Password = doc.GetStringValue("/m:DataSourceDefinition/m:Password"),
+                    Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
+                    UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
+                    UserName = doc.GetStringValue("/m:DataSourceDefinition/m:UserName"),
+                    WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
                 };
                 service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
             }
