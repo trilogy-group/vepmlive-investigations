@@ -82,8 +82,8 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var roles = client.ListRoles("Catalog", "");
             var errors = string.Empty;
-            var contentManagers = AssignContentManagerRole(groups, userList, client, roles.GetRole("Content Manager"), ref errors);
-            AssignReportViewerRole(groups, userList, client, roles.GetRole("Browser"), contentManagers, ref errors);
+            AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators", ref errors);
+            AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers", ref errors);
             if(!string.IsNullOrEmpty(errors))
             {
                 throw new Exception(errors);
@@ -121,34 +121,10 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignReportViewerRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, List<SPUser> contentManagers, ref string errors)
+        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole, ref string errors)
         {
-            var reportViewers = groups.GetByName("Report Viewers");
+            var reportViewers = groups.GetByName(spRole);
             foreach (SPUser user in reportViewers.Users)
-            {
-                try
-                {
-                    var extendedList = userList.Items.GetItemById(user.ID);
-                    if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
-                        && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
-                    {
-                        AssignRole(client, role, user.LoginName);
-                        extendedList["Synchronized"] = true;
-                        extendedList.SystemUpdate();
-                    }
-                }
-                catch (Exception exception)
-                {
-                    errors += exception.ToString();
-                }
-            }
-        }
-
-        private List<SPUser> AssignContentManagerRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, ref string errors)
-        {
-            var contentManagers = groups.GetByName("Administrators");
-            var users = contentManagers.Users.OfType<SPUser>().ToList();
-            foreach (SPUser user in users.Where(x => x.Name != "System Account"))
             {
                 try
                 {
@@ -166,8 +142,6 @@ namespace EPMLiveCore.Jobs.SSRS
                     errors += exception.ToString();
                 }
             }
-
-            return users;
         }
 
         private void AssignRole(ReportingService2010 client, Role role, string loginName)
