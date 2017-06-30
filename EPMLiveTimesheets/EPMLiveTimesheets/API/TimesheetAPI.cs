@@ -1354,7 +1354,7 @@ namespace TimeSheets
         {
             return "";
         }
-
+        private const int TIMESHEET_REJECTION_NOTIFICATION = 18;
         public static string ApproveTimesheets(string data, SPWeb oWeb)
         {
             try
@@ -1398,12 +1398,6 @@ namespace TimeSheets
 
                     //EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
 
-                    SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                        cn.Open();
-                    });
 
                     outData = "<Approve>";
 
@@ -1411,130 +1405,142 @@ namespace TimeSheets
 
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
-                    if (cn != null && cn.State == System.Data.ConnectionState.Open)
+
+                    //string[] tsUids = ndTS.InnerText.Split(',');
+
+                    int status = 3;
+
+                    foreach (XmlNode TS in ndTS)
                     {
 
-                        //string[] tsUids = ndTS.InnerText.Split(',');
 
-                        int status = 3;
-
-                        foreach (XmlNode TS in ndTS)
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            //if (tsUid != "")
+                            using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                             {
-                                try
+                                cn.Open();
+
+                                //if (tsUid != "")
                                 {
-                                    //string[] tsData = tsUid.Split('|');
-
-                                    SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
-                                    cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                    cmd.Parameters.AddWithValue("@notes", TS.InnerText);
-                                    cmd.Parameters.AddWithValue("@status", ApprovalStatus);
-                                    cmd.ExecuteNonQuery();
-
-                                    if (!liveHours)
+                                    try
                                     {
-                                        cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                        cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                        //string[] tsData = tsUid.Split('|');
 
-                                        SqlDataReader dr = cmd.ExecuteReader();
-                                        if (dr.Read())
-                                        {
-                                            status = dr.GetInt32(0);
-                                        }
-                                        dr.Close();
-
-                                        if (status == 3)
-                                        {
-                                            cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                            cmd.ExecuteNonQuery();
-
-                                            cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                            cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                            // if (tsData.Length > 1)
-                                            //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
-                                            //else
-                                            cmd.Parameters.AddWithValue("@JOBDATA", "");
-                                            cmd.ExecuteNonQuery();
-
-                                        }
-
-                                    }
-
-                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
-                                    if (ApprovalStatus == "2")
-                                    {
-                                        Guid tuseruid = Guid.Empty;
-                                        int sharepointaccountid = 0;
-                                        string emailto = string.Empty;
-                                        string emailcontent = string.Empty;
-                                        cmd = new SqlCommand("Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid", cn);
+                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
                                         cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                        using (SqlDataReader dr = cmd.ExecuteReader())
+                                        cmd.Parameters.AddWithValue("@notes", TS.InnerText);
+                                        cmd.Parameters.AddWithValue("@status", ApprovalStatus);
+                                        cmd.ExecuteNonQuery();
+
+                                        if (!liveHours)
                                         {
-                                            emailcontent = @"<html><body><table width='100%' cellpadding='0' cellspacing='0'><tr><td style='font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>Dear {User_Name},<br></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:15px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>The following timesheet entries were rejected by Project Manager:</u></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:15px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'><ul>";
+                                            cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
+                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+
+                                            SqlDataReader dr = cmd.ExecuteReader();
                                             if (dr.Read())
                                             {
-                                                emailcontent = emailcontent.Replace("{User_Name}", Convert.ToString(dr["RESOURCENAME"]));
-                                                tuseruid = Guid.Parse(Convert.ToString(dr["TSUSER_UID"]));
+                                                status = dr.GetInt32(0);
+                                            }
+                                            dr.Close();
+
+                                            if (status == 3)
+                                            {
+                                                cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
+                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                                cmd.ExecuteNonQuery();
+
+                                                cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
+                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                                cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                                // if (tsData.Length > 1)
+                                                //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
+                                                //else
+                                                cmd.Parameters.AddWithValue("@JOBDATA", "");
+                                                cmd.ExecuteNonQuery();
 
                                             }
+
                                         }
-                                        cmd = new SqlCommand("SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid", cn);
-                                        cmd.Parameters.AddWithValue("@tsuser_uid", tuseruid);
-                                        using (SqlDataReader dr = cmd.ExecuteReader())
+
+                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
+                                        if (ApprovalStatus == "2")
                                         {
-                                            if (dr.Read())
+                                            Guid tuseruid = Guid.Empty;
+                                            int sharepointaccountid = 0;
+                                            string emailto = string.Empty;
+                                            string emailcontent = string.Empty;
+                                            string ResourceName = "";
+                                            cmd = new SqlCommand("Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid", cn);
+                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
                                             {
-                                                sharepointaccountid = Convert.ToInt32(dr["USER_ID"]);
-                                            }
-                                        }
-                                        //Getting reciepient email address
-                                        SPSecurity.RunWithElevatedPrivileges(() =>
-                                        {
-                                            using (SqlConnection rptcon = new SqlConnection(EPMLiveCore.CoreFunctions.getReportingConnectionString(oWeb.Site.WebApplication.Id, oWeb.Site.ID)))
-                                            {
-                                                rptcon.Open();
-                                                cmd = new SqlCommand("Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid", rptcon);
-                                                cmd.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
-                                                using (SqlDataReader dr = cmd.ExecuteReader())
+
+                                                if (dr.Read())
                                                 {
-                                                    if (dr.Read())
-                                                    {
-                                                        emailto = Convert.ToString(dr["Email"]);
-                                                    }
+                                                    ResourceName = Convert.ToString(dr["RESOURCENAME"]);
+                                                    tuseruid = Guid.Parse(Convert.ToString(dr["TSUSER_UID"]));
+
                                                 }
                                             }
-                                        });
-                                        //Getting List pf rejected entries
-                                        cmd = new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", cn);
-                                        cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                        using (SqlDataReader dr = cmd.ExecuteReader())
-                                        {
-                                            while (dr.Read())
+                                            cmd = new SqlCommand("SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid", cn);
+                                            cmd.Parameters.AddWithValue("@tsuser_uid", tuseruid);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
                                             {
-                                                emailcontent += "<li>" + dr["Title"] + "</li>";
+                                                if (dr.Read())
+                                                {
+                                                    sharepointaccountid = Convert.ToInt32(dr["USER_ID"]);
+                                                }
+                                            }
+                                            //Getting reciepient email address
+                                            SPSecurity.RunWithElevatedPrivileges(() =>
+                                            {
+                                                using (SqlConnection rptcon = new SqlConnection(EPMLiveCore.CoreFunctions.getReportingConnectionString(oWeb.Site.WebApplication.Id, oWeb.Site.ID)))
+                                                {
+                                                    rptcon.Open();
+                                                    cmd = new SqlCommand("Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid", rptcon);
+                                                    cmd.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
+                                                    using (SqlDataReader dr = cmd.ExecuteReader())
+                                                    {
+                                                        if (dr.Read())
+                                                        {
+                                                            emailto = Convert.ToString(dr["Email"]);
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                            //Getting List pf rejected entries
+                                            cmd = new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", cn);
+                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                            {
+                                                while (dr.Read())
+                                                {
+                                                    emailcontent += "<li>" + dr["Title"] + "</li>";
+                                                }
+                                            }
+
+
+                                            if (!string.IsNullOrEmpty(emailto))
+                                            {
+                                                List<string> emaillist = new List<string>();
+                                                emaillist.Add(emailto);
+                                                APIEmail.sendEmail(TIMESHEET_REJECTION_NOTIFICATION,
+        new Hashtable() { { "TimesheetUser_Name", ResourceName },
+                                      { "Element_Entries", emailcontent } },
+        emaillist, string.Empty, oWeb, true);
                                             }
                                         }
-
-                                        emailcontent += @"</ul></td></tr><tr><td>&nbsp;</td></tr><tr><td style='font-size:12px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>For help, please visit <a href='http://support.epmlive.com' style='font-size:12px;color:#3366CC;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>http://support.epmlive.com</a></td></tr><tr><td><hr></td></tr><tr><td style='font-size:10px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif'>Powered by EPM Live :)</td></tr></table></body></html>";
-                                        if (!string.IsNullOrEmpty(emailto))
-                                        {
-                                            APIEmail.sendEmail(emailcontent, "Your timesheet entry was rejected.", emailto, oWeb);
-                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        errors = true;
+                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
                                     }
                                 }
-                                catch (Exception ex)
-                                {
-                                    errors = true;
-                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
-                                }
                             }
-                        }
+                        });
 
-                        cn.Close();
                     }
 
                     outData += "</Approve>";
