@@ -1,11 +1,12 @@
 ﻿using Microsoft.SharePoint;
 using System;
-using System.Linq;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
     public class SyncJob : API.BaseJob
     {
+        private IReportingService client;
+
         public void execute(SPSite site, SPWeb web, string data)
         {
             if (string.IsNullOrEmpty(data))
@@ -115,11 +116,16 @@ namespace EPMLiveCore.Jobs.SSRS
 
         private IReportingService GetReportingServiceInstance(SPSite site)
         {
-            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+            if(client == null)
+            {
+                client = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                             Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                             Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
                                                                             Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
                                                                             site.ID);
+            }
+
+            return client;
         }
     }
 }
