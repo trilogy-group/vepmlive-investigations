@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
     public interface IReportingService
     {
-        void CreateSiteCollectionMappedFolder(Guid siteCollectionId);
-        void DeleteSiteCollectionMappedFolder(Guid siteCollectionId);
+        void CreateSiteCollectionMappedFolder();
+        void DeleteSiteCollectionMappedFolder();
+        void SyncReports(SPDocumentLibrary reportLibrary);
+        void DeleteReport(string data);
+        void AssignRoleMapping(SPGroupCollection groups, SPList userList);
+        void RemoveRoleMapping(string data);
     }
 }

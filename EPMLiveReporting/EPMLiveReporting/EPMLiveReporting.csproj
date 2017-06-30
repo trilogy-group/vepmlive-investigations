@@ -98,6 +98,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\Errors.cs" />
     <Compile Include="API\ReportManager.cs" />
     <Compile Include="DataScrubber.cs" />
+    <Compile Include="EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.cs" />
     <Compile Include="epmlive\ReportDatabases.aspx.cs">
       <DependentUpon>ReportDatabases.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -113,6 +114,10 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>SetupReportDatabase.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="EPMMenu.cs" />
+    <Compile Include="Features\EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.EventReceiver.cs">
+      <DependentUpon>EPMLiveReportLibraryEventReceiver.feature</DependentUpon>
+    </Compile>
+    <Compile Include="GroupUserEventReceiver.cs" />
     <Compile Include="Jobs\CollectJob.cs" />
     <Compile Include="Jobs\ListDataCleanupJob.cs" />
     <Compile Include="Jobs\RefreshSec.cs" />
@@ -217,8 +222,14 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="SocialEngineEvents.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="EPMLiveReportLibraryEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5c543257-da85-4af8-a2ea-d74c976b22b2}</SharePointProjectItemId>
+    </None>
     <None Include="epmlive\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{73ab6fbc-92b9-4ed6-9d9e-bbf8b1ee8c62}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.feature">
+      <FeatureId>{a6377fdd-daa9-4974-a8ac-cf07d938ab65}</FeatureId>
     </None>
     <None Include="key.snk" />
     <None Include="Layouts\SharePointProjectItem.spdata">
@@ -234,12 +245,14 @@ net start "WETimer"</PostDeploymentCommand>
       <SharePointProjectItemId>{01102227-0b21-4654-b05c-cdbc85df434e}</SharePointProjectItemId>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Features\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="EPMLiveReportLibraryEventReceiver\Elements.xml" />
     <Content Include="epmlive\ReportDatabases.aspx" />
     <Content Include="epmlive\SetupReportDatabase.aspx" />
+    <Content Include="Features\EPMLiveReportLibraryEventReceiver\EPMLiveReportLibraryEventReceiver.Template.xml">
+      <DependentUpon>EPMLiveReportLibraryEventReceiver.feature</DependentUpon>
+    </Content>
     <Content Include="Layouts\EPMLive\Action.aspx" />
     <Content Include="Layouts\EPMLive\AllSchedules.aspx" />
     <Content Include="Layouts\EPMLive\AllSnapshots.aspx" />
