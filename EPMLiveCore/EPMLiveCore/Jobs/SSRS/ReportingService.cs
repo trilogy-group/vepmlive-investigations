@@ -37,8 +37,6 @@ namespace EPMLiveCore.Jobs.SSRS
                 var errors = string.Empty;
                 foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
                 {
-                    EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
-                    EnsureFieldExists(item, "UpdatedBy", SPFieldType.Text);
                     var reportItem = new ReportItem()
                     {
                         FileName = item.File.Name,
@@ -131,7 +129,6 @@ namespace EPMLiveCore.Jobs.SSRS
                 try
                 {
                     var extendedList = userList.Items.GetItemById(user.ID);
-                    EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
                     if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                         && !contentManagers.Exists(x => x.Name == user.Name) && user.Name != "System Account")
                     {
@@ -156,7 +153,6 @@ namespace EPMLiveCore.Jobs.SSRS
                 try
                 {
                     var extendedList = userList.Items.GetItemById(user.ID);
-                    EnsureFieldExists(extendedList, "Synchronized", SPFieldType.Boolean);
                     if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                         && user.Name != "System Account")
                     {
@@ -172,14 +168,6 @@ namespace EPMLiveCore.Jobs.SSRS
             }
 
             return users;
-        }
-
-        private void EnsureFieldExists(SPListItem extendedList, string fieldName, SPFieldType fieldType)
-        {
-            if (!extendedList.Fields.ContainsField(fieldName))
-            {
-                extendedList.Fields.Add(fieldName, fieldType, false);
-            }
         }
 
         private void AssignRole(ReportingService2010 client, Role role, string loginName)

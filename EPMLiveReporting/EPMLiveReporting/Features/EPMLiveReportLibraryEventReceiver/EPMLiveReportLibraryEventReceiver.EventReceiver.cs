@@ -2,6 +2,8 @@ using Microsoft.SharePoint;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Linq;
+
 
 namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
 {
@@ -32,6 +34,19 @@ namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
             grpUserRemoved.Class = "EPMLiveReportsAdmin.GroupUserEventReceiver";
             grpUserRemoved.Update();
             web.Update();
+
+            var reportLibrary = web.Lists["Report Library"] as SPDocumentLibrary;
+            EnsureFieldExists(reportLibrary, "Synchronized", SPFieldType.Boolean);
+            EnsureFieldExists(reportLibrary, "UpdatedBy", SPFieldType.Text);
+            EnsureFieldExists(web.SiteUserInfoList, "Synchronized", SPFieldType.Boolean);
+        }
+
+        private void EnsureFieldExists(SPList extendedList, string fieldName, SPFieldType fieldType)
+        {
+            if (!extendedList.Fields.ContainsField(fieldName))
+            {
+                extendedList.Fields.Add(fieldName, fieldType, false);
+            }
         }
     }
 }
