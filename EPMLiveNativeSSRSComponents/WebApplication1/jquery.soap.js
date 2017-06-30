@@ -135,9 +135,9 @@ SOAPClient._onLoadWsdl = function (url, method, parameters, async, callback, req
     SOAPClient_cacheWsdl[url] = wsdl;	// save a copy in cache
     return SOAPClient._sendSoapRequest(url, method, parameters, async, callback, wsdl);
 }
-SOAPClient._sendSoapRequest = function (url, method, parameters, async, callback, wsdl) {
+SOAPClient._sendSoapRequest = function (url, method, parameters, async, callback) {
     // get namespace
-    var ns = (wsdl.documentElement.attributes["targetNamespace"] + "" == "undefined") ? wsdl.documentElement.attributes.getNamedItem("targetNamespace").nodeValue : wsdl.documentElement.attributes["targetNamespace"].value;
+    var ns = "http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer";
     // build SOAP request
     var sr =
 				"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +

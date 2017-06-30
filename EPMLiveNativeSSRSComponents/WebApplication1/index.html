@@ -12,12 +12,9 @@
 
         // DEMO 1
         var pl = new SOAPClientParameters();
-        pl.add("userName", "farmadmin");
-        pl.add("password", "Pass@word1");
-        SOAPClient.invoke(url, "LogonUser", pl, true, HelloWorld_callBack);
-        function HelloWorld_callBack(r) {
-
-        }
+        pl.add("userName", "client1");
+        pl.add("password", "password@123");
+        SOAPClient._sendSoapRequest(url, "LogonUser", pl, true, null);
     </script>
 </body>
 </html>
