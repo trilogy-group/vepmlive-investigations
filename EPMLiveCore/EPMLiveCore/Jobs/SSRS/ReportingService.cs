@@ -4,6 +4,8 @@ using Microsoft.SharePoint.Administration.Claims;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text;
+using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -215,7 +217,30 @@ namespace EPMLiveCore.Jobs.SSRS
         private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
-            service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            if (report.FileName.EndsWith(".rdl"))
+            {
+                service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            }
+            else if (report.FileName.EndsWith(".rsds"))
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(Encoding.UTF8.GetString(report.BinaryData));
+                var definition = new DataSourceDefinition()
+                {
+                    CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.SelectSingleNode("/DataSourceDefinition/CredentialRetrieval").InnerText),
+                    ConnectString = doc.GetStringValue("/DataSourceDefinition/ConnectString"),
+                    Enabled = doc.GetBooleanValue("/DataSourceDefinition/Enabled"),
+                    Extension = doc.GetStringValue("/DataSourceDefinition/Extension"),
+                    ImpersonateUser = doc.GetBooleanValue("/DataSourceDefinition/ImpersonateUser"),
+                    OriginalConnectStringExpressionBased = doc.GetBooleanValue("/DataSourceDefinition/OriginalConnectStringExpressionBased"),
+                    Password = doc.GetStringValue("/DataSourceDefinition/Password"),
+                    Prompt = doc.GetStringValue("/DataSourceDefinition/Prompt"),
+                    UseOriginalConnectString = doc.GetBooleanValue("/DataSourceDefinition/UseOriginalConnectString"),
+                    UserName = doc.GetStringValue("/DataSourceDefinition/UserName"),
+                    WindowsCredentials = doc.GetBooleanValue("/DataSourceDefinition/WindowsCredentials")
+                };
+                service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
+            }
         }
 
         private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
