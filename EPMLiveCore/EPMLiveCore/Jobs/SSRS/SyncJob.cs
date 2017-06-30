@@ -6,6 +6,7 @@ namespace EPMLiveCore.Jobs.SSRS
     public class SyncJob : API.BaseJob
     {
         private IReportingService client;
+        private object lockObject = new object();
 
         public void execute(SPSite site, SPWeb web, string data)
         {
@@ -116,16 +117,19 @@ namespace EPMLiveCore.Jobs.SSRS
 
         private IReportingService GetReportingServiceInstance(SPSite site)
         {
-            if(client == null)
+            lock(lockObject)
             {
-                client = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
-                                                                            Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
-                                                                            Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
-                                                                            Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
-                                                                            site.ID);
-            }
+                if (client == null)
+                {
+                    client = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
+                                                                                site.ID);
+                }
 
-            return client;
+                return client;
+            }
         }
     }
 }
