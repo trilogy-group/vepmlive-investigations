@@ -955,62 +955,65 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                //check if this is for user or it's a generic (EPMLCID-11683)
+                if (uv.User != null)
                 {
-                    using (SPSite spSite = new SPSite(web.Site.ID))
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb(web.ID))
+                        using (SPSite spSite = new SPSite(web.Site.ID))
                         {
-                            spWeb.AllowUnsafeUpdates = true;
-                            SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
-                            if (spUser != null)
+                            using (SPWeb spWeb = spSite.OpenWeb(web.ID))
                             {
+                                spWeb.AllowUnsafeUpdates = true;
+                                SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
+                                if (spUser != null)
+                                {
                                 // Re-opening the item with the system account
                                 SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
-                                foreach (SPRoleAssignment role in adminItem.RoleAssignments)
-                                {
-                                    try
+                                    foreach (SPRoleAssignment role in adminItem.RoleAssignments)
                                     {
-                                        if (role.Member.GetType() == typeof(SPGroup))
+                                        try
                                         {
-                                            SPGroup group = spWeb.Groups.GetByID(role.Member.ID);
-                                            SPUser tempuser = null;
-
-                                            if (group != null)
+                                            if (role.Member.GetType() == typeof(SPGroup))
                                             {
-                                                if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                                SPGroup group = spWeb.Groups.GetByID(role.Member.ID);
+                                                SPUser tempuser = null;
+
+                                                if (group != null)
                                                 {
-                                                    continue;
-                                                }
-                                                else
-                                                {
-                                                    try
+                                                    if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
                                                     {
-                                                        tempuser = group.Users.GetByID(spUser.ID);
+                                                        continue;
                                                     }
-                                                    catch { }
-                                                    if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                                    else
                                                     {
-                                                        group.AddUser(spUser);
-                                                    }
-                                                    if (tempuser != null && !arr.Contains(group.ID.ToString()) && li.HasUniqueRoleAssignments)
-                                                    {
-                                                        if (additionalPermissions.Contains(Convert.ToString(group.ID)))
-                                                            continue;
-                                                        else
-                                                            group.RemoveUser(spUser);
+                                                        try
+                                                        {
+                                                            tempuser = group.Users.GetByID(spUser.ID);
+                                                        }
+                                                        catch { }
+                                                        if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                                        {
+                                                            group.AddUser(spUser);
+                                                        }
+                                                        if (tempuser != null && !arr.Contains(group.ID.ToString()) && li.HasUniqueRoleAssignments)
+                                                        {
+                                                            if (additionalPermissions.Contains(Convert.ToString(group.ID)))
+                                                                continue;
+                                                            else
+                                                                group.RemoveUser(spUser);
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                        catch { }
                                     }
-                                    catch { }
                                 }
                             }
                         }
-                    }
-                });
-
+                    });
+                }
                 //foreach(SPGroup group in web.Groups)
                 //{
                 //    try
