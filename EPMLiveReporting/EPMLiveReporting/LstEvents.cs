@@ -40,9 +40,10 @@ namespace EPMLiveReportsAdmin
             {
                 _stCurrentContext.Session["ViewSession"] = null;
             }
-            catch {
+            catch
+            {
             }
-           
+
             if (properties.Field.InternalName.ToLower() == "today")
             {
                 return;
@@ -71,7 +72,7 @@ namespace EPMLiveReportsAdmin
                         }
                     }
                 }
-            }            
+            }
         }
 
         public override void FieldUpdated(SPListEventProperties properties)
