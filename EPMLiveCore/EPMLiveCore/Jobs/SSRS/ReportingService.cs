@@ -12,6 +12,7 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
+        private object lockObject = new object();
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
@@ -31,35 +32,38 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            var errors = string.Empty;
-            foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
+            lock(lockObject)
             {
-                EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
-                EnsureFieldExists(item, "UpdatedBy", SPFieldType.Text);
-                var reportItem = new ReportItem()
+                var errors = string.Empty;
+                foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
                 {
-                    FileName = item.File.Name,
-                    LastModified = item.File.TimeLastModified,
-                    Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
-                    BinaryData = item.File.OpenBinary()
-                };
-                try
-                {
-                    CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
-                    UploadReport(client, siteCollectionId.ToString(), reportItem);
-                    item["Synchronized"] = true;
-                    item["UpdatedBy"] = "RS";
-                    item.SystemUpdate();
+                    EnsureFieldExists(item, "Synchronized", SPFieldType.Boolean);
+                    EnsureFieldExists(item, "UpdatedBy", SPFieldType.Text);
+                    var reportItem = new ReportItem()
+                    {
+                        FileName = item.File.Name,
+                        LastModified = item.File.TimeLastModified,
+                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
+                        BinaryData = item.File.OpenBinary()
+                    };
+                    try
+                    {
+                        CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
+                        UploadReport(client, siteCollectionId.ToString(), reportItem);
+                        item["Synchronized"] = true;
+                        item["UpdatedBy"] = "RS";
+                        item.SystemUpdate();
+                    }
+                    catch (Exception exception)
+                    {
+                        errors += exception.ToString();
+                    }
                 }
-                catch (Exception exception)
-                {
-                    errors += exception.ToString();
-                }
-            }
 
-            if(string.IsNullOrEmpty(errors))
-            {
-                throw new Exception(errors);
+                if (string.IsNullOrEmpty(errors))
+                {
+                    throw new Exception(errors);
+                }
             }
         }
 
