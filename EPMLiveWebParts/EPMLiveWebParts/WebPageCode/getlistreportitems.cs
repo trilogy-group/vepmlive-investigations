@@ -8,11 +8,11 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using EPMLiveCore;
-using EPMLiveWebParts.SSRS2006;
-using EPMLiveWebParts.SSRS2010;
 using Microsoft.SharePoint;
 using System.Linq;
 using System.Collections.Generic;
+using EPMLiveCore.Jobs.SSRS;
+using EPMLiveCore.SSRS2010;
 
 namespace EPMLiveWebParts
 {
@@ -24,8 +24,6 @@ namespace EPMLiveWebParts
         private string _reportingServicesUrl;
         private bool _isIntegrated;
         private string _reportsFolderName;
-        //private ReportingService2006 _srs2006;
-        private ReportingService2010 _srs2010;
         private bool _isSsrs;
 
         //TODO: This should probably be a handler and not a web form so we dont have the overhead of the page lifecycle.
@@ -259,21 +257,7 @@ namespace EPMLiveWebParts
                 password = CoreFunctions.Decrypt(chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
             }
 
-            _srs2010 = new ReportingService2010 { UseDefaultCredentials = true };
-            var rptWs = _reportingServicesUrl + "/ReportService2010.asmx";
-            _srs2010.Url = rptWs;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate
-            {
-                if (password == "") return;
-                _srs2010.UseDefaultCredentials = false;
-                if (username.Contains("\\"))
-                    _srs2010.Credentials = new NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
-                else
-                    _srs2010.Credentials = new NetworkCredential(username, password);
-            });
-
-            var catalogItems = _srs2010.ListChildren($"/{web.Site.ID.ToString()}", true);
+            var catalogItems = ReportingService.GetInstance(SPContext.Current.Site).ListChildren($"/{web.Site.ID.ToString()}", true);
             
             // Create a top-level node to start things off
             var tn = new TreeNode("RootNode", "0");
@@ -318,9 +302,8 @@ namespace EPMLiveWebParts
                     {
                         tnAdd.Text = item.CatalogTreeItem.Name;
                         tnAdd.ImageUrl = "/_layouts/images/16doc.gif";
-                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?isNativeMode=True" +
-                            "&itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
-                            "&weburl = " + HttpUtility.UrlEncode(web.Url);                                                
+                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
+                            "&weburl = " + HttpUtility.UrlEncode(web.Url); ;                               
                     }
                 }
                 catch (Exception ex)
@@ -562,7 +545,7 @@ namespace EPMLiveWebParts
 
         private class CatalogItemTreeView
         {
-            public SSRS2010.CatalogItem CatalogTreeItem { get; set; }
+            public CatalogItem CatalogTreeItem { get; set; }
             public bool AddedToTree { get; set; }
         }
     }
