@@ -61,7 +61,7 @@ namespace EPMLiveReportsAdmin
                 doc.LoadXml(properties.FieldXml);
                 if (doc != null)
                 {
-                    bool isHidden = doc.FirstChild.Attributes["Hidden"] == null || Convert.ToBoolean(doc.FirstChild.Attributes["Hidden"].Value);
+                    bool isHidden = Convert.ToBoolean(doc.FirstChild.Attributes["Hidden"].Value);
                     if (!isHidden)
                     {
                         if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
