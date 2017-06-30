@@ -13,11 +13,30 @@ namespace EPMLiveCore.Jobs.SSRS
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
         private object lockObject = new object();
+        private static object lockObjectForSingletion = new object();
+        private static IReportingService singletonInstance;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
             client = GetClient(username, password, reportServerUrl, authenticationType);
             this.siteCollectionId = siteCollectionId.ToString();
+        }
+
+        public static IReportingService GetInstance(SPSite site)
+        {
+            lock(lockObjectForSingletion)
+            {
+                if (singletonInstance == null)
+                {
+                    singletonInstance = new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
+                                                                                site.ID);
+                }
+
+                return singletonInstance;
+            }
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -32,7 +51,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock (lockObject)
+            lock (siteCollectionId)
             {
                 var errors = string.Empty;
                 foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
