@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml;
 
 namespace EPMLive.SSRSCustomAuthentication
 {
@@ -45,6 +46,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, CatalogOperation[] requiredOperations)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             foreach (CatalogOperation operation in requiredOperations)
             {
                 if (!CheckAccess(userName, userToken, secDesc, operation))
@@ -55,6 +59,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, FolderOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -74,6 +81,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, ResourceOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -93,6 +103,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, DatasourceOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -112,6 +125,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, ModelItemOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -131,6 +147,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, ModelOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -150,6 +169,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, ResourceOperation[] requiredOperations)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             foreach (ResourceOperation operation in requiredOperations)
             {
                 if (!CheckAccess(userName, userToken, secDesc, operation))
@@ -160,6 +182,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, FolderOperation[] requiredOperations)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             foreach (FolderOperation operation in requiredOperations)
             {
                 if (!CheckAccess(userName, userToken, secDesc, operation))
@@ -170,6 +195,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, ReportOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -189,6 +217,9 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public bool CheckAccess(string userName, IntPtr userToken, byte[] secDesc, CatalogOperation requiredOperation)
         {
+            if (usernames.Split(',').ToList().Contains(userName))
+                return true;
+
             var acl = DeserializeAcl(secDesc);
 
             foreach (AceStruct ace in acl)
@@ -328,8 +359,18 @@ namespace EPMLive.SSRSCustomAuthentication
 
         public void SetConfiguration(string configuration)
         {
-            // Way to parse admin usernames from database
-            usernames = "admin1,admin2";
+            var doc = new XmlDocument();
+            doc.LoadXml(configuration);
+            if (doc.DocumentElement.Name == "AdminConfiguration")
+            {
+                foreach (XmlNode child in doc.DocumentElement.ChildNodes)
+                {
+                    if (child.Name == "UserName")
+                    {
+                        usernames = child.InnerText;
+                    }
+                }
+            }
         }
 
         private static void InitializeMaps()
