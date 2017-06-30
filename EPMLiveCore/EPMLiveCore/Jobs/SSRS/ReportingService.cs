@@ -32,7 +32,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 var errors = string.Empty;
                 foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
@@ -82,9 +82,23 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var roles = client.ListRoles("Catalog", "");
             var errors = string.Empty;
-            AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators", ref errors);
-            AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers", ref errors);
-            if(!string.IsNullOrEmpty(errors))
+            try
+            {
+                AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators");
+            }
+            catch (Exception exception)
+            {
+                errors += exception.ToString();
+            }
+            try
+            {
+                AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
+            }
+            catch (Exception exception)
+            {
+                errors += exception.ToString();
+            }            
+            if (!string.IsNullOrEmpty(errors))
             {
                 throw new Exception(errors);
             }
@@ -104,7 +118,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 var roleToRemove = roleList.Where(x => x.Name == GetSSRSRole(group)).FirstOrDefault();
                 roleList.Remove(roleToRemove);
                 existingRole.Roles = roleList.ToArray();
-                if(roleList.Count == 0)
+                if (roleList.Count == 0)
                 {
                     policies.RemoveAll(x => x.GroupUserName.ToLower() == loginName.ToLower());
                 }
@@ -121,8 +135,9 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole, ref string errors)
+        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole)
         {
+            string errors = string.Empty;
             var reportViewers = groups.GetByName(spRole);
             foreach (SPUser user in reportViewers.Users)
             {
@@ -141,6 +156,10 @@ namespace EPMLiveCore.Jobs.SSRS
                 {
                     errors += exception.ToString();
                 }
+            }
+            if (!string.IsNullOrEmpty(errors))
+            {
+                throw new Exception(errors);
             }
         }
 
