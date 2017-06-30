@@ -1409,17 +1409,13 @@ namespace TimeSheets
                     //string[] tsUids = ndTS.InnerText.Split(',');
 
                     int status = 3;
-
-                    foreach (XmlNode TS in ndTS)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-
-
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                         {
-                            using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+                            cn.Open();
+                            foreach (XmlNode TS in ndTS)
                             {
-                                cn.Open();
-
                                 //if (tsUid != "")
                                 {
                                     try
@@ -1525,27 +1521,35 @@ namespace TimeSheets
                                             {
                                                 List<string> emaillist = new List<string>();
                                                 emaillist.Add(emailto);
-                                                APIEmail.sendEmail(TIMESHEET_REJECTION_NOTIFICATION,
-        new Hashtable() { { "TimesheetUser_Name", ResourceName },
+                                                try
+                                                {
+                                                    APIEmail.sendEmail(TIMESHEET_REJECTION_NOTIFICATION,
+                                                           new Hashtable() { { "TimesheetUser_Name", ResourceName },
                                       { "Element_Entries", emailcontent } },
-        emaillist, string.Empty, oWeb, true);
+                                                           emaillist, string.Empty, oWeb, true);
+                                                }
+                                                catch (Exception ex)
+                                                {
+
+                                                    Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
+                                                }
+
                                             }
                                         }
                                     }
                                     catch (Exception ex)
                                     {
+                                        Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
                                         errors = true;
                                         outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
                                     }
                                 }
+                                outData += "</Approve>";
                             }
-                        });
+                        }
+                    });
 
-                    }
-
-                    outData += "</Approve>";
                 }
-
                 if (errors)
                     return EPMLiveCore.API.Response.Failure(90010, outData);
                 else
