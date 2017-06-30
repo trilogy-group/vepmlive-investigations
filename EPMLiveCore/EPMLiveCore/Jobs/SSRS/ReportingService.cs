@@ -2,7 +2,6 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Claims;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -54,7 +53,11 @@ namespace EPMLiveCore.Jobs.SSRS
             lock (siteCollectionId)
             {
                 var errors = string.Empty;
-                foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
+                var spQuery = new SPQuery()
+                {
+                    Query = "<Where><Neq><FieldRef Name='Synchronized' /><Value Type='Boolean'>true</Value></Neq></Where>"
+                };
+                foreach (SPListItem item in reportLibrary.GetItems(spQuery))
                 {
                     var reportItem = new ReportItem()
                     {
@@ -82,12 +85,6 @@ namespace EPMLiveCore.Jobs.SSRS
                     throw new Exception(errors);
                 }
             }
-        }
-
-        private bool UnsyncedReports(SPListItem item)
-        {
-            var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
-            return !(bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
         }
 
         public void DeleteReport(string data)
