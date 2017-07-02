@@ -2,9 +2,10 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Claims;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -35,7 +36,12 @@ namespace EPMLiveCore.Jobs.SSRS
             lock(lockObject)
             {
                 var errors = string.Empty;
-                foreach (var item in reportLibrary.Items.OfType<SPListItem>().Where(x => UnsyncedReports(x)))
+                var spQuery = new SPQuery()
+                {
+                    Query = "<Where><And><Eq><FieldRef Name='FSObjType' /><Value Type='Integer'>0</Value></Eq><Neq><FieldRef Name='Synchronized' /><Value Type='Boolean'>1</Value></Neq></And></Where>",
+                    ViewAttributes = "Scope=\"RecursiveAll\""
+                };
+                foreach (SPListItem item in reportLibrary.GetItems(spQuery))
                 {
                     var reportItem = new ReportItem()
                     {
@@ -57,8 +63,7 @@ namespace EPMLiveCore.Jobs.SSRS
                         errors += exception.ToString();
                     }
                 }
-
-                if (string.IsNullOrEmpty(errors))
+                if (!string.IsNullOrEmpty(errors))
                 {
                     throw new Exception(errors);
                 }
@@ -188,7 +193,33 @@ namespace EPMLiveCore.Jobs.SSRS
         private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
-            service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            if (report.FileName.ToLower().EndsWith(".rdl"))
+            {
+                service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+            }
+            else if (report.FileName.ToLower().EndsWith(".rsds"))
+            {
+                var doc = new XmlDocument();
+                using (MemoryStream ms = new MemoryStream(report.BinaryData))
+                {
+                    doc.Load(ms);
+                    var definition = new DataSourceDefinition()
+                    {
+                        CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
+                        ConnectString = doc.GetStringValue("/m:DataSourceDefinition/m:ConnectString"),
+                        Enabled = doc.GetBooleanValue("/m:DataSourceDefinition/m:Enabled"),
+                        Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
+                        ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
+                        OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
+                        Password = doc.GetStringValue("/m:DataSourceDefinition/m:Password"),
+                        Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
+                        UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
+                        UserName = doc.GetStringValue("/m:DataSourceDefinition/m:UserName"),
+                        WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
+                    };
+                    service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
+                }
+            }
         }
 
         private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
