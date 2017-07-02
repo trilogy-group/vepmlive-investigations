@@ -5,7 +5,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 3.0, Description = "New email templates to accomplish a new feature: the non-team member time allocation notification.")]
+    [UpgradeStep(Version = EPMLiveVersion.V610, Order = 1.0, Description = "New email templates to accomplish a new feature: the non-team member time allocation notification.")]
     internal class NewEmailNotificationsTemplates : UpgradeStep
     {
         public NewEmailNotificationsTemplates(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)

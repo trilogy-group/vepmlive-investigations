@@ -410,6 +410,7 @@
     <Compile Include="Integrations\Salesforce\SalesforceServiceResponse.cs" />
     <Compile Include="Integrations\Salesforce\SfMedadataService.cs" />
     <Compile Include="Integrations\Salesforce\SfService.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6021Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\QueueAgent.cs" />

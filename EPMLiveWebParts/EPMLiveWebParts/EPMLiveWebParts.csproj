@@ -310,6 +310,13 @@
     <Compile Include="Layouts\epmlive\RedirectionProxy.aspx.designer.cs">
       <DependentUpon>RedirectionProxy.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\SSRSNativeReportViewer.aspx.cs">
+      <DependentUpon>SSRSNativeReportViewer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SSRSNativeReportViewer.aspx.designer.cs">
+      <DependentUpon>SSRSNativeReportViewer.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\SSRSReportRedirect.aspx.cs">
       <DependentUpon>SSRSReportRedirect.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1027,6 +1034,8 @@
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
     <Content Include="Layouts\epmlive\javascripts\jquery.fancybox.js" />
+    <Content Include="Layouts\epmlive\javascripts\nativeviewer.js" />
+    <Content Include="Layouts\epmlive\SSRSNativeReportViewer.aspx" />
     <Content Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.css" />
     <Content Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.min.css" />
     <Content Include="Layouts\epmlive\Stylesheets\jquery.fancybox.css" />
@@ -1034,6 +1043,7 @@
     <Content Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.css" />
     <Content Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.min.css" />
     <Content Include="Layouts\epmlive\Stylesheets\SocialStream.min.css" />
+    <Content Include="Layouts\epmlive\styles\NativeReportViewer\nativeviewer.css" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>

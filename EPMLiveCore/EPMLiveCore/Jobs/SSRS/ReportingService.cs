@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml;
+using System.Text;
+using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
@@ -13,12 +15,20 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         private readonly string siteCollectionId;
         private readonly ReportingService2010 client;
-        private object lockObject = new object();
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
             client = GetClient(username, password, reportServerUrl, authenticationType);
             this.siteCollectionId = siteCollectionId.ToString();
+        }
+
+        public static IReportingService GetInstance(SPSite site)
+        {
+            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
+                                                                                site.ID);
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -33,7 +43,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock(lockObject)
+            lock (siteCollectionId + "_ReportLibrary")
             {
                 var errors = string.Empty;
                 var spQuery = new SPQuery()
@@ -70,12 +80,6 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private bool UnsyncedReports(SPListItem item)
-        {
-            var synchronizedField = item.Fields["Synchronized"] as SPFieldBoolean;
-            return !(bool)synchronizedField.GetFieldValue(Convert.ToString(item["Synchronized"]));
-        }
-
         public void DeleteReport(string data)
         {
             var report = data.Split(':')[1];
@@ -85,13 +89,30 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
         {
-            var roles = client.ListRoles("Catalog", "");
-            var errors = string.Empty;
-            AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators", ref errors);
-            AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers", ref errors);
-            if(!string.IsNullOrEmpty(errors))
+            lock (siteCollectionId + "_RoleMapping")
             {
-                throw new Exception(errors);
+                var roles = client.ListRoles("Catalog", "");
+                var errors = string.Empty;
+                try
+                {
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators");
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
+                }
+                try
+                {
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
+                }
+                if (!string.IsNullOrEmpty(errors))
+                {
+                    throw new Exception(errors);
+                }
             }
         }
 
@@ -109,12 +130,45 @@ namespace EPMLiveCore.Jobs.SSRS
                 var roleToRemove = roleList.Where(x => x.Name == GetSSRSRole(group)).FirstOrDefault();
                 roleList.Remove(roleToRemove);
                 existingRole.Roles = roleList.ToArray();
-                if(roleList.Count == 0)
+                if (roleList.Count == 0)
                 {
                     policies.RemoveAll(x => x.GroupUserName.ToLower() == loginName.ToLower());
                 }
                 client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
             }
+        }
+
+        public Subscription[] ListSubscriptions(string reportPath)
+        {
+            return client.ListSubscriptions(reportPath);
+        }
+
+        public Extension[] ListExtensions(string extensionType)
+        {
+            return client.ListExtensions(extensionType);
+        }
+
+        public ItemParameter[] GetItemParameters(string reportPath)
+        {
+            return client.GetItemParameters(reportPath, null, true, null, null);
+        }
+
+        public void EnableSubscription(string subscriptionID)
+        {
+            client.EnableSubscription(subscriptionID);
+        }
+        public void DisableSubscription(string subscriptionID)
+        {
+            client.DisableSubscription(subscriptionID);
+        }
+        public void DeleteSubscription(string subscriptionID)
+        {
+            client.DeleteSubscription(subscriptionID);
+        }
+
+        public CatalogItem[] ListChildren(string itemPath, bool recursive)
+        {
+            return client.ListChildren(itemPath, recursive);
         }
 
         private string GetSSRSRole(string group)
@@ -126,8 +180,9 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole, ref string errors)
+        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole)
         {
+            string errors = string.Empty;
             var reportViewers = groups.GetByName(spRole);
             foreach (SPUser user in reportViewers.Users)
             {
@@ -146,6 +201,10 @@ namespace EPMLiveCore.Jobs.SSRS
                 {
                     errors += exception.ToString();
                 }
+            }
+            if (!string.IsNullOrEmpty(errors))
+            {
+                throw new Exception(errors);
             }
         }
 
