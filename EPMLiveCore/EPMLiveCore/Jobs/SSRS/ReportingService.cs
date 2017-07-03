@@ -22,6 +22,18 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
+            if (site.WebApplication.Properties["SSRSAdminUsername"] == null)
+                site.WebApplication.Properties.Add("SSRSAdminUsername", "farmadmin");
+
+            if (site.WebApplication.Properties["SSRSAdminPassword"] == null)
+                site.WebApplication.Properties.Add("SSRSAdminPassword", "Pass@word1");
+
+            if (site.WebApplication.Properties["SSRSReportServerUrl"] == null)
+                site.WebApplication.Properties.Add("SSRSReportServerUrl", "http://10.137.22.61/ReportServer_SSRSNATIVE/ReportService2010.asmx");
+
+            if (site.WebApplication.Properties["SSRSAuthenticationType"] == null)
+                site.WebApplication.Properties["SSRSAuthenticationType"] = "WindowsAuthentication";
+
             return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
@@ -163,10 +175,25 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             client.DeleteSubscription(subscriptionID);
         }
-
         public CatalogItem[] ListChildren(string itemPath, bool recursive)
         {
             return client.ListChildren(itemPath, recursive);
+        }
+        public string CreateSubscription(string itemPath, ExtensionSettings extensionSettings, string description,
+            string eventType, string matchData, ParameterValue[] parameters)
+        {
+            return client.CreateSubscription(itemPath, extensionSettings, description, eventType, matchData, parameters);
+        }
+        public void ChangeSubscriptionOwner(string subscriptionID, string newOwner)
+        {
+            client.ChangeSubscriptionOwner(subscriptionID, newOwner);
+        }
+        public string GetSubscriptionProperties(string subscriptionID, out ExtensionSettings extensionSettings,
+            out string description, out ActiveState active, out string status, out string eventType,
+            out string matchData, out ParameterValue[] parameters)
+        {
+            return client.GetSubscriptionProperties(subscriptionID, out extensionSettings, out description, out active,
+                out status, out eventType, out matchData, out parameters);
         }
 
         private string GetSSRSRole(string group)

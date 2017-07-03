@@ -14,6 +14,7 @@ using System.Data;
 using System.Text;
 using System.Linq;
 using EPMLiveCore.Jobs.SSRS;
+using EPMLiveCore.SSRS2010;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -79,6 +80,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 if (SPContext.Current.Web.CurrentUser.LoginName.ToUpper().EndsWith(subsc.Owner.ToUpper()))
                     table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status,
                         subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
+
+                ExtensionSettings extset = null;
+                string desc, status, eventtype, matchdata;
+                ParameterValue[] paramss;
+                ActiveState acs;
+
+                var aaa = rs.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
             }
             //GetAddSubscriptionsFilters();
             ds.Tables.Add(table);
@@ -92,7 +100,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var extensions = rs.ListExtensions("Delivery");
             string html = "<option value=\"choose\">Choose a method of delivery</option>";
 
-            extensions?.ToList().ForEach(x => html += $"<option value\"{x.LocalizedName}\">{x.LocalizedName}</option>");
+            extensions?.ToList().ForEach(x => html += $"<option value=\"{x.Name}\">{x.LocalizedName}</option>");
 
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(html);
@@ -122,7 +130,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {
                 htmlToLoad.Append("<tr>");
 
-                htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p></td>");
+                htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p><input type=\"hidden\" id=\"ParamItemNameID{i}\" name=\"ParamItemNameID{i}\" value =\"{ ip.Name }\" /></td>");
 
                 htmlToLoad.Append($"<td><select {(ip.DefaultValues == null ? "disabled" : string.Empty)} id=\"EnterFieldID{i}\" name=\"EnterFieldID{i}\" onchange=\"EnterFieldChange('{i}')\">");
                 htmlToLoad.Append($"<option value=\"enter\" {(ip.DefaultValues == null ? "selected" : string.Empty)}>Enter value</option>");
@@ -190,18 +198,46 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         [WebMethod]
-        public static bool SaveSubscription()
+        public static void SaveSubscription(string description, string deliveryMethod, string deliveryParams,
+                    string matchData, string reportParametersList)
         {
-            //ScheduleDefinition sd = new ScheduleDefinition();
-            //var rp = sd.Item;
-            //rp.
-            //ParameterValue parameters = null;
-            //parameters.
-            //ExtensionSettings extensionSettings = new ExtensionSettings();
-            //extensionSettings.Extension = EXTENSION_FILESHARE;
-            //extensionSettings.ParameterValues = extensionParams;
+            var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
+            var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
+            var addresses = $"{reportURL}/{itemUrlRequest}";
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
 
-            return true;
+            string eventType = "TimedSubscription";
+            ExtensionSettings extSettings = GetExtensionSettings(deliveryParams, deliveryMethod);
+            ParameterValue[] parameters = GetParameterValueList(reportParametersList);
+
+            var subsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
+            var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
+            rs.ChangeSubscriptionOwner(subsID, currentUserLogin[currentUserLogin.Length - 1]);
+        }
+
+        private static ExtensionSettings GetExtensionSettings(string deliveryParams, string deliveryMethod)
+        {
+            ExtensionSettings extensionSettings = new ExtensionSettings();
+            extensionSettings.Extension = deliveryMethod;
+            extensionSettings.ParameterValues = GetParameterValueList(deliveryParams);
+
+            return extensionSettings;
+        }
+
+        private static ParameterValue[] GetParameterValueList(string reportParams)
+        {
+            var delParamsSplit = reportParams.Split(new string[] { "||" }, StringSplitOptions.None);
+            var extSet = new List<ParameterValue>();
+
+            var auxSpltParam = new string[2];
+            delParamsSplit?.ToList().ForEach(param =>
+            {
+                auxSpltParam = param.Split('|');
+                if (auxSpltParam != null && auxSpltParam.Length > 1)
+                    extSet.Add(new ParameterValue() { Name = auxSpltParam[0], Value = auxSpltParam[1] });
+            });
+
+            return extSet.ToArray();
         }
 
         [WebMethod]
