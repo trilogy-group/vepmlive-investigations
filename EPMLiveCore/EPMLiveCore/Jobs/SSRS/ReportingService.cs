@@ -6,8 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml;
-using System.Text;
-using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
