@@ -391,7 +391,7 @@
                     break;
                 case "week":
                     xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
-                    xml += '<WeeksInterval>1</WeeksInterval>';
+                    xml += '<WeeksInterval>'+ $("#RepeateNmbWeeks").val() +'</WeeksInterval>';
                     xml += '<DaysOfWeek>';
                     if ($('#WeeklyScheduleSun').is(':checked'))
                         xml += '<Sunday>true</Sunday>';
@@ -483,6 +483,100 @@
             return xml;
         }
 
+        function ValidateFields() {
+            var errors = '';
+
+            if ($("#DeliveryMethodOptions").val() == '' || $("#DeliveryMethodOptions").val() == 'choose')
+                errors += "- 'Delivery Extension' is not selected.\n";
+
+            if ($("#DeliveryMethodOptions").val() == 'Report Server FileShare') {
+                if ($("#FileName").val() == '')
+                    errors += "- 'File name' is empty.\n";
+                if ($("#Path").val() == '')
+                    errors += "- 'File path' is empty.\n";
+                if ($("#UserNameWindows").val() == '')
+                    errors += "- 'User name' is empty.\n";
+                if ($("#PasswordWindows").val() == '')
+                    errors += "- 'Password' is empty.\n";
+            }
+
+            var scheduleOption = $("input[name='editschedule']:checked").val();
+            switch (scheduleOption) {
+                case "hour":
+                    if ($("#HourlyScheduleHour").val() == '' || $("#HourlyScheduleMinutes").val() == '')
+                        errors += "- Hour or minute field is empty for the selected Hourly schedule type.\n";
+                    break;
+                case "day":
+                    var dailOptSelcted = $('input[name="dailyoptions"]:checked').val();
+                    switch (dailOptSelcted) {
+                        case "followingdays":
+                            if (!$('#DailyoptionsSun').is(':checked') && !$('#DailyoptionsMon').is(':checked')
+                                && !$('#DailyoptionsTue').is(':checked') && !$('#DailyoptionsWed').is(':checked')
+                                && !$('#DailyoptionsThu').is(':checked') && !$('#DailyoptionsFri').is(':checked')
+                                && !$('#DailyoptionsSat').is(':checked'))
+                                errors += "- No day(s) selected for the Daily schedule type.\n";
+                            break;
+                        case "weekdays":
+                            break;
+                        case "numbdays":
+                            if ($('#RepeateNmbDays').val() == '')
+                                errors += "- Number of Days is empty for the Daily schedule type.\n";
+                            break;
+                    }
+                    break;
+                case "week":
+                    if ($("#RepeateNmbWeeks").val() == '')
+                        errors += "- Number of weeks was not informed for the Weekly schedule.\n";
+                    if (!$('#WeeklyScheduleSun').is(':checked') && !$('#WeeklyScheduleMon').is(':checked')
+                        && !$('#WeeklyScheduleTue').is(':checked') && !$('#WeeklyScheduleWed').is(':checked')
+                        && !$('#WeeklyScheduleThu').is(':checked') && !$('#WeeklyScheduleFri').is(':checked')
+                        && !$('#WeeklyScheduleSat').is(':checked'))
+                        errors += "- No day(s) selected for the Weekly schedule type.\n";
+                    break;
+                case "month":
+                    var monthOptSelected = $('input[name="monthlyoptions"]:checked').val();
+                    switch (monthOptSelected) {
+                        case "onweek":
+                            if (!$('#MonthlyScheduleSun').is(':checked') && !$('#MonthlyScheduleMon').is(':checked')
+                                && !$('#MonthlyScheduleTue').is(':checked') && !$('#MonthlyScheduleWed').is(':checked')
+                                && !$('#MonthlyScheduleThu').is(':checked') && !$('#MonthlyScheduleFri').is(':checked')
+                                && !$('#MonthlyScheduleSat').is(':checked'))
+                                errors += "- No day(s) selected for the Monthly schedule type.\n";
+                            break;
+                        case "oncalendardays":
+                            if ($("#OnCalendarDays").val() == '')
+                                errors += "- Calendar days field is empty for the Monthly schedule type.\n";
+                            break;
+                    }
+
+                    if (!$('#MonthlyScheduleJan').is(':checked') && !$('#MonthlyScheduleFeb').is(':checked')
+                        && !$('#MonthlyScheduleMar').is(':checked') && !$('#MonthlyScheduleApr').is(':checked')
+                        && !$('#MonthlyScheduleMay').is(':checked') && !$('#MonthlyScheduleJun').is(':checked')
+                        && !$('#MonthlyScheduleJul').is(':checked') && !$('#MonthlyScheduleAug').is(':checked')
+                        && !$('#MonthlyScheduleSep').is(':checked') && !$('#MonthlyScheduleOct').is(':checked')
+                        && !$('#MonthlyScheduleNov').is(':checked') && !$('#MonthlyScheduleDec').is(':checked'))
+                        errors += "- No month(s) selected for the Monthly schedule type.\n";
+                    break;
+                case "once":
+                    break;
+            }
+
+            if ($("#StarTimeHour").val() == '' || $("#StarTimeMinutes").val() == '')
+                errors += "- Hour or Minutes fields for the 'Schedule Details' is empty.\n";
+            if ($("#StartDateSchedule").val() == '')
+                errors += "- Start Date for the 'Schedule Details' is empty.\n";
+            if ($('#chkStopDateSchedule').is(':checked') && $("#StopDateSchedule").val() == '')
+                errors += "- Stop Date for the 'Schedule Details' is empty.\n";
+
+            if (errors == '')
+                return true;
+            else
+            {
+                alert('The following errors were found:\n\n' + errors);
+                return false;
+            }
+        }
+
         function GetDeliveryMethodParams(deliveryMethod) {
             var params = '';
 
@@ -503,60 +597,62 @@
 
         function SaveSubscription() {
             try {
-                $("#AddSubscriptionForm").fadeOut("slow", function () {
+                if (ValidateFields()) {
+                    $("#AddSubscriptionForm").fadeOut("slow", function () {
 
-                    $("#LoadingDivSave").fadeIn();
-                    var qString = "?" + window.location.href.split("?")[1];
+                        $("#LoadingDivSave").fadeIn();
+                        var qString = "?" + window.location.href.split("?")[1];
 
-                    var desc = $("#Description").val();
-                    var delMethod = $("#DeliveryMethodOptions").val();
-                    var delParams = GetDeliveryMethodParams(delMethod);
-                    var qtyParams = $("#QtyParams").val();
-                    var mData = GetMatchData();
+                        var desc = $("#Description").val();
+                        var delMethod = $("#DeliveryMethodOptions").val();
+                        var delParams = GetDeliveryMethodParams(delMethod);
+                        var qtyParams = $("#QtyParams").val();
+                        var mData = GetMatchData();
 
-                    var reportParamsList = "";
-                    if (qtyParams != null) {
-                        var qtyParamsInt = parseInt(qtyParams);
-                        for (i = 0; i < qtyParamsInt; i++) {
+                        var reportParamsList = "";
+                        if (qtyParams != null) {
+                            var qtyParamsInt = parseInt(qtyParams);
+                            for (i = 0; i < qtyParamsInt; i++) {
 
-                            var paramItemName = "ParamItemNameID" + i;
-                            var valueFieldID = "ValueFieldID" + i;
+                                var paramItemName = "ParamItemNameID" + i;
+                                var valueFieldID = "ValueFieldID" + i;
 
-                            if (document.getElementById(valueFieldID).nodeName == "SELECT") {
-                                $('#' + valueFieldID + ' :selected').each(function (i, selected) {
+                                if (document.getElementById(valueFieldID).nodeName == "SELECT") {
+                                    $('#' + valueFieldID + ' :selected').each(function (i, selected) {
+                                        reportParamsList += $("#" + paramItemName).val() + "|";
+                                        reportParamsList += $(selected).text() + "||";
+                                    });
+                                } else if (document.getElementById(valueFieldID).nodeName == "INPUT") {
                                     reportParamsList += $("#" + paramItemName).val() + "|";
-                                    reportParamsList += $(selected).text() + "||";
-                                });
-                            } else if (document.getElementById(valueFieldID).nodeName == "INPUT") {
-                                reportParamsList += $("#" + paramItemName).val() + "|";
-                                reportParamsList += $("#" + valueFieldID).val() + "||";
+                                    reportParamsList += $("#" + valueFieldID).val() + "||";
+                                }
                             }
                         }
-                    }
 
-                    $.ajax({
-                        type: "POST",
-                        url: "SSRSNativeReportViewer.aspx/SaveSubscription" + qString,
-                        data: JSON.stringify({
-                            description: desc, deliveryMethod: delMethod, deliveryParams: delParams,
-                            matchData: mData, reportParametersList: reportParamsList
-                        }),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: 'json',
+                        $.ajax({
+                            type: "POST",
+                            url: "SSRSNativeReportViewer.aspx/SaveSubscription" + qString,
+                            data: JSON.stringify({
+                                description: desc, deliveryMethod: delMethod, deliveryParams: delParams,
+                                matchData: mData, reportParametersList: reportParamsList
+                            }),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: 'json',
 
-                        success: function (data) {
-                            $("#LoadingDivSave").fadeOut();
-                            alert('Subscription has been successfully added.');
-                            OpenSubscriptions();
-                        },
-                        error: function (XHR, errStatus, errorThrown) {
-                            $("#LoadingDivSave").fadeOut();
-                            var err = JSON.parse(XHR.responseText);
-                            alert("Error. " + err.Message);
-                            $("#AddSubscriptionForm").fadeIn();
-                        }
+                            success: function (data) {
+                                $("#LoadingDivSave").fadeOut();
+                                alert('Subscription has been successfully added.');
+                                OpenSubscriptions();
+                            },
+                            error: function (XHR, errStatus, errorThrown) {
+                                $("#LoadingDivSave").fadeOut();
+                                var err = JSON.parse(XHR.responseText);
+                                alert("Error. " + err.Message);
+                                $("#AddSubscriptionForm").fadeIn();
+                            }
+                        });
                     });
-                });
+                }
             }
             catch (err) {
                 alert('Error. ' + err.message);
