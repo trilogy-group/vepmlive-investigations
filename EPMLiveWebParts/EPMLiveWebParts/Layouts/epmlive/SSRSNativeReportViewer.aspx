@@ -343,12 +343,12 @@
                     xml += (parseInt($("#HourlyScheduleHour").val()) * 60 + parseInt($("#HourlyScheduleMinutes").val()));
                     xml += '</MinutesInterval></MinuteRecurrence>';                    
                     break;
-                case "day":
-                    xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
+                case "day":                   
                     
                     var dailOptSelcted = $('input[name="dailyoptions"]:checked').val();
                     switch (dailOptSelcted) {
                         case "followingdays":
+                            xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
                             xml += '<WeeksInterval>1</WeeksInterval>';
                             xml += '<DaysOfWeek>';
                             if ($('#DailyoptionsSun').is(':checked'))
@@ -366,8 +366,10 @@
                             if ($('#DailyoptionsSat').is(':checked'))
                                 xml += '<Saturday>true</Saturday>';
                             xml += '</DaysOfWeek>';
+                            xml += '</WeeklyRecurrence>';
                             break;
                         case "weekdays":
+                            xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
                             xml += '<WeeksInterval>1</WeeksInterval>';
                             xml += '<DaysOfWeek>';
                             xml += '<Monday>true</Monday>';
@@ -376,6 +378,7 @@
                             xml += '<Thursday>true</Thursday>';
                             xml += '<Friday>true</Friday>';
                             xml += '</DaysOfWeek>';
+                            xml += '</WeeklyRecurrence>';
                             break;
                         case "numbdays":
                             xml += '<DailyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
@@ -384,8 +387,7 @@
                             xml += '</DaysInterval>';
                             xml += '</DailyRecurrence>';
                             break;
-                    }
-                    xml += '</WeeklyRecurrence>';
+                    }                    
                     break;
                 case "week":
                     xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
@@ -406,6 +408,7 @@
                     if ($('#WeeklyScheduleSat').is(':checked'))
                         xml += '<Saturday>true</Saturday>';
                     xml += '</DaysOfWeek>';
+                    xml += '</WeeklyRecurrence>';
                     break;
                 case "month":                    
                     var monthOptSelected = $('input[name="monthlyoptions"]:checked').val();
@@ -415,8 +418,9 @@
                             monthTag = '</MonthlyDOWRecurrence>';
                             xml += '<MonthlyDOWRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
                             xml += '<WhichWeek>';
-                            xml += $("#monthlyoptions").val();
+                            xml += $("#MonthlyOptionsWhichWeek").val();
                             xml += '</WhichWeek>';
+                            xml += '<DaysOfWeek>';
                             if ($('#WeeklyScheduleSun').is(':checked'))
                                 xml += '<Sunday>true</Sunday>';
                             if ($('#MonthlyScheduleMon').is(':checked'))
@@ -431,7 +435,7 @@
                                 xml += '<Friday>true</Friday>';
                             if ($('#MonthlyScheduleSat').is(':checked'))
                                 xml += '<Saturday>true</Saturday>';
-                            xml += '</MonthlyDOWRecurrence>';
+                            xml += '</DaysOfWeek>';
                             break;
                         case "oncalendardays":
                             xml += '<MonthlyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
@@ -468,7 +472,7 @@
                     if ($('#MonthlyScheduleDec').is(':checked'))
                         xml += '<December>true</December>';
                     xml += '</MonthsOfYear>';
-                    sml += monthTag;
+                    xml += monthTag;
                     break;
                 case "once":
                     break;
@@ -498,60 +502,65 @@
         }
 
         function SaveSubscription() {
-            $("#AddSubscriptionForm").fadeOut("slow", function () {
+            try {
+                $("#AddSubscriptionForm").fadeOut("slow", function () {
 
-                $("#LoadingDivSave").fadeIn();
-                var qString = "?" + window.location.href.split("?")[1];
+                    $("#LoadingDivSave").fadeIn();
+                    var qString = "?" + window.location.href.split("?")[1];
 
-                var desc = $("#Description").val();
-                var delMethod = $("#DeliveryMethodOptions").val();
-                var delParams = GetDeliveryMethodParams(delMethod);
-                var qtyParams = $("#QtyParams").val();
-                var mData = GetMatchData();
+                    var desc = $("#Description").val();
+                    var delMethod = $("#DeliveryMethodOptions").val();
+                    var delParams = GetDeliveryMethodParams(delMethod);
+                    var qtyParams = $("#QtyParams").val();
+                    var mData = GetMatchData();
 
-                var reportParamsList = "";
-                if (qtyParams != null) {
-                    var qtyParamsInt = parseInt(qtyParams);
-                    for (i = 0; i < qtyParamsInt; i++) {
+                    var reportParamsList = "";
+                    if (qtyParams != null) {
+                        var qtyParamsInt = parseInt(qtyParams);
+                        for (i = 0; i < qtyParamsInt; i++) {
 
-                        var paramItemName = "ParamItemNameID" + i;
-                        var valueFieldID = "ValueFieldID" + i;
+                            var paramItemName = "ParamItemNameID" + i;
+                            var valueFieldID = "ValueFieldID" + i;
 
-                        if (document.getElementById(valueFieldID).nodeName == "SELECT") {
-                            $('#' + valueFieldID + ' :selected').each(function (i, selected) {
+                            if (document.getElementById(valueFieldID).nodeName == "SELECT") {
+                                $('#' + valueFieldID + ' :selected').each(function (i, selected) {
+                                    reportParamsList += $("#" + paramItemName).val() + "|";
+                                    reportParamsList += $(selected).text() + "||";
+                                });
+                            } else if (document.getElementById(valueFieldID).nodeName == "INPUT") {
                                 reportParamsList += $("#" + paramItemName).val() + "|";
-                                reportParamsList += $(selected).text() + "||";
-                            });
-                        } else if (document.getElementById(valueFieldID).nodeName == "INPUT") {
-                            reportParamsList += $("#" + paramItemName).val() + "|";
-                            reportParamsList += $("#" + valueFieldID).val() + "||";
+                                reportParamsList += $("#" + valueFieldID).val() + "||";
+                            }
                         }
                     }
-                }
 
-                $.ajax({
-                    type: "POST",
-                    url: "SSRSNativeReportViewer.aspx/SaveSubscription" + qString,
-                    data: JSON.stringify({
-                        description: desc, deliveryMethod: delMethod, deliveryParams: delParams,
-                        matchData: mData, reportParametersList: reportParamsList
-                    }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
+                    $.ajax({
+                        type: "POST",
+                        url: "SSRSNativeReportViewer.aspx/SaveSubscription" + qString,
+                        data: JSON.stringify({
+                            description: desc, deliveryMethod: delMethod, deliveryParams: delParams,
+                            matchData: mData, reportParametersList: reportParamsList
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
 
-                    success: function (data) {
-                        $("#LoadingDivSave").fadeOut();
-                        alert('Subscription has been successfully added.');
-                        OpenSubscriptions();
-                    },
-                    error: function (XHR, errStatus, errorThrown) {
-                        $("#LoadingDivSave").fadeOut();
-                        var err = JSON.parse(XHR.responseText);
-                        alert("Error. " + err.Message);
-                        $("#AddSubscriptionForm").fadeIn();
-                    }
+                        success: function (data) {
+                            $("#LoadingDivSave").fadeOut();
+                            alert('Subscription has been successfully added.');
+                            OpenSubscriptions();
+                        },
+                        error: function (XHR, errStatus, errorThrown) {
+                            $("#LoadingDivSave").fadeOut();
+                            var err = JSON.parse(XHR.responseText);
+                            alert("Error. " + err.Message);
+                            $("#AddSubscriptionForm").fadeIn();
+                        }
+                    });
                 });
-            });
+            }
+            catch (err) {
+                alert('Error. ' + err.message);
+            }
         }
 
         function EditSchedule() {
@@ -804,7 +813,7 @@
     <div id="EditScheduleForm" style="visibility:collapse">
         <div id="upperEditSchedule">
 	        <ul>
-                <li><a href="javascript:BackToSubsAdd()">Save</a></li>
+                <li><a href="javascript:BackToSubsAdd()">Apply</a></li>
                 <li style="float:right;background-color:#4CAF50"><a href="javascript:BackToSubsAdd()">Back</a></li>
             </ul>
         </div>
@@ -863,7 +872,7 @@
             <input type="checkbox" value="Dec" id="MonthlyScheduleDec"/>Dec<br />
             
             <input type="radio" name="monthlyoptions" value="onweek" checked>On week of month:
-            <select>
+            <select id="MonthlyOptionsWhichWeek">
                 <option value="FirstWeek">1st</option>
                 <option value="SecondWeek">2nd</option>
                 <option value="ThirdWeek">3rd</option>
