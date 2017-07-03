@@ -108,6 +108,7 @@
     <%--<script src="javascripts/nativeviewer.js"></script>--%>
     <script>
         var linkBuilder = "";
+        var initHTML = '';
 
         $(window).resize(function () {
             var topUpper = $('#upper').height() + 5;
@@ -131,6 +132,7 @@
                         var addresses = objdata.toString().split("|");
                         $("#ReportFrame").attr('src', addresses[0]);
                         linkBuilder = addresses[1];
+                        initHTML = $("#AddForm").html();
                     }
                     else {
                         alert('Error! Could not load report link.');
@@ -229,9 +231,11 @@
                 $("#SubscribeManagerDiv").fadeIn();
             });
         }
-
-
+        
         function RedirectAddSubscription() {
+
+            $("#AddForm").html(initHTML);
+            
             $("#SubscribeManagerDiv").fadeOut("slow", function () {
 
                 $("#ReportParameters").empty();
@@ -823,6 +827,7 @@
             </tr>
         </table>
     </div>
+    <div id="AddForm">
     <div id="AddSubscriptionForm" style="visibility:hidden">
         <div id="upperAddSubscription">
 	        <ul>
@@ -997,6 +1002,7 @@
         <input type="checkbox" id="chkStopDateSchedule" name="chkStopDateSchedule" onclick="javascript: $('#StopDateSchedule').prop('disabled', !$('#chkStopDateSchedule').is(':checked'));"/>
         Stop this schedule on: <input type="date" name="StopDateSchedule" id="StopDateSchedule" style="width:110px" disabled/>
     </div>
+        </div>
 </asp:content>
 
 <asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
