@@ -14,6 +14,41 @@ param (
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true
 );
+function exec
+{
+    param
+    (
+        [ScriptBlock] $ScriptBlock,
+        [string] $StderrPrefix = "",
+        [int[]] $AllowedExitCodes = @(0)
+    )
+ 
+    $backupErrorActionPreference = $script:ErrorActionPreference
+ 
+    $script:ErrorActionPreference = "Continue"
+    try
+    {
+        & $ScriptBlock 2>&1 | ForEach-Object -Process `
+            {
+                if ($_ -is [System.Management.Automation.ErrorRecord])
+                {
+                    "$StderrPrefix$_"
+                }
+                else
+                {
+                    "$_"
+                }
+            }
+        if ($AllowedExitCodes -notcontains $LASTEXITCODE)
+        {
+            throw "Execution failed with exit code $LASTEXITCODE"
+        }
+    }
+    finally
+    {
+        $script:ErrorActionPreference = $backupErrorActionPreference
+    }
+}
 
 $projectsToBePackaged = @(
 							"EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
@@ -262,20 +297,19 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
     if ($LastExitCode -ne 0) {
         throw "Project build failed with exit code: $LastExitCode."
     }
-	
-    $signingError = &$signtool sign /n "EPM Live, Inc." `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" 2>&1
-	if ($LastExitCode -ne 0)
+	Try
 	{
-		Write-Warning "Failed to sign PublisherSetup2016x64.msi: $signingError" -WarningAction SilentlyContinue
+    exec {&$signtool sign /n "EPM Live, Inc." `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" }
+    exec {&$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" }
 	}
-    $signingError = &$signtool timestamp /t http://timestamp.digicert.com `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\PublisherSetup2016x64.msi" `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\setup.exe" 2>&1
-	if ($LastExitCode -ne 0)
+	Catch
 	{
-		Write-Warning "Failed to sign PublisherSetup2016x64.msi: $signingError" -WarningAction SilentlyContinue
+		$ErrorMessage = $_.Exception.Message
+		Write-Warning "Failed to sign PublisherSetup2016x64.msi: $ErrorMessage" -WarningAction SilentlyContinue
 	}
     $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016x86.vdproj") -Recurse
 
@@ -286,26 +320,21 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
     if ($LastExitCode -ne 0) {
         throw "Project build failed with exit code: $LastExitCode."
     }
-	
-    $signingError = &$signtool sign /n "EPM Live, Inc." `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\PublisherSetup2016x86.msi" `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" 2>&1
-	
-	if ($LastExitCode -ne 0)
+	Try
 	{
-		Write-Warning "Failed to sign PublisherSetup2016x86.msi: $signingError" -WarningAction SilentlyContinue
-	}
-	
-    $signingError = &$signtool timestamp /t http://timestamp.digicert.com `
+    exec {&$signtool sign /n "EPM Live, Inc." `
         "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\PublisherSetup2016x86.msi" `
-        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" 2>&1
-	
-	if ($LastExitCode -ne 0)
-	{
-		Write-Warning "Failed to sign PublisherSetup2016x86.msi: $signingError" -WarningAction SilentlyContinue
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" }
+    exec {&$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\PublisherSetup2016x86.msi" `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\setup.exe" }
 	}
-	
-	Log-Section "Copying Files..."
+	Catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Warning "Failed to sign PublisherSetup2016x86.msi: $ErrorMessage" -WarningAction SilentlyContinue
+	}
+Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
