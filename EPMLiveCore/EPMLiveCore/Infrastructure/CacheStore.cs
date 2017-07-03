@@ -191,17 +191,17 @@ namespace EPMLiveCore.Infrastructure
 
         private void Cleanup(object state)
         {
+           
+            // Wait for 30 seconds just in-case if 
+            // something is still using an old key
+
+            Thread.Sleep(30000);
             long ticks = _ticks;
 
             lock (Locker)
             {
                 _ticks = DateTime.Now.Ticks;
             }
-
-            // Wait for 30 seconds just in-case if 
-            // something is still using an old key
-
-            Thread.Sleep(30000);
 
             string oldTicks = "_" + ticks;
 
