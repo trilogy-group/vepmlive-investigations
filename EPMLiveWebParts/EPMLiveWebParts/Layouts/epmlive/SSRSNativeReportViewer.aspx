@@ -27,17 +27,17 @@
             float: left;
         }
 
-        li a, .dropbtn {
-            display: inline-block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
+            li a, .dropbtn {
+                display: inline-block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
 
-        li a:visited {
-            color: white;
-        }
+                li a:visited {
+                    color: white;
+                }
 
         .dropdown-content a:visited {
             color: black;
@@ -60,17 +60,17 @@
             z-index: 1;
         }
 
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-        }
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+            }
 
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
+                .dropdown-content a:hover {
+                    background-color: #f1f1f1;
+                }
 
         .dropdown:hover .dropdown-content {
             display: block;
@@ -82,15 +82,15 @@
             width: 100%;
         }
 
-        #SubscriptionsTable td, th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
+            #SubscriptionsTable td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
 
-        #SubscriptionsTable tr:nth-child(even) {
-            background-color: #dddddd;
-        }
+            #SubscriptionsTable tr:nth-child(even) {
+                background-color: #dddddd;
+            }
 
         table span {
             font-size: 11px;
@@ -166,6 +166,117 @@
 
         var subscriptionsList;
 
+        function ViewSubscription(id) {
+            var subsIDFromField = $("#SubsID" + id).val();
+
+            $.ajax({
+                type: "POST",
+                url: "SSRSNativeReportViewer.aspx/GetSubscription",
+                data: JSON.stringify({ subsID: subsIDFromField }),
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+
+                success: function (data) {
+                    var objdata = $.parseJSON(data.d);
+                        
+                    if (objdata != null) {
+                        $("#Description").val(objdata.Description);
+                        $("#DeliveryMethodOptions").val(objdata.DeliverySettings.Extension);
+                        ChangeDeliveryMethod();
+
+                        if (objdata.DeliverySettings.Extension == 'Report Server FileShare') {                            
+                            $.each(objdata.DeliverySettings.ParameterValues, function (index, value) {
+                                switch (value.Name.toUpperCase()) {
+                                    case "FILENAME":
+                                        $("#FileName").val(value.Value);
+                                        break;
+                                    case "FILEEXTN":
+                                        $("#FileExtensionAdd").val(value.Value);
+                                        break;
+                                    case "PATH":
+                                        $("#Path").val(value.Value);
+                                        break;
+                                    case "RENDER_FORMAT":
+                                        $("#RenderFormat").val(value.Value);
+                                        break;
+                                    case "USERNAME":
+                                        $("#UserNameWindows").val(value.Value);
+                                        break;
+                                    case "PASSWORD":
+                                        $("#PasswordWindows").val(value.Value);
+                                        break;
+                                    case "WRITEMODE":
+                                        $('input[name="overwriteoptions"]:checked').val(value.Value);
+                                        break;
+                                }
+                            });
+                        }
+                        else if (objdata.DeliverySettings.Extension == 'Report Server Email') {
+                            $.each(objdata.DeliverySettings.ParameterValues, function (index, value) {
+                                switch (value.Name.toUpperCase()) {
+                                    case "TO":
+                                        $("#EmailTo").val(value.Value);
+                                        break;
+                                    case "CC":
+                                        $("#EmailCC").val(value.Value);
+                                        break;
+                                    case "BCC":
+                                        $("#EmailBcc").val(value.Value);
+                                        break;
+                                    case "REPLYTO":
+                                        $("#ReplyTo").val(value.Value);
+                                        break;
+                                    case "INCLUDEREPORT":
+                                        $("#EmailIncludeReport").prop("checked", value.Value.toUpperCase() == "TRUE");
+                                        break;
+                                    case "INCLUDELINK":
+                                        $("#EmailIncludeLink").prop("checked", value.Value.toUpperCase() == "TRUE");
+                                        break;
+                                    case "RENDERFORMAT":
+                                        $("#EmailRenderFormat").val(value.Value);
+                                        break;
+                                    case "PRIORITY":
+                                        $("#EmailPriority").val(value.Value);
+                                        break;
+                                    case "SUBJECT":
+                                        $("#EmailSubject").val(value.Value);
+                                        break;
+                                    case "COMMENT":
+                                        if (value.Value.toString() != 'undefined')
+                                            $("#EmailComment").val(value.Value);
+                                        break;
+                                }                                
+                            });
+                        }
+                        
+                        var qtyParams = $("#QtyParams").val();
+                        var auxValue = '';
+                        $.each(objdata.ReportParams, function (index, value) {
+                            auxValue = value.Value;
+                            if (auxValue.toUpperCase() == "TRUE") auxValue = "true";
+                            else if (auxValue.toUpperCase() == "FALSE") auxValue = "false";
+
+                            for (var i = 0; i < qtyParams; i++) {
+                                if ($("#ParamItemNameID" + i).val() == value.Name) {
+
+                                    if (document.getElementById("ValueFieldID"+i).nodeName == "SELECT") {
+                                        $("#ValueFieldID" + i + " option[value='" + auxValue + "']").prop("selected", true);
+                                    }
+                                    else if (document.getElementById("ValueFieldID" + i).nodeName == "INPUT") {
+                                        $("#ValueFieldID" + i).val(auxValue);
+                                    }
+                                    break;
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        alert('Error! Could not find the subscription.');
+                    }
+                }
+            });
+        }
+
         function OpenSubscriptions() {
             $("#ViewerDiv").fadeOut("slow", function () {
                 $("#LoadingDiv").fadeIn();
@@ -203,6 +314,7 @@
                                         '<td>' + objdata.Table[i][2] + '</td>' +
                                         '<td>' + objdata.Table[i][3] + '</td>' +
                                         '<td>' + objdata.Table[i][4] + '</td>' +
+                                        '<td><a href="javascript:RedirectAddSubscription(' + i + ', true)">View</a></td>' +
                                         '</tr>');
                                 }
                             }
@@ -231,11 +343,11 @@
                 $("#SubscribeManagerDiv").fadeIn();
             });
         }
-        
-        function RedirectAddSubscription() {
+
+        function RedirectAddSubscription(id, isOpen) {
 
             $("#AddForm").html(initHTML);
-            
+
             $("#SubscribeManagerDiv").fadeOut("slow", function () {
 
                 $("#ReportParameters").empty();
@@ -246,27 +358,10 @@
 
                 $("#StarTimeHour").val(currDate.getHours());
                 $("#StarTimeMinutes").val(currDate.getMinutes());
-                $("#StartDateSchedule").val(("0" + (currDate.getMonth() + 1)).slice(-2) + "-" + ("0" + currDate.getDate()).slice(-2) + "-" + currDate.getFullYear());                
+                $("#StartDateSchedule").val(("0" + (currDate.getMonth() + 1)).slice(-2) + "-" + ("0" + currDate.getDate()).slice(-2) + "-" + currDate.getFullYear());
 
                 //ReportParameters
                 var qString = "?" + window.location.href.split("?")[1];
-
-                $.ajax({
-                    type: "POST",
-                    url: "SSRSNativeReportViewer.aspx/GetReportParameters" + qString,
-                    data: {},
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-
-                    success: function (data) {
-                        var objdata = $.parseJSON(data.d);
-                        $("#ReportParameters").append(objdata);
-                    },
-                    error: function (XHR, errStatus, errorThrown) {
-                        var err = JSON.parse(XHR.responseText);
-                        alert("Error. " + err.Message);
-                    }
-                });
 
                 $.ajax({
                     type: "POST",
@@ -278,6 +373,26 @@
                     success: function (data) {
                         var objdata = $.parseJSON(data.d);
                         $("#DeliveryMethodOptions").append(objdata);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "SSRSNativeReportViewer.aspx/GetReportParameters" + qString,
+                            data: {},
+                            contentType: "application/json; charset=utf-8",
+                            dataType: 'json',
+
+                            success: function (data) {
+                                var objdata = $.parseJSON(data.d);
+                                $("#ReportParameters").append(objdata);
+
+                                if (isOpen)
+                                    ViewSubscription(id);
+                            },
+                            error: function (XHR, errStatus, errorThrown) {
+                                var err = JSON.parse(XHR.responseText);
+                                alert("Error. " + err.Message);
+                            }
+                        });
                     },
                     error: function (XHR, errStatus, errorThrown) {
                         var err = JSON.parse(XHR.responseText);
@@ -315,16 +430,18 @@
 
         function ChangeDeliveryMethod() {
             var selValue = $("#DeliveryMethodOptions").val();
+            $("#WindowsFileDelMethod").css("visibility", "collapse");
+            $("#EmailMethod").css("visibility", "collapse");
+
             switch (selValue) {
-                case 'choose':
-                case 'NULL':
-                    $("#WindowsFileDelMethod").css("visibility", "collapse");
-                    break;
                 case 'Report Server FileShare':
                     $("#WindowsFileDelMethod").css("visibility", "visible");
                     break;
+                case 'Report Server Email':
+                    $("#EmailMethod").css("visibility", "visible");
+                    break;
             }
-        }        
+        }
 
         function GetMatchData() {
             var scheduleOption = $("input[name='editschedule']:checked").val();
@@ -345,10 +462,10 @@
                 case "hour":
                     xml += '<MinuteRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer"><MinutesInterval>';
                     xml += (parseInt($("#HourlyScheduleHour").val()) * 60 + parseInt($("#HourlyScheduleMinutes").val()));
-                    xml += '</MinutesInterval></MinuteRecurrence>';                    
+                    xml += '</MinutesInterval></MinuteRecurrence>';
                     break;
-                case "day":                   
-                    
+                case "day":
+
                     var dailOptSelcted = $('input[name="dailyoptions"]:checked').val();
                     switch (dailOptSelcted) {
                         case "followingdays":
@@ -391,11 +508,11 @@
                             xml += '</DaysInterval>';
                             xml += '</DailyRecurrence>';
                             break;
-                    }                    
+                    }
                     break;
                 case "week":
                     xml += '<WeeklyRecurrence xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/03/01/ReportServer">';
-                    xml += '<WeeksInterval>'+ $("#RepeateNmbWeeks").val() +'</WeeksInterval>';
+                    xml += '<WeeksInterval>' + $("#RepeateNmbWeeks").val() + '</WeeksInterval>';
                     xml += '<DaysOfWeek>';
                     if ($('#WeeklyScheduleSun').is(':checked'))
                         xml += '<Sunday>true</Sunday>';
@@ -414,7 +531,7 @@
                     xml += '</DaysOfWeek>';
                     xml += '</WeeklyRecurrence>';
                     break;
-                case "month":                    
+                case "month":
                     var monthOptSelected = $('input[name="monthlyoptions"]:checked').val();
                     var monthTag = '';
                     switch (monthOptSelected) {
@@ -449,7 +566,7 @@
                             xml += '</Days>';
                             break;
                     }
-                    
+
                     xml += '<MonthsOfYear>';
                     if ($('#MonthlyScheduleJan').is(':checked'))
                         xml += '<January>true</January>';
@@ -502,6 +619,12 @@
                     errors += "- 'User name' is empty.\n";
                 if ($("#PasswordWindows").val() == '')
                     errors += "- 'Password' is empty.\n";
+            }
+            else if ($("#DeliveryMethodOptions").val() == 'Report Server Email') {
+                if ($("#EmailTo").val() == '')
+                    errors += "- 'Email To' is empty.\n";
+                if ($("#EmailSubject").val() == '')
+                    errors += "- 'Subject' is empty.\n";
             }
 
             var scheduleOption = $("input[name='editschedule']:checked").val();
@@ -574,8 +697,7 @@
 
             if (errors == '')
                 return true;
-            else
-            {
+            else {
                 alert('The following errors were found:\n\n' + errors);
                 return false;
             }
@@ -586,13 +708,31 @@
 
             switch (deliveryMethod) {
                 case 'Report Server FileShare':
-                    params += 'FILENAME|' + $("#FileName").val() + '||';
-                    params += 'FILEEXTN|' + $("#FileExtensionAdd").val() + '||';
-                    params += 'PATH|' + $("#Path").val() + '||';
-                    params += 'RENDER_FORMAT|' + $("#RenderFormat").val() + '||';
-                    params += 'USERNAME|' + $("#UserNameWindows").val() + '||';
-                    params += 'PASSWORD|' + $("#PasswordWindows").val() + '||';
+                    params += 'FILENAME|' + $("#FileName").val() + '[/]';
+                    params += 'FILEEXTN|' + $("#FileExtensionAdd").val() + '[/]';
+                    params += 'PATH|' + $("#Path").val() + '[/]';
+                    params += 'RENDER_FORMAT|' + $("#RenderFormat").val() + '[/]';
+                    params += 'USERNAME|' + $("#UserNameWindows").val() + '[/]';
+                    params += 'PASSWORD|' + $("#PasswordWindows").val() + '[/]';
                     params += 'WRITEMODE|' + $('input[name="overwriteoptions"]:checked').val();
+                    break;
+                case 'Report Server Email':
+                    params += 'TO|' + $("#EmailTo").val() + '[/]';
+                    params += 'CC|' + $("#EmailCC").val() + '[/]';
+                    params += 'BCC|' + $("#EmailBcc").val() + '[/]';
+                    params += 'ReplyTo|' + $("#EmailReplyTo").val() + '[/]';
+                    if ($('#EmailIncludeReport').is(':checked'))
+                        params += 'IncludeReport|true[/]';
+                    else
+                        params += 'IncludeReport|false[/]';
+                    params += 'RenderFormat|' + $("#EmailRenderFormat").val() + '[/]';
+                    params += 'Priority|' + $("#EmailPriority").val() + '[/]';
+                    params += 'Subject|' + $("#EmailSubject").val() + '[/]';
+                    params += 'Comment|' + $("EmailComment").val() + '[/]';
+                    if ($('#EmailIncludeLink').is(':checked'))
+                        params += 'IncludeLink|true';
+                    else
+                        params += 'IncludeLink|false';
                     break;
             }
 
@@ -624,11 +764,11 @@
                                 if (document.getElementById(valueFieldID).nodeName == "SELECT") {
                                     $('#' + valueFieldID + ' :selected').each(function (i, selected) {
                                         reportParamsList += $("#" + paramItemName).val() + "|";
-                                        reportParamsList += $(selected).text() + "||";
+                                        reportParamsList += $(selected).text() + "[/]";
                                     });
                                 } else if (document.getElementById(valueFieldID).nodeName == "INPUT") {
                                     reportParamsList += $("#" + paramItemName).val() + "|";
-                                    reportParamsList += $("#" + valueFieldID).val() + "||";
+                                    reportParamsList += $("#" + valueFieldID).val() + "[/]";
                                 }
                             }
                         }
@@ -665,7 +805,7 @@
 
         function EditSchedule() {
             $("#AddSubscriptionForm").fadeOut("slow", function () {
-                
+
                 $("#EditScheduleForm").css("visibility", "visible");
                 $("#EditScheduleForm").fadeIn();
             });
@@ -807,7 +947,7 @@
     <div id="SubscribeManagerDiv" style="visibility:hidden">    
         <div id="upperSubscriptionManager">
 	        <ul>
-                <li><a href="javascript:RedirectAddSubscription()">Add Subscription</a></li>
+                <li><a href="javascript:RedirectAddSubscription('', false)">Add Subscription</a></li>
                 <%--<li><a href="javascript:void(0)">Add Data-Driven Subscription</a></li>--%>
                 <li><a href="javascript:EnableDisableSubscription(true)" class="disabled" id="chkEnableSub">Enable</a></li>
                 <li><a href="javascript:EnableDisableSubscription(false)" class="disabled" id="chkDisableSub">Disable</a></li>
@@ -824,6 +964,7 @@
                 <th>Description</th>
                 <th>Status</th>
                 <th>Last Run</th>
+                <th></th>
             </tr>
         </table>
     </div>
@@ -857,6 +998,7 @@
             </tr>
         </table>
         <table id="WindowsFileDelMethod" style="visibility:collapse">
+            <tr><td colspan="2"><p>Delivery options (Windows File Share)</p></td></tr>
             <tr>
                 <td><p>File Name *</p></td>
                 <td><input type="text" id="FileName" name="FileName" required></td>
@@ -907,6 +1049,68 @@
                     <input type="radio" name="overwriteoptions" value="AutoIncrement">Increment file names as newer versions are added
                 </td>
             </tr>   
+        </table>
+        <table id="EmailMethod" style="visibility:collapse">
+            <tr>
+                <td colspan="2"><p>Delivery options (E-Mail)</p></td>
+            </tr>
+            <tr>
+                <td>To *: </td>
+                <td><input type="text" id="EmailTo"/></td>
+            </tr>
+            <tr>
+                <td>CC: </td>
+                <td><input type="text" id="EmailCC"/></td>
+            </tr>
+            <tr>
+                <td>Bcc: </td>
+                <td><input type="text" id="EmailBcc"/></td>
+            </tr>
+            <tr><td></td><td><p>(Use (;) to separate multiple e-mail addresses.)</p></td></tr>
+            <tr>
+                <td>Reply-To: </td>
+                <td><input type="text" id="EmailReplyTo"/></td>
+            </tr>
+            <tr>
+                <td>Subject *: </td>
+                <td><input type="text" id="EmailSubject"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="checkbox" value="Sun" id="EmailIncludeReport"/>&nbsp Include Report <br />
+                    <input type="checkbox" value="Sun" id="EmailIncludeLink"/>&nbsp Include Link
+                </td>
+            </tr>
+            <tr>
+                <td><p>Render Format *</p></td>
+                <td>
+                    <select id="EmailRenderFormat">
+                        <option value="PDF">PDF</option>
+                        <option value="WORD">Word</option>
+                        <option value="EXCEL">Excel</option>
+                        <option value="POWERPOINT">PowerPoint</option>
+                        <option value="TIFF">TIFF file</option>
+                        <option value="MHTML">MHTML (web archive)</option>
+                        <option value="CSV">CSV (comma delimited)</option>
+                        <option value="DATAFEED">Data Feed</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><p>Priority: </p></td>
+                <td>
+                    <select id="EmailPriority">
+                        <option value="NORMAL">Normal</option>
+                        <option value="LOW">Low</option>
+                        <option value="HIGH">High</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><p>Comment: </p></td>
+                <td><textarea rows="6" cols="50" id="EmailComment"></textarea></td>
+            </tr>
         </table>
         <br />
         <div id="ReportParameters"></div>

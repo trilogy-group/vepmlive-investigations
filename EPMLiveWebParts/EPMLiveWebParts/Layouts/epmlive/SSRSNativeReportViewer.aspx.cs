@@ -55,6 +55,38 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         [WebMethod]
+        public static string GetSubscription(string subsID)
+        {
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
+            ExtensionSettings extset = null;
+            string desc, status, eventtype, matchdata;
+            ParameterValue[] reportparams;
+            ActiveState acs;            
+
+            rs.GetSubscriptionProperties(subsID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out reportparams);
+            var subs = new SubscriptionExtension()
+            {
+                Active = acs,
+                DeliverySettings = extset,
+                Description = desc,
+                EventType = eventtype,
+                Status = status,
+                SubscriptionID = subsID,
+                ReportParams = reportparams,
+                MatchData = matchdata
+            };
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            return json.Serialize(subs);
+        }
+
+        public class SubscriptionExtension : Subscription
+        {
+            public ParameterValue[] ReportParams { get; set; }
+            public string MatchData { get; set; }
+        }
+
+        [WebMethod]
         public static string GetSubscriptions()
         {
             var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
@@ -80,15 +112,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 if (SPContext.Current.Web.CurrentUser.LoginName.ToUpper().EndsWith(subsc.Owner.ToUpper()))
                     table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status,
                         subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
-
-                ExtensionSettings extset = null;
-                string desc, status, eventtype, matchdata;
-                ParameterValue[] paramss;
-                ActiveState acs;
-
-                var aaa = rs.GetSubscriptionProperties(subsc.SubscriptionID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out paramss);
             }
-            //GetAddSubscriptionsFilters();
+
             ds.Tables.Add(table);
             return DataSetToJSON(ds);
         }
@@ -226,7 +251,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private static ParameterValue[] GetParameterValueList(string reportParams)
         {
-            var delParamsSplit = reportParams.Split(new string[] { "||" }, StringSplitOptions.None);
+            var delParamsSplit = reportParams.Split(new string[] { "[/]" }, StringSplitOptions.None);
             var extSet = new List<ParameterValue>();
 
             var auxSpltParam = new string[2];
