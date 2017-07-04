@@ -72,24 +72,23 @@ namespace EPMLiveCore.Infrastructure
             lock (Locker)
             {
                 key = BuildKey(key, category);
+
+                if (_store.ContainsKey(category) && _store[category].ContainsKey(key)) return _store[category][key];
             }
-            if (_store.ContainsKey(category) && _store[category].ContainsKey(key)) return _store[category][key];
-
-            Set(originalKey, getValue(), category, keepIndefinite);
-
-            return _store[category][keepIndefinite ? originalKey : key];
+            return Set(originalKey, getValue(), category, keepIndefinite);
+            
         }
 
         public DataTable GetDataTable()
         {
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("Key", typeof (string));
-            dataTable.Columns.Add("Value", typeof (object));
-            dataTable.Columns.Add("Category", typeof (string));
-            dataTable.Columns.Add("CreatedAt", typeof (DateTime));
-            dataTable.Columns.Add("UpdatedAt", typeof (DateTime));
-            dataTable.Columns.Add("LastReadAt", typeof (DateTime));
+            dataTable.Columns.Add("Key", typeof(string));
+            dataTable.Columns.Add("Value", typeof(object));
+            dataTable.Columns.Add("Category", typeof(string));
+            dataTable.Columns.Add("CreatedAt", typeof(DateTime));
+            dataTable.Columns.Add("UpdatedAt", typeof(DateTime));
+            dataTable.Columns.Add("LastReadAt", typeof(DateTime));
 
             foreach (var p in _store.OrderBy(p => p.Key))
             {
@@ -145,7 +144,7 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public void Set(string key, object value, string category, bool keepIndefinite = false)
+        public CachedValue Set(string key, object value, string category, bool keepIndefinite = false)
         {
             if (keepIndefinite)
             {
@@ -160,7 +159,7 @@ namespace EPMLiveCore.Infrastructure
                 }
             }
 
-            
+
 
             lock (Locker)
             {
@@ -169,7 +168,7 @@ namespace EPMLiveCore.Infrastructure
 
                 if (!_store.ContainsKey(category))
                 {
-                    _store.Add(category, new Dictionary<string, CachedValue> {{key, cachedValue}});
+                    _store.Add(category, new Dictionary<string, CachedValue> { { key, cachedValue } });
                 }
                 else
                 {
@@ -182,7 +181,9 @@ namespace EPMLiveCore.Infrastructure
                         _store[category][key].Value = value;
                     }
                 }
+                return cachedValue;
             }
+            
         }
 
         // Private Methods (4) 
