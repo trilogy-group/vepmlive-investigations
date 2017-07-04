@@ -269,6 +269,93 @@
                                 }
                             }
                         });
+
+                        var parser, xmlDoc;
+                        parser = new DOMParser();
+                        xmlDoc = parser.parseFromString(objdata.MatchData, "text/xml");
+                        
+                        if (!(xmlDoc.getElementsByTagName("MinuteRecurrence")[0] === undefined)) {
+                            $("input[name='editschedule']:checked").val("hour");
+                            if (!(xmlDoc.getElementsByTagName("MinutesInterval")[0].childNodes[0].nodeValue === undefined)) {
+                                var minutesTotal = parseInt(xmlDoc.getElementsByTagName("MinutesInterval")[0].childNodes[0].nodeValue);
+                                $("#HourlyScheduleHour").val(Math.floor(minutesTotal / 60));
+                                $("#HourlyScheduleMinutes").val(minutesTotal % 60);
+                            }                            
+                        }
+                        else if (!(xmlDoc.getElementsByTagName("WeeklyRecurrence")[0] === undefined)) {
+                            $("input[name='editschedule']:checked").val("week");
+                            $("#RepeateNmbWeeks").val(xmlDoc.getElementsByTagName("WeeksInterval")[0].childNodes[0].nodeValue);
+                            
+                            if (!(xmlDoc.getElementsByTagName("Sunday")[0] === undefined))
+                                $("#WeeklyScheduleSun").prop("checked", xmlDoc.getElementsByTagName("Sunday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Monday")[0] === undefined))
+                                $("#WeeklyScheduleMon").prop("checked", xmlDoc.getElementsByTagName("Monday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Tuesday")[0] === undefined))
+                                $("#WeeklyScheduleTue").prop("checked", xmlDoc.getElementsByTagName("Tuesday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Wednesday")[0] === undefined))
+                                $("#WeeklyScheduleWed").prop("checked", xmlDoc.getElementsByTagName("Wednesday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Thursday")[0] === undefined))
+                                $("#WeeklyScheduleThu").prop("checked", xmlDoc.getElementsByTagName("Thursday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Friday")[0] === undefined))
+                                $("#WeeklyScheduleFri").prop("checked", xmlDoc.getElementsByTagName("Friday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Saturday")[0] === undefined))
+                                $("#WeeklyScheduleSat").prop("checked", xmlDoc.getElementsByTagName("Saturday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                        }
+                        else if (!(xmlDoc.getElementsByTagName("DailyRecurrence")[0] === undefined)) {
+                            $("input[name='editschedule']:checked").val("day");
+                            $('input[name="dailyoptions"]:checked').val(numbdays);
+                            $('#RepeateNmbDays').val(xmlDoc.getElementsByTagName("DaysInterval")[0].childNodes[0].nodeValue);
+                        }
+                        else if (!(xmlDoc.getElementsByTagName("MonthlyDOWRecurrence")[0] === undefined)) {
+                            $('input[name="monthlyoptions"]:checked').val("onweek");
+                            $("#MonthlyOptionsWhichWeek").val(xmlDoc.getElementsByTagName("WhichWeek")[0].childNodes[0].nodeValue);
+
+                            if (!(xmlDoc.getElementsByTagName("Sunday")[0] === undefined))
+                                $("#MonthlyScheduleSun").prop("checked", xmlDoc.getElementsByTagName("Sunday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Monday")[0] === undefined))
+                                $("#MonthlyScheduleMon").prop("checked", xmlDoc.getElementsByTagName("Monday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Tuesday")[0] === undefined))
+                                $("#MonthlyScheduleTue").prop("checked", xmlDoc.getElementsByTagName("Tuesday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Wednesday")[0] === undefined))
+                                $("#MonthlyScheduleWed").prop("checked", xmlDoc.getElementsByTagName("Wednesday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Thursday")[0] === undefined))
+                                $("#MonthlyScheduleThu").prop("checked", xmlDoc.getElementsByTagName("Thursday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Friday")[0] === undefined))
+                                $("#MonthlyScheduleFri").prop("checked", xmlDoc.getElementsByTagName("Friday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("Saturday")[0] === undefined))
+                                $("#MonthlyScheduleSat").prop("checked", xmlDoc.getElementsByTagName("Saturday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                        }
+                        else if (!(xmlDoc.getElementsByTagName("MonthlyRecurrence")[0] === undefined)) {
+                            $('input[name="monthlyoptions"]:checked').val("oncalendardays");
+                            $("#OnCalendarDays").val(xmlDoc.getElementsByTagName("Days")[0].childNodes[0].nodeValue);
+                        }
+
+                        if ((!(xmlDoc.getElementsByTagName("MonthlyDOWRecurrence")[0] === undefined)) || (!(xmlDoc.getElementsByTagName("MonthlyRecurrence")[0] === undefined))) {
+                            if (!(xmlDoc.getElementsByTagName("January")[0] === undefined))
+                                $("#MonthlyScheduleJan").prop("checked", xmlDoc.getElementsByTagName("January")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("February")[0] === undefined))
+                                $("#MonthlyScheduleFeb").prop("checked", xmlDoc.getElementsByTagName("February")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("March")[0] === undefined))
+                                $("#MonthlyScheduleMar").prop("checked", xmlDoc.getElementsByTagName("March")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("April")[0] === undefined))
+                                $("#MonthlyScheduleApr").prop("checked", xmlDoc.getElementsByTagName("April")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("May")[0] === undefined))
+                                $("#MonthlyScheduleMay").prop("checked", xmlDoc.getElementsByTagName("May")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("June")[0] === undefined))
+                                $("#MonthlyScheduleJun").prop("checked", xmlDoc.getElementsByTagName("June")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("July")[0] === undefined))
+                                $("#MonthlyScheduleJul").prop("checked", xmlDoc.getElementsByTagName("July")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("August")[0] === undefined))
+                                $("#MonthlyScheduleAug").prop("checked", xmlDoc.getElementsByTagName("August")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("September")[0] === undefined))
+                                $("#MonthlyScheduleSep").prop("checked", xmlDoc.getElementsByTagName("September")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("October")[0] === undefined))
+                                $("#MonthlyScheduleOct").prop("checked", xmlDoc.getElementsByTagName("October")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("November")[0] === undefined))
+                                $("#MonthlyScheduleNov").prop("checked", xmlDoc.getElementsByTagName("November")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                            if (!(xmlDoc.getElementsByTagName("December")[0] === undefined))
+                                $("#MonthlyScheduleDec").prop("checked", xmlDoc.getElementsByTagName("December")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+                        }
                     }
                     else {
                         alert('Error! Could not find the subscription.');
