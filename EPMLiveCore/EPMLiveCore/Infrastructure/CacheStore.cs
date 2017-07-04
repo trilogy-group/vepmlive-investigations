@@ -69,8 +69,10 @@ namespace EPMLiveCore.Infrastructure
             bool keepIndefinite = false)
         {
             string originalKey = key;
-            key = BuildKey(key, category);
-
+            lock (Locker)
+            {
+                key = BuildKey(key, category);
+            }
             if (_store.ContainsKey(category) && _store[category].ContainsKey(key)) return _store[category][key];
 
             Set(originalKey, getValue(), category, keepIndefinite);
@@ -158,10 +160,11 @@ namespace EPMLiveCore.Infrastructure
                 }
             }
 
-            key = BuildKey(key, category);
+            
 
             lock (Locker)
             {
+                key = BuildKey(key, category);
                 var cachedValue = new CachedValue(value);
 
                 if (!_store.ContainsKey(category))
@@ -191,17 +194,17 @@ namespace EPMLiveCore.Infrastructure
 
         private void Cleanup(object state)
         {
-           
-            // Wait for 30 seconds just in-case if 
-            // something is still using an old key
-
-            Thread.Sleep(30000);
             long ticks = _ticks;
 
             lock (Locker)
             {
                 _ticks = DateTime.Now.Ticks;
             }
+
+            // Wait for 30 seconds just in-case if 
+            // something is still using an old key
+
+            //Thread.Sleep(30000);
 
             string oldTicks = "_" + ticks;
 
