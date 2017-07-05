@@ -240,10 +240,13 @@ namespace EPMLiveWebParts
             var curWeb = SPContext.Current.Web;
             var web = curWeb.Site.RootWeb;
 
-            if (_isIntegrated)
-                GetItemsIntegratedMode(ref node, web);
-            else
-                GetItemsNativeMode(ref node, web);
+            // Case we need to load from SSRS native server, uncomment it.
+            //if (_isIntegrated)
+            //    GetSharepointItems(ref node, web);
+            //else
+            //    GetItemsNativeMode(ref node, web);
+
+            GetSharepointItems(ref node, web);
         }
 
         private void GetItemsNativeMode(ref TreeNode node, SPWeb web)
@@ -325,7 +328,7 @@ namespace EPMLiveWebParts
             }
         }
         
-        private void GetItemsIntegratedMode(ref TreeNode node, SPWeb web)
+        private void GetSharepointItems(ref TreeNode node, SPWeb web)
         {
             SPDocumentLibrary doc;
 
@@ -458,9 +461,17 @@ namespace EPMLiveWebParts
                             //tnAdd.NavigateUrl = sServerReelativeUrl +
                             //    "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
                             //   sServerReelativeUrl + "/" + item.Url + urlim + "&rv:HeaderArea=none";
-
-                            tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(web.Url) +
-                                                "&itemurl=" + HttpUtility.UrlEncode(item.Url);
+                            if (_isIntegrated)
+                            {
+                                tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(web.Url) +
+                                                    "&itemurl=" + HttpUtility.UrlEncode(item.Url);
+                            }
+                            else
+                            {
+                                tnAdd.NavigateUrl = $"/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=/{web.Site.ID.ToString()}"+
+                                    $"/{HttpUtility.UrlEncode(item.Url.Replace(System.IO.Path.GetExtension(item.Url), string.Empty))}" +
+                                "&weburl = " + HttpUtility.UrlEncode(web.Url); ;
+                            }
                         }
                         catch (Exception ex)
                         {
