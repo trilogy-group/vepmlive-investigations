@@ -1,6 +1,7 @@
 ﻿using EPMLiveCore.Jobs.SSRS;
 using Microsoft.SharePoint;
 using System;
+using System.Linq;
 
 namespace EPMLiveReportsAdmin
 {
@@ -49,8 +50,9 @@ namespace EPMLiveReportsAdmin
             {
                 using (SPWeb web = site.OpenWeb(properties.Web.ID))
                 {
+                    var parts = properties.BeforeUrl.Split('/');
                     var syncJob = new SyncJob();
-                    syncJob.execute(site, web, $"deletereport:{properties.ListItem.Name}:{properties.ListItem.File.ParentFolder.Url}");
+                    syncJob.execute(site, web, $"deletereport:{parts.Last()}:{string.Join("/", parts.Take(parts.Length - 1))}");
                 }
             }
         }

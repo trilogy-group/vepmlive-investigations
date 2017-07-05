@@ -1,9 +1,8 @@
 using Microsoft.SharePoint;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Linq;
-
 
 namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
 {
@@ -18,6 +17,7 @@ namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
     {
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
+            Debugger.Launch();
             var web = properties.Feature.Parent as SPWeb;
             var grpUserAdded = web.EventReceivers.Add();
             grpUserAdded.Name = "Event Receiver GroupUserAdded";
@@ -38,7 +38,21 @@ namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
             var reportLibrary = web.Lists["Report Library"] as SPDocumentLibrary;
             EnsureFieldExists(reportLibrary, "Synchronized", SPFieldType.Boolean);
             EnsureFieldExists(reportLibrary, "UpdatedBy", SPFieldType.Text);
+            EnsureFieldExists(reportLibrary, "Datasource Credentials", SPFieldType.Text);
             EnsureFieldExists(web.SiteUserInfoList, "Synchronized", SPFieldType.Boolean);
+            AssociateFieldWithContentType(reportLibrary, "Datasource Credentials", "Report Data Source");
+        }
+
+        private void AssociateFieldWithContentType(SPDocumentLibrary reportLibrary, string fieldName, string contentName)
+        {
+            var field = reportLibrary.Fields[fieldName];
+            var fieldLink = new SPFieldLink(field);
+            var contentType = reportLibrary.ContentTypes[contentName];
+            if (contentType.FieldLinks[fieldName] == null)
+            {
+                contentType.FieldLinks.Add(fieldLink);
+                contentType.Update();
+            }
         }
 
         private void EnsureFieldExists(SPList extendedList, string fieldName, SPFieldType fieldType)
