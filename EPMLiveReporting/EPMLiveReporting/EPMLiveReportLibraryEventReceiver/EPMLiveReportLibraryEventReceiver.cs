@@ -1,6 +1,8 @@
-﻿using EPMLiveCore.Jobs.SSRS;
+﻿using EPMLiveCore;
+using EPMLiveCore.Jobs.SSRS;
 using Microsoft.SharePoint;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace EPMLiveReportsAdmin
@@ -24,10 +26,15 @@ namespace EPMLiveReportsAdmin
             try
             {
                 EventFiringEnabled = false;
-                if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == true
-                && string.IsNullOrEmpty(Convert.ToString(properties.ListItem["UpdatedBy"])))
+                if (properties.ListItem.ContentType.Name == "Report Data Source"
+                    && !string.IsNullOrEmpty(Convert.ToString(properties.ListItem["Datasource Credentials"])))
                 {
-                    properties.ListItem["Synchronized"] = false;
+                    properties.ListItem["Datasource Credentials"] = CoreFunctions.Encrypt(Convert.ToString(properties.ListItem["Datasource Credentials"]), "FpUagQ2RG9");
+                }
+                if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == true
+                    && string.IsNullOrEmpty(Convert.ToString(properties.ListItem["UpdatedBy"])))
+                {
+                    properties.ListItem["Synchronized"] = false;                    
                     QueueAgent.QueueJob(properties.Site.WebApplication, properties.Site);
                 }
                 properties.ListItem["UpdatedBy"] = null;
@@ -35,12 +42,12 @@ namespace EPMLiveReportsAdmin
                 base.ItemUpdated(properties);
             }
             catch
-            {                
+            {
             }
             finally
             {
                 EventFiringEnabled = true;
-            }            
+            }
         }
 
         public override void ItemDeleted(SPItemEventProperties properties)

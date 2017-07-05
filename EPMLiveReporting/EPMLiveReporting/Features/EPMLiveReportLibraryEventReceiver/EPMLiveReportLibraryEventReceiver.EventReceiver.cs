@@ -1,6 +1,5 @@
 using Microsoft.SharePoint;
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -17,7 +16,6 @@ namespace EPMLiveReportsAdmin.Features.EPMLiveReportLibraryEventReceiver
     {
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
-            Debugger.Launch();
             var web = properties.Feature.Parent as SPWeb;
             var grpUserAdded = web.EventReceivers.Add();
             grpUserAdded.Name = "Event Receiver GroupUserAdded";
