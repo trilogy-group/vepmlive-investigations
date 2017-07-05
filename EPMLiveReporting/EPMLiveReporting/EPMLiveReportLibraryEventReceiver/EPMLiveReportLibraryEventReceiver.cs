@@ -2,7 +2,6 @@
 using EPMLiveCore.Jobs.SSRS;
 using Microsoft.SharePoint;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace EPMLiveReportsAdmin
@@ -26,15 +25,17 @@ namespace EPMLiveReportsAdmin
             try
             {
                 EventFiringEnabled = false;
+                var credentials = Convert.ToString(properties.ListItem["Datasource Credentials"]);
                 if (properties.ListItem.ContentType.Name == "Report Data Source"
-                    && !string.IsNullOrEmpty(Convert.ToString(properties.ListItem["Datasource Credentials"])))
+                    && !string.IsNullOrEmpty(credentials)
+                    && string.IsNullOrEmpty(CoreFunctions.Decrypt(credentials, "FpUagQ2RG9")))
                 {
-                    properties.ListItem["Datasource Credentials"] = CoreFunctions.Encrypt(Convert.ToString(properties.ListItem["Datasource Credentials"]), "FpUagQ2RG9");
+                    properties.ListItem["Datasource Credentials"] = CoreFunctions.Encrypt(credentials, "FpUagQ2RG9");
                 }
                 if (Convert.ToBoolean(properties.ListItem["Synchronized"]) == true
                     && string.IsNullOrEmpty(Convert.ToString(properties.ListItem["UpdatedBy"])))
                 {
-                    properties.ListItem["Synchronized"] = false;                    
+                    properties.ListItem["Synchronized"] = false;
                     QueueAgent.QueueJob(properties.Site.WebApplication, properties.Site);
                 }
                 properties.ListItem["UpdatedBy"] = null;

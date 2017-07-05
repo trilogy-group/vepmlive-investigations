@@ -60,7 +60,7 @@ namespace EPMLiveCore.Jobs.SSRS
                         LastModified = item.File.TimeLastModified,
                         Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
                         BinaryData = item.File.OpenBinary(),
-                        DatasourceCredentials = item.ContentType.Name == "Report Data Source" ? Convert.ToString(item.Fields["Datasource Credentials"]) : null
+                        DatasourceCredentials = item.File.Name.ToLower().EndsWith(".rsds") ? CoreFunctions.Decrypt(Convert.ToString(item["Datasource Credentials"]), "FpUagQ2RG9") : null
                     };
                     try
                     {
@@ -281,7 +281,6 @@ namespace EPMLiveCore.Jobs.SSRS
             }
             else if (report.FileName.ToLower().EndsWith(".rsds"))
             {
-                var parts = report.DatasourceCredentials.Split(':');
                 var doc = new XmlDocument();
                 using (var memoryStream = new MemoryStream(report.BinaryData))
                 {
@@ -294,12 +293,16 @@ namespace EPMLiveCore.Jobs.SSRS
                         Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
                         ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
                         OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
-                        Password = parts[1].Trim(),
                         Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
                         UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
-                        UserName = parts[0].Trim(),
                         WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
                     };
+                    if (!string.IsNullOrEmpty(report.DatasourceCredentials))
+                    {
+                        var parts = report.DatasourceCredentials.Split(':');
+                        definition.UserName = parts[0].Trim();
+                        definition.Password = parts[1].Trim();
+                    }
                     service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
                 }
             }
