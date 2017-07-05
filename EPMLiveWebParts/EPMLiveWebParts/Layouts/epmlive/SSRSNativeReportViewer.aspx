@@ -168,6 +168,7 @@
 
         function ViewSubscription(id) {
             var subsIDFromField = $("#SubsID" + id).val();
+            $("#CurrentSubsID").val(subsIDFromField);
 
             $.ajax({
                 type: "POST",
@@ -178,13 +179,13 @@
 
                 success: function (data) {
                     var objdata = $.parseJSON(data.d);
-                        
+
                     if (objdata != null) {
                         $("#Description").val(objdata.Description);
                         $("#DeliveryMethodOptions").val(objdata.DeliverySettings.Extension);
                         ChangeDeliveryMethod();
 
-                        if (objdata.DeliverySettings.Extension == 'Report Server FileShare') {                            
+                        if (objdata.DeliverySettings.Extension == 'Report Server FileShare') {
                             $.each(objdata.DeliverySettings.ParameterValues, function (index, value) {
                                 switch (value.Name.toUpperCase()) {
                                     case "FILENAME":
@@ -245,10 +246,10 @@
                                         if (value.Value.toString() != 'undefined')
                                             $("#EmailComment").val(value.Value);
                                         break;
-                                }                                
+                                }
                             });
                         }
-                        
+
                         var qtyParams = $("#QtyParams").val();
                         var auxValue = '';
                         $.each(objdata.ReportParams, function (index, value) {
@@ -259,7 +260,7 @@
                             for (var i = 0; i < qtyParams; i++) {
                                 if ($("#ParamItemNameID" + i).val() == value.Name) {
 
-                                    if (document.getElementById("ValueFieldID"+i).nodeName == "SELECT") {
+                                    if (document.getElementById("ValueFieldID" + i).nodeName == "SELECT") {
                                         $("#ValueFieldID" + i + " option[value='" + auxValue + "']").prop("selected", true);
                                     }
                                     else if (document.getElementById("ValueFieldID" + i).nodeName == "INPUT") {
@@ -273,19 +274,21 @@
                         var parser, xmlDoc;
                         parser = new DOMParser();
                         xmlDoc = parser.parseFromString(objdata.MatchData, "text/xml");
-                        
+
                         if (!(xmlDoc.getElementsByTagName("MinuteRecurrence")[0] === undefined)) {
-                            $("input[name='editschedule']:checked").val("hour");
+                            $('input[name=editschedule][value="hour"]').attr('checked', 'checked');
                             if (!(xmlDoc.getElementsByTagName("MinutesInterval")[0].childNodes[0].nodeValue === undefined)) {
                                 var minutesTotal = parseInt(xmlDoc.getElementsByTagName("MinutesInterval")[0].childNodes[0].nodeValue);
                                 $("#HourlyScheduleHour").val(Math.floor(minutesTotal / 60));
                                 $("#HourlyScheduleMinutes").val(minutesTotal % 60);
-                            }                            
+                            }
+
+                            TimeBasisChanged("HourlySchedule");
                         }
                         else if (!(xmlDoc.getElementsByTagName("WeeklyRecurrence")[0] === undefined)) {
-                            $("input[name='editschedule']:checked").val("week");
+                            $('input[name=editschedule][value="week"]').attr('checked', 'checked');
                             $("#RepeateNmbWeeks").val(xmlDoc.getElementsByTagName("WeeksInterval")[0].childNodes[0].nodeValue);
-                            
+
                             if (!(xmlDoc.getElementsByTagName("Sunday")[0] === undefined))
                                 $("#WeeklyScheduleSun").prop("checked", xmlDoc.getElementsByTagName("Sunday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
                             if (!(xmlDoc.getElementsByTagName("Monday")[0] === undefined))
@@ -300,13 +303,18 @@
                                 $("#WeeklyScheduleFri").prop("checked", xmlDoc.getElementsByTagName("Friday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
                             if (!(xmlDoc.getElementsByTagName("Saturday")[0] === undefined))
                                 $("#WeeklyScheduleSat").prop("checked", xmlDoc.getElementsByTagName("Saturday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+
+                            TimeBasisChanged("WeeklySchedule");
                         }
                         else if (!(xmlDoc.getElementsByTagName("DailyRecurrence")[0] === undefined)) {
-                            $("input[name='editschedule']:checked").val("day");
+                            $('input[name=editschedule][value="day"]').attr('checked', 'checked');
                             $('input[name="dailyoptions"]:checked').val(numbdays);
                             $('#RepeateNmbDays').val(xmlDoc.getElementsByTagName("DaysInterval")[0].childNodes[0].nodeValue);
+
+                            TimeBasisChanged("DaylySchedule");
                         }
                         else if (!(xmlDoc.getElementsByTagName("MonthlyDOWRecurrence")[0] === undefined)) {
+                            $('input[name=editschedule][value="month"]').attr('checked', 'checked');
                             $('input[name="monthlyoptions"]:checked').val("onweek");
                             $("#MonthlyOptionsWhichWeek").val(xmlDoc.getElementsByTagName("WhichWeek")[0].childNodes[0].nodeValue);
 
@@ -324,10 +332,15 @@
                                 $("#MonthlyScheduleFri").prop("checked", xmlDoc.getElementsByTagName("Friday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
                             if (!(xmlDoc.getElementsByTagName("Saturday")[0] === undefined))
                                 $("#MonthlyScheduleSat").prop("checked", xmlDoc.getElementsByTagName("Saturday")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
+
+                            TimeBasisChanged("MonthlySchedule");
                         }
                         else if (!(xmlDoc.getElementsByTagName("MonthlyRecurrence")[0] === undefined)) {
+                            $('input[name=editschedule][value="month"]').attr('checked', 'checked');
                             $('input[name="monthlyoptions"]:checked').val("oncalendardays");
                             $("#OnCalendarDays").val(xmlDoc.getElementsByTagName("Days")[0].childNodes[0].nodeValue);
+
+                            TimeBasisChanged("MonthlySchedule");
                         }
 
                         if ((!(xmlDoc.getElementsByTagName("MonthlyDOWRecurrence")[0] === undefined)) || (!(xmlDoc.getElementsByTagName("MonthlyRecurrence")[0] === undefined))) {
@@ -356,6 +369,11 @@
                             if (!(xmlDoc.getElementsByTagName("December")[0] === undefined))
                                 $("#MonthlyScheduleDec").prop("checked", xmlDoc.getElementsByTagName("December")[0].childNodes[0].nodeValue.toString().toUpperCase() == "TRUE");
                         }
+
+                        var startDateTime = new Date(xmlDoc.getElementsByTagName("StartDateTime")[0].childNodes[0].nodeValue.toString());
+                        $("#StarTimeHour").val(startDateTime.getHours());
+                        $("#StarTimeMinutes").val(startDateTime.getMinutes());
+                        $("#StartDateSchedule").val(("0" + (startDateTime.getMonth())).slice(-2) + "-" + ("0" + startDateTime.getDate()).slice(-2) + "-" + startDateTime.getFullYear());
                     }
                     else {
                         alert('Error! Could not find the subscription.');
@@ -379,7 +397,7 @@
                     success: function (data) {
 
                         $("#SubscriptionsTable").find("tr:gt(0)").remove();
-                        $("#SubscribeManagerDiv").css("visibility", "visible");
+                        $("#SubscribeManagerDiv").css("display", "block");
                         $("#SubscribeManagerDiv").fadeIn();
                         $("#SubscriptionsTable").show();
                         $("#LoadingDiv").fadeOut();
@@ -420,7 +438,7 @@
 
         function BackToViewer() {
             $("#SubscribeManagerDiv").fadeOut("slow", function () {
-                $("#AddSubscriptionForm").css("visibility", "hidden");
+                $("#AddSubscriptionForm").css("display", "none");
                 $("#ViewerDiv").fadeIn();
             });
         }
@@ -434,6 +452,8 @@
         function RedirectAddSubscription(id, isOpen) {
 
             $("#AddForm").html(initHTML);
+            $("#CurrentSubsID").val("");
+            RestoreDateTimePicker();
 
             $("#SubscribeManagerDiv").fadeOut("slow", function () {
 
@@ -488,7 +508,7 @@
                 });
 
 
-                $("#AddSubscriptionForm").css("visibility", "visible");
+                $("#AddSubscriptionForm").css("display", "block");
                 $("#AddSubscriptionForm").fadeIn();
             });
         }
@@ -517,15 +537,15 @@
 
         function ChangeDeliveryMethod() {
             var selValue = $("#DeliveryMethodOptions").val();
-            $("#WindowsFileDelMethod").css("visibility", "collapse");
-            $("#EmailMethod").css("visibility", "collapse");
+            $("#WindowsFileDelMethod").css("display", "none");
+            $("#EmailMethod").css("display", "none");
 
             switch (selValue) {
                 case 'Report Server FileShare':
-                    $("#WindowsFileDelMethod").css("visibility", "visible");
+                    $("#WindowsFileDelMethod").css("display", "block");
                     break;
                 case 'Report Server Email':
-                    $("#EmailMethod").css("visibility", "visible");
+                    $("#EmailMethod").css("display", "block");
                     break;
             }
         }
@@ -860,19 +880,25 @@
                             }
                         }
 
+                        var currentSubsID = $("#CurrentSubsID").val();
                         $.ajax({
                             type: "POST",
                             url: "SSRSNativeReportViewer.aspx/SaveSubscription" + qString,
                             data: JSON.stringify({
                                 description: desc, deliveryMethod: delMethod, deliveryParams: delParams,
-                                matchData: mData, reportParametersList: reportParamsList
+                                matchData: mData, reportParametersList: reportParamsList, subsID: currentSubsID
                             }),
                             contentType: "application/json; charset=utf-8",
                             dataType: 'json',
 
                             success: function (data) {
+                                var addOrUpdate = '';
+                                if (currentSubsID === undefined || currentSubsID == "")
+                                    addOrUpdate = "added";
+                                else
+                                    addOrUpdate = "updated";
                                 $("#LoadingDivSave").fadeOut();
-                                alert('Subscription has been successfully added.');
+                                alert('Subscription has been successfully ' + addOrUpdate + '.');
                                 OpenSubscriptions();
                             },
                             error: function (XHR, errStatus, errorThrown) {
@@ -890,18 +916,27 @@
             }
         }
 
+        var htmlShedule;
         function EditSchedule() {
+            htmlShedule = $("#EditScheduleFormContent").clone();
+
             $("#AddSubscriptionForm").fadeOut("slow", function () {
 
-                $("#EditScheduleForm").css("visibility", "visible");
+                $("#EditScheduleForm").css("display", "block");
                 $("#EditScheduleForm").fadeIn();
             });
         }
 
-        function BackToSubsAdd() {
+        function BackToSubsAdd(shouldReset) {
+
+            if (shouldReset) {
+                $("#EditScheduleForm").empty();
+                htmlShedule.appendTo("#EditScheduleForm");
+            }
+
             $("#EditScheduleForm").fadeOut("slow", function () {
 
-                $("#AddSubscriptionForm").css("visibility", "visible");
+                $("#AddSubscriptionForm").css("display", "block");
                 $("#AddSubscriptionForm").fadeIn();
             });
         }
@@ -1011,10 +1046,10 @@
             return false;
         }
 
-        $(function () {
+        function RestoreDateTimePicker() {
             if ($('#StartDateSchedule')[0].type != 'date') $('#StartDateSchedule').datepicker({ dateFormat: 'mm-dd-yy' });
             if ($('#StopDateSchedule')[0].type != 'date') $('#StopDateSchedule').datepicker({ dateFormat: 'mm-dd-yy' });
-        });
+        }
     </script>
 
     <div id="ViewerDiv">
@@ -1031,7 +1066,7 @@
         </div>
         <iframe id="ReportFrame" width="100%" height="100%" src=""></iframe>
     </div>
-    <div id="SubscribeManagerDiv" style="visibility:hidden">    
+    <div id="SubscribeManagerDiv" style="display:none">    
         <div id="upperSubscriptionManager">
 	        <ul>
                 <li><a href="javascript:RedirectAddSubscription('', false)">Add Subscription</a></li>
@@ -1056,7 +1091,8 @@
         </table>
     </div>
     <div id="AddForm">
-    <div id="AddSubscriptionForm" style="visibility:hidden">
+    <div id="AddSubscriptionForm" style="display:none">
+        <input type="hidden" id="CurrentSubsID" name="CurrentSubsID" value="" />
         <div id="upperAddSubscription">
 	        <ul>
                 <li><a href="javascript:SaveSubscription()">Save</a></li>
@@ -1064,7 +1100,7 @@
                 <li style="float:right;background-color:#4CAF50"><a href="javascript:BackToSubsManager()">Back</a></li>
             </ul>
         </div>
-        <div id="LoadingDivSave" style="visibility:hidden">Please wait...</div>
+        <div id="LoadingDivSave" style="display:none">Please wait...</div>
         <table id="AddSubscriptionTable" style="width:100%;>
             <tr><td colspan="2"><p>Use this page to edit the delivery options for a subscription.</p></td></tr>
             <tr>
@@ -1084,7 +1120,7 @@
                 <td><a id="btnEditSchedule" href="javascript:EditSchedule()">Edit schedule</a></td>
             </tr>
         </table>
-        <table id="WindowsFileDelMethod" style="visibility:collapse">
+        <table id="WindowsFileDelMethod" style="display:none">
             <tr><td colspan="2"><p>Delivery options (Windows File Share)</p></td></tr>
             <tr>
                 <td><p>File Name *</p></td>
@@ -1137,7 +1173,7 @@
                 </td>
             </tr>   
         </table>
-        <table id="EmailMethod" style="visibility:collapse">
+        <table id="EmailMethod" style="display:none">
             <tr>
                 <td colspan="2"><p>Delivery options (E-Mail)</p></td>
             </tr>
@@ -1202,11 +1238,12 @@
         <br />
         <div id="ReportParameters"></div>
     </div>  
-    <div id="EditScheduleForm" style="visibility:collapse">
+    <div id="EditScheduleForm" style="display:none">
+        <div id="EditScheduleFormContent">
         <div id="upperEditSchedule">
 	        <ul>
-                <li><a href="javascript:BackToSubsAdd()">Apply</a></li>
-                <li style="float:right;background-color:#4CAF50"><a href="javascript:BackToSubsAdd()">Back</a></li>
+                <li><a href="javascript:BackToSubsAdd(false)">Apply</a></li>
+                <li style="float:right;background-color:#4CAF50"><a href="javascript:BackToSubsAdd(true)">Back</a></li>
             </ul>
         </div>
         <h1>Schedule details</h1>
@@ -1289,10 +1326,11 @@
         <br /><br />
         Start Time: <input type="text" id="StarTimeHour" style="width:20px" onkeypress='return event.charCode >= 48 && event.charCode <= 57'/>: 
         <input type="text" id="StarTimeMinutes" style="width:20px" onkeypress='return event.charCode >= 48 && event.charCode <= 57'/> (24h format)<br />
-        Begin running this schedule on: <input type="date" name="StartDateSchedule" id="StartDateSchedule" style="width:110px"/><br />
+        Begin running this schedule on: <input type="text" name="StartDateSchedule" id="StartDateSchedule" style="width:110px"/><br />
         <input type="checkbox" id="chkStopDateSchedule" name="chkStopDateSchedule" onclick="javascript: $('#StopDateSchedule').prop('disabled', !$('#chkStopDateSchedule').is(':checked'));"/>
-        Stop this schedule on: <input type="date" name="StopDateSchedule" id="StopDateSchedule" style="width:110px" disabled/>
+        Stop this schedule on: <input type="text" name="StopDateSchedule" id="StopDateSchedule" style="width:110px" disabled/>
     </div>
+        </div>
         </div>
 </asp:content>
 

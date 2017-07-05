@@ -224,7 +224,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         [WebMethod]
         public static void SaveSubscription(string description, string deliveryMethod, string deliveryParams,
-                    string matchData, string reportParametersList)
+                    string matchData, string reportParametersList, string subsID)
         {
             var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
             var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
@@ -235,9 +235,14 @@ namespace EPMLiveWebParts.Layouts.epmlive
             ExtensionSettings extSettings = GetExtensionSettings(deliveryParams, deliveryMethod);
             ParameterValue[] parameters = GetParameterValueList(reportParametersList);
 
-            var subsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
-            var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
-            rs.ChangeSubscriptionOwner(subsID, currentUserLogin[currentUserLogin.Length - 1]);
+            if (string.IsNullOrWhiteSpace(subsID))
+            {
+                var createdSubsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
+                var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
+                rs.ChangeSubscriptionOwner(createdSubsID, currentUserLogin[currentUserLogin.Length - 1]);
+            }
+            else
+                rs.SetSubscriptionProperties(subsID, extSettings, description, eventType, matchData, parameters);
         }
 
         private static ExtensionSettings GetExtensionSettings(string deliveryParams, string deliveryMethod)

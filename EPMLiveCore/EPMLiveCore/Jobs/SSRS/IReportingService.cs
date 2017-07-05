@@ -24,5 +24,7 @@ namespace EPMLiveCore.Jobs.SSRS
         string GetSubscriptionProperties(string subscriptionID, out ExtensionSettings extensionSettings,
             out string description, out ActiveState active, out string status, out string eventType,
             out string matchData, out ParameterValue[] parameters);
+        void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
+            string description, string eventType, string matchData, ParameterValue[] parameters);
     }
 }

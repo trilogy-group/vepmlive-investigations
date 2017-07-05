@@ -195,6 +195,11 @@ namespace EPMLiveCore.Jobs.SSRS
             return client.GetSubscriptionProperties(subscriptionID, out extensionSettings, out description, out active,
                 out status, out eventType, out matchData, out parameters);
         }
+        public void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
+            string description, string eventType, string matchData, ParameterValue[] parameters)
+        {
+            client.SetSubscriptionProperties(subscriptionID, extensionSettings, description, eventType, matchData, parameters);
+        }
 
         private string GetSSRSRole(string group)
         {
