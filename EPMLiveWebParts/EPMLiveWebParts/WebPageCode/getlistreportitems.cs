@@ -468,8 +468,7 @@ namespace EPMLiveWebParts
                             }
                             else
                             {
-                                tnAdd.NavigateUrl = $"/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=/{web.Site.ID.ToString()}"+
-                                    $"/{HttpUtility.UrlEncode(item.Url.Replace(System.IO.Path.GetExtension(item.Url), string.Empty))}" +
+                                tnAdd.NavigateUrl = $"/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=/{web.Site.ID.ToString()}/{HttpUtility.UrlEncode(item.Url)}" +
                                 "&weburl = " + HttpUtility.UrlEncode(web.Url); ;
                             }
                         }

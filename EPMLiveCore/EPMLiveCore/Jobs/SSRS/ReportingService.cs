@@ -22,18 +22,6 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            if (site.WebApplication.Properties["SSRSAdminUsername"] == null)
-                site.WebApplication.Properties.Add("SSRSAdminUsername", "farmadmin");
-
-            if (site.WebApplication.Properties["SSRSAdminPassword"] == null)
-                site.WebApplication.Properties.Add("SSRSAdminPassword", "Pass@word1");
-
-            if (site.WebApplication.Properties["SSRSReportServerUrl"] == null)
-                site.WebApplication.Properties.Add("SSRSReportServerUrl", "http://10.137.22.61/ReportServer_SSRSNATIVE/ReportService2010.asmx");
-
-            if (site.WebApplication.Properties["SSRSAuthenticationType"] == null)
-                site.WebApplication.Properties["SSRSAuthenticationType"] = "WindowsAuthentication";
-
             return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
                                                                                 Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),

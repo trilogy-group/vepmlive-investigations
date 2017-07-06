@@ -153,6 +153,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             int i = 0;
             foreach (var ip in itemParameters)
             {
+                if (string.IsNullOrWhiteSpace(ip.Prompt)) // Prompt will be empty when parameteris hidden for user.
+                    continue;
+
                 htmlToLoad.Append("<tr>");
 
                 htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p><input type=\"hidden\" id=\"ParamItemNameID{i}\" name=\"ParamItemNameID{i}\" value =\"{ ip.Name }\" /></td>");
@@ -186,17 +189,23 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     case "INTEGER":
                     case "FLOAT":
                     case "DATETIME":
-                        if (ip.ValidValues != null)
+                        if (ip.ValidValues != null || ip.Name.ToUpper() == "PERIODEND")
                         {
                             htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)} id=\"ValueFieldID{i}\" name=\"ValueFieldID{i}\">");
-                            ip.ValidValues?.ToList().ForEach(x =>
+
+                            var itemP = ip;
+                            if (ip.Name.ToUpper() == "PERIODEND")
+                                itemP = itemParameters.Where(x => x.Name.ToUpper() == "PERIODSTART").FirstOrDefault();
+
+                            itemP?.ValidValues?.ToList().ForEach(x =>
                             {
                                 isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(defValue => defValue != null && defValue.ToUpper() == x.Value));
 
                                 htmlToLoad.Append($"<option value=\"{x.Value}\" ");
                                 htmlToLoad.Append(ip.DefaultValues != null && isDefaultValue ? "selected" : string.Empty);
-                                htmlToLoad.Append($">{x.Value}</option>");
+                                htmlToLoad.Append($">{x.Label}</option>");
                             });
+                            
                             htmlToLoad.Append("</select>");
                         }
                         else
