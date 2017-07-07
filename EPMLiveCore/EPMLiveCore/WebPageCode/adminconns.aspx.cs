@@ -28,6 +28,7 @@ namespace EPMLiveCore
         protected TextBox txtReportServer;
         protected TextBox txtDefaultPath;
         protected CheckBox chkIntegrated;
+        protected CheckBox chkWindowsAuth;
         protected TextBox txtUsername;
         protected TextBox txtPassword;
         protected Button btnUpgrade;
@@ -169,12 +170,9 @@ namespace EPMLiveCore
             try
             {
                 txtReportServer.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportingServicesURL");
-                txtDefaultPath.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder");
-                
+                txtDefaultPath.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder");                
                 chkIntegrated.Checked = bool.Parse(CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsUseIntegrated"));
-
-
-                
+                chkWindowsAuth.Checked = bool.Parse(CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsWindowsAuthentication"));
             }
             catch { }
         }
@@ -243,8 +241,8 @@ namespace EPMLiveCore
 
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportingServicesURL", txtReportServer.Text);
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder", txtDefaultPath.Text);
-
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsUseIntegrated", chkIntegrated.Checked.ToString());
+                    CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsWindowsAuthentication", chkWindowsAuth.Checked.ToString());
 
                     if (txtPassword.Text != "" || txtUsername.Text == "")
                     {

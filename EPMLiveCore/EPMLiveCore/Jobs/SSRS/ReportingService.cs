@@ -24,11 +24,12 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
-                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
-                                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
-                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
-                                                                                site.ID);
+            var reportServerUrl = CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportingServicesURL") + "ReportService2010.asmx";
+            var authInfo = site.WebApplication.GetChild<ReportAuth>("ReportAuth");
+            var username = authInfo.Username;
+            var password = CoreFunctions.Decrypt(authInfo.Password, "KgtH(@C*&@Dhflosdf9f#&f");
+            var authenticationType = bool.Parse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsWindowsAuthentication")) == true ? "WindowsAuthentication" : "FormsBasedAuthentication";
+            return new ReportingService(username, password, reportServerUrl, authenticationType, site.ID);
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -58,8 +59,9 @@ namespace EPMLiveCore.Jobs.SSRS
                     {
                         FileName = item.File.Name,
                         LastModified = item.File.TimeLastModified,
-                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
-                        BinaryData = item.File.OpenBinary()
+                        Folder = item.File.ParentFolder.Url,
+                        BinaryData = item.File.OpenBinary(),
+                        DatasourceCredentials = item.File.Name.ToLower().EndsWith(".rsds") ? CoreFunctions.Decrypt(Convert.ToString(item["Datasource Credentials"]), "FpUagQ2RG9") : null
                     };
                     try
                     {
@@ -74,6 +76,7 @@ namespace EPMLiveCore.Jobs.SSRS
                         errors += exception.ToString();
                     }
                 }
+
                 if (!string.IsNullOrEmpty(errors))
                 {
                     throw new Exception(errors);
@@ -85,7 +88,7 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var report = data.Split(':')[1];
             var folder = data.Split(':')[2];
-            client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
+            client.DeleteItem($"/{siteCollectionId.ToString()}{folder}/{report}");
         }
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
@@ -255,11 +258,11 @@ namespace EPMLiveCore.Jobs.SSRS
             Warning[] warnings;
             if (report.FileName.ToLower().EndsWith(".rdl"))
             {
-                if(dataSources == null)
+                if (dataSources == null)
                 {
                     dataSources = service.ListChildren($"/{siteCollectionId}", true).Where(x => x.TypeName == "DataSource").ToList();
                 }
-                var catalogItem = service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
+                var catalogItem = service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}/{report.Folder}", true, report.BinaryData, null, out warnings);
                 var reportDatasources = service.GetItemDataSources(catalogItem.Path);
                 var itemRefs = new List<ItemReference>();
                 foreach (DataSource reportDatasource in reportDatasources)
@@ -273,16 +276,16 @@ namespace EPMLiveCore.Jobs.SSRS
                             Reference = existingDatasource.Path
                         };
                         itemRefs.Add(itemRef);
-                    }                    
+                    }
                 }
                 service.SetItemReferences(catalogItem.Path, itemRefs.ToArray());
             }
             else if (report.FileName.ToLower().EndsWith(".rsds"))
             {
                 var doc = new XmlDocument();
-                using (MemoryStream ms = new MemoryStream(report.BinaryData))
+                using (var memoryStream = new MemoryStream(report.BinaryData))
                 {
-                    doc.Load(ms);
+                    doc.Load(memoryStream);
                     var definition = new DataSourceDefinition()
                     {
                         CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
@@ -291,13 +294,17 @@ namespace EPMLiveCore.Jobs.SSRS
                         Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
                         ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
                         OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
-                        Password = doc.GetStringValue("/m:DataSourceDefinition/m:Password"),
                         Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
                         UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
-                        UserName = doc.GetStringValue("/m:DataSourceDefinition/m:UserName"),
                         WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
                     };
-                    service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
+                    if (!string.IsNullOrEmpty(report.DatasourceCredentials))
+                    {
+                        var parts = report.DatasourceCredentials.Split(':');
+                        definition.UserName = parts[0].Trim();
+                        definition.Password = parts[1].Trim();
+                    }
+                    service.CreateDataSource(report.FileName, $"/{siteCollectionId}/{report.Folder}", true, definition, null);
                 }
             }
         }
