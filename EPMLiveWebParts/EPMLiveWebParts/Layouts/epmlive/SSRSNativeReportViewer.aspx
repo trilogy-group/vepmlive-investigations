@@ -45,7 +45,7 @@
         <div id="LoadingDiv">Please wait...</div>
         <table id="SubscriptionsTable">
             <tr>
-                <th><input type="checkbox" id="chkCheckAll" onclick="CheckAll()"></th>
+                <th width="10px"><input type="checkbox" id="chkCheckAll" onclick="CheckAll()"></th>
                 <th>Type</th>
                 <th>Delivery Extension</th>
                 <th>Description</th>
