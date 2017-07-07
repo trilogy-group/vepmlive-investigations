@@ -57,33 +57,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [WebMethod]
         public static string GetSubscription(string subsID)
         {
-            var rs = ReportingService.GetInstance(SPContext.Current.Site);
-            ExtensionSettings extset = null;
-            string desc, status, eventtype, matchdata;
-            ParameterValue[] reportparams;
-            ActiveState acs;            
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);        
 
-            rs.GetSubscriptionProperties(subsID, out extset, out desc, out acs, out status, out eventtype, out matchdata, out reportparams);
-            var subs = new SubscriptionExtension()
-            {
-                Active = acs,
-                DeliverySettings = extset,
-                Description = desc,
-                EventType = eventtype,
-                Status = status,
-                SubscriptionID = subsID,
-                ReportParams = reportparams,
-                MatchData = matchdata
-            };
-
+            var subsProps = rs.GetSubscriptionProperties(subsID);
+            subsProps.SubscriptionID = subsID;
+            
             JavaScriptSerializer json = new JavaScriptSerializer();
-            return json.Serialize(subs);
-        }
-
-        public class SubscriptionExtension : Subscription
-        {
-            public ParameterValue[] ReportParams { get; set; }
-            public string MatchData { get; set; }
+            return json.Serialize(subsProps);
         }
 
         [WebMethod]

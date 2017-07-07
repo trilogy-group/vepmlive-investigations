@@ -21,9 +21,7 @@ namespace EPMLiveCore.Jobs.SSRS
         string CreateSubscription(string itemPath, ExtensionSettings extensionSettings, string description,
             string eventType, string matchData, ParameterValue[] parameters);
         void ChangeSubscriptionOwner(string SubscriptionID, string NewOwner);
-        string GetSubscriptionProperties(string subscriptionID, out ExtensionSettings extensionSettings,
-            out string description, out ActiveState active, out string status, out string eventType,
-            out string matchData, out ParameterValue[] parameters);
+        SubscriptionProperties GetSubscriptionProperties(string subscriptionID);
         void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
             string description, string eventType, string matchData, ParameterValue[] parameters);
     }

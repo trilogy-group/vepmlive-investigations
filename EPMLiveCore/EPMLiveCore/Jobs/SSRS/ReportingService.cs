@@ -176,12 +176,27 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             client.ChangeSubscriptionOwner(subscriptionID, newOwner);
         }
-        public string GetSubscriptionProperties(string subscriptionID, out ExtensionSettings extensionSettings,
-            out string description, out ActiveState active, out string status, out string eventType,
-            out string matchData, out ParameterValue[] parameters)
+        public SubscriptionProperties GetSubscriptionProperties(string subscriptionID)
         {
-            return client.GetSubscriptionProperties(subscriptionID, out extensionSettings, out description, out active,
-                out status, out eventType, out matchData, out parameters);
+            ExtensionSettings extset = null;
+            string desc, status, eventtype, matchdata;
+            ParameterValue[] reportparams;
+            ActiveState acs;
+                       
+            var owner = client.GetSubscriptionProperties(subscriptionID, out extset, out desc, out acs,
+                out status, out eventtype, out matchdata, out reportparams);
+
+            return new SubscriptionProperties()
+            {
+                Active = acs,
+                Description = desc,
+                EventType = eventtype,
+                DeliverySettings = extset,
+                MatchData = matchdata,
+                Owner = owner,
+                ReportParams = reportparams,
+                Status = status
+            };
         }
         public void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
             string description, string eventType, string matchData, ParameterValue[] parameters)
