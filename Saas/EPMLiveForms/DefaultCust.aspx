@@ -28,7 +28,7 @@
                 clickedit = true;
                 btn.className = "login-buttond";
                 btn.value = "Signing In...";
-                var url = "/ReportServer/ReportService2010.asmx";
+                var url = "/ssrs/ReportService2010.asmx";
                 var pl = new SOAPClientParameters();
                 pl.add("userName", $("#ctl00_PlaceHolderMain_signInControl_UserName").val());
                 pl.add("password", $("#ctl00_PlaceHolderMain_signInControl_password").val());
