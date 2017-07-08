@@ -28,15 +28,15 @@
                 clickedit = true;
                 btn.className = "login-buttond";
                 btn.value = "Signing In...";
-				var url = "/ReportServer/ReportService2010.asmx";
-				var pl = new SOAPClientParameters();
-				pl.add("userName", $("#ctl00_PlaceHolderMain_signInControl_UserName").val());
-				pl.add("password", $("#ctl00_PlaceHolderMain_signInControl_password").val());
-				SOAPClient._sendSoapRequest(url, "LogonUser", pl, true, callback);				
+                var url = "/ReportServer/ReportService2010.asmx";
+                var pl = new SOAPClientParameters();
+                pl.add("userName", $("#ctl00_PlaceHolderMain_signInControl_UserName").val());
+                pl.add("password", $("#ctl00_PlaceHolderMain_signInControl_password").val());
+                SOAPClient._sendSoapRequest(url, "LogonUser", pl, true, callback);				
                 function callback() {
-					theForm.submit();
-				}
-				return false;
+                    theForm.submit();
+                }
+                return false;
             }
             return false;
         }
@@ -61,7 +61,7 @@
                             <div class="password-img input-img">
                                 <span class="fui-lock"></span>
                             </div>
-							<input type="hidden" name="ctl00$PlaceHolderMain$signInControl$login" value="Sign in" />
+                            <input type="hidden" name="ctl00$PlaceHolderMain$signInControl$login" value="Sign in" />
                             <asp:TextBox ID="password" TextMode="Password" autocomplete="off" runat="server" class="" placeholder="Password" title="Password" Style="margin-top: 10px;" />
                             <asp:Button ID="login" CommandName="Login" Text="<%$Resources:wss,login_pagetitle%>" runat="server" class="login-button" OnClientClick="return DisableButton(this);" />
                             <asp:CheckBox ID="RememberMe" Text="<%$SPHtmlEncodedResources:wss,login_pageRememberMe%>" runat="server" />
@@ -114,7 +114,7 @@
                 </div>
                 <script src="./jquery.soap.js"></script>
                 <script src="./login.js"></script>
-				<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+                <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
             </LayoutTemplate>
         </asp:Login>
     </div>
