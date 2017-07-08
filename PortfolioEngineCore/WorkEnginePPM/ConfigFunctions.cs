@@ -432,9 +432,10 @@ namespace WorkEnginePPM
             return dt;
         }
 
-        private static string addTeam(SPListItem li, SPItemEventDataCollection properties)
+        private static string addTeam(SPListItem li, SPItemEventDataCollection properties, DataTable dtResources = null)
         {
-            DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Resources><Columns>EXTID</Columns></Resources>", li.ParentList.ParentWeb);
+            if (dtResources == null)
+                dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Resources><Columns>EXTID</Columns></Resources>", li.ParentList.ParentWeb);
 
             string team = "";
 
@@ -475,7 +476,7 @@ namespace WorkEnginePPM
 
         }
 
-        public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web)
+        public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web, DataTable dtResources = null)
         {
             SPList list = li.ParentList;
 
@@ -489,7 +490,7 @@ namespace WorkEnginePPM
             catch { }
 
             xml += "<Title><![CDATA[" + title + "]]></Title>";
-            xml += addTeam(li, properties);
+            xml += addTeam(li, properties, dtResources);
 
             foreach (DictionaryEntry field in hshFields)
             {
