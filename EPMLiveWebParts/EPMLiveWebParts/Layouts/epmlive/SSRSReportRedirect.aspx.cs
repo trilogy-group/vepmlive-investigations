@@ -7,8 +7,6 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveWebParts.SSRS2006;
-using System.Web.Services;
-using System.Web.Script.Serialization;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -34,30 +32,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 itemUrl = Request["itemurl"];
             }
 
-            if (!string.IsNullOrEmpty(Request["isNativeMode"]))
-            {
-                bool.TryParse(Request["isNativeMode"], out isNativeMode);
-            }
-
             Redirect();
         }
 
-        [WebMethod]
-        public static string GetRegs()
-        {
-            var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
-            var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
-            var addresses = $"{$"{reportURL}/Pages/ReportViewer.aspx?{itemUrlRequest}&rs:Command=Render"}|reportbuilder:Action=Edit&ItemPath={itemUrlRequest}&Endpoint={reportURL}";
-            JavaScriptSerializer json = new JavaScriptSerializer();
-            return json.Serialize(addresses);
-        }
         private void Redirect()
         {
-            if (!string.IsNullOrEmpty(itemUrl))
-            {
-                if (!isNativeMode)                    
-                    RedirectIntegratedMode();
-            }            
+            RedirectIntegratedMode();
         }
 
         private void RedirectIntegratedMode()

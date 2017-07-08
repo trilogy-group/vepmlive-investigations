@@ -1033,6 +1033,7 @@
     <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\jquery.fancybox.js" />
     <Content Include="Layouts\epmlive\javascripts\nativeviewer.js" />
     <Content Include="Layouts\epmlive\SSRSNativeReportViewer.aspx" />
