@@ -13,6 +13,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 using System.Drawing;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
@@ -280,14 +281,14 @@ namespace EPMLiveCore
         {
             AddWebConfigModification(webApp, "configuration/system.webServer", "rewrite", 0, @"<rewrite></rewrite>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
             AddWebConfigModification(webApp, "configuration/system.webServer/rewrite", "rules", 1, @"<rules></rules>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
-            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite/rules", "rule[@name='Rewrite to report server instance']", 2, "<rule name=\"Rewrite to report server instance\"><match url=\"^reportingservice/(.*)\" /><action type=\"Rewrite\" url=\""+ serverUrl + "/{R:1}\" /></rule>", SPWebConfigModification.SPWebConfigModificationType.EnsureChildNode);
+            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite/rules", "rule[@name='Rewrite to report server instance']", 2, "<rule name=\"Rewrite to report server instance\"><match url=\"(.*)ssrs/(.*)\" /><action type=\"Rewrite\" url=\"" + serverUrl + "/{R:2}\" /></rule>", SPWebConfigModification.SPWebConfigModificationType.EnsureChildNode);
             webApp.WebService.Update();
             webApp.WebService.ApplyWebConfigModifications();
         }
 
         private void AddWebConfigModification(SPWebApplication webApp, string path, string name, uint sequence, string value, SPWebConfigModification.SPWebConfigModificationType type)
         {
-            var myModification = new SPWebConfigModification()
+            webApp.WebService.WebConfigModifications.Add(new SPWebConfigModification()
             {
                 Path = path,
                 Name = name,
@@ -295,19 +296,12 @@ namespace EPMLiveCore
                 Owner = "System",
                 Type = type,
                 Value = value
-            };
-            webApp.WebService.WebConfigModifications.Add(myModification);
+            });
         }
 
         private void RevertWebConfigModifications(SPWebApplication webApp)
         {
-            var toRemove = new List<SPWebConfigModification>();
-            foreach (var modification in webApp.WebService.WebConfigModifications)
-            {
-                if (modification.Owner == "System")
-                    toRemove.Add(modification);
-            }
-            foreach (var modification in toRemove)
+            foreach (var modification in webApp.WebService.WebConfigModifications.Where(x => x.Owner == "System"))
             {
                 webApp.WebService.WebConfigModifications.Remove(modification);
             }
