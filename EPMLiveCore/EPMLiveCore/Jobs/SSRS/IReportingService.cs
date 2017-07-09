@@ -18,5 +18,11 @@ namespace EPMLiveCore.Jobs.SSRS
         void DisableSubscription(string subscriptionID);
         void DeleteSubscription(string subscriptionID);
         CatalogItem[] ListChildren(string itemPath, bool recursive);
+        string CreateSubscription(string itemPath, ExtensionSettings extensionSettings, string description,
+            string eventType, string matchData, ParameterValue[] parameters);
+        void ChangeSubscriptionOwner(string SubscriptionID, string NewOwner);
+        SubscriptionProperties GetSubscriptionProperties(string subscriptionID);
+        void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
+            string description, string eventType, string matchData, ParameterValue[] parameters);
     }
 }

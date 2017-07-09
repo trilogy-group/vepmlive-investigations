@@ -237,7 +237,8 @@ namespace WorkEnginePPM
 
                         string xml = "<Items>";
 
-                        xml += ConfigFunctions.getItemXml(properties.ListItem, hshFields, properties.AfterProperties, properties.Web);
+                        var dtResources = HelperFunctions.GetResourcePool(properties.Web);
+                        xml += ConfigFunctions.getItemXml(properties.ListItem, hshFields, properties.AfterProperties, properties.Web, dtResources);
 
                         xml += "</Items>";
 

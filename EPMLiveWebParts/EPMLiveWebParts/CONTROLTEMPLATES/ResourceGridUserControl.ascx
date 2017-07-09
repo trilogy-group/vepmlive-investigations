@@ -294,7 +294,14 @@
                     epmLiveResourceGrid.LaunchInForm=<%=LaunchInForm.ToString().ToLower()%>;
                     epmLiveResourceGrid.UserHaveResourceCenterPermission = <%= CurrentUserHaveResourceCenterPermission(SPBasePermissions.AddListItems).ToString(CultureInfo.InvariantCulture).ToLower() %>;
 
-                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
+                    <%--window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');--%>
+             TreeGrid(   { 
+                Layout:{ Url:"<%= WebUrl %>/_vti_bin/WorkEngine.asmx",Timeout:0, Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetResourcePoolLayoutGrid",Dataxml:"<%=LayoutXml %>" } } ,
+                Data:{ Url:"<%= WebUrl %>/_vti_bin/WorkEngine.asmx",Timeout:0, Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetResourcePoolDataGrid",Dataxml:"<%=DataXml %>" } }, 
+                Debug:"<%= DebugTag %>",SuppressMessage:"3"
+            }, 
+	        "EPMResourceGrid" );
+
                 }, true);
 
                 window.epmLiveResourceGrid.actions.getNewFormUrl = epmLive.currentWebFullUrl + '/' + '<%=NewFormUrl %>';

@@ -9,6 +9,7 @@ using System.Xml;
 using System.DirectoryServices;
 using System.Web;
 using System.Web.UI;
+using System.Runtime.Caching;
 //using Microsoft.SharePoint.Administration;
 //using Microsoft.SharePoint.Administration.Claims;
 
@@ -422,16 +423,7 @@ namespace WorkEnginePPM
                     {
                         try
                         {
-                            DataTable dtRes = null;
-                            if (HttpContext.Current.Session["ResPoolDt"] == null)
-                            {
-                                dtRes = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns>EXTID</Columns></Data>", web);
-                                HttpContext.Current.Session["ResPoolDt"] = dtRes;
-                            }
-                            else
-                            {
-                                dtRes = HttpContext.Current.Session["ResPoolDt"] as DataTable;
-                            }
+                            DataTable dtRes = GetResourcePool(web);
 
                             string[] sTeams = val.Split(',');
 
@@ -469,13 +461,20 @@ namespace WorkEnginePPM
                         string sfld = hshFields[fname].ToString();
                         if(list.Fields.ContainsField(sfld))
                         {
-                            li[sfld] = val;
+                            if (!(li[sfld] == null && val == null || (li[sfld] != null && li[sfld].ToString() == val)
+                                || (li[sfld] != null && li[sfld].ToString() == "False" && val == "0")
+                                || (li[sfld] != null && li[sfld].ToString() == "True" && val == "1")
+                                ))
+                            {
+                                li[sfld] = val;
+                                updated = true;
+                            }
                         }
                     }
                 }
 
                 if ((li["ExternalID"] == null && externalid != null)
-                    || (li["ExternalID"] != null))
+                    || (li["ExternalID"] != null && li["ExternalID"].ToString() != externalid))
                 {
                     li["ExternalID"] = externalid;
                     updated = true;
@@ -504,6 +503,22 @@ namespace WorkEnginePPM
             }
 
             return message;
+        }
+
+        public static DataTable GetResourcePool(SPWeb web)
+        {
+            var memoryCache = MemoryCache.Default;
+
+            if (!memoryCache.Contains("ResPoolDt_" + web.ID))
+            {
+                var expiration = DateTimeOffset.UtcNow.AddMinutes(20);
+                var ResPoolDt = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns>EXTID</Columns></Data>", web);
+
+                memoryCache.Add("ResPoolDt_" + web.ID, ResPoolDt, expiration);
+            }
+
+            return memoryCache.Get("ResPoolDt_" + web.ID, null) as DataTable;
+
         }
     }
 }
