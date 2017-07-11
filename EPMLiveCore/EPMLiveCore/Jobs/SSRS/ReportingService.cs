@@ -136,9 +136,9 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        public Subscription[] ListSubscriptions(string reportPath)
+        public Subscription[] ListSubscriptions(string itemPathOrSiteURL)
         {
-            return client.ListSubscriptions(reportPath);
+            return client.ListSubscriptions(itemPathOrSiteURL);
         }
 
         public Extension[] ListExtensions(string extensionType)
