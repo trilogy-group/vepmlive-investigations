@@ -110,10 +110,15 @@ namespace SyncSubscriptions
                             var createdSubsID = nativeClient.CreateSubscription(reportPath, subsProp.DeliverySettings, $"{subsProp.Description} - {integratedSub.SubscriptionID}",
                                 subsProp.EventType, subsProp.MatchData, subsProp.ReportParams);
                             nativeClient.ChangeSubscriptionOwner(createdSubsID, integratedSub.Owner);
+
+                            WriteToConsole($"     - ID: {createdSubsID} -> added!");
                         }
                         else
+                        {
                             nativeClient.SetSubscriptionProperties(nativesubs.First().SubscriptionID, subsProp.DeliverySettings, nativesubs.First().Description,
                                 subsProp.EventType, subsProp.MatchData, subsProp.ReportParams);
+                            WriteToConsole($"     - ID: {nativesubs.First().SubscriptionID} -> updated!");
+                        }
                     }
                 }
 
