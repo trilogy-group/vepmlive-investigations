@@ -257,7 +257,7 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 policies.Add(new Policy
                 {
-                    GroupUserName = loginName,
+                    GroupUserName = loginName.Split('\\').Last(),
                     Roles = new Role[] { role }
                 });
             }
