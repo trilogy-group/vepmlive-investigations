@@ -15,7 +15,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 string username = CoreFunctions.GetJustUsername(SPContext.Current.Web.CurrentUser.LoginName);
                 Guid gAuth = Guid.NewGuid();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
                     SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
