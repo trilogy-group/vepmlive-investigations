@@ -48,7 +48,7 @@ public partial class TemplateDesigner : Page
         {
             AdHocSettings.AdHocConfig.DeleteTemplateInternal(templateName);
 
-            string templateData =  AdHocSettings.AdHocConfig.GetVolatileTemplate(templateName);
+            string templateData = AdHocSettings.AdHocConfig.GetVolatileTemplate(templateName);
 
             Response.Write("<html><head>");
             Response.Write("<script src=\"elrte/js/jquery-1.6.1.min.js\" type=\"text/javascript\" charset=\"utf-8\"></script>");

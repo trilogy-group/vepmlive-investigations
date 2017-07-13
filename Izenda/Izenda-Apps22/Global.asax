@@ -6,8 +6,13 @@
     [Serializable]
     public class CustomAdHocConfig : DatabaseAdHocConfig
     {
-        public static string sitecollectionname = string.Empty;
-        public static void InitializeReporting()
+        private string sitecollectionname=string.Empty;
+        public CustomAdHocConfig(string _sitecollectionname)
+        {
+            sitecollectionname = _sitecollectionname;
+        }
+
+        public void InitializeReporting()
         {
             HttpSessionState session = HttpContext.Current.Session;
             if (session == null)
@@ -20,7 +25,7 @@
             AdHocSettings.LicenseKey = ConfigurationManager.AppSettings["IzendaLicenseKey"];
             AdHocSettings.GenerateThumbnails = true;
             AdHocSettings.DashboardViewer = "Dashboards.aspx";
-            AdHocSettings.AdHocConfig = new CustomAdHocConfig();
+            AdHocSettings.AdHocConfig = new CustomAdHocConfig(sitecollectionname);
             AdHocSettings.ChartLimit = 100;
             AdHocSettings.Formats.Add(DateTime.Now.ToString("dd/MM/yyyy"), "{0:dd/MM/yyyy}");
             AdHocSettings.Formats.Add(DateTime.Now.ToString("dd-MM-yyyy"), "{0:dd-MM-yyyy}");
