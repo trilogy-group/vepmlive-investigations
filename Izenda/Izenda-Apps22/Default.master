@@ -138,17 +138,17 @@
         <div class="top-nav applyStyles" id="blueHeader">
             <div class="page">
                 <ul id="topnav" style="margin: 0px; padding: 0px;">
-                    <li class="top-nav-item"><a href="ReportList.aspx?sitecollectiontitle=<%sitecollectionname.ToString();%>">Reports</a></li>
-                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1&sitecollectiontitle=<%sitecollectionname.ToString();%>" onclick="ShowRlToDbLoading();">Dashboards</a></li>
+                    <li class="top-nav-item"><a href="ReportList.aspx?sitecollectiontitle=<%= sitecollectionname%>">Reports</a></li>
+                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1&sitecollectiontitle=<%= sitecollectionname%>" onclick="ShowRlToDbLoading();">Dashboards</a></li>
                     <li class="top-nav-item designer-only btn-group">
-                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectiontitle=<%sitecollectionname.ToString();%>"><span class="plus">+</span> New</a>
+                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectiontitle=<%= sitecollectionname%>"><span class="plus">+</span> New</a>
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectiontitle=<%sitecollectionname.ToString();%>">Report</a></li>
-                            <li runat="server" id="irItem"><a href="InstantReport.aspx?sitecollectiontitle=<%sitecollectiontitle.ToString();%>">Instant Report</a></li>
-                            <li><a href="DashboardDesigner.aspx?clear=1&sitecollectiontitle=<%sitecollectionname.ToString();%>">Dashboard</a></li>
+                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectiontitle=<%= sitecollectionname%>">Report</a></li>
+                            <li runat="server" id="irItem"><a href="InstantReport.aspx?sitecollectiontitle=<%= sitecollectiontitle%>">Instant Report</a></li>
+                            <li><a href="DashboardDesigner.aspx?clear=1&sitecollectiontitle=<%=sitecollectionname%>">Dashboard</a></li>
                         </ul>
                     </li>
 
