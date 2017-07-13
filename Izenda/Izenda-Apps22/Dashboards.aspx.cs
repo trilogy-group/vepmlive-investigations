@@ -1,5 +1,9 @@
 public partial class Dashboards : System.Web.UI.Page {
   protected override void OnPreInit(System.EventArgs e) {
-    ASP.global_asax.CustomAdHocConfig.InitializeReporting();
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectiontitle"]))
+        {
+            ASP.global_asax.CustomAdHocConfig.sitecollectionname = Request.QueryString["sitecollectiontitle"];
+        }
+        ASP.global_asax.CustomAdHocConfig.InitializeReporting();
   }
 }

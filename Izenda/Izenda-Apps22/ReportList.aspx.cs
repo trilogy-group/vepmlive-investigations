@@ -2,9 +2,9 @@ public partial class ReportList : System.Web.UI.Page
 {
     protected override void OnPreInit(System.EventArgs e)
     {
-        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionurl"]))
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectiontitle"]))
         {
-            ASP.global_asax.CustomAdHocConfig.sitecollectionname = Request.QueryString["sitecollectionurl"];
+            ASP.global_asax.CustomAdHocConfig.sitecollectionname = Request.QueryString["sitecollectiontitle"];
         }
         ASP.global_asax.CustomAdHocConfig.InitializeReporting();
     }

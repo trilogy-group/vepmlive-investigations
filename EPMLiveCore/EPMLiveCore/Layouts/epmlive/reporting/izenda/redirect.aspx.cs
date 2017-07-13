@@ -41,7 +41,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 if (reportsurl != "")
                 {
-                    url = reportsurl + "/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64 + "&sitecollectionurl=" + SPContext.Current.Web.Title;
+                    url = reportsurl + "/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64 + "&sitecollectiontitle=" + SPContext.Current.Web.Title;
                 }
 
                 if (url != "")
