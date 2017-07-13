@@ -107,6 +107,14 @@ namespace EPMLiveCore.Jobs.SSRS
                 }
                 try
                 {
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Report Builder"), "Administrators");
+                }
+                catch (Exception exception)
+                {
+                    errors += exception.ToString();
+                }
+                try
+                {
                     AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
                 }
                 catch (Exception exception)
@@ -126,7 +134,7 @@ namespace EPMLiveCore.Jobs.SSRS
             var group = data.Split('~')[2];
             bool inheritParent;
             var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
-            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
+            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value.Split('\\').Last();
             var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
             if (existingRole != null)
             {
