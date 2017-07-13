@@ -459,6 +459,7 @@
     <Compile Include="Jobs\ResourcePlan.cs" />
     <Compile Include="Jobs\RollupJob.cs" />
     <Compile Include="Jobs\SecurityUpdate.cs" />
+    <Compile Include="Jobs\SSRS\ReportingService2010Extended.cs" />
     <Compile Include="Jobs\SSRS\ReportItem.cs" />
     <Compile Include="Jobs\SSRS\SyncJob.cs" />
     <Compile Include="Jobs\TimerFix.cs" />

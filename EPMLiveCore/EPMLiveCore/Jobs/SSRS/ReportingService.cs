@@ -13,7 +13,7 @@ namespace EPMLiveCore.Jobs.SSRS
     public class ReportingService : IReportingService
     {
         private readonly string siteCollectionId;
-        private readonly ReportingService2010 client;
+        private readonly ReportingService2010Extended client;
         private List<CatalogItem> dataSources;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
@@ -184,7 +184,7 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole)
+        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010Extended client, Role role, string spRole)
         {
             string errors = string.Empty;
             var reportViewers = groups.GetByName(spRole);
@@ -212,7 +212,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void AssignRole(ReportingService2010 client, Role role, string loginName)
+        private void AssignRole(ReportingService2010Extended client, Role role, string loginName)
         {
             bool inheritParent;
             var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
@@ -236,9 +236,9 @@ namespace EPMLiveCore.Jobs.SSRS
             client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
         }
 
-        private ReportingService2010 GetClient(string username, string password, string reportServerUrl, string authenticationType)
+        private ReportingService2010Extended GetClient(string username, string password, string reportServerUrl, string authenticationType)
         {
-            var client = new ReportingService2010()
+            var client = new ReportingService2010Extended()
             {
                 Url = reportServerUrl
             };
@@ -253,7 +253,7 @@ namespace EPMLiveCore.Jobs.SSRS
             return client;
         }
 
-        private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
+        private void UploadReport(ReportingService2010Extended service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
             if (report.FileName.ToLower().EndsWith(".rdl"))
@@ -296,7 +296,9 @@ namespace EPMLiveCore.Jobs.SSRS
                         OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
                         Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
                         UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
-                        WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
+                        WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials"),
+                        UserName = "",
+                        Password = ""
                     };
                     if (!string.IsNullOrEmpty(report.DatasourceCredentials))
                     {
@@ -309,7 +311,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
+        private void CreateFoldersIfNotExist(ReportingService2010Extended service, string siteCollectionId, string folder)
         {
             var children = service.ListChildren($"/{siteCollectionId}", true).ToList();
             var folders = folder.Split('/').ToList();
