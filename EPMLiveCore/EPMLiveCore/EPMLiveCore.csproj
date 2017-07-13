@@ -461,6 +461,7 @@
     <Compile Include="Jobs\SecurityUpdate.cs" />
     <Compile Include="Jobs\SSRS\ReportingService2010Extended.cs" />
     <Compile Include="Jobs\SSRS\ReportItem.cs" />
+    <Compile Include="Jobs\SSRS\SubscriptionProperties.cs" />
     <Compile Include="Jobs\SSRS\SyncJob.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
     <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />

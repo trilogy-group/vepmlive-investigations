@@ -169,10 +169,45 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             client.DeleteSubscription(subscriptionID);
         }
-
         public CatalogItem[] ListChildren(string itemPath, bool recursive)
         {
             return client.ListChildren(itemPath, recursive);
+        }
+        public string CreateSubscription(string itemPath, ExtensionSettings extensionSettings, string description,
+            string eventType, string matchData, ParameterValue[] parameters)
+        {
+            return client.CreateSubscription(itemPath, extensionSettings, description, eventType, matchData, parameters);
+        }
+        public void ChangeSubscriptionOwner(string subscriptionID, string newOwner)
+        {
+            client.ChangeSubscriptionOwner(subscriptionID, newOwner);
+        }
+        public SubscriptionProperties GetSubscriptionProperties(string subscriptionID)
+        {
+            ExtensionSettings extset = null;
+            string desc, status, eventtype, matchdata;
+            ParameterValue[] reportparams;
+            ActiveState acs;
+                       
+            var owner = client.GetSubscriptionProperties(subscriptionID, out extset, out desc, out acs,
+                out status, out eventtype, out matchdata, out reportparams);
+
+            return new SubscriptionProperties()
+            {
+                Active = acs,
+                Description = desc,
+                EventType = eventtype,
+                DeliverySettings = extset,
+                MatchData = matchdata,
+                Owner = owner,
+                ReportParams = reportparams,
+                Status = status
+            };
+        }
+        public void SetSubscriptionProperties(string subscriptionID, ExtensionSettings extensionSettings,
+            string description, string eventType, string matchData, ParameterValue[] parameters)
+        {
+            client.SetSubscriptionProperties(subscriptionID, extensionSettings, description, eventType, matchData, parameters);
         }
 
         private string GetSSRSRole(string group)

@@ -14,6 +14,7 @@ using System.Data;
 using System.Text;
 using System.Linq;
 using EPMLiveCore.Jobs.SSRS;
+using EPMLiveCore.SSRS2010;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -54,6 +55,18 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         [WebMethod]
+        public static string GetSubscription(string subsID)
+        {
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);        
+
+            var subsProps = rs.GetSubscriptionProperties(subsID);
+            subsProps.SubscriptionID = subsID;
+            
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            return json.Serialize(subsProps);
+        }
+
+        [WebMethod]
         public static string GetSubscriptions()
         {
             var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
@@ -80,7 +93,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     table.Rows.Add(subsc.EventType, subsc.DeliverySettings.Extension, subsc.Description, subsc.Status,
                         subsc.LastExecuted, subsc.SubscriptionID, subsc.Active.DisabledByUser);
             }
-            //GetAddSubscriptionsFilters();
+
             ds.Tables.Add(table);
             return DataSetToJSON(ds);
         }
@@ -92,7 +105,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var extensions = rs.ListExtensions("Delivery");
             string html = "<option value=\"choose\">Choose a method of delivery</option>";
 
-            extensions?.ToList().ForEach(x => html += $"<option value\"{x.LocalizedName}\">{x.LocalizedName}</option>");
+            extensions?.ToList().ForEach(x => html += $"<option value=\"{x.Name}\">{x.LocalizedName}</option>");
 
             JavaScriptSerializer json = new JavaScriptSerializer();
             return json.Serialize(html);
@@ -120,9 +133,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
             int i = 0;
             foreach (var ip in itemParameters)
             {
+                if (string.IsNullOrWhiteSpace(ip.Prompt)) // Prompt will be empty when parameteris hidden for user.
+                    continue;
+
                 htmlToLoad.Append("<tr>");
 
-                htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p></td>");
+                htmlToLoad.Append($"<td id=\"FieldLabelID{i}\"><p>{ip.Prompt}</p><input type=\"hidden\" id=\"ParamItemNameID{i}\" name=\"ParamItemNameID{i}\" value =\"{ ip.Name }\" /></td>");
 
                 htmlToLoad.Append($"<td><select {(ip.DefaultValues == null ? "disabled" : string.Empty)} id=\"EnterFieldID{i}\" name=\"EnterFieldID{i}\" onchange=\"EnterFieldChange('{i}')\">");
                 htmlToLoad.Append($"<option value=\"enter\" {(ip.DefaultValues == null ? "selected" : string.Empty)}>Enter value</option>");
@@ -153,17 +169,23 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     case "INTEGER":
                     case "FLOAT":
                     case "DATETIME":
-                        if (ip.ValidValues != null)
+                        if (ip.ValidValues != null || ip.Name.ToUpper() == "PERIODEND")
                         {
                             htmlToLoad.Append($"<select {(ip.DefaultValues != null ? "disabled" : string.Empty)} {(ip.MultiValue ? "multiple" : string.Empty)} id=\"ValueFieldID{i}\" name=\"ValueFieldID{i}\">");
-                            ip.ValidValues?.ToList().ForEach(x =>
+
+                            var itemP = ip;
+                            if (ip.Name.ToUpper() == "PERIODEND")
+                                itemP = itemParameters.Where(x => x.Name.ToUpper() == "PERIODSTART").FirstOrDefault();
+
+                            itemP?.ValidValues?.ToList().ForEach(x =>
                             {
                                 isDefaultValue = (ip.DefaultValues != null && ip.DefaultValues.ToList().Any(defValue => defValue != null && defValue.ToUpper() == x.Value));
 
                                 htmlToLoad.Append($"<option value=\"{x.Value}\" ");
                                 htmlToLoad.Append(ip.DefaultValues != null && isDefaultValue ? "selected" : string.Empty);
-                                htmlToLoad.Append($">{x.Value}</option>");
+                                htmlToLoad.Append($">{x.Label}</option>");
                             });
+                            
                             htmlToLoad.Append("</select>");
                         }
                         else
@@ -190,18 +212,51 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         [WebMethod]
-        public static bool SaveSubscription()
+        public static void SaveSubscription(string description, string deliveryMethod, string deliveryParams,
+                    string matchData, string reportParametersList, string subsID)
         {
-            //ScheduleDefinition sd = new ScheduleDefinition();
-            //var rp = sd.Item;
-            //rp.
-            //ParameterValue parameters = null;
-            //parameters.
-            //ExtensionSettings extensionSettings = new ExtensionSettings();
-            //extensionSettings.Extension = EXTENSION_FILESHARE;
-            //extensionSettings.ParameterValues = extensionParams;
+            var itemUrlRequest = HttpContext.Current.Request.QueryString["itemurl"];
+            var reportURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
+            var addresses = $"{reportURL}/{itemUrlRequest}";
+            var rs = ReportingService.GetInstance(SPContext.Current.Site);
 
-            return true;
+            string eventType = "TimedSubscription";
+            ExtensionSettings extSettings = GetExtensionSettings(deliveryParams, deliveryMethod);
+            ParameterValue[] parameters = GetParameterValueList(reportParametersList);
+
+            if (string.IsNullOrWhiteSpace(subsID))
+            {
+                var createdSubsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
+                var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
+                rs.ChangeSubscriptionOwner(createdSubsID, currentUserLogin[currentUserLogin.Length - 1]);
+            }
+            else
+                rs.SetSubscriptionProperties(subsID, extSettings, description, eventType, matchData, parameters);
+        }
+
+        private static ExtensionSettings GetExtensionSettings(string deliveryParams, string deliveryMethod)
+        {
+            ExtensionSettings extensionSettings = new ExtensionSettings();
+            extensionSettings.Extension = deliveryMethod;
+            extensionSettings.ParameterValues = GetParameterValueList(deliveryParams);
+
+            return extensionSettings;
+        }
+
+        private static ParameterValue[] GetParameterValueList(string reportParams)
+        {
+            var delParamsSplit = reportParams.Split(new string[] { "[/]" }, StringSplitOptions.None);
+            var extSet = new List<ParameterValue>();
+
+            var auxSpltParam = new string[2];
+            delParamsSplit?.ToList().ForEach(param =>
+            {
+                auxSpltParam = param.Split('|');
+                if (auxSpltParam != null && auxSpltParam.Length > 1)
+                    extSet.Add(new ParameterValue() { Name = auxSpltParam[0], Value = auxSpltParam[1] });
+            });
+
+            return extSet.ToArray();
         }
 
         [WebMethod]
