@@ -1041,22 +1041,17 @@ namespace PortfolioEngineCore
                 int nContext = xData.GetInt("JobContext", 0);
                 string sComment = xData.GetString("Comment", "Job Request");
                 string sContextData = xData.GetString("Data", "No Context Data");
-
-                Guid guid = Guid.NewGuid();
-
-                sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA)"
-                   + " VALUES(@GUID,@JobContext,@JobSession,@WresID,@JobSubmitted,@JobStatus,@JobComment,@JobData)";
-                oCommand = new SqlCommand(sCommand, dba.Connection);
-                oCommand.Parameters.AddWithValue("@GUID", guid);
-                oCommand.Parameters.AddWithValue("@JobContext", nContext);
-                oCommand.Parameters.AddWithValue("@JobSession", "I'm a Session?");
-                oCommand.Parameters.AddWithValue("@WresID", WresID);
-                oCommand.Parameters.AddWithValue("@JobSubmitted", DateTime.Now);
-                oCommand.Parameters.AddWithValue("@JobStatus", 0);
-                oCommand.Parameters.AddWithValue("@JobComment", sComment);
-                oCommand.Parameters.AddWithValue("@JobData", sContextData);
-                oCommand.ExecuteNonQuery();
-
+                dbaQueueManager.QueueJob(new JobParameters()
+                {
+                    Guid = Guid.NewGuid(),
+                    Context = nContext,
+                    Session = "I'm a Session?",
+                    UserId = WresID,
+                    Comment = sComment,
+                    ContextData = sContextData,
+                    Transaction = dba.Transaction,
+                    Connection = dba.Connection
+                });
             }
             catch (Exception ex)
             {

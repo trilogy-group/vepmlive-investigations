@@ -83,6 +83,7 @@
     <Compile Include="Base\DBAccess\DBAdmin.cs" />
     <Compile Include="Base\DBAccess\General.cs" />
     <Compile Include="Base\DBAccess\Groups.cs" />
+    <Compile Include="Base\DBAccess\JobParameters.cs" />
     <Compile Include="Base\DBAccess\LMR_IF.cs" />
     <Compile Include="Base\DBAccess\Lookups.cs" />
     <Compile Include="Base\DBAccess\Models.cs" />

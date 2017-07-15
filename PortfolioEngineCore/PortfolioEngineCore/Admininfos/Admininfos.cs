@@ -4665,20 +4665,17 @@ namespace PortfolioEngineCore
 				CStruct xProcess = xSet.CreateSubStruct("EPKProcess");
 				// SetSavePSCostValues = 5
 				xProcess.CreateInt("RequestNo", 5);
-
-				const string sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
-				SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-				cmd.Parameters.AddWithValue("@JOB_GUID", Guid.NewGuid());
-				//    qjcCustom = 0
-				cmd.Parameters.AddWithValue("@JOB_CONTEXT", 0);
-				cmd.Parameters.AddWithValue("@JOB_SESSION", Guid.NewGuid());
-				cmd.Parameters.AddWithValue("@WRES_ID", _dba.UserWResID);
-				cmd.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-				cmd.Parameters.AddWithValue("@JOB_STATUS", 0); // For now let 0 mean Not Started
-				cmd.Parameters.AddWithValue("@JOB_COMMENT", "PostCostValues Scheduled Work ");
-				cmd.Parameters.AddWithValue("@JOB_CONTEXT_DATA", xRequest.XML());
-				cmd.ExecuteNonQuery();
-
+                dbaQueueManager.QueueJob(new JobParameters()
+                {
+                    Guid = Guid.NewGuid(),
+                    Context = 0,
+                    Session = Guid.NewGuid().ToString(),
+                    UserId = _dba.UserWResID,
+                    Comment = "PostCostValues Scheduled Work ",
+                    ContextData = xRequest.XML(),
+                    Transaction = _dba.Transaction,
+                    Connection = _dba.Connection
+                });
 			}
 			catch (Exception ex)
 			{
