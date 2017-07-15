@@ -1025,9 +1025,6 @@ namespace PortfolioEngineCore
 
         public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData)
         {
-            SqlCommand oCommand;
-            string sCommand;
-
             bool bResult = false;
             CStruct xData = new CStruct();
             if (xData.LoadXML(sData) == false)
@@ -1038,17 +1035,14 @@ namespace PortfolioEngineCore
 
             try
             {
-                int nContext = xData.GetInt("JobContext", 0);
-                string sComment = xData.GetString("Comment", "Job Request");
-                string sContextData = xData.GetString("Data", "No Context Data");
                 dbaQueueManager.QueueJob(new JobParameters()
                 {
                     Guid = Guid.NewGuid(),
-                    Context = nContext,
+                    Context = xData.GetInt("JobContext", 0),
                     Session = "I'm a Session?",
                     UserId = WresID,
-                    Comment = sComment,
-                    ContextData = sContextData,
+                    Comment = xData.GetString("Comment", "Job Request"),
+                    ContextData = xData.GetString("Data", "No Context Data"),
                     Transaction = dba.Transaction,
                     Connection = dba.Connection
                 });
