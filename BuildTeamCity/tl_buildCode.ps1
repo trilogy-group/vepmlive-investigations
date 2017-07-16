@@ -186,7 +186,7 @@ Log-SubSection "Building '$projName'..."
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath="$ReferencePath" `
+    /p:ReferencePath=$ReferencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -207,7 +207,7 @@ Log-SubSection "Building 'Project Publisher"
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath="$ReferencePath" `
+    /p:ReferencePath=$ReferencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
