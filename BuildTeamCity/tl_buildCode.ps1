@@ -12,8 +12,7 @@ param (
     # user-specific additional command line parameters to pass to MSBuild
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
     # should build cleanup be performed before making build
-    [string]$CleanBuild = $true,
-	[string]$ReferencePath = "/p:ReferencePath=""C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST"""
+    [string]$CleanBuild = $true
 );
 
 $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegrationService",
@@ -186,7 +185,7 @@ Log-SubSection "Building '$projName'..."
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    $ReferencePath `
+    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -207,7 +206,7 @@ Log-SubSection "Building 'Project Publisher"
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    $ReferencePath `
+    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
