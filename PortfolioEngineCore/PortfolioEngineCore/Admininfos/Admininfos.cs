@@ -4673,7 +4673,7 @@ namespace PortfolioEngineCore
                     Comment = "PostCostValues Scheduled Work ",
                     ContextData = xRequest.XML()
                 };
-                job.Queue(_dba);
+                job.Queue(new DbRepository(_dba), new Msmq(@".\private$\Bills"));
             }
             catch (Exception ex)
             {

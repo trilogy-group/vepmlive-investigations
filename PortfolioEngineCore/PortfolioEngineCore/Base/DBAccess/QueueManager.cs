@@ -64,7 +64,7 @@ namespace PortfolioEngineCore
                 Comment = jobComment,
                 ContextData = jobContextData
             };
-            rowsAffected = job.Queue(databaseAccess);
+            rowsAffected = job.Queue(new DbRepository(databaseAccess), new Msmq(@".\private$\Bills"));
             return StatusEnum.rsSuccess;
         }
 
@@ -78,7 +78,7 @@ namespace PortfolioEngineCore
                 Comment = "Test Job",
                 ContextData = ""
             };
-            job.Queue(dba);
+            job.Queue(new DbRepository(dba), new Msmq(@".\private$\Bills"));
             return StatusEnum.rsSuccess;
         }
 

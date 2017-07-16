@@ -1043,7 +1043,7 @@ namespace PortfolioEngineCore
                     Comment = xData.GetString("Comment", "Job Request"),
                     ContextData = xData.GetString("Data", "No Context Data")
                 };
-                job.Queue(dba);
+                job.Queue(new DbRepository(dba), new Msmq(@".\private$\Bills"));
             }
             catch (Exception ex)
             {

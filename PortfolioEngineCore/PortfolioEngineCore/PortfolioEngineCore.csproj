@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,8 +82,10 @@
     <Compile Include="Base\DBAccess\CostViews.cs" />
     <Compile Include="Base\DBAccess\DataAccess.cs" />
     <Compile Include="Base\DBAccess\DBAdmin.cs" />
+    <Compile Include="Base\DBAccess\DbRepository.cs" />
     <Compile Include="Base\DBAccess\General.cs" />
     <Compile Include="Base\DBAccess\Groups.cs" />
+    <Compile Include="Base\DBAccess\IDbRepository.cs" />
     <Compile Include="Base\DBAccess\PfeJob.cs" />
     <Compile Include="Base\DBAccess\LMR_IF.cs" />
     <Compile Include="Base\DBAccess\Lookups.cs" />
@@ -95,6 +98,8 @@
     <Compile Include="Base\Debugger.cs" />
     <Compile Include="Base\Encrypt.cs" />
     <Compile Include="Base\Internal.cs" />
+    <Compile Include="Base\MessageQueue\IMessageQueue.cs" />
+    <Compile Include="Base\MessageQueue\Msmq.cs" />
     <Compile Include="Base\PFEBase.cs" />
     <Compile Include="Base\PFEError.cs" />
     <Compile Include="Base\PFEException.cs" />

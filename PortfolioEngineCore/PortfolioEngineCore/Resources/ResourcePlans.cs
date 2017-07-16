@@ -2823,7 +2823,7 @@ namespace PortfolioEngineCore
                     Comment = "RPE Post for ProjectIDs " + sProjectIDs,
                     ContextData = xRequest.XML()
                 };
-                job.Queue(_dba);
+                job.Queue(new DbRepository(_dba), new Msmq(@".\private$\Bills"));
             }
             catch (Exception ex)
             {
