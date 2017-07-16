@@ -5,9 +5,6 @@ namespace EPMLiveCore.Jobs.SSRS
 {
     public class SyncJob : API.BaseJob
     {
-        private IReportingService client;
-        private object lockObject = new object();
-
         public void execute(SPSite site, SPWeb web, string data)
         {
             if (string.IsNullOrEmpty(data))

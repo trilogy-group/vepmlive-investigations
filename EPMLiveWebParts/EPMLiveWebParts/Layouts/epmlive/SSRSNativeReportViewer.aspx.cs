@@ -228,7 +228,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {
                 var createdSubsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
                 var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
-                rs.ChangeSubscriptionOwner(createdSubsID, currentUserLogin[currentUserLogin.Length - 1]);
+                var currentUser = currentUserLogin.Last().Split('\\').Last();
+                rs.ChangeSubscriptionOwner(createdSubsID, currentUser);
             }
             else
                 rs.SetSubscriptionProperties(subsID, extSettings, description, eventType, matchData, parameters);

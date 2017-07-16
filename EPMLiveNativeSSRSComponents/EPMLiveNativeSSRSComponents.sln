@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.SSRSCustomAuthentication", "EPMLive.SSRSCustomAuthentication\EPMLive.SSRSCustomAuthentication.csproj", "{9157BD43-B537-41BD-87C6-7872F43C9AE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.SSRSConfigInjector", "EPMLive.SSRSConfigInjector\EPMLive.SSRSConfigInjector.csproj", "{42D7E6BD-FBD4-4BFB-885D-13409A10D14D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9157BD43-B537-41BD-87C6-7872F43C9AE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9157BD43-B537-41BD-87C6-7872F43C9AE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9157BD43-B537-41BD-87C6-7872F43C9AE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9157BD43-B537-41BD-87C6-7872F43C9AE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42D7E6BD-FBD4-4BFB-885D-13409A10D14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42D7E6BD-FBD4-4BFB-885D-13409A10D14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42D7E6BD-FBD4-4BFB-885D-13409A10D14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42D7E6BD-FBD4-4BFB-885D-13409A10D14D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

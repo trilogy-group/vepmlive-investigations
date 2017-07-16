@@ -13,8 +13,10 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 using System.Drawing;
+using System.Linq;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace EPMLiveCore
 {
@@ -28,6 +30,7 @@ namespace EPMLiveCore
         protected TextBox txtReportServer;
         protected TextBox txtDefaultPath;
         protected CheckBox chkIntegrated;
+        protected CheckBox chkWindowsAuth;
         protected TextBox txtUsername;
         protected TextBox txtPassword;
         protected Button btnUpgrade;
@@ -169,12 +172,9 @@ namespace EPMLiveCore
             try
             {
                 txtReportServer.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportingServicesURL");
-                txtDefaultPath.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder");
-                
+                txtDefaultPath.Text = CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder");                
                 chkIntegrated.Checked = bool.Parse(CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsUseIntegrated"));
-
-
-                
+                chkWindowsAuth.Checked = bool.Parse(CoreFunctions.getWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsWindowsAuthentication"));
             }
             catch { }
         }
@@ -241,10 +241,13 @@ namespace EPMLiveCore
                         lblStatusDyn.BackColor = System.Drawing.Color.LightGreen;
                     }
 
+                    RevertWebConfigModifications(webApp);
+                    ApplyWebConfigModifications(webApp, txtReportServer.Text);
+
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportingServicesURL", txtReportServer.Text);
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder", txtDefaultPath.Text);
-
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsUseIntegrated", chkIntegrated.Checked.ToString());
+                    CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsWindowsAuthentication", chkWindowsAuth.Checked.ToString());
 
                     if (txtPassword.Text != "" || txtUsername.Text == "")
                     {
@@ -272,6 +275,43 @@ namespace EPMLiveCore
                 lblStatusDyn.Text = "Error: " + exception.Message;
                 lblStatusDyn.BackColor = System.Drawing.Color.Red;
             }
+        }
+
+        private void ApplyWebConfigModifications(SPWebApplication webApp, string serverUrl)
+        {
+            AddWebConfigModification(webApp, "configuration/system.webServer", "rewrite", 0, @"<rewrite></rewrite>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
+            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite", "rules", 1, @"<rules></rules>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
+            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite/rules", "rule[@name='Rewrite to report server instance']", 2, "<rule name=\"Rewrite to report server instance\"><match url=\"(.*)ssrs/(.*)\" /><action type=\"Rewrite\" url=\"" + serverUrl + "{R:2}\" /></rule>", SPWebConfigModification.SPWebConfigModificationType.EnsureChildNode);
+            webApp.WebService.Update();
+            webApp.WebService.ApplyWebConfigModifications();
+        }
+
+        private void AddWebConfigModification(SPWebApplication webApp, string path, string name, uint sequence, string value, SPWebConfigModification.SPWebConfigModificationType type)
+        {
+            webApp.WebService.WebConfigModifications.Add(new SPWebConfigModification()
+            {
+                Path = path,
+                Name = name,
+                Sequence = sequence,
+                Owner = "System",
+                Type = type,
+                Value = value
+            });
+        }
+
+        private void RevertWebConfigModifications(SPWebApplication webApp)
+        {
+            var modificationsToRemove = new List<SPWebConfigModification>();
+            foreach (var modification in webApp.WebService.WebConfigModifications.Where(x => x.Owner == "System"))
+            {
+                modificationsToRemove.Add(modification);
+            }
+            foreach (var modification in modificationsToRemove)
+            {
+                webApp.WebService.WebConfigModifications.Remove(modification);
+            }
+            webApp.WebService.Update();
+            webApp.WebService.ApplyWebConfigModifications();
         }
 
         protected bool ConnectionTest(string sDBConnStr)
