@@ -101,7 +101,6 @@
                 }
                 else {
                     alert(retVal);
-                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose');
                 }
 
             };
