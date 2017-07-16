@@ -13,7 +13,7 @@ param (
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true,
-	[string]$ReferencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST"
+	[string]$ReferencePath = "/p:ReferencePath=""C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST"""
 );
 
 $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegrationService",
@@ -186,7 +186,7 @@ Log-SubSection "Building '$projName'..."
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$ReferencePath `
+    $ReferencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -207,7 +207,7 @@ Log-SubSection "Building 'Project Publisher"
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$ReferencePath `
+    $ReferencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
