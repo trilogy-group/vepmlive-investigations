@@ -2,6 +2,6 @@
 {
     public interface IMessageQueue
     {
-        void Queue();
+        void Queue(string basePath);
     }
 }

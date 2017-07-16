@@ -12,10 +12,10 @@ namespace PortfolioEngineCore
             address = queueAddress;
         }
 
-        public void Queue()
+        public void Queue(string basePath)
         {
             var pfeQueue = new MessageQueue(address);
-            pfeQueue.Send("Some Message");
+            pfeQueue.Send(basePath);
         }
     }
 }

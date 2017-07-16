@@ -362,7 +362,7 @@ namespace PortfolioEngineCore.WEIntegration
                     Comment = "PostCostValues Timesheet Data ",
                     ContextData = xRequest.XML()
                 };
-                job.Queue(new DbRepository(_dba), new Msmq(@".\private$\Bills"));
+                job.Queue(new DbRepository(_dba), new Msmq(@".\private$\Bills"), "basepath");
             }
             catch (Exception ex)
             {

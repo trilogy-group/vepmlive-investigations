@@ -12,11 +12,11 @@
 
         public int UserId { get; internal set; }
 
-        public int Queue(IDbRepository dbRepository, IMessageQueue messageQueue)
+        public int Queue(IDbRepository dbRepository, IMessageQueue messageQueue, string basePath)
         {
             var rowsAffected = dbRepository.QueuePfeJob(this);
 
-            messageQueue.Queue();
+            messageQueue.Queue(basePath);
 
             return rowsAffected;
         }
