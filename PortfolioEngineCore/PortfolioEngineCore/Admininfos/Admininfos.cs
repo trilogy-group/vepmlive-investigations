@@ -4667,16 +4667,13 @@ namespace PortfolioEngineCore
                 xProcess.CreateInt("RequestNo", 5);
                 var job = new PfeJob()
                 {
-                    Guid = Guid.NewGuid(),
                     Context = 0,
                     Session = Guid.NewGuid().ToString(),
                     UserId = _dba.UserWResID,
                     Comment = "PostCostValues Scheduled Work ",
-                    ContextData = xRequest.XML(),
-                    Transaction = _dba.Transaction,
-                    Connection = _dba.Connection
+                    ContextData = xRequest.XML()
                 };
-                job.Queue();
+                job.Queue(_dba);
             }
             catch (Exception ex)
             {

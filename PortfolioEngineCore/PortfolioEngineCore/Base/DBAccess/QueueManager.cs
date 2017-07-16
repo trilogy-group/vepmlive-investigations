@@ -58,16 +58,13 @@ namespace PortfolioEngineCore
         {
             var job = new PfeJob()
             {
-                Guid = Guid.NewGuid(),
                 Context = 0,
                 Session = Guid.NewGuid().ToString(),
                 UserId = databaseAccess.UserWResID,
                 Comment = jobComment,
-                ContextData = jobContextData,
-                Transaction = databaseAccess.Transaction,
-                Connection = databaseAccess.Connection
+                ContextData = jobContextData
             };
-            rowsAffected = job.Queue();
+            rowsAffected = job.Queue(databaseAccess);
             return StatusEnum.rsSuccess;
         }
 
@@ -75,16 +72,13 @@ namespace PortfolioEngineCore
         {
             var job = new PfeJob()
             {
-                Guid = Guid.NewGuid(),
                 Context = 100001,
                 Session = Guid.NewGuid().ToString(),
                 UserId = dba.UserWResID,
                 Comment = "Test Job",
-                ContextData = "",
-                Transaction = dba.Transaction,
-                Connection = dba.Connection
+                ContextData = ""
             };
-            job.Queue();
+            job.Queue(dba);
             return StatusEnum.rsSuccess;
         }
 

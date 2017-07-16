@@ -2817,16 +2817,13 @@ namespace PortfolioEngineCore
                 if (bPublishBaseline) xProcess.CreateBoolean("PublishBaseline", true);
                 var job = new PfeJob()
                 {
-                    Guid = Guid.NewGuid(),
                     Context = 0,
                     Session = Guid.NewGuid().ToString(),
                     UserId = _dba.UserWResID,
                     Comment = "RPE Post for ProjectIDs " + sProjectIDs,
-                    ContextData = xRequest.XML(),
-                    Transaction = _dba.Transaction,
-                    Connection = _dba.Connection
+                    ContextData = xRequest.XML()
                 };
-                job.Queue();
+                job.Queue(_dba);
             }
             catch (Exception ex)
             {

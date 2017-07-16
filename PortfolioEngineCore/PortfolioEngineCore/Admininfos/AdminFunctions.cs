@@ -1037,16 +1037,13 @@ namespace PortfolioEngineCore
             {
                 var job = new PfeJob()
                 {
-                    Guid = Guid.NewGuid(),
                     Context = xData.GetInt("JobContext", 0),
                     Session = "I'm a Session?",
                     UserId = WresID,
                     Comment = xData.GetString("Comment", "Job Request"),
-                    ContextData = xData.GetString("Data", "No Context Data"),
-                    Transaction = dba.Transaction,
-                    Connection = dba.Connection
+                    ContextData = xData.GetString("Data", "No Context Data")
                 };
-                job.Queue();
+                job.Queue(dba);
             }
             catch (Exception ex)
             {
