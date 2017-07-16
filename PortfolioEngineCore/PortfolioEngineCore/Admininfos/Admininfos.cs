@@ -4665,7 +4665,7 @@ namespace PortfolioEngineCore
 				CStruct xProcess = xSet.CreateSubStruct("EPKProcess");
 				// SetSavePSCostValues = 5
 				xProcess.CreateInt("RequestNo", 5);
-                dbaQueueManager.QueueJob(new JobParameters()
+                var job = new PfeJob()
                 {
                     Guid = Guid.NewGuid(),
                     Context = 0,
@@ -4675,7 +4675,8 @@ namespace PortfolioEngineCore
                     ContextData = xRequest.XML(),
                     Transaction = _dba.Transaction,
                     Connection = _dba.Connection
-                });
+                };
+                job.Queue();
 			}
 			catch (Exception ex)
 			{

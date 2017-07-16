@@ -2815,7 +2815,7 @@ namespace PortfolioEngineCore
                 xProcess.CreateString("PIs", sProjectIDs);
                 if (bPublish) xProcess.CreateBoolean("Publish", true);
                 if (bPublishBaseline) xProcess.CreateBoolean("PublishBaseline", true);
-                dbaQueueManager.QueueJob(new JobParameters()
+                var job = new PfeJob()
                 {
                     Guid = Guid.NewGuid(),
                     Context = 0,
@@ -2825,7 +2825,8 @@ namespace PortfolioEngineCore
                     ContextData = xRequest.XML(),
                     Transaction = _dba.Transaction,
                     Connection = _dba.Connection
-                });
+                };
+                job.Queue();
             }
             catch (Exception ex)
             {

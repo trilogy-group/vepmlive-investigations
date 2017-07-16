@@ -53,25 +53,27 @@ namespace PortfolioEngineCore
             return eStatus;
 
         }
-        public static StatusEnum PostCostValues(DBAccess dba, string sComment, string sData, out int lRowsAffected)
+
+        public static StatusEnum PostCostValues(DBAccess databaseAccess, string jobComment, string jobContextData, out int rowsAffected)
         {
-            lRowsAffected = QueueJob(new JobParameters()
+            var job = new PfeJob()
             {
                 Guid = Guid.NewGuid(),
                 Context = 0,
                 Session = Guid.NewGuid().ToString(),
-                UserId = dba.UserWResID,
-                Comment = sComment,
-                ContextData = sData,
-                Transaction = dba.Transaction,
-                Connection = dba.Connection
-            });
+                UserId = databaseAccess.UserWResID,
+                Comment = jobComment,
+                ContextData = jobContextData,
+                Transaction = databaseAccess.Transaction,
+                Connection = databaseAccess.Connection
+            };
+            rowsAffected = job.Queue();
             return StatusEnum.rsSuccess;
         }
 
         public static StatusEnum QueueTestJob(DBAccess dba)
         {
-            QueueJob(new JobParameters()
+            var job = new PfeJob()
             {
                 Guid = Guid.NewGuid(),
                 Context = 100001,
@@ -81,23 +83,9 @@ namespace PortfolioEngineCore
                 ContextData = "",
                 Transaction = dba.Transaction,
                 Connection = dba.Connection
-            });
+            };
+            job.Queue();
             return StatusEnum.rsSuccess;
-        }
-
-        public static int QueueJob(JobParameters job)
-        {
-            var query = "INSERT INTO EPG_JOBS(JOB_GUID, JOB_CONTEXT, JOB_SESSION ,WRES_ID, JOB_SUBMITTED,JOB_STATUS, JOB_COMMENT, JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
-            var sqlCommand = new SqlCommand(query, job.Connection, job.Transaction);
-            sqlCommand.Parameters.AddWithValue("@JOB_GUID", job.Guid);
-            sqlCommand.Parameters.AddWithValue("@JOB_CONTEXT", job.Context);
-            sqlCommand.Parameters.AddWithValue("@JOB_SESSION", job.Session);
-            sqlCommand.Parameters.AddWithValue("@WRES_ID", job.UserId);
-            sqlCommand.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-            sqlCommand.Parameters.AddWithValue("@JOB_STATUS", 0);
-            sqlCommand.Parameters.AddWithValue("@JOB_COMMENT", job.Comment);
-            sqlCommand.Parameters.AddWithValue("@JOB_CONTEXT_DATA", job.ContextData);
-            return sqlCommand.ExecuteNonQuery();
         }
 
         public static StatusEnum SelectHeartbeat(DBAccess dba, out DateTime dtHeartbeat)

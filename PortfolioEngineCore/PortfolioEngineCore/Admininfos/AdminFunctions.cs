@@ -1035,7 +1035,7 @@ namespace PortfolioEngineCore
 
             try
             {
-                dbaQueueManager.QueueJob(new JobParameters()
+                var job = new PfeJob()
                 {
                     Guid = Guid.NewGuid(),
                     Context = xData.GetInt("JobContext", 0),
@@ -1045,7 +1045,8 @@ namespace PortfolioEngineCore
                     ContextData = xData.GetString("Data", "No Context Data"),
                     Transaction = dba.Transaction,
                     Connection = dba.Connection
-                });
+                };
+                job.Queue();
             }
             catch (Exception ex)
             {
