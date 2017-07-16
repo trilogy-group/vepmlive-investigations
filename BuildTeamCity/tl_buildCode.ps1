@@ -125,7 +125,7 @@ If ($CleanBuild -eq $true) {
 	    /t:Clean `
 	    /p:SkipInvalidConfigurations=true `
 	    /p:Configuration="$ConfigurationToBuild" `
-	    /p:Platform="$PlatformToBuild" `
+	    /p:Platform="""$PlatformToBuild""" `
         /m:4 `
         /p:WarningLevel=0 `
         $ToolsVersion `
@@ -141,7 +141,7 @@ If ($CleanBuild -eq $true) {
 	    /t:Clean `
 	    /p:SkipInvalidConfigurations=true `
 	    /p:Configuration="$ConfigurationToBuild" `
-	    /p:Platform="$PlatformToBuild" `
+	    /p:Platform="""$PlatformToBuild""" `
         /m:4 `
         /p:WarningLevel=0 `
         $ToolsVersion `
@@ -181,11 +181,11 @@ Log-SubSection "Building '$projName'..."
     /p:PreBuildEvent= `
     /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
-    /p:Platform="$PlatformToBuild" `
+    /p:Platform="""$PlatformToBuild""" `
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+    /p:ReferencePath="""C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST""" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -202,11 +202,11 @@ Log-SubSection "Building 'Project Publisher"
     /p:PreBuildEvent= `
     /p:PostBuildEvent= `
     /p:Configuration="$ConfigurationToBuild" `
-    /p:Platform="$PlatformToBuild" `
+    /p:Platform="""$PlatformToBuild""" `
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+    /p:ReferencePath="""C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST""" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
