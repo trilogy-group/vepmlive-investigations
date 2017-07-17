@@ -5,41 +5,33 @@ namespace SyncSubscriptions
 {
     public class Options
     {
-        [Option("iu", Required = true,
-              HelpText = "URL to SSRS running as integrated mode.")]
-        public string IntegratedURL { get; set; }
+        [Option('m', Required = true,
+              HelpText = "Running Mode. B = Backup of Subscriptions on integrated server | R = Restore subscriptions on native server.")]
+        public string Mode { get; set; }
 
-        [Option("in", Required = true,
-          HelpText = "SSRS Username (integrated mode).")]
-        public string IntegratedUsername { get; set; }
+        [Option('s', Required = true,
+              HelpText = "URL to SSRS server.")]
+        public string URL { get; set; }
 
-        [Option("ip", Required = true,
-          HelpText = "SSRS Password (integrated mode).")]
-        public string IntegratedPassword { get; set; }
+        [Option('u', Required = true,
+          HelpText = "SSRS Username.")]
+        public string Username { get; set; }
 
-        [Option("ia", Required = true,
-          HelpText = "SSRS Authentication Mode (integrated mode). Values allowed: W = WindowsAuthentication | F = FormsBasedAuthentication")]
-        public string IntegratedAuthMode { get; set; }
+        [Option('p', Required = true,
+          HelpText = "SSRS Password.")]
+        public string Password { get; set; }
 
-        [Option("nu", Required = true,
-          HelpText = "URL to SSRS running as native mode.")]
-        public string NativeURL { get; set; }
+        [Option('a', Required = true,
+          HelpText = "SSRS Authentication Mode. Values allowed: W = WindowsAuthentication | F = FormsBasedAuthentication")]
+        public string AuthMode { get; set; }        
 
-        [Option("nn", Required = true,
-          HelpText = "SSRS Username (native mode).")]
-        public string NativeUsername { get; set; }
-
-        [Option("np", Required = true,
-          HelpText = "SSRS Password (native mode).")]
-        public string NativePassword { get; set; }
-
-        [Option("na", Required = true,
-          HelpText = "SSRS Authentication Mode (native mode). Values allowed: W = WindowsAuthentication | F = FormsBasedAuthentication")]
-        public string NativeAuthMode { get; set; }
-
-        [Option("wu", Required = true,
-          HelpText = "WebApplication URL.")]
+        [Option('w', Required = false,
+          HelpText = "WebApplication URL. Should be informed when running on backup (B) mode only.")]
         public string WebApplicationURL { get; set; }
+
+        [Option('b', Required = false,
+          HelpText = "Path for a folder where backup files will be placed. Default value: /Backup. If path does not exists, then it will be automatically created. ")]
+        public string BackupPath { get; set; }
 
         [HelpOption]
         public string GetUsage()
