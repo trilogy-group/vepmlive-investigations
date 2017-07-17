@@ -11,7 +11,7 @@ namespace EPMLiveCore.Jobs.SSRS
         void DeleteReport(string data);
         void AssignRoleMapping(SPGroupCollection groups, SPList userList);
         void RemoveRoleMapping(string data);
-        Subscription[] ListSubscriptions(string reportPath);
+        Subscription[] ListSubscriptions(string itemPathOrSiteURL);
         Extension[] ListExtensions(string extensionType);
         ItemParameter[] GetItemParameters(string reportPath);
         void EnableSubscription(string subscriptionID);

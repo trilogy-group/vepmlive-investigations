@@ -269,13 +269,44 @@ namespace EPMLiveCore.ReportHelper
                 }
                 catch (Exception ex)
                 {
-                    message = string.Format("Refresh not completed due errors. {0} ",  ex.ToString());
-                    hasErrors = false;
+                    message = string.Format("Refresh not completed due errors. {0} ", ex.ToString());
+                    hasErrors = true;
                 }
                 return hasErrors;
             }
         }
+        public bool RefreshTimesheetInstant(out string message, Guid jobUid)
+        {
+            using (var rd = new ReportData(_siteId))
+            {
+                message = string.Empty;
+                bool hasErrors = false;
+                try
+                {
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Begin refreshing time sheet data for web: " + WebTitle,
+                        "Begin refreshing time sheet data for web: " + WebTitle,
+                        0, 1, jobUid.ToString());
 
+                    rd.RefreshTimeSheet(_siteId, WebTitle, jobUid);
+
+                    //message = "Successfully refreshed timesheet data.";
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Finished refreshing time sheet data for web: " + WebTitle,
+                        "Finished refreshing time sheet data for web: " + WebTitle,
+                        0, 1, jobUid.ToString());
+
+                }
+                catch (Exception ex)
+                {
+                    message = string.Format("Refresh not completed due errors. {0} ", ex.ToString());
+                    hasErrors = true;
+                }
+                return hasErrors;
+            }
+        }
         //Modules created by xjh -- START
         public DataTable GetAllForeignKeys(EPMData DAO)
         {

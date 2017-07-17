@@ -2596,7 +2596,7 @@ namespace TimeSheets
                     }
                     if (Filter == "2")
                     {
-                        if (drTimesheet == null)
+                        if (drTimesheet == null || drTimesheet["SUBMITTED"].ToString().ToLower() == "false")
                         {
                             iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
                         }
