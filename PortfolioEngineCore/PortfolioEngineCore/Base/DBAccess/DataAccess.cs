@@ -28,7 +28,5 @@ namespace PortfolioEngineCore
                 return _dba;
             }
         }
-
-        public string QueueAddress => _queueAddress;
     }
 }
