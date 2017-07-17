@@ -2468,10 +2468,10 @@ namespace EPMLiveCore.ReportHelper
         /// </summary>
         /// <param name="sMessage"></param>
         /// <returns></returns>
-        public bool RefreshTimesheets(out string sMessage, Guid jobUid)
+        public bool RefreshTimesheets(out string sMessage, Guid jobUid,bool consolidationdone)
         {
             var oTimeSheet = new ReportBiz(_siteID);
-            return oTimeSheet.RefreshTimesheet(out sMessage, jobUid);
+            return (consolidationdone ?  oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid):  oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
         }
 
         /// <summary>

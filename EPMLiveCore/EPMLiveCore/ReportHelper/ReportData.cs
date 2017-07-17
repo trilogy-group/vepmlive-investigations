@@ -1178,6 +1178,18 @@ namespace EPMLiveCore.ReportHelper
             return false;
         }
 
+        public void RefreshTimeSheet(Guid siteid, string webtitile, Guid jobid)
+        {
+            _DAO.AddParam("@dbname", _DAO.GetEPMLiveConnection.Database);
+            _DAO.AddParam("@siteuid", siteid);
+            _DAO.AddParam("@RPTTSData", GetSafeTableName("RPTTSData"));
+            _DAO.AddParam("@WebTitle", webtitile);
+            _DAO.AddParam("@jobUid", jobid);
+            _DAO.Command = "spRefreshTimesheet";
+            _DAO.CommandType = CommandType.StoredProcedure;
+            _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
+        }
+
         //Modules created by XJH -- START
         public string GetTableName(Guid listId)
         {

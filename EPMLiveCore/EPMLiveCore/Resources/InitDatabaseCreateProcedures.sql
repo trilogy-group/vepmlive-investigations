@@ -1251,6 +1251,119 @@ END
 
 ')
  
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spRefreshTimesheet')
+begin
+    Print 'Creating Stored Procedure spRefreshTimesheet'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spRefreshTimesheet'
+    SET @createoralter = 'ALTER'
+end
+exec (@createoralter + ' PROCEDURE spRefreshTimesheet 
+	  @dbname  varchar(50),
+	  @siteuid uniqueidentifier,
+	  @RPTTSData varchar(20),
+	  @WebTitle  varchar(20),
+	  @jobUid uniqueidentifier
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+    Declare   @tablecount int = 0
+    Declare   @tstablerowcount int = 0
+    Declare   @SafeRPTDataTableName varchar(20)=''''
+    Declare @colname varchar(255)
+    Declare @cols varchar(MAX)
+
+set @cols = ''''
+exec(''SELECT distinct columnname into ##tempColumn from ''+@dbname+''.dbo.vwmeta where site_id =''''''+ @siteuid+'''''''')
+
+DECLARE colsCursors CURSOR FOR 
+select * from ##tempColumn
+OPEN colsCursors
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+set @cols = @cols + '',['' + @colname + '']''
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+END
+
+CLOSE colsCursors
+DEALLOCATE colsCursors
+
+
+if @cols <> ''''
+begin
+	declare @sql varchar(MAX)
+
+	set @sql = ''SELECT Username, [Resource Name], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - ''''
+ + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] as [Item Notes]''
+
+
+	set @sql = @sql + @cols
+	set @sql = @sql + '', [Item UID], [Timesheet UID] into ##TempTsData FROM ''
+	set @sql = @sql + ''(SELECT Username, [Resource Name], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted],
+ [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [TS_ITEM_NOTES], columnname, columnvalue,site_id
+	FROM ''+@dbname+''.dbo.vwmeta Where hours > 0) ps
+	PIVOT
+	(
+	min (columnvalue)
+	FOR columnname IN
+	(''
+
+	set @sql = @sql + substring(@cols,2,len(@cols)-1)
+
+	set @sql = @sql + '')''
+	set @sql = @sql + '') AS pvt where site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+	
+end
+else
+begin
+
+	set @sql = ''SELECT Username, [Resource Name], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(
+15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] into ##TempTsData from ''+@dbname+''.dbo.vwmeta where hours > 0 and site_id = '' + convert(varchar(50),@siteuid) + ''''
+
+end
+
+
+--print @sql
+--print @cols
+exec(@sql)
+
+set @tstablerowcount =(select  count(*) from ##TempTsData)
+if @tstablerowcount != 0 
+
+begin 
+
+alter table ##TempTsData add rpttsduid uniqueidentifier
+update ##TempTsData set rpttsduid=newid()
+
+INSERT INTO dbo.RPTLog VALUES(null,''TimeSheet'',''Begin deleting existing time sheet data for web: ''+@WebTitle,''Begin deleting existing time sheet data for web: ''+@WebTitle,0,1,getdate(),@jobUid)
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(@RPTTSData) AND type in (N''U''))EXEC(''DROP TABLE ''+@RPTTSData)
+INSERT INTO dbo.RPTLog VALUES(null,''TimeSheet'',''Finished deleting existing time sheet data for web: ''+@WebTitle,''Finished deleting existing time sheet data for web: ''+@WebTitle,0,1,getdate(),@jobUid)
+
+INSERT INTO dbo.RPTLog VALUES(null,''TimeSheet'',''Recreating and Inserting Data into RPTTSData for web: ''+@WebTitle,''Recreating and Inserting Data into RPTTSData for web: ''+@WebTitle,0,1,getdate(),@jobUid)
+exec(''Select * into  ''+@RPTTSData+'' from  ##TempTsData'')
+INSERT INTO dbo.RPTLog VALUES(null,''TimeSheet'',''Finished refreshing time sheet data for web:  ''+@WebTitle,''Recreating RPTTSData for web: ''+@WebTitle,0,1,getdate(),@jobUid)
+--Global Table dropped
+
+END
+ELSe
+Begin
+INSERT INTO dbo.RPTLog VALUES(null,''TimeSheet'',''No time sheet data exists for web:  ''+@WebTitle,''No time sheet data exists for web: ''+@WebTitle,0,1,getdate(),@jobUid)
+END
+Drop table ##tempColumn
+Drop table ##TempTsData
+END')
 
 if not exists (select * from sys.indexes where name = 'ix_listid_itemid')
 begin

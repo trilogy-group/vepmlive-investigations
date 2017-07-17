@@ -215,7 +215,9 @@ namespace EPMLiveReportsAdmin.Jobs
                 try
                 {
                     string err = "";
-                    bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid);
+                    bool consolidationdone;
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveconsolidation"), out consolidationdone);
+                    bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone);
                     if (tErrors)
                         bErrors = true;
                     if (bErrors)
