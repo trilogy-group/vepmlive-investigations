@@ -1,13 +1,13 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Timers;
@@ -54,7 +54,6 @@ namespace WE_QueueMgr
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
                 string basepaths = BuildSitesList();
                 if (!string.IsNullOrEmpty(basepaths))
-
                 {
                     MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
                     m_lExceptionCount = 0;
@@ -211,9 +210,47 @@ namespace WE_QueueMgr
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        private void ServiceTimer_Tick(object sender, System.Timers.ElapsedEventArgs e)
+        private void ServiceTimer_Tick(object sender, ElapsedEventArgs e)
         {
-            timer.Stop();
+            timer.Stop();            
+            try
+            {
+                ManageTimerJobs();
+                ManageQueueJobs();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler("ServiceTimer_Tick", ex);
+            }
+            finally
+            {
+                timer.Start();
+            }
+        }
+
+        private void ManageQueueJobs()
+        {
+            var basePath = messageQueue.Receive();
+            while (!string.IsNullOrEmpty(basePath))
+            {
+                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
+                if (site != null)
+                {
+                    try
+                    {
+                        ManageQueue(site);
+                    }
+                    catch (Exception exception)
+                    {
+                        ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
+                    }
+                }
+                basePath = messageQueue.Receive();
+            }
+        }
+
+        private void ManageTimerJobs()
+        {
             long lMinutes = DateTime.Now.Ticks / 600000000;
             try
             {
@@ -239,35 +276,17 @@ namespace WE_QueueMgr
                             {
                                 ManageTimerJobs(site);
                             }
-                            catch (Exception ex)
+                            catch (Exception exception)
                             {
-                                ExceptionHandler("ServiceTimer_Tick ManageJobs for '" + site + "'", ex);
+                                ExceptionHandler($"ServiceTimer_Tick ManageJobs for '{site}'", exception);
                             }
                         }
                     }
                 }
-                while (true)
-                {
-                    var basePath = messageQueue.Receive();
-                    if(string.IsNullOrEmpty(basePath))
-                    {
-                        break;
-                    }
-                    var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-                    if(site != null)
-                    {
-                        ManageQueue(site);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler("ServiceTimer_Tick", ex);
             }
             finally
             {
                 m_lMinutes = lMinutes;
-                timer.Start();
             }
         }
 
@@ -278,22 +297,11 @@ namespace WE_QueueMgr
                 string sXML = BuildProductInfoString(site);
                 try
                 {
-
-                    Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                    object comObject = Activator.CreateInstance(comObjectType);
-                    object[] myparams = new object[] { "ManageTimerJobs", site.basePath };
-                    string s = (string)comObjectType.InvokeMember("RSVPRequest",
-                                                            BindingFlags.InvokeMethod,
-                                                            null,
-                                                            comObject,
-                                                            myparams);
-
-                    comObject = null;
+                    var s = InvokeComObject(site, "ManageTimerJobs");
                     // added check for non-zero reply status CRL 18JAN13
                     string slc = s.ToLower();
                     if (slc.Contains("<error") || !slc.Contains("<status>0</status>"))
                     {
-
                         new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)100, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageTimerJobs Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                     }
@@ -306,6 +314,7 @@ namespace WE_QueueMgr
                 }
             }
         }
+
         private void ManageQueue(QMSite site)
         {
             if (!string.IsNullOrEmpty(site.basePath))
@@ -314,7 +323,7 @@ namespace WE_QueueMgr
                 {
                     // check the queue for .net items before using RSVP
                     string sXML = BuildProductInfoString(site);
-                    using (PortfolioEngineCore.QueueManager qm = new QueueManager(sXML))
+                    using (var qm = new QueueManager(sXML))
                     {
                         if (qm.ReadNextQueuedItem())
                         {
@@ -332,17 +341,7 @@ namespace WE_QueueMgr
                                         ErrorHandler("ManageQueue Case 200", 98765);
                                         break;
                                     default:
-                                        Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-                                        object comObject = Activator.CreateInstance(comObjectType);
-                                        object[] myparams = new object[] { "ManageQueue", site.basePath };
-                                        string s = (string)comObjectType.InvokeMember("RSVPRequest",
-                                                                    BindingFlags.
-                                                                        InvokeMethod,
-                                                                    null,
-                                                                    comObject,
-                                                                    myparams);
-
-                                        comObject = null;
+                                        var s = InvokeComObject(site, "ManageQueue");
                                         if (s.Contains("<Error"))
                                         {
                                             new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
@@ -351,7 +350,6 @@ namespace WE_QueueMgr
                                         break;
                                 }
                             }
-
                         }
                     }
 
@@ -364,6 +362,7 @@ namespace WE_QueueMgr
                 }
             }
         }
+
         private string BuildProductInfoString(QMSite site)
         {
             CStruct xEPKServer = new CStruct();
@@ -381,6 +380,7 @@ namespace WE_QueueMgr
 
             return xEPKServer.XML();
         }
+
         private void ExceptionHandler(string sLocation, Exception ex)
         {
             // don't flood the event log with exceptions
@@ -414,6 +414,26 @@ namespace WE_QueueMgr
             catch (Exception ex)
             {
                 ExceptionHandler("MessageHandler - " + sContext + sLocation, ex);
+            }
+        }
+
+        private string InvokeComObject(QMSite site, string job)
+        {
+            object comObject = null;
+            try
+            {
+                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
+                comObject = Activator.CreateInstance(comObjectType);
+                object[] myparams = new object[] { job, site.basePath };
+                return (string)comObjectType.InvokeMember("RSVPRequest",
+                                                        BindingFlags.InvokeMethod,
+                                                        null,
+                                                        comObject,
+                                                        myparams);
+            }
+            finally
+            {
+                comObject = null;
             }
         }
 
