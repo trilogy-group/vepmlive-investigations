@@ -77,8 +77,9 @@ namespace SyncSubscriptions
             new DirectoryInfo(options.BackupPath).GetFiles()?.ToList().ForEach(file => 
             {
                 WriteToConsole();
-                WriteToConsole($"File: {file.Name}");
+                WriteToConsole($"File: {file.Name}");                
                 var subsList = XmlUtil.ReadFromXmlFile<List<SubscriptionProperties>>(file.FullName);
+                WriteToConsole($"Site URL: {((subsList != null && subsList.Any()) ? subsList.First().SitePath : string.Empty)}");
 
                 WriteToConsole($"   - Subscriptions found: {(subsList != null ? subsList.Count() : 0)}");
 
