@@ -20,6 +20,7 @@ namespace PortfolioEngineCore
 		protected int _port;
 		protected string _session;
 		protected DBAccess _dba;
+        protected string _queueAddress;
 
 		#endregion Fields
 
@@ -40,7 +41,8 @@ namespace PortfolioEngineCore
 			string pid = xBaseInfo.GetString("pid");
 			string company = xBaseInfo.GetString("company");
 			string dbcnstring = xBaseInfo.GetString("dbcnstring");
-			_port = xBaseInfo.GetInt("port");
+            _queueAddress = xBaseInfo.GetString("queueaddress");
+            _port = xBaseInfo.GetInt("port");
 			_session = xBaseInfo.GetString("session");
 
 			PFEBaseCommon(basepath, username, pid, company, dbcnstring, secLevel, bDebug);

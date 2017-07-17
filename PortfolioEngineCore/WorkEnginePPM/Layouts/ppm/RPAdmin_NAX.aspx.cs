@@ -155,7 +155,7 @@ Exit_Function:
                 xQueue.CreateString("Context", "Edit Calendar");
                 xQueue.CreateString("Comment", "Calculate Availability");
                 xQueue.CreateString("Data", "No Context Data");
-                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), da.QueueAddress, da.BasePath);
             }
             dba.Close();
         }

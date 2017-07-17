@@ -60,7 +60,7 @@ namespace WorkEnginePPM
             context.Response.Write(CStruct.ConvertXMLToJSON(s));
         }
 
-        public static string PostCostValuesRequest(HttpContext Context, string sRequestContext, CStruct xData)
+        public static string PostCostValuesRequest(HttpContext Context, string sRequestContext, CStruct xData, string queueAddress, string basePath)
         {
             string sReply = "";
             try
@@ -87,7 +87,7 @@ namespace WorkEnginePPM
                             DBAccess dba = da.dba;
                             if (dba.Open() == StatusEnum.rsSuccess)
                             {
-                                sReply = PostCostValues(dba, xData);
+                                sReply = PostCostValues(dba, xData, queueAddress, basePath);
                             }
                             dba.Close();
                             break;
@@ -136,7 +136,7 @@ namespace WorkEnginePPM
             return sReply;
         }
 
-        private static string PostCostValues(DBAccess dba, CStruct xData)
+        private static string PostCostValues(DBAccess dba, CStruct xData, string queueAddress, string basePath)
         {
             string sReply = "";
             int nCTId = xData.GetIntAttr("CT_ID");
@@ -209,7 +209,7 @@ namespace WorkEnginePPM
                 xCT.CreateIntAttr("Id", nCTId);
 
                 xQueue.CreateString("Data", xRequest.XML());
-                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), queueAddress, basePath);
 
             }
 
