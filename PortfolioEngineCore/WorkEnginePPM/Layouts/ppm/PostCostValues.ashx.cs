@@ -157,7 +157,7 @@ namespace WorkEnginePPM
                 xCBCT.CreateIntAttr("CTID", nCTId);
                 xCBCT.CreateIntAttr("CBID", nCBId);
                 int lRowsAffected;
-                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), out lRowsAffected);
+                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), queueAddress, basePath, out lRowsAffected);
             }
             else if (lMethod == 1)
             {
