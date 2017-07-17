@@ -94,18 +94,19 @@
   <ItemGroup>
     <Compile Include="LogService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service1.cs">
+    <Compile Include="QMSite.cs" />
+    <Compile Include="PPMWorkEngineQueueService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Service1.Designer.cs">
-      <DependentUpon>Service1.cs</DependentUpon>
+    <Compile Include="PPMWorkEngineQueueService.Designer.cs">
+      <DependentUpon>PPMWorkEngineQueueService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Service1.resx">
+    <EmbeddedResource Include="PPMWorkEngineQueueService.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>Service1.cs</DependentUpon>
+      <DependentUpon>PPMWorkEngineQueueService.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -132,12 +133,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
