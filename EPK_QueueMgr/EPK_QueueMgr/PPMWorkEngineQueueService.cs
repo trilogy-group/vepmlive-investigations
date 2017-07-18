@@ -251,10 +251,10 @@ namespace WE_QueueMgr
 
         private void ManageTimerJobs()
         {
-            long lMinutes = DateTime.Now.Ticks / 600000000;
+            var lMinutes = DateTime.Now.Ticks / 600000000;
             try
             {
-                bool bNewMinute = (lMinutes != m_lMinutes);
+                var bNewMinute = (lMinutes != m_lMinutes);
                 if (bNewMinute)
                 {
                     m_lElapsedMinutes++;
@@ -422,9 +422,9 @@ namespace WE_QueueMgr
             object comObject = null;
             try
             {
-                Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
+                var comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                 comObject = Activator.CreateInstance(comObjectType);
-                object[] myparams = new object[] { job, site.basePath };
+                var myparams = new object[] { job, site.basePath };
                 return (string)comObjectType.InvokeMember("RSVPRequest",
                                                         BindingFlags.InvokeMethod,
                                                         null,
