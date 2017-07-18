@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.ServiceProcess;
 using System.Diagnostics;
-using System.Text;
-using PortfolioEngineCore;
-using System.Configuration;
+using System.ServiceProcess;
 
 namespace WE_QueueMgr
 {
@@ -17,7 +13,9 @@ namespace WE_QueueMgr
         {
             try
             {
-                Global.Instance.Start();
+                var version = AssemblyInfo.Version();
+                EventLog.WriteEntry("PfE Queue Manager - " + version, "", EventLogEntryType.Information);
+                ServiceBase.Run(new ServiceBase[] { Global.Instance });
             }
             catch (Exception ex)
             {

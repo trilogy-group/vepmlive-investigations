@@ -2,7 +2,6 @@ using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -19,7 +18,6 @@ namespace WE_QueueMgr
     public partial class PPMWorkEngineQueueService : ServiceBase
     {
         private ServiceHost serviceHost = null;
-        System.Threading.ManualResetEvent ms = new System.Threading.ManualResetEvent(false);
         private Timer timer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
         private long m_lMinutes;
@@ -443,12 +441,6 @@ namespace WE_QueueMgr
             {
                 comObject = null;
             }
-        }
-
-        internal void Start()
-        {
-            OnStart(null);
-            ms.WaitOne();
         }
     }
 }
