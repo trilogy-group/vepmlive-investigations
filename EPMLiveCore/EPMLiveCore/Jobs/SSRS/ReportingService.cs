@@ -2,10 +2,9 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Claims;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
@@ -13,34 +12,21 @@ namespace EPMLiveCore.Jobs.SSRS
     public class ReportingService : IReportingService
     {
         private readonly string siteCollectionId;
-        private readonly ReportingService2010Extended client;
-        private List<CatalogItem> dataSources;
+        private readonly ReportingService2010 client;
 
         public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
-            client = new ReportingService2010Extended()
-            {
-                Url = reportServerUrl
-            };
-            if (authenticationType == "WindowsAuthentication")
-            {
-                client.Credentials = new NetworkCredential(username, password);
-            }
-            else if (authenticationType == "FormsBasedAuthentication")
-            {
-                client.LogonUser(username, password, null);
-            }
+            client = GetClient(username, password, reportServerUrl, authenticationType);
             this.siteCollectionId = siteCollectionId.ToString();
         }
 
         public static IReportingService GetInstance(SPSite site)
         {
-            var reportServerUrl = CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportingServicesURL") + "ReportService2010.asmx";
-            var authInfo = site.WebApplication.GetChild<ReportAuth>("ReportAuth");
-            var username = authInfo.Username;
-            var password = CoreFunctions.Decrypt(authInfo.Password, "KgtH(@C*&@Dhflosdf9f#&f");
-            var authenticationType = bool.Parse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsWindowsAuthentication")) == true ? "WindowsAuthentication" : "FormsBasedAuthentication";
-            return new ReportingService(username, password, reportServerUrl, authenticationType, site.ID);
+            return new ReportingService(Convert.ToString(site.WebApplication.Properties["SSRSAdminUsername"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAdminPassword"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSReportServerUrl"]),
+                                                                                Convert.ToString(site.WebApplication.Properties["SSRSAuthenticationType"]),
+                                                                                site.ID);
         }
 
         public void CreateSiteCollectionMappedFolder()
@@ -60,24 +46,21 @@ namespace EPMLiveCore.Jobs.SSRS
                 var errors = string.Empty;
                 var spQuery = new SPQuery()
                 {
-                    Query = "<Where><And><Eq><FieldRef Name='FSObjType' /><Value Type='Integer'>0</Value></Eq><Neq><FieldRef Name='Synchronized' /><Value Type='Boolean'>1</Value></Neq></And></Where>",
-                    ViewAttributes = "Scope=\"RecursiveAll\""
+                    Query = "<Where><Neq><FieldRef Name='Synchronized' /><Value Type='Boolean'>true</Value></Neq></Where>"
                 };
-                var items = reportLibrary.GetItems(spQuery).OfType<SPListItem>().OrderByDescending(x => new FileInfo(x.File.Name).Extension).ToList();
-                foreach (SPListItem item in items)
+                foreach (SPListItem item in reportLibrary.GetItems(spQuery))
                 {
                     var reportItem = new ReportItem()
                     {
                         FileName = item.File.Name,
                         LastModified = item.File.TimeLastModified,
-                        Folder = item.File.ParentFolder.Url,
-                        BinaryData = item.File.OpenBinary(),
-                        DatasourceCredentials = item.File.Name.ToLower().EndsWith(".rsds") ? CoreFunctions.Decrypt(Convert.ToString(item["Datasource Credentials"]), "FpUagQ2RG9") : null
+                        Folder = item.File.ParentFolder.Url.Replace("Report Library", "").Replace("//", ""),
+                        BinaryData = item.File.OpenBinary()
                     };
                     try
                     {
-                        CreateFoldersIfNotExist(siteCollectionId.ToString(), reportItem.Folder);
-                        UploadReport(siteCollectionId.ToString(), reportItem);
+                        CreateFoldersIfNotExist(client, siteCollectionId.ToString(), reportItem.Folder);
+                        UploadReport(client, siteCollectionId.ToString(), reportItem);
                         item["Synchronized"] = true;
                         item["UpdatedBy"] = "RS";
                         item.SystemUpdate();
@@ -88,7 +71,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     }
                 }
 
-                if (!string.IsNullOrEmpty(errors))
+                if (string.IsNullOrEmpty(errors))
                 {
                     throw new Exception(errors);
                 }
@@ -99,7 +82,7 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             var report = data.Split(':')[1];
             var folder = data.Split(':')[2];
-            client.DeleteItem($"/{siteCollectionId.ToString()}{folder}/{report}");
+            client.DeleteItem($"/{siteCollectionId.ToString()}{folder.Replace("Report Library", "")}/{report}");
         }
 
         public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
@@ -110,7 +93,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 var errors = string.Empty;
                 try
                 {
-                    AssignSsrsRole(groups, userList, roles.GetRole("Content Manager"), "Administrators");
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Content Manager"), "Administrators");
                 }
                 catch (Exception exception)
                 {
@@ -118,15 +101,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 }
                 try
                 {
-                    AssignSsrsRole(groups, userList, roles.GetRole("Report Builder"), "Administrators");
-                }
-                catch (Exception exception)
-                {
-                    errors += exception.ToString();
-                }
-                try
-                {
-                    AssignSsrsRole(groups, userList, roles.GetRole("Browser"), "Report Viewers");
+                    AssignSsrsRole(groups, userList, client, roles.GetRole("Browser"), "Report Viewers");
                 }
                 catch (Exception exception)
                 {
@@ -145,7 +120,7 @@ namespace EPMLiveCore.Jobs.SSRS
             var group = data.Split('~')[2];
             bool inheritParent;
             var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
-            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value.Split('\\').Last();
+            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
             var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
             if (existingRole != null)
             {
@@ -207,7 +182,7 @@ namespace EPMLiveCore.Jobs.SSRS
             string desc, status, eventtype, matchdata;
             ParameterValue[] reportparams;
             ActiveState acs;
-
+                       
             var owner = client.GetSubscriptionProperties(subscriptionID, out extset, out desc, out acs,
                 out status, out eventtype, out matchdata, out reportparams);
 
@@ -238,7 +213,7 @@ namespace EPMLiveCore.Jobs.SSRS
             return string.Empty;
         }
 
-        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, Role role, string spRole)
+        private void AssignSsrsRole(SPGroupCollection groups, SPList userList, ReportingService2010 client, Role role, string spRole)
         {
             string errors = string.Empty;
             var reportViewers = groups.GetByName(spRole);
@@ -250,7 +225,7 @@ namespace EPMLiveCore.Jobs.SSRS
                     if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                         && user.Name != "System Account")
                     {
-                        AssignRole(role, user.LoginName);
+                        AssignRole(client, role, user.LoginName);
                         extendedList["Synchronized"] = true;
                         extendedList.SystemUpdate();
                     }
@@ -266,7 +241,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void AssignRole(Role role, string loginName)
+        private void AssignRole(ReportingService2010 client, Role role, string loginName)
         {
             bool inheritParent;
             var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
@@ -276,7 +251,7 @@ namespace EPMLiveCore.Jobs.SSRS
             {
                 policies.Add(new Policy
                 {
-                    GroupUserName = loginName.Split('\\').Last(),
+                    GroupUserName = loginName,
                     Roles = new Role[] { role }
                 });
             }
@@ -290,67 +265,55 @@ namespace EPMLiveCore.Jobs.SSRS
             client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
         }
 
-        private void UploadReport(string siteCollectionId, ReportItem report)
+        private ReportingService2010 GetClient(string username, string password, string reportServerUrl, string authenticationType)
+        {
+            var client = new ReportingService2010()
+            {
+                Url = reportServerUrl
+            };
+            if (authenticationType == "WindowsAuthentication")
+            {
+                client.Credentials = new NetworkCredential(username, password);
+            }
+            else if (authenticationType == "FormsBasedAuthentication")
+            {
+                client.LogonUser(username, password, null);
+            }
+            return client;
+        }
+
+        private void UploadReport(ReportingService2010 service, string siteCollectionId, ReportItem report)
         {
             Warning[] warnings;
             if (report.FileName.ToLower().EndsWith(".rdl"))
             {
-                if (dataSources == null)
-                {
-                    dataSources = client.ListChildren($"/{siteCollectionId}", true).Where(x => x.TypeName == "DataSource").ToList();
-                }
-                var catalogItem = client.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}/{report.Folder}", true, report.BinaryData, null, out warnings);
-                var reportDatasources = client.GetItemDataSources(catalogItem.Path);
-                var itemRefs = new List<ItemReference>();
-                foreach (DataSource reportDatasource in reportDatasources)
-                {
-                    if (reportDatasource.Item.GetType() == typeof(InvalidDataSourceReference))
-                    {
-                        var existingDatasource = dataSources.Where(x => x.Name == reportDatasource.Name + ".rsds").First();
-                        var itemRef = new ItemReference()
-                        {
-                            Name = reportDatasource.Name,
-                            Reference = existingDatasource.Path
-                        };
-                        itemRefs.Add(itemRef);
-                    }
-                }
-                client.SetItemReferences(catalogItem.Path, itemRefs.ToArray());
+                service.CreateCatalogItem("Report", report.FileName, $"/{siteCollectionId}{report.Folder}", true, report.BinaryData, null, out warnings);
             }
             else if (report.FileName.ToLower().EndsWith(".rsds"))
             {
                 var doc = new XmlDocument();
-                using (var memoryStream = new MemoryStream(report.BinaryData))
+                doc.LoadXml(Encoding.UTF8.GetString(report.BinaryData));
+                var definition = new DataSourceDefinition()
                 {
-                    doc.Load(memoryStream);
-                    var definition = new DataSourceDefinition()
-                    {
-                        CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
-                        ConnectString = doc.GetStringValue("/m:DataSourceDefinition/m:ConnectString"),
-                        Enabled = doc.GetBooleanValue("/m:DataSourceDefinition/m:Enabled"),
-                        Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
-                        ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
-                        OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
-                        Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
-                        UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
-                        WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials"),
-                        UserName = "",
-                        Password = ""
-                    };
-                    if (!string.IsNullOrEmpty(report.DatasourceCredentials))
-                    {
-                        var parts = report.DatasourceCredentials.Split(':');
-                        definition.UserName = parts[0].Trim();
-                        definition.Password = parts[1].Trim();
-                    }
-                    client.CreateDataSource(report.FileName, $"/{siteCollectionId}/{report.Folder}", true, definition, null);
-                }
+                    CredentialRetrieval = (CredentialRetrievalEnum)Enum.Parse(typeof(CredentialRetrievalEnum), doc.GetStringValue("/m:DataSourceDefinition/m:CredentialRetrieval")),
+                    ConnectString = doc.GetStringValue("/m:DataSourceDefinition/m:ConnectString"),
+                    Enabled = doc.GetBooleanValue("/m:DataSourceDefinition/m:Enabled"),
+                    Extension = doc.GetStringValue("/m:DataSourceDefinition/m:Extension"),
+                    ImpersonateUser = doc.GetBooleanValue("/m:DataSourceDefinition/m:ImpersonateUser"),
+                    OriginalConnectStringExpressionBased = doc.GetBooleanValue("/m:DataSourceDefinition/m:OriginalConnectStringExpressionBased"),
+                    Password = doc.GetStringValue("/m:DataSourceDefinition/m:Password"),
+                    Prompt = doc.GetStringValue("/m:DataSourceDefinition/m:Prompt"),
+                    UseOriginalConnectString = doc.GetBooleanValue("/m:DataSourceDefinition/m:UseOriginalConnectString"),
+                    UserName = doc.GetStringValue("/m:DataSourceDefinition/m:UserName"),
+                    WindowsCredentials = doc.GetBooleanValue("/m:DataSourceDefinition/m:WindowsCredentials")
+                };
+                service.CreateDataSource(report.FileName, $"/{siteCollectionId}{report.Folder}", true, definition, null);
             }
         }
 
-        private void CreateFoldersIfNotExist(string siteCollectionId, string folder)
+        private void CreateFoldersIfNotExist(ReportingService2010 service, string siteCollectionId, string folder)
         {
-            var children = client.ListChildren($"/{siteCollectionId}", true).ToList();
+            var children = service.ListChildren($"/{siteCollectionId}", true).ToList();
             var folders = folder.Split('/').ToList();
             var folderToCheck = $"/{siteCollectionId}";
             for (int i = 0; i < folders.Count; i++)
@@ -361,8 +324,8 @@ namespace EPMLiveCore.Jobs.SSRS
                     folderToCheck += $"/{folders[i]}";
                     if (!children.Exists(x => x.Path == folderToCheck))
                     {
-                        client.CreateFolder(folders[i], parentFolder, null);
-                        children = client.ListChildren($"/{siteCollectionId}", true).ToList();
+                        service.CreateFolder(folders[i], parentFolder, null);
+                        children = service.ListChildren($"/{siteCollectionId}", true).ToList();
                     }
                 }
             }
