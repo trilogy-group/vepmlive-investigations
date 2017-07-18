@@ -66,7 +66,8 @@ namespace WorkEnginePPM
             string basePath, username, pid, company, dbcnstring;
             SecurityLevels secLevel;
             CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
-            var xEPKServer = new CStruct();
+
+            CStruct xEPKServer = new CStruct();
             xEPKServer.Initialize("BaseInfo");
             xEPKServer.CreateString("basepath", basePath);
             xEPKServer.CreateString("username", username);
@@ -75,6 +76,7 @@ namespace WorkEnginePPM
             xEPKServer.CreateString("dbcnstring", dbcnstring);
             xEPKServer.CreateInt("port", context.Request.Url.Port);
             xEPKServer.CreateString("session", GetSPSessionString(context, "SessionInfo"));
+
             return xEPKServer.XML();
         }
 

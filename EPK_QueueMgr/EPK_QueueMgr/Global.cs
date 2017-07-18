@@ -1,18 +1,26 @@
 ﻿namespace WE_QueueMgr
 {
-    public class Global
+    public sealed class Global
     {
-        private static PPMWorkEngineQueueService _instance;
+        private static PPMWorkEngineQueueService instance;
+
+        static Global()
+        {
+        }
+
+        private Global()
+        {
+        }
 
         public static PPMWorkEngineQueueService Instance
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new PPMWorkEngineQueueService();
+                    instance = new PPMWorkEngineQueueService();
                 }
-                return _instance;
+                return instance;
             }
         }
     }

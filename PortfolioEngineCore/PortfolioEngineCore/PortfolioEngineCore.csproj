@@ -173,7 +173,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="EPMLiveLists.snk" />
     <None Include="Resources\01_PE_CRTTBLS.sql" />
     <None Include="Service References\ND\NotificationDispatcher.wsdl" />

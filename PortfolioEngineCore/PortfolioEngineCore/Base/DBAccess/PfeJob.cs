@@ -10,9 +10,7 @@
         public int Queue(IDbRepository dbRepository, IMessageQueue messageQueue, string basePath)
         {
             var rowsAffected = dbRepository.QueuePfeJob(this);
-
             messageQueue.Queue(basePath);
-
             return rowsAffected;
         }
     }

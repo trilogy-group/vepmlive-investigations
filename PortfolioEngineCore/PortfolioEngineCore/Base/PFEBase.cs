@@ -171,12 +171,29 @@ namespace PortfolioEngineCore
             }
         }
 
-        public string BasePath => _basepath;
+        public string BasePath
+        {
+            get
+            {
+                return _basepath;
+            }
+        }
 
-        public string UserName => _username;
+        public string UserName
+        {
+            get
+            {
+                return _username;
+            }
+        }
 
-        public int UserId => _userWResID;
-
+        public int UserId
+        {
+            get
+            {
+                return _userWResID;
+            }
+        }
         #endregion Properties
     }
 }
