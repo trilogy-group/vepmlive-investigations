@@ -163,8 +163,9 @@ $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
 
-Log-Section "Downloading Nuget . . ."
-$nugetPath = $SourcesDirectory + "\nuget.exe"
+#Log-Section "Downloading Nuget . . ."
+$nugetPath = $SourcesDirectory + "\.nuget\nuget.exe"
+#& $nugetPath update -self
 Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
 
 Log-Section "Restoring missing packages . . ."
@@ -172,6 +173,7 @@ Log-Section "Restoring missing packages . . ."
 & $nugetPath restore "$SourcesDirectory\Saas\EPMLive.Saas"
 & $nugetPath restore "$SourcesDirectory\Saas\EPMLiveAccountManagement"
 & $nugetPath restore "$SourcesDirectory\ProjectPublisher2016"
+& $nugetPath restore "$SourcesDirectory\EPMLiveCore"
 
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
