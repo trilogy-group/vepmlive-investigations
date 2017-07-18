@@ -27,17 +27,6 @@ namespace WorkEnginePPM
             }
         }
 
-        /// <summary>
-        /// Reads pfe queue address from web application property bag.
-        /// </summary>
-        public static string GetQueueAddress()
-        {
-            using (var site = new SPSite(SPContext.Current.Web.Site.ID))
-            {
-                return CoreFunctions.getWebAppSetting(site.WebApplication.Id, "PfeQueueAddress");
-            }
-        }
-
         public static void CapturePFEBaseInfo(SPWeb web, out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel)
         {
             secLevel = SecurityLevels.Base;
@@ -84,7 +73,6 @@ namespace WorkEnginePPM
             xEPKServer.CreateString("pid", pid);
             xEPKServer.CreateString("company", company);
             xEPKServer.CreateString("dbcnstring", dbcnstring);
-            xEPKServer.CreateString("queueaddress", GetQueueAddress());
             xEPKServer.CreateInt("port", context.Request.Url.Port);
             xEPKServer.CreateString("session", GetSPSessionString(context, "SessionInfo"));
             return xEPKServer.XML();

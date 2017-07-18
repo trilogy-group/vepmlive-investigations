@@ -297,7 +297,7 @@ namespace WorkEnginePPM
                             DBAccess dba = da.dba;
                             if (dba.Open() == StatusEnum.rsSuccess)
                             {
-                                sReply = PostCostValues(dba, xData, da.QueueAddress, da.BasePath);
+                                sReply = PostCostValues(dba, xData, da.BasePath);
                             }
                             dba.Close();
                             break;
@@ -732,7 +732,7 @@ namespace WorkEnginePPM
             return sReply;
         }
 
-        private static string PostCostValues(DBAccess dba, CStruct xData, string queueAddress, string basePath)
+        private static string PostCostValues(DBAccess dba, CStruct xData, string basePath)
         {
             string sReply = "";
             int nCTId = xData.GetIntAttr("CT_ID");
@@ -753,7 +753,7 @@ namespace WorkEnginePPM
                 xCBCT.CreateIntAttr("CTID", nCTId);
                 xCBCT.CreateIntAttr("CBID", nCBId);
                 int lRowsAffected;
-                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), queueAddress, basePath, out lRowsAffected);
+                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), basePath, out lRowsAffected);
             }
             else if (lMethod == 1)
             {
@@ -805,7 +805,7 @@ namespace WorkEnginePPM
                 xCT.CreateIntAttr("Id", nCTId);
 
                 xQueue.CreateString("Data", xRequest.XML());
-                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), queueAddress, basePath);
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), basePath);
 
             }
 

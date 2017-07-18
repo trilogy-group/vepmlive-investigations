@@ -1023,7 +1023,7 @@ namespace PortfolioEngineCore
             return bResult;
         }
 
-        public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData, string queueAddress, string basePath)
+        public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData, string basePath)
         {
             bool bResult = false;
             CStruct xData = new CStruct();
@@ -1043,7 +1043,7 @@ namespace PortfolioEngineCore
                     Comment = xData.GetString("Comment", "Job Request"),
                     ContextData = xData.GetString("Data", "No Context Data")
                 };
-                job.Queue(new DbRepository(dba), new Msmq(queueAddress), basePath);
+                job.Queue(new DbRepository(dba), new Msmq(), basePath);
             }
             catch (Exception ex)
             {

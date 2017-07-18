@@ -3,7 +3,5 @@
     public interface IMessageQueue
     {
         void Queue(string basePath);
-
-        string Receive();
     }
 }

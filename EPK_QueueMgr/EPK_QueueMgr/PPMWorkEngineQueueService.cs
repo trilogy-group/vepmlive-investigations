@@ -9,13 +9,16 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.ServiceModel;
 using System.ServiceProcess;
 using System.Timers;
+using WE_QueueMgr.MsmqIntegration;
 
 namespace WE_QueueMgr
 {
     public partial class PPMWorkEngineQueueService : ServiceBase
     {
+        private ServiceHost serviceHost = null;
         System.Threading.ManualResetEvent ms = new System.Threading.ManualResetEvent(false);
         private Timer timer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
@@ -39,7 +42,7 @@ namespace WE_QueueMgr
                 timer = new Timer(interval);
                 timer.Elapsed += new ElapsedEventHandler(ServiceTimer_Tick);
 
-                messageQueue = new Msmq(ConfigurationManager.AppSettings["QueueAddress"]);
+                messageQueue = new Msmq();
             }
             catch (Exception ex)
             {
@@ -75,6 +78,12 @@ namespace WE_QueueMgr
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     timer.Start();
+                    if (serviceHost != null)
+                    {
+                        serviceHost.Close();
+                    }
+                    serviceHost = new ServiceHost(typeof(NotificationDispatcher));
+                    serviceHost.Open();
                 }
                 else
                 {
@@ -195,6 +204,11 @@ namespace WE_QueueMgr
         {
             timer.AutoReset = false;
             timer.Enabled = false;
+            if (serviceHost != null)
+            {
+                serviceHost.Close();
+                serviceHost = null;
+            }
             MessageHandler("Stop", "OnStop", "Exceptions: " + m_lExceptionCount.ToString());
         }
 
@@ -216,7 +230,6 @@ namespace WE_QueueMgr
             try
             {
                 ManageTimerJobs();
-                ManageQueueJobs();
             }
             catch (Exception ex)
             {
@@ -228,24 +241,19 @@ namespace WE_QueueMgr
             }
         }
 
-        private void ManageQueueJobs()
+        public void ManageQueueJobs(string basePath)
         {
-            var basePath = messageQueue.Receive();
-            while (!string.IsNullOrEmpty(basePath))
+            var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
+            if (site != null)
             {
-                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-                if (site != null)
+                try
                 {
-                    try
-                    {
-                        ManageQueue(site);
-                    }
-                    catch (Exception exception)
-                    {
-                        ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
-                    }
+                    ManageQueue(site);
                 }
-                basePath = messageQueue.Receive();
+                catch (Exception exception)
+                {
+                    ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
+                }
             }
         }
 

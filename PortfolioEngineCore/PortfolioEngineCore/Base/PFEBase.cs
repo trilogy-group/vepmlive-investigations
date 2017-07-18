@@ -20,7 +20,6 @@ namespace PortfolioEngineCore
         protected int _port;
         protected string _session;
         protected DBAccess _dba;
-        protected string _queueAddress;
 
         #endregion Fields
 
@@ -41,7 +40,6 @@ namespace PortfolioEngineCore
             string pid = xBaseInfo.GetString("pid");
             string company = xBaseInfo.GetString("company");
             string dbcnstring = xBaseInfo.GetString("dbcnstring");
-            _queueAddress = xBaseInfo.GetString("queueaddress");
             _port = xBaseInfo.GetInt("port");
             _session = xBaseInfo.GetString("session");
 
@@ -178,8 +176,6 @@ namespace PortfolioEngineCore
         public string UserName => _username;
 
         public int UserId => _userWResID;
-
-        public string QueueAddress => _queueAddress;
 
         #endregion Properties
     }

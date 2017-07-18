@@ -1,40 +1,18 @@
-﻿using System;
-using System.Messaging;
+﻿using System.Transactions;
 
 namespace PortfolioEngineCore
 {
     public class Msmq : IMessageQueue
     {
-        private readonly string address;
-        private readonly MessageQueue queue;
-
-        public Msmq(string queueAddress)
-        {
-            address = queueAddress;
-            queue = new MessageQueue(queueAddress);
-        }
-
         public void Queue(string basePath)
         {
-            queue.Send(basePath);
-        }
-
-        public string Receive()
-        {
-            try
+            var client = new ND.NotificationDispatcherClient();
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required))
             {
-                var message = queue.Receive(new TimeSpan(0, 0, 1));
-                message.Formatter = new XmlMessageFormatter(new string[] { "System.String, mscorlib" });
-                return message.Body.ToString();
+                client.QueueNotification(new ND.Notification() { BasePath = basePath });
+                scope.Complete();
             }
-            catch (Exception exception)
-            {
-                if (exception.Message == "Timeout for the requested operation has expired.")
-                {
-                    return string.Empty;
-                }
-                throw;                
-            }
+            client.Close();
         }
     }
 }

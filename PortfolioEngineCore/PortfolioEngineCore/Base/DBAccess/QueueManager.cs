@@ -54,7 +54,7 @@ namespace PortfolioEngineCore
 
         }
 
-        public static StatusEnum PostCostValues(DBAccess databaseAccess, string jobComment, string jobContextData, string queueAddress, string basePath, out int rowsAffected)
+        public static StatusEnum PostCostValues(DBAccess databaseAccess, string jobComment, string jobContextData, string basePath, out int rowsAffected)
         {
             var job = new PfeJob()
             {
@@ -64,11 +64,11 @@ namespace PortfolioEngineCore
                 Comment = jobComment,
                 ContextData = jobContextData
             };
-            rowsAffected = job.Queue(new DbRepository(databaseAccess), new Msmq(queueAddress), basePath);
+            rowsAffected = job.Queue(new DbRepository(databaseAccess), new Msmq(), basePath);
             return StatusEnum.rsSuccess;
         }
 
-        public static StatusEnum QueueTestJob(DBAccess dba, string queueAddress, string basePath)
+        public static StatusEnum QueueTestJob(DBAccess dba, string basePath)
         {
             var job = new PfeJob()
             {
@@ -78,7 +78,7 @@ namespace PortfolioEngineCore
                 Comment = "Test Job",
                 ContextData = ""
             };
-            job.Queue(new DbRepository(dba), new Msmq(queueAddress), basePath);
+            job.Queue(new DbRepository(dba), new Msmq(), basePath);
             return StatusEnum.rsSuccess;
         }
 

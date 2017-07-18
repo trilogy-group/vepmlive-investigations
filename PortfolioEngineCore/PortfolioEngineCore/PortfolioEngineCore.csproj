@@ -44,6 +44,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -100,6 +103,7 @@
     <Compile Include="Base\Internal.cs" />
     <Compile Include="Base\MessageQueue\IMessageQueue.cs" />
     <Compile Include="Base\MessageQueue\Msmq.cs" />
+    <Compile Include="Base\MessageQueue\Notification.cs" />
     <Compile Include="Base\PFEBase.cs" />
     <Compile Include="Base\PFEError.cs" />
     <Compile Include="Base\PFEException.cs" />
@@ -141,6 +145,11 @@
     <Compile Include="Resources\ResourceSelector.cs" />
     <Compile Include="Resources\RPEditorData.cs" />
     <Compile Include="Resources\RPEditorResources.cs" />
+    <Compile Include="Service References\ND\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Services\DataServices\Contracts\IDataServiceModule.cs" />
     <Compile Include="Services\DataServices\Controller.cs" />
     <Compile Include="Services\DataServices\Core\ActionKind.cs" />
@@ -164,8 +173,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="EPMLiveLists.snk" />
     <None Include="Resources\01_PE_CRTTBLS.sql" />
+    <None Include="Service References\ND\NotificationDispatcher.wsdl" />
+    <None Include="Service References\ND\notificationdispatcher.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\ND\notificationdispatcher1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\ND\notificationdispatcher2.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\02_PE_CRTINDS.sql" />
@@ -184,6 +204,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\06_PE_DATA.txt" />
+    <None Include="Service References\ND\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\ND\configuration.svcinfo" />
+    <None Include="Service References\ND\configuration91.svcinfo" />
+    <None Include="Service References\ND\notificationdispatcher.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\ND\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
