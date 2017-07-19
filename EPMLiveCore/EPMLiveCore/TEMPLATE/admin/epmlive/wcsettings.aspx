@@ -261,7 +261,8 @@
 		    <b>Default Path:</b> By default the reports are installed on the root of Reporting Services and do not require configuration. If you have installed in a non-default location you will need to 
 		    specify that here.<br /><br />
 		    <b>Use Integrated Mode:</b> Select this option if your SQL Server Reporting Services uses SharePoint Integrated Mode.<br /><br />
-		    <b>Username/Password:</b> If you have multiple WFE's or your SSRS is not installed on your WFE, you will need to specify the web application account credentials here. These credentials will be used to authenticate to SSRS.<br /><br />
+		    <b>Username/Password:</b> If you have multiple WFE's or your SSRS is not installed on your WFE, you will need to specify the web application account credentials here. These credentials will be used to authenticate to SSRS.<br /><br /><br /><br />
+            <b>Use Windows Authentication:</b> Check if windows authentication is to be used. Uncheck if forms based authentication is to be used.<br /><br />
 		</Template_Description>
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="URL:" runat="server" width="100%">
@@ -287,6 +288,11 @@
             <wssuc:InputFormControl LabelText="Password:" runat="server" width="100%">
 				 <Template_Control>
 				    <asp:TextBox ID="txtPassword" runat="server" CssClass="ms-input" TextMode=Password></asp:TextBox>
+				 </Template_Control>
+		    </wssuc:InputFormControl>
+            <wssuc:InputFormControl LabelText="Use Windows Authentication:" runat="server" width="100%">
+				 <Template_Control>
+				    <asp:CheckBox ID="chkWindowsAuth" runat="server" />
 				 </Template_Control>
 		    </wssuc:InputFormControl>
 		</Template_InputFormControls>
