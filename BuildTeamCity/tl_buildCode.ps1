@@ -185,7 +185,7 @@ Log-SubSection "Building '$projName'..."
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$referencePath`
+    /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
