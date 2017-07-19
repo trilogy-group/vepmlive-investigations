@@ -173,7 +173,7 @@ Log-Section "Starting build..."
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
 $langversion = "Default"
-$referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" -replace "\s","%20"
+    
 Log-SubSection "Building '$projName'..."
     
 # Run MSBuild
@@ -206,7 +206,7 @@ Log-SubSection "Building 'Project Publisher"
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$referencePath `
+    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
