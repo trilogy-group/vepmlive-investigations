@@ -8,7 +8,7 @@ namespace WE_QueueMgr.MsmqIntegration
         [OperationBehavior(TransactionScopeRequired = true, TransactionAutoComplete = true)]
         public void QueueNotification(Notification notification)
         {
-            Global.Instance.ManageQueueJobs(notification.BasePath);
+            Global.Instance.QueueNotification(notification.BasePath);
         }
     }
 }

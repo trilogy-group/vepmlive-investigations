@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -27,6 +28,7 @@ namespace WE_QueueMgr
         private const int const_Frequency = 60;
         private IMessageQueue messageQueue;
         private List<QMSite> sites;
+        private ConcurrentQueue<string> notifications;
 
         public PPMWorkEngineQueueService()
         {
@@ -42,6 +44,7 @@ namespace WE_QueueMgr
                 timer.Elapsed += new ElapsedEventHandler(ServiceTimer_Tick);
 
                 messageQueue = new Msmq();
+                notifications = new ConcurrentQueue<string>();
             }
             catch (Exception ex)
             {
@@ -225,10 +228,11 @@ namespace WE_QueueMgr
 
         private void ServiceTimer_Tick(object sender, ElapsedEventArgs e)
         {
-            timer.Stop();            
+            timer.Stop();
             try
             {
                 ManageTimerJobs();
+                ManageQueueJobs();
             }
             catch (Exception ex)
             {
@@ -240,18 +244,28 @@ namespace WE_QueueMgr
             }
         }
 
-        public void ManageQueueJobs(string basePath)
+        public void QueueNotification(string basePath)
         {
-            var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-            if (site != null)
+            notifications.Enqueue(basePath);
+        }
+
+        private void ManageQueueJobs()
+        {
+            while (!notifications.IsEmpty)
             {
-                try
+                var basePath = string.Empty;
+                if (!notifications.TryDequeue(out basePath)) continue;
+                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
+                if (site != null)
                 {
-                    ManageQueue(site);
-                }
-                catch (Exception exception)
-                {
-                    ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
+                    try
+                    {
+                        ManageQueue(site);
+                    }
+                    catch (Exception exception)
+                    {
+                        ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
+                    }
                 }
             }
         }
