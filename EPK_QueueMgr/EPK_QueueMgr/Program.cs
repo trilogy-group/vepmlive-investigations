@@ -13,9 +13,16 @@ namespace WE_QueueMgr
         {
             try
             {
-                var version = AssemblyInfo.Version();
-                EventLog.WriteEntry("PfE Queue Manager - " + version, "", EventLogEntryType.Information);
-                ServiceBase.Run(new ServiceBase[] { Global.Instance });
+                if(Environment.UserInteractive)
+                {
+                    Global.Instance.Start();
+                }
+                else
+                {
+                    var version = AssemblyInfo.Version();
+                    EventLog.WriteEntry("PfE Queue Manager - " + version, "", EventLogEntryType.Information);
+                    ServiceBase.Run(new ServiceBase[] { Global.Instance });
+                }
             }
             catch (Exception ex)
             {

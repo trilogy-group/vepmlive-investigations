@@ -17,6 +17,7 @@ namespace WE_QueueMgr
 {
     public partial class PPMWorkEngineQueueService : ServiceBase
     {
+        private System.Threading.ManualResetEvent ms = new System.Threading.ManualResetEvent(false);
         private ServiceHost serviceHost = null;
         private Timer timer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
@@ -441,6 +442,12 @@ namespace WE_QueueMgr
             {
                 comObject = null;
             }
+        }
+
+        internal void Start()
+        {
+            OnStart(null);
+            ms.WaitOne();
         }
     }
 }
