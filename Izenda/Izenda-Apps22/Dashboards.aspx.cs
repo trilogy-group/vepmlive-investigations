@@ -1,12 +1,17 @@
 public partial class Dashboards : System.Web.UI.Page {
   protected override void OnPreInit(System.EventArgs e) {
-        string sitecollectiontitle = string.Empty;
-        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectiontitle"]))
+        string sitecollectionid = string.Empty;
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionid"]))
         {
-            sitecollectiontitle = Request.QueryString["sitecollectiontitle"];
+            sitecollectionid = Request.QueryString["sitecollectionid"];
 
         }
-        ASP.global_asax.CustomAdHocConfig config = new ASP.global_asax.CustomAdHocConfig(sitecollectiontitle);
+        else if (Request.UrlReferrer.Query.Contains("sitecollectionid"))
+        {
+            sitecollectionid= Request.UrlReferrer.Query.Substring(Request.UrlReferrer.Query.IndexOf("=") + 1);
+            
+        }
+        ASP.global_asax.CustomAdHocConfig config = new ASP.global_asax.CustomAdHocConfig(sitecollectionid);
         config.InitializeReporting();
     }
 }

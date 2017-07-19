@@ -39,16 +39,16 @@ public partial class TemplateDesigner : Page
             }
             if (!doNotDoAnything)
             {
-                AdHocSettings.AdHocConfig.SetVolatileTemplate(templateName, saveData);
+                //AdHocSettings.AdHocConfig.SetVolatileTemplate(templateName, saveData);
             }
             string goBack = Request.Params["goback"];//save clicked
         }
         string delete = Request.Params["delete"];
         if (!String.IsNullOrEmpty(delete) && delete == "1")
         {
-            AdHocSettings.AdHocConfig.DeleteTemplateInternal(templateName);
+            //AdHocSettings.AdHocConfig.DeleteTemplateInternal(templateName);
 
-            string templateData = AdHocSettings.AdHocConfig.GetVolatileTemplate(templateName);
+            string templateData = "";//AdHocSettings.AdHocConfig.GetVolatileTemplate(templateName);
 
             Response.Write("<html><head>");
             Response.Write("<script src=\"elrte/js/jquery-1.6.1.min.js\" type=\"text/javascript\" charset=\"utf-8\"></script>");

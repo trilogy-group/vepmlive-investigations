@@ -6,12 +6,18 @@ using Izenda.AdHoc;
 
 public partial class MasterPage1 : MasterPage
 {
-    public string sitecollectiontitle = "";
+    public string sitecollectionid = "";
     protected override void OnInit(EventArgs e)
     {
-        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectiontitle"]))
+        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionid"]))
         {
-            sitecollectiontitle = Request.QueryString["sitecollectiontitle"];
+            sitecollectionid = Request.QueryString["sitecollectionid"];
+
+        }
+        else if (Request.UrlReferrer.Query.Contains("sitecollectionid"))
+        {
+            sitecollectionid = Request.UrlReferrer.Query.Substring(Request.UrlReferrer.Query.IndexOf("=") + 1);
+
         }
         if (HttpContext.Current == null || HttpContext.Current.Session == null)
             return;
