@@ -22,7 +22,6 @@ public partial class MasterPage1 : MasterPage
         if (HttpContext.Current == null || HttpContext.Current.Session == null)
             return;
         Utility.CheckLimitations(true);
-        HttpSessionState session = HttpContext.Current.Session;
         
 
         if (!String.IsNullOrEmpty(AdHocSettings.ApplicationHeaderImageUrl))
