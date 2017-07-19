@@ -163,8 +163,9 @@ $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
 
-Log-Section "Downloading Nuget . . ."
-$nugetPath = $SourcesDirectory + "\nuget.exe"
+#Log-Section "Downloading Nuget . . ."
+$nugetPath = $SourcesDirectory + "\.nuget\nuget.exe"
+#& $nugetPath update -self
 Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
 
 Log-Section "Restoring missing packages . . ."
@@ -172,10 +173,12 @@ Log-Section "Restoring missing packages . . ."
 & $nugetPath restore "$SourcesDirectory\Saas\EPMLive.Saas"
 & $nugetPath restore "$SourcesDirectory\Saas\EPMLiveAccountManagement"
 & $nugetPath restore "$SourcesDirectory\ProjectPublisher2016"
+& $nugetPath restore "$SourcesDirectory\EPMLiveCore"
 
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
 $langversion = "Default"
+$referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" -replace "\s","%20"
 
 
 Log-Section "Creating Output Folders . . ."
@@ -215,7 +218,7 @@ foreach($projectToBePackaged in $projectsToBePackaged){
    /p:Platform="$PlatformToBuild" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -243,7 +246,7 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
    /p:Platform="x64" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -271,7 +274,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    /p:Platform="$PlatformToBuild" `
    /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
