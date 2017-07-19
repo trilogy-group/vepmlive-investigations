@@ -178,6 +178,7 @@ Log-Section "Restoring missing packages . . ."
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $outDir = Join-Path $BinariesDirectory $projName
 $langversion = "Default"
+$referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" -replace "\s","%20"
 
 
 Log-Section "Creating Output Folders . . ."
@@ -217,7 +218,7 @@ foreach($projectToBePackaged in $projectsToBePackaged){
    /p:Platform="$PlatformToBuild" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -245,7 +246,7 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
    /p:Platform="x64" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
@@ -273,7 +274,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    /p:Platform="$PlatformToBuild" `
    /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+   /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
