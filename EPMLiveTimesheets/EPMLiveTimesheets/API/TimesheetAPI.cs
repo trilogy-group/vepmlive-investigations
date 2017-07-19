@@ -3502,10 +3502,7 @@ namespace TimeSheets
                 {
                     if (string.IsNullOrEmpty(Convert.ToString(drItem["ASSIGNEDTOID"])))
                     {
-                        if (string.IsNullOrEmpty(userId))
                             assignedToId = "-99";
-                        else
-                            assignedToId = userId;
                     }
                     else
                     {
