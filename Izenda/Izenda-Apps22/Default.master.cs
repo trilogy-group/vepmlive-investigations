@@ -23,9 +23,7 @@ public partial class MasterPage1 : MasterPage
             return;
         Utility.CheckLimitations(true);
         HttpSessionState session = HttpContext.Current.Session;
-        if (session["ReportingInitialized"] == null || session["ReportingInitialized"] as bool? != true)
-            return;
-
+        
 
         if (!String.IsNullOrEmpty(AdHocSettings.ApplicationHeaderImageUrl))
             rightLogo.Src = AdHocSettings.ApplicationHeaderImageUrl;
