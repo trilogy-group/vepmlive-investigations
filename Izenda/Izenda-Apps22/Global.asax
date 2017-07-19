@@ -6,7 +6,13 @@
     [Serializable]
     public class CustomAdHocConfig : DatabaseAdHocConfig
     {
-        public static void InitializeReporting()
+        private string sitecollectionname=string.Empty;
+        public CustomAdHocConfig(string _sitecollectionname)
+        {
+            sitecollectionname = _sitecollectionname;
+        }
+
+        public void InitializeReporting()
         {
             HttpSessionState session = HttpContext.Current.Session;
             if (session == null)
@@ -19,7 +25,7 @@
             AdHocSettings.LicenseKey = ConfigurationManager.AppSettings["IzendaLicenseKey"];
             AdHocSettings.GenerateThumbnails = true;
             AdHocSettings.DashboardViewer = "Dashboards.aspx";
-            AdHocSettings.AdHocConfig = new CustomAdHocConfig();
+            AdHocSettings.AdHocConfig = new CustomAdHocConfig(sitecollectionname);
             AdHocSettings.ChartLimit = 100;
             AdHocSettings.Formats.Add(DateTime.Now.ToString("dd/MM/yyyy"), "{0:dd/MM/yyyy}");
             AdHocSettings.Formats.Add(DateTime.Now.ToString("dd-MM-yyyy"), "{0:dd-MM-yyyy}");
@@ -100,20 +106,20 @@
             AdHocSettings.DefaultVisibilityForNonAdmins = "Report Viewers";
             AdHocSettings.GenerateThumbnails = true;
 
-            if (HttpContext.Current.Session["Role"] != null)
-                AdHocSettings.CurrentUserRoles = new string[] { HttpContext.Current.Session["Role"].ToString() };
+            if (HttpContext.Current.Session[sitecollectionname+"Role"] != null)
+                AdHocSettings.CurrentUserRoles = new string[] { HttpContext.Current.Session[sitecollectionname+"Role"].ToString() };
 
-            if (HttpContext.Current.Session["webid"] != null)
-                AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session["webid"].ToString();
+            if (HttpContext.Current.Session[sitecollectionname+"webid"] != null)
+                AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session[sitecollectionname+"webid"].ToString();
 
             AdHocSettings.CurrentUserIsAdmin = false;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
 
-            if (HttpContext.Current.Session["ConnectionString"] != null)
+            if (HttpContext.Current.Session[sitecollectionname+"ConnectionString"] != null)
             {
-                AdHocSettings.SqlServerConnectionString = HttpContext.Current.Session["ConnectionString"].ToString();
-                if (HttpContext.Current.Session["StorageConnectionString"] != null)
-                    SavedReportsDriver = new Izenda.AdHoc.Database.MSSQLDriver(HttpContext.Current.Session["StorageConnectionString"].ToString());
+                AdHocSettings.SqlServerConnectionString = HttpContext.Current.Session[sitecollectionname+"ConnectionString"].ToString();
+                if (HttpContext.Current.Session[sitecollectionname+"StorageConnectionString"] != null)
+                    SavedReportsDriver = new Izenda.AdHoc.Database.MSSQLDriver(HttpContext.Current.Session[sitecollectionname+"StorageConnectionString"].ToString());
             }
 
             if (HttpContext.Current.Session["UserName"] != null)
@@ -138,11 +144,11 @@
         {
             AdHocSettings.GenerateThumbnails = true;
 
-            if (HttpContext.Current.Session["Role"] != null)
-                AdHocSettings.CurrentUserRoles = new string[] { HttpContext.Current.Session["Role"].ToString() };
+            if (HttpContext.Current.Session[sitecollectionname+"Role"] != null)
+                AdHocSettings.CurrentUserRoles = new string[] { HttpContext.Current.Session[sitecollectionname+"Role"].ToString() };
 
-            if (HttpContext.Current.Session["webid"] != null)
-                AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session["webid"].ToString();
+            if (HttpContext.Current.Session[sitecollectionname+"webid"] != null)
+                AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session[sitecollectionname+"webid"].ToString();
 
             AdHocSettings.CurrentUserIsAdmin = false;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
@@ -150,11 +156,11 @@
             if (HttpContext.Current.Session["UserName"] != null)
                 AdHocSettings.CurrentUserName = HttpContext.Current.Session["UserName"].ToString();
 
-            if (HttpContext.Current.Session["ConnectionString"] != null)
-                AdHocSettings.SqlServerConnectionString = HttpContext.Current.Session["ConnectionString"].ToString();
+            if (HttpContext.Current.Session[sitecollectionname+"ConnectionString"] != null)
+                AdHocSettings.SqlServerConnectionString = HttpContext.Current.Session[sitecollectionname+"ConnectionString"].ToString();
 
-            if (HttpContext.Current.Session["StorageConnectionString"] != null)
-                SavedReportsDriver = new Izenda.AdHoc.Database.MSSQLDriver(HttpContext.Current.Session["StorageConnectionString"].ToString());
+            if (HttpContext.Current.Session[sitecollectionname+"StorageConnectionString"] != null)
+                SavedReportsDriver = new Izenda.AdHoc.Database.MSSQLDriver(HttpContext.Current.Session[sitecollectionname+"StorageConnectionString"].ToString());
 
             AdHocSettings.CurrentUserIsAdmin = false;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
