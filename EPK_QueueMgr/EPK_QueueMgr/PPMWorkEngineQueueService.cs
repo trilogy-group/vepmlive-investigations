@@ -26,7 +26,6 @@ namespace WE_QueueMgr
         private long m_lExceptionCount = 0;
         private long m_lElapsedMinutes = 0;
         private const int const_Frequency = 60;
-        private IMessageQueue messageQueue;
         private List<QMSite> sites;
         private ConcurrentQueue<string> notifications;
 
@@ -43,7 +42,6 @@ namespace WE_QueueMgr
                 timer = new Timer(interval);
                 timer.Elapsed += new ElapsedEventHandler(ServiceTimer_Tick);
 
-                messageQueue = new Msmq();
                 notifications = new ConcurrentQueue<string>();
             }
             catch (Exception ex)
