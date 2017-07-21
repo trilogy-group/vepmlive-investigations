@@ -13,14 +13,16 @@ using System.ServiceModel;
 using System.ServiceProcess;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
+using Threading = System.Threading;
 
 namespace WE_QueueMgr
 {
     public partial class PPMWorkEngineQueueService : ServiceBase
     {
-        private System.Threading.ManualResetEvent ms = new System.Threading.ManualResetEvent(false);
+        private Threading.ManualResetEvent ms = new Threading.ManualResetEvent(false);
         private ServiceHost serviceHost = null;
-        private Timer timer = null;
+        private Timer timerJobsTimer = null;
+        private Timer queueJobsTimer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
         private long m_lMinutes;
         private long m_lExceptionCount = 0;
@@ -39,8 +41,11 @@ namespace WE_QueueMgr
                 m_lElapsedMinutes = 0;
 
                 double interval = 1000;
-                timer = new Timer(interval);
-                timer.Elapsed += new ElapsedEventHandler(ServiceTimer_Tick);
+                timerJobsTimer = new Timer(interval);
+                timerJobsTimer.Elapsed += ProcessTimerJobs;
+
+                queueJobsTimer = new Timer(interval);
+                queueJobsTimer.Elapsed += ProcessQueueJobs;
 
                 notifications = new ConcurrentQueue<string>();
             }
@@ -75,9 +80,12 @@ namespace WE_QueueMgr
                         }
                     }
 
-                    timer.AutoReset = true;
-                    timer.Enabled = true;
-                    timer.Start();
+                    timerJobsTimer.AutoReset = true;
+                    timerJobsTimer.Enabled = true;
+                    timerJobsTimer.Start();
+                    queueJobsTimer.AutoReset = true;
+                    queueJobsTimer.Enabled = true;
+                    queueJobsTimer.Start();
                     if (serviceHost != null)
                     {
                         serviceHost.Close();
@@ -137,8 +145,7 @@ namespace WE_QueueMgr
                                     rk.Close();
                                     if (site != null)
                                     {
-                                        SqlConnection m_oConnection = new SqlConnection();
-                                        m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
+                                        var m_oConnection = GetSqlConnection(site);
                                         m_oConnection.Open();
 
                                         SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection);
@@ -200,10 +207,17 @@ namespace WE_QueueMgr
             }
         }
 
+        private static SqlConnection GetSqlConnection(QMSite site)
+        {
+            SqlConnection m_oConnection = new SqlConnection();
+            m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
+            return m_oConnection;
+        }
+
         protected override void OnStop()
         {
-            timer.AutoReset = false;
-            timer.Enabled = false;
+            timerJobsTimer.AutoReset = false;
+            timerJobsTimer.Enabled = false;
             if (serviceHost != null)
             {
                 serviceHost.Close();
@@ -214,37 +228,54 @@ namespace WE_QueueMgr
 
         protected override void OnPause()
         {
-            timer.Stop();
+            timerJobsTimer.Stop();
             MessageHandler("Pause", "OnPause", "");
         }
 
         protected override void OnContinue()
         {
-            timer.Start();
+            timerJobsTimer.Start();
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        private void ServiceTimer_Tick(object sender, ElapsedEventArgs e)
+        private void ProcessTimerJobs(object sender, ElapsedEventArgs e)
         {
-            timer.Stop();
+            timerJobsTimer.Stop();
             try
             {
                 ManageTimerJobs();
-                ManageQueueJobs();
             }
             catch (Exception ex)
             {
-                ExceptionHandler("ServiceTimer_Tick", ex);
+                ExceptionHandler("ProcessTimerJobs", ex);
             }
             finally
             {
-                timer.Start();
+                timerJobsTimer.Start();
+            }
+        }
+
+        private void ProcessQueueJobs(object sender, ElapsedEventArgs e)
+        {
+            queueJobsTimer.Stop();
+            try
+            {
+                ManageQueueJobs();
+            }
+            catch (Exception exception)
+            {
+                ExceptionHandler("ProcessQueueJobs", exception);
+            }
+            finally
+            {
+                queueJobsTimer.Start();
             }
         }
 
         public void QueueNotification(string basePath)
         {
-            notifications.Enqueue(basePath);
+            if (!notifications.Contains(basePath))
+                notifications.Enqueue(basePath);
         }
 
         private void ManageQueueJobs()
@@ -324,12 +355,31 @@ namespace WE_QueueMgr
                         new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)100, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageTimerJobs Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                     }
+                    else
+                    {
+                        QueueNewJobNotificationIfApplicable(site);
+                    }
                 }
                 catch (Exception ex)
                 {
-
                     new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)100, ex);
                     ExceptionHandler("ManageTimerJobs - " + site.basePath, ex);
+                }
+            }
+        }
+
+        private void QueueNewJobNotificationIfApplicable(QMSite site)
+        {
+            using (var connection = GetSqlConnection(site))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand("SELECT TOP 1 JOB_GUID FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 ORDER BY JOB_SUBMITTED", connection))
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        QueueNotification(site.basePath);
+                    }
                 }
             }
         }
