@@ -27,6 +27,7 @@ namespace WE_QueueMgr
         private long m_lElapsedMinutes = 0;
         private const int const_Frequency = 60;
         private List<QMSite> sites;
+        private IMessageQueue messageQueue;
 
         public PPMWorkEngineQueueService()
         {
@@ -40,6 +41,8 @@ namespace WE_QueueMgr
                 double interval = 1000;
                 timerJobsTimer = new Timer(interval);
                 timerJobsTimer.Elapsed += ProcessTimerJobs;
+
+                messageQueue = new Msmq();
             }
             catch (Exception ex)
             {
@@ -80,6 +83,7 @@ namespace WE_QueueMgr
                         serviceHost.Close();
                     }
                     serviceHost = new ServiceHost(typeof(NotificationDispatcher));
+                    messageQueue.CreateQueue(GetQueueName(serviceHost));
                     serviceHost.Open();
                 }
                 else
@@ -91,6 +95,12 @@ namespace WE_QueueMgr
             {
                 ExceptionHandler("OnStart", ex);
             }
+        }
+
+        private string GetQueueName(ServiceHost serviceHost)
+        {
+            var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
+            return @".\Private$\" + msmqAddress.Split('/').Last();
         }
 
         private string BuildSitesList()
