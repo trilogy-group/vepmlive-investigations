@@ -1,7 +1,6 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -22,14 +21,12 @@ namespace WE_QueueMgr
         private Threading.ManualResetEvent ms = new Threading.ManualResetEvent(false);
         private ServiceHost serviceHost = null;
         private Timer timerJobsTimer = null;
-        private Timer queueJobsTimer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
         private long m_lMinutes;
         private long m_lExceptionCount = 0;
         private long m_lElapsedMinutes = 0;
         private const int const_Frequency = 60;
         private List<QMSite> sites;
-        private ConcurrentQueue<string> notifications;
 
         public PPMWorkEngineQueueService()
         {
@@ -43,11 +40,6 @@ namespace WE_QueueMgr
                 double interval = 1000;
                 timerJobsTimer = new Timer(interval);
                 timerJobsTimer.Elapsed += ProcessTimerJobs;
-
-                queueJobsTimer = new Timer(interval);
-                queueJobsTimer.Elapsed += ProcessQueueJobs;
-
-                notifications = new ConcurrentQueue<string>();
             }
             catch (Exception ex)
             {
@@ -83,9 +75,6 @@ namespace WE_QueueMgr
                     timerJobsTimer.AutoReset = true;
                     timerJobsTimer.Enabled = true;
                     timerJobsTimer.Start();
-                    queueJobsTimer.AutoReset = true;
-                    queueJobsTimer.Enabled = true;
-                    queueJobsTimer.Start();
                     if (serviceHost != null)
                     {
                         serviceHost.Close();
@@ -255,35 +244,10 @@ namespace WE_QueueMgr
             }
         }
 
-        private void ProcessQueueJobs(object sender, ElapsedEventArgs e)
+        public void ManageQueueJobs(string basePath = "")
         {
-            queueJobsTimer.Stop();
-            try
+            if(!string.IsNullOrEmpty(basePath))
             {
-                ManageQueueJobs();
-            }
-            catch (Exception exception)
-            {
-                ExceptionHandler("ProcessQueueJobs", exception);
-            }
-            finally
-            {
-                queueJobsTimer.Start();
-            }
-        }
-
-        public void QueueNotification(string basePath)
-        {
-            if (!notifications.Contains(basePath))
-                notifications.Enqueue(basePath);
-        }
-
-        private void ManageQueueJobs()
-        {
-            while (!notifications.IsEmpty)
-            {
-                var basePath = string.Empty;
-                if (!notifications.TryDequeue(out basePath)) continue;
                 var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
                 if (site != null)
                 {
@@ -378,7 +342,7 @@ namespace WE_QueueMgr
                 {
                     if (reader.HasRows)
                     {
-                        QueueNotification(site.basePath);
+                        ManageQueueJobs(site.basePath);
                     }
                 }
             }
