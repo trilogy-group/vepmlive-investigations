@@ -18,10 +18,7 @@ namespace SyncReportGenerator
             }
             FileStream fs = new FileStream(fileName, FileMode.CreateNew);
             fs.Close();
-            var client = new ReportingService2010Extended()
-            {
-                Url = "http://win-6j09gf4nbp8:8082/ReportServer/ReportService2010.asmx"
-            };
+            var client = new ReportingService2010Extended();
             client.LogonUser(ConfigurationManager.AppSettings["rsadminusername"], ConfigurationManager.AppSettings["rsadminpassword"], null);
             var topLevelFolders = client.ListChildren("/", false).ToList();
             using (var rootSite = new SPSite(ConfigurationManager.AppSettings["baseUrl"]))
