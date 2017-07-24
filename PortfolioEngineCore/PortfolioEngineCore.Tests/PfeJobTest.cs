@@ -1,5 +1,5 @@
-﻿using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Telerik.JustMock;
 
 namespace PortfolioEngineCore.Tests
 {
@@ -9,22 +9,18 @@ namespace PortfolioEngineCore.Tests
         [TestMethod]
         public void PfeJob_Should_Be_Saved_In_Queue()
         {
-            var sut = new Fakes.StubPfeJob();
-            var messageQueued = false;
-            using (ShimsContext.Create())
-            {
-                var dbrepository = new Fakes.ShimDbRepository()
-                {
-                    QueuePfeJobPfeJob = (job) => { return 1; }
-                };
-                var messageQueue = new Fakes.ShimMsmq()
-                {
-                    QueueString = (input) => messageQueued = true
-                };
-                var output = sut.Queue(dbrepository.Instance, messageQueue.Instance, "TestPath");
-                Assert.AreEqual(output, 1);
-                Assert.IsTrue(messageQueued);
-            }
+            // Arrange.
+            var sut = new PfeJob();
+            var dbRepository = Mock.Create<IDbRepository>();
+            var msmq = Mock.Create<IMessageQueue>();
+            Mock.Arrange(() => dbRepository.QueuePfeJob(Arg.IsAny<PfeJob>())).Returns(1);
+
+            // Act.
+            var output = sut.Queue(dbRepository, msmq, "TestPath");
+
+            // Assert.
+            Assert.AreEqual(output, 1);
+            Mock.Assert(() => msmq.Queue("TestPath"), Occurs.Exactly(1));
         }
     }
 }
