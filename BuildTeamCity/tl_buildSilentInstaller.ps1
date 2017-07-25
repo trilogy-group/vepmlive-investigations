@@ -1,11 +1,15 @@
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 
-New-Item "SilentInstaller" -type directory -Force
-Remove-Item "SilentInstaller\Files" -Force -Recurse
-New-Item "SilentInstaller\Files" -type directory -Force
+$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
+$SourcesDirectory = "$ScriptDir\..\"
+$outputFolder = Join-Path $SourcesDirectory "output"
+$outputFolder2 = Join-Path $SourcesDirectory "InstallShield\Build Dependencies"
+$silentInstallerFolder = Join-Path $ScriptDir "SilentInstaller"
+$filesFolderName = Join-Path $scriptDir "SilentInstaller\Files" 
 
-$outputFolder = "..\output"
-$outputFolder2 = "..\InstallShield\Build Dependencies"
+New-Item $silentInstallerFolder -type directory -Force
+If(Test-path $filesFolderName) {Remove-Item $filesFolderName -Force -Recurse}
+New-Item $filesFolderName -type directory -Force
 
 function ZipFiles( $zipfilename, $sourcedir )
 {
@@ -17,7 +21,8 @@ function ZipFiles( $zipfilename, $sourcedir )
 
 foreach ($component in $config.Components)
 {
-    $folderName = "SilentInstaller\Files\"+$component.name
+    
+	$folderName = Join-Path $filesFolderName $component.name
     New-Item $folderName -type directory -Force
 
     foreach ($file in $component.files)
@@ -32,7 +37,10 @@ foreach ($component in $config.Components)
             ForEach-Object {Copy-Item -Path $_.Fullname -Destination $folderName -Force}
     }    
 }
+$configFile = Join-Path $scriptDir "config.json"
+$configDest = Join-Path $scriptDir "SilentInstaller\config.json"
+Copy-Item -Path  $configFile -Destination $configDest -Force
 
-Copy-Item -Path "config.json" -Destination "SilentInstaller\config.json" -Force
 
-ZipFiles "SilentInstaller.zip" "SilentInstaller"
+$outputZipPath = Join-Path $ScriptDir "SilentInstaller.zip"
+ZipFiles $outputZipPath $silentInstallerFolder

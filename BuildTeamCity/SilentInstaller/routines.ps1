@@ -19,14 +19,18 @@ function ClarifyPath
     return $newpath
 }
 
-function WaitUntilServices($searchString, $status)
+function WaitUntilServices($services, $status)
 {
-    # Get all services where DisplayName matches $searchString and loop through each of them.
-    foreach($service in (Get-Service $searchString))
-    {
-        # Wait for the service to reach the $status or a maximum of 30 seconds
-        $service.WaitForStatus($status, '00:00:30')
-    }
+
+	$maxRepeat = 50
+
+	do 
+	{
+		Write-Host("Waiting for $services $status status")
+		$count = (Get-Service -Name $services | ? {$_.status -ne $status}).count
+		$maxRepeat--
+		sleep -Milliseconds 600
+	} until ($count -eq 0 -or $maxRepeat -eq 0)
 }
 
 function RestartSPTimerV4()
@@ -41,7 +45,7 @@ function RestartSPTimerV4()
 
 function RemoveWSP()
 {
-    param([string] $name, [string] $path, [string] $webAppName)
+    param([string] $name, [string] $webAppName)
     
     $sln = get-spsolution -identity $name
 
@@ -49,11 +53,11 @@ function RemoveWSP()
     {
         if (![string]::IsNullOrEmpty($webAppName))
         {
-            uninstall-spsolution -identity $name -confirm:$false -webapplication:$webAppName
+            uninstall-spsolution -identity $name -confirm:$false -webapplication:$webAppName  -ErrorAction silentlycontinue
         }
         else
         {
-            uninstall-spsolution -identity $name -confirm:$false
+            uninstall-spsolution -identity $name -confirm:$false  -ErrorAction silentlycontinue
         }    
  
         echo "Started solution retraction..."
@@ -64,7 +68,7 @@ function RemoveWSP()
             start-sleep -s 5
         }
  
-        remove-spsolution -identity $name -confirm:$false -Force
+        remove-spsolution -identity $name -confirm:$false -Force  -ErrorAction silentlycontinue
     }
 }
 
@@ -136,16 +140,59 @@ function Register-File
 		[ValidateScript({ Test-Path -Path $_ -PathType 'Leaf' })]
 		[string]$FilePath
 	)
+	
 	process {
+	    Write-Host ("Registering COM $FilePath")
 		try {
-			$Result = Start-Process -FilePath 'regsvr32.exe' -Args "/s $FilePath" -Wait -NoNewWindow -PassThru
+			$Result = Start-Process -FilePath 'regsvr32.exe' -Args "/s ""$FilePath""" -Wait -NoNewWindow -PassThru
 		} catch {
 			Write-Error $_.Exception.Message
 			$false
 		}
 	}
 }
-
+function Unregister-File 
+{
+	param (
+		[ValidateScript({ Test-Path -Path $_ -PathType 'Leaf' })]
+		[string]$FilePath
+	)
+	
+	process {
+	    Write-Host ("Unregistering COM $FilePath")
+		try {
+			$Result = Start-Process -FilePath 'regsvr32.exe' -Args "/u /s ""$FilePath""" -Wait -NoNewWindow -PassThru
+		} catch {
+			Write-Error $_.Exception.Message
+			$false
+		}
+	}
+}
+function Unregister-COMPlus
+{
+	param (
+        [string]$appName
+	)
+    Write-Host "Uninstall COM+ Application: $appName"
+    $comAdmin = New-Object -com ("COMAdmin.COMAdminCatalog.1")
+    $applications = $comAdmin.GetCollection("Applications") 
+    $applications.Populate() 
+	$index = 0
+	foreach($app in $applications) {
+		if ($app.Name -eq $appName)
+		{
+			$comAdmin.ShutdownApplication($app.name)
+			Write-Host ("Removing app " + $app.Name)
+			$applications.Remove($index)
+			$applications.SaveChanges()
+		}
+		else
+		{
+			$index = $index + 1
+		}
+	}
+	$applications.SaveChanges()
+}
 function Register-COMPlus
 {
 	param (
@@ -161,11 +208,12 @@ function Register-COMPlus
     $applications = $comAdmin.GetCollection("Applications") 
     $applications.Populate() 
 
-    $app = $applications.add()
-    $app.Value("ID") = $id
-    $app.Value("Name") = $appName
-    $app.Value("Activation") = 1
-    $app.Value("ApplicationAccessChecksEnabled") = 0
+	$app = $applications.add()
+	$app.Value("ID") = $id
+	$app.Value("Name") = $appName
+	$app.Value("Activation") = 1
+	$app.Value("ApplicationAccessChecksEnabled") = 0
+	
     $app.Value("Description") = " "
     $app.Value("Identity") = $UserName
     $app.Value("Password") = $Password
@@ -173,6 +221,6 @@ function Register-COMPlus
 
     $applications.SaveChanges()
 
-    $comAdmin.InstallComponent($appName, $FilePath, "", "")
-    $comAdmin.StartApplication($appName)
+    $res = $comAdmin.InstallComponent($appName, $FilePath, "", "")
+    $res = $comAdmin.StartApplication($appName)
 }

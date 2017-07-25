@@ -15,13 +15,13 @@ REGEDIT4
 "Class"="WE_WEI.Session"
 "Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
 "RuntimeVersion"="v2.0.50727"
-"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+"CodeBase"="file:///C:/repo/vepmlive-epmlive2013release/InstallShield/Build Dependencies/ServerFiles/WE_WEI.dll"
 
 [HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\InprocServer32\43.2.0.600]
 "Class"="WE_WEI.Session"
 "Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
 "RuntimeVersion"="v2.0.50727"
-"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+"CodeBase"="file:///C:/repo/vepmlive-epmlive2013release/InstallShield/Build Dependencies/ServerFiles/WE_WEI.dll"
 
 [HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\ProgId]
 @="WE_WEI.Session"
@@ -43,13 +43,13 @@ REGEDIT4
 "Class"="WE_WEI.WebSvcLMR.Integration"
 "Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
 "RuntimeVersion"="v2.0.50727"
-"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+"CodeBase"="file:///C:/repo/vepmlive-epmlive2013release/InstallShield/Build Dependencies/ServerFiles/WE_WEI.dll"
 
 [HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\InprocServer32\43.2.0.600]
 "Class"="WE_WEI.WebSvcLMR.Integration"
 "Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
 "RuntimeVersion"="v2.0.50727"
-"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+"CodeBase"="file:///C:/repo/vepmlive-epmlive2013release/InstallShield/Build Dependencies/ServerFiles/WE_WEI.dll"
 
 [HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\ProgId]
 @="WE_WEI.WebSvcLMR.Integration"
