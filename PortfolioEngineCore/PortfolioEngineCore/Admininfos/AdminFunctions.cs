@@ -1023,11 +1023,8 @@ namespace PortfolioEngineCore
             return bResult;
         }
 
-        public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData)
+        public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData, string basePath)
         {
-            SqlCommand oCommand;
-            string sCommand;
-
             bool bResult = false;
             CStruct xData = new CStruct();
             if (xData.LoadXML(sData) == false)
@@ -1038,25 +1035,15 @@ namespace PortfolioEngineCore
 
             try
             {
-                int nContext = xData.GetInt("JobContext", 0);
-                string sComment = xData.GetString("Comment", "Job Request");
-                string sContextData = xData.GetString("Data", "No Context Data");
-
-                Guid guid = Guid.NewGuid();
-
-                sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA)"
-                   + " VALUES(@GUID,@JobContext,@JobSession,@WresID,@JobSubmitted,@JobStatus,@JobComment,@JobData)";
-                oCommand = new SqlCommand(sCommand, dba.Connection);
-                oCommand.Parameters.AddWithValue("@GUID", guid);
-                oCommand.Parameters.AddWithValue("@JobContext", nContext);
-                oCommand.Parameters.AddWithValue("@JobSession", "I'm a Session?");
-                oCommand.Parameters.AddWithValue("@WresID", WresID);
-                oCommand.Parameters.AddWithValue("@JobSubmitted", DateTime.Now);
-                oCommand.Parameters.AddWithValue("@JobStatus", 0);
-                oCommand.Parameters.AddWithValue("@JobComment", sComment);
-                oCommand.Parameters.AddWithValue("@JobData", sContextData);
-                oCommand.ExecuteNonQuery();
-
+                var job = new PfeJob()
+                {
+                    Context = xData.GetInt("JobContext", 0),
+                    Session = "I'm a Session?",
+                    UserId = WresID,
+                    Comment = xData.GetString("Comment", "Job Request"),
+                    ContextData = xData.GetString("Data", "No Context Data")
+                };
+                job.Queue(new DbRepository(dba), new Msmq(), basePath);
             }
             catch (Exception ex)
             {

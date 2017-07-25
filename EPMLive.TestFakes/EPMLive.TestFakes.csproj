@@ -38,6 +38,9 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveTimerService.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveWebParts.Fakes">
       <HintPath>FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
     </Reference>
@@ -133,9 +136,6 @@
     <Fakes Include="Fakes\mscorlib.fakes" />
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
-  </ItemGroup>
-  <ItemGroup>
     <Fakes Include="Fakes\WorkEnginePPM.fakes" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +144,7 @@
     <Fakes Include="Fakes\System.Web.fakes" />
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
+    <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.ServiceProcess;
 using System.Diagnostics;
-using System.Text;
+using System.ServiceProcess;
 
 namespace WE_QueueMgr
 {
