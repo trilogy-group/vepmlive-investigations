@@ -12,14 +12,12 @@ using System.ServiceModel;
 using System.ServiceProcess;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
-using Threading = System.Threading;
 
 namespace WE_QueueMgr
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class PPMWorkEngineQueueService : ServiceBase, INotificationDispatcher
     {
-        private Threading.ManualResetEvent ms = new Threading.ManualResetEvent(false);
         private ServiceHost serviceHost = null;
         private Timer timerJobsTimer = null;
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
@@ -44,7 +42,7 @@ namespace WE_QueueMgr
                 m_lMinutes = DateTime.Now.Ticks / 600000000;
                 m_lElapsedMinutes = 0;
 
-                double interval = 1000;
+                double interval = 30 * 1000;
                 timerJobsTimer = new Timer(interval);
                 timerJobsTimer.Elapsed += ManageTimerJobs;
 
@@ -227,12 +225,14 @@ namespace WE_QueueMgr
         protected override void OnPause()
         {
             timerJobsTimer.Stop();
+            serviceHost?.Close();
             MessageHandler("Pause", "OnPause", "");
         }
 
         protected override void OnContinue()
         {
             timerJobsTimer.Start();
+            serviceHost?.Open();
             MessageHandler("Continue", "OnContinue", "");
         }
 
@@ -440,12 +440,6 @@ namespace WE_QueueMgr
             {
                 comObject = null;
             }
-        }
-
-        internal void Start()
-        {
-            OnStart(null);
-            ms.WaitOne();
         }
     }
 
