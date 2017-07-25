@@ -16,7 +16,8 @@ using Threading = System.Threading;
 
 namespace WE_QueueMgr
 {
-    public partial class PPMWorkEngineQueueService : ServiceBase
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public partial class PPMWorkEngineQueueService : ServiceBase, INotificationDispatcher
     {
         private Threading.ManualResetEvent ms = new Threading.ManualResetEvent(false);
         private ServiceHost serviceHost = null;
@@ -28,6 +29,11 @@ namespace WE_QueueMgr
         private const int const_Frequency = 60;
         private List<QMSite> sites;
         private IMessageQueue messageQueue;
+
+        public void QueueNotification(Notification notification)
+        {
+            ManageQueueJobs(notification.BasePath);
+        }
 
         public PPMWorkEngineQueueService()
         {
@@ -43,6 +49,13 @@ namespace WE_QueueMgr
                 timerJobsTimer.Elapsed += ProcessTimerJobs;
 
                 messageQueue = new Msmq();
+
+                if (serviceHost != null)
+                {
+                    serviceHost.Close();
+                }
+                serviceHost = new ServiceHost(this);
+                messageQueue.CreateQueue(GetQueueName(serviceHost));
             }
             catch (Exception ex)
             {
@@ -78,12 +91,6 @@ namespace WE_QueueMgr
                     timerJobsTimer.AutoReset = true;
                     timerJobsTimer.Enabled = true;
                     timerJobsTimer.Start();
-                    if (serviceHost != null)
-                    {
-                        serviceHost.Close();
-                    }
-                    serviceHost = new ServiceHost(typeof(NotificationDispatcher));
-                    messageQueue.CreateQueue(GetQueueName(serviceHost));
                     serviceHost.Open();
                 }
                 else
