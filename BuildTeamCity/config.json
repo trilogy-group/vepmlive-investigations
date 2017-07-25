@@ -39,7 +39,8 @@
 				"name": "PFE Queue",
 				"displayname": "PortfolioEngine Queue",
 				"processname": "WE_QueueMgr",
- 				"description": " "
+ 				"description": " ",
+				"key": "PFE"
 			}		},
 		{
 			"name": "RestSharp.dll", 
@@ -90,7 +91,8 @@
 				"name": "WETimer",
 				"displayname": "Work Engine Timer Service",
 				"processname": "TimerService",
-				"description": " "
+				"description": " ",
+				"key": "Timer"
 			}		},
 		{
 			"name": "WETimerConfig", 

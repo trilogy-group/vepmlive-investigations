@@ -6,17 +6,20 @@ Param(
     [string] $dbName = "epmlive",
     [string] $appPool = "SharePoint - qaepmlive680",
     [string] $inUserName = "farmadmin@epmldev",
+	[string] $comUserName = "epmldev\farmadmin",
     [string] $inPassword = "Pass@word1",
 	[string] $version = "6.1.0.0",
-	[switch] $deployServices,
 	[switch] $deploySolutions,
 	[switch] $deployGAC,
 	[switch] $deployCOM,
+	[switch] $deployTimer,
+	[switch] $deployPFE,
 	[switch] $createDB
 	
 )
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 . ".\routines.ps1"
+$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 if (!(Test-ADCredential $inUserName $inPassword))
 {
@@ -25,27 +28,43 @@ if (!(Test-ADCredential $inUserName $inPassword))
 }
 
 #### STOP SERVICES ####
-if ($deployServices)
+foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
 {
-    foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
-    {
-		if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
-		{
-			Write-Host ("Stop service:" + $component.installAsService.name)
-			Stop-Service -Name $component.installAsService.name
-			WaitUntilServices $component.installAsService.name "Stopped"
-			Write-Host("Killing " + $component.installAsService.processname)
-			Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
-		}
-		else
-		{
-			Write-Host ("Service " + $component.installAsService.name + " not found, skipping stop")
-		}
-    }
+	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
+	{
+		Write-Host ("Stop service:" + $component.installAsService.name)
+		Stop-Service -Name $component.installAsService.name
+		WaitUntilServices $component.installAsService.name "Stopped"
+		Write-Host("Killing " + $component.installAsService.processname)
+		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
+	}
+	else
+	{
+		Write-Host ("Service " + $component.installAsService.name + " not found, skipping stop")
+	}
 }
- 
+
+## UNREGISTER COM
+foreach ($component in $config.Components | Where-Object {($_.registerCOMplus -ne $null) -or ($_.registerCOM -ne $null)})
+{
+    $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
+	$destination = ClarifyPath $component.destination
+    foreach ($file in $component.files)
+    {
+		if (![string]::IsNullOrEmpty($component.registerCOM) )
+		{
+			unregister-File (Join-Path $destination $file)
+		}
+
+		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
+		{
+			Unregister-COMPlus $component.registerCOMplus.Name
+		}
+	}
+}
+	
 #### COPY FILES #####
-$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
+
 
 [System.Reflection.Assembly]::Load("System.EnterpriseServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") | Out-Null
 
@@ -78,15 +97,6 @@ foreach ($component in $config.Components)
 	}
     foreach ($file in $component.files)
     {
-		if (![string]::IsNullOrEmpty($component.registerCOM) -and $deployCOM)
-		{
-			unregister-File (Join-Path $destination $file)
-		}
-
-		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
-		{
-			Unregister-COMPlus $component.registerCOMplus.Name
-		}
 		
         $fullName = Join-Path $folderName $file
         Write-Host ("Copying file $file")
@@ -98,15 +108,17 @@ foreach ($component in $config.Components)
             $outDir = ClarifyPath $component.unzip
             Unzip $fullName $outDir  
         }
-		
-		if (![string]::IsNullOrEmpty($component.registerCOM) -and $deployCOM)
+		if ($deployCOM)
 		{
-			Register-File (Join-Path $destination $file)
-		}
+			if (![string]::IsNullOrEmpty($component.registerCOM))
+			{
+				Register-File (Join-Path $destination $file)
+			}
 
-		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
-		{
-			Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $inUserName $inPassword
+			if (![string]::IsNullOrEmpty($component.registerCOMplus))
+			{
+				Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
+			}
 		}
 		
     }
@@ -219,25 +231,30 @@ if($createDB)
     [EPMLiveCore.CoreFunctions]::setConnectionString($w.Id, $cn, [ref] $sError)
 }
 
-#### INSTALL SERVICES ####
-if ($deployServices)
-{
-    foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
-    {
-        foreach ($file in $component.files)
-        {
-            $destination = ClarifyPath $component.destination
-            $destFileName =  Join-Path $destination $file
-            Write-Host "Install as service: $destFileName"
-            Install-Service `
-                -serviceName $component.installAsService.name `
-                -displayName $component.installAsService.displayname `
-                -description $component.installAsService.description `
-                -path $destFileName `
-                -UserName $inUserName `
-                -Password $inPassword
-            
-        }
-    }
+#### DEPLOY AND START SERVICES ####
 
+foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
+{
+	if (($deployPFE -and $component.installAsService.key -eq "PFE" ) -or ($deployTimer -and $component.installAsService.key -eq "Timer" ))
+	{
+		foreach ($file in $component.files)
+		{
+			$destination = ClarifyPath $component.destination
+			$destFileName =  Join-Path $destination $file
+			Write-Host "Install as service: $destFileName"
+			Install-Service `
+				-serviceName $component.installAsService.name `
+				-displayName $component.installAsService.displayname `
+				-description $component.installAsService.description `
+				-path $destFileName `
+				-UserName $inUserName `
+				-Password $inPassword
+			
+		}
+	}
+	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
+	{
+		Start-Service -Name $component.installAsService.name
+		WaitUntilServices $component.installAsService.name "Running"
+	}
 }
