@@ -291,10 +291,10 @@ namespace WE_QueueMgr
 
         public void ManageQueueJobs(string basePath)
         {
-            var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-            if (site != null)
+            lock(basePath)
             {
-                try
+                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
+                if (site != null)
                 {
                     try
                     {
@@ -329,7 +329,6 @@ namespace WE_QueueMgr
                                 }
                             }
                         }
-
                     }
                     catch (Exception ex)
                     {
@@ -337,10 +336,6 @@ namespace WE_QueueMgr
                         new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)99, ex);
                         ExceptionHandler("ManageQueue - " + site.basePath, ex);
                     }
-                }
-                catch (Exception exception)
-                {
-                    ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
                 }
             }
         }
@@ -452,5 +447,18 @@ namespace WE_QueueMgr
             OnStart(null);
             ms.WaitOne();
         }
+    }
+
+    internal class QMSite
+    {
+        public string basePath;
+        public string connection;
+        public string pid;
+        public string cn;
+        public string WRES_ID;
+        public string userName;
+        public string NTAccount;
+        public string SessionInfo;
+        public string ActiveTraceChannels;
     }
 }
