@@ -141,7 +141,8 @@ namespace WE_QueueMgr
                                     rk.Close();
                                     if (site != null)
                                     {
-                                        var m_oConnection = GetSqlConnection(site);
+                                        var m_oConnection = new SqlConnection();
+                                        m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
                                         m_oConnection.Open();
 
                                         SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection);
@@ -201,13 +202,6 @@ namespace WE_QueueMgr
                 ExceptionHandler("BuildSitesList", ex);
                 return "";
             }
-        }
-
-        private static SqlConnection GetSqlConnection(QMSite site)
-        {
-            SqlConnection m_oConnection = new SqlConnection();
-            m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
-            return m_oConnection;
         }
 
         protected override void OnStop()
