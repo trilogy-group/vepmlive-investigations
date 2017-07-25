@@ -289,21 +289,58 @@ namespace WE_QueueMgr
             }
         }
 
-        public void ManageQueueJobs(string basePath = "")
+        public void ManageQueueJobs(string basePath)
         {
-            if(!string.IsNullOrEmpty(basePath))
+            var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
+            if (site != null)
             {
-                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-                if (site != null)
+                try
                 {
                     try
                     {
-                        ManageQueue(site);
+                        // check the queue for .net items before using RSVP
+                        string sXML = BuildProductInfoString(site);
+                        using (var qm = new QueueManager(sXML))
+                        {
+                            if (qm.ReadNextQueuedItem())
+                            {
+                                new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
+                                // we have a queued item - try to handle it in portfolioenginecore first
+                                if (!qm.ManageQueue()) // false means not handled
+                                {
+                                    switch (qm.Context)
+                                    {
+                                        case 200:
+                                            //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                                            //////pFeAPI.Execute("RefreshRoles", "");
+                                            //////pFeAPI.Dispose();
+                                            qm.SetJobCompleted();
+                                            ErrorHandler("ManageQueue Case 200", 98765);
+                                            break;
+                                        default:
+                                            var s = InvokeComObject(site, "ManageQueue");
+                                            if (s.Contains("<Error"))
+                                            {
+                                                new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
+                                                EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+
                     }
-                    catch (Exception exception)
+                    catch (Exception ex)
                     {
-                        ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
+                        string sXML = BuildProductInfoString(site);
+                        new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)99, ex);
+                        ExceptionHandler("ManageQueue - " + site.basePath, ex);
                     }
+                }
+                catch (Exception exception)
+                {
+                    ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
                 }
             }
         }
@@ -325,77 +362,13 @@ namespace WE_QueueMgr
                     }
                     else
                     {
-                        QueueNewJobNotificationIfApplicable(site);
+                        ManageQueueJobs(site.basePath);
                     }
                 }
                 catch (Exception ex)
                 {
                     new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)100, ex);
                     ExceptionHandler("ManageTimerJobs - " + site.basePath, ex);
-                }
-            }
-        }
-
-        private void QueueNewJobNotificationIfApplicable(QMSite site)
-        {
-            using (var connection = GetSqlConnection(site))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand("SELECT TOP 1 JOB_GUID FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 ORDER BY JOB_SUBMITTED", connection))
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.HasRows)
-                    {
-                        ManageQueueJobs(site.basePath);
-                    }
-                }
-            }
-        }
-
-        private void ManageQueue(QMSite site)
-        {
-            if (!string.IsNullOrEmpty(site.basePath))
-            {
-                try
-                {
-                    // check the queue for .net items before using RSVP
-                    string sXML = BuildProductInfoString(site);
-                    using (var qm = new QueueManager(sXML))
-                    {
-                        if (qm.ReadNextQueuedItem())
-                        {
-                            new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
-                            // we have a queued item - try to handle it in portfolioenginecore first
-                            if (!qm.ManageQueue()) // false means not handled
-                            {
-                                switch (qm.Context)
-                                {
-                                    case 200:
-                                        //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                                        //////pFeAPI.Execute("RefreshRoles", "");
-                                        //////pFeAPI.Dispose();
-                                        qm.SetJobCompleted();
-                                        ErrorHandler("ManageQueue Case 200", 98765);
-                                        break;
-                                    default:
-                                        var s = InvokeComObject(site, "ManageQueue");
-                                        if (s.Contains("<Error"))
-                                        {
-                                            new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
-                                            EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    string sXML = BuildProductInfoString(site);
-                    new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)99, ex);
-                    ExceptionHandler("ManageQueue - " + site.basePath, ex);
                 }
             }
         }
