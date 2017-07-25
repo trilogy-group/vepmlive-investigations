@@ -46,16 +46,14 @@ namespace WE_QueueMgr
 
                 double interval = 1000;
                 timerJobsTimer = new Timer(interval);
-                timerJobsTimer.Elapsed += ProcessTimerJobs;
+                timerJobsTimer.Elapsed += ManageTimerJobs;
 
                 messageQueue = new Msmq();
 
-                if (serviceHost != null)
-                {
-                    serviceHost.Close();
-                }
+                serviceHost?.Close();
                 serviceHost = new ServiceHost(this);
-                messageQueue.CreateQueue(GetQueueName(serviceHost));
+                var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
+                messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
             }
             catch (Exception ex)
             {
@@ -102,12 +100,6 @@ namespace WE_QueueMgr
             {
                 ExceptionHandler("OnStart", ex);
             }
-        }
-
-        private string GetQueueName(ServiceHost serviceHost)
-        {
-            var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
-            return @".\Private$\" + msmqAddress.Split('/').Last();
         }
 
         private string BuildSitesList()
@@ -244,12 +236,48 @@ namespace WE_QueueMgr
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        private void ProcessTimerJobs(object sender, ElapsedEventArgs e)
+        private void ManageTimerJobs(object sender, ElapsedEventArgs e)
         {
             timerJobsTimer.Stop();
             try
             {
-                ManageTimerJobs();
+                var lMinutes = DateTime.Now.Ticks / 600000000;
+                try
+                {
+                    var bNewMinute = (lMinutes != m_lMinutes);
+                    if (bNewMinute)
+                    {
+                        m_lElapsedMinutes++;
+                        if (m_lElapsedMinutes >= const_Frequency)
+                        {
+                            m_lElapsedMinutes = 0;
+                            string basepaths = BuildSitesList();
+                            if (!string.IsNullOrEmpty(basepaths))
+                                MessageHandler("Refresh", "Refresh site list",
+                                               "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                        }
+                        if (sites != null)
+                        {
+                            foreach (QMSite site in sites)
+                            {
+                                string sXML = BuildProductInfoString(site);
+                                new LogService(sXML).TraceLog("ServiceTimer_Tick", 0, "");
+                                try
+                                {
+                                    ManageTimerJobs(site);
+                                }
+                                catch (Exception exception)
+                                {
+                                    ExceptionHandler($"ServiceTimer_Tick ManageJobs for '{site}'", exception);
+                                }
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    m_lMinutes = lMinutes;
+                }
             }
             catch (Exception ex)
             {
@@ -277,47 +305,6 @@ namespace WE_QueueMgr
                         ExceptionHandler($"ServiceTimer_Tick ManageQueue for '{site}'", exception);
                     }
                 }
-            }
-        }
-
-        private void ManageTimerJobs()
-        {
-            var lMinutes = DateTime.Now.Ticks / 600000000;
-            try
-            {
-                var bNewMinute = (lMinutes != m_lMinutes);
-                if (bNewMinute)
-                {
-                    m_lElapsedMinutes++;
-                    if (m_lElapsedMinutes >= const_Frequency)
-                    {
-                        m_lElapsedMinutes = 0;
-                        string basepaths = BuildSitesList();
-                        if (!string.IsNullOrEmpty(basepaths))
-                            MessageHandler("Refresh", "Refresh site list",
-                                           "active basePaths :\n" + basepaths.Replace(',', '\n'));
-                    }
-                    if (sites != null)
-                    {
-                        foreach (QMSite site in sites)
-                        {
-                            string sXML = BuildProductInfoString(site);
-                            new LogService(sXML).TraceLog("ServiceTimer_Tick", 0, "");
-                            try
-                            {
-                                ManageTimerJobs(site);
-                            }
-                            catch (Exception exception)
-                            {
-                                ExceptionHandler($"ServiceTimer_Tick ManageJobs for '{site}'", exception);
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                m_lMinutes = lMinutes;
             }
         }
 
