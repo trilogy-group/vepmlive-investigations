@@ -159,35 +159,51 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
             using (SPWeb mySite = Web.Site.OpenWeb())
             {
+                string UserName = string.Empty;
                 string basePath = CoreFunctions.getConfigSetting(mySite, "epkbasepath");
                 bool ResourceLevelPermision = false;
                 SPList myList = mySite.Lists["Resources"];
                 SPListItemCollection myItems = myList.GetItems();
                 foreach (SPListItem item in myItems)
                 {
-                    int ResourceLevel = Convert.ToInt32(item["ResourceLevel"]);
-                    string Title = Convert.ToString(item["Title"]);
-                    string UserName = string.Empty;
-
-                    if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
-                        ResourceLevelPermision = true;
-
-                    SPFieldUserValue SpFieldUser = new SPFieldUserValue(item.Web, item["SharePointAccount"].ToString());
                     try
                     {
-                        UserName = CoreFunctions.GetRealUserName(SpFieldUser.User.LoginName);
-                        bool ResourcePlanPermission = Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermision;
-                        var newitem = Utilities.ReloadListItem(item);
-                        newitem["UserHasPermission"] = ResourcePlanPermission;
-                        using (var scope = new DisabledItemEventScope())
+                        int ResourceLevel = 0;
+                        int.TryParse(Convert.ToString(item["ResourceLevel"]), out ResourceLevel);
+                        string Title = Convert.ToString(item["Title"]);
+                        bool ResourcePlanPermission = false;
+                        if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
+                            ResourceLevelPermision = true;
+                        if (!string.IsNullOrEmpty(Convert.ToString(item["SharePointAccount"])))
                         {
-                            newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                            SPFieldUserValue SpFieldUser = new SPFieldUserValue(item.Web, item["SharePointAccount"].ToString());
+                            if (SpFieldUser.User != null)
+                            {
+                                UserName = CoreFunctions.GetRealUserName(SpFieldUser.User.LoginName);
+                                ResourcePlanPermission = Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermision;
+                                var newitem = Utilities.ReloadListItem(item);
+                                newitem["UserHasPermission"] = ResourcePlanPermission;
+                                using (var scope = new DisabledItemEventScope())
+                                {
+                                    newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                                }
+                            }
+                            else
+                            {
+                                var newitem = Utilities.ReloadListItem(item);
+
+                                newitem["UserHasPermission"] = ResourcePlanPermission;
+                                using (var scope = new DisabledItemEventScope())
+                                {
+                                    newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                                }
+                            }
+                            LogMessage(string.Format("Updated for {0} with UserHasPermission value {1} ", Title, ResourcePlanPermission), 2);
                         }
-                        LogMessage(string.Format("Updating value for {0}", UserName), 2);
                     }
                     catch (Exception ex)
                     {
-                        LogMessage(ex.ToString(), MessageKind.FAILURE, 4);
+                        LogMessage(string.Format("Update fail for {0},  Error {1}", UserName, ex.ToString()), MessageKind.FAILURE, 4);
                     }
                 }
             }
