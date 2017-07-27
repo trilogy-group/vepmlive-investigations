@@ -543,33 +543,41 @@ namespace TimeSheets
 
             if(ds.Tables.Count > 0)
             {
-                foreach (DataRow dataRow in ds.Tables[0].Rows)
+                try
                 {
-
-                    Guid wGuid = new Guid(dataRow["WEB_UID"].ToString());
-                    Guid lGuid = new Guid(dataRow["LIST_UID"].ToString());
-
-                    if (webGuid != wGuid)
+                    foreach (DataRow dataRow in ds.Tables[0].Rows)
                     {
-                        if (iWeb != null)
+
+                        Guid wGuid = new Guid(dataRow["WEB_UID"].ToString());
+                        Guid lGuid = new Guid(dataRow["LIST_UID"].ToString());
+
+                        if (webGuid != wGuid)
                         {
-                            iWeb.Close();
-                            iWeb = site.OpenWeb(wGuid);
+                            if (iWeb != null)
+                            {
+                                iWeb.Close();
+                                iWeb = site.OpenWeb(wGuid);
+                            }
+                            else
+                                iWeb = site.OpenWeb(wGuid);
+                            webGuid = iWeb.ID;
                         }
-                        else
-                            iWeb = site.OpenWeb(wGuid);
-                        webGuid = iWeb.ID;
-                    }
-                    if (listGuid != lGuid)
-                    {
-                        iList = iWeb.Lists[lGuid];
+                        if (listGuid != lGuid)
+                        {
+                            iList = iWeb.Lists[lGuid];
 
-                        pList = SharedFunctions.getProjectCenterList(iList);
+                            pList = SharedFunctions.getProjectCenterList(iList);
 
-                        listGuid = iList.ID;
+                            listGuid = iList.ID;
+                        }
+                        SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
+                        SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                     }
-                    SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
-                    SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
+                }
+                finally
+                {
+                    if (iWeb != null)
+                        iWeb.Close();
                 }
             }
         }
