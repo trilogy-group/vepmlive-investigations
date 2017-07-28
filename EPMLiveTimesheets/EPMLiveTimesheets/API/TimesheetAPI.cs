@@ -515,6 +515,8 @@ namespace TimeSheets
                 else
                     message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
 
+                ProcessFullMeta(oWeb.Site, cn, tsuid);
+
                 cn.Close();
 
                 return message;
@@ -522,6 +524,61 @@ namespace TimeSheets
             catch (Exception ex)
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
+            }
+        }
+
+        public static void ProcessFullMeta(SPSite site, SqlConnection cn, string ts_uid)
+        {
+            var cmd = new SqlCommand("select ts_item_uid,web_uid,list_uid,item_id,project from TSITEM where TS_UID=@ts_uid", cn);
+            cmd.Parameters.AddWithValue("@ts_uid", ts_uid);
+            DataSet ds = new DataSet();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+
+            SPList pList = null;
+            SPWeb iWeb = null;
+            SPList iList = null;
+            Guid webGuid = Guid.Empty;
+            Guid listGuid = Guid.Empty;
+
+            if(ds.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach (DataRow dataRow in ds.Tables[0].Rows)
+                    {
+
+                        Guid wGuid = new Guid(dataRow["WEB_UID"].ToString());
+                        Guid lGuid = new Guid(dataRow["LIST_UID"].ToString());
+
+                        if (webGuid != wGuid)
+                        {
+                            if (iWeb != null)
+                            {
+                                iWeb.Close();
+                                iWeb = site.OpenWeb(wGuid);
+                            }
+                            else
+                                iWeb = site.OpenWeb(wGuid);
+                            webGuid = iWeb.ID;
+                        }
+                        if (listGuid != lGuid)
+                        {
+                            iList = iWeb.Lists[lGuid];
+
+                            pList = SharedFunctions.getProjectCenterList(iList);
+
+                            listGuid = iList.ID;
+                        }
+                        SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
+                        SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
+                    }
+                }
+                finally
+                {
+                    if (iWeb != null)
+                        iWeb.Close();
+                }
             }
         }
 
@@ -3502,7 +3559,7 @@ namespace TimeSheets
                 {
                     if (string.IsNullOrEmpty(Convert.ToString(drItem["ASSIGNEDTOID"])))
                     {
-                            assignedToId = "-99";
+                        assignedToId = "-99";
                     }
                     else
                     {
