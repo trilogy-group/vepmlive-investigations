@@ -340,7 +340,7 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
 Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
-Get-ChildItem -Path ($SourcesDirectory + "\UplandIntegrations\UplandIntegrations\bin\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
+Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "UplandIntegrations.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\Libraries\*")  -Include "RestSharp.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 Get-ChildItem -Path ($SourcesDirectory + "\packages\Newtonsoft.Json.6.0.8\lib\net45\*")  -Include "Newtonsoft.Json.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
