@@ -2,7 +2,7 @@
 
 # ### Define user adjustable parameters
 
-param (
+param ( 
     # MSBuild - which configuration to build
     [string]$ConfigurationToBuild = "Debug",
     # MSBuild - for which platform to make builds
