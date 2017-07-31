@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle Name="Project Publisher 2016" Version="6.1.0.0" Manufacturer="EPM Live" UpgradeCode="8c14fd8f-8f77-4c2d-998a-3b7c2e34bee0">
+    <!-- Bundle can only be installed on Windows >= 7 
+  	         (see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx) -->
+    <bal:Condition Message="Requires Windows >= 7">
+      <![CDATA[VersionNT >= v6.1]]>       
+    </bal:Condition>
+
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+      <bal:WixStandardBootstrapperApplication
+        LicenseUrl=""
+        LogoFile="..\setupicon.bmp"
+            />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <!-- TODO: Define the list of chained packages. -->
+      <MsiPackage Id="Shell" SourceFile="$(var.PublisherSetup2016WiX.TargetDir)PublisherSetup2016.msi">
+        <!-- Pass a property value to Shell installer -->
+        <!--MsiProperty Name="INSTALLSDK" Value="1" /-->
+      </MsiPackage>
+      <!-- <MsiPackage SourceFile="path\to\your.msi" /> -->
+
+    </Chain>
+  </Bundle>
+</Wix>
