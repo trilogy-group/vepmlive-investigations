@@ -76,9 +76,8 @@
         <File Source="..\EPMLive.ico" />
         <File Source="..\setuplogo.jpg" />
 
-        <?if $(var.Platform) = x86 ?>
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.XmlSerializers.dll" />
-        <?endif ?>
+
       </Component>
     </ComponentGroup>
   </Fragment>
