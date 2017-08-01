@@ -323,41 +323,42 @@ foreach ($platform in $platforms)
 		if ($LastExitCode -ne 0) {
 			throw "Project build failed with exit code: $LastExitCode."
 		}
-		if ($projIndex -eq 1)
-		{
-			Copy-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016$platform.msi" -Force
-		}
-		if ($projIndex -eq 2)
-		{
-			
-			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe" -Force
-		}
+		
+
 		Try
 		{
 			if ($projIndex -eq 1)
 			{
 				exec {&$signtool sign /n "EPM Live, Inc." `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016.msi"}
+					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
 				
 				exec {&$signtool timestamp /t http://timestamp.digicert.com `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016.msi"}
+					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
 				
 			}
 			if ($projIndex -eq 2)
 			{
 				exec {&$signtool sign /n "EPM Live, Inc." `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe"}
+					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe"}
 				
 				exec {&$signtool timestamp /t http://timestamp.digicert.com `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe"}
+					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe"}
 					
 			}
+			
 		}
 		Catch
 		{
 			$ErrorMessage = $_.Exception.Message
 			Write-Warning "Failed to sign $wixProject ($platform): $ErrorMessage" -WarningAction SilentlyContinue
 		}
+		if ($projIndex -eq 2)
+		{
+			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016$platform.msi" -Force
+			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe" -Force
+			
+		}
+		
 		$projIndex++
 	}
 	$platformIndex++;
