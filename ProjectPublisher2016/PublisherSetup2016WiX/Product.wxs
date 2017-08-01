@@ -71,10 +71,14 @@
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.dll"/>
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.Runtime.dll" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll"/>
-        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.XmlSerializers.dll"/>
+        
         <File Source="$(var.ProjectPublisher2016.TargetDir)PPMUtility.exe"/>
         <File Source="..\EPMLive.ico" />
         <File Source="..\setuplogo.jpg" />
+
+        <?if $(var.Platform) = x86 ?>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.XmlSerializers.dll" />
+        <?endif ?>
       </Component>
     </ComponentGroup>
   </Fragment>

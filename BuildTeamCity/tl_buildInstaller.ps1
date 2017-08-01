@@ -284,6 +284,81 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
         throw "Project build failed with exit code: $LastExitCode."
     }
 }
+Log-Section "Building WiX Projects . . ."
+
+$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016WiX.wixproj") -Recurse
+
+    
+	Log-SubSection "projectPath: '$projectPath'...."
+    
+	Log-SubSection "Building PublisherSetup2016WiX.wixproj Release|x64..."
+   & $MSBuildExec $projectPath `
+   /t:build `
+   /p:OutputPath="bin\x64\Release" `
+   /p:PreBuildEvent= `
+   /p:PostBuildEvent= `
+   /p:Configuration="Release" `
+   /p:Platform="x64" `
+   /p:langversion="$langversion" `
+   /p:GenerateSerializationAssemblies="Off" `
+   /p:ReferencePath=$referencePath `
+	/fl /flp:"$loggerArgs" `
+	/m:4 `
+	$ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+	if ($LastExitCode -ne 0) {
+		throw "Project build failed with exit code: $LastExitCode."
+	}
+	
+	Try
+	{
+	exec {&$signtool sign /n "EPM Live, Inc." `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\x64\Release\PublisherSetup2016.msi"}
+    
+	exec {&$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\x64\Release\PublisherSetup2016.msi"}
+	}
+	Catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Warning "Failed to sign PublisherSetup2016.msi (x64): $ErrorMessage" -WarningAction SilentlyContinue
+	}
+	
+	Log-SubSection "Building PublisherSetup2016WiX.wixproj Release|x86..."
+   & $MSBuildExec $projectPath `
+   /t:build `
+   /p:OutputPath="bin\Release" `
+   /p:PreBuildEvent= `
+   /p:PostBuildEvent= `
+   /p:Configuration="Release" `
+   /p:Platform="x86" `
+   /p:langversion="$langversion" `
+   /p:GenerateSerializationAssemblies="Off" `
+   /p:ReferencePath=$referencePath `
+	/fl /flp:"$loggerArgs" `
+	/m:4 `
+	$ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+	if ($LastExitCode -ne 0) {
+		throw "Project build failed with exit code: $LastExitCode."
+	}
+	Try
+	{
+	exec {&$signtool sign /n "EPM Live, Inc." `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\Release\PublisherSetup2016.msi"}
+    
+	exec {&$signtool timestamp /t http://timestamp.digicert.com `
+        "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\Release\PublisherSetup2016.msi"}
+	}
+	Catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Warning "Failed to sign PublisherSetup2016.msi (x86): $ErrorMessage" -WarningAction SilentlyContinue
+	}
+
+
 
 Log-Section "Building VD Projects . . ."
 #set registry value for building VDPROJ setup projects
@@ -295,7 +370,7 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
     Log-SubSection "Building 'PublisherSetup2016x64.vdproj'..."
 	Log-SubSection "projectPath: '$projectPath'...."
     
-   & $VSExec $projectPath /build "Release|Any CPU"
+   & $VSExec $projectPath /build "Release|x64"
 
     if ($LastExitCode -ne 0) {
         throw "Project build failed with exit code: $LastExitCode."
@@ -337,6 +412,9 @@ Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild
 		$ErrorMessage = $_.Exception.Message
 		Write-Warning "Failed to sign PublisherSetup2016x86.msi: $ErrorMessage" -WarningAction SilentlyContinue
 	}
+	
+	
+
 Log-Section "Copying Files..."
 
 #Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Copy-Item -Destination $IntermediatesDirectory -Force
