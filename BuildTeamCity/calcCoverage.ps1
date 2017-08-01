@@ -13,12 +13,7 @@ $f = $a.GetFile($vsConsolePath)
 $vsConsolePath = $f.ShortPath
 
 $targetFiles= (@(Get-ChildItem "$ScriptDir" -Include *.Tests.dll -Recurse -File |
-    Where-Object {(
-        $_.DirectoryName -inotmatch '\\obj\\' -and
-        ($_.DirectoryName -ilike "*\$ConfigurationToBuild"
-		-or $_.DirectoryName -ilike "*\Test-Output")
-	
-    )}
+    Where-Object {($_.DirectoryName -inotmatch '\\obj\\' -and ($_.DirectoryName -ilike "*\$ConfigurationToBuild" -or $_.DirectoryName -ilike "*\Test-Output"))}
 ) | Select -ExpandProperty FullName) -join " "
 
 Write-Host $targetFiles
