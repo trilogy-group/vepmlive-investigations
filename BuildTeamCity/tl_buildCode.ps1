@@ -80,7 +80,7 @@ $referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" -re
 
 if ($TestsOnly)
 {
-	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests")
+	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests")
 	
 	# Directory for outputs
 	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
