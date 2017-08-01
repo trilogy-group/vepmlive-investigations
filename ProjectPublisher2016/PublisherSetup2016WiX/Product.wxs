@@ -76,8 +76,6 @@
         <File Source="..\EPMLive.ico" />
         <File Source="..\setuplogo.jpg" />
 
-        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.XmlSerializers.dll" />
-
       </Component>
     </ComponentGroup>
   </Fragment>
