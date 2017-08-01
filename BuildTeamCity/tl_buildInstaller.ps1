@@ -284,14 +284,17 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
         throw "Project build failed with exit code: $LastExitCode."
     }
 }
-Log-Section "Building WiX Projects . . ."
 
-$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016WiX.wixproj") -Recurse
+Log-Section "Building WiX Projects . . ."
+$wixProjects = @("ProjectPublisher2016.csproj", "PublisherSetup2016WiX.wixproj", "PublisherSetupBootstrapper.wixproj")
+foreach($wixProject in $wixProjects)
+{
+	$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("$wixProject") -Recurse
 
     
 	Log-SubSection "projectPath: '$projectPath'...."
     
-	Log-SubSection "Building PublisherSetup2016WiX.wixproj Release|x64..."
+	Log-SubSection "Building $wixProject Release|x64..."
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="bin\x64\Release" `
@@ -310,7 +313,7 @@ $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("Publish
 	if ($LastExitCode -ne 0) {
 		throw "Project build failed with exit code: $LastExitCode."
 	}
-	
+}
 	Try
 	{
 	exec {&$signtool sign /n "EPM Live, Inc." `
@@ -324,8 +327,14 @@ $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("Publish
 		$ErrorMessage = $_.Exception.Message
 		Write-Warning "Failed to sign PublisherSetup2016.msi (x64): $ErrorMessage" -WarningAction SilentlyContinue
 	}
+foreach($wixProject in $wixProjects)
+{
+	$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("$wixProject") -Recurse
+
+    
+	Log-SubSection "projectPath: '$projectPath'...."
 	
-	Log-SubSection "Building PublisherSetup2016WiX.wixproj Release|x86..."
+	Log-SubSection "Building $wixProject Release|x86..."
    & $MSBuildExec $projectPath `
    /t:build `
    /p:OutputPath="bin\Release" `
@@ -344,6 +353,7 @@ $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("Publish
 	if ($LastExitCode -ne 0) {
 		throw "Project build failed with exit code: $LastExitCode."
 	}
+}
 	Try
 	{
 	exec {&$signtool sign /n "EPM Live, Inc." `
