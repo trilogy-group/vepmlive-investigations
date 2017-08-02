@@ -13,6 +13,7 @@ param (
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true,
+	# build test projects only
 	[switch]$TestsOnly
 );
 
@@ -69,6 +70,7 @@ $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
 $SourcesDirectory = "$ScriptDir\..\"
+# Initialize logs directory
 $LogsDirectory = "$SourcesDirectory\logs"
 if (!(Test-Path -Path $LogsDirectory )){
     New-Item $LogsDirectory -type Directory
@@ -131,7 +133,7 @@ $BinariesDirectory = Join-Path $OutputDirectory "binaries"
 $LibrariesDirectory = "$OutputDirectory\libraries"
 # Initialize intermediates directory (PDB)
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
-# Initialize logs directory
+
 
 
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
