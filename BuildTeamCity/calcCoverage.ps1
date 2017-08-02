@@ -1,3 +1,8 @@
+param (
+    # MSBuild - which configuration to build
+    [string]$ConfigurationToBuild = "Debug"
+)
+	
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 $ScriptDir = (get-item $ScriptDir).parent.FullName
 
@@ -8,10 +13,7 @@ $f = $a.GetFile($vsConsolePath)
 $vsConsolePath = $f.ShortPath
 
 $targetFiles= (@(Get-ChildItem "$ScriptDir" -Include *.Tests.dll -Recurse -File |
-    Where-Object {(
-        $_.DirectoryName -inotmatch '\\obj\\' -and
-        $_.DirectoryName -ilike "*\Debug"
-    )}
+    Where-Object {($_.DirectoryName -inotmatch '\\obj\\' -and ($_.DirectoryName -ilike "*\$ConfigurationToBuild" -or $_.DirectoryName -ilike "*\Test-Output"))}
 ) | Select -ExpandProperty FullName) -join " "
 
 Write-Host $targetFiles
