@@ -11,8 +11,8 @@ param (
     [string]$ToolsVersion = "/tv:14.0",
     # user-specific additional command line parameters to pass to MSBuild
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
-    # should build cleanup be performed before making build
-    [string]$CleanBuild = $true
+    #Skip InstallShield
+	[switch]$SkipInstallShield
 );
 function exec
 {
@@ -432,7 +432,9 @@ Copy-Item $BinariesDirectory\EPMLiveIntegration.dll $BuildDependenciesFolder -Fo
 New-Item $BuildDependenciesFolder\PS -type directory -Force
 Copy-Item $SourcesDirectory\EPMLiveCore\EPMLiveCore\Resources\*.sql $BuildDependenciesFolder\PS -Force  
 
-
+if (!$SkipInstallShield)
+{
 #Run Installshield project to generate product .exe
 & "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease" -l PATH_TO_BUILDDDEPENDENC_FILES="$BuildDependenciesFolder" -l PATH_TO_PRODUCTOUTPUT_FILES="$ProductOutput"
 Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe" -NewName "WorkEngine$NewReleaseNumber.exe"
+}
