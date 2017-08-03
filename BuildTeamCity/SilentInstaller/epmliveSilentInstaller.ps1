@@ -1,14 +1,25 @@
+
 Param(  
-    #[string] $webAppName = ("http://" + $env:COMPUTERNAME)
-    [string] $webAppName = "http://qaepmlive6",
+    [string] $webAppName = ("http://" + $env:COMPUTERNAME),
+    #[string] $webAppName = "http://qaepmlive6",
     [string] $dbService = "epmDB.epmldev.com",
     [string] $dbName = "epmlive",
     [string] $appPool = "SharePoint - qaepmlive680",
     [string] $inUserName = "farmadmin@epmldev",
-    [string] $inPassword = "Pass@word1"
+	[string] $comUserName = "epmldev\farmadmin",
+    [string] $inPassword = "Pass@word1",
+	[string] $version = "6.1.0.0",
+	[switch] $deploySolutions,
+	[switch] $deployGAC,
+	[switch] $deployCOM,
+	[switch] $deployTimer,
+	[switch] $deployPFE,
+	[switch] $createDB
+	
 )
-
+$config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 . ".\routines.ps1"
+$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 if (!(Test-ADCredential $inUserName $inPassword))
 {
@@ -17,81 +28,120 @@ if (!(Test-ADCredential $inUserName $inPassword))
 }
 
 #### STOP SERVICES ####
-if ($true)
+foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
 {
-    foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
-    {
-        Write-Host ("Stop service:" + $component.installAsService.name)
-        Stop-Service $component.installAsService.name
-    }
+	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
+	{
+		Write-Host ("Stop service:" + $component.installAsService.name)
+		Stop-Service -Name $component.installAsService.name
+		WaitUntilServices $component.installAsService.name "Stopped"
+		Write-Host("Killing " + $component.installAsService.processname)
+		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
+	}
+	else
+	{
+		Write-Host ("Service " + $component.installAsService.name + " not found, skipping stop")
+	}
 }
 
+## UNREGISTER COM
+foreach ($component in $config.Components | Where-Object {($_.registerCOMplus -ne $null) -or ($_.registerCOM -ne $null)})
+{
+    $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
+	$destination = ClarifyPath $component.destination
+    foreach ($file in $component.files)
+    {
+		if (![string]::IsNullOrEmpty($component.registerCOM) )
+		{
+			unregister-File (Join-Path $destination $file)
+		}
+
+		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
+		{
+			Unregister-COMPlus $component.registerCOMplus.Name
+		}
+	}
+}
+	
 #### COPY FILES #####
+
 
 [System.Reflection.Assembly]::Load("System.EnterpriseServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") | Out-Null
 
-$config = Get-Content "config.json" | Out-String | ConvertFrom-Json
+
 foreach ($component in $config.Components)
 {
-    $folderName = "Files\"+$component.name
-    
-    if ($component.destination.Equals("GAC"))
-    {
-        foreach ($file in $component.files)
-        {
-            $fullName = Resolve-Path ($folderName + "\" + $file) 
-            Write-Host "Add to GAC: $fullName"
-            $publish = New-Object System.EnterpriseServices.Internal.Publish            
-            $publish.GacInstall($fullName)
-        }
-        continue
-    }
-
+    $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
+	
+	if ($component.destination.Equals("GAC"))
+	{
+		if ($deployGAC)
+		{
+			foreach ($file in $component.files)
+			{
+				$fullName = Join-Path $folderName $file
+				Write-Host ("Add to GAC: $fullName")
+				$publish = New-Object System.EnterpriseServices.Internal.Publish            
+				$publish.GacInstall($fullName)
+			}
+		}
+		continue;
+	}
+	
     $destination = ClarifyPath $component.destination
     
-    Write-Host $destination
-    New-Item $destination -type directory -Force
+    #Write-Host "Destination $destination"
+	if(!(Test-Path -Path $destination )){
+		Write-Host ("Create folder $destination")
+		New-Item $destination -type directory -Force
+	}
     foreach ($file in $component.files)
     {
-        $fullName = Resolve-Path ($folderName + "\" + $file) 
-        Copy-Item $fullName $destination -Force
+		
+        $fullName = Join-Path $folderName $file
+        Write-Host ("Copying file $file")
+		Copy-Item $fullName $destination -Force 
 
         if (![string]::IsNullOrEmpty($component.unzip))
         {
+			Write-Host ("Unzip file $file") 
             $outDir = ClarifyPath $component.unzip
-            Unzip $fullName $outDir
+            Unzip $fullName $outDir  
         }
+		if ($deployCOM)
+		{
+			if (![string]::IsNullOrEmpty($component.registerCOM))
+			{
+				Register-File (Join-Path $destination $file)
+			}
 
-        if (![string]::IsNullOrEmpty($component.registerCOM))
-        {
-            Register-File (Join-Path $destination $file)
-        }
-
-        if (![string]::IsNullOrEmpty($component.registerCOMplus))
-        {
-            Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $inUserName $inPassword
-        }
+			if (![string]::IsNullOrEmpty($component.registerCOMplus))
+			{
+				Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
+			}
+		}
+		
     }
 }
-
+ 
 #### Install WSP ####
-if ($false)
+if ($deploySolutions)
 {
     RestartSPTimerV4
 
     foreach ($component in $config.Components)
     {
-        $folderName = "Files\"+$component.name
-    
+        $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
+        
         if (![string]::IsNullOrEmpty($component.deployWSP))
         {
             if ($component.deployWSP.Equals("web"))
             {
                 foreach ($file in $component.files)
                 {
-                    $fullName = Resolve-Path ($folderName + "\" + $file) 
-                    Write-Host "Remove WSP: $fullName"
-                    RemoveWSP $file $fullName $webAppName
+                    
+                    Write-Host "Remove WSP: $file"
+                    RemoveWSP $file -webAppName $webAppName
                 }
             }
 
@@ -99,9 +149,9 @@ if ($false)
             {
                 foreach ($file in $component.files)
                 {
-                    $fullName = Resolve-Path ($folderName + "\" + $file) 
-                    Write-Host "Remove WSP: $fullName"
-                    RemoveWSP $file $fullName
+                    
+                    Write-Host "Remove WSP: $file"
+                    RemoveWSP $file 
                 }
             }
         }
@@ -109,11 +159,12 @@ if ($false)
 
     RestartSPTimerV4
 
+	
     start-sleep -s 60
 
     foreach ($component in $config.Components)
     {
-        $folderName = "Files\"+$component.name
+        $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
     
         if (![string]::IsNullOrEmpty($component.deployWSP))
         {
@@ -121,7 +172,7 @@ if ($false)
             {
                 foreach ($file in $component.files)
                 {
-                    $fullName = Resolve-Path ($folderName + "\" + $file) 
+                    $fullName = Join-Path $folderName $file
                     Write-Host "Deploy WSP: $fullName"
                     DeployWSP $file $fullName $webAppName
                 }
@@ -131,7 +182,7 @@ if ($false)
             {
                 foreach ($file in $component.files)
                 {
-                    $fullName = Resolve-Path ($folderName + "\" + $file) 
+                    $fullName = Join-Path $folderName $file
                     Write-Host "Deploy WSP: $fullName"
                     DeployWSP $file $fullName
                 }
@@ -139,12 +190,11 @@ if ($false)
         }
     }
 
-
     RestartSPTimerV4
 }
-
+ 
 #### Create Database ####
-if($false)
+if($createDB)
 {
     Import-Module WebAdministration
     $webApp = (Get-ChildItem -Path IIS:\AppPools\ | Where-Object {$_.name -eq $appPool});
@@ -161,11 +211,11 @@ if($false)
 
     foreach ($component in $config.Components | Where-Object {$_.runSQL -eq "true"})
     {
-        $folderName = "Files\"+$component.name
+        $folderName = Join-Path $ScriptDir "Files" | Join-Path -ChildPath $component.name
     
         foreach ($file in $component.files)
         {
-            $fullName = Resolve-Path ($folderName + "\" + $file)
+            $fullName = $fullName = Join-Path $folderName $file
             Write-Host "Run SQL: $fullName"
             Invoke-Sqlcmd -InputFile $fullName -ServerInstance $dbService -Database $dbName 
         }
@@ -181,25 +231,30 @@ if($false)
     [EPMLiveCore.CoreFunctions]::setConnectionString($w.Id, $cn, [ref] $sError)
 }
 
-#### INSTALL SERVICES ####
-if ($true)
-{
-    foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
-    {
-        foreach ($file in $component.files)
-        {
-            $destination = ClarifyPath $component.destination
-            $destFileName =  Join-Path $destination $file
-            Write-Host "Install as service: $destFileName"
-            Install-Service `
-                -serviceName $component.installAsService.name `
-                -displayName $component.installAsService.displayname `
-                -description $component.installAsService.description `
-                -path $destFileName `
-                -UserName $inUserName `
-                -Password $inPassword
-            #Invoke-Sqlcmd -InputFile $fullName -ServerInstance $dbService -Database $dbName 
-        }
-    }
+#### DEPLOY AND START SERVICES ####
 
+foreach ($component in $config.Components | Where-Object {$_.installAsService -ne $null})
+{
+	if (($deployPFE -and $component.installAsService.key -eq "PFE" ) -or ($deployTimer -and $component.installAsService.key -eq "Timer" ))
+	{
+		foreach ($file in $component.files)
+		{
+			$destination = ClarifyPath $component.destination
+			$destFileName =  Join-Path $destination $file
+			Write-Host "Install as service: $destFileName"
+			Install-Service `
+				-serviceName $component.installAsService.name `
+				-displayName $component.installAsService.displayname `
+				-description $component.installAsService.description `
+				-path $destFileName `
+				-UserName $inUserName `
+				-Password $inPassword
+			
+		}
+	}
+	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
+	{
+		Start-Service -Name $component.installAsService.name
+		WaitUntilServices $component.installAsService.name "Running"
+	}
 }

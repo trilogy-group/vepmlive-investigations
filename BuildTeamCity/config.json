@@ -36,9 +36,11 @@
 			"files": ["WE_QueueMgr.exe"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN",
 			"installAsService": {
-				"name": "PFEQueue",
+				"name": "PFE Queue",
 				"displayname": "PortfolioEngine Queue",
-				"description": " "
+				"processname": "WE_QueueMgr",
+ 				"description": " ",
+				"key": "PFE"
 			}		},
 		{
 			"name": "RestSharp.dll", 
@@ -86,9 +88,11 @@
 			"files": ["TimerService.exe"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\Timer",
 			"installAsService": {
-				"name": "WorkEngineTimer",
+				"name": "WETimer",
 				"displayname": "Work Engine Timer Service",
-				"description": " "
+				"processname": "TimerService",
+				"description": " ",
+				"key": "Timer"
 			}		},
 		{
 			"name": "WETimerConfig", 
