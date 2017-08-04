@@ -2116,6 +2116,9 @@ namespace EPMLiveCore.API
             {
                 foreach (DataRow dr in dtTemp.Rows)
                 {
+                    if (dr["Disabled"] != null && dr["Disabled"].ToString() == "Yes")
+                        continue;
+
                     XmlNode ndNew = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
 
                     XmlAttribute nattr = docOut.CreateAttribute("NoColorState");
@@ -2140,14 +2143,7 @@ namespace EPMLiveCore.API
                                 ndNew.Attributes.Append(nattr);
                             }
                         }
-                    }
-
-                    if (dr["Disabled"].ToString() == "Yes")
-                    {
-                        nattr = docOut.CreateAttribute("Visible");
-                        nattr.Value = "0";
-                        ndNew.Attributes.Append(nattr);
-                    }
+                    }                    
 
                     ndBody.AppendChild(ndNew);
                 }
