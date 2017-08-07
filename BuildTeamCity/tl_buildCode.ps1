@@ -13,8 +13,8 @@ param (
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true,
-	# build test projects only
-	[switch]$TestsOnly
+	  # build test projects only
+	  [switch]$TestsOnly
 );
 
 $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegrationService",
@@ -93,6 +93,7 @@ if ($TestsOnly)
     
     $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
 
+
     Log-SubSection "Building '$projectToBeBuildAsDLL'..."
 	Log-SubSection "projectPath: '$projectPath'...."
 	
@@ -117,7 +118,6 @@ if ($TestsOnly)
 	}
 
 }
-
 }
 else
 {
@@ -133,9 +133,6 @@ $BinariesDirectory = Join-Path $OutputDirectory "binaries"
 $LibrariesDirectory = "$OutputDirectory\libraries"
 # Initialize intermediates directory (PDB)
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
-
-
-
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projDir = Split-Path $projAbsPath -parent
