@@ -86,7 +86,7 @@ namespace WorkEnginePPM
                             DBAccess dba = da.dba;
                             if (dba.Open() == StatusEnum.rsSuccess)
                             {
-                                dbaQueueManager.QueueTestJob(dba);
+                                dbaQueueManager.QueueTestJob(dba, da.BasePath);
                             }
                             dba.Close();
                             break;

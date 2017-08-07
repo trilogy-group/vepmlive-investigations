@@ -13,7 +13,8 @@ param (
     [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true,
-	[switch]$TestsOnly
+	  # build test projects only
+	  [switch]$TestsOnly
 );
 
 $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegrationService",
@@ -69,6 +70,7 @@ $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
 $SourcesDirectory = "$ScriptDir\..\"
+# Initialize logs directory
 $LogsDirectory = "$SourcesDirectory\logs"
 if (!(Test-Path -Path $LogsDirectory )){
     New-Item $LogsDirectory -type Directory
@@ -90,6 +92,7 @@ if ($TestsOnly)
 	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
     
     $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
+
 
     Log-SubSection "Building '$projectToBeBuildAsDLL'..."
 	Log-SubSection "projectPath: '$projectPath'...."
@@ -115,7 +118,6 @@ if ($TestsOnly)
 	}
 
 }
-
 }
 else
 {
@@ -131,9 +133,6 @@ $BinariesDirectory = Join-Path $OutputDirectory "binaries"
 $LibrariesDirectory = "$OutputDirectory\libraries"
 # Initialize intermediates directory (PDB)
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
-# Initialize logs directory
-
-
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projDir = Split-Path $projAbsPath -parent

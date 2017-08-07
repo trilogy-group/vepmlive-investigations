@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  <?if $(var.Platform) = x64 ?>
+  <?define bitness = "(64 bit)" ?>
+  <?define Win64 = "yes" ?>
+  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+  <?define bitness = "(32 bit)" ?>
+  <?define Win64 = "no" ?>
+  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+  
+  <Product Id="*" Name="Project Publisher 2016" Language="1033" Version="6.1.0" Manufacturer="EPM Live" UpgradeCode="555A36A7-8558-4CC2-9A65-6013F4316C84">
+    
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    
+    <MediaTemplate EmbedCab="yes" /> 
+    
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" AllowSameVersionUpgrades="no" />
+    
+      <Feature Id="ProductFeature" Title="Publisher Setup 2016" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+    
+    <WixVariable Id="WixUIBannerBmp" Value="..\setuplogo.bmp" />
+    <Icon Id="icon.ico" SourceFile="..\EPMLive.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+    
+    <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
+    
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+      <Publish Dialog="WelcomeDlg"
+            Control="Next"
+            Event="NewDialog"
+            Value="InstallDirDlg"
+            Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+            Control="Back"
+            Event="NewDialog"
+            Value="WelcomeDlg"
+            Order="2">1</Publish>
+    </UI>
+  
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="ManufacturerFolder" Name="!(bind.property.Manufacturer)">
+          <Directory Id="INSTALLFOLDER" Name="!(bind.property.ProductName)" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER" >
+      <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+      <Component Id="ProductComponent" Win64="$(var.Win64)" Guid="0089E29C-E076-4723-9067-FEA0231835D5">
+        <!-- TODO: Insert files, registry keys, and other resources here. -->
+        <File Source="$(var.ProjectPublisher2016.TargetPath)" KeyPath="yes"/>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.dll.manifest" />
+        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.vsto"/>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.Common.dll" />
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.Common.v4.0.Utilities.dll"/>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.dll" />
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.v4.0.Framework.dll"/>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.dll"/>
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.Runtime.dll" />
+        <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll"/>
+        
+        <File Source="$(var.ProjectPublisher2016.TargetDir)PPMUtility.exe"/>
+        <File Source="..\EPMLive.ico" />
+        <File Source="..\setuplogo.jpg" />
+
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  
+  
+</Wix>

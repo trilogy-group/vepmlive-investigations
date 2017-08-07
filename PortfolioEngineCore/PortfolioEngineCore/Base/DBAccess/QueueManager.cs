@@ -53,42 +53,35 @@ namespace PortfolioEngineCore
             return eStatus;
 
         }
-        public static StatusEnum PostCostValues(DBAccess dba, string sComment, string sData, out int lRowsAffected)
-        {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-            const string sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
 
-            SqlCommand cmd = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-            cmd.Parameters.AddWithValue("@JOB_GUID", Guid.NewGuid());
-            //    qjcCustom = 0
-            cmd.Parameters.AddWithValue("@JOB_CONTEXT", 0);
-            cmd.Parameters.AddWithValue("@JOB_SESSION", Guid.NewGuid());
-            cmd.Parameters.AddWithValue("@WRES_ID", dba.UserWResID);
-            cmd.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-            cmd.Parameters.AddWithValue("@JOB_STATUS", 0); // For now let 0 mean Not Started
-            cmd.Parameters.AddWithValue("@JOB_COMMENT", sComment);
-            cmd.Parameters.AddWithValue("@JOB_CONTEXT_DATA", sData);
-            lRowsAffected = cmd.ExecuteNonQuery();
-            return eStatus;
-        }
-        public static StatusEnum QueueTestJob(DBAccess dba)
+        public static StatusEnum PostCostValues(DBAccess databaseAccess, string jobComment, string jobContextData, string basePath, out int rowsAffected)
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-            const string sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
-
-            SqlCommand cmd = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-            cmd.Parameters.AddWithValue("@JOB_GUID", Guid.NewGuid());
-            //    qjcCustom = 0
-            cmd.Parameters.AddWithValue("@JOB_CONTEXT", 100001);
-            cmd.Parameters.AddWithValue("@JOB_SESSION", Guid.NewGuid());
-            cmd.Parameters.AddWithValue("@WRES_ID", dba.UserWResID);
-            cmd.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-            cmd.Parameters.AddWithValue("@JOB_STATUS", 0); // For now let 0 mean Not Started
-            cmd.Parameters.AddWithValue("@JOB_COMMENT", "Test Job");
-            cmd.Parameters.AddWithValue("@JOB_CONTEXT_DATA", "");
-            cmd.ExecuteNonQuery();
-            return eStatus;
+            var job = new PfeJob()
+            {
+                Context = 0,
+                Session = Guid.NewGuid().ToString(),
+                UserId = databaseAccess.UserWResID,
+                Comment = jobComment,
+                ContextData = jobContextData
+            };
+            rowsAffected = job.Queue(new DbRepository(databaseAccess), new Msmq(), basePath);
+            return StatusEnum.rsSuccess;
         }
+
+        public static StatusEnum QueueTestJob(DBAccess dba, string basePath)
+        {
+            var job = new PfeJob()
+            {
+                Context = 100001,
+                Session = Guid.NewGuid().ToString(),
+                UserId = dba.UserWResID,
+                Comment = "Test Job",
+                ContextData = ""
+            };
+            job.Queue(new DbRepository(dba), new Msmq(), basePath);
+            return StatusEnum.rsSuccess;
+        }
+
         public static StatusEnum SelectHeartbeat(DBAccess dba, out DateTime dtHeartbeat)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;

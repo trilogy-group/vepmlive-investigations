@@ -1173,7 +1173,9 @@ function SetTaskAssignments(Row) {
                     }
                 }
                 else {
-                    grid.SetValue(newrow, "Work", 0, oShowAssignments);
+                    if (Row.TaskType != "Individual") {
+                        grid.SetValue(newrow, "Work", 0, oShowAssignments);
+                    }
                 }
                 //if(!oShowAssignments)
                 //    grid.HideRow(newrow);
