@@ -11,13 +11,24 @@
     EPM Live - Snapshot Manager
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <sharepoint:menutemplate id="mtEventMenu" runat="server">
+    <sharepoint:menutemplate id="mtEventMenuSchedule" runat="server">
         <Sharepoint:MenuItemTemplate 
             ID="MenuItemTemplate1" 
             runat="server"
             Text="Edit"           
             ImageUrl="/_layouts/images/CDX16.GIF"         
-            ClientOnClickUsingPostBackEvent = "__page,%uid%"
+            ClientOnClickUsingPostBackEvent = "__page,%uid%,schedule"
+            Title="Edit">
+        </Sharepoint:MenuItemTemplate>     
+    </sharepoint:menutemplate>
+
+      <sharepoint:menutemplate id="mtEventMenuSnapshot" runat="server">
+        <Sharepoint:MenuItemTemplate 
+            ID="MenuItemTemplate2" 
+            runat="server"
+            Text="Edit"           
+            ImageUrl="/_layouts/images/CDX16.GIF"         
+            ClientOnClickUsingPostBackEvent = "__page,%uid%,snapshot"
             Title="Edit">
         </Sharepoint:MenuItemTemplate>     
     </sharepoint:menutemplate>
@@ -34,7 +45,7 @@
                            HeaderStyle-CssClass="ms-alternatingstrong" Width="70%">
         <Columns>
             <SharePoint:SPMenuField HeaderText="Schedule Name" TextFields="Schedule Name" HeaderStyle-Font-Size="Smaller"
-                                    MenuTemplateId="mtEventMenu" ToolTipFields="Schedule Name" TokenNameAndValueFields="uid=timerjobuid" />
+                                    MenuTemplateId="mtEventMenuSchedule" ToolTipFields="Schedule Name" TokenNameAndValueFields="uid=timerjobuid" />
         </Columns>
     </SharePoint:SPGridView>
     <table>
@@ -64,7 +75,7 @@
                 TextFields="Report Title"
                 HeaderStyle-Font-Size="Smaller"
                 HeaderStyle-ForeColor = "Black"
-                MenuTemplateId="mtEventMenu"
+                MenuTemplateId="mtEventMenuSnapshot"
                 ToolTipFields="Report Title"
                 TokenNameAndValueFields="uid=periodid"                                
                 />
