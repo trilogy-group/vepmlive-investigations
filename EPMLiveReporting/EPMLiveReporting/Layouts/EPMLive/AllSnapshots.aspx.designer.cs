@@ -13,13 +13,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
     public partial class AllSnapshots {
         
         /// <summary>
-        /// mtEventMenu control.
+        /// mtEventMenuSchedule control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.MenuTemplate mtEventMenu;
+        protected global::Microsoft.SharePoint.WebControls.MenuTemplate mtEventMenuSchedule;
         
         /// <summary>
         /// MenuItemTemplate1 control.
@@ -29,6 +29,24 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.SharePoint.WebControls.MenuItemTemplate MenuItemTemplate1;
+        
+        /// <summary>
+        /// mtEventMenuSnapshot control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.MenuTemplate mtEventMenuSnapshot;
+        
+        /// <summary>
+        /// MenuItemTemplate2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.MenuItemTemplate MenuItemTemplate2;
         
         /// <summary>
         /// grdVwSchedules control.

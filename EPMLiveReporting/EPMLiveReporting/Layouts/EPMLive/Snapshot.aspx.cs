@@ -60,7 +60,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             DataTable dt;
             //_DAO.Command = "SELECT * FROM RPTPeriods WHERE PeriodID = '" + Request.QueryString["uid"] + "'"; - CAT.NET
             _DAO.Command = "SELECT * FROM RPTPeriods WHERE PeriodID = @uid";
-            _DAO.AddParam("@uid", Request.QueryString["uid"]);
+            _DAO.AddParam("@uid", Request.QueryString["uid"].Split(',')[0]);
             dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
             snapShotDate.SelectedDate = DateTime.Parse(dt.Rows[0]["PeriodDate"].ToString());
             title.Text = dt.Rows[0]["Title"].ToString();
@@ -69,7 +69,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void save_Click(object sender, EventArgs e)
         {
-            var id = new Guid(Request.QueryString["uid"]);
+            var id = new Guid(Request.QueryString["uid"].Split(',')[0]);
             _DAO.Command =
                 "UPDATE RPTPeriods SET PeriodDate=@periodDate, Title=@title, Enabled=@enabled WHERE periodid=@period";
             _DAO.AddParam("@periodDate", snapShotDate.SelectedDate);
