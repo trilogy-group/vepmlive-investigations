@@ -40,7 +40,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Forms.4.0.0.0.Fakes">
+    <Reference Include="System.Windows.Forms.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>FakesAssemblies\System.Windows.Forms.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
@@ -66,9 +67,6 @@
       <Project>{E265BBB7-2B0A-4E42-9981-FC577172398F}</Project>
       <Name>ProjectPublisher2016</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Windows.Forms.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
