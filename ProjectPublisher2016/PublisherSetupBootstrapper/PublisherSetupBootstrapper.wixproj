@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build"  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <WixToolPath>..\..\wix\3.11\</WixToolPath>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<PropertyGroup>
+    <WixToolPath>..\..\wix\4.0\</WixToolPath>
     <WixTargetsPath>$(WixToolPath)Wix.targets</WixTargetsPath>
     <WixTasksPath>wixtasks.dll</WixTasksPath>
   </PropertyGroup>
@@ -13,8 +13,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>ProjectPublisher2016</OutputName>
     <OutputType>Bundle</OutputType>
-	<WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\WiX Toolset\v4\wix.targets</WixTargetsPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -42,12 +41,6 @@
     <Compile Include="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <WixExtension Include="WixBalExtension">
-      <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
-      <Name>WixBalExtension</Name>
-    </WixExtension>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\PublisherSetup2016WiX\PublisherSetup2016WiX.wixproj">
       <Name>PublisherSetup2016WiX</Name>
       <Project>{696f4052-72d2-4bac-9d66-171d9c13502a}</Project>
@@ -57,8 +50,16 @@
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" />
-  
+  <ItemGroup>
+    <WixExtension Include="WixBalExtension">
+      <HintPath>..\..\..\..\..\Program Files (x86)\WiX Toolset v4.0\bin\WixBalExtension.dll</HintPath>
+      <Name>WixBalExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" Exists('$(WixTargetsPath)') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" !Exists('$(WixTargetsPath)') ">
+    <Error Text="The WiX Toolset v4 build tools must be installed to build this project. To download the WiX Toolset v4, see http://wixtoolset.org/releases/" />
+  </Target>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.

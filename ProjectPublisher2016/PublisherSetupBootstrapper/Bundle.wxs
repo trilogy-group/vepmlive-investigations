@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+<Wix  xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <Bundle Name="Project Publisher 2016" Version="6.1.0.0" Manufacturer="EPM Live" UpgradeCode="8c14fd8f-8f77-4c2d-998a-3b7c2e34bee0">
     <!-- Bundle can only be installed on Windows >= 7 
   	         (see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx) -->

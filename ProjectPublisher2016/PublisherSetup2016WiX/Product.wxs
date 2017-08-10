@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
   <?if $(var.Platform) = x64 ?>
   <?define bitness = "(64 bit)" ?>
   <?define Win64 = "yes" ?>
@@ -9,27 +9,27 @@
   <?define Win64 = "no" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-  
-  <Product Id="*" Name="Project Publisher 2016" Language="1033" Version="6.1.0" Manufacturer="EPM Live" UpgradeCode="555A36A7-8558-4CC2-9A65-6013F4316C84">
-    
+
+  <Product Id="*" Name="Project Publisher 2016" Language="1033" Version="6.1.0.0" Manufacturer="EPM Live" UpgradeCode="555A36A7-8558-4CC2-9A65-6013F4316C84">
+
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-    
-    <MediaTemplate EmbedCab="yes" /> 
-    
+
+    <MediaTemplate EmbedCab="yes" />
+
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" AllowSameVersionUpgrades="no" />
-    
-      <Feature Id="ProductFeature" Title="Publisher Setup 2016" Level="1">
+
+    <Feature Id="ProductFeature" Title="Publisher Setup 2016" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
-    
+
     <WixVariable Id="WixUIBannerBmp" Value="..\setuplogo.bmp" />
     <Icon Id="icon.ico" SourceFile="..\EPMLive.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
-    
+
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
-    
+
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    
+
     <UI>
       <UIRef Id="WixUI_InstallDir" />
       <Publish Dialog="WelcomeDlg"
@@ -43,7 +43,7 @@
             Value="WelcomeDlg"
             Order="2">1</Publish>
     </UI>
-  
+
   </Product>
 
   <Fragment>
@@ -71,7 +71,7 @@
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.dll"/>
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.Runtime.dll" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll"/>
-        
+
         <File Source="$(var.ProjectPublisher2016.TargetDir)PPMUtility.exe"/>
         <File Source="..\EPMLive.ico" />
         <File Source="..\setuplogo.jpg" />
@@ -79,6 +79,6 @@
       </Component>
     </ComponentGroup>
   </Fragment>
-  
-  
+
+
 </Wix>
