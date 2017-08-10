@@ -77,7 +77,9 @@ if (!(Test-Path -Path $LogsDirectory )){
 }
 $loggerArgs = "LogFile=$LogsDirectory\${projName}.log;Verbosity=normal;Encoding=Unicode"
 $langversion = "Default"
-$referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" -replace "\s","%20"
+$referencePath = "C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST; C:\Program Files (x86)\Microsoft Visual Studio 14.0\Visual Studio Tools for Office\PIA\Office15; C:\Program Files (x86)\Microsoft Visual Studio 14.0\Visual Studio Tools for Office\PIA\Common"
+$referencePath = $referencePath -replace "\s","%20" 
+$referencePath = $referencePath -replace ";","%3B"
 
 
 if ($TestsOnly)
