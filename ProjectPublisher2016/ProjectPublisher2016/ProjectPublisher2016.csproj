@@ -290,6 +290,7 @@
     <Compile Include="ClosePubWindow.cs" />
     <Compile Include="Connect.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="DummyReference.cs" />
     <Compile Include="UpdatePerf.cs" />
     <Compile Include="PublishPerf.cs" />
     <Compile Include="DeleteProject.cs" />
