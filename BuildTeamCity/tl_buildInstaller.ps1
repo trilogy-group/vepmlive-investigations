@@ -290,7 +290,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 Log-Section "Building WiX Projects . . ."
 
 $platforms = @("x64", "x86")
-$paths = @("\x64", "\x86")
+$paths = @("\x64", "")
 $platformIndex = 0;
 foreach ($platform in $platforms)
 {
