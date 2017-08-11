@@ -290,7 +290,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 Log-Section "Building WiX Projects . . ."
 
 $platforms = @("x64", "x86")
-$paths = @("\x64", "")
+$paths = @("\x64", "\x86")
 $platformIndex = 0;
 foreach ($platform in $platforms)
 {
@@ -309,7 +309,6 @@ foreach ($platform in $platforms)
 		Log-SubSection "Building $wixProject Release|$platform..."
 	   & $MSBuildExec $projectPath `
 	   /t:build `
-	   /p:OutputPath="bin$platformPath\Release" `
 	   /p:PreBuildEvent= `
 	   /p:PostBuildEvent= `
 	   /p:Configuration="Release" `
