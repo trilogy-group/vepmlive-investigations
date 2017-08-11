@@ -309,6 +309,7 @@ foreach ($platform in $platforms)
 		Log-SubSection "Building $wixProject Release|$platform..."
 	   & $MSBuildExec $projectPath `
 	   /t:build `
+	   /p:OutputPath="bin$platformPath\Release" `
 	   /p:PreBuildEvent= `
 	   /p:PostBuildEvent= `
 	   /p:Configuration="Release" `
