@@ -1466,7 +1466,7 @@ namespace EPMLiveCore.API
                                         attr.Value = perms.Trim(';');
                                         ndNew.Attributes.Append(attr);
 
-                                        slUsers.Add(drs[0]["Title"].ToString(), ndNew);
+                                        slUsers.Add(drs[0]["SharePointAccount"].ToString(), ndNew);
                                     }
                                 }
 
