@@ -22,7 +22,9 @@ namespace EPMLiveCore.API
 
         private const string COMPONENT_NAME = "ResourceGrid";
         private static readonly Dictionary<string, string> _resourceDictionary = new Dictionary<string, string>();
-
+        private static int page = 0;
+        private static int pagesize = 0;
+        private static string searchquery = string.Empty;
         #endregion Fields
 
         #region Enums (1)
@@ -451,8 +453,11 @@ namespace EPMLiveCore.API
                 Guid webId = Guid.Empty;
                 Guid listid = Guid.Empty;
                 int itemid = 0;
+
+                int totalrec = 0;
+
                 XmlDocument docQuery = new XmlDocument();
-                docQuery.LoadXml(data.Replace("&gt;",">").Replace("&lt;", "<"));
+                docQuery.LoadXml(data.Replace("&gt;", ">").Replace("&lt;", "<"));
 
                 try
                 {
@@ -471,8 +476,35 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
+                var query = HttpUtility.ParseQueryString(HttpContext.Current.Request.UrlReferrer.Query);
+                if (query.AllKeys.Contains("page"))
+                {
+                    page = Convert.ToInt32(query.Get("page"));
+                }
+                if (query.AllKeys.Contains("searchquery"))
+                {
+                    searchquery = query.Get("searchquery");
+                }
+
+
+
+                SPList list = web.Lists["Resources"];
+
+                foreach (SPView view in list.Views)
+                {
+                    if (view.DefaultView) pagesize = Convert.ToInt32(view.RowLimit);
+                }
                 XDocument resourceXml =
                   XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb));
+                XElement reselement = resourceXml.Root.Elements("Resource").FirstOrDefault();
+                try
+                {
+                    totalrec = Convert.ToInt32(reselement.Attributes("TotalRows").FirstOrDefault().Value);
+                }
+                catch
+                {
+                    totalrec = resourceXml.Root.Elements("Resource").Count();
+                }
 
                 XDocument resourceTeam = new XDocument();
                 if (isRootWeb && listid == Guid.Empty && itemid == 0)
@@ -565,7 +597,11 @@ namespace EPMLiveCore.API
 
                 gridElement.Add(new XElement("Cols"));
                 XElement colsElement = gridElement.Element("Cols");
-
+                gridElement.Add(new XElement("Cfg"));
+                XElement xcfg = gridElement.Element("Cfg");
+                xcfg.Add(new XAttribute("PagInfo", totalrec));
+                xcfg.Add(new XAttribute("PagSize", pagesize));
+                xcfg.Add(new XAttribute("CurPage", page));
                 // build enum value rules for treegrid
                 BuildEnumValues(gridFields, bElement, resourceTeam, colsElement);
 
@@ -917,7 +953,7 @@ namespace EPMLiveCore.API
                         string deleteResourceCheckMessage = string.Empty;
                         string deleteResourceCheckStatus = string.Empty;
 
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             SPWeb oWeb = SPContext.Current.Web;
                             oWeb.AllowUnsafeUpdates = true;
@@ -1054,8 +1090,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
-                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
+                return GetDataGrid(data, web);
             }
             catch (APIException)
             {
@@ -1314,7 +1349,9 @@ namespace EPMLiveCore.API
                             includeReadOnly = includeReadOnlyElement.Value.ToBool();
                         }
                     }
-
+                    resourceManager.page = page;
+                    resourceManager.pagesize = pagesize;
+                    resourceManager.searchquery = searchquery;
                     resultXml = resourceManager.GetAll(includeHidden, includeReadOnly);
                 }
 
@@ -1396,7 +1433,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                 
+
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";

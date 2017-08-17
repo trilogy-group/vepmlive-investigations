@@ -204,6 +204,7 @@
      }
 
     </SharePoint:StyleBlock>
+   
     <div id="test"></div>
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
@@ -242,8 +243,10 @@
         <b class="border-notch notch"></b>
         <b class="notch"></b>
     </div>
+     <div id="rightUpperDiv"><table id="pagetable" style="display: none;"><tbody><tr><td><div style="margin:0px;"><div id="pagediv" style="display:none;padding-left: 45px; width: 85px;"></div><div id="viewalldiv"></div></div></td></tr></tbody></table></div>
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 500px;">
         <SharePoint:ScriptBlock runat="server">
+         
             fixedRibbon=false;
                 function initializeResourceGridWP() {
             if (window.epmLiveMasterPageVersion >= 5.5) {

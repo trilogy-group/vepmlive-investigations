@@ -600,7 +600,7 @@ BEGIN
 
 			set @sql = ''
 			CREATE TABLE #Groups (GroupId INT, sectype int)
-			
+			declare @recordcount int=0
 			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
 			
 			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
@@ -608,12 +608,12 @@ BEGIN
 			select * INTO #tmp '' + @sql + '';
 			
 			'' + @sca + ''
-			
+			select @recordcount = count(*) from #tmp 	
 			;WITH MyCTE AS (
 				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by '' + @orderby + '') as RowID,*
 				from #tmp
 			)
-			SELECT *
+			SELECT *,@recordcount As TotalRecords
 			FROM MyCTE
 			WHERE RowID BETWEEN '' + convert(varchar(15),(@page - 1) * @pagesize + 1) + '' and '' + convert(varchar(15),@topval) 
 			+ ''select count(*) from #tmp''
