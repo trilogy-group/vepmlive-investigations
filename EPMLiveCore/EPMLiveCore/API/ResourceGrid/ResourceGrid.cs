@@ -22,9 +22,7 @@ namespace EPMLiveCore.API
 
         private const string COMPONENT_NAME = "ResourceGrid";
         private static readonly Dictionary<string, string> _resourceDictionary = new Dictionary<string, string>();
-        private static int page = 0;
-        private static int pagesize = 0;
-        private static string searchquery = string.Empty;
+
         #endregion Fields
 
         #region Enums (1)
@@ -475,7 +473,9 @@ namespace EPMLiveCore.API
                     itemid = int.Parse(docQuery.FirstChild.Attributes["ItemId"].Value);
                 }
                 catch { }
-
+                int page = 0;
+                int pagesize = 0;
+                string searchquery = string.Empty;
                 var query = HttpUtility.ParseQueryString(HttpContext.Current.Request.UrlReferrer.Query);
                 if (query.AllKeys.Contains("page"))
                 {
@@ -495,7 +495,7 @@ namespace EPMLiveCore.API
                     if (view.DefaultView) pagesize = Convert.ToInt32(view.RowLimit);
                 }
                 XDocument resourceXml =
-                  XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb));
+                  XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb, pagesize));
                 XElement reselement = resourceXml.Root.Elements("Resource").FirstOrDefault();
                 try
                 {
@@ -1267,6 +1267,17 @@ namespace EPMLiveCore.API
         /// <returns></returns>
         internal static string GetResourcePoolViews(string data, SPWeb web)
         {
+             int page = 0;
+                string searchquery = string.Empty;
+                var query = HttpUtility.ParseQueryString(HttpContext.Current.Request.UrlReferrer.Query);
+                if (query.AllKeys.Contains("page"))
+                {
+                    page = Convert.ToInt32(query.Get("page"));
+                }
+                if (query.AllKeys.Contains("searchquery"))
+                {
+                    searchquery = query.Get("searchquery");
+                }
             try
             {
                 return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Views"),
@@ -1315,12 +1326,23 @@ namespace EPMLiveCore.API
         /// <param name="data">The data.</param>
         /// <param name="oWeb"></param>
         /// <returns></returns>
-        internal static string GetResources(string data, SPWeb web)
+        internal static string GetResources(string data, SPWeb web, int pagesize = 0)
         {
+            int page = 0;
+            string searchquery = string.Empty;
+            var query = HttpUtility.ParseQueryString(HttpContext.Current.Request.UrlReferrer.Query);
+            if (query.AllKeys.Contains("page"))
+            {
+                page = Convert.ToInt32(query.Get("page"));
+            }
+            if (query.AllKeys.Contains("searchquery"))
+            {
+                searchquery = query.Get("searchquery");
+            }
             try
             {
                 XDocument resultXml;
-
+               
                 using (var resourceManager = new ResourcePoolManager(web))
                 {
                     bool includeHidden = false;
