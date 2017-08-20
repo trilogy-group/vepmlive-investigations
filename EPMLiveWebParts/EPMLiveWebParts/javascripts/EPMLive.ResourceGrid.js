@@ -27,7 +27,7 @@ function registerEpmLiveResourceGridScript() {
         $$.ItemId = null;
         $$.LaunchInForm = false;
         $$.UserHaveResourceCenterPermission = true;
-
+        window.epmLive.ResourceSearchQuery = "";
         $$.reports = {
             wcReportId: null,
             opened: false,
@@ -1615,27 +1615,11 @@ function registerEpmLiveResourceGridScript() {
 
                 $('#EPMLiveResourceGridSelector').autocomplete({
                     source: function (request, response) {
-                        var results = $.ui.autocomplete.filter($$.actions.myResourcesOn ? $$.myResources : $$.resources, request.term);
 
-                        response(results);
                     },
 
                     select: function (event, ui) {
-                        var rowId = $$.resourceDictionary[ui.item.value];
-
-                        if (rowId) {
-                            var theRow = grid.Rows[rowId];
-
-                            grid.ExpandParents(theRow);
-
-                            grid.ActionClearSelection();
-                            grid.SelectRow(theRow, true);
-
-                            grid.SetScrollTop(grid.GetRowTop(theRow));
-                        }
-
-                        $$.actions.toggleEasyScroll();
-                        window.setTimeout(function () { window.RefreshCommandUI(); }, 100);
+                        var a = "";
                     }
                 });
 
@@ -1974,7 +1958,7 @@ function registerEpmLiveResourceGridScript() {
                             }
                         }
                         var i = 1;
-                        
+
                         var splitReOrderCols = sAvailableFlds.split(',');
                         for (var i = 0; i < splitReOrderCols.length; i++) {
                             var sptIndValue = splitReOrderCols[i].split('|');
@@ -1983,7 +1967,7 @@ function registerEpmLiveResourceGridScript() {
                                 'checked': ($.inArray(sptIndValue[1].trim().toString(), aViewCols) != -1)
                             };
                         }
-                       
+
                         var viewSectionTemplate = {
                             'heading': 'none',
                             'divider': 'no',
@@ -2400,6 +2384,11 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [{
                                         'eventName': 'keypress',
                                         'function': function (e) {
+                                            var key = e.which;
+                                            if (key == 13)  // the enter key code
+                                            {
+                                                Search($("#toolBarResGridSelector").val());
+                                            }
                                         }
                                     }]
                                 },
@@ -2741,10 +2730,100 @@ function registerEpmLiveResourceGridScript() {
             $$.reports.load();
             $$.actions.createToolBar('test');
         };
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        function ChangePage(pg, gridid) {
+            var url = window.location.href;
+            
+            var a = url.indexOf("?");
+            var b = url.substring(a);
+            var c = url.replace(b, "");
+            url = c;
+            var newA = document.createElement('a');
+            var queryindex = getParameterByName("searchquery")
+            if (queryindex != null && queryindex != "")
+            {
+                newA.setAttribute('href', url + "?page=" + pg + "&searchquery=" + queryindex);
+            }
+            else {
+                newA.setAttribute('href', url + "?page=" + pg);
+            }
+            
+            newA.click();
+        }
+        function Search(query) {
+            var url = window.location.href;
+            var a = url.indexOf("?");
+            var b = url.substring(a);
+            var c = url.replace(b, "");
+            url = c;
+            var newA = document.createElement('a');
 
+            newA.setAttribute('href', url + "?page=0&searchquery=" + query);
+            newA.click();
+        }
         window.Grids.OnUpdated = function (grid) {
             $$.grid.resetNoDataRow();
         };
+        window.Grids.OnRenderFinish = function (grid) {
+            setupPage(grid.PagInfo, true, grid.PagSize, grid, grid.CurPage);
+            //setupPage(3, true, 1, grid, 1);
+            var queryindex = getParameterByName("searchquery")
+            $("#toolBarResGridSelector").val(queryindex);
+        }
+        function setupPage(records, UseReporting, PageSize, grid, startpage) {
+            var gridid = grid.id;
+
+            var pages = Math.ceil(records / PageSize);
+
+            var pagediv = document.getElementById("pagediv");
+
+            var pagetable = document.getElementById("pagetable");
+            var ResourceGridLoader = document.getElementById("ResourceGridLoader");
+            ResourceGridLoader.style.display = "none";
+
+            if (UseReporting) {
+                if (pages > 1) {
+
+
+
+                    pagetable.style.display = "block";
+
+                    var p = $("#pagediv").parent();
+                    $("#pagediv").remove();
+                    p.append("<div id=\"pagediv\"/>");
+
+                    if (startpage == "0")
+                        startpage = "1";
+
+                    $("#pagediv").paginate({
+                        count: pages,
+                        start: startpage,
+                        display: 12,
+                        border: true,
+                        rotate: false,
+                        images: false,
+                        mouse: 'press',
+                        onChange: ChangePage,
+                        gridid: gridid
+                    });
+
+
+                }
+                else {
+                    viewalldiv.style.display = "none";
+                    pagetable.style.display = "none";
+                }
+            }
+
+        }
 
         window.Grids.OnLoaded = function (grid) {
             var offset = $.browser.msie ? 20 : 5;
@@ -2846,8 +2925,6 @@ function registerEpmLiveResourceGridScript() {
 
             return posY;
         }
-
-        //resize completed
 
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
