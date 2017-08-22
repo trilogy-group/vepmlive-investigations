@@ -968,8 +968,8 @@ namespace EPMLiveCore.API
                                 SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
                                 if (spUser != null)
                                 {
-                                // Re-opening the item with the system account
-                                SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
+                                    // Re-opening the item with the system account
+                                    SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
                                     foreach (SPRoleAssignment role in adminItem.RoleAssignments)
                                     {
                                         try
@@ -1051,7 +1051,7 @@ namespace EPMLiveCore.API
                 //    APIEmail.sendEmail(2, uv.LookupId, new Hashtable());
                 //}
             }
-            catch(Exception ex) { throw ex; }
+            catch (Exception ex) { throw ex; }
 
         }
 
@@ -1439,6 +1439,7 @@ namespace EPMLiveCore.API
 
                                 SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(tWeb, Convert.ToString(li["AssignedTo"]));
 
+                                int index = 0;
                                 SortedList slUsers = new SortedList();
 
                                 foreach (SPFieldUserValue uv in uvc)
@@ -1466,7 +1467,7 @@ namespace EPMLiveCore.API
                                         attr.Value = perms.Trim(';');
                                         ndNew.Attributes.Append(attr);
 
-                                        slUsers.Add(drs[0]["SharePointAccount"].ToString(), ndNew);
+                                        slUsers.Add(drs[0]["Title"].ToString() + index++, ndNew);
                                     }
                                 }
 
@@ -1988,7 +1989,7 @@ namespace EPMLiveCore.API
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     SPGroup group = (SPGroup)assn.Member;
-                                   
+
                                     string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
                                     SPList myList = oWeb.Lists["Resources"];
                                     SPQuery curQry = new SPQuery();
@@ -2143,7 +2144,7 @@ namespace EPMLiveCore.API
                                 ndNew.Attributes.Append(nattr);
                             }
                         }
-                    }                    
+                    }
 
                     ndBody.AppendChild(ndNew);
                 }
