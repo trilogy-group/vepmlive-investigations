@@ -213,9 +213,9 @@ namespace EPMLiveCore
                 if ((!view.Hidden) && (!view.PersonalView))
                 {
                     if (((roleProperties[groupId].ContainsKey(view.Url)) && (roleProperties[groupId][view.Url] == true)) || viewsNotInAnyGroup.Contains(view.Url))
-                        result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" checked=\"checked\"/> {2}<br/>", groupId, view.Url, view.Title));
+                        result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" checked=\"checked\"/> {2}<br/>", groupId, view.Url, HttpUtility.HtmlEncode(view.Title)));
                     else
-                        result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" /> {2}<br/>", groupId, view.Url, view.Title));
+                        result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" /> {2}<br/>", groupId, view.Url, HttpUtility.HtmlEncode(view.Title)));
                 }
             }
 
