@@ -60,6 +60,12 @@
     <None Include="Samples\rssrvpolicy.config" />
     <None Include="Samples\web.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EPMLive.SSRSCustomAuthentication\EPMLive.SSRSCustomAuthentication.csproj">
+      <Project>{9157bd43-b537-41bd-87c6-7872f43c9ae7}</Project>
+      <Name>EPMLive.SSRSCustomAuthentication</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
