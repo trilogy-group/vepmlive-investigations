@@ -55,7 +55,9 @@ $projectsToBePackaged = @(
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner",
 							"WorkEnginePPM",
-                            "AdminSite","BillingSite"
+                            "AdminSite","BillingSite",
+							"EPMLiveTimerJobs"
+							
                             )
 
 $projectsToBeBuildAsEXE = @(
