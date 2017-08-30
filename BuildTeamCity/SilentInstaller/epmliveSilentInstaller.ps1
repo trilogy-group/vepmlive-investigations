@@ -251,10 +251,11 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 				-Password $inPassword
 			
 		}
+		if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
+		{
+			Start-Service -Name $component.installAsService.name
+			WaitUntilServices $component.installAsService.name "Running"
+		}
 	}
-	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
-	{
-		Start-Service -Name $component.installAsService.name
-		WaitUntilServices $component.installAsService.name "Running"
-	}
+	
 }
