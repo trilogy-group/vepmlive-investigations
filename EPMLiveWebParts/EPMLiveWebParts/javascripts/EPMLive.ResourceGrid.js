@@ -27,7 +27,7 @@ function registerEpmLiveResourceGridScript() {
         $$.ItemId = null;
         $$.LaunchInForm = false;
         $$.UserHaveResourceCenterPermission = true;
-        window.epmLive.ResourceSearchQuery = "";
+        
         $$.reports = {
             wcReportId: null,
             opened: false,
@@ -2741,22 +2741,18 @@ function registerEpmLiveResourceGridScript() {
         }
         function ChangePage(pg, gridid) {
             var url = window.location.href;
-            
+
             var a = url.indexOf("?");
             var b = url.substring(a);
             var c = url.replace(b, "");
             url = c;
-            var newA = document.createElement('a');
             var queryindex = getParameterByName("searchquery")
-            if (queryindex != null && queryindex != "")
-            {
-                newA.setAttribute('href', url + "?page=" + pg + "&searchquery=" + queryindex);
+            if (queryindex != null && queryindex != "") {
+                window.location = url + "?page=" + pg + "&searchquery=" + queryindex;
             }
             else {
-                newA.setAttribute('href', url + "?page=" + pg);
+                window.location = url + "?page=" + pg;
             }
-            
-            newA.click();
         }
         function Search(query) {
             var url = window.location.href;
@@ -2764,10 +2760,7 @@ function registerEpmLiveResourceGridScript() {
             var b = url.substring(a);
             var c = url.replace(b, "");
             url = c;
-            var newA = document.createElement('a');
-
-            newA.setAttribute('href', url + "?page=0&searchquery=" + query);
-            newA.click();
+            window.location = url + "?page=0&searchquery=" + query
         }
         window.Grids.OnUpdated = function (grid) {
             $$.grid.resetNoDataRow();
