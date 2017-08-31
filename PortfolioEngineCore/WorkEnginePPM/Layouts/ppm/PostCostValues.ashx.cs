@@ -60,7 +60,7 @@ namespace WorkEnginePPM
             context.Response.Write(CStruct.ConvertXMLToJSON(s));
         }
 
-        public static string PostCostValuesRequest(HttpContext Context, string sRequestContext, CStruct xData, string basePath)
+        public static string PostCostValuesRequest(HttpContext Context, string sRequestContext, CStruct xData)
         {
             string sReply = "";
             try
@@ -87,7 +87,7 @@ namespace WorkEnginePPM
                             DBAccess dba = da.dba;
                             if (dba.Open() == StatusEnum.rsSuccess)
                             {
-                                sReply = PostCostValues(dba, xData, basePath);
+                                sReply = PostCostValues(dba, xData);
                             }
                             dba.Close();
                             break;
@@ -136,7 +136,7 @@ namespace WorkEnginePPM
             return sReply;
         }
 
-        private static string PostCostValues(DBAccess dba, CStruct xData, string basePath)
+        private static string PostCostValues(DBAccess dba, CStruct xData)
         {
             string sReply = "";
             int nCTId = xData.GetIntAttr("CT_ID");
@@ -157,7 +157,7 @@ namespace WorkEnginePPM
                 xCBCT.CreateIntAttr("CTID", nCTId);
                 xCBCT.CreateIntAttr("CBID", nCBId);
                 int lRowsAffected;
-                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), basePath, out lRowsAffected);
+                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), out lRowsAffected);
             }
             else if (lMethod == 1)
             {
@@ -209,7 +209,7 @@ namespace WorkEnginePPM
                 xCT.CreateIntAttr("Id", nCTId);
 
                 xQueue.CreateString("Data", xRequest.XML());
-                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), basePath);
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
 
             }
 
