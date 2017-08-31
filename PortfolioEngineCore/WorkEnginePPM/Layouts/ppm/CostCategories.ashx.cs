@@ -238,7 +238,7 @@ namespace WorkEnginePPM
                         xQueue.CreateString("Context", "Edit Periods");
                         xQueue.CreateString("Comment", "Calculate Default FTE values");
                         xQueue.CreateString("Data", "No Context Data");
-                        AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML(), da.BasePath);
+                        AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
 
                         // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
                         if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
