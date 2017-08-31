@@ -65,7 +65,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
-    <Compile Include="PfeJobTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
