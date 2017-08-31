@@ -2815,15 +2815,20 @@ namespace PortfolioEngineCore
                 xProcess.CreateString("PIs", sProjectIDs);
                 if (bPublish) xProcess.CreateBoolean("Publish", true);
                 if (bPublishBaseline) xProcess.CreateBoolean("PublishBaseline", true);
-                var job = new PfeJob()
-                {
-                    Context = 0,
-                    Session = Guid.NewGuid().ToString(),
-                    UserId = _dba.UserWResID,
-                    Comment = "RPE Post for ProjectIDs " + sProjectIDs,
-                    ContextData = xRequest.XML()
-                };
-                job.Queue(new DbRepository(_dba), new Msmq(), _basepath);
+
+                const string sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
+                SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                cmd.Parameters.AddWithValue("@JOB_GUID", Guid.NewGuid());
+                //    qjcCustom = 0
+                cmd.Parameters.AddWithValue("@JOB_CONTEXT", 0);
+                cmd.Parameters.AddWithValue("@JOB_SESSION", Guid.NewGuid());
+                cmd.Parameters.AddWithValue("@WRES_ID", _dba.UserWResID);
+                cmd.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
+                cmd.Parameters.AddWithValue("@JOB_STATUS", 0); // For now let 0 mean Not Started
+                cmd.Parameters.AddWithValue("@JOB_COMMENT", "RPE Post for ProjectIDs " + sProjectIDs);
+                cmd.Parameters.AddWithValue("@JOB_CONTEXT_DATA", xRequest.XML());
+                cmd.ExecuteNonQuery();
+
             }
             catch (Exception ex)
             {
