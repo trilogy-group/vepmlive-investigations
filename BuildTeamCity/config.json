@@ -64,8 +64,7 @@
 				"WorkEngineEnterprise.wsp", 
 				"WorkEngineReporting.wsp", 
 				"WorkEngineSynch.wsp",
-				"WorkEngineWorkPlanner.wsp",
-				"WorkEngineTimerJobs.wsp"
+				"WorkEngineWorkPlanner.wsp"
 				],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\webparts",
 			"deployWSP": "farm"
