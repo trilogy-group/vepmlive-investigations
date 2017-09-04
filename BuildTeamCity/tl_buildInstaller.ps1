@@ -443,4 +443,5 @@ if (!$SkipInstallShield)
 Rename-Item -Path "$SourcesDirectory\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe" -NewName "WorkEngine$NewReleaseNumber.exe"
 }
 
-Stop-Process -Name MSBuild -Force
+Stop-Process -Name MSBuild -Force -ErrorAction SilentlyContinue  
+
