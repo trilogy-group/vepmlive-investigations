@@ -265,5 +265,5 @@ if ($LastExitCode -ne 0) {
 }
 
 
-Stop-Process -Name MSBuild -Force
+Stop-Process -Name MSBuild -Force -ErrorAction SilentlyContinue  
 
