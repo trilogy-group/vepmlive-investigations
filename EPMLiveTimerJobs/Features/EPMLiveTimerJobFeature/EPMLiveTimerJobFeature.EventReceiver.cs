@@ -42,16 +42,8 @@ namespace EPMLiveTimerJobs.Features.EPMLiveTimerJobFeature
         {
             try
             {
-                var job = new SSRSSyncTimerJob(JobName, site)
-                {
-                    Schedule = new SPMinuteSchedule()
-                    {
-                        BeginSecond = 0,
-                        EndSecond = 59,
-                        Interval = 15
-                    }
-                };
-                job.Update();
+                var job = new SSRSSyncTimerJob(JobName, site);
+                
             }
             catch
             {
