@@ -13,7 +13,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive.Tests
         {
             using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
-                string snapshotId = "AE3914B2-C74F-4400-B01F-FE8A9EDF21BA";
+                string snapshotId = "AE3914B2-C74F-4400-B01F-FE8A9EDF21BA;schedule";
 
                 using (ShimsContext.Create())
                 {
@@ -35,7 +35,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive.Tests
                 AllSnapshots allSnapshotPage = new AllSnapshots();
                 allSnapshotPage.RaisePostBackEvent(snapshotId);
 
-                Assert.AreEqual(resultUrl, "epmlive/ReportSchedule.aspx?uid=" + snapshotId);                
+                Assert.AreEqual(resultUrl, "epmlive/ReportSchedule.aspx?uid=" + snapshotId.Split(';')[0]);                
             }
         }
     }

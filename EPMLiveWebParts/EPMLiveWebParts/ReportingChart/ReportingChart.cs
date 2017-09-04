@@ -688,13 +688,14 @@ namespace EPMLiveWebParts.ReportingChart
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
             //int intNoDataCt = 0;
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sArea = new AreaSeries();
                 sArea.Name = list.Key;
                 sArea.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToAreaSeries(sArea);
+                ApplyColorToBaseSeriesForMulticolor(sArea, colorIndex++);
 
                 //SPWeb spWeb = SPContext.Current.Web;
                 //SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
@@ -736,13 +737,15 @@ namespace EPMLiveWebParts.ReportingChart
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
             //int intNoDataCt = 0;
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBar = new BarSeries();
                 sBar.Name = list.Key;
                 sBar.Items.AddRange(list.Value);
-                // Apply color to chart items from color palette
-                ApplyColorToBarSeries(sBar);
+
+                ApplyColorToBaseSeriesForMulticolor(sBar, colorIndex++);
+
                 if (PropYaxisFormat == "Currency")
                 {
                     sBar.LabelsAppearance.DataFormatString = "c";
@@ -772,21 +775,22 @@ namespace EPMLiveWebParts.ReportingChart
             //{
             //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             //}
-        }
+        }        
 
         private void BuildColumnSeries()
         {
             ColumnSeries sCol;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
-            Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
             //int intNoDataCt = 0;
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sCol = new ColumnSeries();
                 sCol.Name = list.Key;
                 sCol.Items.AddRange(list.Value);
-                // Apply color to chart items from color palette
-                ApplyColorToColumnSeries(sCol);
+
+                ApplyColorToBaseSeriesForMulticolor(sCol, colorIndex++);
+
                 if (PropYaxisFormat == "Currency")
                 {
                     sCol.LabelsAppearance.DataFormatString = "c";
@@ -824,13 +828,15 @@ namespace EPMLiveWebParts.ReportingChart
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
             //int intNoDataCt = 0;
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sLine = new LineSeries();
                 sLine.Name = list.Key;
                 sLine.Items.AddRange(list.Value);
-                // Apply color to chart items from color palette
-                ApplyColorToLineSeries(sLine);
+
+                ApplyColorToBaseSeriesForMulticolor(sLine, colorIndex++);
+
                 if (PropYaxisFormat == "Currency")
                 {
                     sLine.LabelsAppearance.DataFormatString = "c";
@@ -868,7 +874,7 @@ namespace EPMLiveWebParts.ReportingChart
                 sPie.Name = list.Key;
                 sPie.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToPieSeries(sPie);
+                ApplyColorToBaseSeriesForSingleColor(sPie);
 
                 if (PropYaxisFormat == "Currency")
                 {
@@ -904,13 +910,14 @@ namespace EPMLiveWebParts.ReportingChart
         {
             ScatterSeries sScatter;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sScatter = new ScatterSeries();
                 sScatter.Name = list.Key;
                 sScatter.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToScatterSeries(sScatter);
+                ApplyColorToBaseSeriesForMulticolor(sScatter, colorIndex++);
                 _radChart.PlotArea.Series.Add(sScatter);
             }
         }
@@ -919,13 +926,14 @@ namespace EPMLiveWebParts.ReportingChart
         {
             ScatterLineSeries sScatterLine;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
+            int colorIndex = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sScatterLine = new ScatterLineSeries();
                 sScatterLine.Name = list.Key;
                 sScatterLine.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToScatterLineSeries(sScatterLine);
+                ApplyColorToBaseSeriesForMulticolor(sScatterLine, colorIndex++);
                 _radChart.PlotArea.Series.Add(sScatterLine);
             }
         }
@@ -941,7 +949,7 @@ namespace EPMLiveWebParts.ReportingChart
                 sBubble.Name = !string.IsNullOrEmpty(list.Key) ? list.Key.Replace("'", @"\'") : string.Empty;
                 sBubble.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToBubbleSeries(sBubble);
+                ApplyColorToBaseSeriesForSingleColor(sBubble);
 
                 if (!string.IsNullOrEmpty(PropYaxisFormat))
                 {
@@ -984,7 +992,7 @@ namespace EPMLiveWebParts.ReportingChart
                 sDonut.Name = list.Key;
                 sDonut.Items.AddRange(list.Value);
                 // Apply color to chart items from color palette
-                ApplyColorToDonutSeries(sDonut);
+                ApplyColorToBaseSeriesForSingleColor(sDonut);
 
                 if (!string.IsNullOrEmpty(PropYaxisFormat))
                 {
@@ -1239,7 +1247,8 @@ namespace EPMLiveWebParts.ReportingChart
                         {
                             SeriesItem si = new SeriesItem(
                                 decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
-                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
+                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2))
+                            { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
                             si.TooltipValue = oTemp[3].ToString().Replace("'", @"\'");
                             result.Add(si);
                         }
@@ -1254,7 +1263,8 @@ namespace EPMLiveWebParts.ReportingChart
                         {
                             SeriesItem si = new SeriesItem(
                                 decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
-                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
+                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2))
+                            { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
                             si.TooltipValue = oTemp[3].ToString().Replace("'", @"\'");
                             result.Add(si);
                         }
@@ -1344,7 +1354,7 @@ namespace EPMLiveWebParts.ReportingChart
             var rx = (from DataRow r in dtRaw.AsEnumerable()
                       where r[sSeriesSQLCol] != DBNull.Value
                       group r by r[sCatSQLCol] into gr
-                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT),
                                         gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
             foreach (object[] o in rx)
@@ -1426,7 +1436,7 @@ namespace EPMLiveWebParts.ReportingChart
             }
 
             IEnumerable<string> strCollection = ((from r in dtRaw.AsEnumerable()
-                                                  select  r[sCatSQLCol].ToString().Split(',')).SelectMany(x => x));
+                                                  select r[sCatSQLCol].ToString().Split(',')).SelectMany(x => x));
 
             DataTable dt = new DataTable();
             dt.Columns.Add(sCatSQLCol, typeof(string));
@@ -1644,8 +1654,8 @@ namespace EPMLiveWebParts.ReportingChart
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
                               where r[sSeriesSQLCol] != DBNull.Value
                               group r by r[sCatSQLCol] into gr
-                              select new[] { 
-                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                              select new[] {
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT),
                                   gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     foreach (object[] o in rx)
@@ -1743,8 +1753,8 @@ namespace EPMLiveWebParts.ReportingChart
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
                               where r[sSeriesSQLCol] != DBNull.Value
                               group r by r[sCatSQLCol] into gr
-                              select new[] { 
-                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                              select new[] {
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT),
                                   gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     // foreach total
@@ -1799,8 +1809,8 @@ namespace EPMLiveWebParts.ReportingChart
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
                               where r[sSeriesSQLCol] != DBNull.Value
                               group r by r[sCatSQLCol] into gr
-                              select new[] { 
-                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                              select new[] {
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT),
                                   gr.Average(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
                     foreach (object[] o in rx)
                     {
@@ -1897,8 +1907,8 @@ namespace EPMLiveWebParts.ReportingChart
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
                               where r[sSeriesSQLCol] != DBNull.Value
                               group r by r[sCatSQLCol] into gr
-                              select new[] { 
-                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                              select new[] {
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT),
                                   gr.Average(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     foreach (object[] r in rx)
@@ -1918,12 +1928,35 @@ namespace EPMLiveWebParts.ReportingChart
         #endregion
 
         #region Apply Colors to Charts from Color Palette
+        private void ApplyColorToBaseSeriesForMulticolor(SeriesBase sCol, int colorIndex)
+        {
+            Random rColor = new Random();
+            KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
+            Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
+
+            Color color;
+            if (colorIndex >= paletteColors.Length)
+            {
+                KnownColor randomColorName = names[rColor.Next(names.Length)];
+                color = Color.FromKnownColor(randomColorName);
+            }
+            else
+            {
+                color = paletteColors[colorIndex++];
+            }
+
+            for (int i = 0; i < sCol.Items.Count; i++)
+            {
+                sCol.Items[i].BackgroundColor = color;
+            }
+            sCol.Appearance.FillStyle.BackgroundColor = color;
+        }
 
         /// <summary>
         /// Apply color from color palette to Area Series
         /// </summary>
         /// <param name="sArea">Area series</param>
-        private void ApplyColorToAreaSeries(AreaSeries sArea)
+        private void ApplyColorToBaseSeriesForSingleColor(SeriesBase series)
         {
             try
             {
@@ -1933,303 +1966,23 @@ namespace EPMLiveWebParts.ReportingChart
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
                 Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sArea.Items.Count; i++)
+                for (int i = 0; i < series.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
                     {
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sArea.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        series.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
                         Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
-                        sArea.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        series.Items[i].BackgroundColor = paletteColors[colorIndex];
                         Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
-                sArea.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Bar Series
-        /// </summary>
-        /// <param name="sBar">Bar series</param>
-        private void ApplyColorToBarSeries(BarSeries sBar)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sBar.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sBar.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sBar.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sBar.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Column Series
-        /// </summary>
-        /// <param name="sColumn">Column series</param>
-        private void ApplyColorToColumnSeries(ColumnSeries sColumn)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sColumn.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sColumn.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sColumn.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sColumn.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Line Series
-        /// </summary>
-        /// <param name="sLine">Line series</param>
-        private void ApplyColorToLineSeries(LineSeries sLine)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sLine.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sLine.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sLine.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sLine.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Pie Series
-        /// </summary>
-        /// <param name="sPie">Pie series</param>
-        private void ApplyColorToPieSeries(PieSeries sPie)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sPie.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sPie.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sPie.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sPie.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Scatter Series
-        /// </summary>
-        /// <param name="sScatter">Scatter series</param>
-        private void ApplyColorToScatterSeries(ScatterSeries sScatter)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sScatter.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sScatter.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sScatter.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sScatter.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Scatter Line Series
-        /// </summary>
-        /// <param name="sScatterLine">Scatter line series</param>
-        private void ApplyColorToScatterLineSeries(ScatterLineSeries sScatterLine)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sScatterLine.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sScatterLine.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sScatterLine.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sScatterLine.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Bubble Series
-        /// </summary>
-        /// <param name="sBubble">Bubble series</param>
-        private void ApplyColorToBubbleSeries(BubbleSeries sBubble)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sBubble.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sBubble.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sBubble.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sBubble.Appearance.FillStyle.BackgroundColor = Legendcolor;
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Apply color from color palette to Donut Series
-        /// </summary>
-        /// <param name="sDonut">Donut series</param>
-        private void ApplyColorToDonutSeries(DonutSeries sDonut)
-        {
-            try
-            {
-                Random rColor = new Random();
-                KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-
-                Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-                int colorIndex = 0;
-                Color Legendcolor = Color.AliceBlue;
-                for (int i = 0; i < sDonut.Items.Count; i++)
-                {
-                    if (colorIndex >= paletteColors.Length)
-                    {
-                        // Assigns random color if chart items are more than number of colors in palette 
-                        KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sDonut.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
-                        Legendcolor = Color.FromKnownColor(randomColorName);
-                    }
-                    else
-                    {
-                        sDonut.Items[i].BackgroundColor = paletteColors[colorIndex];
-                        Legendcolor = paletteColors[colorIndex];
-                        colorIndex++;
-                    }
-                }
-                sDonut.Appearance.FillStyle.BackgroundColor = Legendcolor;
+                series.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }

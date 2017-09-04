@@ -1380,7 +1380,11 @@ namespace EPMLiveWebParts
                                             displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
+                                        if(val.Trim() == "")
+                                        {
+                                            displayValue = "";
+                                        }
+                                        else if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
                                         {
                                             SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
                                             displayValue = "";
@@ -1861,7 +1865,7 @@ namespace EPMLiveWebParts
                                 }
                             }
                         }
-                        if (!wbs.Contains("."))
+                        if (!wbs.Contains(".") || list.RootFolder.Name == "Project Center")
                         {
                             foreach (string group in groups)
                             {
