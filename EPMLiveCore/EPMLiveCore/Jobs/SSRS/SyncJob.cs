@@ -7,19 +7,38 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         public void execute(SPSite site, SPWeb web, string data)
         {
-            if (string.IsNullOrEmpty(data))
+            bool integrated = true;
+            bool.TryParse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsUseIntegrated"), out integrated);
+            bool windowsAuth = true;
+            bool.TryParse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsWindowsAuthentication"), out windowsAuth);
+            if (integrated)
             {
-                CreateSiteCollectionMappedFolder(site, web);
-                SyncReports(site, web);
-                AssignRoleMapping(site, web);
+                bErrors = true;
+                sErrors += "SSRS is in integrated mode; Synchronization cannot run;";
+
             }
-            else if (data.StartsWith("deletereport"))
+            else if (windowsAuth)
             {
-                DeleteReport(site, web, data);
+                bErrors = true;
+                sErrors += "SSRS is in windows authentication mode; Synchronization cannot run;";
+
             }
-            else if (data.StartsWith("removerole"))
+            else
             {
-                RemoveRole(site, web, data);
+                if (string.IsNullOrEmpty(data))
+                {
+                    CreateSiteCollectionMappedFolder(site, web);
+                    SyncReports(site, web);
+                    AssignRoleMapping(site, web);
+                }
+                else if (data.StartsWith("deletereport"))
+                {
+                    DeleteReport(site, web, data);
+                }
+                else if (data.StartsWith("removerole"))
+                {
+                    RemoveRole(site, web, data);
+                }
             }
         }
 
