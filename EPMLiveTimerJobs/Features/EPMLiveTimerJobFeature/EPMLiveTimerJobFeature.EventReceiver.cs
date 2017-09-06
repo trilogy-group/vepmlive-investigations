@@ -40,15 +40,28 @@ namespace EPMLiveTimerJobs.Features.EPMLiveTimerJobFeature
 
         private void CreateJob(SPWebApplication site)
         {
-            try
+            DateTime start = DateTime.Now.AddMinutes(-10);
+            DateTime end = start.AddMinutes(5);
+            var job = new SSRSSyncTimerJob(JobName, site)
             {
-                var job = new SSRSSyncTimerJob(JobName, site);
+                Schedule = new SPYearlySchedule()
+                {
+                    BeginMonth = start.Month,
+                    BeginDay = start.Day,
+                    BeginHour = start.Hour,
+                    BeginMinute = start.Minute,   
+                    BeginSecond = 0,
+                    EndMonth = end.Month,
+                    EndDay = end.Day,
+                    EndHour = end.Hour,
+                    EndMinute = end.Minute,
+                    EndSecond = end.Second
+                }
                 
-            }
-            catch
-            {
-            }
+            };
+            job.Update();
         }
+
 
         public void DeleteExistingJob(string jobName, SPWebApplication site)
         {
