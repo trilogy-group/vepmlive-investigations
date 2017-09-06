@@ -35,7 +35,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public static IReportingService GetInstance(SPSite site)
         {
-            var reportServerUrl = CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportingServicesURL") + "ReportService2010.asmx";
+            var reportServerUrl = CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportingServicesURL") + "/ReportService2010.asmx";
             var authInfo = site.WebApplication.GetChild<ReportAuth>("ReportAuth");
             var username = authInfo.Username;
             var password = CoreFunctions.Decrypt(authInfo.Password, "KgtH(@C*&@Dhflosdf9f#&f");
@@ -242,23 +242,30 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             string errors = string.Empty;
             var reportViewers = groups.GetByName(spRole);
-            foreach (SPUser user in reportViewers.Users)
+            try
             {
-                try
+                foreach (SPUser user in reportViewers.Users)
                 {
-                    var extendedList = userList.Items.GetItemById(user.ID);
-                    if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
-                        && user.Name != "System Account")
+                    try
                     {
-                        AssignRole(role, user.LoginName);
-                        extendedList["Synchronized"] = true;
-                        extendedList.SystemUpdate();
+                        var extendedList = userList.Items.GetItemById(user.ID);
+                        if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
+                            && user.Name != "System Account")
+                        {
+                            AssignRole(role, user.LoginName);
+                            extendedList["Synchronized"] = true;
+                            extendedList.SystemUpdate();
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        errors += exception.ToString();
                     }
                 }
-                catch (Exception exception)
-                {
-                    errors += exception.ToString();
-                }
+            }
+            catch (Exception exception)
+            {
+                errors += exception.ToString();
             }
             if (!string.IsNullOrEmpty(errors))
             {
