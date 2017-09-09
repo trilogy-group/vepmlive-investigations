@@ -10,8 +10,11 @@ namespace EPMLiveCore.Jobs.SSRS
     {
         public static void QueueJob(SPWebApplication webapp)
         {
+            Guid librariesFeature = new Guid("a8ebe311-83e1-48a4-ab31-50f237398f44");
             foreach (SPSite site in webapp.Sites)
             {
+                if (site.RootWeb.Features[librariesFeature] == null)
+                    site.RootWeb.Features.Add(librariesFeature);
                 QueueJob(webapp, site);
                 //Slowing down queue jobs creation, 1 every 30 seconds
                 Thread.Sleep(30 * 1000);
