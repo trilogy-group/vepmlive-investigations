@@ -412,6 +412,7 @@
     <Compile Include="Integrations\Salesforce\SfService.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6021Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6115Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6301Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\630Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
