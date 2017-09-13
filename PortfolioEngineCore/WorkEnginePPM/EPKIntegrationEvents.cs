@@ -63,7 +63,11 @@ namespace WorkEnginePPM
         public override void ItemUpdating(SPItemEventProperties properties)
         {
             processItem(properties);
-           
+            if (properties.List.Fields.ContainsFieldWithInternalName("Title"))
+            {
+                UpdateProject(properties);
+            }
+
             if (properties.ListTitle?.ToUpper().Trim() == PROJECT_CENTER_TITLE)
                 CheckProjectNameChange(properties);
         }
@@ -172,7 +176,30 @@ namespace WorkEnginePPM
                 }
             });
         }
-       
+        /// <summary>
+        /// Updating Project Name in EPG_RPT_Cost and EPG_RPT_Cost
+        /// </summary>
+        /// <param name="properties"></param>
+        public void UpdateProject(SPItemEventProperties properties)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                string connectionString = CoreFunctions.getReportingConnectionString(properties.Web.Site.WebApplication.Id, properties.Web.Site.ID);
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                        con.Open();
+                        SqlCommand oCommand = new SqlCommand("Update [EPG_RPT_Cost] set [Project Name] = @projectname where ProjectId=@projectid", con);
+                        oCommand.Parameters.AddWithValue("@projectname", properties.AfterProperties["Title"]);
+                        oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                        oCommand.ExecuteNonQuery();
+
+                        oCommand = new SqlCommand("Update [EPG_RPT_Projects] set [Project Name] = @projectname where ProjectId=@projectid", con);
+                        oCommand.Parameters.AddWithValue("@projectname", properties.AfterProperties["Title"]);
+                        oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                        oCommand.ExecuteNonQuery();
+                }
+            });
+        }
         private void processItem(SPItemEventProperties properties)
         {
             //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99900, "WorkEnginePPM", "processItem", "Entry", "");
