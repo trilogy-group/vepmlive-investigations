@@ -115,7 +115,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         LogMessage("UserHasPermission column already exists", MessageKind.SKIPPED, 4);
                     }
                     LogMessage("Updating value to the database . . .", 2);
-                    PopulateColumn(CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
+                    //PopulateColumn(CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
                     //LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 4);
                 }
                 catch (Exception exception)
