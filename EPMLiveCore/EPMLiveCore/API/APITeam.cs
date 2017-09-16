@@ -1989,24 +1989,7 @@ namespace EPMLiveCore.API
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     SPGroup group = (SPGroup)assn.Member;
-
-                                    string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
-                                    SPList myList = oWeb.Lists["Resources"];
-                                    SPQuery curQry = new SPQuery();
-                                    //Get resource with Sp Account Id       					
-                                    string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", oWeb.CurrentUser.ID);
-                                    curQry.Query = query;
-                                    if (myList != null && myList.ItemCount > 0)
-                                    {
-                                        SPListItemCollection myItems = myList.GetItems(curQry);
-                                        if (myItems.Count > 0)
-                                        {
-                                            if (myItems.Fields.ContainsField("UserHasPermission"))
-                                                CurrentUserHasPermissionToChangeOwner = Convert.ToBoolean(myItems[0]["UserHasPermission"]);
-                                            else
-                                                CurrentUserHasPermissionToChangeOwner = true;
-                                        }
-                                    }
+                                    
                                     if (group.CanCurrentUserEditMembership)
                                     {
                                         if (!idArrays.Contains(Convert.ToString(group.ID)))

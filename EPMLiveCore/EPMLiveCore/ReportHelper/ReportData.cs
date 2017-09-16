@@ -1181,7 +1181,7 @@ namespace EPMLiveCore.ReportHelper
         public void RefreshTimeSheet(Guid siteid, string webtitile, Guid jobid)
         {
             string desttablename = GetSafeTableName("RPTTSData");
-            _DAO.Command = "spRefreshTimesheet";
+            _DAO.Command = "spRefreshTimesheet_V2";
             _DAO.CommandType = CommandType.StoredProcedure;
             _DAO.AddParam("@dbname", _DAO.GetEPMLiveConnection.Database);
             _DAO.AddParam("@RPTTSData", desttablename);
