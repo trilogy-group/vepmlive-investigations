@@ -691,39 +691,48 @@ namespace TimeSheets
 
         private static void CheckTaskTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
         {
-            //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
-            var projectItem = oWeb.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
+            SPUserToken systoken = oWeb.Site.SystemAccount.UserToken;
+            SPListItem projectItem = null;
+            using (SPSite site = new SPSite(oWeb.Site.ID, systoken))
+            {
+                using (SPWeb webSysAdmin = site.OpenWeb())
+                {
+                    //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
+                    projectItem = webSysAdmin.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
                 .Where(x => x.Name == timeSheetItem.ProjectName).FirstOrDefault();
-            var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
 
-            var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
-            var emailToList = new List<string>();
-            var idToList = new List<int>();
+                    var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
 
-            if (!project.Item2) // Item2 = isMember
-            {
-                userTypesTosend.ForEach(userType =>
-                {
-                    var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, oWeb);
-                    emailToList.AddRange(usersToSendNotification.Item1);
-                    idToList.AddRange(usersToSendNotification.Item2);
-                });
+                    var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
+                    var emailToList = new List<string>();
+                    var idToList = new List<int>();
 
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                    "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
-            }
-            else if (timeSheetItem.AssignedToID == null || !timeSheetItem.AssignedToID.Split(',').ToList().Contains(oWeb.CurrentUser.ID.ToString()))
-            {
-                userTypesTosend.ForEach(userType =>
-                {
-                    var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, oWeb);
-                    emailToList.AddRange(usersToSendNotification.Item1);
-                    idToList.AddRange(usersToSendNotification.Item2);
-                });
+                    if (!project.Item2) // Item2 = isMember
+                    {
+                        userTypesTosend.ForEach(userType =>
+                        {
+                            var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, webSysAdmin);
+                            emailToList.AddRange(usersToSendNotification.Item1);
+                            idToList.AddRange(usersToSendNotification.Item2);
+                        });
 
-                SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                    "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated",
-                    PROJECT_WORK_FIELD_NAME);
+                        SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
+                            "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
+                    }
+                    else if (timeSheetItem.AssignedToID == null || !timeSheetItem.AssignedToID.Split(',').ToList().Contains(oWeb.CurrentUser.ID.ToString()))
+                    {
+                        userTypesTosend.ForEach(userType =>
+                        {
+                            var usersToSendNotification = GetUsersToSendNotification(projectItem, userType, webSysAdmin);
+                            emailToList.AddRange(usersToSendNotification.Item1);
+                            idToList.AddRange(usersToSendNotification.Item2);
+                        });
+
+                        SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
+                            "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated",
+                            PROJECT_WORK_FIELD_NAME);
+                    }
+                }
             }
         }
 
@@ -781,10 +790,7 @@ namespace TimeSheets
             if (listItem != null)
             {
                 if (itemTypeName != PORTFLOIO_WORK_FIELD_NAME)
-                    listItem.RoleAssignments?.OfType<SPRoleAssignment>()?.ToList()?.ForEach(group =>
-                    {
-                        isMember = isMember || (((SPGroup)group.Member).ContainsCurrentUser);
-                    });
+                    isMember = listItem.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
 
                 if (!isMember && listItem.Fields.OfType<SPField>().Where(x => x.InternalName == "AssignedTo").Any())
                 {
