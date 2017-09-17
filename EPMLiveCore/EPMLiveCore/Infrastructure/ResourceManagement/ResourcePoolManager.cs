@@ -14,9 +14,6 @@ namespace EPMLiveCore.Infrastructure
     public sealed class ResourcePoolManager : SPListItemManager
     {
         #region Constructors (2) 
-        public int page = 0;
-        public int pagesize = 0;
-        public string searchquery = string.Empty;
 
         public ResourcePoolManager(SPWeb web)
             : base("Resources", web.ID, web.Site.ID, "Resources", "Resource") { }
@@ -59,15 +56,15 @@ namespace EPMLiveCore.Infrastructure
 
                     foreach (
                         DataTable dataTable in
-                            from obj in new[] { "[dbo].[spGetReportListData]" }
+                            from obj in new[] {"[dbo].[spGetReportListData]"}
                             let queryExecutor = new QueryExecutor(spWeb)
                             select queryExecutor.ExecuteReportingDBQuery(
                                 @"SELECT COUNT(*) AS Found FROM dbo.sysobjects WHERE id = object_id(@Object)",
-                                new Dictionary<string, object> { { "@Object", obj } }))
+                                new Dictionary<string, object> {{"@Object", obj}}))
                     {
                         if (dataTable.Rows.Count > 0)
                         {
-                            if ((int)dataTable.Rows[0]["Found"] != 1)
+                            if ((int) dataTable.Rows[0]["Found"] != 1)
                             {
                                 exists = false;
                             }
@@ -95,7 +92,7 @@ namespace EPMLiveCore.Infrastructure
         private List<XElement> BuildXmlElements(bool includeHidden, bool includeReadOnly,
             IEnumerable<DataRow> rowCollection, List<SPField> spFieldCollection,
             DataColumnCollection dataColumnCollection, DataTable resources,
-            out Dictionary<string, object[]> valueDictionary, int totalRows = 0)
+            out Dictionary<string, object[]> valueDictionary)
         {
             var elements = new List<XElement>();
             valueDictionary = new Dictionary<string, object[]>();
@@ -109,7 +106,7 @@ namespace EPMLiveCore.Infrastructure
             {
                 var itemElement = new XElement(ElementName);
                 itemElement.Add(new XAttribute("ID", row["ID"]));
-                itemElement.Add(new XAttribute("TotalRows", totalRows));
+
                 foreach (SPField spField in spFieldCollection)
                 {
                     string internalName = spField.InternalName;
@@ -215,7 +212,7 @@ namespace EPMLiveCore.Infrastructure
                     switch (spField.Type)
                     {
                         case SPFieldType.Lookup:
-                            var spFieldLookup = ((SPFieldLookup)spField);
+                            var spFieldLookup = ((SPFieldLookup) spField);
                             string key = spFieldLookup.LookupList + spFieldLookup.LookupField + stringValue;
 
                             if (!lookupValues.ContainsKey(key))
@@ -226,9 +223,9 @@ namespace EPMLiveCore.Infrastructure
 
                                 fieldHtmlValue = key;
 
-                                lookupValues.Add(key, new[] { fieldTextValue, fieldEditValue, fieldHtmlValue });
+                                lookupValues.Add(key, new[] {fieldTextValue, fieldEditValue, fieldHtmlValue});
 
-                                valueDictionary.Add(key, new[] { spField, value });
+                                valueDictionary.Add(key, new[] {spField, value});
                             }
                             else
                             {
@@ -248,7 +245,7 @@ namespace EPMLiveCore.Infrastructure
                                     out fieldTextValue,
                                     out fieldHtmlValue);
 
-                                userValues.Add(value, new[] { fieldTextValue, fieldEditValue, fieldHtmlValue });
+                                userValues.Add(value, new[] {fieldTextValue, fieldEditValue, fieldHtmlValue});
                             }
                             else
                             {
@@ -262,7 +259,7 @@ namespace EPMLiveCore.Infrastructure
                         case SPFieldType.DateTime:
                             string specialValue = string.IsNullOrEmpty(stringValue)
                                 ? string.Empty
-                                : ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                                : ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss");
 
                             fieldTextValue = specialValue;
                             fieldHtmlValue = specialValue;
@@ -316,7 +313,6 @@ namespace EPMLiveCore.Infrastructure
 
                 SPWeb spWeb = ParentList.ParentWeb;
 
-
                 var parameters = new Dictionary<string, object>
                 {
                     {"@siteid", spWeb.Site.ID},
@@ -325,54 +321,79 @@ namespace EPMLiveCore.Infrastructure
                     {"@userid", spWeb.CurrentUser.ID},
                     {"@rollup", false},
                     {"@list", "ResourcePool"},
-                    {"@query",!string.IsNullOrEmpty(searchquery)?" Title  like '%"+searchquery+"%'": string.Empty},
-                    {"@page", page},
-                    {"@pagesize", pagesize}
+                    {"@query", string.Empty}
                 };
 
                 var queryExecutor = new QueryExecutor(spWeb);
                 DataTable resources = queryExecutor.ExecuteReportingDBStoredProc("spGetReportListData", parameters);
-                int totalRows = 0;
+
                 if (resources == null)
                 {
                     var xml = new XDocument();
                     xml.Add(rootElement);
+
                     return xml;
                 }
+
                 List<SPField> spFieldCollection = ParentList.Fields.Cast<SPField>().ToList();
 
                 DataColumnCollection dataColumnCollection = resources.Columns;
                 EnumerableRowCollection<DataRow> rowCollection = resources.AsEnumerable();
-                try
+
+                var tasks = new List<Task<object[]>>();
+
+                int totalRows = rowCollection.Count();
+                int pageSize = 200;
+                int threadCount = totalRows/pageSize;
+
+                if (totalRows <= pageSize)
                 {
-                    totalRows = Convert.ToInt32(resources.Rows[0]["TotalRecords"]);
+                    pageSize = totalRows;
+                    threadCount = 1;
                 }
-                catch { totalRows = 0; }
 
-                if (totalRows == 0) totalRows = rowCollection.Count();
+                int pagesProcessed = 0;
 
-                Task<object[]> task = Task<object[]>.Factory.StartNew(() =>
+                while (pagesProcessed < threadCount)
                 {
+                    int page = pageSize;
+                    int offset = pagesProcessed*pageSize;
 
-                    Dictionary<string, object[]> valueDictionary;
+                    pagesProcessed++;
 
-                    List<XElement> element = BuildXmlElements(includeHidden,
-                        includeReadOnly, rowCollection,
-                        spFieldCollection,
-                        dataColumnCollection,
-                        resources,
-                        out valueDictionary, totalRows);
+                    if (pagesProcessed == threadCount)
+                    {
+                        page = totalRows - offset;
+                    }
 
-                    return new object[] { element, valueDictionary };
-                });
+                    Task<object[]> task = Task<object[]>.Factory.StartNew(() =>
+                    {
+                        IEnumerable<DataRow> dataRows = (from r in rowCollection select r).Skip(offset).Take(page);
 
-                object[] result = task.Result;
+                        Dictionary<string, object[]> valueDictionary;
 
-                var elements = (List<XElement>)result[0];
-                ProcessHtmlValues(elements, (Dictionary<string, object[]>)result[1]);
+                        List<XElement> elements = BuildXmlElements(includeHidden,
+                            includeReadOnly, dataRows,
+                            spFieldCollection,
+                            dataColumnCollection,
+                            resources,
+                            out valueDictionary);
 
-                rootElement.Add(elements);
+                        return new object[] {elements, valueDictionary};
+                    });
 
+                    tasks.Add(task);
+                }
+
+                foreach (var task in tasks)
+                {
+                    object[] result = task.Result;
+
+                    var elements = (List<XElement>) result[0];
+                    ProcessHtmlValues(elements, (Dictionary<string, object[]>) result[1]);
+
+                    rootElement.Add(elements);
+                }
 
                 var resourcesXml = new XDocument();
                 resourcesXml.Add(rootElement);
@@ -381,7 +402,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int)Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
+                throw new APIException((int) Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
             }
         }
 
@@ -404,7 +425,7 @@ namespace EPMLiveCore.Infrastructure
 
                     object[] data = valueDictionary[key];
 
-                    element.Attribute("HtmlValue").SetValue(((SPFieldLookup)data[0]).GetFieldValueAsHtml(data[1]));
+                    element.Attribute("HtmlValue").SetValue(((SPFieldLookup) data[0]).GetFieldValueAsHtml(data[1]));
                 }
             }
         }
