@@ -2862,7 +2862,10 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public bool UpdateRPTSettings(string nonWorkingDays, int workHrs, out string sResult)
         {
+            LogStatus("", "UpdateRPTSettings", "", "",  0,0,"");
+            LogStatus("", "UpdateRPTSettings", "", "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID", 0, 0, "");
             Command = "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID";
+            //
             AddParam("@siteID", _siteID);
             string webName;
             string webUrl;
@@ -2871,10 +2874,12 @@ namespace EPMLiveCore.ReportHelper
 
             if ((int)oResult == 0)
             {
+                LogStatus("", "UpdateRPTSettings", "", "INSERT INTO RPTSettings VALUES(@siteID, @nonWorkingDays, @workHrs, @SiteName, @SiteUrl)", 0, 0, "");
                 Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
             }
             else
             {
+                LogStatus("", "UpdateRPTSettings", "", "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID", 0, 0, "");
                 Command =
                     "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
             }

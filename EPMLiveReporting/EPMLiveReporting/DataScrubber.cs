@@ -14,15 +14,18 @@ namespace EPMLiveReportsAdmin
         public static void CleanTables(SPSite site, EPMData epmdata)
         {
             #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE
-
+            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "Started Cleanup tables", 0);
             SqlCommand cmd;
             cmd = new SqlCommand("DELETE FROM ReportListIds", epmdata.GetClientReportingConnection);
+            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
 
             cmd = new SqlCommand("DELETE FROM RPTWeb", epmdata.GetClientReportingConnection);
+            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
 
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
+            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
 
             #endregion
@@ -56,6 +59,7 @@ namespace EPMLiveReportsAdmin
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 cmd = new SqlCommand("SELECT [ListName], [TableName] FROM RPTList");
+                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
                 cmd.Connection = epmdata.GetClientReportingConnection;
                 var adapter = new SqlDataAdapter();
                 adapter.SelectCommand = cmd;
@@ -221,9 +225,9 @@ namespace EPMLiveReportsAdmin
                     }
 
                     #region BULK INSERT ReportListIds TABLE
-
                     if (listIds.Rows.Count > 0)
                     {
+                        epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "BULK INSERT ReportListIds TABLE", 0);
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
                         using (
                             var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
@@ -243,6 +247,7 @@ namespace EPMLiveReportsAdmin
                             {
                                 hasError = true;
                                 errMsg += e2.Message;
+                                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, e2.Message, 0);
                             }
                         }
                     }
@@ -253,6 +258,7 @@ namespace EPMLiveReportsAdmin
 
                     if (rptWeb.Rows.Count > 0)
                     {
+                        epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "BULK INSERT RPTWeb and epmlive.Webs TABLE", 0);
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
                         using (
                             var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
@@ -280,6 +286,7 @@ namespace EPMLiveReportsAdmin
                             {
                                 hasError = true;
                                 errMsg += e3.Message;
+                                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, e3.Message, 0);
                             }
                         }
                     }
@@ -290,6 +297,7 @@ namespace EPMLiveReportsAdmin
                 #region CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS
 
                 cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
+                epmdata.LogRefreshStatus(Guid.NewGuid(), "CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
                 cmd.Connection = epmdata.GetClientReportingConnection;
                 var ad = new SqlDataAdapter();
                 ad.SelectCommand = cmd;
@@ -396,6 +404,7 @@ namespace EPMLiveReportsAdmin
 
                 if (finalRecent.Rows.Count > 0)
                 {
+                    epmdata.LogRefreshStatus(Guid.NewGuid(), "BULK INSERT FRF - Recent items", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
                     SqlTransaction tx = epmdata.GetEPMLiveConnection.BeginTransaction();
                     using (var sbc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), tx))
                     {
