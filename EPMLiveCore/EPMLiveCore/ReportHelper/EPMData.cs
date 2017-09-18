@@ -2862,7 +2862,6 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public bool UpdateRPTSettings(string nonWorkingDays, int workHrs, out string sResult)
         {
-            LogStatus("", "UpdateRPTSettings", "", "",  0,0,"");
             LogStatus("", "UpdateRPTSettings", "", "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID", 0, 0, "");
             Command = "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID";
             //
