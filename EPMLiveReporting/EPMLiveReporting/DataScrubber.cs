@@ -25,7 +25,6 @@ namespace EPMLiveReportsAdmin
             epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWeb"), 2, 3, "");
 
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
-            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
             epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWEBGROUPS"), 2, 3, "");
             #endregion
@@ -39,14 +38,14 @@ namespace EPMLiveReportsAdmin
             listIds.Columns.Add(new DataColumn("ListIcon", typeof(String)));
 
             var rptWeb = new DataTable();
-            rptWeb.Columns.Add(new DataColumn("SiteId", typeof (Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemWebId", typeof (Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemListId", typeof (Guid)));
-            rptWeb.Columns.Add(new DataColumn("ItemId", typeof (int)));
-            rptWeb.Columns.Add(new DataColumn("ParentWebId", typeof (Guid)));
-            rptWeb.Columns.Add(new DataColumn("WebId", typeof (Guid)));
-            rptWeb.Columns.Add(new DataColumn("WebUrl", typeof (string)));
-            rptWeb.Columns.Add(new DataColumn("WebTitle", typeof (string)));
+            rptWeb.Columns.Add(new DataColumn("SiteId", typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn("ItemWebId", typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn("ItemListId", typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn("ItemId", typeof(int)));
+            rptWeb.Columns.Add(new DataColumn("ParentWebId", typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn("WebId", typeof(Guid)));
+            rptWeb.Columns.Add(new DataColumn("WebUrl", typeof(string)));
+            rptWeb.Columns.Add(new DataColumn("WebTitle", typeof(string)));
             rptWeb.Columns.Add(new DataColumn("WebDescription", typeof(string)));
             rptWeb.Columns.Add(new DataColumn("WebOwnerId", typeof(int)));
 
@@ -80,7 +79,7 @@ namespace EPMLiveReportsAdmin
                         DataRow r = rptWeb.Rows.Add();
                         if (!string.IsNullOrEmpty(sParentItem))
                         {
-                            string[] sa = sParentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
+                            string[] sa = sParentItem.Split(new[] { "^^" }, StringSplitOptions.RemoveEmptyEntries);
                             string sItemWebId = sa[0];
                             string sItemListId = sa[1];
                             string sItemId = sa[2];
@@ -131,15 +130,15 @@ namespace EPMLiveReportsAdmin
                         {
                             epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Started bulk insert dbo.RPTWEBGROUPS"), 2, 3, "");
                             var dt = new DataTable();
-                            var dc = new DataColumn("RPTWEBGROUPS") {DataType = Type.GetType("System.Guid")};
+                            var dc = new DataColumn("RPTWEBGROUPS") { DataType = Type.GetType("System.Guid") };
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("SITEID") {DataType = Type.GetType("System.Guid")};
+                            dc = new DataColumn("SITEID") { DataType = Type.GetType("System.Guid") };
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("WEBID") {DataType = Type.GetType("System.Guid")};
+                            dc = new DataColumn("WEBID") { DataType = Type.GetType("System.Guid") };
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("GROUPID") {DataType = Type.GetType("System.Int32")};
+                            dc = new DataColumn("GROUPID") { DataType = Type.GetType("System.Int32") };
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("SECTYPE") {DataType = Type.GetType("System.Int32")};
+                            dc = new DataColumn("SECTYPE") { DataType = Type.GetType("System.Int32") };
                             dt.Columns.Add(dc);
 
                             foreach (SPRoleAssignment ra in w.RoleAssignments)
@@ -157,11 +156,11 @@ namespace EPMLiveReportsAdmin
                                                 SPBasePermissions.ViewListItems);
                                 if (found)
                                 {
-                                    dt.Rows.Add(new object[] {Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type});
+                                    dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type });
                                 }
                             }
 
-                            dt.Rows.Add(new object[] {Guid.NewGuid(), es.ID, w.ID, 999999, 1});
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, 999999, 1 });
 
                             using (var bulkCopy = new SqlBulkCopy(epmdata.GetClientReportingConnection))
                             {
@@ -229,7 +228,7 @@ namespace EPMLiveReportsAdmin
                     #region BULK INSERT ReportListIds TABLE
                     if (listIds.Rows.Count > 0)
                     {
-                        epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "BULK INSERT ReportListIds TABLE", 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh BULK INSERT ReportListIds TABLE", string.Format("BULK INSERT ReportListIds TABLE"), 2, 3, "");
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
                         using (
                             var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
@@ -300,7 +299,7 @@ namespace EPMLiveReportsAdmin
                 #region CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS
                 epmdata.LogStatus("", "", "Reporting Refresh  CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS", string.Format("SELECT [Id] FROM ReportListIds"), 2, 3, "");
                 cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
-                
+
                 cmd.Connection = epmdata.GetClientReportingConnection;
                 var ad = new SqlDataAdapter();
                 ad.SelectCommand = cmd;
@@ -391,8 +390,8 @@ namespace EPMLiveReportsAdmin
                     (from webid in rptWebTest.AsEnumerable() select webid["WebId"].ToString()).ToList();
 
                 List<DataRow> results = (from r in recent.AsEnumerable()
-                    where lsListIds.Contains(r["LIST_ID"].ToString()) && lsWebIds.Contains(r["WEB_ID"].ToString())
-                    select r).ToList<DataRow>();
+                                         where lsListIds.Contains(r["LIST_ID"].ToString()) && lsWebIds.Contains(r["WEB_ID"].ToString())
+                                         select r).ToList<DataRow>();
 
                 var finalRecent = new DataTable();
 
@@ -407,7 +406,7 @@ namespace EPMLiveReportsAdmin
 
                 if (finalRecent.Rows.Count > 0)
                 {
-                    epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items",string.Format("Started BULK INSERT FRF - Recent items"), 2, 3, "");
+                    epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items", string.Format("Started BULK INSERT FRF - Recent items"), 2, 3, "");
                     SqlTransaction tx = epmdata.GetEPMLiveConnection.BeginTransaction();
                     using (var sbc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), tx))
                     {

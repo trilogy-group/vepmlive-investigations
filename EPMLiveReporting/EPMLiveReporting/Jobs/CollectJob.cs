@@ -306,7 +306,6 @@ namespace EPMLiveReportsAdmin.Jobs
                 try
                 {
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Started Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    epmdata.LogRefreshStatus(JobUid, "CheckReqSP", JobUid, web.Title, "Started StoreProcedure Alteration", 0);
                     CheckReqSP(epmdata.GetClientReportingConnection);
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Completed Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                 }
@@ -515,6 +514,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
+                    sbErrors.Append("<font color=\"red\">Clear Cache Error: " + message + "</font><br>");
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job Clear Cache", string.Format("Cleaning Cache Failed for site : {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
