@@ -49,12 +49,14 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + sResults + "</font><br>");
+                    epmdata.LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("Error Updating RPTSettings {0}", sResults), 2, 3, "");
                 }
             }
             catch (Exception ex)
             {
                 bErrors = true;
                 sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>");
+                epmdata.LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("Error Updating RPTSettings  {0}", ex.ToString()), 2, 3, "");
             }
         }
 
@@ -111,13 +113,13 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     totalCount = site.AllWebs.Count;
                     epmdata = new EPMData(site.ID);
-                    epmdata.LogRefreshStatus(JobUid, "Reporting Refresh", JobUid, web.Title, "Process Started", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh  Collect Job", "Reporting refresh process started.", 2, 3, Convert.ToString(JobUid));
                     try
                     {
-                        epmdata.LogRefreshStatus(JobUid, "ProcessSecurityGroups", JobUid, web.Title, "Processing Security Group", 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh  Collect Job", string.Format("Started processing security groups for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                         ProcessSecurity.ProcessSecurityGroups(site, epmdata.GetClientReportingConnection, "");
                         sbErrors.Append("Completed processing security groups for site: " + site.Url + ".</br>");
-                        epmdata.LogRefreshStatus(JobUid, "ProcessSecurityGroups", JobUid, web.Title, "Completed processing security groups for site: " + site.Url, 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh  Collect Job", string.Format("Completed processing security groups for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     }
                     catch (Exception ex)
                     {
@@ -125,7 +127,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                         bErrors = true;
                         sbErrors.Append("<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " + message + "</font><br>");
-                        epmdata.LogRefreshStatus(JobUid, "ProcessSecurityGroups", JobUid, web.Title, ex.ToString(), 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh  Collect Job", string.Format("Error processing security on site: {0}. Error: {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                     }
 
                     if (string.IsNullOrEmpty(data))
@@ -142,7 +144,9 @@ namespace EPMLiveReportsAdmin.Jobs
 
                         try
                         {
+                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job", string.Format("Started updating reporting settings for site: {0}.", site.Url), 2, 3, Convert.ToString(JobUid));
                             setRPTSettings(epmdata, site);
+                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job", string.Format("Completed updating reporting settings for site: {0}.", site.Url), 2, 3, Convert.ToString(JobUid));
                         }
                         catch (Exception ex)
                         {
@@ -150,7 +154,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                             bErrors = true;
                             sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + message + "</font><br>");
-                            epmdata.LogRefreshStatus(JobUid, "setRPTSettings", JobUid, web.Title, message, 0);
+                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job", string.Format("Updating reporting settings failed for site: {0}. ,Error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                         }
                     }
                 }
@@ -158,7 +162,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "setRPTSettings", JobUid, web.Title, ex.Message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job", string.Format("Updating reporting settings failed for site: {0}. ,Error {1}", site.Url, ex.Message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -221,6 +225,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     string err = "";
                     bool consolidationdone;
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Starting Process TimeSheet Data for site: {0}.", site.Url), 2, 3, Convert.ToString(JobUid));
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveconsolidation"), out consolidationdone);
                     bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone);
                     if (tErrors)
@@ -228,15 +233,15 @@ namespace EPMLiveReportsAdmin.Jobs
                     if (bErrors)
                     {
                         sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>");
-                        epmdata.LogRefreshStatus(JobUid, "RefreshTimesheets", JobUid, web.Title, err, 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Process TimeSheet Data failed for site: {0}. Error {1}", site.Url, err), 2, 3, Convert.ToString(JobUid));
                     }
 
                     else
                     {
                         sbErrors.Append("Processed Timesheets<br>");
-                        epmdata.LogRefreshStatus(JobUid, "Processed Timesheets", JobUid, web.Title, "Processed Timesheets", 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Completed timeSheet data processing for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     }
-                       
+
                 }
                 catch (Exception ex)
                 {
@@ -244,7 +249,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "Process TimeSheet Data", JobUid, web.Title, message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Process TimeSheet Data failed for site: {0}. Error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -253,10 +258,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
-                   
+
                     if (site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                     {
-                        epmdata.LogRefreshStatus(JobUid, " Process PFE Data", JobUid, web.Title, "Process PFE Data", 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process PFE Data", string.Format("Processing PFE Data for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                         rootWeb = site.RootWeb;
 
                         string basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
@@ -282,7 +287,7 @@ namespace EPMLiveReportsAdmin.Jobs
                                 });
 
                         sbErrors.Append("Processed PfE Reporting: " + message + "<br>");
-                        epmdata.LogRefreshStatus(JobUid, "Processed PfE Reporting:", JobUid, web.Title, message, 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process PFE Data", string.Format("Completed Processing PFE Data for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     }
                 }
                 catch (Exception ex)
@@ -291,7 +296,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error Processing PfE Reporting: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "Processed PfE Reporting:", JobUid, web.Title, message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process PFE Data", string.Format("Error Processing PfE Reporting for site: {0} Error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion Process PFE Data
@@ -300,9 +305,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Started Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     epmdata.LogRefreshStatus(JobUid, "CheckReqSP", JobUid, web.Title, "Started StoreProcedure Alteration", 0);
                     CheckReqSP(epmdata.GetClientReportingConnection);
-                    epmdata.LogRefreshStatus(JobUid, "CheckReqSP", JobUid, web.Title, "Completed StoreProcedure Alteration", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Completed Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                 }
                 catch (Exception exReqSP)
                 {
@@ -310,14 +316,15 @@ namespace EPMLiveReportsAdmin.Jobs
 
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error while checking SPRequirement: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "CheckReqSP", JobUid, web.Title, "Error while StoreProcedure Alteration", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Error while checking SPRequirement for site: {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 try
                 {
-                    epmdata.LogRefreshStatus(JobUid, "CheckSchema", JobUid, web.Title, "Started StoreProcedure Alteration", 0);
+
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Started updating schema for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     CheckSchema(epmdata.GetClientReportingConnection);
-                    epmdata.LogRefreshStatus(JobUid, "CheckSchema", JobUid, web.Title, "Completed StoreProcedure Alteration", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Completed updating schema for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                 }
                 catch (Exception exSchema)
                 {
@@ -325,7 +332,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error while updating schema: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "CheckSchema", JobUid, web.Title, "Error while  StoreProcedure Alteration", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Error while updating schema for site: {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -334,7 +341,9 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Started DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     DataScrubber.CleanTables(site, epmdata);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Completed DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                 }
                 catch (Exception ex)
                 {
@@ -342,7 +351,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error while cleaning tables: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "CleanTables", JobUid, web.Title, "Error while cleaning tables: " + message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Error while cleaning tables for site: {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -359,19 +368,19 @@ namespace EPMLiveReportsAdmin.Jobs
                             ds = new DataSet();
                             using (var cmd1 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection))
                             {
-                                epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, cmd1.CommandText, 0);
+                                epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Started Update Status Field for site: {0} ,SQL  (SELECT TABLENAME FROM RPTList) ", site.Url), 2, 3, Convert.ToString(JobUid));
                                 using (SqlDataAdapter da = new SqlDataAdapter(cmd1))
                                 {
                                     da.Fill(ds);
-                                    epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "spUpdateStatusFields", 0);
+
                                     foreach (DataRow dr in ds.Tables[0].Rows)
                                     {
                                         using (var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection))
                                         {
-                                          
                                             cmd2.CommandType = CommandType.StoredProcedure;
                                             cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
                                             cmd2.ExecuteNonQuery();
+                                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Executing  store procedure spUpdateStatusFields '{0}'", dr[0].ToString()), 2, 3, Convert.ToString(JobUid));
                                         }
                                     }
                                 }
@@ -383,7 +392,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                             bErrors = true;
                             sbErrors.Append("<font color=\"red\">Error updating status fields: " + message + "</font><br>");
-                            epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Error updating status fields: " + message, 0);
+                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Error updating status fields: for site {0},error {1} ", site.Url, message), 2, 3, Convert.ToString(JobUid));
                         }
                         finally
                         {
@@ -408,7 +417,7 @@ namespace EPMLiveReportsAdmin.Jobs
                                         ds = new DataSet();
                                         using (var cmd1 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection))
                                         {
-                                            epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, cmd1.CommandText, 0);
+                                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("SELECT TABLENAME FROM RPTList where listid={0} ", list.ID), 2, 3, Convert.ToString(JobUid));
                                             cmd1.Parameters.AddWithValue("@listid", list.ID);
                                             using (SqlDataAdapter da = new SqlDataAdapter(cmd1))
                                             {
@@ -416,10 +425,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                                                 using (var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection))
                                                 {
-                                                    epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "spUpdateStatusFields", 0);
                                                     cmd2.CommandType = CommandType.StoredProcedure;
                                                     cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
                                                     cmd2.ExecuteNonQuery();
+                                                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Executed spUpdateStatusFields '{0}' ", Convert.ToString(ds.Tables[0].Rows[0][0])), 2, 3, Convert.ToString(JobUid));
                                                 }
                                             }
                                         }
@@ -430,7 +439,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                                         bErrors = true;
                                         sbErrors.Append("<font color=\"red\">Error updating status fields (" + sList + "): " + message + "</font><br>");
-                                        epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Error updating status fields (" + sList + "): " + message, 0);
+                                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Error updating status fields ({0}) Error {1}", sList, message), 2, 3, Convert.ToString(JobUid));
                                     }
                                     finally
                                     {
@@ -447,7 +456,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                             bErrors = true;
                             sbErrors.Append("<font color=\"red\">Error updating status fields: " + message + "</font><br>");
-                            epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Error updating status fields: " + message, 0);
+                            epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Error updating status fields Error {0}", message), 2, 3, Convert.ToString(JobUid));
                         }
 
                     }
@@ -462,8 +471,8 @@ namespace EPMLiveReportsAdmin.Jobs
                                 {
                                     cmd2.CommandType = CommandType.StoredProcedure;
                                     cmd2.Parameters.AddWithValue("@listtable", list);
-
                                     cmd2.ExecuteNonQuery();
+                                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Executed spUpdateStatusFields '{0}'", list), 2, 3, Convert.ToString(JobUid));
                                 }
                             }
                             catch (Exception ex)
@@ -472,7 +481,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                                 bErrors = true;
                                 sbErrors.Append("<font color=\"red\">Error running schedule field update for (" + list + "): " + message + "</font><br>");
-                                epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Error running schedule field update for (" + list + "): " + message, 0);
+                                epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Error running schedule field update for ({0}) error {1}.", list, message), 2, 3, Convert.ToString(JobUid));
                             }
 
                             if (!hshMessages.Contains(list))
@@ -481,15 +490,14 @@ namespace EPMLiveReportsAdmin.Jobs
                     }
 
                     sbErrors.Append("<br>Updated Status Fields<br>");
-                    epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Updated Status Fields", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Complete  running Updated Status Fields"), 2, 3, Convert.ToString(JobUid));
                 }
                 catch (Exception ex)
                 {
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-
                     bErrors = true;
                     sbErrors.Append("<font color=\"red\">Error running schedule field update: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, " Update Status Field", JobUid, web.Title, "Error running schedule field update: " + message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Update Status Field", string.Format("Error running schedule field update: {0}", message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -498,17 +506,16 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
-                    epmdata.LogRefreshStatus(JobUid, "Clear Cache", JobUid, web.Title, "Clearing Cache", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Clear Cache", string.Format("Started Cleaning cache for site : {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                     CacheStore.Current.RemoveSafely(web.Url, new CacheStoreCategory(web).Navigation);
-                    epmdata.LogRefreshStatus(JobUid, "CacheStore.Current.RemoveSafely", JobUid, web.Title, "Cache Cleard", 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Clear Cache", string.Format("Completed Cleaning cache for site : {0}", site.Url), 2, 3, Convert.ToString(JobUid));
                 }
                 catch (Exception ex)
                 {
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sbErrors.Append("<font color=\"red\">Clear Cache Error: " + message + "</font><br>");
-                    epmdata.LogRefreshStatus(JobUid, "CacheStore.Current.RemoveSafely", JobUid, web.Title, "Clear Cache Error: " + message, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Clear Cache", string.Format("Cleaning Cache Failed for site : {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
                 }
 
                 #endregion
@@ -519,7 +526,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 bErrors = true;
                 sbErrors.Append("<font color=\"red\">General Execute Error: " + message + "</font><br>");
-                epmdata.LogRefreshStatus(JobUid, "Error", JobUid, web.Title, "General Execute Error: " + message, 0);
+                epmdata.LogStatus("", "", "Reporting Refresh Collect Job", string.Format("General Execute Error for site : {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
             }
             finally
             {

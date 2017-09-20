@@ -14,20 +14,20 @@ namespace EPMLiveReportsAdmin
         public static void CleanTables(SPSite site, EPMData epmdata)
         {
             #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE
-            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "Started Cleanup tables", 0);
+
             SqlCommand cmd;
             cmd = new SqlCommand("DELETE FROM ReportListIds", epmdata.GetClientReportingConnection);
-            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
-            cmd.ExecuteNonQuery();
 
-            cmd = new SqlCommand("DELETE FROM RPTWeb", epmdata.GetClientReportingConnection);
-            epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
+            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM ReportListIds"), 2, 3, "");
+            cmd = new SqlCommand("DELETE FROM RPTWeb", epmdata.GetClientReportingConnection);
+            cmd.ExecuteNonQuery();
+            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWeb"), 2, 3, "");
 
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
             epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
             cmd.ExecuteNonQuery();
-
+            epmdata.LogStatus("", "", "Reporting Refresh WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE", string.Format("DELETE FROM RPTWEBGROUPS"), 2, 3, "");
             #endregion
 
             #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES
@@ -59,12 +59,11 @@ namespace EPMLiveReportsAdmin
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 cmd = new SqlCommand("SELECT [ListName], [TableName] FROM RPTList");
-                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
                 cmd.Connection = epmdata.GetClientReportingConnection;
                 var adapter = new SqlDataAdapter();
                 adapter.SelectCommand = cmd;
                 adapter.Fill(listNames);
-
+                epmdata.LogStatus("", "", "Reporting Refresh REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES", string.Format("SELECT [ListName], [TableName] FROM RPTList"), 2, 3, "");
                 using (var es = new SPSite(site.ID))
                 {
                     foreach (SPWeb w in es.AllWebs)
@@ -130,6 +129,7 @@ namespace EPMLiveReportsAdmin
 
                         try
                         {
+                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Started bulk insert dbo.RPTWEBGROUPS"), 2, 3, "");
                             var dt = new DataTable();
                             var dc = new DataColumn("RPTWEBGROUPS") {DataType = Type.GetType("System.Guid")};
                             dt.Columns.Add(dc);
@@ -170,11 +170,13 @@ namespace EPMLiveReportsAdmin
 
                                 bulkCopy.WriteToServer(dt);
                             }
+                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Completed bulk insert dbo.RPTWEBGROUPS"), 2, 3, "");
                         }
                         catch (Exception e)
                         {
                             hasError = true;
                             errMsg += e.Message;
+                            epmdata.LogStatus("", "", "Reporting Refresh POPULATE RPTWEBGROUPS", string.Format("Error while Bulk insert dbo.RPTWEBGROUPS Error : {0}", e.Message), 2, 3, "");
                         }
 
                         #endregion
@@ -247,7 +249,7 @@ namespace EPMLiveReportsAdmin
                             {
                                 hasError = true;
                                 errMsg += e2.Message;
-                                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, e2.Message, 0);
+                                epmdata.LogStatus("", "", "Reporting Refresh BULK INSERT ReportListIds TABLE", string.Format("Error while bulk insert into ReportListIds. error {0}", e2.Message), 2, 3, "");
                             }
                         }
                     }
@@ -258,7 +260,7 @@ namespace EPMLiveReportsAdmin
 
                     if (rptWeb.Rows.Count > 0)
                     {
-                        epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, "BULK INSERT RPTWeb and epmlive.Webs TABLE", 0);
+                        epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Started BULK INSERT RPTWeb and epmlive.Webs TABLE"), 2, 3, "");
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
                         using (
                             var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(),
@@ -281,12 +283,13 @@ namespace EPMLiveReportsAdmin
                                 sbc.Close();
                                 tx.Commit();
                                 tx.Dispose();
+                                epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Completed BULK INSERT RPTWeb and epmlive.Webs TABLE"), 2, 3, "");
                             }
                             catch (Exception e3)
                             {
                                 hasError = true;
                                 errMsg += e3.Message;
-                                epmdata.LogRefreshStatus(Guid.NewGuid(), "CleanTables", Guid.NewGuid(), site.RootWeb.Title, e3.Message, 0);
+                                epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT RPTWeb and epmlive.Webs TABLE", string.Format("Error while  BULK INSERT RPTWeb and epmlive.Webs TABLE. error {0}", e3.Message), 2, 3, "");
                             }
                         }
                     }
@@ -295,9 +298,9 @@ namespace EPMLiveReportsAdmin
                 }
 
                 #region CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS
-
+                epmdata.LogStatus("", "", "Reporting Refresh  CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS", string.Format("SELECT [Id] FROM ReportListIds"), 2, 3, "");
                 cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
-                epmdata.LogRefreshStatus(Guid.NewGuid(), "CLEAN LST TABLES - DELETE ENTRIES WITH NONEXISTENT LISTIDS", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
+                
                 cmd.Connection = epmdata.GetClientReportingConnection;
                 var ad = new SqlDataAdapter();
                 ad.SelectCommand = cmd;
@@ -404,7 +407,7 @@ namespace EPMLiveReportsAdmin
 
                 if (finalRecent.Rows.Count > 0)
                 {
-                    epmdata.LogRefreshStatus(Guid.NewGuid(), "BULK INSERT FRF - Recent items", Guid.NewGuid(), site.RootWeb.Title, cmd.CommandText, 0);
+                    epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items",string.Format("Started BULK INSERT FRF - Recent items"), 2, 3, "");
                     SqlTransaction tx = epmdata.GetEPMLiveConnection.BeginTransaction();
                     using (var sbc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), tx))
                     {
@@ -427,6 +430,7 @@ namespace EPMLiveReportsAdmin
                             sbc.Close();
                             tx.Commit();
                             tx.Dispose();
+                            epmdata.LogStatus("", "", "Reporting Refresh  BULK INSERT FRF - Recent items", string.Format("Completed BULK INSERT FRF - Recent items"), 2, 3, "");
                         }
                         catch (Exception e3)
                         {
