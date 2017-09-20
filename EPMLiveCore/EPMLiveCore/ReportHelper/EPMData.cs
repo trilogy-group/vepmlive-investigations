@@ -1708,7 +1708,7 @@ namespace EPMLiveCore.ReportHelper
                                 if (tx != null)
                                     tx.Dispose();
                                 if (sbc != null)
-                                    sbc.Close(); 
+                                    sbc.Close();
                             }
                         }
                     }
@@ -2468,10 +2468,10 @@ namespace EPMLiveCore.ReportHelper
         /// </summary>
         /// <param name="sMessage"></param>
         /// <returns></returns>
-        public bool RefreshTimesheets(out string sMessage, Guid jobUid,bool consolidationdone)
+        public bool RefreshTimesheets(out string sMessage, Guid jobUid, bool consolidationdone)
         {
             var oTimeSheet = new ReportBiz(_siteID);
-            return (consolidationdone ?  oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid):  oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
+            return (consolidationdone ? oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid) : oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
         }
 
         /// <summary>
@@ -2862,23 +2862,14 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public bool UpdateRPTSettings(string nonWorkingDays, int workHrs, out string sResult)
         {
+            LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID={0}", _siteID), 2, 3, "");
             Command = "SELECT ISNULL(COUNT(*),0) as SiteCount FROM RPTSettings WHERE SiteID=@siteID";
+            //
             AddParam("@siteID", _siteID);
             string webName;
             string webUrl;
 
             object oResult = ExecuteScalar(GetClientReportingConnection);
-
-            if ((int)oResult == 0)
-            {
-                Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
-            }
-            else
-            {
-                Command =
-                    "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
-            }
-
             using (var site = new SPSite(_siteID))
             {
                 using (SPWeb web = site.OpenWeb())
@@ -2886,6 +2877,18 @@ namespace EPMLiveCore.ReportHelper
                     webName = web.Title;
                     webUrl = web.ServerRelativeUrl;
                 }
+            }
+
+            if ((int)oResult == 0)
+            {
+                LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("INSERT INTO RPTSettings VALUES({0},{1},{2},{3},{4})", _siteID, nonWorkingDays, workHrs, SiteName, SiteUrl), 2, 3, "");
+                Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
+            }
+            else
+            {
+                LogStatus("", "", "Reporting Refresh UpdateRPTSettings",  string.Format("UPDATE RPTSettings SET NonWorkingDays={0}, WorkHours={1} WHERE SiteID={2}", nonWorkingDays, workHrs, _siteID), 2, 3, "");
+                Command =
+                    "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
             }
 
             AddParam("@siteID", _siteID);
