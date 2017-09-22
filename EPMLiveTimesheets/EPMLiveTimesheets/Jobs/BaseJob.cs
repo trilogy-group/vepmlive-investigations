@@ -22,7 +22,12 @@ namespace TimeSheets
         protected SqlConnection CreateConnection()
         {
             string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
-            return new SqlConnection(strConn);
+            SqlConnection cn = new SqlConnection(strConn);
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                cn.Open();
+            });
+            return cn;
         }
         public bool initJob(SPSite site)
         {
@@ -31,11 +36,6 @@ namespace TimeSheets
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        cn.Open();
-                    });
-
                     using (SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn))
                     {
                         cmd.Parameters.AddWithValue("@queueuid", QueueUid);
@@ -45,7 +45,6 @@ namespace TimeSheets
                             {
                                 if (dr.GetInt32(0) != 1)
                                 {
-                                    cn.Close();
                                     return false;
                                 }
                             }
@@ -75,11 +74,7 @@ namespace TimeSheets
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        cn.Open();
-                    });
-
+                  
                     //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
                     //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
                     //SqlDataReader dr = cmd.ExecuteReader();
