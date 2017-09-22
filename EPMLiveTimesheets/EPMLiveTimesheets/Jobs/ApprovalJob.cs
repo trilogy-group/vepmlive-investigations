@@ -15,45 +15,40 @@ namespace TimeSheets
         {
             WebAppId = site.WebApplication.Id;
 
-            SqlConnection cn = CreateConnection();
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                try
                 {
                     cn.Open();
-                });
+                    bool liveHours = false;
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
-                bool liveHours = false;
+                    //string[] tsuids = data.Split(',');
 
-                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
-
-                //string[] tsuids = data.Split(',');
-
-                //foreach(string tsuidData in tsuids)
-                {
-                    //if (actualWork != "")
-                    //{
-                    if (!liveHours)
+                    //foreach(string tsuidData in tsuids)
                     {
-                        sErrors = SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                        //if (actualWork != "")
+                        //{
+                        if (!liveHours)
+                        {
+                            sErrors = SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                        }
+                        //}
                     }
-                    //}
-                }
 
-                if (sErrors != "")
-                    bErrors = true;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                if (site != null)
-                    site.Dispose();
-                data = null;
-                if (cn != null)
-                    cn.Dispose();
+                    if (sErrors != "")
+                        bErrors = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (site != null)
+                        site.Dispose();
+                    data = null;
+                }
             }
         }
 
