@@ -19,6 +19,7 @@ namespace TimeSheets
             {
                 try
                 {
+                    cn.Open();
                     bool liveHours = false;
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 

@@ -26,6 +26,7 @@ namespace TimeSheets
             {
                 try
                 {
+                    cn.Open();
                     try
                     {
                         WorkList = site.RootWeb.Lists["My Work"];
@@ -426,6 +427,7 @@ namespace TimeSheets
             {
                 try
                 {
+                    cn.Open();
                     if (li != null)
                     {
                         using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))

@@ -646,6 +646,7 @@ namespace TimeSheets
                 {
                     try
                     {
+                        cn.Open();
                         using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
                         {
                             cmd.Parameters.AddWithValue("@tsuid", base.TSUID);

@@ -21,13 +21,12 @@ namespace TimeSheets
         public Guid WebAppId = Guid.Empty;
         protected SqlConnection CreateConnection()
         {
-            string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
-            SqlConnection cn = new SqlConnection(strConn);
+            string strConn = string.Empty;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                cn.Open();
+               strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
             });
-            return cn;
+            return new SqlConnection(strConn);
         }
         public bool initJob(SPSite site)
         {
@@ -36,6 +35,7 @@ namespace TimeSheets
             {
                 try
                 {
+                    cn.Open();
                     using (SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn))
                     {
                         cmd.Parameters.AddWithValue("@queueuid", QueueUid);
@@ -45,6 +45,7 @@ namespace TimeSheets
                             {
                                 if (dr.GetInt32(0) != 1)
                                 {
+                                    cn.Close();
                                     return false;
                                 }
                             }
@@ -74,7 +75,7 @@ namespace TimeSheets
             {
                 try
                 {
-                  
+                    cn.Open();
                     //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
                     //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
                     //SqlDataReader dr = cmd.ExecuteReader();
@@ -106,7 +107,7 @@ namespace TimeSheets
                     //    cmd.ExecuteNonQuery();
                     //}
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bErrors = true;
                     sErrors = ex.Message;
