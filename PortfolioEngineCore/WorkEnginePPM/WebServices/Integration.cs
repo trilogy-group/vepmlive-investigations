@@ -1268,7 +1268,15 @@ namespace WorkEnginePPM
                                 {
                                     if(listGuid != lGuid)
                                     {
-                                        iList = iWeb.Lists[lGuid];
+                                        try
+                                        {
+                                            iList = iWeb.Lists[lGuid];
+                                        }
+                                        catch
+                                        {
+                                            EventLog.WriteEntry(sSource, "In UpdateItems: list not found in the SP site: " + lGuid, EventLogEntryType.Information);
+                                            continue;
+                                        }
                                         listGuid = iList.ID;
                                     }
                                 }
