@@ -21,9 +21,10 @@ namespace TimeSheets
         {
             DataTable dtItems = null;
             int userid = 0;
-            SqlConnection cn = null;
+
             try
             {
+
                 try
                 {
                     WorkList = site.RootWeb.Lists["My Work"];
@@ -32,24 +33,23 @@ namespace TimeSheets
 
                 XmlDocument docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
-
-
-
-                WebAppId= site.WebApplication.Id;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                WebAppId = site.WebApplication.Id;
+                using (SqlConnection cn = CreateConnection())
                 {
-                    cn = CreateConnection();
-                    cn.Open();
-                });
-
-                using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
-                {
-                    cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (dr.Read())
+
+                        cn.Open();
+                    });
+                    using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER WITH (NOLOCK) INNER JOIN dbo.TSTIMESHEET WITH (NOLOCK) ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            userid = dr.GetInt32(0);
+                            if (dr.Read())
+                            {
+                                userid = dr.GetInt32(0);
+                            }
                         }
                     }
                 }
@@ -76,67 +76,81 @@ namespace TimeSheets
                     }
                     else
                     {
-                        using (SqlCommand cmd1 = new SqlCommand("update TSQUEUE set percentcomplete=1 where TSQUEUE_ID=@QueueUid", cn))
+                        using (SqlConnection cn = CreateConnection())
                         {
-                            cmd1.Parameters.AddWithValue("@queueuid", QueueUid);
-                            cmd1.ExecuteNonQuery();
-                        }
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            {
 
+                                cn.Open();
+                            });
+                            using (SqlCommand cmd1 = new SqlCommand("update TSQUEUE set percentcomplete=1 where TSQUEUE_ID=@QueueUid", cn))
+                            {
+                                cmd1.Parameters.AddWithValue("@queueuid", QueueUid);
+                                cmd1.ExecuteNonQuery();
+                            }
+                        }
                         TimesheetSettings settings = new TimesheetSettings(site.RootWeb);
 
                         DataSet dsItems = new DataSet();
 
                         SPUser editUser = site.RootWeb.AllUsers.GetByID(base.userid);
-
-                        using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn))
+                        using (SqlConnection cn = CreateConnection())
                         {
-                            cmd2.Parameters.AddWithValue("@tsuid", base.TSUID);
-                            using (SqlDataAdapter da = new SqlDataAdapter(cmd2))
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
                             {
-                                da.Fill(dsItems);
-                                dtItems = dsItems.Tables[0];
 
-                                XmlNodeList ndItems = docTimesheet.FirstChild.SelectNodes("Item");
-
-                                float percent = 0;
-                                float count = 0;
-                                float total = ndItems.Count;
-
-                                using (SqlCommand cmd3 = new SqlCommand("update TSQUEUE set percentcomplete=2 where TSQUEUE_ID=@QueueUid", cn))
+                                cn.Open();
+                            });
+                            using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM TSITEM WITH (NOLOCK) WHERE TS_UID=@tsuid", cn))
+                            {
+                                cmd2.Parameters.AddWithValue("@tsuid", base.TSUID);
+                                using (SqlDataAdapter da = new SqlDataAdapter(cmd2))
                                 {
-                                    cmd3.Parameters.AddWithValue("@queueuid", QueueUid);
-                                    cmd3.ExecuteNonQuery();
-                                }
-                                foreach (XmlNode ndItem in ndItems)
-                                {
-                                    string worktype = "";
+                                    da.Fill(dsItems);
+                                    dtItems = dsItems.Tables[0];
 
-                                    try
+                                    XmlNodeList ndItems = docTimesheet.FirstChild.SelectNodes("Item");
+
+                                    float percent = 0;
+                                    float count = 0;
+                                    float total = ndItems.Count;
+
+                                    using (SqlCommand cmd3 = new SqlCommand("update TSQUEUE set percentcomplete=2 where TSQUEUE_ID=@QueueUid", cn))
                                     {
-                                        worktype = ndItem.Attributes["WorkTypeField"].Value;
+                                        cmd3.Parameters.AddWithValue("@queueuid", QueueUid);
+                                        cmd3.ExecuteNonQuery();
                                     }
-                                    catch { }
-
-                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
-
-                                    count++;
-                                    float pct = count / total * 98;
-
-                                    if (pct >= percent + 10)
+                                    foreach (XmlNode ndItem in ndItems)
                                     {
-                                        using (SqlCommand cmd4 = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                        string worktype = "";
+
+                                        try
                                         {
-                                            cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
-                                            cmd4.Parameters.AddWithValue("@pct", pct);
-                                            cmd4.ExecuteNonQuery();
+                                            worktype = ndItem.Attributes["WorkTypeField"].Value;
                                         }
-                                        percent = pct;
+                                        catch { }
+
+                                        ProcessItemRow(ndItem, ref dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
+
+                                        count++;
+                                        float pct = count / total * 98;
+
+                                        if (pct >= percent + 10)
+                                        {
+                                            using (SqlCommand cmd4 = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                            {
+                                                cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
+                                                cmd4.Parameters.AddWithValue("@pct", pct);
+                                                cmd4.ExecuteNonQuery();
+                                            }
+                                            percent = pct;
+                                        }
                                     }
                                 }
                             }
+                            if (liveHours)
+                                sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                         }
-                        if (liveHours)
-                            sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                     }
                 }
                 else
@@ -159,11 +173,8 @@ namespace TimeSheets
                 if (site != null)
                     site.Dispose();
                 data = null;
-                if (cn != null)
-                {
-                    cn.Close();
-                }
             }
+
         }
 
         private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
@@ -436,7 +447,10 @@ namespace TimeSheets
             {
                 try
                 {
-                    cn.Open();
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        cn.Open();
+                    });
                     if (li != null)
                     {
                         using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
