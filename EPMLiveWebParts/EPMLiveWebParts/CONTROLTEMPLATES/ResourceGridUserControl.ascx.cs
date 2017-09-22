@@ -19,7 +19,7 @@ namespace EPMLiveWebParts
     public partial class ResourceGridUserControl : UserControl
     {
         #region Fields (9)
-        
+
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         protected string WcReportId = "Resource Work vs. Capacity".Md5();
         protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
@@ -30,7 +30,7 @@ namespace EPMLiveWebParts
         public string _resListId;
         public string _reqWebId;
         private string _webPartHeight;
-        
+
         public bool LaunchInForm;
 
         #endregion Fields
@@ -78,8 +78,7 @@ namespace EPMLiveWebParts
                 Guid webId = Guid.Empty;
                 Guid listid = Guid.Empty;
                 int itemid = 0;
-              
-                
+
                 try
                 {
                     webId = new Guid(Convert.ToString(Request["webid"]));
@@ -104,7 +103,7 @@ namespace EPMLiveWebParts
                 }
 
                 SPWeb web = Guid.Empty == webId ? _currentWeb : SPContext.Current.Site.OpenWeb(webId);
-               
+
                 if (listid == Guid.Empty && itemid == 0)
                 {
                     APITeam.VerifyProjectTeamWorkspace(web, out itemid, out listid);
@@ -147,8 +146,6 @@ namespace EPMLiveWebParts
                 attr.Value = Convert.ToString(itemid);
                 doc.FirstChild.Attributes.Append(attr);
 
-
-                
                 return GetGridParam(XDocument.Parse(doc.OuterXml))
                         .Replace(Environment.NewLine, string.Empty)
                         .Replace(@"\t", string.Empty);
@@ -370,11 +367,7 @@ namespace EPMLiveWebParts
                 {
                     "libraries/jquery.min", "@EPM", "/treegrid/GridE", "@EPMLive.ResourceGrid"
                 });
-                EPMLiveCore.Infrastructure.EPMLiveScriptManager.RegisterScript(Page, new[]
-                {
-                    "libraries/jquery.min", "libraries/jquery.paginate"
-                });
-                SPPageContentManager.RegisterStyleFile("/_layouts/15/epmlive/stylesheets/jpaginate.css");
+
                 ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
             }
             else
@@ -471,7 +464,7 @@ namespace EPMLiveWebParts
             epmDebug = Page.Request.Params["epmdebug"];
             return !string.IsNullOrEmpty(epmDebug);
         }
-        
+
 
 
         #endregion Methods
