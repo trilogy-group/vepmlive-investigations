@@ -1085,6 +1085,8 @@ namespace ProjectPublisher2016
 								if(file.ToLower() != "template.mpp")
 								{
                                     int lastslash = path.LastIndexOf("/Project%20Schedules");
+                                    if(lastslash < 0)
+                                        lastslash = path.LastIndexOf("/Project Schedules");
 									path = path.Substring(0,lastslash);
 									Connect.setProperty("EPMLiveURL",pj,path);
 									url = path;
