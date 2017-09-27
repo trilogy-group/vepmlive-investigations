@@ -146,19 +146,21 @@ namespace EPMLiveCore.API
             else if (field.Equals("SharePointAccount"))
             {
                 resourceId = new SPFieldUserValue(spWeb, dataElement.Value).LookupId;
-
-                try
+                if (dtUserInfo.Rows.Count > 0)
                 {
-                    DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
-
-                    var thumbnail = dataRow["Picture"] as string;
-
-                    if (!string.IsNullOrEmpty(thumbnail))
+                    try
                     {
-                        profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                        DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
+
+                        var thumbnail = dataRow["Picture"] as string;
+
+                        if (!string.IsNullOrEmpty(thumbnail))
+                        {
+                            profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                        }
                     }
+                    catch { }
                 }
-                catch { }
             }
 
             if (!gridSafeFields.ContainsKey(field))
@@ -452,7 +454,7 @@ namespace EPMLiveCore.API
                 Guid listid = Guid.Empty;
                 int itemid = 0;
                 XmlDocument docQuery = new XmlDocument();
-                docQuery.LoadXml(data.Replace("&gt;",">").Replace("&lt;", "<"));
+                docQuery.LoadXml(data.Replace("&gt;", ">").Replace("&lt;", "<"));
 
                 try
                 {
@@ -514,12 +516,16 @@ namespace EPMLiveCore.API
                 IEnumerable<XElement> resourceElements = resourceTeam.Root.Elements("Resource");
 
                 var dtUserInfo = new DataTable();
-
+                bool epmliveloaduserprofilepic = false;
                 XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
                 if (arrResourceElements.Any())
                 {
-                    dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
-                    dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveloadthumnail"), out epmliveloaduserprofilepic);
+                    if (epmliveloaduserprofilepic)
+                    {
+                        dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                        dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
+                    }
                 }
 
                 foreach (XElement resourceElement in arrResourceElements)
@@ -529,7 +535,6 @@ namespace EPMLiveCore.API
                     int resourceId = 0;
                     string profilePic = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png",
                         web.SafeServerRelativeUrl());
-
                     foreach (XElement dataElement in resourceElement.Elements())
                     {
                         string field = dataElement.Attribute("Field").Value;
@@ -543,7 +548,6 @@ namespace EPMLiveCore.API
                             web, field, iElement, dtUserInfo, dataElement, ref profilePic,
                             ref resourceId);
                     }
-
                     iElement.Add(new XAttribute("ResourceID", resourceId));
                     iElement.Add(new XAttribute("ProfilePic",
                         string.Format(
@@ -917,7 +921,7 @@ namespace EPMLiveCore.API
                         string deleteResourceCheckMessage = string.Empty;
                         string deleteResourceCheckStatus = string.Empty;
 
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             SPWeb oWeb = SPContext.Current.Web;
                             oWeb.AllowUnsafeUpdates = true;
@@ -1396,7 +1400,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                 
+
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";
