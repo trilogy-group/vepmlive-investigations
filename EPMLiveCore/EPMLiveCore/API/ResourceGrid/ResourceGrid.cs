@@ -137,7 +137,7 @@ namespace EPMLiveCore.API
             Dictionary<string, string> gridSafeFields, string type,
             string value, SPWeb spWeb, string field,
             XElement iElement, DataTable dtUserInfo, XElement dataElement,
-            ref string profilePic, ref int resourceId)
+            ref string profilePic, ref int resourceId, bool disableThumbnails)
         {
             if (field.Equals("ID"))
             {
@@ -146,19 +146,29 @@ namespace EPMLiveCore.API
             else if (field.Equals("SharePointAccount"))
             {
                 resourceId = new SPFieldUserValue(spWeb, dataElement.Value).LookupId;
-
-                try
+                if (!disableThumbnails)
                 {
-                    DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
-
-                    var thumbnail = dataRow["Picture"] as string;
-
-                    if (!string.IsNullOrEmpty(thumbnail))
+                    if (dtUserInfo.Rows.Count > 0)
                     {
-                        profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                        try
+                        {
+                            DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
+
+                            var thumbnail = dataRow["Picture"] as string;
+
+                            if (!string.IsNullOrEmpty(thumbnail))
+                            {
+                                profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                            }
+                        }
+                        catch { }
                     }
                 }
-                catch { }
+                else
+                {
+                    profilePic = string.Format("{0}/_layouts/15/epmlive/images/white-avatar.png",
+                        spWeb.SafeServerRelativeUrl());
+                }
             }
 
             if (!gridSafeFields.ContainsKey(field))
@@ -296,35 +306,41 @@ namespace EPMLiveCore.API
         ///     Filters the department resources.
         /// </summary>
         /// <param name="resultXml">The result XML.</param>
+        
         private static void FilterDepartmentResources(ref XDocument resultXml)
         {
+            if (resultXml.Root == null)
+            {
+                throw new APIException((int)Errors.CantFindResultRoot, "The Resources Root element was not found.");
+            }
+
             XDocument departmentsXml;
 
             using (var departmentManager = new DepartmentManager(SPContext.Current.Site.RootWeb))
             {
                 departmentsXml = departmentManager.GetAll();
             }
-
-            var dataTable = new DataTable("Managers");
-
-            dataTable.Columns.Add("Id", typeof(string));
-            dataTable.Columns.Add("IdClean", typeof(string));
-            dataTable.Columns.Add("ParentId", typeof(string));
-            dataTable.Columns.Add("ParentIdClean", typeof(string));
-            dataTable.Columns.Add("Managers", typeof(object));
-            dataTable.Columns.Add("Children", typeof(List<string>));
-
             if (departmentsXml.Root == null)
             {
                 throw new APIException((int)Errors.CantGetDepts, "Unable to query departments.");
             }
 
+            var departmentsTable = new DataTable();
+
+            departmentsTable.Columns.Add("Id", typeof(string));
+            departmentsTable.Columns.Add("ParentId", typeof(string));
+            departmentsTable.Columns.Add("MyDepartment", typeof(bool));
+
+            SPUser currentUser = SPContext.Current.Web.CurrentUser;
+            string username = string.Format("{0};#{1}", currentUser.ID, currentUser.Name.ToSqlCompliant());
+            List<string> myDepartments = new List<string>();
             foreach (XElement departmentElement in departmentsXml.Root.Elements("Department"))
             {
                 string id = null;
-                string idClean = null;
+
                 string parent = null;
-                var managers = new List<string>();
+                bool myDepartmentManager = false;
+                bool myDepartmentExecutive = false;
 
                 foreach (XElement dataElement in departmentElement.Elements())
                 {
@@ -345,70 +361,48 @@ namespace EPMLiveCore.API
                                 throw new APIException((int)Errors.CantFindIdAttr, "ID attribute was not found.");
                             }
 
-                            idClean = idAttribute.Value;
-                            id = string.Format("{0};#{1}", idClean, dataElement.Value);
+                            id = idAttribute.Value;
                             break;
                         case "RBS":
                             parent = dataElement.Value;
                             break;
                         case "Managers":
+                            myDepartmentManager = ParseResources(dataElement.Value).Where(me => me.IndexOf(username, StringComparison.CurrentCultureIgnoreCase) >= 0).Any();
+                            break;
                         case "Executives":
-                            foreach (string manager in ParseResources(dataElement.Value)
-                                .Where(manager => !managers.Contains(manager)))
-                            {
-                                managers.Add(manager);
-                            }
+                            myDepartmentExecutive = ParseResources(dataElement.Value).Where(me => me.IndexOf(username, StringComparison.CurrentCultureIgnoreCase) >= 0).Any();
                             break;
                     }
                 }
 
                 if (string.IsNullOrEmpty(parent))
                 {
-                    parent = id;
+                    parent = null;
                 }
                 else if (parent.Equals("0;#"))
                 {
-                    parent = id;
+                    parent = null;
                 }
 
-                dataTable.Rows.Add(id, idClean, parent, parent.Split(';')[0], managers, new List<string>());
+                departmentsTable.Rows.Add(id, parent, myDepartmentManager||myDepartmentExecutive);
             }
 
-            var dataSet = new DataSet();
-
-            dataSet.Tables.Add(dataTable);
-            DataTable dsTable = dataSet.Tables["Managers"];
-
-            dataSet.Relations.Add("ParentChild", dsTable.Columns["IdClean"], dsTable.Columns["ParentIdClean"]);
-
-            BuildDepartmentHierarchy(dsTable.Select("ParentIdClean = IdClean"), ref dataTable);
-
-            foreach (DataRow dataRow in dataTable.Rows)
+            DataRow[] myDepartmentsRows = departmentsTable.Select("MyDepartment=" + true);
+            while (myDepartmentsRows.Any())
             {
-                dataRow["Managers"] = string.Join(",", ((List<string>)dataRow["Managers"]).ToArray());
-
-                var children = ((List<string>)dataRow["Children"]);
-                children.Add((string)dataRow["Id"]);
+                List<DataRow> newMyDepartments = new List<DataRow>();
+                foreach (DataRow currentDepartmentRow in myDepartmentsRows)
+                {
+                    myDepartments.Add((string)currentDepartmentRow["Id"]);
+                    DataRow[] childDepartments = departmentsTable.Select(String.Format("ParentId LIKE '{0};%'", currentDepartmentRow["Id"]));
+                    if (childDepartments.Any())
+                    {
+                        newMyDepartments.AddRange(childDepartments);
+                    }
+                }
+                myDepartmentsRows = newMyDepartments.Distinct().ToArray();
             }
-
-            SPUser currentUser = SPContext.Current.Web.CurrentUser;
-            string username = string.Format("{0};#{1}", currentUser.ID, currentUser.Name.ToSqlCompliant());
-
-            var departments = new List<string>();
-
-            foreach (string department in dataTable.Select(string.Format("Managers LIKE '%{0}%'", username))
-                .SelectMany(dataRow => ((List<string>)dataRow["Children"]),
-                    (dataRow, department) => department.Split(';')[0])
-                .Where(department => !departments.Contains(department)))
-            {
-                departments.Add(department);
-            }
-
-            if (resultXml.Root == null)
-            {
-                throw new APIException((int)Errors.CantFindResultRoot, "The Resources Root element was not found.");
-            }
-
+            myDepartments = myDepartments.Distinct().ToList();
             foreach (XElement resourceElement in resultXml.Root.Elements())
             {
                 bool validDepartment = false;
@@ -420,14 +414,13 @@ namespace EPMLiveCore.API
                         return a != null && a.Value.Equals("Department");
                     }))
                 {
-                    if (departments.Contains((dataElement.Value).Split(';')[0])) validDepartment = true;
+                    if (myDepartments.Contains((dataElement.Value).Split(';')[0])) validDepartment = true;
                     break;
                 }
 
                 resourceElement.Add(new XAttribute("IsMyResource", validDepartment));
             }
         }
-
         private static string GetCacheKey(SPWeb web, string kind)
         {
             return "ResourceGrid_" + kind + "_W_" + web.ID + "_U_" + web.CurrentUser.ID;
@@ -440,7 +433,7 @@ namespace EPMLiveCore.API
             {
                 SPList resourcesList = resourceManager.ParentList;
                 bool isRootWeb = web.IsRootWeb;
-
+                GridGanttSettings gSettings = new GridGanttSettings(resourcesList);
                 while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
                     if (web.IsRootWeb)
@@ -452,7 +445,7 @@ namespace EPMLiveCore.API
                 Guid listid = Guid.Empty;
                 int itemid = 0;
                 XmlDocument docQuery = new XmlDocument();
-                docQuery.LoadXml(data.Replace("&gt;",">").Replace("&lt;", "<"));
+                docQuery.LoadXml(data.Replace("&gt;", ">").Replace("&lt;", "<"));
 
                 try
                 {
@@ -516,10 +509,10 @@ namespace EPMLiveCore.API
                 var dtUserInfo = new DataTable();
 
                 XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
-                if (arrResourceElements.Any())
+                if (arrResourceElements.Any() && !gSettings.DisableThumbnails)
                 {
-                    dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
-                    dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
+                        dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                        dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
                 }
 
                 foreach (XElement resourceElement in arrResourceElements)
@@ -529,7 +522,6 @@ namespace EPMLiveCore.API
                     int resourceId = 0;
                     string profilePic = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png",
                         web.SafeServerRelativeUrl());
-
                     foreach (XElement dataElement in resourceElement.Elements())
                     {
                         string field = dataElement.Attribute("Field").Value;
@@ -541,9 +533,8 @@ namespace EPMLiveCore.API
 
                         BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
                             web, field, iElement, dtUserInfo, dataElement, ref profilePic,
-                            ref resourceId);
+                            ref resourceId, gSettings.DisableThumbnails);
                     }
-
                     iElement.Add(new XAttribute("ResourceID", resourceId));
                     iElement.Add(new XAttribute("ProfilePic",
                         string.Format(
@@ -917,7 +908,7 @@ namespace EPMLiveCore.API
                         string deleteResourceCheckMessage = string.Empty;
                         string deleteResourceCheckStatus = string.Empty;
 
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             SPWeb oWeb = SPContext.Current.Web;
                             oWeb.AllowUnsafeUpdates = true;
@@ -1091,7 +1082,7 @@ namespace EPMLiveCore.API
                 var changesXml = new XElement("Changes");
 
                 SPList resourcesList = spWeb.Lists["Resources"];
-
+                GridGanttSettings gSettings = new GridGanttSettings(resourcesList);
                 var spListItems = new List<SPListItem>();
 
                 if (changeType.Equals("Added"))
@@ -1130,10 +1121,10 @@ namespace EPMLiveCore.API
                         spListItems.Add(spListItem);
                     }
                 }
-
+               
                 var dtUserInfo = new DataTable();
-
-                if (spListItems.Count > 0)
+               
+                if (spListItems.Count > 0  && !gSettings.DisableThumbnails)
                 {
                     dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
                     dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
@@ -1167,7 +1158,7 @@ namespace EPMLiveCore.API
 
                             BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
                                 spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
-                                ref resourceId);
+                                ref resourceId, gSettings.DisableThumbnails);
                         }
                         catch { }
                     }
@@ -1319,6 +1310,7 @@ namespace EPMLiveCore.API
                 }
 
                 FilterDepartmentResources(ref resultXml);
+                
 
                 return resultXml.ToString();
             }
@@ -1396,7 +1388,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                 
+
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";
