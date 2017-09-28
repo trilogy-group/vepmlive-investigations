@@ -328,6 +328,24 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.CheckBox chkEmails;
         
         /// <summary>
+        /// ThumbnailSetting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ThumbnailSetting;
+        
+        /// <summary>
+        /// chkDisableThumbnails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkDisableThumbnails;
+        
+        /// <summary>
         /// chkTimesheet control.
         /// </summary>
         /// <remarks>
