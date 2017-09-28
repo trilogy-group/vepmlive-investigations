@@ -254,20 +254,20 @@ namespace EPMLiveCore
                 
                 using(SPSite oSite = new SPSite(site.ID))
                 {
-                    if(oSite.WebApplication.ApplicationPool.Username == SPAdministrationWebApplication.Local.ApplicationPool.Username)
-                    {
-                        try
-                        {
-                            Licensing lic = new Licensing();
-                            retVal = lic.SetUserLevel(username, feature);
-                        }
-                        catch(Exception ex)
-                        {
-                            bLatestError = ex.Message;
-                            retVal = 1000;
-                        }
-                    }
-                    else
+                    //if(oSite.WebApplication.ApplicationPool.Username == SPAdministrationWebApplication.Local.ApplicationPool.Username)
+                    //{
+                    //    try
+                    //    {
+                    //        Licensing lic = new Licensing();
+                    //        retVal = lic.SetUserLevel(username, feature);
+                    //    }
+                    //    catch(Exception ex)
+                    //    {
+                    //        bLatestError = ex.Message;
+                    //        retVal = 1000;
+                    //    }
+                    //}
+                    //else
                     {
                         try
                         {
