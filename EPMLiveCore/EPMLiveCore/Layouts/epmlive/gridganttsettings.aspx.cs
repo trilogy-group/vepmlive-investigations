@@ -313,7 +313,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     chkResTools.Checked = gSettings.EnableResourcePlan;
                     chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
                     ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
-                    chkLoadThumbnails.Checked = gSettings.LoadThumbnails;
+                    chkDisableThumbnails.Checked = gSettings.DisableThumbnails;
                     //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
                     {
                         SectionEmail.Visible = true;
@@ -1128,7 +1128,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
             gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
             gSettings.EnableContentReporting = chkContentReporting.Checked;
-            gSettings.LoadThumbnails = chkLoadThumbnails.Checked;
+            gSettings.DisableThumbnails = chkDisableThumbnails.Checked;
             gSettings.SaveSettings(list);
 
             //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)

@@ -137,7 +137,7 @@ namespace EPMLiveCore.API
             Dictionary<string, string> gridSafeFields, string type,
             string value, SPWeb spWeb, string field,
             XElement iElement, DataTable dtUserInfo, XElement dataElement,
-            ref string profilePic, ref int resourceId)
+            ref string profilePic, ref int resourceId, bool disableThumbnails)
         {
             if (field.Equals("ID"))
             {
@@ -146,20 +146,23 @@ namespace EPMLiveCore.API
             else if (field.Equals("SharePointAccount"))
             {
                 resourceId = new SPFieldUserValue(spWeb, dataElement.Value).LookupId;
-                if (dtUserInfo.Rows.Count > 0)
+                if (!disableThumbnails)
                 {
-                    try
+                    if (dtUserInfo.Rows.Count > 0)
                     {
-                        DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
-
-                        var thumbnail = dataRow["Picture"] as string;
-
-                        if (!string.IsNullOrEmpty(thumbnail))
+                        try
                         {
-                            profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                            DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
+
+                            var thumbnail = dataRow["Picture"] as string;
+
+                            if (!string.IsNullOrEmpty(thumbnail))
+                            {
+                                profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
                 else
                 {
@@ -523,13 +526,10 @@ namespace EPMLiveCore.API
                 var dtUserInfo = new DataTable();
 
                 XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
-                if (arrResourceElements.Any())
+                if (arrResourceElements.Any() && !gSettings.DisableThumbnails)
                 {
-                    if (gSettings.LoadThumbnails)
-                    {
                         dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
                         dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
-                    }
                 }
 
                 foreach (XElement resourceElement in arrResourceElements)
@@ -550,7 +550,7 @@ namespace EPMLiveCore.API
 
                         BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
                             web, field, iElement, dtUserInfo, dataElement, ref profilePic,
-                            ref resourceId);
+                            ref resourceId, gSettings.DisableThumbnails);
                     }
                     iElement.Add(new XAttribute("ResourceID", resourceId));
                     iElement.Add(new XAttribute("ProfilePic",
@@ -1099,7 +1099,7 @@ namespace EPMLiveCore.API
                 var changesXml = new XElement("Changes");
 
                 SPList resourcesList = spWeb.Lists["Resources"];
-
+                GridGanttSettings gSettings = new GridGanttSettings(resourcesList);
                 var spListItems = new List<SPListItem>();
 
                 if (changeType.Equals("Added"))
@@ -1138,10 +1138,10 @@ namespace EPMLiveCore.API
                         spListItems.Add(spListItem);
                     }
                 }
-
+               
                 var dtUserInfo = new DataTable();
-
-                if (spListItems.Count > 0)
+               
+                if (spListItems.Count > 0  && !gSettings.DisableThumbnails)
                 {
                     dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
                     dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
@@ -1175,7 +1175,7 @@ namespace EPMLiveCore.API
 
                             BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
                                 spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
-                                ref resourceId);
+                                ref resourceId, gSettings.DisableThumbnails);
                         }
                         catch { }
                     }

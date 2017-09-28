@@ -57,7 +57,7 @@ namespace EPMLiveCore
         public string BuildTeamPermissions = "";
 
         public bool EnableContentReporting = false;
-        public bool LoadThumbnails = false;
+        public bool DisableThumbnails = false;
 
 
         public bool SaveSettings(SPList _list)
@@ -169,7 +169,7 @@ namespace EPMLiveCore
             catch { }
             try { RibbonBehavior = settings[40]; }
             catch { }
-            try { LoadThumbnails = bool.Parse(settings[41]); }
+            try { DisableThumbnails = bool.Parse(settings[41]); }
             catch { }
 
 
@@ -219,7 +219,7 @@ namespace EPMLiveCore
             data += ListIcon + "\n";
             data += EnableFancyForms + "\n";
             data += RibbonBehavior + "\n";
-            data += LoadThumbnails + "\n";
+            data += DisableThumbnails + "\n";
             return data;
         }
     }
