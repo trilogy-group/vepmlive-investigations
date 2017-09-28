@@ -266,6 +266,44 @@ BEGIN
 END
 
 
+---------------FUNCTION: fnCheckUserAccess----------------------
+
+PRINT 'Creating function fnCheckUserAccess'
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnCheckUserAccess]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+	DROP FUNCTION [dbo].[fnCheckUserAccess]
+END
+
+IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnCheckUserAccess]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+	EXEC sp_executesql N'
+	CREATE FUNCTION [dbo].[fnCheckUserAccess]
+	(
+		@UserId INT,
+		@WebId  UNIQUEIDENTIFIER,
+		@ListId UNIQUEIDENTIFIER = NULL,
+		@ItemId INT = NULL
+	)
+	RETURNS BIT
+	AS
+	BEGIN
+		IF @UserId = 1073741823 RETURN 1
+	
+		IF @ItemId IS NULL
+		BEGIN
+			IF (@WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS WHERE (SECTYPE = 1) AND (GROUPID IN 
+					(SELECT GroupId FROM (SELECT GROUPID FROM dbo.RPTGROUPUSER WHERE USERID = @UserId) AS Groups)) 
+					OR (SECTYPE = 0) AND (GROUPID = @UserId))) RETURN 1
+			RETURN 0
+		END
+	
+		IF (@ItemId IN (SELECT ITEMID FROM dbo.RPTITEMGROUPS WHERE (LISTID = @ListId) AND ((SECTYPE = 1) AND (GROUPID IN 
+				(SELECT GroupId FROM (SELECT GROUPID FROM dbo.RPTGROUPUSER WHERE USERID = @UserId) AS Groups)) 
+				OR (SECTYPE = 0) AND (GROUPID = @UserId)))) RETURN 1
+		RETURN 0
+	END'
+END
 
 ---------------SP: SS_GetLatestThreads----------------------
 
@@ -307,7 +345,7 @@ BEGIN
 							dbo.SS_Threads.ItemId, 
 							(SELECT	COUNT(Id) FROM dbo.SS_Activities WHERE ((ThreadId = dbo.SS_Threads.Id) AND (MassOperation = 0) AND (Kind <> 3 AND Kind <> 4))) AS TotalActivities,
                             (SELECT COUNT(Id) FROM dbo.SS_Activities WHERE (Kind = 4) AND (ThreadId = dbo.SS_Threads.Id)) AS TotalComments, 
-							1 AS HasAccess
+							dbo.fnCheckUserAccess(@UserId, dbo.SS_Threads.WebId, dbo.SS_Threads.ListId, dbo.SS_Threads.ItemId) AS HasAccess
 					FROM	dbo.ReportListIds INNER JOIN dbo.RPTList ON dbo.ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
 							dbo.SS_Threads INNER JOIN dbo.RPTWeb ON dbo.SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = dbo.SS_Threads.ListId
 					WHERE   (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
@@ -362,7 +400,7 @@ BEGIN
                      dbo.SS_Activities.MassOperation AS ActivityIsMassOperation, 
                      dbo.SS_Activities.ThreadId, dbo.SS_Activities.UserId, dbo.LSTUserInformationList.Title AS UserDisplayName, 
                      dbo.LSTUserInformationList.Name AS UserName, dbo.LSTUserInformationList.Picture AS UserPicture, 
-                     1 AS HasAccess
+                     dbo.fnCheckUserAccess(@UserId, @WebId, @ListId, @ItemId) AS HasAccess
             FROM	 dbo.SS_Activities INNER JOIN dbo.LSTUserInformationList ON dbo.SS_Activities.UserId = dbo.LSTUserInformationList.ID
             WHERE	 dbo.SS_Activities.ThreadId = @ThreadId AND dbo.SS_Activities.Date < @Offset AND
 					 dbo.SS_Activities.Kind >= @KindMin AND dbo.SS_Activities.Kind <= @KindMax AND dbo.SS_Activities.Kind <> 3) 
