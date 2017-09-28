@@ -57,6 +57,7 @@ namespace EPMLiveCore
         public string BuildTeamPermissions = "";
 
         public bool EnableContentReporting = false;
+        public bool LoadThumbnails = false;
 
 
         public bool SaveSettings(SPList _list)
@@ -163,11 +164,14 @@ namespace EPMLiveCore
             try { WorkspaceParentSiteLookup = settings[37]; }
             catch { }
             try { ListIcon = settings[38]; }
-            catch{}
+            catch { }
             try { EnableFancyForms = bool.Parse(settings[39]); }
             catch { }
             try { RibbonBehavior = settings[40]; }
             catch { }
+            try { LoadThumbnails = bool.Parse(settings[41]); }
+            catch { }
+
 
         }
 
@@ -215,7 +219,7 @@ namespace EPMLiveCore
             data += ListIcon + "\n";
             data += EnableFancyForms + "\n";
             data += RibbonBehavior + "\n";
-
+            data += LoadThumbnails + "\n";
             return data;
         }
     }

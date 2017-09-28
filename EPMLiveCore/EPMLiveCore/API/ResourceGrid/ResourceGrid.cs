@@ -161,6 +161,11 @@ namespace EPMLiveCore.API
                     }
                     catch { }
                 }
+                else
+                {
+                    profilePic = string.Format("{0}/_layouts/15/epmlive/images/white-avatar.png",
+                        spWeb.SafeServerRelativeUrl());
+                }
             }
 
             if (!gridSafeFields.ContainsKey(field))
@@ -442,7 +447,7 @@ namespace EPMLiveCore.API
             {
                 SPList resourcesList = resourceManager.ParentList;
                 bool isRootWeb = web.IsRootWeb;
-
+                GridGanttSettings gSettings = new GridGanttSettings(resourcesList);
                 while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
                     if (web.IsRootWeb)
@@ -516,12 +521,11 @@ namespace EPMLiveCore.API
                 IEnumerable<XElement> resourceElements = resourceTeam.Root.Elements("Resource");
 
                 var dtUserInfo = new DataTable();
-                bool epmliveloaduserprofilepic = false;
+
                 XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
                 if (arrResourceElements.Any())
                 {
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveloadthumnail"), out epmliveloaduserprofilepic);
-                    if (epmliveloaduserprofilepic)
+                    if (gSettings.LoadThumbnails)
                     {
                         dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
                         dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };

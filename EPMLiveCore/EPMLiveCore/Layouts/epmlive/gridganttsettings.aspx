@@ -493,6 +493,21 @@
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
 
+    <wssuc:InputFormSection Title="Thumbnail Setting"
+		Description=""
+		runat="server" ID="ThumbnailSetting">
+		<Template_Description>
+		    Check this box to enable thumbnails.
+		</Template_Description>
+		<Template_InputFormControls>
+			<wssuc:InputFormControl LabelText="" runat="server">
+				 <Template_Control>
+                    <asp:CheckBox ID="chkLoadThumbnails" runat="server" Text="Enable Thumbnails" />
+				 </Template_Control>
+			</wssuc:InputFormControl>
+		</Template_InputFormControls>
+	</wssuc:InputFormSection>
+
 	<wssuc:InputFormSection Title="Enable Resource Tools"
 		Description=""
 		runat="server">

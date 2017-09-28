@@ -127,7 +127,7 @@ begin
 	set @sql = @sql + '(SELECT Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted],
 
  [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id
-	FROM vwMeta_V2 Where hours > 0) ps
+	FROM vwMeta Where hours > 0) ps
 	PIVOT
 	(
 	min (columnvalue)
@@ -143,7 +143,7 @@ end
 else
 begin
 
-	set @sql = 'SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into TempTSTable  from vwMeta_V2 where hours > 0 and site_id = ''' + convert(varchar(50),@siteuid) + ''''
+	set @sql = 'SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into TempTSTable  from vwMeta where hours > 0 and site_id = ''' + convert(varchar(50),@siteuid) + ''''
 
 end
 set @sql=@sql+' alter table TempTSTable add rpttsduid uniqueidentifier'
@@ -396,38 +396,5 @@ END");
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V630, Order = 3.0,
-     Description = "Add Loadthumbnail Flag")]
-    internal class AddLoadThumbnailFlag : UpgradeStep
-    {
-
-        public AddLoadThumbnailFlag(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
-        {
-        }
-        public override bool Perform()
-        {
-            try
-            {
-                if (!Web.Properties.ContainsKey("epmliveloadthumnail"))
-                {
-                    //Setting default value to false as described in requirement
-                    Web.Properties.Add("epmliveloadthumnail", "false");
-                    Web.Properties.Update();
-                    LogMessage("epmliveloadthumnail property key added.", MessageKind.SUCCESS, 4);
-                }
-                else
-                {
-                    LogMessage("epmliveloadthumnail property key already exists.", MessageKind.SUCCESS, 4);
-                }
-                
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LogMessage(string.Format("Error while adding epmliveloadthumnail property Er : {0}.", ex.Message), MessageKind.FAILURE, 4);
-                return false;
-            }
-        }
-    }
     
 }

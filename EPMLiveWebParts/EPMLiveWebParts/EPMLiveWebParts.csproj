@@ -1031,6 +1031,7 @@
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-16.png" />
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-32.png" />
     <Content Include="Layouts\epmlive\images\User.png" />
+    <Content Include="Layouts\epmlive\images\white-avatar.png" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
     <Content Include="Layouts\epmlive\javascripts\jquery-ui.min.js" />
