@@ -225,6 +225,87 @@ function ChangeView(grid, view) {
     grid.Render();
 }
 
+function DeleteView(grid, view) {
+
+    var cnt = 0;
+    ShowMessage(grid.id, "Deleting View...", 150, 50);
+
+    var dataXml = "<View Name=\"" + escape(view) + "\" NonWork=\"" + NonWork + "\"/>";
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_DeleteWorkView", dataXml, function (response) {
+        var oResponse = eval("(" + response + ")");
+        grid.StaticCursor = 1;
+
+        HideMessage(grid.id);
+
+        if (oResponse.Views.Status == "0") {
+            Views = eval("(" + oResponse.Views.Text.replace(/&quot;/g, "\"") + ")");
+
+            for (var view in Views) {
+                var oView = Views[view];
+                cnt++;
+            }
+
+            if (Views[view] != "" || Views[view] != undefined || Views[view] != null) {
+                if (cnt != 0) {
+                    ChangeView(grid, view, "1");
+                }
+                else {
+                    CurrentView = "";
+                    CurrentViewId = "";
+                }
+            }
+
+            RefreshCommandUI();
+        }
+        else {
+            alert(oResponse.Views.Text);
+        }
+    });
+}
+
+function checkDefaultView(grid, viewName) {
+    for (var view in Views) {
+        var oView = Views[view];
+        if (unescape(oView.Name) == unescape(viewName)) {
+            return oView.Default;
+        }
+    }
+}
+
+function RenameView(grid, view, retval) {
+
+    ShowMessage(grid.id, "Renaming View...", 150, 50);
+
+    var dataXml = "<View Name=\"" + escape(view) + "\" NewName=\"" + escape(retval[0]) + "\" Default=\"" + retval[1] + "\" NonWork=\"" + NonWork + "\"/>";
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameWorkView", dataXml, function (response) {
+        var oResponse = eval("(" + response + ")");
+        grid.StaticCursor = 1;
+
+        HideMessage(grid.id);
+
+        if (oResponse.Views.Status == "0") {
+
+            Views = eval("(" + oResponse.Views.Text.replace(/&quot;/g, "\"") + ")");
+
+            for (var view in Views) {
+                var oView = Views[view];
+
+                if (oView.Name == retval[0]) {
+                    CurrentView = retval[0];
+                    CurrentViewId = view;
+                    break;
+                }
+            }
+
+            RefreshCommandUI();
+        }
+        else {
+            alert(oResponse.Views.Text);
+        }
+    });
+}
 
 function SaveView(grid, retval) {
 

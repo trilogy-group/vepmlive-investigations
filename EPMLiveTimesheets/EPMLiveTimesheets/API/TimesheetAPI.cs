@@ -288,6 +288,85 @@ namespace TimeSheets
 
         }
 
+        public static string DeleteWorkView(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument docTimesheet = new XmlDocument();
+                docTimesheet.LoadXml(data);
+
+                if (docTimesheet.FirstChild.Attributes["NonWork"].Value == "true")
+                {
+                    EPMLiveCore.API.ViewManager Views = GetNonWorkViews(oWeb);
+
+                    Views.DeleteView(docTimesheet.FirstChild.Attributes["Name"].Value);
+
+                    oWeb.AllowUnsafeUpdates = true;
+
+                    EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSNonWorkViews", Views.ToString());
+
+                    return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+                }
+                else
+                {
+                    EPMLiveCore.API.ViewManager Views = GetWorkViews(oWeb);
+
+                    Views.DeleteView(docTimesheet.FirstChild.Attributes["Name"].Value);
+
+                    oWeb.AllowUnsafeUpdates = true;
+
+                    EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSWorkViews", Views.ToString());
+
+                    return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return "<Views Status=\"1\">" + ex.Message + "</Views>";
+            }
+
+        }
+
+        public static string RenameWorkView(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument docTimesheet = new XmlDocument();
+                docTimesheet.LoadXml(data);
+
+                if (docTimesheet.FirstChild.Attributes["NonWork"].Value == "true")
+                {
+                    EPMLiveCore.API.ViewManager Views = GetNonWorkViews(oWeb);
+
+                    Views.RenameView(docTimesheet.FirstChild.Attributes["Name"].Value, docTimesheet.FirstChild.Attributes["NewName"].Value, docTimesheet.FirstChild.Attributes["Default"].Value);
+
+                    oWeb.AllowUnsafeUpdates = true;
+
+                    EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSNonWorkViews", Views.ToString());
+
+                    return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+                }
+                else
+                {
+                    EPMLiveCore.API.ViewManager Views = GetWorkViews(oWeb);
+
+                    Views.RenameView(docTimesheet.FirstChild.Attributes["Name"].Value, docTimesheet.FirstChild.Attributes["NewName"].Value, docTimesheet.FirstChild.Attributes["Default"].Value);
+
+                    oWeb.AllowUnsafeUpdates = true;
+
+                    EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSWorkViews", Views.ToString());
+
+                    return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+                }
+            }
+            catch (Exception ex)
+            {
+                return "<Views Status=\"1\">" + ex.Message + "</Views>";
+            }
+
+        }
+
         internal static EPMLiveCore.API.ViewManager GetNonWorkViews(SPWeb oWeb)
         {
             EPMLiveCore.API.ViewManager vws = new EPMLiveCore.API.ViewManager(oWeb, "EPMLiveTSNonWorkViews");

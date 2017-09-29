@@ -66,7 +66,7 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
         Array.add($arr, 'Ribbon.MyTimesheetWork.QueryCurrentView');
         Array.add($arr, 'Ribbon.MyTimesheetWork.ShowHideFilters.Query');
         Array.add($arr, 'Ribbon.MyTimesheetWork.ShowHideGrouping.Query');
-        
+
         return $arr;
     },
     isFocusable: function () {
@@ -114,7 +114,7 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
 
         if (commandId === 'Ribbon.MyTimesheetWork.AddWork') {
-            
+
             ShowMessage("Adding Work", 120, 30);
 
             var items = "";
@@ -122,25 +122,18 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
             var pGrid = parent.curGrid;
 
-            for(var sRow in grid.Rows)
-            {
+            for (var sRow in grid.Rows) {
                 var oRow = grid.Rows[sRow];
-                if(oRow.Def.Name == "R")
-                {
-                    if(grid.GetValue(oRow, "Check") == "1")
-                    {
+                if (oRow.Def.Name == "R") {
+                    if (grid.GetValue(oRow, "Check") == "1") {
                         var id = grid.GetValue(oRow, "ListId") + "." + grid.GetValue(oRow, "ItemId");
 
-                        if(grid.GetValue(oRow, "Current") == "1")
-                        {
-                            if(NonWork)
-                            {
+                        if (grid.GetValue(oRow, "Current") == "1") {
+                            if (NonWork) {
                                 alert("(" + grid.GetValue(oRow, "Title") + ") is already in your timesheet.");
                             }
-                            else
-                            {
-                                if(confirm("(" + grid.GetValue(oRow, "Title") + ") is already in your timesheet, would you like to add another copy?"))
-                                {
+                            else {
+                                if (confirm("(" + grid.GetValue(oRow, "Title") + ") is already in your timesheet, would you like to add another copy?")) {
                                     //items += "," + id;
                                     var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
                                     pGrid.ChangeDef(nRow, "R", 1, 0);
@@ -155,17 +148,13 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                 }
                             }
                         }
-                        else
-                        {
-                            if(NonWork)
-                            {
-                            
+                        else {
+                            if (NonWork) {
+
                                 var found = false;
 
-                                for(var R in pGrid.Rows)
-                                {
-                                    try
-                                    {
+                                for (var R in pGrid.Rows) {
+                                    try {
                                         var pRow = pGrid.Rows[R];
 
                                         var plistid = pGrid.GetValue(pRow, "ListID");
@@ -173,17 +162,15 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
                                         var listid = grid.GetValue(oRow, "ListID");
                                         var itemid = grid.GetValue(oRow, "ItemID");
-    
-                                        if(plistid == listid && pitemid == itemid)
-                                        {
+
+                                        if (plistid == listid && pitemid == itemid) {
                                             found = true;
                                             break;
                                         }
-                                    }catch(e){}
+                                    } catch (e) { }
                                 }
 
-                                if(!found)
-                                {
+                                if (!found) {
                                     var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
                                     pGrid.ChangeDef(nRow, "R", 1, 0);
                                     pGrid.SetValue(nRow, "TSTotals", 0, 0);
@@ -195,13 +182,11 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
                                     parent.GetOtherHours(pGrid, nRow);
                                 }
-                                else
-                                {
+                                else {
                                     alert("(" + grid.GetValue(oRow, "Title") + ") is already in your timesheet.");
                                 }
                             }
-                            else
-                            {
+                            else {
                                 var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
                                 pGrid.ChangeDef(nRow, "R", 1, 0);
                                 pGrid.SetValue(nRow, "TSTotals", 0, 0);
@@ -225,19 +210,18 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
             parent.TimesheetHoursEdited = true;
             window.frameElement.commitPopup();
 
-//            if(items != "")
-//            {
-//                items = items.substr(1);
-//                
-//                AddItems(grid, items);    
-//            }
+            //            if(items != "")
+            //            {
+            //                items = items.substr(1);
+            //                
+            //                AddItems(grid, items);    
+            //            }
         }
-        else if (commandId === 'Ribbon.MyTimesheetWork.AllWork')
-        {
+        else if (commandId === 'Ribbon.MyTimesheetWork.AllWork') {
 
             ShowMessage("Loading Work", 130, 50);
 
-            if(OtherWork)
+            if (OtherWork)
                 var sUrl = "MyTimesheetAddWork.aspx?ID=" + TSUID;
             else
                 var sUrl = "MyTimesheetAddWork.aspx?ID=" + TSUID + "&otherwork=true";
@@ -247,15 +231,13 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.MyTimesheetWork.Search') {
             ShowSearch();
         }
-        else if (commandId === 'Ribbon.MyTimesheetWork.AllWork.Query')
-        {
+        else if (commandId === 'Ribbon.MyTimesheetWork.AllWork.Query') {
             properties.On = OtherWork;
         }
         else if (commandId === 'Ribbon.MyTimesheetWork.PopulateViewDropDown') {
             properties.PopulationXML = this.getViews();
         }
-        else if (commandId === 'Ribbon.MyTimesheetWork.QueryCurrentView')
-        {
+        else if (commandId === 'Ribbon.MyTimesheetWork.QueryCurrentView') {
             properties['Value'] = CurrentView;
         }
         else if (commandId === 'Ribbon.MyTimesheetWork.SelectColumns') {
@@ -282,6 +264,42 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.MyTimesheetWork.ShowHideGrouping.Query') {
             var grid = Grids["TSWork"];
             properties.On = grid.GetRowById("Group").Visible;
+        }
+        else if (commandId === 'Ribbon.MyTimesheetWork.DeleteView') {
+            var grid = Grids["TSWork"];
+            //var newobj = eval("TSObject" + this.tsObject.id);
+
+            if (Object.keys(Views).length == 1) {
+                alert("You can not delete this view '" + CurrentView + "'");
+                return;
+            }
+
+            if (confirm("Are you sure you want to delete this view: " + CurrentView + "?")) {
+                DeleteView(grid, CurrentView);
+            }
+        }
+        else if (commandId === 'Ribbon.MyTimesheetWork.RenameView') {
+
+            var grid = Grids["TSWork"];
+
+            viewNameDiv2.style.display = "";
+
+            viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.value = CurrentView;
+
+            viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
+
+            var isDefault = checkDefaultView(grid, CurrentView);
+
+            if (isDefault != null && isDefault.toLowerCase() == "true") {
+                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
+            }
+            else
+                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+
+            curGrid = grid;
+            cView = CurrentView;
+            var options = { html: viewNameDiv2, width: 260, height: 150, title: "Rename View", dialogReturnValueCallback: this.onRenameViewClose };
+            SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheetWork.SaveView') {
 
@@ -319,6 +337,14 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
             var retval = returnValue.split('|');
 
             SaveView(curGrid, retval);
+        }
+
+    },
+    onRenameViewClose: function (dialogResult, returnValue) {
+        if (dialogResult == "1") {
+            var retval = returnValue.split('|');
+
+            RenameView(curGrid, cView, retval);
         }
 
     },
