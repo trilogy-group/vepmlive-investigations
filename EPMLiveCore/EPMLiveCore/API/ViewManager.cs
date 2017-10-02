@@ -163,6 +163,7 @@ namespace EPMLiveCore.API
         {
             try
             {
+                view = System.Web.HttpUtility.UrlDecode(view);
                 if (defaultView.ToLower() == "true")
                 {
                     foreach (KeyValuePair<string, Dictionary<string, string>> key in Views)
@@ -177,21 +178,9 @@ namespace EPMLiveCore.API
                     d["Default"] = defaultView;
                 }
                 Views.Remove(view);
-                Views.Add(newname, d);
+                Views.Add(System.Web.HttpUtility.UrlDecode(newname), d);
             }
             catch { }
-            //try
-            //{
-            //    Views[view]
-            //}
-            //catch { }
-            //foreach(KeyValuePair<string, Dictionary<string, string>> key in Views)
-            //{
-            //    if(key.Key == view)
-            //    {
-            //        Views.d
-            //    }
-            //}
         }
 
         public override string ToString()
