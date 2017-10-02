@@ -284,17 +284,11 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
             viewNameDiv2.style.display = "";
 
-            viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.value = CurrentView;
-
-            viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
+            viewNameDiv2.querySelector("input[name='viewname2']").value = CurrentView;
 
             var isDefault = checkDefaultView(grid, CurrentView);
 
-            if (isDefault != null && isDefault.toLowerCase() == "true") {
-                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
-            }
-            else
-                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+            viewNameDiv2.querySelector("input[name='chkViewDefault2']").checked = (isDefault != null && isDefault.toLowerCase() == "true");
 
             curGrid = grid;
             cView = CurrentView;
@@ -307,15 +301,9 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
             viewNameDiv2.style.display = "";
 
-            viewNameDiv2.firstChild.nextSibling.nextSibling.value = CurrentView;
+            viewNameDiv2.querySelector("input[name='viewname2']").value = CurrentView;
 
-            viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "";
-
-            if (Views[CurrentViewId].Default.toLowerCase() == "true") {
-                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
-            }
-            else
-                viewNameDiv2.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+            viewNameDiv2.querySelector("input[name='chkViewDefault2']").checked = Views[CurrentViewId].Default.toLowerCase() == "true";
 
             curGrid = grid;
 

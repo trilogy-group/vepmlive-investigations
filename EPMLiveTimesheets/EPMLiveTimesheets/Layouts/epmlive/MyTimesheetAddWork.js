@@ -241,19 +241,22 @@ function DeleteView(grid, view) {
         if (oResponse.Views.Status == "0") {
             Views = eval("(" + oResponse.Views.Text.replace(/&quot;/g, "\"") + ")");
 
-            for (var view in Views) {
-                var oView = Views[view];
-                cnt++;
-            }
+            if (Object.keys(Views).length > 0) {
+                var view = Object.keys(Views)[Object.keys(Views).length - 1];
 
-            if (Views[view] != "" || Views[view] != undefined || Views[view] != null) {
-                if (cnt != 0) {
-                    ChangeView(grid, view, "1");
+                if (Views[view] != "" || Views[view] != undefined || Views[view] != null) {
+                    if (Object.keys(Views).length > 0) {
+                        ChangeView(grid, view, "1");
+                    }
+                    else {
+                        CurrentView = "";
+                        CurrentViewId = "";
+                    }
                 }
-                else {
-                    CurrentView = "";
-                    CurrentViewId = "";
-                }
+            }
+            else {
+                CurrentView = "";
+                CurrentViewId = "";
             }
 
             RefreshCommandUI();

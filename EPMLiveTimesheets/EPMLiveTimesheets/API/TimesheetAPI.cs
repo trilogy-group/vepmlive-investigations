@@ -221,7 +221,10 @@ namespace TimeSheets
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
-
+            finally
+            {
+                oWeb.AllowUnsafeUpdates = false;
+            }
         }
 
         public static string RenameView(string data, SPWeb oWeb)
@@ -244,6 +247,10 @@ namespace TimeSheets
             catch (Exception ex)
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
+            }
+            finally
+            {
+                oWeb.AllowUnsafeUpdates = false;
             }
 
         }
@@ -285,7 +292,10 @@ namespace TimeSheets
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
-
+            finally
+            {
+                oWeb.AllowUnsafeUpdates = false;
+            }
         }
 
         public static string DeleteWorkView(string data, SPWeb oWeb)
@@ -325,7 +335,10 @@ namespace TimeSheets
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
-
+            finally
+            {
+                oWeb.AllowUnsafeUpdates = false;
+            }
         }
 
         public static string RenameWorkView(string data, SPWeb oWeb)
@@ -364,7 +377,10 @@ namespace TimeSheets
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
-
+            finally
+            {
+                oWeb.AllowUnsafeUpdates = false;
+            }
         }
 
         internal static EPMLiveCore.API.ViewManager GetNonWorkViews(SPWeb oWeb)
