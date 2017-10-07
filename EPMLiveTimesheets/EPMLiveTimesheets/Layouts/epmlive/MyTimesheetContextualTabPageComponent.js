@@ -119,7 +119,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     return true;
                 return false;
             case 'Ribbon.MyTimesheet.Comments':
-                if (curRow != null && curRow["ItemId"] != null)
+                if (curRow != null && curRow["ItemId"] != null && (curRow["IsDeleted"] == null || curRow["IsDeleted"] != "True"))
                     return true;
                 return false;
             case 'MyTimesheetContextualTab.EnableMyTimesheetViewsTab':
