@@ -754,7 +754,7 @@ namespace WorkEnginePPM.DataServiceModules
                 {
                     using (Stream stream = epmLiveFileStore.GetStream(_fileId))
                     {
-                        using (StreamReader sr = new StreamReader(stream))
+                        using (StreamReader sr = new StreamReader(stream, Encoding.GetEncoding("Windows-1252")))
                         {
                             string[] headers = sr.ReadLine().Split(',');
                             foreach (string header in headers)
