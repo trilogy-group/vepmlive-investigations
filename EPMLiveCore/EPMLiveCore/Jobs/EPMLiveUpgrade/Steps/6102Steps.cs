@@ -28,13 +28,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     {
                         epmLiveCn.Open();
 
-                        var metaViewDefinition = epmLiveCn.GetViewDefinition("dbo.vwMeta");
-                        var versionMarker = "v6.1.0";
-                        if (metaViewDefinition != null && !metaViewDefinition.Contains(versionMarker))
-                        {
-                            #region ViewCode
 
-                            epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
+                        var versionMarker = "v6.1.0";
+
+                        #region ViewCode
+
+                        epmLiveCn.ExecuteNonQuery($@"ALTER VIEW [dbo].[vwMeta] AS
 -- {versionMarker}
 SELECT dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSUSER.USER_ID AS SharePointAccountID, dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
                          dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ListName + '_' + dbo.TSMETA.ColumnName, 'TempColumn') 
@@ -93,14 +92,10 @@ FROM            dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                          dbo.TSTYPE AS TSTYPE_1 ON TSTIMESHEET_1.SITE_UID = TSTYPE_1.SITE_UID AND TSITEMHOURS_1.TS_ITEM_TYPE_ID = TSTYPE_1.TSTYPE_ID  LEFT OUTER JOIN
 						dbo.TSUSER AS TSUSER_1 ON TSTIMESHEET_1.TSUSER_UID = TSUSER_1.TSUSERUID");
 
-                            #endregion
+                        #endregion
 
-                            LogMessage("LastSubmittedByName, LastSubmittedByUser columns added to the vwMeta view", MessageKind.SUCCESS, 4);
-                        }
-                        else
-                        {
-                            LogMessage("LastSubmittedByName, LastSubmittedByUser columns already exists in the vwMeta view", MessageKind.SKIPPED, 4);
-                        }
+                        LogMessage("LastSubmittedByName, LastSubmittedByUser columns added to the vwMeta view", MessageKind.SUCCESS, 4);
+
                     }
                 });
 
