@@ -70,5 +70,19 @@ ELSE SELECT 0";
         {
             return GetDefinition(sqlConnection, spName, "P");
         }
+        public static string IndexDefinition(this SqlConnection sqlConnection, string indexName)
+        {
+            return GetIndexDefinition(sqlConnection, indexName);
+        }
+        public static string GetIndexDefinition(this SqlConnection sqlConnection, string objectName)
+        {
+            var sql = string.Format("Select name from sys.indexes where name='{0}'", objectName);
+            return ExecuteReader(sqlConnection, sql, reader =>
+            {
+                if (reader.Read())
+                    return reader.GetString(0);
+                return null;
+            });
+        }
     }
 }
