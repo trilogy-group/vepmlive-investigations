@@ -61,17 +61,6 @@ ELSE SELECT 0";
             });
         }
 
-        public static string GetIndexDefinition(this SqlConnection sqlConnection, string objectName)
-        {
-            var sql =string.Format("Select name from sys.indexes where name='{0}'", objectName);
-            return ExecuteReader(sqlConnection, sql, reader =>
-            {
-                if (reader.Read())
-                    return reader.GetString(0);
-                return null;
-            });
-        }
-
         public static string GetViewDefinition(this SqlConnection sqlConnection, string viewName)
         {
             return GetDefinition(sqlConnection, viewName, "V");
@@ -84,6 +73,16 @@ ELSE SELECT 0";
         public static string IndexDefinition(this SqlConnection sqlConnection, string indexName)
         {
             return GetIndexDefinition(sqlConnection, indexName);
+        }
+        public static string GetIndexDefinition(this SqlConnection sqlConnection, string objectName)
+        {
+            var sql = string.Format("Select name from sys.indexes where name='{0}'", objectName);
+            return ExecuteReader(sqlConnection, sql, reader =>
+            {
+                if (reader.Read())
+                    return reader.GetString(0);
+                return null;
+            });
         }
     }
 }

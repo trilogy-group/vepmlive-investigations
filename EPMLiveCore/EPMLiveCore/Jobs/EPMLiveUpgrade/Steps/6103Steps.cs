@@ -30,7 +30,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                         var definition = epmLiveCn.GetSpDefinition("dbo.spTSAllData");
                         var versionMarker = "v6.1.0";
-                       
+                        if (definition != null && !definition.Contains(versionMarker))
+                        {
                             #region ViewCode
 
                             epmLiveCn.ExecuteNonQuery($@"ALTER PROC [dbo].[spTSAllData]
@@ -44,32 +45,9 @@ declare @cols varchar(MAX)
 set @cols = ''
 
 DECLARE colsCursors CURSOR FOR 
-SELECT distinct IV.columnname
-FROM (
-SELECT		COALESCE (dbo.TSMETA.ListName + '_' + dbo.TSMETA.ColumnName, 'TempColumn') AS ColumnName
-FROM		dbo.TSITEM
-INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
-INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
-INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID
-WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
-UNION
-SELECT		COALESCE (dbo.TSMETA.ColumnName, 'TempColumn') AS ColumnName
-FROM		dbo.TSITEM
-INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
-INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
-INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND dbo.TSITEM.LIST = dbo.TSMETA.ListName
-WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
-UNION
-SELECT		'Resource_' + dbo.TSRESMETA.ColumnName AS columnname
-FROM		dbo.TSTIMESHEET AS TSTIMESHEET_1
-INNER JOIN	dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID
-INNER JOIN	dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID
-INNER JOIN	dbo.TSITEMHOURS AS TSITEMHOURS_1 ON TSITEM_1.TS_ITEM_UID = TSITEMHOURS_1.TS_ITEM_UID
-WHERE TSTIMESHEET_1.SITE_UID = @siteuid
-UNION
-SELECT		'TempColumn') as IV
-order by IV.columnname
-
+SELECT distinct columnname
+from vwmeta
+where site_id = @siteuid
 OPEN colsCursors
 
 FETCH NEXT FROM colsCursors 
@@ -92,10 +70,10 @@ if @cols <> ''
 begin
 	declare @sql varchar(MAX)
 
-	set @sql = 'SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] '
+	set @sql = 'SELECT Username, [Resource Name], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] '
 	set @sql = @sql + @cols
 	set @sql = @sql + ', [Item UID], [Timesheet UID] FROM '
-	set @sql = @sql + '(SELECT Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id
+	set @sql = @sql + '(SELECT Username, [Resource Name], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id
 	FROM vwmeta Where hours > 0) ps
 	PIVOT
 	(
@@ -112,7 +90,7 @@ end
 else
 begin
 
-	set @sql = 'SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] from vwmeta where hours > 0 and site_id = ''' + convert(varchar(50),@siteuid) + ''''
+	set @sql = 'SELECT Username, [Resource Name], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '' - '' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] from vwmeta where hours > 0 and site_id = ''' + convert(varchar(50),@siteuid) + ''''
 
 end
 
@@ -125,6 +103,11 @@ END");
                             #endregion
 
                             LogMessage("LastSubmittedByName columns added to the spTSAllData", MessageKind.SUCCESS, 4);
+                        }
+                        else
+                        {
+                            LogMessage("LastSubmittedByName columns already exists in the spTSAllData", MessageKind.SKIPPED, 4);
+                        }
                     }
                 });
 
