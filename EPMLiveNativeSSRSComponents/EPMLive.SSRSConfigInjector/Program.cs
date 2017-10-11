@@ -92,6 +92,15 @@ namespace EPMLive.SSRSConfigInjector
                 File.Copy(libraryPath + "dll", Path.Combine(ssrsBinPath, libraryPath + "dll"), true);
                 File.Copy(libraryPath + "pdb", Path.Combine(ssrsBinPath, libraryPath + "pdb"), true);
                 File.Copy("Logon.aspx", Path.Combine(pathResolver.GetReportingServicePath(), "Logon.aspx"), true);
+                Directory.CreateDirectory(Path.Combine(pathResolver.GetReportingServicePath(), "Javascript"));
+                File.Copy(Path.Combine("Javascript", "easyXDM.min.js"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "easyXDM.min.js"), true);
+                File.Copy(Path.Combine("Javascript", "easyxdm.swf"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "easyxdm.swf"), true);
+                File.Copy(Path.Combine("Javascript", "easyXDM.Widgets.min.js"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "easyXDM.Widgets.min.js"), true);
+                File.Copy(Path.Combine("Javascript", "jquery.soap.js"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "jquery.soap.js"), true);
+                File.Copy(Path.Combine("Javascript", "json2.js"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "json2.js"), true);
+                File.Copy(Path.Combine("Javascript", "name.html"), Path.Combine(pathResolver.GetReportingServicePath(), "Javascript", "name.html"), true);
+
+
             }
             else throw new FileNotFoundException("Unable to find custom binaries to copy.");
         }
@@ -129,6 +138,11 @@ namespace EPMLive.SSRSConfigInjector
             machineKeyEntryNode.InnerXml = "<machineKey validationKey=\"" + validationKey + "\" decryptionKey=\"" + machineKey + "\" validation=\"AES\" decryption=\"AES\" />";
 
             xmlDocument.SelectSingleNode("//configuration/system.web").AppendChild(machineKeyEntryNode);
+
+            var fragment = xmlDocument.CreateDocumentFragment();
+            fragment.InnerXml = @"<location path=""ReportService2010.asmx""><system.web><authorization><allow users=""*""/></authorization></system.web></location>";
+            var configNode = xmlDocument.SelectSingleNode("//configuration");
+            configNode.AppendChild(fragment);
 
             SaveXmlDocument(pathResolver.GetReportingServicePath("web.config"), xmlDocument);
         }
@@ -169,7 +183,7 @@ namespace EPMLive.SSRSConfigInjector
             AddExistingUiNode(xmlDocument);
             AddExistingSecurityExtNode(xmlDocument, adminUsername);
             AddExistingAuthExtNode(xmlDocument);
-
+           
             SaveXmlDocument(pathResolver.GetReportingServicePath("rsreportserver.config"), xmlDocument);
         }
 
@@ -218,6 +232,8 @@ namespace EPMLive.SSRSConfigInjector
             authenticationNode.RemoveAll();
             authenticationNode.AppendChild(customNode);
         }
+
+       
 
         private static void CopyFile(string sourceFilename, string destFilename, bool restore)
         {
