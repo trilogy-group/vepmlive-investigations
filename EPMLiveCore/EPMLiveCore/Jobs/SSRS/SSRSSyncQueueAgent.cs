@@ -6,23 +6,39 @@ using System.Threading;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
-    public class QueueAgent
+    public class SSRSSyncQueueAgent
     {
-        public static void QueueJob(SPWebApplication webapp)
+        public static void EnequeuPFEJobAllSiteCollections(SPWebApplication webapp)
         {
-            Guid librariesFeature = new Guid("a8ebe311-83e1-48a4-ab31-50f237398f44");
+            Guid fieldsFeature = new Guid("acdb86be-bfa5-41c7-91a8-7682d7edffa5");
+            Guid receiversFeature = new Guid("a8ebe311-83e1-48a4-ab31-50f237398f44");
             foreach (SPSite site in webapp.Sites)
             {
-                if (site.RootWeb.Features[librariesFeature] == null)
-                    site.RootWeb.Features.Add(librariesFeature);
-                QueueJob(webapp, site);
+                try
+                {
+                    if (site.RootWeb.Features[fieldsFeature] == null)
+                        site.RootWeb.Features.Add(fieldsFeature);
+                    if (site.RootWeb.Features[receiversFeature] == null)
+                        site.RootWeb.Features.Add(receiversFeature);
+                    EnequePFEJobSingleSiteCollection(webapp, site);
+                }
+                catch (Exception e)
+                {
+                    SPDiagnosticsService.Local.WriteEvent(0,
+                        new SPDiagnosticsCategory("SSRs Sync",
+                            TraceSeverity.Unexpected,
+                            EventSeverity.ErrorCritical),
+                        EventSeverity.ErrorCritical,
+                        "Failed to eneque PFEQ SSRS Sync Job for " + site.Url,
+                        e);
+                }
                 //Slowing down queue jobs creation, 1 every 30 seconds
                 Thread.Sleep(30 * 1000);
             }
 
         }
 
-        public static void QueueJob(SPWebApplication webapp, SPSite site)
+        public static void EnequePFEJobSingleSiteCollection(SPWebApplication webapp, SPSite site)
         {
             var jobGuid = Guid.NewGuid();
             using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(webapp.Id)))

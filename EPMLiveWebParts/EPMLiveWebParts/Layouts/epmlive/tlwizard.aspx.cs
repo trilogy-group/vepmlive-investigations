@@ -10,6 +10,9 @@ using System.Security.Principal;
 using System.Runtime.InteropServices;
 using System.Web;
 using System.Net;
+using System.Text;
+using System.Collections;
+using System.Diagnostics;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -39,20 +42,20 @@ namespace EPMLiveWebParts.Layouts.epmlive
             if (!IsPostBack)
             {
                 //step = 1;
-                if (EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated").ToLower() != "true")
-                {
-                    lblReporting.Visible = true;
-                    txtReportServer.Enabled = false;
-                    txtReportPassword.Enabled = false;
+                //if (EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated").ToLower() != "true")
+                //{
+                //    lblReporting.Visible = true;
+                //    txtReportServer.Enabled = false;
+                //    txtReportPassword.Enabled = false;
 
-                    txtReportDatabase.Enabled = false;
-                    txtReportUsername.Enabled = false;
-                }
-                else
+                //    txtReportDatabase.Enabled = false;
+                //    txtReportUsername.Enabled = false;
+                //}
+                //else
                 {
                     ssrsurl = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         string strCon = EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);
                         if (strCon != "")
@@ -222,7 +225,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             pnlProcessing.Visible = true;
             SPWeb w = SPContext.Current.Web;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(w.Url))
                 {
@@ -327,7 +330,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void ProcessCleanUpAll(SPWeb web)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
@@ -405,7 +408,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn.Open();
             });
@@ -589,7 +592,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn.Open();
             });
@@ -637,7 +640,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 {
                     string error = "";
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         string username = txtReportUsername.Text;
                         string domain = "";
@@ -710,13 +713,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void processReports(SPWeb web)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-
-                SSRS2006.ReportingService2006 SSRS = new SSRS2006.ReportingService2006();
-                SSRS.Url = ssrsurl + "/ReportService2006.asmx";
-                SSRS.UseDefaultCredentials = true;
-
                 string username = "";
                 string password = "";
                 EPMLiveCore.ReportAuth _chrono = SPContext.Current.Site.WebApplication.GetChild<EPMLiveCore.ReportAuth>("ReportAuth");
@@ -726,87 +724,129 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     password = EPMLiveCore.CoreFunctions.Decrypt(_chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
                 }
 
-                if (password != "")
+                bool reportingIntegratedMode = true;
+                bool.TryParse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated"), out reportingIntegratedMode);
+
+                if (!reportingIntegratedMode)
                 {
-                    SSRS.UseDefaultCredentials = false;
-                    if (username.Contains("\\"))
-                    {
-                        SSRS.Credentials = new System.Net.NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
-                    }
-                    else
-                    {
-                        SSRS.Credentials = new System.Net.NetworkCredential(username, password);
-                    }
+                    Guid fieldsFeature = new Guid("acdb86be-bfa5-41c7-91a8-7682d7edffa5");
+                    if (web.Features[fieldsFeature] == null)
+                        web.Features.Add(fieldsFeature);
+
+                    Guid receiversFeature = new Guid("a8ebe311-83e1-48a4-ab31-50f237398f44");
+
+                    if (web.Features[receiversFeature] == null)
+                        web.Features.Add(receiversFeature);
+                   
+                    string dataSourceString = String.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
+                    <DataSourceDefinition xmlns=""http://schemas.microsoft.com/sqlserver/reporting/2006/03/reportdatasource"">
+                      <Extension>SQL</Extension>
+                      <ConnectString>Data Source={0};Initial Catalog={1};</ConnectString>
+                      <CredentialRetrieval>Store</CredentialRetrieval>
+                      <WindowsCredentials>{2}</WindowsCredentials>
+                      <ImpersonateUser>False</ImpersonateUser>
+                      <Enabled>True</Enabled>
+                    </DataSourceDefinition>", txtReportServer.Text, txtReportDatabase.Text, chkWindows.Checked);
+
+                    SPDocumentLibrary doclib = web.Lists["Report Library"] as SPDocumentLibrary;
+                    web.AllowUnsafeUpdates = true;
+                    SPFile file = doclib.RootFolder.Files.Add(doclib.RootFolder.Url + "/Data Sources/EPMLiveReportDB.rsds", Encoding.ASCII.GetBytes(dataSourceString), new Hashtable { { "Datasource Credentials", String.Format("{0}:{1}", txtReportUsername.Text, hdnReportPassword.Value == "" ? hdnSaveReportPassword.Value : hdnReportPassword.Value) } }, true);
+
+                    web.AllowUnsafeUpdates = false;
+
+
                 }
-
-
-                /*System.Web.HttpCookie tCookie = System.Web.HttpContext.Current.Response.Cookies["WSS_KeepSessionAuthenticated"];
-
-                System.Net.Cookie oC = new System.Net.Cookie();
-
-                // Convert between the System.Net.Cookie to a System.Web.HttpCookie...
-                oC.Domain = System.Web.HttpContext.Current.Request.Url.Host;
-                oC.Expires = tCookie.Expires;
-                oC.Name = tCookie.Name;
-                oC.Path = tCookie.Path;
-                oC.Secure = tCookie.Secure;
-                oC.Value = tCookie.Value;
-                 
-                SSRS.CookieContainer = new System.Net.CookieContainer();
-
-                SSRS.CookieContainer.Add(oC);
-                */
-
-                try
+                else
                 {
-                    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
-                    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
-                    SSRS.CookieContainer = new CookieContainer();
-                    SSRS.CookieContainer.Add(fedAuth);
-                }
-                catch { }
+                    SSRS2006.ReportingService2006 SSRS = new SSRS2006.ReportingService2006();
+                    SSRS.Url = ssrsurl + "/ReportService2006.asmx";
+                    SSRS.UseDefaultCredentials = true;
 
-                SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
 
-                SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
-
-                try
-                {
-                    foreach (SPListItem li in folders)
+                    if (password != "")
                     {
-                        if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
+                        SSRS.UseDefaultCredentials = false;
+                        if (username.Contains("\\"))
                         {
-                            SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
-                            dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
-                            dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
-                            dsd.UserName = txtReportUsername.Text;
-                            if (hdnReportPassword.Value == "")
-                                dsd.Password = hdnSaveReportPassword.Value;
-                            else
-                                dsd.Password = hdnReportPassword.Value;
-
-                            if (chkWindows.Checked)
-                                dsd.WindowsCredentials = chkWindows.Checked;
-
-                            dsd.Enabled = true;
-                            dsd.Extension = "SQL";
-
-                            SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
+                            SSRS.Credentials = new System.Net.NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
+                        }
+                        else
+                        {
+                            SSRS.Credentials = new System.Net.NetworkCredential(username, password);
                         }
                     }
 
-                    SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
-                    dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
 
-                    foreach (SPListItem li in folders)
+                    /*System.Web.HttpCookie tCookie = System.Web.HttpContext.Current.Response.Cookies["WSS_KeepSessionAuthenticated"];
+
+                    System.Net.Cookie oC = new System.Net.Cookie();
+
+                    // Convert between the System.Net.Cookie to a System.Web.HttpCookie...
+                    oC.Domain = System.Web.HttpContext.Current.Request.Url.Host;
+                    oC.Expires = tCookie.Expires;
+                    oC.Name = tCookie.Name;
+                    oC.Path = tCookie.Path;
+                    oC.Secure = tCookie.Secure;
+                    oC.Value = tCookie.Value;
+
+                    SSRS.CookieContainer = new System.Net.CookieContainer();
+
+                    SSRS.CookieContainer.Add(oC);
+                    */
+
+                    try
                     {
-                        processRDL(SSRS, web, li, dsr, list);
+                        var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+                        var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                        SSRS.CookieContainer = new CookieContainer();
+                        SSRS.CookieContainer.Add(fedAuth);
+                    }
+                    catch { }
+
+                    SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
+
+                    SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
+
+                    try
+                    {
+                        foreach (SPListItem li in folders)
+                        {
+                            if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
+                            {
+                                SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
+                                dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
+                                dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
+                                dsd.UserName = txtReportUsername.Text;
+                                if (hdnReportPassword.Value == "")
+                                    dsd.Password = hdnSaveReportPassword.Value;
+                                else
+                                    dsd.Password = hdnReportPassword.Value;
+
+                                if (chkWindows.Checked)
+                                    dsd.WindowsCredentials = chkWindows.Checked;
+
+                                dsd.Enabled = true;
+                                dsd.Extension = "SQL";
+
+                                SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
+                            }
+                        }
+
+                        SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
+                        dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
+
+                        foreach (SPListItem li in folders)
+                        {
+                            processRDL(SSRS, web, li, dsr, list);
+                        }
+
+                    }
+                    catch
+                    {
+                        pnlMessage.Visible = true;
                     }
                 }
-                catch
-                {
-                    pnlMessage.Visible = true;
-                }
+
             });
         }
 

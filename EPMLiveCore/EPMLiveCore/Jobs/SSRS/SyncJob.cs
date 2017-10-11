@@ -9,18 +9,10 @@ namespace EPMLiveCore.Jobs.SSRS
         {
             bool integrated = true;
             bool.TryParse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsUseIntegrated"), out integrated);
-            bool windowsAuth = true;
-            bool.TryParse(CoreFunctions.getWebAppSetting(site.WebApplication.Id, "ReportsWindowsAuthentication"), out windowsAuth);
             if (integrated)
             {
                 bErrors = true;
                 sErrors += "SSRS is in integrated mode; Synchronization cannot run;";
-
-            }
-            else if (windowsAuth)
-            {
-                bErrors = true;
-                sErrors += "SSRS is in windows authentication mode; Synchronization cannot run;";
 
             }
             else
@@ -29,7 +21,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 {
                     CreateSiteCollectionMappedFolder(site, web);
                     SyncReports(site, web);
-                    AssignRoleMapping(site, web);
+                    AddRoleMapping(site, web);
                 }
                 else if (data.StartsWith("deletereport"))
                 {
@@ -37,7 +29,7 @@ namespace EPMLiveCore.Jobs.SSRS
                 }
                 else if (data.StartsWith("removerole"))
                 {
-                    RemoveRole(site, web, data);
+                    RemoveRoleMapping(site, web, data);
                 }
             }
         }
@@ -103,12 +95,12 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void AssignRoleMapping(SPSite site, SPWeb web)
+        private void AddRoleMapping(SPSite site, SPWeb web)
         {
             try
             {
                 IReportingService reportingService = ReportingService.GetInstance(site);
-                reportingService.AssignRoleMapping(web.SiteGroups, web.SiteUserInfoList);
+                reportingService.AddRoleMapping(web.SiteGroups, web.SiteUserInfoList);
             }
             catch (Exception exception)
             {
@@ -117,7 +109,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void RemoveRole(SPSite site, SPWeb web, string data)
+        private void RemoveRoleMapping(SPSite site, SPWeb web, string data)
         {
             try
             {

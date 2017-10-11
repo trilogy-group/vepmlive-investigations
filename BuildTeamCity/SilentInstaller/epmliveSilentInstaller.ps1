@@ -242,14 +242,27 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 			$destination = ClarifyPath $component.destination
 			$destFileName =  Join-Path $destination $file
 			Write-Host "Install as service: $destFileName"
+			if ($component.installAsService.dependency -ne "")
+			{
+			Install-Service-With-Dependency `
+				-serviceName $component.installAsService.name `
+				-displayName $component.installAsService.displayname `
+				-description $component.installAsService.description `
+				-path $destFileName `
+				-UserName $inUserName `
+				-Password $inPassword `
+				-Dependency $component.installAsService.dependency
+			}
+			else
+			{
 			Install-Service `
 				-serviceName $component.installAsService.name `
 				-displayName $component.installAsService.displayname `
 				-description $component.installAsService.description `
 				-path $destFileName `
 				-UserName $inUserName `
-				-Password $inPassword
-			
+				-Password $inPassword 
+			}
 		}
 		if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
 		{

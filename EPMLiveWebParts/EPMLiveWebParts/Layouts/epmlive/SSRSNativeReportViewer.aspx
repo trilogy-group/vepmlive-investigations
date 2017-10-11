@@ -300,9 +300,9 @@
 </asp:content>
 
 <asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
-Application Page
+Report Viewer
 </asp:content>
 
 <asp:content id="PageTitleInTitleArea" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
-My Application Page
+Report Viewer
 </asp:content>
