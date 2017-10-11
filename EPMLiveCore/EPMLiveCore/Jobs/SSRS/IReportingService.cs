@@ -9,7 +9,7 @@ namespace EPMLiveCore.Jobs.SSRS
         void DeleteSiteCollectionMappedFolder();
         void SyncReports(SPDocumentLibrary reportLibrary);
         void DeleteReport(string data);
-        void AssignRoleMapping(SPGroupCollection groups, SPList userList);
+        void AddRoleMapping(SPGroupCollection groups, SPList userList);
         void RemoveRoleMapping(string data);
         Subscription[] ListSubscriptions(string itemPathOrSiteURL);
         Extension[] ListExtensions(string extensionType);

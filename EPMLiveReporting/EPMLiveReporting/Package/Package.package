@@ -2,6 +2,7 @@
 <package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="823cf7cc-3c12-47a3-9f0a-6b69c391b915" solutionId="823cf7cc-3c12-47a3-9f0a-6b69c391b915" resetWebServer="false" sharePointProductVersion="16.0" name="EPMLiveReporting" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <features>
     <featureReference itemId="a6377fdd-daa9-4974-a8ac-cf07d938ab65" />
+    <featureReference itemId="e399d077-9e80-4787-9d1a-3e07d65a59a1" />
   </features>
   <projectItems>
     <projectItemReference itemId="73ab6fbc-92b9-4ed6-9d9e-bbf8b1ee8c62" />

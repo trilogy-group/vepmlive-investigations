@@ -61,12 +61,12 @@ $projectsToBePackaged = @(
                             )
 
 $projectsToBeBuildAsEXE = @(
-                            "EPMLiveTimerService", "EPK_QueueMgr"
+                            "EPMLiveTimerService", "EPK_QueueMgr", "EPMLive.SSRSConfigInjector"
                             )
 
 $projectsToBeBuildAsDLL = @(
                             "PortfolioEngineCore","UplandIntegrations",
-                            "EPMLiveIntegration", "UserNameChecker"
+                            "EPMLiveIntegration", "UserNameChecker", "EPMLive.SSRSCustomAuthentication"
                             )
 							
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"

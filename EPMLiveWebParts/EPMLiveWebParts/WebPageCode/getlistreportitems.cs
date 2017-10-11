@@ -305,7 +305,7 @@ namespace EPMLiveWebParts
                     {
                         tnAdd.Text = item.CatalogTreeItem.Name;
                         tnAdd.ImageUrl = "/_layouts/images/16doc.gif";
-                        tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
+                        tnAdd.NavigateUrl = web.Url + "/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=" + HttpUtility.UrlEncode(item.CatalogTreeItem.Path) +
                             "&weburl = " + HttpUtility.UrlEncode(web.Url); ;                               
                     }
                 }
@@ -463,12 +463,12 @@ namespace EPMLiveWebParts
                             //   sServerReelativeUrl + "/" + item.Url + urlim + "&rv:HeaderArea=none";
                             if (_isIntegrated)
                             {
-                                tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(web.Url) +
+                                tnAdd.NavigateUrl = $"{web.Url}/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(web.Url) +
                                                     "&itemurl=" + HttpUtility.UrlEncode(item.Url);
                             }
                             else
                             {
-                                tnAdd.NavigateUrl = $"/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=/{web.Site.ID.ToString()}/{HttpUtility.UrlEncode(item.Url)}" +
+                                tnAdd.NavigateUrl = $"{web.Url}/_layouts/epmlive/SSRSNativeReportViewer.aspx?itemurl=/{web.Site.ID.ToString()}/{HttpUtility.UrlEncode(item.Url)}" +
                                 "&weburl = " + HttpUtility.UrlEncode(web.Url); ;
                             }
                         }

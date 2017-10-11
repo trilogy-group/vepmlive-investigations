@@ -16,7 +16,7 @@ namespace EPMLiveReportsAdmin
                 var extendedList = properties.Web.SiteUserInfoList.Items.GetItemById(addedUser.ID);
                 extendedList["Synchronized"] = false;
                 extendedList.Update();
-                QueueAgent.QueueJob(properties.Web.Site.WebApplication, properties.Web.Site);
+                SSRSSyncQueueAgent.EnequePFEJobSingleSiteCollection(properties.Web.Site.WebApplication, properties.Web.Site);
             }
         }
 

@@ -134,6 +134,31 @@ function Install-Service()
     Start-Service $serviceName
 }
 
+function Install-Service-With-Dependency()
+{
+    Param
+    (
+        [string]$serviceName,
+        [string]$displayName,
+        [string]$description,
+        [string]$path,
+        [string]$UserName,
+        [string]$Password,
+		[string]$Dependency
+    )
+
+    Write-Host "Delete service: $serviceName"
+    (Get-WmiObject Win32_Service -filter "name='$serviceName'").Delete()
+
+    $passwordSec = $Password | ConvertTo-SecureString -asPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential($UserName,$passwordSec)
+
+    Write-Host "Install service: $serviceName"
+    New-Service -Name $serviceName -DependsOn $Dependency -DisplayName "$displayName" -Description "$description" -BinaryPathName "$path" -StartupType Automatic -Credential $credential -Confirm:$false
+    Write-Host "Start service: $serviceName"
+    Start-Service $serviceName
+}
+
 function Register-File 
 {
 	param (

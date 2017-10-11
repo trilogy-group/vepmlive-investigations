@@ -21,8 +21,8 @@ $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegration
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM", "AdminSite", "BillingSite" )
  
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr", "EPMLive.SSRSConfigInjector")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", "EPMLive.SSRSCustomAuthentication")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -104,7 +104,7 @@ if ($TestsOnly)
 	/p:OutputPath="$OutputDirectory" `
     /p:PreBuildEvent= `
     /p:PostBuildEvent= `
-    /p:Configuration="$ConfigurationToBuild" `
+    /p:Configuration="Debug" `
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
@@ -137,6 +137,7 @@ $LibrariesDirectory = "$OutputDirectory\libraries"
 $IntermediatesDirectory = "$OutputDirectory\intermediate"
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
+$projSSRSPath = Join-Path $SourcesDirectory "\EPMLiveNativeSSRSComponents\EPMLiveNativeSSRSComponents.sln"
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
@@ -183,7 +184,7 @@ If ($CleanBuild -eq $true) {
 		throw "Project clean-up failed with exit code: $LastExitCode."
 	}
 
-    Log-SubSection "Cleaning 'Project Publisher"
+    Log-SubSection "Cleaning Project Publisher"
 	    
 	& $MSBuildExec "$projPublisherAbsPath"  `
 	    /t:Clean `
@@ -199,7 +200,21 @@ If ($CleanBuild -eq $true) {
 		throw "Project clean-up failed with exit code: $LastExitCode."
 	}
 		
-	
+	Log-SubSection "Cleaning SSRS Injector"
+	    
+	& $MSBuildExec "$projSSRSPath"  `
+	    /t:Clean `
+	    /p:SkipInvalidConfigurations=true `
+	    /p:Configuration="$ConfigurationToBuild" `
+	    /p:Platform="$PlatformToBuild" `
+        /m:4 `
+        /p:WarningLevel=0 `
+        $ToolsVersion `
+	    $DfMsBuildArgs `
+	    $MsBuildArguments
+	if ($LastExitCode -ne 0) {
+		throw "Project clean-up failed with exit code: $LastExitCode."
+	}
 }
 
 Log-Section "Downloading Nuget . . ."
@@ -242,7 +257,7 @@ if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
 
-Log-SubSection "Building 'Project Publisher"
+Log-SubSection "Building Project Publisher"
     
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
@@ -262,6 +277,29 @@ Log-SubSection "Building 'Project Publisher"
 if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
+
+
+Log-SubSection "Building SSRS Injector"
+    
+# Run MSBuild
+& $MSBuildExec $projSSRSPath `
+    /p:PreBuildEvent= `
+    /p:PostBuildEvent= `
+    /p:Configuration="$ConfigurationToBuild" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath=$referencePath `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+    throw "Project build failed with exit code: $LastExitCode."
+}
+
 }
 
 
