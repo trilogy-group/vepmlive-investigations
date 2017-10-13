@@ -414,9 +414,12 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6115Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6301Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\630Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6311Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6312Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
-    <Compile Include="Jobs\SSRS\QueueAgent.cs" />
+    <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
     <Compile Include="Jobs\SSRS\ReportingService.cs" />
     <Compile Include="ISAPI\Lic\Licensing.asmx.cs">
       <DependentUpon>Licensing.asmx</DependentUpon>

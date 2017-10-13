@@ -241,9 +241,8 @@ namespace EPMLiveCore
                         lblStatusDyn.BackColor = System.Drawing.Color.LightGreen;
                     }
 
-                    RevertWebConfigModifications(webApp);
-                    ApplyWebConfigModifications(webApp, txtReportServer.Text);
-
+                    
+                    
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportingServicesURL", txtReportServer.Text);
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsRootFolder", txtDefaultPath.Text);
                     CoreFunctions.setWebAppSetting(new Guid(WebApplicationSelector1.CurrentId), "ReportsUseIntegrated", chkIntegrated.Checked.ToString());
@@ -277,14 +276,7 @@ namespace EPMLiveCore
             }
         }
 
-        private void ApplyWebConfigModifications(SPWebApplication webApp, string serverUrl)
-        {
-            AddWebConfigModification(webApp, "configuration/system.webServer", "rewrite", 0, @"<rewrite></rewrite>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
-            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite", "rules", 1, @"<rules></rules>", SPWebConfigModification.SPWebConfigModificationType.EnsureSection);
-            AddWebConfigModification(webApp, "configuration/system.webServer/rewrite/rules", "rule[@name='Rewrite to report server instance']", 2, "<rule name=\"Rewrite to report server instance\"><match url=\"(.*)ssrs/(.*)\" /><action type=\"Rewrite\" url=\"" + serverUrl + "{R:2}\" /></rule>", SPWebConfigModification.SPWebConfigModificationType.EnsureChildNode);
-            webApp.WebService.Update();
-            webApp.WebService.ApplyWebConfigModifications();
-        }
+        
 
         private void AddWebConfigModification(SPWebApplication webApp, string path, string name, uint sequence, string value, SPWebConfigModification.SPWebConfigModificationType type)
         {
@@ -299,20 +291,7 @@ namespace EPMLiveCore
             });
         }
 
-        private void RevertWebConfigModifications(SPWebApplication webApp)
-        {
-            var modificationsToRemove = new List<SPWebConfigModification>();
-            foreach (var modification in webApp.WebService.WebConfigModifications.Where(x => x.Owner == "System"))
-            {
-                modificationsToRemove.Add(modification);
-            }
-            foreach (var modification in modificationsToRemove)
-            {
-                webApp.WebService.WebConfigModifications.Remove(modification);
-            }
-            webApp.WebService.Update();
-            webApp.WebService.ApplyWebConfigModifications();
-        }
+        
 
         protected bool ConnectionTest(string sDBConnStr)
         {

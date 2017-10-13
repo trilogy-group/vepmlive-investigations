@@ -2,21 +2,25 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Claims;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Xml;
 
 namespace EPMLiveCore.Jobs.SSRS
 {
     public class ReportingService : IReportingService
     {
+        private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
+
         private readonly string siteCollectionId;
         private readonly ReportingService2010Extended client;
         private List<CatalogItem> dataSources;
 
-        public ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
+        private ReportingService(string username, string password, string reportServerUrl, string authenticationType, Guid siteCollectionId)
         {
             client = new ReportingService2010Extended()
             {
@@ -31,6 +35,15 @@ namespace EPMLiveCore.Jobs.SSRS
                 client.LogonUser(username, password, null);
             }
             this.siteCollectionId = siteCollectionId.ToString();
+            
+            if (HttpContext.Current != null && HttpContext.Current.Request != null && HttpContext.Current.Request.Cookies["FedAuth"] != null)
+            {
+                var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+                var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                client.CookieContainer = new CookieContainer();
+                client.CookieContainer.Add(fedAuth);
+            }
+            
         }
 
         public static IReportingService GetInstance(SPSite site)
@@ -55,7 +68,7 @@ namespace EPMLiveCore.Jobs.SSRS
 
         public void SyncReports(SPDocumentLibrary reportLibrary)
         {
-            lock (siteCollectionId + "_ReportLibrary")
+            lock (_locks.GetOrAdd(siteCollectionId + "_ReportLibrary", s => new object()))
             {
                 var errors = string.Empty;
                 var spQuery = new SPQuery()
@@ -102,9 +115,9 @@ namespace EPMLiveCore.Jobs.SSRS
             client.DeleteItem($"/{siteCollectionId.ToString()}{folder}/{report}");
         }
 
-        public void AssignRoleMapping(SPGroupCollection groups, SPList userList)
+        public void AddRoleMapping(SPGroupCollection groups, SPList userList)
         {
-            lock (siteCollectionId + "_RoleMapping")
+            lock (_locks.GetOrAdd(siteCollectionId + "_RoleMapping", s => new object()))
             {
                 var roles = client.ListRoles("Catalog", "");
                 var errors = string.Empty;
@@ -252,7 +265,28 @@ namespace EPMLiveCore.Jobs.SSRS
                         if ((extendedList["Synchronized"] == null || Convert.ToBoolean(extendedList["Synchronized"]) == false)
                             && user.Name != "System Account")
                         {
-                            AssignRole(role, user.LoginName);
+                            string loginName = user.LoginName;
+                            bool inheritParent;
+                            var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
+                            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
+                            var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
+                            if (existingRole == null)
+                            {
+                                policies.Add(new Policy
+                                {
+                                    GroupUserName = loginName.Split('\\').Last(),
+                                    Roles = new Role[] { role }
+                                });
+                            }
+                            else
+                            {
+                                var roleList = existingRole.Roles.ToList();
+                                roleList.Clear();
+                                roleList.Add(role);
+                                existingRole.Roles = roleList.ToArray();
+                            }
+                            client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
+
                             extendedList["Synchronized"] = true;
                             extendedList.SystemUpdate();
                         }
@@ -273,29 +307,7 @@ namespace EPMLiveCore.Jobs.SSRS
             }
         }
 
-        private void AssignRole(Role role, string loginName)
-        {
-            bool inheritParent;
-            var policies = client.GetPolicies($"/{siteCollectionId.ToString()}", out inheritParent).ToList();
-            loginName = SPClaimProviderManager.Local.DecodeClaim(loginName).Value;
-            var existingRole = policies.SingleOrDefault(x => x.GroupUserName.ToLower() == loginName.ToLower());
-            if (existingRole == null)
-            {
-                policies.Add(new Policy
-                {
-                    GroupUserName = loginName.Split('\\').Last(),
-                    Roles = new Role[] { role }
-                });
-            }
-            else
-            {
-                var roleList = existingRole.Roles.ToList();
-                roleList.Clear();
-                roleList.Add(role);
-                existingRole.Roles = roleList.ToArray();
-            }
-            client.SetPolicies($"/{siteCollectionId.ToString()}", policies.ToArray());
-        }
+      
 
         private void UploadReport(string siteCollectionId, ReportItem report)
         {

@@ -7,17 +7,17 @@ namespace EPMLiveCore.Jobs.SSRS
 {
     public class ReportingService2010Extended : ReportingService2010
     {
-        private string cookieName;
-        private Cookie authCookie;
+        
+        private string authCookies = null;
 
         protected override WebRequest GetWebRequest(Uri uri)
         {
-            var request = (HttpWebRequest)WebRequest.Create(uri);
-            request.CookieContainer = new CookieContainer();
+            var request = base.GetWebRequest(uri);//(HttpWebRequest)WebRequest.Create(uri);
 
-            if (!string.IsNullOrEmpty(cookieName))
+            if (authCookies != null && request is HttpWebRequest)
             {
-                request.CookieContainer.Add(authCookie);
+                if (((HttpWebRequest)request).CookieContainer == null) ((HttpWebRequest)request).CookieContainer = new CookieContainer();
+                ((HttpWebRequest)request).CookieContainer.SetCookies(uri, authCookies );
             }
             request.Timeout = -1;
 
@@ -30,19 +30,10 @@ namespace EPMLiveCore.Jobs.SSRS
         protected override WebResponse GetWebResponse(WebRequest request)
         {
             var response = base.GetWebResponse(request);
-            if (string.IsNullOrEmpty(cookieName))
+            if (!string.IsNullOrEmpty(response.Headers["Set-Cookie"]))
             {
-                cookieName = response.Headers["RSAuthenticationHeader"];
-                if (cookieName != null)
-                {
-                    var webResponse = (HttpWebResponse)response;
-                    authCookie = webResponse.Cookies[cookieName];
-                    if (authCookie == null)
-                    {
-                        throw new Exception(
-                            "Authorization ticket not received by LogonUser");
-                    }
-                }
+                authCookies = response.Headers["Set-Cookie"];
+               
             }
             return response;
         }

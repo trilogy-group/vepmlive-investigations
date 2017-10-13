@@ -40,7 +40,8 @@
 				"displayname": "PortfolioEngine Queue",
 				"processname": "WE_QueueMgr",
  				"description": " ",
-				"key": "PFE"
+				"key": "PFE",
+				"dependency": "MSMQ"
 			}		},
 		{
 			"name": "RestSharp.dll", 
@@ -93,13 +94,9 @@
 				"displayname": "Work Engine Timer Service",
 				"processname": "TimerService",
 				"description": " ",
-				"key": "Timer"
+				"key": "Timer",
+				"dependency": ""
 			}		},
-		{
-			"name": "WETimerConfig", 
-			"files": ["TimerService.exe.config"],
-			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\Timer"
-		},
 		{	"name": "WE_CSRequest.dll", 
 			"files": ["WE_CSRequest.dll"],
 			"destination": "[ProgramFilesFolder]EPM Live\\EPM Live 2013\\PFEBIN"		},

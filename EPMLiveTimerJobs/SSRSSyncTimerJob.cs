@@ -30,7 +30,7 @@ namespace EPMLiveTimerJobs
         {
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                QueueAgent.QueueJob(Parent as SPWebApplication);
+                SSRSSyncQueueAgent.EnequeuPFEJobAllSiteCollections(Parent as SPWebApplication);
             });
         }
     }

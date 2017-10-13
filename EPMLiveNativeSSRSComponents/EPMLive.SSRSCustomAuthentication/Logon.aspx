@@ -3,7 +3,56 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Log In</title>
+	<script type='text/javascript' src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type='text/javascript' src="./Javascript/jquery.soap.js"></script>
+	<script type="text/javascript" src="./Javascript/easyXDM.min.js">
+        </script>
+		
+        <script type="text/javascript">
+            /**
+             * Request the use of the JSON object
+             */
+            easyXDM.DomHelper.requiresJSON("./Javascript/json2.js");
+			var remote = new easyXDM.Rpc(/** The channel configuration*/{
+                local: "./Javascript/name.html",
+                swf: "./Javascript/easyxdm.swf"
+            }, /** The configuration */ {
+                
+                local: {
+                    authenticateUser: function(loginUserName, loginPassword){
+                        var success = false;
+						var loginUrl = "./ReportService2010.asmx/LogonUser";
+						try
+						{
+							var url = "ReportService2010.asmx";
+							var pl = new SOAPClientParameters();
+							pl.add("userName", loginUserName);
+							pl.add("password", loginPassword);
+							
+							SOAPClient.invoke(url, "LogonUser", pl, false, callback);				
+							function callback(e) {
+								if (e == null || e.constructor.toString().indexOf("function Error()") < 0)
+								{
+									success = true;
+								}
+							}
+
+						}
+						catch (error)
+						{
+						}
+						return success;
+			
+					
+				},
+				noOp: function(){}
+			}
+		});
+
+        
+        </script>
+		
 </head>
 <body>
     <div style="width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; background-color: #cacaca; overflow: hidden">
@@ -61,5 +110,7 @@
             </div>
         </div>
     </div>
+	
+	
 </body>
 </html>

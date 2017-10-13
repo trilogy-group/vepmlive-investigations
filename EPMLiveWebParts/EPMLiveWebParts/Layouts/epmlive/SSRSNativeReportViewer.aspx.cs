@@ -15,6 +15,7 @@ using System.Text;
 using System.Linq;
 using EPMLiveCore.Jobs.SSRS;
 using EPMLiveCore.SSRS2010;
+using Microsoft.SharePoint.Administration.Claims;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -227,8 +228,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             if (string.IsNullOrWhiteSpace(subsID))
             {
                 var createdSubsID = rs.CreateSubscription(itemUrlRequest, extSettings, description, eventType, matchData, parameters);
-                var currentUserLogin = SPContext.Current.Web.CurrentUser.LoginName?.Split('|');
-                var currentUser = currentUserLogin.Last().Split('\\').Last();
+                
+                var currentUserLogin = SPClaimProviderManager.Local.DecodeClaim(SPContext.Current.Web.CurrentUser.LoginName).Value; 
+                var currentUser = currentUserLogin.Split('\\').Last();
                 rs.ChangeSubscriptionOwner(createdSubsID, currentUser);
             }
             else
