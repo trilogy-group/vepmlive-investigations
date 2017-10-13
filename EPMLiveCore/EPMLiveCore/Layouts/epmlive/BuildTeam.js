@@ -112,10 +112,13 @@ function RemoveResource() {
     isDirty = true;
     for (var r in sRows) {
         var oSRow = sRows[r];
-        var oRrow = rGrid.GetRowById(oSRow.id);
-        oRrow.CanFilter = 1
-        rGrid.ShowRow(oRrow);
         tGrid.RemoveRow(oSRow);
+
+        var oRrow = rGrid.GetRowById(oSRow.id);
+        if (oRrow != null) {
+            oRrow.CanFilter = 1;
+            rGrid.ShowRow(oRrow);
+        }
     }
     RefreshCommandUI();
     tGrid.UpdateHeights(1);
