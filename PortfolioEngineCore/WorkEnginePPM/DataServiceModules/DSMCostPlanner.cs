@@ -717,7 +717,7 @@ namespace WorkEnginePPM.DataServiceModules
                     _dvPeriods.RowFilter = String.Empty;
                     columnValue = Utilities.GetValidDateInFormat(calendarOrderType, columnValue, dateSeparator);
 
-                    _dvPeriods.RowFilter = string.Format("cb_id={0} and prd_start_date='{1}'", foreignKeyId, columnValue);
+                    _dvPeriods.RowFilter = string.Format("cb_id={0} and PRD_START_DATE <= '{1}'  AND PRD_FINISH_DATE >= '{1}'", foreignKeyId, columnValue);
                     if (_dvPeriods.Count > 0)
                     {
                         returnValue = Convert.ToInt32(_dvPeriods[0]["prd_id"]);
@@ -865,7 +865,7 @@ namespace WorkEnginePPM.DataServiceModules
                 dtCategories = null;
             }
 
-            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select prd_id, cb_id, prd_name, prd_start_date from epg_periods", _PFECN))
+            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select prd_id, cb_id, prd_name, prd_start_date, prd_finish_date from epg_periods", _PFECN))
             {
                 DataTable dtPeriods = new DataTable();
                 sqlDataAdapter.Fill(dtPeriods);
