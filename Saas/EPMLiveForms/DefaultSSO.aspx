@@ -196,5 +196,5 @@
 
     <script type="text/javascript" src="jquery.soap.js"></script>
     <script type="text/javascript" src="login.js"></script>
-    <script type="text/jscript" src="placeholder.js"></script>
+    <script type="text/javascript" src="placeholder.js"></script>
 </asp:Content>
