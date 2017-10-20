@@ -139,10 +139,15 @@ namespace EPMLive.SSRSConfigInjector
 
             xmlDocument.SelectSingleNode("//configuration/system.web").AppendChild(machineKeyEntryNode);
 
-            var fragment = xmlDocument.CreateDocumentFragment();
-            fragment.InnerXml = @"<location path=""ReportService2010.asmx""><system.web><authorization><allow users=""*""/></authorization></system.web></location>";
             var configNode = xmlDocument.SelectSingleNode("//configuration");
-            configNode.AppendChild(fragment);
+
+            var asmxFragment = xmlDocument.CreateDocumentFragment();
+            asmxFragment.InnerXml = @"<location path=""ReportService2010.asmx""><system.web><authorization><allow users=""*""/></authorization></system.web></location>";
+            configNode.AppendChild(asmxFragment);
+
+            var javascriptFragment = xmlDocument.CreateDocumentFragment();
+            javascriptFragment.InnerXml = @"<location path=""Javascript""><system.web><authorization><allow users=""*""/></authorization></system.web></location>";
+            configNode.AppendChild(javascriptFragment);
 
             SaveXmlDocument(pathResolver.GetReportingServicePath("web.config"), xmlDocument);
         }
