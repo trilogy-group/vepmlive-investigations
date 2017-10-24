@@ -7,7 +7,7 @@ using EPMLiveCore;
 using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
 using WorkEnginePPM.WebServices.Core;
 using System.Threading;
-
+using System.Threading.Tasks;
 namespace WorkEnginePPM.Events
 {
     /// <summary>
@@ -215,14 +215,12 @@ namespace WorkEnginePPM.Events
 
         private void CalculateResourceAvailabilities(string pfeResourceId, SPWeb spWeb)
         {
-            Thread thread = new Thread(() =>
-            {
+            Task.Run(() => {
                 using (var resourceManager = new ResourceManager(spWeb))
                 {
                     resourceManager.CalculateResourceAvailabilities(int.Parse(pfeResourceId));
                 }
             });
-            thread.Start();
         }
 
         public static void UpdateUser(SPItemEventProperties properties)
