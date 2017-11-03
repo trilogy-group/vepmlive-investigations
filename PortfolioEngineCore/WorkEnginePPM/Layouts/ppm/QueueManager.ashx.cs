@@ -109,7 +109,8 @@ namespace WorkEnginePPM
             xQMStatus.Initialize("QMStatus");
 
             dbaQueueManager.SelectHeartbeat(dba, out dtHeartbeat);
-            DateTime dtWhen = DateTime.Now.AddMinutes(-5);
+            //This value need to be moved to config file, now there is no config 
+            DateTime dtWhen = DateTime.Now.AddMinutes(-20);
             string sInfo;
             if (dtWhen < dtHeartbeat) 
             {

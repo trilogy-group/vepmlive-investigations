@@ -445,7 +445,7 @@ namespace EPMLiveCore.API
                 Guid listid = Guid.Empty;
                 int itemid = 0;
                 XmlDocument docQuery = new XmlDocument();
-                docQuery.LoadXml(data.Replace("&gt;", ">").Replace("&lt;", "<"));
+                docQuery.LoadXml(HttpUtility.HtmlDecode(data));
 
                 try
                 {
