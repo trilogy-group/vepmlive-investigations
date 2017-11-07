@@ -18,7 +18,7 @@ LABEL \
 ARG SERVER_URL='http://10.137.22.36'
 ARG ZIP7_INSTALLER_URL='http://www.7-zip.org/a/7z1604-x64.msi'
 ARG GIT_INSTALLER_URL='https://github.com/git-for-windows/git/releases/download/v2.13.3.windows.1/Git-2.13.3-64-bit.exe'
-ARG JRE_INSTALLER_URL='http://files.msassist.com/Java/jre-8u151-windows-x64.exe'
+ARG JRE_INSTALLER_URL='https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283&resid=FDD9E9CD6B4F4283%21420&authkey=AH5m155o_rMJ_aI'
 ARG DOCKER_INSTALLER_URL='https://get.docker.com/builds/Windows/x86_64/docker-17.03.1-ce.zip'
 ARG DOCKER_COMPOSE_INSTALLER_URL='https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Windows-x86_64.exe'
 ARG AWSTOOLS_INSTALLER_URL='http://sdk-for-net.amazonwebservices.com/latest/AWSToolsAndSDKForNet.msi'
