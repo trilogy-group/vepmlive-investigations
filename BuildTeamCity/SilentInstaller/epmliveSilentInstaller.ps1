@@ -33,7 +33,9 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
 	{
 		Write-Host ("Stop service:" + $component.installAsService.name)
+		Set-Service -Name $component.installAsService.name -StartupType Disabled
 		Stop-Service -Name $component.installAsService.name
+		
 		WaitUntilServices $component.installAsService.name "Stopped"
 		Write-Host("Killing " + $component.installAsService.processname)
 		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
