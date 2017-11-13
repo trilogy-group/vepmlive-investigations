@@ -270,7 +270,8 @@ namespace EPMLiveCore.ReportHelper
                 }
                 catch (Exception ex)
                 {
-                    message += string.Format(" Refresh not completed due errors. {0}", ex.ToString());
+                    string error= string.Format("Refresh not completed due errors. {0} at step :{1}", ex.ToString(), message);
+                    message = error;
                     hasErrors = true;
                 }
                 return hasErrors;
