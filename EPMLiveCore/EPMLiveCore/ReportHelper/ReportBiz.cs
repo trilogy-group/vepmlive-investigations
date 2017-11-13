@@ -183,7 +183,7 @@ namespace EPMLiveCore.ReportHelper
                         "TimeSheet",
                         "Begin refreshing time sheet data for web: " + WebTitle,
                         "Begin refreshing time sheet data for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
 
                     DataTable tblTSData = rd.GetTSAllDataWithSchema();
 
@@ -199,14 +199,14 @@ namespace EPMLiveCore.ReportHelper
                         "TimeSheet",
                         "Begin deleting existing time sheet data for web: " + WebTitle,
                         "Begin deleting existing time sheet data for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
 
                     rd.DeleteExistingTSData();
                     rd.LogStatus("",
                         "TimeSheet",
                         "Finished deleting existing time sheet data for web: " + WebTitle,
                         "Finished deleting existing time sheet data for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
                     //End
 
                     //IF performance becomes an issue, change rpttsduid to int and auto-increment. 
@@ -228,7 +228,7 @@ namespace EPMLiveCore.ReportHelper
                         "TimeSheet",
                         "Recreating RPTTSData for web: " + WebTitle,
                         "Recreating RPTTSData for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
                     if (!rd.CreateTable(sTableName, columns, true, out message))
                     {
                         hasErrors = true;
@@ -236,42 +236,41 @@ namespace EPMLiveCore.ReportHelper
                             "TimeSheet",
                             "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
                             message,
-                            0, 1, Convert.ToString(jobUid));
+                            0, 1, jobUid.ToString());
                     }
                     rd.LogStatus("",
                         "TimeSheet",
                         "Finished recreating RPTTSData for web: " + WebTitle,
                         "Finished recreating RPTTSData for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
 
                     rd.LogStatus("", "TimeSheet",
                         "Inserting data to RPTTSData for web: " + WebTitle,
                         "Inserting data to RPTTSData for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
                     if (!rd.InsertTSAllData(tblTSData, out message))
                     {
                         hasErrors = true;
                         rd.LogStatus("",
                             "TimeSheet",
                             "Error occurred while inserting data into RPTTSData for web: " + WebTitle,
-                            message, 0, 3, Convert.ToString(jobUid));
+                            message, 0, 3, jobUid.ToString());
                     }
                     rd.LogStatus("", "TimeSheet",
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
                     //message = "Successfully refreshed timesheet data.";
                     rd.LogStatus("",
                         "TimeSheet",
                         "Finished refreshing time sheet data for web: " + WebTitle,
                         "Finished refreshing time sheet data for web: " + WebTitle,
-                        0, 1, Convert.ToString(jobUid));
+                        0, 1, jobUid.ToString());
 
                 }
                 catch (Exception ex)
                 {
-                    string error= string.Format("Refresh not completed due errors. {0} at step :{1}", ex.ToString(), message);
-                    message = error;
+                    message = string.Format("Refresh not completed due errors. {0} ", ex.ToString());
                     hasErrors = true;
                 }
                 return hasErrors;
