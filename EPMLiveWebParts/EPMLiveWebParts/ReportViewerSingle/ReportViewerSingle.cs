@@ -23,7 +23,6 @@ using System.Web.UI.HtmlControls;
 using System.Reflection;
 using Microsoft.SharePoint.Administration;
 using System.Collections.Generic;
-using Microsoft.Reporting.WebForms;
 
 namespace EPMLiveWebParts
 {
@@ -152,7 +151,7 @@ namespace EPMLiveWebParts
 
         protected override void CreateChildControls()
         {
-            
+
             rv = new Microsoft.Reporting.WebForms.ReportViewer();
             SPWeb rootWeb = SPContext.Current.Site.RootWeb;
             if (UseDefaults)
@@ -169,7 +168,7 @@ namespace EPMLiveWebParts
             {
                 ReportingServicesURL = PropSRSUrl;
                 Integrated = IsIntegratedMode;
-            }             
+            }
             if (string.IsNullOrEmpty(PropReportPath))
             {
                 error = "Report Path has not been set. Please configure the Report Path.";
@@ -184,11 +183,11 @@ namespace EPMLiveWebParts
             }
             else
             {
-               try
+                try
                 {
                     rv.ProcessingMode = Microsoft.Reporting.WebForms.ProcessingMode.Remote;
                     rv.ServerReport.ReportServerUrl = new Uri(ReportingServicesURL);
-                    if(Integrated)
+                    if (Integrated)
                         rv.ServerReport.ReportPath = rootWeb.Url + "/Report Library" + PropReportPath + ".rdl";
                     else
                         rv.ServerReport.ReportPath = PropReportPath;
@@ -199,8 +198,7 @@ namespace EPMLiveWebParts
                     rv.EnableTheming = true;
                     rv.Width = new Unit(59, UnitType.Percentage);
                     rv.ControlStyle.Width = new Unit(79, UnitType.Percentage);
-                    IReportServerCredentials irsc = new CustomReportCredentials("farmadmin", "Pass@word1", "epmldev");
-                    rv.ServerReport.ReportServerCredentials = irsc;
+
                     Microsoft.Reporting.WebForms.ReportParameterInfoCollection rpic = rv.ServerReport.GetParameters();
 
                     List<Microsoft.Reporting.WebForms.ReportParameter> arrParams = new List<Microsoft.Reporting.WebForms.ReportParameter>();
@@ -236,10 +234,7 @@ namespace EPMLiveWebParts
                         }
                     }
                     if (arrParams.Count > 0)
-                    {
-                        
                         rv.ServerReport.SetParameters(arrParams);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -271,38 +266,6 @@ namespace EPMLiveWebParts
             }
 
 
-        }
-    }
-
-    public class CustomReportCredentials : IReportServerCredentials
-    {
-        private string _UserName;
-        private string _PassWord;
-        private string _DomainName;
-
-        public CustomReportCredentials(string UserName, string PassWord, string DomainName)
-        {
-            _UserName = UserName;
-            _PassWord = PassWord;
-            _DomainName = DomainName;
-        }
-
-        public System.Security.Principal.WindowsIdentity ImpersonationUser
-        {
-            get { return null; }
-        }
-
-        public ICredentials NetworkCredentials
-        {
-            get { return new NetworkCredential(_UserName, _PassWord, _DomainName); }
-        }
-
-        public bool GetFormsCredentials(out Cookie authCookie, out string user,
-         out string password, out string authority)
-        {
-            authCookie = null;
-            user = password = authority = null;
-            return false;
         }
     }
 }
