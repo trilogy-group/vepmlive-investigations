@@ -458,23 +458,28 @@ namespace EPMLiveWebParts
             }
 
 
-            foreach (DictionaryEntry de in hshLookupEnums)
-            {
-                XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
-                if (nd != null)
-                {
-                    nd.Attributes["EnumKeys"].Value = ";" + string.Join(";", (int[])((ArrayList)de.Value).ToArray(Type.GetType("System.Int32")));
-                }
-            }
+            //foreach (DictionaryEntry de in hshLookupEnums)
+            //{
+            //    XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
+            //    if (nd != null)
+            //    {
+            //        nd.Attributes["EnumKeys"].Value = ";" + string.Join(";", (int[])((ArrayList)de.Value).ToArray(Type.GetType("System.Int32")));
+            //    }
+            //}
 
-            foreach (DictionaryEntry de in hshLookupEnumKeys)
-            {
-                XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
-                if (nd != null)
-                {
-                    nd.Attributes["Enum"].Value = ";" + string.Join(";", (string[])((ArrayList)de.Value).ToArray(Type.GetType("System.String")));
-                }
-            }
+            //foreach (DictionaryEntry de in hshLookupEnumKeys)
+            //{
+            //    XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
+            //    if (nd != null)
+            //    {
+            //        nd.Attributes["Enum"].Value = ";" + string.Join(";", (string[])((ArrayList)de.Value).ToArray(Type.GetType("System.String")));
+            //    }
+            //}
+
+                XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='lookupcol1']");
+            nd.Attributes["EnumKeys"].Value = ";1;2;3";
+                XmlNode nd2 = doc.FirstChild.SelectSingleNode("//C[@Name='lookupcol1']");
+            nd2.Attributes["Enum"].Value = ";test1;test2;test3";
 
 
             XmlNode ndPag = docXml.SelectSingleNode("//call[@command='setuppaging']");
