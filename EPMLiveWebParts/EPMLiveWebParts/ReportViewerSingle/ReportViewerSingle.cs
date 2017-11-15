@@ -151,7 +151,7 @@ namespace EPMLiveWebParts
 
         protected override void CreateChildControls()
         {
-            
+
             rv = new Microsoft.Reporting.WebForms.ReportViewer();
             SPWeb rootWeb = SPContext.Current.Site.RootWeb;
             if (UseDefaults)
@@ -168,7 +168,7 @@ namespace EPMLiveWebParts
             {
                 ReportingServicesURL = PropSRSUrl;
                 Integrated = IsIntegratedMode;
-            }             
+            }
             if (string.IsNullOrEmpty(PropReportPath))
             {
                 error = "Report Path has not been set. Please configure the Report Path.";
@@ -183,11 +183,11 @@ namespace EPMLiveWebParts
             }
             else
             {
-               try
+                try
                 {
                     rv.ProcessingMode = Microsoft.Reporting.WebForms.ProcessingMode.Remote;
                     rv.ServerReport.ReportServerUrl = new Uri(ReportingServicesURL);
-                    if(Integrated)
+                    if (Integrated)
                         rv.ServerReport.ReportPath = rootWeb.Url + "/Report Library" + PropReportPath + ".rdl";
                     else
                         rv.ServerReport.ReportPath = PropReportPath;

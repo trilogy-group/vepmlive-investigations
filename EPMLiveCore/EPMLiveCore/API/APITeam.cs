@@ -735,10 +735,7 @@ namespace EPMLiveCore.API
                     }
 
                     li["AssignedTo"] = uvc;
-                    using (var scope = new DisabledItemEventScope())
-                    {
-                        li.SystemUpdate();
-                    }
+                    li.SystemUpdate();
 
 
                 }
