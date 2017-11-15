@@ -201,115 +201,115 @@ namespace WorkEnginePPM.Jobs
                         cmd.Parameters.AddWithValue("@dtapproved", dt.ToString("MM/dd/yyyy"));
                     }
 
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    doc = new XmlDocument();
-                    doc.LoadXml("<Timesheets/>");
-
-                    while (dr.Read())
+                    using (SqlDataReader dr = cmd.ExecuteReader())
                     {
-                        string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
-                        XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + DateTime.Parse(dr["period_start"].ToString()).ToString("s") + "'  and @period_end='" + DateTime.Parse(dr["period_end"].ToString()).ToString("s") + "']");
-                        if (ndTimesheet == null)
+                        doc = new XmlDocument();
+                        doc.LoadXml("<Timesheets/>");
+                        while (dr.Read())
                         {
-                            ndTimesheet = doc.CreateNode(XmlNodeType.Element, "Timesheet", doc.NamespaceURI);
-
-                            XmlAttribute attrResource = doc.CreateAttribute("Resource");
-                            attrResource.Value = sUsername;
-                            ndTimesheet.Attributes.Append(attrResource);
-
-                            XmlAttribute attrStart = doc.CreateAttribute("period_start");
-                            attrStart.Value = DateTime.Parse(dr["period_start"].ToString()).ToString("s");
-                            ndTimesheet.Attributes.Append(attrStart);
-
-                            XmlAttribute attrEnd = doc.CreateAttribute("period_end");
-                            attrEnd.Value = DateTime.Parse(dr["period_end"].ToString()).ToString("s");
-                            ndTimesheet.Attributes.Append(attrEnd);
-
-                            doc.FirstChild.AppendChild(ndTimesheet);
-                        }
-
-                        if (dr["project_list_uid"].ToString() != "")
-                        {
-                            XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
-
-                            XmlAttribute attrProject = doc.CreateAttribute("Project");
-
-                            string itemid = dr["web_uid"].ToString() + "." + dr["project_list_uid"].ToString() + "." + dr["project_id"].ToString();
-
-                            try
+                            string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
+                            XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + DateTime.Parse(dr["period_start"].ToString()).ToString("s") + "'  and @period_end='" + DateTime.Parse(dr["period_end"].ToString()).ToString("s") + "']");
+                            if (ndTimesheet == null)
                             {
+                                ndTimesheet = doc.CreateNode(XmlNodeType.Element, "Timesheet", doc.NamespaceURI);
 
-                                SPList tList;
-                                if (splistcollection.ContainsKey(Convert.ToString(dr["project_list_uid"])))
+                                XmlAttribute attrResource = doc.CreateAttribute("Resource");
+                                attrResource.Value = sUsername;
+                                ndTimesheet.Attributes.Append(attrResource);
+
+                                XmlAttribute attrStart = doc.CreateAttribute("period_start");
+                                attrStart.Value = DateTime.Parse(dr["period_start"].ToString()).ToString("s");
+                                ndTimesheet.Attributes.Append(attrStart);
+
+                                XmlAttribute attrEnd = doc.CreateAttribute("period_end");
+                                attrEnd.Value = DateTime.Parse(dr["period_end"].ToString()).ToString("s");
+                                ndTimesheet.Attributes.Append(attrEnd);
+
+                                doc.FirstChild.AppendChild(ndTimesheet);
+                            }
+
+                            if (dr["project_list_uid"].ToString() != "")
+                            {
+                                XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
+
+                                XmlAttribute attrProject = doc.CreateAttribute("Project");
+
+                                string itemid = dr["web_uid"].ToString() + "." + dr["project_list_uid"].ToString() + "." + dr["project_id"].ToString();
+
+                                try
                                 {
-                                    tList = splistcollection[Convert.ToString(dr["project_list_uid"])];
-                                }
-                                else
-                                {
-                                    using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
+
+                                    SPList tList;
+                                    if (splistcollection.ContainsKey(Convert.ToString(dr["project_list_uid"])))
                                     {
-                                        tList = tweb.Lists[new Guid(Convert.ToString(dr["project_list_uid"]))];
-                                        splistcollection.Add(Convert.ToString(dr["project_list_uid"]), tList);
+                                        tList = splistcollection[Convert.ToString(dr["project_list_uid"])];
+                                    }
+                                    else
+                                    {
+                                        using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
+                                        {
+                                            tList = tweb.Lists[new Guid(Convert.ToString(dr["project_list_uid"]))];
+                                            splistcollection.Add(Convert.ToString(dr["project_list_uid"]), tList);
+                                        }
+                                    }
+                                    SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
+                                    if (li["ParentItem"].ToString() != "")
+                                    {
+                                        itemid = li["ParentItem"].ToString();
                                     }
                                 }
-                                SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
-                                if (li["ParentItem"].ToString() != "")
-                                {
-                                    itemid = li["ParentItem"].ToString();
-                                }
+                                catch { }
+
+                                attrProject.Value = itemid;
+                                ndProject.Attributes.Append(attrProject);
+
+                                XmlAttribute attrDate = doc.CreateAttribute("Date");
+                                attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
+                                ndProject.Attributes.Append(attrDate);
+
+                                XmlAttribute attrHours = doc.CreateAttribute("Hours");
+                                attrHours.Value = dr["TotalHours"].ToString();
+                                ndProject.Attributes.Append(attrHours);
+
+                                XmlAttribute attrType = doc.CreateAttribute("Type");
+                                attrType.Value = dr["TYPEID"].ToString();
+                                ndProject.Attributes.Append(attrType);
+
+                                XmlAttribute attrCategory = doc.CreateAttribute("Category");
+                                attrCategory.Value = dr["TSTYPE_NAME"].ToString();
+                                ndProject.Attributes.Append(attrCategory);
+
+                                ndTimesheet.AppendChild(ndProject);
                             }
-                            catch { }
+                            else if (arrLists.Contains(dr["LIST"].ToString()))
+                            {
+                                XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
 
-                            attrProject.Value = itemid;
-                            ndProject.Attributes.Append(attrProject);
+                                XmlAttribute attrProject = doc.CreateAttribute("Project");
 
-                            XmlAttribute attrDate = doc.CreateAttribute("Date");
-                            attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
-                            ndProject.Attributes.Append(attrDate);
+                                string itemid = dr["web_uid"].ToString() + "." + dr["list_uid"].ToString() + "." + dr["project_id"].ToString();
 
-                            XmlAttribute attrHours = doc.CreateAttribute("Hours");
-                            attrHours.Value = dr["TotalHours"].ToString();
-                            ndProject.Attributes.Append(attrHours);
+                                attrProject.Value = itemid;
+                                ndProject.Attributes.Append(attrProject);
 
-                            XmlAttribute attrType = doc.CreateAttribute("Type");
-                            attrType.Value = dr["TYPEID"].ToString();
-                            ndProject.Attributes.Append(attrType);
+                                XmlAttribute attrDate = doc.CreateAttribute("Date");
+                                attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
+                                ndProject.Attributes.Append(attrDate);
 
-                            XmlAttribute attrCategory = doc.CreateAttribute("Category");
-                            attrCategory.Value = dr["TSTYPE_NAME"].ToString();
-                            ndProject.Attributes.Append(attrCategory);
+                                XmlAttribute attrHours = doc.CreateAttribute("Hours");
+                                attrHours.Value = dr["TotalHours"].ToString();
+                                ndProject.Attributes.Append(attrHours);
 
-                            ndTimesheet.AppendChild(ndProject);
-                        }
-                        else if (arrLists.Contains(dr["LIST"].ToString()))
-                        {
-                            XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
+                                XmlAttribute attrType = doc.CreateAttribute("Type");
+                                attrType.Value = dr["TYPEID"].ToString();
+                                ndProject.Attributes.Append(attrType);
 
-                            XmlAttribute attrProject = doc.CreateAttribute("Project");
+                                XmlAttribute attrCategory = doc.CreateAttribute("Category");
+                                attrCategory.Value = dr["TSTYPE_NAME"].ToString();
+                                ndProject.Attributes.Append(attrCategory);
 
-                            string itemid = dr["web_uid"].ToString() + "." + dr["list_uid"].ToString() + "." + dr["project_id"].ToString();
-
-                            attrProject.Value = itemid;
-                            ndProject.Attributes.Append(attrProject);
-
-                            XmlAttribute attrDate = doc.CreateAttribute("Date");
-                            attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
-                            ndProject.Attributes.Append(attrDate);
-
-                            XmlAttribute attrHours = doc.CreateAttribute("Hours");
-                            attrHours.Value = dr["TotalHours"].ToString();
-                            ndProject.Attributes.Append(attrHours);
-
-                            XmlAttribute attrType = doc.CreateAttribute("Type");
-                            attrType.Value = dr["TYPEID"].ToString();
-                            ndProject.Attributes.Append(attrType);
-
-                            XmlAttribute attrCategory = doc.CreateAttribute("Category");
-                            attrCategory.Value = dr["TSTYPE_NAME"].ToString();
-                            ndProject.Attributes.Append(attrCategory);
-
-                            ndTimesheet.AppendChild(ndProject);
+                                ndTimesheet.AppendChild(ndProject);
+                            }
                         }
                     }
                 }
