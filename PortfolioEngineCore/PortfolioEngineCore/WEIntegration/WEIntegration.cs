@@ -168,72 +168,80 @@ namespace PortfolioEngineCore.WEIntegration
             sCommand = "Select WRES_NT_ACCOUNT,WRES_ID,RES_NAME,WRES_RP_DEPT as DeptId, LV_VALUE as Department From EPG_RESOURCES r" +
                         " Left Join EPGP_LOOKUP_VALUES lv On lv.LV_UID=r.WRES_RP_DEPT" +
                                 " Where r.WRES_NT_ACCOUNT is not null";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-            SqlReader = SqlCommand.ExecuteReader();
-            oResource = new PfEResource();
-            while (SqlReader.Read())
+            using (SqlCommand = new SqlCommand(sCommand, _PFECN))
             {
+                SqlReader = SqlCommand.ExecuteReader();
 
-                string WRES_NT_ACCOUNT = DBAccess.ReadStringValue(SqlReader["WRES_NT_ACCOUNT"]);
-                oResource.WresID = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                oResource.DeptId = DBAccess.ReadIntValue(SqlReader["DeptId"]);
-                oResource.Dept = DBAccess.ReadStringValue(SqlReader["Department"]);
-                if (!resourceIDs.ContainsKey(WRES_NT_ACCOUNT))
+                while (SqlReader.Read())
                 {
-                    resourceIDs.Add(WRES_NT_ACCOUNT, oResource);
+                    oResource = new PfEResource();
+                    string WRES_NT_ACCOUNT = DBAccess.ReadStringValue(SqlReader["WRES_NT_ACCOUNT"]);
+                    oResource.WresID = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
+                    oResource.DeptId = DBAccess.ReadIntValue(SqlReader["DeptId"]);
+                    oResource.Dept = DBAccess.ReadStringValue(SqlReader["Department"]);
+                    if (!resourceIDs.ContainsKey(WRES_NT_ACCOUNT))
+                    {
+                        resourceIDs.Add(WRES_NT_ACCOUNT, oResource);
+                    }
                 }
+                SqlReader.Close();
             }
-            SqlReader.Close();
 
 
             sCommand = "Select PROJECT_ID,PROJECT_EXT_UID From EPGP_PROJECTS";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-
-            SqlCommand.Transaction = transaction;
-            SqlReader = SqlCommand.ExecuteReader();
-            string PROJECT_EXT_UID;
-            int PROJECT_ID;
-            while (SqlReader.Read())
+            using (SqlCommand = new SqlCommand(sCommand, _PFECN))
             {
-                PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                PROJECT_EXT_UID = DBAccess.ReadStringValue(SqlReader["PROJECT_ID"]);
-                if (!projectIDs.ContainsKey(PROJECT_EXT_UID))
+
+                SqlCommand.Transaction = transaction;
+                SqlReader = SqlCommand.ExecuteReader();
+                string PROJECT_EXT_UID;
+                int PROJECT_ID;
+                while (SqlReader.Read())
                 {
-                    projectIDs.Add(PROJECT_EXT_UID, PROJECT_ID);
+                    PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
+                    PROJECT_EXT_UID = DBAccess.ReadStringValue(SqlReader["PROJECT_ID"]);
+                    if (!projectIDs.ContainsKey(PROJECT_EXT_UID))
+                    {
+                        projectIDs.Add(PROJECT_EXT_UID, PROJECT_ID);
+                    }
                 }
+                SqlReader.Close();
             }
-            SqlReader.Close();
 
             sCommand = "Select WEC_CHG_UID,WRES_ID,PROJECT_ID,WEC_MAJORCATEGORY,WEC_CATEGORY,WEC_DEPT_NAME,WEC_DEPT_UID From EPG_WE_CHARGES";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-            SqlReader = SqlCommand.ExecuteReader();
-            while (SqlReader.Read())
+            using (SqlCommand = new SqlCommand(sCommand, _PFECN))
             {
-                PfECharge pfeCharge=new PfECharge();
-                pfeCharge.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEC_CHG_UID"]);
-                pfeCharge.PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                pfeCharge.WresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                pfeCharge.CATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_CATEGORY"]);
-                pfeCharge.DEPT_NAME = DBAccess.ReadStringValue(SqlReader["WEC_DEPT_NAME"]);
-                pfeCharge.DEPT_Id = DBAccess.ReadIntValue(SqlReader["WEC_DEPT_UID"]);
-                pfeCharge.MAJORCATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_MAJORCATEGORY"]);
-                pfeCharges.Add(pfeCharge);
+                SqlReader = SqlCommand.ExecuteReader();
+                while (SqlReader.Read())
+                {
+                    PfECharge pfeCharge = new PfECharge();
+                    pfeCharge.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEC_CHG_UID"]);
+                    pfeCharge.PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
+                    pfeCharge.WresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
+                    pfeCharge.CATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_CATEGORY"]);
+                    pfeCharge.DEPT_NAME = DBAccess.ReadStringValue(SqlReader["WEC_DEPT_NAME"]);
+                    pfeCharge.DEPT_Id = DBAccess.ReadIntValue(SqlReader["WEC_DEPT_UID"]);
+                    pfeCharge.MAJORCATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_MAJORCATEGORY"]);
+                    pfeCharges.Add(pfeCharge);
+                }
+                SqlReader.Close();
             }
-            SqlReader.Close();
 
             List<PfEChargeDate> pfEChargeDates = new List<PfEChargeDate>();
             sCommand = "Select WEH_CHG_UID,WEH_DATE From EPG_WE_ACTUALHOURS";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-            SqlReader = SqlCommand.ExecuteReader();
-            while (SqlReader.Read())
+            using (SqlCommand = new SqlCommand(sCommand, _PFECN))
             {
-                PfEChargeDate pfEChargeDate = new PfEChargeDate();
-                pfEChargeDate.CHG_UID= DBAccess.ReadIntValue(SqlReader["WEH_CHG_UID"]);
-                pfEChargeDate.Date = DBAccess.ReadDateValue(SqlReader["WEH_DATE"]);
-                pfEChargeDates.Add(pfEChargeDate);
+                SqlReader = SqlCommand.ExecuteReader();
+                while (SqlReader.Read())
+                {
+                    PfEChargeDate pfEChargeDate = new PfEChargeDate();
+                    pfEChargeDate.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEH_CHG_UID"]);
+                    pfEChargeDate.Date = DBAccess.ReadDateValue(SqlReader["WEH_DATE"]);
+                    pfEChargeDates.Add(pfEChargeDate);
+                }
+                SqlReader.Close();
             }
-            SqlReader.Close();
-           
+
             foreach (CStruct xTS in listTSs)
             {
                 string resource = xTS.GetStringAttr("Resource");

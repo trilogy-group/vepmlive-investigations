@@ -205,8 +205,8 @@ namespace WorkEnginePPM.Jobs
 
                     doc = new XmlDocument();
                     doc.LoadXml("<Timesheets/>");
-                  
-                    while(dr.Read())
+
+                    while (dr.Read())
                     {
                         string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
                         XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + DateTime.Parse(dr["period_start"].ToString()).ToString("s") + "'  and @period_end='" + DateTime.Parse(dr["period_end"].ToString()).ToString("s") + "']");
@@ -239,23 +239,24 @@ namespace WorkEnginePPM.Jobs
 
                             try
                             {
-                                using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
+
+                                SPList tList;
+                                if (splistcollection.ContainsKey(Convert.ToString(dr["project_list_uid"])))
                                 {
-                                    SPList tList;
-                                    if (splistcollection.ContainsKey(Convert.ToString(dr["project_list_uid"])))
+                                    tList = splistcollection[Convert.ToString(dr["project_list_uid"])];
+                                }
+                                else
+                                {
+                                    using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
                                     {
-                                        tList = splistcollection[Convert.ToString(dr["project_list_uid"])];
-                                    }
-                                    else {
                                         tList = tweb.Lists[new Guid(Convert.ToString(dr["project_list_uid"]))];
                                         splistcollection.Add(Convert.ToString(dr["project_list_uid"]), tList);
                                     }
-                                    SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
-
-                                    if (li["ParentItem"].ToString() != "")
-                                    {
-                                        itemid = li["ParentItem"].ToString();
-                                    }
+                                }
+                                SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
+                                if (li["ParentItem"].ToString() != "")
+                                {
+                                    itemid = li["ParentItem"].ToString();
                                 }
                             }
                             catch { }
