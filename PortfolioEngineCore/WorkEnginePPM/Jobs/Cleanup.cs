@@ -170,6 +170,7 @@ namespace WorkEnginePPM.Jobs
             XmlDocument doc = null;
             XmlDocument docResXml = null;
             DataSet ds = new DataSet();
+            Dictionary<string, SPList> splistcollection = new Dictionary<string, SPList>();
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
@@ -187,6 +188,7 @@ namespace WorkEnginePPM.Jobs
                 using (SqlCommand cmd = new SqlCommand("spTSGetApprovedTimesheets", cn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 1200;
                     cmd.Parameters.AddWithValue("@siteguid", site.ID);
                     if (string.IsNullOrEmpty(lastApproved))
                     {
@@ -199,14 +201,14 @@ namespace WorkEnginePPM.Jobs
                         cmd.Parameters.AddWithValue("@dtapproved", dt.ToString("MM/dd/yyyy"));
                     }
 
-                    ds = GetDataset(ds, cmd);
+                    SqlDataReader dr = cmd.ExecuteReader();
 
                     doc = new XmlDocument();
                     doc.LoadXml("<Timesheets/>");
-                    foreach (DataRow dr in ds.Tables[0].Rows)
+                  
+                    while(dr.Read())
                     {
                         string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
-
                         XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + DateTime.Parse(dr["period_start"].ToString()).ToString("s") + "'  and @period_end='" + DateTime.Parse(dr["period_end"].ToString()).ToString("s") + "']");
                         if (ndTimesheet == null)
                         {
@@ -239,8 +241,15 @@ namespace WorkEnginePPM.Jobs
                             {
                                 using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
                                 {
-                                    SPList tList = tweb.Lists[new Guid(dr["project_list_uid"].ToString())];
-
+                                    SPList tList;
+                                    if (splistcollection.ContainsKey(Convert.ToString(dr["project_list_uid"])))
+                                    {
+                                        tList = splistcollection[Convert.ToString(dr["project_list_uid"])];
+                                    }
+                                    else {
+                                        tList = tweb.Lists[new Guid(Convert.ToString(dr["project_list_uid"]))];
+                                        splistcollection.Add(Convert.ToString(dr["project_list_uid"]), tList);
+                                    }
                                     SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
 
                                     if (li["ParentItem"].ToString() != "")
