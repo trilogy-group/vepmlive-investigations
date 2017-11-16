@@ -33,7 +33,12 @@ namespace EPMLiveWebParts
 
         protected SPList list = null;
         protected SPView view = null;
-
+        private bool DoesUserHavePermissionsViewListItems = false;
+        private bool DoesUserHavePermissionsEditListItems = false;
+        private bool DoesUserHavePermissionsManagePermissions = false;
+        private bool DoesUserHavePermissionsDeleteListItems = false;
+        private bool DoesUserHavePermissionsViewVersions = false;
+        private bool DoesUserHavePermissionsApproveItems = false;
         protected string strlist;
         protected string strview;
         protected string usewbs;
@@ -314,6 +319,21 @@ namespace EPMLiveWebParts
 
                 addHeader();
                 addGroups(curWeb);
+
+                //DoesUserHavePermissions is slowing the process in addmenu for every item so we are setting flags. 
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+                    DoesUserHavePermissionsViewListItems=true;
+                if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                    DoesUserHavePermissionsEditListItems = true;
+                if (list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions))
+                    DoesUserHavePermissionsManagePermissions = true;
+                if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                    DoesUserHavePermissionsDeleteListItems = true;
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewVersions))
+                    DoesUserHavePermissionsViewVersions = true;
+                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                    DoesUserHavePermissionsApproveItems = true;
+
                 addItems();
 
                 foreach (DictionaryEntry de in hshItemNodes)
@@ -505,21 +525,21 @@ namespace EPMLiveWebParts
 
             int[] viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+            if (DoesUserHavePermissionsViewListItems)
                 viewMenus[0] = 1;
 
-            if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+            if (DoesUserHavePermissionsEditListItems)
                 viewMenus[1] = 1;
 
-            if (list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions))
+            if (DoesUserHavePermissionsManagePermissions)
                 viewMenus[2] = 1;
 
-            if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems) && !isTimesheet)
+            if (DoesUserHavePermissionsDeleteListItems && !isTimesheet)
                 viewMenus[3] = 1;
 
 
             if (list.EnableVersioning)
-                if (list.DoesUserHavePermissions(SPBasePermissions.ViewVersions))
+                if (DoesUserHavePermissionsViewVersions)
                     viewMenus[4] = 1;
 
             //if (list.WorkflowAssociations.Count > 0)
@@ -530,7 +550,7 @@ namespace EPMLiveWebParts
             viewMenus[5] = 1;
 
             if (list.EnableModeration)
-                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                if (DoesUserHavePermissionsApproveItems)
                     viewMenus[6] = 1;
 
             if (list.WorkflowAssociations.Count > 0)
@@ -643,7 +663,7 @@ namespace EPMLiveWebParts
             //if (list.ParentWeb.Features[new Guid("")] != null)
             //    viewMenus[10] = 1;
 
-            if (list.EnableAttachments && list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+            if (list.EnableAttachments && DoesUserHavePermissionsEditListItems)
                 viewMenus[12] = 1;
 
             //show edit in project (NON PS)
@@ -993,7 +1013,7 @@ namespace EPMLiveWebParts
 
                             if (list.EnableModeration)
                             {
-                                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                                if (DoesUserHavePermissionsApproveItems)
                                 {
                                     if (field.Id == SPBuiltInFieldId._ModerationStatus)
                                     {
@@ -1380,7 +1400,7 @@ namespace EPMLiveWebParts
                                             displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        if(val.Trim() == "")
+                                        if (val.Trim() == "")
                                         {
                                             displayValue = "";
                                         }
