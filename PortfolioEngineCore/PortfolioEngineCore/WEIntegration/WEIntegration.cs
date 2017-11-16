@@ -131,7 +131,7 @@ namespace PortfolioEngineCore.WEIntegration
             //       </PostTimesheetData>
             //  don't know why Result tag there twice but thought safer to leave it alone
 
-            CStruct xTimesheets=null;
+            CStruct xTimesheets = null;
             CStruct xDataInputElement = xData.GetSubStruct("Data");
             if (xDataInputElement == null) xTimesheets = xData.GetSubStruct("Timesheets");
             else xTimesheets = xDataInputElement.GetSubStruct("Timesheets");
@@ -146,22 +146,101 @@ namespace PortfolioEngineCore.WEIntegration
             }
 
             SqlCommand SqlCommand;
-            SqlDataReader SqlReader;
+
             SqlTransaction transaction = null;
             string sCommand;
 
-            if (_PFECN.State != ConnectionState.Open)  _PFECN.Open();
+            if (_PFECN.State != ConnectionState.Open) _PFECN.Open();
 
             // we'll stash the PROJECT_IDs we get from the WEPIDs as we hit them, same for WRESIDs
             Dictionary<string, int> projectIDs = new Dictionary<string, int>();
+            Dictionary<int, DateTime> actualhours = new Dictionary<int, DateTime>();
             Dictionary<string, PfEResource> resourceIDs = new Dictionary<string, PfEResource>();
             PfEResource oResource;
-
+            List<PfECharge> pfeCharges = new List<PfECharge>();
             CStruct xResult = new CStruct();
             xResult.Initialize("Result");
 
             int lprocessedtimesheets = 0;
             int linvalidtimesheets = 0;
+
+            //Resourcee Id's
+            sCommand = "Select WRES_NT_ACCOUNT,WRES_ID,RES_NAME,WRES_RP_DEPT as DeptId, LV_VALUE as Department From EPG_RESOURCES r" +
+                        " Left Join EPGP_LOOKUP_VALUES lv On lv.LV_UID=r.WRES_RP_DEPT" +
+                                " Where r.WRES_NT_ACCOUNT is not null";
+            SqlCommand = new SqlCommand(sCommand, _PFECN);
+            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
+            {
+                while (SqlReader.Read())
+                {
+                    oResource = new PfEResource();
+                    string WRES_NT_ACCOUNT = DBAccess.ReadStringValue(SqlReader["WRES_NT_ACCOUNT"]);
+                    oResource.WresID = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
+                    oResource.DeptId = DBAccess.ReadIntValue(SqlReader["DeptId"]);
+                    oResource.Dept = DBAccess.ReadStringValue(SqlReader["Department"]);
+                    if (!resourceIDs.ContainsKey(WRES_NT_ACCOUNT))
+                    {
+                        resourceIDs.Add(WRES_NT_ACCOUNT, oResource);
+                    }
+                }
+            }
+
+            //Project Id's
+            sCommand = "Select PROJECT_ID,PROJECT_EXT_UID From EPGP_PROJECTS";
+            SqlCommand = new SqlCommand(sCommand, _PFECN);
+            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
+            {
+                string PROJECT_EXT_UID;
+                int PROJECT_ID;
+                while (SqlReader.Read())
+                {
+                    PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
+                    PROJECT_EXT_UID = DBAccess.ReadStringValue(SqlReader["PROJECT_ID"]);
+                    if (!projectIDs.ContainsKey(PROJECT_EXT_UID))
+                    {
+                        projectIDs.Add(PROJECT_EXT_UID, PROJECT_ID);
+                    }
+                }
+            }
+
+
+            // Pfe Charge
+            sCommand = "Select WEC_CHG_UID,WRES_ID,PROJECT_ID,WEC_MAJORCATEGORY,WEC_CATEGORY,WEC_DEPT_NAME,WEC_DEPT_UID From EPG_WE_CHARGES";
+            SqlCommand = new SqlCommand(sCommand, _PFECN);
+            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
+            {
+                while (SqlReader.Read())
+                {
+                    PfECharge pfeCharge = new PfECharge();
+                    pfeCharge.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEC_CHG_UID"]);
+                    pfeCharge.PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
+                    pfeCharge.WresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
+                    pfeCharge.CATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_CATEGORY"]);
+                    pfeCharge.DEPT_NAME = DBAccess.ReadStringValue(SqlReader["WEC_DEPT_NAME"]);
+                    pfeCharge.DEPT_Id = DBAccess.ReadIntValue(SqlReader["WEC_DEPT_UID"]);
+                    pfeCharge.MAJORCATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_MAJORCATEGORY"]);
+                    pfeCharges.Add(pfeCharge);
+                }
+            }
+
+
+
+            // Pfe Charge Date
+            List<PfEChargeDate> pfEChargeDates = new List<PfEChargeDate>();
+            sCommand = "Select WEH_CHG_UID,WEH_DATE From EPG_WE_ACTUALHOURS";
+            SqlCommand = new SqlCommand(sCommand, _PFECN);
+            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
+            {
+                while (SqlReader.Read())
+                {
+                    PfEChargeDate pfEChargeDate = new PfEChargeDate();
+                    pfEChargeDate.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEH_CHG_UID"]);
+                    pfEChargeDate.Date = DBAccess.ReadDateValue(SqlReader["WEH_DATE"]);
+                    pfEChargeDates.Add(pfEChargeDate);
+                }
+            }
+
+
             foreach (CStruct xTS in listTSs)
             {
                 string resource = xTS.GetStringAttr("Resource");
@@ -173,35 +252,11 @@ namespace PortfolioEngineCore.WEIntegration
                 bool bUpdateOK = true;
                 // have we hit this resource already? If not need to pick up info
                 oResource = null;
-                if (!resourceIDs.TryGetValue(resource, out oResource))
-                {
-                    // no point using TS Department here as unknown to WE
-                    sCommand = "Select WRES_ID,RES_NAME,WRES_RP_DEPT as DeptId, LV_VALUE as Department From EPG_RESOURCES r" +
-                                " Left Join EPGP_LOOKUP_VALUES lv On lv.LV_UID=r.WRES_RP_DEPT" +
-                                " Where r.WRES_NT_ACCOUNT=@NTLogin";
-                    SqlCommand = new SqlCommand(sCommand, _PFECN);
-                    SqlCommand.Parameters.AddWithValue("@NTLogin", resource);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        oResource=new PfEResource();
-                        oResource.WresID = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                        oResource.DeptId = DBAccess.ReadIntValue(SqlReader["DeptId"]);
-                        oResource.Dept = DBAccess.ReadStringValue(SqlReader["Department"]);
-                        resourceIDs.Add(resource, oResource);
-                    }
-                    SqlReader.Close();
-                }
+                oResource = resourceIDs.FirstOrDefault(a => a.Key == resource).Value;
                 if (oResource == null)
                 {
-                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1;}
+                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }
 
-                    // old drastic reaction to error
-                    //throw new PFEException((int)PFEError.PostTimesheetData, "Resource Not Found: " + resource);
-
-                    // errors not even reported now - per Jason June 2013: Users don't want to see these errors, they don't mean anything
-                    //CStruct xError = xResult.CreateSubStruct("Error");
-                    //xError.CreateCDataSection("Resource Not Found: " + resource);
                 }
                 else
                 {
@@ -227,36 +282,13 @@ namespace PortfolioEngineCore.WEIntegration
                         {
                             string PIExtId = xHours.GetStringAttr("Project");
                             int lProjID = 0;
-
-                            // have we hit this project already? If not need to pick up PROJECT_ID from dbs
-                            if (!projectIDs.TryGetValue(PIExtId, out lProjID))
-                            {
-                                sCommand = "Select PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                                SqlCommand = new SqlCommand(sCommand, _PFECN);
-                                SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                                SqlCommand.Transaction = transaction;
-                                SqlReader = SqlCommand.ExecuteReader();
-                                if (SqlReader.Read())
-                                {
-                                    lProjID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                                }
-                                SqlReader.Close();
-                            }
+                            lProjID = projectIDs.FirstOrDefault(a => a.Key == PIExtId).Value;
                             if (lProjID <= 0)
                             {
                                 if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }
-
-                                // old drastic reaction to error
-                                //if (transaction != null) transaction.Rollback();
-                                //throw new PFEException((int)PFEError.PostTimesheetData,"Project Not Found: " + resource + ", " + PIExtId);
-
-                                // errors not even reported now - June 2013
-                                //CStruct xError = xResult.CreateSubStruct("Error");
-                                //xError.CreateCDataSection("Project Not Found: " + resource + ", " + PIExtId);
                             }
                             else
                             {
-
                                 PfEChargeItem oCharge = new PfEChargeItem();
                                 oCharge.ProjectID = lProjID;
                                 oCharge.WresId = oResource.WresID;
@@ -266,25 +298,25 @@ namespace PortfolioEngineCore.WEIntegration
                                 oCharge.Category = xHours.GetStringAttr("Category");
                                 string sWorkDate = xHours.GetStringAttr("Date");
                                 DateTime dWorkdate = DateTime.Parse(sWorkDate);
-                                double dHours = xHours.GetDoubleAttr("Hours", 0)*100;
+                                double dHours = xHours.GetDoubleAttr("Hours", 0) * 100;
                                 int lType = xHours.GetIntAttr("Type");
 
                                 // we have a charge fully defined
                                 if (dWorkdate < periodstart || dWorkdate > periodend)
                                 {
-                                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }                                
-                                    
+                                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }
+
                                     // old drastic reaction to error
                                     //if (transaction != null) transaction.Rollback();
                                     //throw new PFEException((int) PFEError.PostTimesheetData,"Timesheet Information outside specified range: " + resource +", " + PIExtId);
-                                    
+
                                     // errors not even reported now - June 2013
                                     //CStruct xError = xResult.CreateSubStruct("Error");
                                     //xError.CreateCDataSection("Timesheet Information outside specified range: " + resource + ", " + PIExtId);
                                 }
                                 else
                                 {
-                                    SetCharge(transaction, oCharge, oCurrentCharge, dWorkdate, dHours, lType, ref ChgId);
+                                    SetCharge(transaction, pfeCharges, pfEChargeDates, oCharge, oCurrentCharge, dWorkdate, dHours, lType, ref ChgId);
                                     oCurrentCharge = oCharge;
                                 }
                             }
@@ -373,40 +405,23 @@ namespace PortfolioEngineCore.WEIntegration
         }
 
 
-        private bool SetCharge(SqlTransaction transaction, PfEChargeItem oCharge, PfEChargeItem oCurrentCharge, DateTime dWorkdate, double dHours, int lType, ref int ChgId)
+        private bool SetCharge(SqlTransaction transaction, List<PfECharge> pfeCharges, List<PfEChargeDate> pfEChargeDates, PfEChargeItem oCharge, PfEChargeItem oCurrentCharge, DateTime dWorkdate, double dHours, int lType, ref int ChgId)
         {
             SqlCommand SqlCommand;
             SqlDataReader SqlReader;
             string sCommand;
 
             // Are these hours for the same Charge as the prev one?
-            if (oCharge.ProjectID==oCurrentCharge.ProjectID && oCharge.WresId==oCurrentCharge.WresId  
-                            && oCharge.DeptId==oCurrentCharge.DeptId && oCharge.Dept==oCurrentCharge.Dept
-                            && oCharge.MajorCategory==oCurrentCharge.MajorCategory && oCharge.Category==oCurrentCharge.Category)
+            if (oCharge.ProjectID == oCurrentCharge.ProjectID && oCharge.WresId == oCurrentCharge.WresId
+                            && oCharge.DeptId == oCurrentCharge.DeptId && oCharge.Dept == oCurrentCharge.Dept
+                            && oCharge.MajorCategory == oCurrentCharge.MajorCategory && oCharge.Category == oCurrentCharge.Category)
             {
                 // use CHG_UID from previous time around
             }
             else
             {
                 // See if charge record we need already exists
-                ChgId = 0;
-                sCommand = "Select WEC_CHG_UID From EPG_WE_CHARGES" +
-                            " WHERE WRES_ID=@WresId and PROJECT_ID=@ProjId and WEC_MAJORCATEGORY = @MC and WEC_CATEGORY = @Cat" +
-                            " and WEC_DEPT_NAME = @DeptName and WEC_DEPT_UID = @DeptId";
-                SqlCommand = new SqlCommand(sCommand, _PFECN);
-                SqlCommand.Parameters.AddWithValue("@WresId", oCharge.WresId);
-                SqlCommand.Parameters.AddWithValue("@ProjId", oCharge.ProjectID);
-                SqlCommand.Parameters.AddWithValue("@MC", oCharge.MajorCategory);
-                SqlCommand.Parameters.AddWithValue("@Cat", oCharge.Category);
-                SqlCommand.Parameters.AddWithValue("@DeptName", oCharge.Dept);
-                SqlCommand.Parameters.AddWithValue("@DeptId", oCharge.DeptId);
-                SqlCommand.Transaction = transaction;
-                SqlReader = SqlCommand.ExecuteReader();
-                if (SqlReader.Read())
-                {
-                    ChgId = DBAccess.ReadIntValue(SqlReader["WEC_CHG_UID"]);
-                }
-                SqlReader.Close();
+                ChgId = pfeCharges.FirstOrDefault(a => a.WresId == oCharge.WresId && a.PROJECT_ID == oCharge.ProjectID && a.MAJORCATEGORY == oCharge.MajorCategory && a.CATEGORY == oCharge.Category && a.DEPT_NAME == oCharge.Dept && a.DEPT_Id == oCharge.DeptId).CHG_UID;
 
                 if (ChgId <= 0)
                 //  add new charge record
@@ -437,18 +452,7 @@ namespace PortfolioEngineCore.WEIntegration
             {
                 // see if we already have an ActualHours record for this date, if so update it, otherwise insert a new one
                 int oldChgId = 0;
-                sCommand = "Select WEH_CHG_UID From EPG_WE_ACTUALHOURS" +
-                            " WHERE WEH_CHG_UID=@ChgId and WEH_DATE=@Date";
-                SqlCommand = new SqlCommand(sCommand, _PFECN);
-                SqlCommand.Parameters.AddWithValue("@ChgId", ChgId);
-                SqlCommand.Parameters.AddWithValue("@Date", dWorkdate);
-                SqlCommand.Transaction = transaction;
-                SqlReader = SqlCommand.ExecuteReader();
-                if (SqlReader.Read())
-                {
-                    oldChgId = DBAccess.ReadIntValue(SqlReader["WEH_CHG_UID"]);
-                }
-                SqlReader.Close();
+                oldChgId = pfEChargeDates.FirstOrDefault(a => a.Date == dWorkdate).CHG_UID;
 
                 if (ChgId == oldChgId)
                 {
@@ -490,7 +494,7 @@ namespace PortfolioEngineCore.WEIntegration
 
         public DataTable GetPfeFields(int type)
         {
-            if(_PFECN.State != ConnectionState.Open)
+            if (_PFECN.State != ConnectionState.Open)
                 _PFECN.Open();
 
             SqlCommand oCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", _PFECN);
@@ -498,13 +502,13 @@ namespace PortfolioEngineCore.WEIntegration
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
 
             SqlDataReader dr = oCommand.ExecuteReader();
-            
+
             DataTable dt = new DataTable();
             dt.Columns.Add("epkField");
             dt.Columns.Add("epkFieldId");
             dt.Columns.Add("epkFieldType");
 
-            while(dr.Read())
+            while (dr.Read())
             {
                 int nFieldID = (int)dr["FIELD_ID"];
                 string sFieldName = (string)dr["FIELD_NAME"];
@@ -521,9 +525,9 @@ namespace PortfolioEngineCore.WEIntegration
 
         public DataTable GetPfeCostViews()
         {
-            if(_PFECN.State != ConnectionState.Open)
+            if (_PFECN.State != ConnectionState.Open)
                 _PFECN.Open();
-            
+
             DataTable dt = new DataTable();
             dt.Columns.Add("costView");
             dt.Columns.Add("costViewId");
@@ -532,7 +536,7 @@ namespace PortfolioEngineCore.WEIntegration
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
 
             SqlDataReader reader = oCommand.ExecuteReader();
-            while(reader.Read())
+            while (reader.Read())
             {
                 int nViewUID = (int)reader["VIEW_UID"];
                 string sViewName = (string)reader["VIEW_NAME"];
@@ -547,7 +551,7 @@ namespace PortfolioEngineCore.WEIntegration
 
         public string DisplayProjects(string data)   // pass in stuff like "<Projects>" + ids.ToLower() + "</Projects>"
         {
- 
+
             CStruct xData = new CStruct();
             CStruct xReply = new CStruct();
             xReply.Initialize("Reply");
@@ -566,8 +570,8 @@ namespace PortfolioEngineCore.WEIntegration
 
                 if (guidTicket == Guid.Empty)
                     guidTicket = Guid.NewGuid();
-                
-                if(_PFECN.State != ConnectionState.Open) _PFECN.Open();
+
+                if (_PFECN.State != ConnectionState.Open) _PFECN.Open();
 
                 sCommand = "INSERT INTO EPG_DATA_CACHE(DC_TICKET,DC_TIMESTAMP,DC_DATA) VALUES(@ticket,@timestamp,@cachedata)";
                 SqlCommand = new SqlCommand(sCommand, _PFECN);
@@ -614,6 +618,21 @@ namespace PortfolioEngineCore.WEIntegration
             public string Dept;
             public string MajorCategory;
             public string Category;
+        }
+        private class PfECharge
+        {
+            public int CHG_UID;
+            public int WresId;
+            public int PROJECT_ID;
+            public string CATEGORY;
+            public string MAJORCATEGORY;
+            public string DEPT_NAME;
+            public int DEPT_Id;
+        }
+        private class PfEChargeDate
+        {
+            public int CHG_UID;
+            public DateTime Date;
         }
         #endregion Private Classes
 
