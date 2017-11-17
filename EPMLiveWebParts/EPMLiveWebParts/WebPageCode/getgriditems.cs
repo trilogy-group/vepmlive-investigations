@@ -321,18 +321,12 @@ namespace EPMLiveWebParts
                 addGroups(curWeb);
 
                 //DoesUserHavePermissions is slowing the process in addmenu for every item so we are setting flags. 
-                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
-                    DoesUserHavePermissionsViewListItems=true;
-                if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
-                    DoesUserHavePermissionsEditListItems = true;
-                if (list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions))
-                    DoesUserHavePermissionsManagePermissions = true;
-                if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
-                    DoesUserHavePermissionsDeleteListItems = true;
-                if (list.DoesUserHavePermissions(SPBasePermissions.ViewVersions))
-                    DoesUserHavePermissionsViewVersions = true;
-                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
-                    DoesUserHavePermissionsApproveItems = true;
+                DoesUserHavePermissionsViewListItems = list.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
+                DoesUserHavePermissionsEditListItems = list.DoesUserHavePermissions(SPBasePermissions.EditListItems);
+                DoesUserHavePermissionsManagePermissions = list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions);
+                DoesUserHavePermissionsDeleteListItems = list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems);
+                DoesUserHavePermissionsViewVersions = list.DoesUserHavePermissions(SPBasePermissions.ViewVersions);
+                DoesUserHavePermissionsApproveItems = list.DoesUserHavePermissions(SPBasePermissions.ApproveItems);
 
                 addItems();
 
