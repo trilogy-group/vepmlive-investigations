@@ -24,7 +24,7 @@ namespace WorkEnginePPM.Jobs.Tests
             int opencon = 0;
             int closecon = 0;
             PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(Cleanup));
-           
+
             string project_list_uid = string.Empty; ;
             //cmd.Parameters.AddWithValue("@siteguid",Guid.NewGuid());
             using (var context = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
@@ -64,7 +64,63 @@ namespace WorkEnginePPM.Jobs.Tests
                     PostTimesheetDataString = (_str) => { return "<timesheet Status=\"1\"></timesheet>"; }
                 };
                 ShimHttpUtility.HtmlEncodeString = (_str) => { return ""; };
-                
+                var rowCounter = 0;
+
+
+
+                ShimSqlDataReader.AllInstances.Read = (sender) =>
+                {
+                    rowCounter++;
+                    return rowCounter <= 1;
+                };
+                ShimSqlCommand.AllInstances.ExecuteReader = (a) =>
+                {
+                    return new ShimSqlDataReader()
+                    {
+                        ItemGetString = (coloumnName) =>
+                        {
+                            if (rowCounter == 1)
+                            {
+                                switch (coloumnName)
+                                {
+                                    case "username":
+                                        return "username";
+                                    case "period_start":
+                                        return "2016-11-01 00:00:00.000";
+                                    case "period_end":
+                                        return "2016-11-30 00:00:00.000";
+                                    case "project_list_uid":
+                                        return Convert.ToString(project_list_uid);
+                                    case "web_uid":
+                                        return Guid.NewGuid().ToString();
+                                    case "project_id":
+                                        return "5";
+                                    case "ts_item_date":
+                                        return "2016-11-30 00:00:00.000";
+                                    
+                                    case "TotalHours":
+                                        return "5";
+                                    case "TYPEID":
+                                        return "TYPEID";
+                                    case "TSTYPE_NAME":
+                                        return "TSTYPE_NAME";
+                                    case "LIST":
+                                        return "Project Center";
+                                    case  "list_uid":
+                                         return Guid.NewGuid().ToString();
+                                    default:
+                                        return "SomeStrigValue";
+                                        
+                                }
+                            }
+                            else {
+                                return "SomeStrigValue";
+                            }
+                            
+                        }
+                    };
+                    
+                };
                 ShimCleanup.AllInstances.GetDatasetDataSetSqlCommand = (instance, sds, scmd) =>
                 {
                     DataTable dt = new DataTable();
@@ -80,7 +136,7 @@ namespace WorkEnginePPM.Jobs.Tests
                     dt.Columns.Add("TSTYPE_NAME");
                     dt.Columns.Add("LIST");
                     dt.Columns.Add("list_uid");
-                    
+
                     DataRow dr = dt.NewRow();
                     dr["username"] = "username";
                     dr["period_start"] = "2016-11-01 00:00:00.000";
@@ -93,7 +149,7 @@ namespace WorkEnginePPM.Jobs.Tests
                     dr["TYPEID"] = "TYPEID";
                     dr["TSTYPE_NAME"] = "Name";
                     dr["LIST"] = "Project Center";
-                    dr["list_uid"]= Guid.NewGuid().ToString();
+                    dr["list_uid"] = Guid.NewGuid().ToString();
                     dt.Rows.Add(dr);
                     DataSet ds = new DataSet();
                     ds.Tables.Add(dt);
@@ -117,8 +173,8 @@ namespace WorkEnginePPM.Jobs.Tests
             };
 
                 objToTestPrivateMethod.SetField("sbErrors", new StringBuilder());
-                
-                
+
+
                 //when project_list_uid is not null
                 //Act                
                 project_list_uid = Guid.NewGuid().ToString();

@@ -191,6 +191,7 @@ namespace EPMLiveCore.ReportHelper
                     {
                         message = "No timesheet data exists.";
                         hasErrors = true;
+                        return hasErrors;
                     }
 
                     //Delete Timesheetdata start 

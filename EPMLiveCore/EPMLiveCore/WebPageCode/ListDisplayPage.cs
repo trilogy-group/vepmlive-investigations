@@ -17,13 +17,13 @@ namespace EPMLiveCore
         private SortedList<string, SPField> displayableFields = new SortedList<string, SPField>();
         private List<SPGroup> groups = new List<SPGroup>();
         private StringBuilder computeFieldsScript = new StringBuilder();
-        private Dictionary<string, Dictionary<string, string>> hiddenFields = new Dictionary<string, Dictionary<string, string>>();
+        
         private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
         
         protected Button OK = new Button();
         protected Button Cancel = new Button();
 
-        protected override void OnLoad(EventArgs e)
+        protected override void OnLoad(EventArgs e) 
         {
             this.Title = "Editable Fields";
 
@@ -44,15 +44,17 @@ namespace EPMLiveCore
                     if (MatchROFields(field.Id))
                          displayableFields.Add(field.Title, field);
                 }
-            }
+            } 
 
             foreach (SPGroup group in this.CurrentList.ParentWeb.Groups)
                 groups.Add(group);
-
+            this.Cancel.PostBackUrl = string.Format("~/_layouts/listedit.aspx?List={0}", CurrentList.ID.ToString());
+            if (IsPostBack)
+                return;
             pageRender = this.PrepareRenderPage();
             RegisterScript();
 
-            this.Cancel.PostBackUrl = string.Format("~/_layouts/listedit.aspx?List={0}", CurrentList.ID.ToString());
+            
         }
 
         protected string RenderPage()
@@ -70,24 +72,57 @@ namespace EPMLiveCore
                 return currentList;
             }
         }
-
+        const int PAGE_SIZE = 5;
         private string PrepareRenderPage()
         {
             StringBuilder result = new StringBuilder();
+            int page = 0;
+            if (Request.QueryString["Page"] != null)
+                int.TryParse(Request.QueryString["Page"], out page);
+            string currentQueryString = Request.QueryString.ToString().Replace("&Page=" + page, "");
 
-            result.Append("<table style=\"width:100%\" cellpadding=\"0\" cellspacing=\"0\">");
-
-            foreach (SPField field in displayableFields.Values)
-            {                
-                result.Append("<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>");
-                if (MatchROFields(field.Id) == false)
-                    result.Append(string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
-                else
-                    result.Append(string.Format("<tr style=\"display:none;\"><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
-                result.Append(string.Format("<td class=\"ms-authoringcontrols\">{0}</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>", RenderOptions(field)));                
+            List<SPField> fields = new List<SPField>();
+            foreach (SPField validField in displayableFields.Values)
+            {
+                if (MatchROFields(validField.Id) == false)
+                {
+                    fields.Add(validField);
+                }
             }
+            result.Append("\n" + "<style>.pageNumber, .pageNumber:visited, .pageNumber:active { color:inherit; text-decoration:none;}</style>");
+ 
+           result.Append("\n" +  (page > 0? "<a class='pageNumber' href ='?" + currentQueryString + "&Page=" + (page - 1) + "'>Previous</a>":"<span>Previous</span>") + "<span>&nbsp;&nbsp;&nbsp;</span>");
 
-            result.Append("</table>");
+            for (int i = 0; i < fields.Count; i+=PAGE_SIZE)
+            {
+                int pageNumber = ((i + PAGE_SIZE - 1) / PAGE_SIZE);
+                result.Append("\n" + "<a class='pageNumber' title='" + fields[i].Title + "' href='?" + currentQueryString + "&Page=" +  pageNumber  + "'>" + (page ==pageNumber? "<b>[" + pageNumber + "]</b>":"[" + pageNumber + "]") +"</a>&nbsp;");
+            }
+           
+          
+           result.Append("\n" + "<span>&nbsp;&nbsp;&nbsp;</span>" + (((page + 1) * PAGE_SIZE) < fields.Count? "<a class='pageNumber' href = '?" + currentQueryString + "&Page=" + (page + 1) + "'>Next</a>" : "<span>Next</span>") );
+
+            result.Append("\n" + "<br><br><br>");
+
+            for (int i = page * PAGE_SIZE; i < Math.Min(fields.Count, (page + 1) * PAGE_SIZE); i++)
+            {
+                SPField field = fields[i];
+
+                result.Append("\n" +  "<table style=\"width:100%\" cellpadding=\"0\" cellspacing=\"0\">");
+                result.Append("\n" +  "<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>");
+
+                result.Append("\n" +  string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));
+                //else
+                //    result.Append("\n" +  string.Format("<tr style=\"display:none;\"><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));
+                result.Append("\n" +  "<td class=\"ms-authoringcontrols\">");
+                result.Append("\n" + RenderOptions(field));
+                result.Append("\n" +  "</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>");
+                result.Append("\n" +  "</table>");
+
+            }
+            
+
+           
 
             return result.ToString();
         }
@@ -109,61 +144,61 @@ namespace EPMLiveCore
             // New mode
             if (field.Type != SPFieldType.Calculated)
             {
-                result.Append("<table style=\"width: 100%\">");
-                result.Append("<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("On new item, display field : ");
-                result.Append("</td><td class=\"ms-authoringcontrols\">");
+                result.Append("\n" + "<table style=\"width: 100%\">");
+                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
+                result.Append("\n" + "On new item, display field : ");
+                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
                 if (field.Required)
-                    result.Append("Always (This field is required)");
+                    result.Append("\n" + "Always (This field is required)");
                 else
                 {
-                    result.Append(RenderOption(field, "New", ref showWhere, ref showEdit));
-                    result.Append(RenderPanelWhere(field, "New", ref showWhere));
+                    result.Append("\n" + RenderOption(field, "New", ref showWhere, ref showEdit));
+                    result.Append("\n" + RenderPanelWhere(field, "New", ref showWhere));
                     UpdateGlobalScript(field, "New");
                 }
-                result.Append("</td></tr>");
-                result.Append("</table>");
+                result.Append("\n" + "</td></tr>");
+                result.Append("\n" + "</table>");
             }
             // Display mode
-            result.Append("<table style=\"width: 100%\">");
-            result.Append("<tr><td style=\"width: 150px;\" class=\"ms-authoringcontrols\">");
-            result.Append("On display item, display field : ");
-            result.Append("</td><td class=\"ms-authoringcontrols\">");
-            result.Append(RenderOption(field, "Display", ref showWhere, ref showEdit));
-            result.Append(RenderPanelWhere(field, "Display", ref showWhere));
+            result.Append("\n" + "<table style=\"width: 100%\">");
+            result.Append("\n" + "<tr><td style=\"width: 150px;\" class=\"ms-authoringcontrols\">");
+            result.Append("\n" + "On display item, display field : ");
+            result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
+            result.Append("\n" + RenderOption(field, "Display", ref showWhere, ref showEdit));
+            result.Append("\n" + RenderPanelWhere(field, "Display", ref showWhere));
             UpdateGlobalScript(field, "Display");
-            result.Append("</td></tr>");
-            result.Append("</table>");
+            result.Append("\n" + "</td></tr>");
+            result.Append("\n" + "</table>");
 
             // Edit mode
             //if (field.Type != SPFieldType.Calculated)
             showEdit = false;
             {
-                result.Append("<table style=\"width: 100%\">");
-                result.Append("<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("On edit item, display field : ");
-                result.Append("</td><td class=\"ms-authoringcontrols\">");
-                result.Append(RenderOption(field, "Edit", ref showWhere, ref showEdit));
-                result.Append(RenderPanelWhere(field, "Edit", ref showWhere));
+                result.Append("\n" + "<table style=\"width: 100%\">");
+                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
+                result.Append("\n" + "On edit item, display field : ");
+                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
+                result.Append("\n" + RenderOption(field, "Edit", ref showWhere, ref showEdit));
+                result.Append("\n" + RenderPanelWhere(field, "Edit", ref showWhere));
                 UpdateGlobalScript(field, "Edit");
-                result.Append("</td></tr>");
-                result.Append("</table>");
+                result.Append("\n" + "</td></tr>");
+                result.Append("\n" + "</table>");
             }
 
             if (field.Type != SPFieldType.Calculated)
             {
-                result.Append("<table style=\"width: 100%\" id=\"Editable" + field.InternalName + "Edit\" style=\"display:");
+                result.Append("\n" + "<table style=\"width: 100%\" id=\"Editable" + field.InternalName + "Edit\" style=\"display:");
                 if (!showEdit)
-                    result.Append("none");                        
-                result.Append(";\">");
-                result.Append("<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
-                result.Append("On edit item, editable: ");
-                result.Append("</td><td class=\"ms-authoringcontrols\">");
-                result.Append(RenderOption(field, "Editable", ref showWhere, ref showEdit));
-                result.Append(RenderPanelWhere(field, "Editable", ref showWhere));
+                    result.Append("\n" + "none");                        
+                result.Append("\n" + ";\">");
+                result.Append("\n" + "<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
+                result.Append("\n" + "On edit item, editable: ");
+                result.Append("\n" + "</td><td class=\"ms-authoringcontrols\">");
+                result.Append("\n" + RenderOption(field, "Editable", ref showWhere, ref showEdit));
+                result.Append("\n" + RenderPanelWhere(field, "Editable", ref showWhere));
                 UpdateGlobalScript(field, "Editable");
-                result.Append("</td></tr>");
-                result.Append("</table>");
+                result.Append("\n" + "</td></tr>");
+                result.Append("\n" + "</table>");
             }
             return result.ToString();
         }
@@ -171,26 +206,29 @@ namespace EPMLiveCore
         private void UpdateGlobalScript(SPField field, string mode)
         {
             computeFieldsScript.Append(String.Format("ComputeField(\"{0}{1}\");", field.InternalName, mode));
-            if (!hiddenFields.ContainsKey(field.InternalName))
-                hiddenFields.Add(field.InternalName, new Dictionary<string, string>());
-
-            hiddenFields[field.InternalName].Add(mode, String.Format("Hidden{0}{1}", field.InternalName, mode));
+           
             this.ClientScript.RegisterHiddenField(String.Format("Hidden{0}{1}", field.InternalName, mode), "");
         }
 
         protected void SaveCustomDisplay(object sender, EventArgs e)
         {
-            fieldProperties = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<string, Dictionary<string, string>> newFieldProperties = new Dictionary<string, Dictionary<string, string>>();
             this.CurrentList.ParentWeb.AllowUnsafeUpdates = true;
-
-            foreach (string field in hiddenFields.Keys)
+            string[] modes = new string[] { "New", "Display", "Edit", "Editable" };
+            foreach (SPField currentField in displayableFields.Values)
             {
-                fieldProperties.Add(field, new Dictionary<string, string>());
-                SPField fld;
-                foreach (string mode in hiddenFields[field].Keys)
+                string field = currentField.InternalName;
+                newFieldProperties.Add(field, new Dictionary<string, string>());
+
+
+                foreach (string mode in modes)
                 {
-                    fld = this.CurrentList.Fields.GetFieldByInternalName(field);
-                    string condition = HttpContext.Current.Request.Params[hiddenFields[field][mode]].Split(";".ToCharArray())[0].ToLower();
+                    string hiddenValue = HttpContext.Current.Request.Params[string.Format("Hidden{0}{1}", field, mode)];
+                    if (string.IsNullOrEmpty(hiddenValue))
+                        continue;
+                    string condition = hiddenValue.Split(";".ToCharArray())[0].ToLower();
+                    SPField fld = this.CurrentList.Fields.GetFieldByInternalName(field);
+
                     if (condition == "always" || condition == "where")
                     {
                         switch (mode)
@@ -226,7 +264,7 @@ namespace EPMLiveCore
                         fld.Update();
                     }
                     catch { }
-                    fieldProperties[field].Add(mode, HttpContext.Current.Request.Params[hiddenFields[field][mode]]);
+                    newFieldProperties[field].Add(mode, hiddenValue);
                 }
             }
 
@@ -238,7 +276,7 @@ namespace EPMLiveCore
             //this.CurrentList.ParentWeb.Properties.Update();
 
             GridGanttSettings gSettings = new GridGanttSettings(CurrentList);
-            gSettings.DisplaySettings = ListDisplayUtils.ConvertToString(fieldProperties);
+            gSettings.DisplaySettings = ListDisplayUtils.ConvertToString(newFieldProperties);
             gSettings.SaveSettings(CurrentList);
 
             //CoreFunctions.setListSetting(CurrentList, "DisplaySettings", ListDisplayUtils.ConvertToString(fieldProperties));
@@ -264,7 +302,7 @@ namespace EPMLiveCore
         //        }
         //        catch { }
         //    }
-        //    result.Append(String.Format("<input type=\"checkbox\" value=\"true\" id=\"Option{0}ro\"{1}> Read-Only", field.InternalName, chk));
+        //    result.Append("\n" + String.Format("<input type=\"checkbox\" value=\"true\" id=\"Option{0}ro\"{1}> Read-Only", field.InternalName, chk));
 
         //    return result.ToString();
         //}
@@ -272,7 +310,7 @@ namespace EPMLiveCore
         private string RenderOption(SPField field, string mode, ref bool showWhere, ref bool showEdit)
         {
             StringBuilder result = new StringBuilder();                        
-            result.Append(String.Format("<select id=\"Option{0}{1}\" runat=\"server\" onchange=\"javascript:OptionChange('{0}{1}');\" style=\"width: 100px;\">", field.InternalName, mode));
+            result.Append("\n" + String.Format("<select id=\"Option{0}{1}\" runat=\"server\" onchange=\"javascript:OptionChange('{0}{1}');\" style=\"width: 100px;\">", field.InternalName, mode));
 
             
             string optionValueAlways = "";
@@ -361,9 +399,9 @@ namespace EPMLiveCore
                     }
                 }
 
-                result.Append(String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
-                result.Append(String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
-                result.Append(String.Format("<option {0}value=\"where\">Where</option>", optionValueWhere));
+                result.Append("\n" + String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
+                result.Append("\n" + String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
+                result.Append("\n" + String.Format("<option {0}value=\"where\">Where</option>", optionValueWhere));
                 
                 showWhere = sSelectOption.Equals("where") ? true : false;
             }
@@ -429,15 +467,15 @@ namespace EPMLiveCore
                         break;
                 }
 
-                result.Append(String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
-                result.Append(String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
-                result.Append("<option value=\"where\">Where</option>");
+                result.Append("\n" + String.Format("<option {0}value=\"always\">Always</option>", optionValueAlways));
+                result.Append("\n" + String.Format("<option {0}value=\"never\">Never</option>", optionValueNever));
+                result.Append("\n" + "<option value=\"where\">Where</option>");
 
                 showWhere = false;
             }
 
-            result.Append("</select>");
-            result.Append("</td></tr>");
+            result.Append("\n" + "</select>");
+            result.Append("\n" + "</td></tr>");
 
             return result.ToString();
         }
@@ -447,11 +485,11 @@ namespace EPMLiveCore
             StringBuilder result = new StringBuilder();
 
             if (showWhere)
-                result.Append(String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:inline;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
+                result.Append("\n" + String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:inline;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
             else
-                result.Append(String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:none;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
+                result.Append("\n" + String.Format("<tr id=\"RowOptionPanel{0}{1}\" style=\"display:none;\"><td style=\"width: 150px;\" ></td><td class=\"ms-authoringcontrols\">", field.InternalName, mode));
 
-            result.Append(RenderWhere(field, mode));
+            result.Append("\n" + RenderWhere(field, mode));
             showWhere = false;
 
             return result.ToString();
@@ -461,8 +499,8 @@ namespace EPMLiveCore
         {
             StringBuilder result = new StringBuilder();
 
-            result.Append("<table cellpadding=\"0px\" cellspacing=\"0px\" style=\"width: 100%;\">");
-            result.Append("<tr><td>");
+            result.Append("\n" + "<table cellpadding=\"0px\" cellspacing=\"0px\" style=\"width: 100%;\">");
+            result.Append("\n" + "<tr><td>");
 
             if ((fieldProperties != null) && (fieldProperties.ContainsKey(field.InternalName)) && (fieldProperties[field.InternalName].ContainsKey(mode)))
             {
@@ -493,142 +531,142 @@ namespace EPMLiveCore
 
                     if (memModeValue.Equals("where"))
                     {
-                        result.Append(String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
+                        result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
                         if (memOptionFieldWhere.Equals("[Me]"))
                         {
-                            result.Append("<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                            result.Append("<option value=\"[Field]\">Field</option>");
+                            result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
+                            result.Append("\n" + "<option value=\"[Field]\">Field</option>");
                         }
                         else
                         {
-                            result.Append("<option selected=\"selected\" value=\"[Field]\">Field</option>");
-                            result.Append("<option value=\"[Me]\">[Me]</option>");
+                            result.Append("\n" + "<option selected=\"selected\" value=\"[Field]\">Field</option>");
+                            result.Append("\n" + "<option value=\"[Me]\">[Me]</option>");
                         }
-                        result.Append("</select>");
+                        result.Append("\n" + "</select>");
 
                         if (memOptionFieldWhere.Equals("[Me]"))
                         {
-                            result.Append(String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
+                            result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
                         }
                         else
                         {
-                            result.Append(String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" >", field.InternalName, mode));
+                            result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" >", field.InternalName, mode));
                         }
                         foreach (SPField fieldItem in displayableFields.Values)
                         {
                             if (memOptionValueFieldNameWhere.Equals(fieldItem.InternalName))
-                                result.Append(String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
+                                result.Append("\n" + String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
                             else
-                                result.Append(String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
+                                result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
                         }
                         //
-                        result.Append("</select>");
+                        result.Append("\n" + "</select>");
 
 
 
-                        result.Append(String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
+                        result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
                         if (memOptionFieldWhere.Equals("[Me]"))
                         {
-                            result.Append(String.Format("<option {0}value=\"IsInGroup\">Is in group</option>", memOptionConditionWhere.Equals("IsInGroup") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsNotInGroup\">Is not in group</option>", memOptionConditionWhere.Equals("IsNotInGroup") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsInGroup\">Is in group</option>", memOptionConditionWhere.Equals("IsInGroup") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsNotInGroup\">Is not in group</option>", memOptionConditionWhere.Equals("IsNotInGroup") ? "selected=\"selected\" " : ""));
                         }
                         else
                         {
-                            result.Append(String.Format("<option {0}value=\"IsEqualTo\">Is equal to</option>", memOptionConditionWhere.Equals("IsEqualTo") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsNotEqualTo\">Is not equal to</option>", memOptionConditionWhere.Equals("IsNotEqualTo") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsGreaterThan\">Is greater than</option>", memOptionConditionWhere.Equals("IsGreaterThan") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsLessThan\">Is less than</option>", memOptionConditionWhere.Equals("IsLessThan") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsGreaterThanOrEqual\">Is greater than or equal to</option>", memOptionConditionWhere.Equals("IsGreaterThanOrEqual") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"IsLessThanOrEqual\">Is less than or equal to</option>", memOptionConditionWhere.Equals("IsLessThanOrEqual") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"BeginWith\">Begins with</option>", memOptionConditionWhere.Equals("BeginWith") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"EndWith\">Ends with</option>", memOptionConditionWhere.Equals("EndWith") ? "selected=\"selected\" " : ""));
-                            result.Append(String.Format("<option {0}value=\"Contains\">Contains</option>", memOptionConditionWhere.Equals("Contains") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsEqualTo\">Is equal to</option>", memOptionConditionWhere.Equals("IsEqualTo") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsNotEqualTo\">Is not equal to</option>", memOptionConditionWhere.Equals("IsNotEqualTo") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsGreaterThan\">Is greater than</option>", memOptionConditionWhere.Equals("IsGreaterThan") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsLessThan\">Is less than</option>", memOptionConditionWhere.Equals("IsLessThan") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsGreaterThanOrEqual\">Is greater than or equal to</option>", memOptionConditionWhere.Equals("IsGreaterThanOrEqual") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"IsLessThanOrEqual\">Is less than or equal to</option>", memOptionConditionWhere.Equals("IsLessThanOrEqual") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"BeginWith\">Begins with</option>", memOptionConditionWhere.Equals("BeginWith") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"EndWith\">Ends with</option>", memOptionConditionWhere.Equals("EndWith") ? "selected=\"selected\" " : ""));
+                            result.Append("\n" + String.Format("<option {0}value=\"Contains\">Contains</option>", memOptionConditionWhere.Equals("Contains") ? "selected=\"selected\" " : ""));
                         }
-                        result.Append("</select>");
+                        result.Append("\n" + "</select>");
 
                         if (memOptionFieldWhere.Equals("[Me]"))
                         {
-                            result.Append(String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:inline\">", field.InternalName, mode));
+                            result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:inline\">", field.InternalName, mode));
                             foreach (SPGroup group in groups)
                                 if (memOptionValueFieldWhere.Equals(group.Name))
-                                    result.Append(String.Format("<option {0}value=\"{1}\" selected=\"selected\" >{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
+                                    result.Append("\n" + String.Format("<option {0}value=\"{1}\" selected=\"selected\" >{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
                                 else
-                                    result.Append(String.Format("<option {0}value=\"{1}\">{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
+                                    result.Append("\n" + String.Format("<option {0}value=\"{1}\">{2}</option>", memOptionValueUserWhere.Equals(group.Name) ? "selected=\"selected\" " : "", group.Name, group.Name));
                         }
                         else
                         {
-                            result.Append(String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:none\">", field.InternalName, mode));
+                            result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px; display:none\">", field.InternalName, mode));
                             foreach (SPGroup group in groups)
                                 if (memOptionValueFieldWhere.Equals(group.Name))
-                                    result.Append(String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", group.Name, group.Name));
+                                    result.Append("\n" + String.Format("<option selected=\"selected\" value=\"{0}\">{1}</option>", group.Name, group.Name));
                                 else
-                                    result.Append(String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
+                                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
                         }
-                        result.Append("</select>");
+                        result.Append("\n" + "</select>");
 
                         if (memOptionFieldWhere.Equals("[Me]"))
-                            result.Append(String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
+                            result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
                         else
-                            result.Append(String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: inline\" value=\"{2}\" />", field.InternalName, mode, memOptionValueFieldWhere));
+                            result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: inline\" value=\"{2}\" />", field.InternalName, mode, memOptionValueFieldWhere));
                     }
                     else
                     {
-                        result.Append(String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
-                        result.Append("<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                        result.Append("<option value=\"[Field]\">Field</option>");
-                        result.Append("</select>");
+                        result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
+                        result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
+                        result.Append("\n" + "<option value=\"[Field]\">Field</option>");
+                        result.Append("\n" + "</select>");
 
-                        result.Append(String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
+                        result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
                         foreach (SPField fieldItem in displayableFields.Values)
-                            result.Append(String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
+                            result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
 
-                        result.Append("</select>");
+                        result.Append("\n" + "</select>");
 
-                        result.Append(String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                        result.Append("<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
-                        result.Append("<option value=\"IsNotInGroup\">Is not in group</option>");
-                        result.Append("</select>");
+                        result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
+                        result.Append("\n" + "<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
+                        result.Append("\n" + "<option value=\"IsNotInGroup\">Is not in group</option>");
+                        result.Append("\n" + "</select>");
 
-                        result.Append(String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
+                        result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
                         foreach (SPGroup group in groups)
-                            result.Append(String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
-                        result.Append("</select>");
+                            result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
+                        result.Append("\n" + "</select>");
 
-                        result.Append(String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
+                        result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
                     }
                 }
             }
             else
             {
-                result.Append(String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
-                result.Append("<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
-                result.Append("<option value=\"[Field]\">Field</option>");
-                result.Append("</select>");
+                result.Append("\n" + String.Format("<select id=\"OptionFieldWhere{0}{1}\" runat=\"server\" onchange=\"javascript:OptionFieldWhereChange('{0}{1}');\">", field.InternalName, mode));
+                result.Append("\n" + "<option selected=\"selected\" value=\"[Me]\">[Me]</option>");
+                result.Append("\n" + "<option value=\"[Field]\">Field</option>");
+                result.Append("\n" + "</select>");
 
-                result.Append(String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
+                result.Append("\n" + String.Format("<select id=\"OptionFieldNameWhere{0}{1}\" runat=\"server\" style=\"display:none\" >", field.InternalName, mode));
                 foreach (SPField fieldItem in displayableFields.Values)
-                    result.Append(String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
+                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", fieldItem.InternalName, fieldItem.Title));
                 //
-                result.Append("</select>");
+                result.Append("\n" + "</select>");
 
-                result.Append(String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
-                result.Append("<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
-                result.Append("<option value=\"IsNotInGroup\">Is not in group</option>");
-                result.Append("</select>");
+                result.Append("\n" + String.Format("<select id=\"OptionConditionWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
+                result.Append("\n" + "<option selected=\"selected\" value=\"IsInGroup\">Is in group</option>");
+                result.Append("\n" + "<option value=\"IsNotInGroup\">Is not in group</option>");
+                result.Append("\n" + "</select>");
 
-                result.Append(String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
+                result.Append("\n" + String.Format("<select id=\"OptionValueUserWhere{0}{1}\" runat=\"server\" style=\"width: 200px\">", field.InternalName, mode));
                 foreach (SPGroup group in groups)
-                    result.Append(String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
-                result.Append("</select>");
+                    result.Append("\n" + String.Format("<option value=\"{0}\">{1}</option>", group.Name, group.Name));
+                result.Append("\n" + "</select>");
 
-                result.Append(String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
+                result.Append("\n" + String.Format("<input id=\"OptionValueFieldWhere{0}{1}\" class=\"ms-long\" style=\"width: 200px; display: none\" />", field.InternalName, mode));
             }
 
-            //result.Append(String.Format("&nbsp<a id=\"OptionAddMoreWhere{0}{1}\" class=\"ms-authoringcontrols\" style=\"cursor: pointer;\" onclick=\"javascript:AddMoreCondition('OptionAddMoreWhere{0}{1}','{0}{1}');\">Add more condition ...</a>", field.InternalName, mode));        
-            result.Append(String.Format("<input id=\"Hidden{0}{1}\" type=\"hidden\" />", field.InternalName, mode));
+            //result.Append("\n" + String.Format("&nbsp<a id=\"OptionAddMoreWhere{0}{1}\" class=\"ms-authoringcontrols\" style=\"cursor: pointer;\" onclick=\"javascript:AddMoreCondition('OptionAddMoreWhere{0}{1}','{0}{1}');\">Add more condition ...</a>", field.InternalName, mode));        
+            result.Append("\n" + String.Format("<input id=\"Hidden{0}{1}\" type=\"hidden\" />", field.InternalName, mode));
 
-            result.Append("</td></tr>");
-            result.Append("</table>");
+            result.Append("\n" + "</td></tr>");
+            result.Append("\n" + "</table>");
 
             return result.ToString();
         }
@@ -786,7 +824,7 @@ namespace EPMLiveCore
                                                 senderControl.parentNode.appendChild(newLabelAnd);
                                                 senderControl.parentNode.appendChild(newOptionAnd);
                                                 senderControl.parentNode.appendChild(newLabelOr);
-                                                senderControl.parentNode.appendChild(newOptionOr);
+                                                senderControl.parentNode.appendChild(newOptionOr);  
                                             }";
         }
     }
