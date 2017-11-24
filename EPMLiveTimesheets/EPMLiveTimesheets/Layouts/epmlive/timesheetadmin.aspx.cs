@@ -392,7 +392,7 @@ namespace TimeSheets
                 if (Page.IsPostBack)
                     sFields = Request["input" + list.Replace(" ", "_")];
                 else
-                    sFields = EPMLiveCore.CoreFunctions.getConfigSetting(configweb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView.Url));
+                    sFields = EPMLiveCore.CoreFunctions.getConfigSetting(configweb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView == null ? splist.DefaultViewUrl : splist.DefaultView.Url));
                 inputData += "<input type='hidden' name='input" + list.Replace(" ", "_") + "' id='input" + list.Replace(" ", "_") + "' value='" + sFields + "'>\r\n";
             }
         }
@@ -508,7 +508,7 @@ namespace TimeSheets
                             catch { }
                             if (splist != null)
                             {
-                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView.Url), Request["input" + list.Replace(" ", "_")]);
+                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView == null ? splist.DefaultViewUrl : splist.DefaultView.Url), Request["input" + list.Replace(" ", "_")]);
                             }
                         }
                         {
@@ -542,7 +542,7 @@ namespace TimeSheets
                                         catch { }
                                         if (splist != null)
                                         {
-                                            EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView.Url), Request["inputResources"]);
+                                            EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView == null ? splist.DefaultViewUrl : splist.DefaultView.Url), Request["inputResources"]);
                                         }
                                         if (resWeb.ID != SPContext.Current.Web.ID)
                                             resWeb.Close();
@@ -560,7 +560,7 @@ namespace TimeSheets
                             catch { }
                             if (splist != null)
                             {
-                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView.Url), Request["inputProject_Center"]);
+                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(splist.DefaultView == null ? splist.DefaultViewUrl : splist.DefaultView.Url), Request["inputProject_Center"]);
                             }
                         }
                     }
