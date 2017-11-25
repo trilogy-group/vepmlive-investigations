@@ -404,7 +404,7 @@ namespace TimeSheets
 
         public static void processMeta(SPWeb iWeb, SPList iList, SPListItem li, Guid newTS, string project, SqlConnection cn, SPList pList)
         {
-            string[] fields = EPMLiveCore.CoreFunctions.getConfigSetting(iWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(iList.DefaultView.Url)).Split(',');
+            string[] fields = EPMLiveCore.CoreFunctions.getConfigSetting(iWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(iList.DefaultView == null ? iList.DefaultViewUrl : iList.DefaultView.Url)).Split(',');
 
             SqlCommand cmd = new SqlCommand("DELETE FROM TSMETA WHERE TS_ITEM_UID = @TS_ITEM_UID", cn);
             cmd.Parameters.AddWithValue("@TS_ITEM_UID", newTS);

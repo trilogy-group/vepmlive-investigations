@@ -137,7 +137,7 @@ namespace TimeSheets
                         ds = new DataSet();
                         da.Fill(ds);
 
-                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(','));
+                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView == null ? list.DefaultViewUrl : list.DefaultView.Url)).Split(','));
 
                         foreach (string field in fields)
                         {
