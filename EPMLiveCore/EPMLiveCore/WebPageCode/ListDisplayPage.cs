@@ -95,8 +95,11 @@ namespace EPMLiveCore
 
             for (int i = 0; i < fields.Count; i+=PAGE_SIZE)
             {
+                string tooltip = "";
+                for (int j = i; j < Math.Min(fields.Count, i + PAGE_SIZE); j++)
+                    tooltip += fields[j].Title + "&#013;";
                 int pageNumber = ((i + PAGE_SIZE - 1) / PAGE_SIZE);
-                result.Append("\n" + "<a class='pageNumber' title='" + fields[i].Title + "' href='?" + currentQueryString + "&Page=" +  pageNumber  + "'>" + (page ==pageNumber? "<b>[" + pageNumber + "]</b>":"[" + pageNumber + "]") +"</a>&nbsp;");
+                result.Append("\n" + "<a class='pageNumber' title='" + tooltip + "' href='?" + currentQueryString + "&Page=" +  pageNumber  + "'>" + (page ==pageNumber? "<b>[" + pageNumber + "]</b>":"[" + pageNumber + "]") +"</a>&nbsp;");
             }
            
           
