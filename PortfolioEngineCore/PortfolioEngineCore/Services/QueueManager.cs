@@ -175,6 +175,26 @@ namespace PortfolioEngineCore
             return bHandled;
         }
 
+        public long ManageTimedJobs()
+        {
+         
+            try
+            {
+
+                return AdminFunctions.ManageTimedJobs(_dba, this._basepath);
+
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("ManageTimedJobs", (StatusEnum)99999, ex);
+            }
+            return -1;
+        }
+
+           
+
+
+
         public bool SetJobStarted()
         {
             bool bSuccess = false;

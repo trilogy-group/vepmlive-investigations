@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -283,9 +284,11 @@ namespace WE_QueueMgr
             }
         }
 
+        private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
+
         public void ManageQueueJobs(string basePath)
         {
-            lock(basePath)
+            lock(_locks.GetOrAdd(basePath.ToLower(), s => new object()))
             {
                 var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
                 if (site != null)
@@ -341,7 +344,12 @@ namespace WE_QueueMgr
                 string sXML = BuildProductInfoString(site);
                 try
                 {
-                    var s = InvokeComObject(site, "ManageTimerJobs");
+                    //var s = InvokeComObject(site, "ManageTimerJobs");
+                    string s;
+                    using (var qm = new QueueManager(sXML))
+                    {
+                        s = "<Reply><HRESULT>0</HRESULT><STATUS>" + qm.ManageTimedJobs() + "</STATUS></Reply>";
+                    }
                     // added check for non-zero reply status CRL 18JAN13
                     string slc = s.ToLower();
                     if (slc.Contains("<error") || !slc.Contains("<status>0</status>"))
@@ -361,6 +369,8 @@ namespace WE_QueueMgr
                 }
             }
         }
+
+
 
         private string BuildProductInfoString(QMSite site)
         {
