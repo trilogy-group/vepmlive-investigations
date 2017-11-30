@@ -175,7 +175,7 @@ namespace PortfolioEngineCore
             return bHandled;
         }
 
-        public long ManageTimedJobs()
+        public int ManageTimedJobs()
         {
          
             try
