@@ -113,8 +113,12 @@ namespace WorkEnginePPM
                 var tablesToUpdateProjectName = new List<string>() { "EPG_RPT_CapacityPlanner", "EPG_RPT_Cost", "EPG_RPT_Projects" };
 
                 StringBuilder query = new StringBuilder();
-                tablesToUpdateProjectText.ForEach(table => query.Append($"UPDATE [{table}] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid;"));
-                tablesToUpdateProjectName.ForEach(table => query.Append($"UPDATE [{table}] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid;"));
+                tablesToUpdateProjectText.ForEach(table =>
+                query.Append($"IF EXISTS(SELECT 1 FROM sys.columns WHERE Name = N'ProjectText' AND Object_ID = Object_ID(N'{table}')) BEGIN UPDATE [{table}] SET [ProjectText]=@projectName WHERE [ProjectID]=@projectid END;"));
+
+                tablesToUpdateProjectName.ForEach(table =>
+                query.Append($"IF EXISTS(SELECT 1 FROM sys.columns WHERE Name = N'[Project Name]' AND Object_ID = Object_ID(N'{table}')) BEGIN UPDATE [{table}] SET [Project Name]=@projectName WHERE [ProjectID]=@projectid END;"));
+
                 query.Append("UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;");
                 query.Append("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;");
 
