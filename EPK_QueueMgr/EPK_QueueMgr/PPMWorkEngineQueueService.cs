@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using PortfolioEngineCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
 
@@ -44,7 +46,7 @@ namespace WE_QueueMgr
 
                 double interval = 30 * 1000;
                 timerJobsTimer = new Timer(interval);
-                timerJobsTimer.Elapsed += ManageTimerJobs;
+                timerJobsTimer.Elapsed += TimerElapsed;
 
                 messageQueue = new Msmq();
 
@@ -61,43 +63,63 @@ namespace WE_QueueMgr
 
         protected override void OnStart(string[] args)
         {
-            try
+            ResumeProcessing();
+            MessageHandler("Start", "OnStart", "");
+        }
+        private void ResumeProcessing()
+        {
+            Task.Run(() =>
             {
-                string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                string basepaths = BuildSitesList();
-                if (!string.IsNullOrEmpty(basepaths))
+                try
                 {
-                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
-                    m_lExceptionCount = 0;
-                    foreach (QMSite site in sites)
-                    {
-                        string sXML = BuildProductInfoString(site);
-                        new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(site.basePath) && !string.IsNullOrEmpty(site.connection))
-                                ManageTimerJobs(site);
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionHandler("OnStart for basepath '" + site.basePath + "'", ex);
-                        }
-                    }
+                    string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
+                    string basepaths = BuildSitesList();
                     timerJobsTimer.AutoReset = true;
                     timerJobsTimer.Enabled = true;
                     timerJobsTimer.Start();
                     serviceHost.Open();
+                    if (!string.IsNullOrEmpty(basepaths))
+                    {
+                        MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                        m_lExceptionCount = 0;
+
+                        foreach (QMSite site in sites)
+                        {
+                            string sXML = BuildProductInfoString(site);
+                            new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
+                            try
+                            {
+                                ManageQueueJobs(site.basePath);
+
+                            }
+                            catch (Exception ex)
+                            {
+                                ExceptionHandler("OnStart ManageQueueJobs for basepath '" + site.basePath + "'", ex);
+                            }
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(site.basePath) && !string.IsNullOrEmpty(site.connection))
+                                    ManageTimedJobs(site);
+                            }
+                            catch (Exception ex)
+                            {
+                                ExceptionHandler("OnStart ManageTimerJobs for basepath '" + site.basePath + "'", ex);
+                            }
+                        }
+
+
+                    }
+                    else
+                    {
+                        ErrorHandler("Start", 99995);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    ErrorHandler("Start", 99995);
+                    ExceptionHandler("OnStart", ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler("OnStart", ex);
-            }
+            });
         }
 
         private string BuildSitesList()
@@ -225,12 +247,11 @@ namespace WE_QueueMgr
 
         protected override void OnContinue()
         {
-            timerJobsTimer.Start();
-            serviceHost?.Open();
+            ResumeProcessing();
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        private void ManageTimerJobs(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             timerJobsTimer.Stop();
             try
@@ -258,7 +279,7 @@ namespace WE_QueueMgr
                                 new LogService(sXML).TraceLog("ServiceTimer_Tick", 0, "");
                                 try
                                 {
-                                    ManageTimerJobs(site);
+                                    ManageTimedJobs(site);
                                 }
                                 catch (Exception exception)
                                 {
@@ -283,9 +304,11 @@ namespace WE_QueueMgr
             }
         }
 
+        private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
+
         public void ManageQueueJobs(string basePath)
         {
-            lock(basePath)
+            lock(_locks.GetOrAdd(basePath.ToLower(), s => new object()))
             {
                 var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
                 if (site != null)
@@ -296,7 +319,7 @@ namespace WE_QueueMgr
                         string sXML = BuildProductInfoString(site);
                         using (var qm = new QueueManager(sXML))
                         {
-                            if (qm.ReadNextQueuedItem())
+                            while (qm.ReadNextQueuedItem())
                             {
                                 new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
                                 // we have a queued item - try to handle it in portfolioenginecore first
@@ -334,33 +357,32 @@ namespace WE_QueueMgr
             }
         }
 
-        private void ManageTimerJobs(QMSite site)
+        private void ManageTimedJobs(QMSite site)
         {
             if (site.basePath != string.Empty)
             {
                 string sXML = BuildProductInfoString(site);
                 try
                 {
-                    var s = InvokeComObject(site, "ManageTimerJobs");
-                    // added check for non-zero reply status CRL 18JAN13
-                    string slc = s.ToLower();
-                    if (slc.Contains("<error") || !slc.Contains("<status>0</status>"))
+                    //var s = InvokeComObject(site, "ManageTimerJobs");
+                    string s;
+                    using (var qm = new QueueManager(sXML))
                     {
-                        new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)100, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
-                        EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageTimerJobs Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
-                    }
-                    else
-                    {
-                        ManageQueueJobs(site.basePath);
+                        int result = qm.ManageTimedJobs();
+                       
+                        if (result == (int)StatusEnum.rsSuccess)
+                            ManageQueueJobs(site.basePath);
                     }
                 }
                 catch (Exception ex)
                 {
-                    new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)100, ex);
-                    ExceptionHandler("ManageTimerJobs - " + site.basePath, ex);
+                    new LogService(sXML).TraceStatusError("ManageTimedJobs - " + site.basePath, (StatusEnum)100, ex);
+                    ExceptionHandler("ManageTimedJobs - " + site.basePath, ex);
                 }
             }
         }
+
+
 
         private string BuildProductInfoString(QMSite site)
         {
