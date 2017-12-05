@@ -58,7 +58,7 @@ foreach ($component in $config.Components | Where-Object {($_.registerCOMplus -n
 			unregister-File (Join-Path $destination $file)
 		}
 
-		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
+		if (![string]::IsNullOrEmpty($component.registerCOMplus))
 		{
 			Unregister-COMPlus $component.registerCOMplus.Name
 		}
@@ -77,16 +77,14 @@ foreach ($component in $config.Components)
 	
 	if ($component.destination.Equals("GAC"))
 	{
-		if ($deployGAC)
+		foreach ($file in $component.files)
 		{
-			foreach ($file in $component.files)
-			{
-				$fullName = Join-Path $folderName $file
-				Write-Host ("Add to GAC: $fullName")
-				$publish = New-Object System.EnterpriseServices.Internal.Publish            
-				$publish.GacInstall($fullName)
-			}
+			$fullName = Join-Path $folderName $file
+			Write-Host ("Add to GAC: $fullName")
+			$publish = New-Object System.EnterpriseServices.Internal.Publish            
+			$publish.GacInstall($fullName)
 		}
+		
 		continue;
 	}
 	
@@ -110,18 +108,17 @@ foreach ($component in $config.Components)
             $outDir = ClarifyPath $component.unzip
             Unzip $fullName $outDir  
         }
-		if ($deployCOM)
+	
+		if (![string]::IsNullOrEmpty($component.registerCOM))
 		{
-			if (![string]::IsNullOrEmpty($component.registerCOM))
-			{
-				Register-File (Join-Path $destination $file)
-			}
-
-			if (![string]::IsNullOrEmpty($component.registerCOMplus))
-			{
-				Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
-			}
+			Register-File (Join-Path $destination $file)
 		}
+
+		if (![string]::IsNullOrEmpty($component.registerCOMplus))
+		{
+			Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
+		}
+		
 		
     }
 }
@@ -244,7 +241,7 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 			$destination = ClarifyPath $component.destination
 			$destFileName =  Join-Path $destination $file
 			Write-Host "Install as service: $destFileName"
-			if ($component.installAsService.dependency -ne "")
+			if (![string]::IsNullOrEmpty($component.installAsService.dependency))
 			{
 			Install-Service-With-Dependency `
 				-serviceName $component.installAsService.name `
