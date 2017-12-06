@@ -3786,7 +3786,7 @@ namespace TimeSheets
                 {
                     try
                     {
-                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND ([AssignedToID] = -99 or [AssignedToID] = " + user.ID + ") AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                         DataTable myWorkDataTable = rptData.ExecuteSql(sql);
 
                         if (myWorkDataTable.Rows.Count > 0)
@@ -3794,12 +3794,13 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows[0]["Timesheet"].ToString() == "True")
                             {
-                                cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid)", cn);
+                                cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID,AssignedToID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid, @assignedtoid)", cn);
                                 cmd.Parameters.AddWithValue("@tsuid", tsuid);
                                 cmd.Parameters.AddWithValue("@webuid", drItem["WEB_UID"].ToString());
                                 cmd.Parameters.AddWithValue("@listuid", drItem["LIST_UID"].ToString());
                                 cmd.Parameters.AddWithValue("@itemid", drItem["ITEM_ID"].ToString());
                                 cmd.Parameters.AddWithValue("@title", drItem["TITLE"].ToString());
+                                cmd.Parameters.AddWithValue("@assignedtoid", user.ID);
 
                                 if (drItem["PROJECT"].ToString() == "")
                                     cmd.Parameters.AddWithValue("@project", DBNull.Value);
