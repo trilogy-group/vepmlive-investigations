@@ -297,8 +297,7 @@ namespace TimeSheets
 
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings,
-            string period, bool liveHours, bool bSkipSP, ArrayList arrOpenTimesheets)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -393,55 +392,50 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    foreach (Guid openTSuid in arrOpenTimesheets)
+                                                    using (SqlCommand tsCmd = new SqlCommand(@"SELECT DISTINCT TS_UID FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
+                                                            WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE <> @nonworktype) 
+                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteuid AND TSUSEr.USER_ID=@userid)", cn))
                                                     {
-                                                        string itemUid = Guid.NewGuid().ToString();
-                                                        if (openTSuid != TSUID)
+                                                        tsCmd.Parameters.AddWithValue("@currenttsuid", TSUID);
+                                                        tsCmd.Parameters.AddWithValue("@currentperiodid", period);
+                                                        tsCmd.Parameters.AddWithValue("@userid", userid);
+                                                        tsCmd.Parameters.AddWithValue("@siteid", site.ID);
+                                                        tsCmd.Parameters.AddWithValue("@nonworktype", settings.NonWorkList);
+
+                                                        using (SqlDataReader dr = tsCmd.ExecuteReader())
                                                         {
-                                                            using (SqlCommand cmdTSItem = new SqlCommand("SELECT ITEM_ID FROM TSITEM where TS_UID=@tsuid AND ITEM_ID=@itemid", cn))
-                                                            {
-                                                                cmdTSItem.Parameters.AddWithValue("@tsuid", openTSuid);
-                                                                cmdTSItem.Parameters.AddWithValue("@itemid", itemid);
-                                                                using (SqlDataReader drTSItem = cmdTSItem.ExecuteReader())
+                                                            while (dr.Read())
+                                                            {                                                               
+                                                                using (SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn))
                                                                 {
-                                                                    if (drTSItem.Read())
-                                                                        continue;
+                                                                    cmd.Parameters.AddWithValue("@tsuid", dr.GetGuid(0));
+                                                                    cmd.Parameters.AddWithValue("@uid", id);
+                                                                    cmd.Parameters.AddWithValue("@webid", web.ID);
+                                                                    cmd.Parameters.AddWithValue("@listid", list.ID);
+                                                                    cmd.Parameters.AddWithValue("@itemid", li.ID);
+                                                                    cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                                    cmd.Parameters.AddWithValue("@list", list.Title);
+                                                                    cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
+                                                                    cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
+
+                                                                    if (projectlist == "")
+                                                                        cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
+                                                                    else
+                                                                        cmd.Parameters.AddWithValue("@projectlistid", projectlist);
+
+                                                                    if (projectid == 0)
+                                                                    {
+                                                                        cmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                                        cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        cmd.Parameters.AddWithValue("@project", project);
+                                                                        cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                                    }
+                                                                    cmd.ExecuteNonQuery();
                                                                 }
                                                             }
-                                                        }
-                                                        else
-                                                        {
-                                                            itemUid = id;
-                                                        }
-
-                                                        using (SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn))
-                                                        {
-                                                            cmd.Parameters.AddWithValue("@tsuid", openTSuid);
-                                                            cmd.Parameters.AddWithValue("@uid", itemUid);
-                                                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                                                            cmd.Parameters.AddWithValue("@listid", list.ID);
-                                                            cmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                            cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
-                                                            cmd.Parameters.AddWithValue("@list", list.Title);
-                                                            cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
-                                                            cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-
-                                                            if (projectlist == "")
-                                                                cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
-                                                            else
-                                                                cmd.Parameters.AddWithValue("@projectlistid", projectlist);
-
-                                                            if (projectid == 0)
-                                                            {
-                                                                cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                                cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
-                                                            }
-                                                            else
-                                                            {
-                                                                cmd.Parameters.AddWithValue("@project", project);
-                                                                cmd.Parameters.AddWithValue("@projectid", projectid);
-                                                            }
-                                                            cmd.ExecuteNonQuery();
                                                         }
                                                     }
                                                 }
@@ -654,7 +648,6 @@ namespace TimeSheets
             DataSet dsItems = null;
             SPUser editUser = null;
             XmlNodeList ndItems = null;
-            ArrayList arrOpenTimesheets = null;
             try
             {
                 try
@@ -752,25 +745,6 @@ namespace TimeSheets
                                                 float count = 0;
                                                 float total = ndItems.Count;
 
-                                                arrOpenTimesheets = new ArrayList();
-                                                arrOpenTimesheets.Add(TSUID);
-
-                                                using (SqlCommand tsCmd = new SqlCommand("select ts_uid from TSTIMESHEET where period_id > @period and SUBMITTED = 0 and site_uid=@siteid and username=@username order by period_id desc", cn))
-                                                {
-                                                    tsCmd.Parameters.AddWithValue("@period", period);
-                                                    tsCmd.Parameters.AddWithValue("@username", user.LoginName);
-                                                    tsCmd.Parameters.AddWithValue("@siteid", site.ID);
-
-                                                    using (SqlDataReader dr = tsCmd.ExecuteReader())
-                                                    {
-                                                        while (dr.Read())
-                                                        {
-                                                            arrOpenTimesheets.Add(dr.GetGuid(0));
-                                                        }
-                                                    }
-                                                }
-
-                                                Guid copyfromtsuid = Guid.Empty;
                                                 foreach (XmlNode ndItem in ndItems)
                                                 {
                                                     string worktype = "";
@@ -781,8 +755,7 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList,
-                                                        worktype == settings.NonWorkList ? new ArrayList() { TSUID } : arrOpenTimesheets);
+                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
 
                                                     count++;
                                                     float pct = count / total * 98;
@@ -799,7 +772,6 @@ namespace TimeSheets
                                                         percent = pct;
                                                     }
                                                 }
-
 
                                                 using (SqlCommand cmd5 = new SqlCommand("update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid", cn))
                                                 {
