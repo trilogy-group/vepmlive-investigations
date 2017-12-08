@@ -32,7 +32,8 @@ namespace WE_QueueMgr
 
         public void QueueNotification(Notification notification)
         {
-            ManageQueueJobs(notification.BasePath);
+            var site = sites.Where(i => i.basePath == notification.BasePath).SingleOrDefault();
+            ManageQueueJobs(site);
         }
 
         public PPMWorkEngineQueueService()
@@ -88,27 +89,9 @@ namespace WE_QueueMgr
                         {
                             string sXML = BuildProductInfoString(site);
                             new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
-                            try
-                            {
-                                ManageQueueJobs(site.basePath);
-
-                            }
-                            catch (Exception ex)
-                            {
-                                ExceptionHandler("OnStart ManageQueueJobs for basepath '" + site.basePath + "'", ex);
-                            }
-                            try
-                            {
-                                if (!string.IsNullOrEmpty(site.basePath) && !string.IsNullOrEmpty(site.connection))
-                                    ManageTimedJobs(site);
-                            }
-                            catch (Exception ex)
-                            {
-                                ExceptionHandler("OnStart ManageTimerJobs for basepath '" + site.basePath + "'", ex);
-                            }
+                            ManageQueueJobs(site);
+                            ManageTimedJobs(site);
                         }
-
-
                     }
                     else
                     {
@@ -270,6 +253,10 @@ namespace WE_QueueMgr
                             if (!string.IsNullOrEmpty(basepaths))
                                 MessageHandler("Refresh", "Refresh site list",
                                                "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                            foreach (QMSite site in sites)
+                            {
+                                ManageQueueJobs(site);
+                            }
                         }
                         if (sites != null)
                         {
@@ -277,14 +264,7 @@ namespace WE_QueueMgr
                             {
                                 string sXML = BuildProductInfoString(site);
                                 new LogService(sXML).TraceLog("ServiceTimer_Tick", 0, "");
-                                try
-                                {
-                                    ManageTimedJobs(site);
-                                }
-                                catch (Exception exception)
-                                {
-                                    ExceptionHandler($"ServiceTimer_Tick ManageJobs for '{site}'", exception);
-                                }
+                                ManageTimedJobs(site);
                             }
                         }
                     }
@@ -306,22 +286,21 @@ namespace WE_QueueMgr
 
         private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-        public void ManageQueueJobs(string basePath)
+        private void ManageQueueJobs(QMSite site)
         {
-            lock(_locks.GetOrAdd(basePath.ToLower(), s => new object()))
+            if (site != null)
             {
-                var site = sites.Where(i => i.basePath == basePath).SingleOrDefault();
-                if (site != null)
+                lock (_locks.GetOrAdd(site.basePath.ToLower(), s => new object()))
                 {
+                    string sXML = BuildProductInfoString(site);
                     try
                     {
                         // check the queue for .net items before using RSVP
-                        string sXML = BuildProductInfoString(site);
                         using (var qm = new QueueManager(sXML))
                         {
                             while (qm.ReadNextQueuedItem())
                             {
-                                new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
+                                new LogService(sXML).TraceLog("ManageQueueJobs", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
                                 // we have a queued item - try to handle it in portfolioenginecore first
                                 if (!qm.ManageQueue()) // false means not handled
                                 {
@@ -332,7 +311,7 @@ namespace WE_QueueMgr
                                             //////pFeAPI.Execute("RefreshRoles", "");
                                             //////pFeAPI.Dispose();
                                             qm.SetJobCompleted();
-                                            ErrorHandler("ManageQueue Case 200", 98765);
+                                            ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
                                         default:
                                             var s = InvokeComObject(site, "ManageQueue");
@@ -349,9 +328,8 @@ namespace WE_QueueMgr
                     }
                     catch (Exception ex)
                     {
-                        string sXML = BuildProductInfoString(site);
                         new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)99, ex);
-                        ExceptionHandler("ManageQueue - " + site.basePath, ex);
+                        ExceptionHandler("ManageQueueJobs - " + site.basePath, ex);
                     }
                 }
             }
@@ -365,13 +343,12 @@ namespace WE_QueueMgr
                 try
                 {
                     //var s = InvokeComObject(site, "ManageTimerJobs");
-                    string s;
                     using (var qm = new QueueManager(sXML))
                     {
                         int result = qm.ManageTimedJobs();
-                       
+
                         if (result == (int)StatusEnum.rsSuccess)
-                            ManageQueueJobs(site.basePath);
+                            ManageQueueJobs(site);
                     }
                 }
                 catch (Exception ex)
