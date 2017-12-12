@@ -121,12 +121,31 @@ namespace WorkEnginePPM
 
                 query.Append("UPDATE [RPTTSData] SET [Project]=@projectName WHERE [ProjectID]=@projectid;");
                 query.Append("UPDATE [LSTProjectCenter] SET [PreviousPName]=[Title] WHERE [ID]=@projectid;");
+                query.Append("UPDATE LSTMyWork SET title=@projectName WHERE itemid=@projectid AND ListId=@listid");
 
                 var oCommand = new SqlCommand(query.ToString(), con);
 
                 oCommand.Parameters.AddWithValue("@projectid", properties.ListItemId);
                 oCommand.Parameters.AddWithValue("@projectName", projectNameNew);
+                oCommand.Parameters.AddWithValue("@listid", properties.ListId);
                 oCommand.ExecuteNonQuery();
+
+                using (SqlConnection epmDBConn = new SqlConnection(ConfigFunctions.getConnectionString(properties.Site.WebApplication.Id)))
+                {
+                    epmDBConn.Open();
+                    query.Clear();
+                    query.Append("UPDATE TSITEM SET Title=@projectName WHERE WEB_UID=@webid AND LIST_UID=@listid AND ITEM_ID=@projectid;");
+                    query.Append("UPDATE TSITEM SET project=@projectName WHERE WEB_UID=@webid AND PROJECT_ID=@projectid");
+                    using (SqlCommand cmd = new SqlCommand(query.ToString(), epmDBConn))
+                    {
+                        cmd.Parameters.AddWithValue("@projectid", properties.ListItemId);
+                        cmd.Parameters.AddWithValue("@projectName", projectNameNew);
+                        cmd.Parameters.AddWithValue("@webid", properties.Web.ID);
+                        cmd.Parameters.AddWithValue("@listid", properties.ListId);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 scope.Complete();
             }
