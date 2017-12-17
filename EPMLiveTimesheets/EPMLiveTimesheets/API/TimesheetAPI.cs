@@ -4162,7 +4162,14 @@ namespace TimeSheets
 
             if (!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                if (settings.AllowUnassigned)
+                {
+                    sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                }
+                else
+                {
+                    sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = {3} AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"), userid);
+                }
             }
             else if (bOtherWork)
             {

@@ -21,7 +21,7 @@ $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 . ".\routines.ps1"
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
-if (!(Test-ADCredential $inUserName $inPassword))
+if (!(Test-ADCredential $comUserName $inPassword))
 {
     Write-Host "Wrong credentials"
     return
@@ -248,7 +248,7 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 				-displayName $component.installAsService.displayname `
 				-description $component.installAsService.description `
 				-path $destFileName `
-				-UserName $inUserName `
+				-UserName $comUserName `
 				-Password $inPassword `
 				-Dependency $component.installAsService.dependency
 			}
@@ -259,7 +259,7 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 				-displayName $component.installAsService.displayname `
 				-description $component.installAsService.description `
 				-path $destFileName `
-				-UserName $inUserName `
+				-UserName $comUserName `
 				-Password $inPassword 
 			}
 		}

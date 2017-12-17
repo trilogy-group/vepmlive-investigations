@@ -98,6 +98,10 @@
                         this.EditRangeDlg.window("winEditRangeDlgDlg").center();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setText(fld.FName);
                         this.EditRangeDlg.window("winEditRangeDlgDlg").attachObject("idEditRangeDlg");
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").button("close").attachEvent("onClick",
+                              function () {
+                                  OptimizerEvent('EditRange_Cancel');
+                              });
                     }
                     else {
                         this.EditRangeDlg.window("idEditRangeDlg").show();
@@ -415,6 +419,10 @@
                         this.DeleteStratDlg.window("winDeleteStratDlg").center();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setText("Delete Stratagy");
                         this.DeleteStratDlg.window("winDeleteStratDlg").attachObject("idDeleteStratagy");
+                        this.DeleteStratDlg.window("winDeleteStratDlg").button("close").attachEvent("onClick",
+                              function () {
+                                  OptimizerEvent('DeleteStratagy_Cancel');
+                              });
                     }
                     else {
                         this.DeleteStratDlg.window("winDeleteStratDlg").show();
@@ -501,7 +509,7 @@
                         this.SaveStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.SaveStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.SaveStratDlg.createWindow("winSaveStratDlg", 20, 30, 280, 192);
- //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
+                        //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
                         this.SaveStratDlg.window("winSaveStratDlg").denyResize();
                         this.SaveStratDlg.window("winSaveStratDlg").button("park").hide();
                         this.SaveStratDlg.window("winSaveStratDlg").button("minmax1").hide();
@@ -509,6 +517,10 @@
                         this.SaveStratDlg.window("winSaveStratDlg").center();
                         this.SaveStratDlg.window("winSaveStratDlg").setText("Save Strategy");
                         this.SaveStratDlg.window("winSaveStratDlg").attachObject("idSaveStrat");
+                        this.SaveStratDlg.window("winSaveStratDlg").button("close").attachEvent("onClick",
+                 				function () {
+                 				    OptimizerEvent('SaveStratagy_Cancel');
+                 				});
                     }
                     else {
                         this.SaveStratDlg.window("winSaveStratDlg").show();
@@ -600,6 +612,10 @@
                         this.RenameStratDlg.window("winRenameStratDlg").center();
                         this.RenameStratDlg.window("winRenameStratDlg").setText("Rename Strategy");
                         this.RenameStratDlg.window("winRenameStratDlg").attachObject("idRenameStratDlg");
+                        this.RenameStratDlg.window("winRenameStratDlg").button("close").attachEvent("onClick",
+                               function () {
+                                   OptimizerEvent('RenameStratagy_Cancel');
+                               });
                     }
                     else {
                         this.RenameStratDlg.window("winRenameStratDlg").show();
