@@ -190,6 +190,12 @@ if ($deploySolutions)
     }
 
     RestartSPTimerV4
+	Write-Host 'Upgrading DB'
+	$dbUpgrader = Join-Path $ScriptDir 'DBUpgrader\EPMLiveDBUpgrader.exe'
+	& $dbUpgrader -W $webAppName
+	if ($LastExitCode -ne 0) {
+		throw "DB upgrader failed with exit code: $LastExitCode."
+	}
 }
  
 #### Create Database ####
