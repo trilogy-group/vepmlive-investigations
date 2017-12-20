@@ -184,7 +184,7 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Project health view should get displayed$")
     public void projectHealthViewShouldGetDisplayed() throws Throwable {
-        assertTrue("Verify title page", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Health"));
+        assertTrue("Verify title page", driver.findElement(By.id("dialogTitleSpan")).getAttribute("textContent").contains("Project Health"));
     }
 
     @When("^I click on 'My Workplace' from left panel$")
@@ -313,13 +313,14 @@ public class SmokeVerificationStepDefinition {
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a")));
     }
+	
 
     @And("^Click on any of the link say : Project$")
     public void clickOnAnyOfTheLinkSayProject() throws Throwable {
         Thread.sleep(5000);
-        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a"));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
@@ -360,14 +361,14 @@ public class SmokeVerificationStepDefinition {
         checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span")));
     }
 
     @And("^I click on 'New Workspace'$")
     public void iClickOnNewWorkspace() throws Throwable {
         checkPageIsReady();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
-        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span"));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
