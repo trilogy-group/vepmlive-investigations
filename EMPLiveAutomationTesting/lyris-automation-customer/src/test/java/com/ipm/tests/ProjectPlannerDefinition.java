@@ -79,7 +79,7 @@ public class ProjectPlannerDefinition {
     public void openProjectCenter() {
         System.out.println("Open Projectplanner");
 
-        driver.navigate().to("http://qaepmlive6/Lists/Project%20Center/Executive%20Summary.aspx");
+        driver.navigate().to("http://qaepmlive6/sites/release633_v2/Lists/Project%20Center/Executive%20Summary.aspx");
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
