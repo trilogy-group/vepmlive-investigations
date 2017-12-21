@@ -34,7 +34,7 @@ Feature: Add, Edit and Delete Project
     And I Click on edit plan menu
     Then The Select Planner Page should be displayed
     And I Click on project planner
-    And I click on Blank Plan
+#    And I click on Blank Plan
     When I Click on edit team
     Then The Page Build Team should be displayed
     When I am selecting the first user from the list
