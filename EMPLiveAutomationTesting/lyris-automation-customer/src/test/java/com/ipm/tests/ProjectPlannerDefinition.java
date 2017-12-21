@@ -269,7 +269,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[2]")));
         driver.findElement(By.xpath("//a[2]")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlMain']")));
     }
 
     @When("^I Click on edit team")
@@ -457,7 +457,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")));
         driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).click();
-        userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).getText();
+        userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).getAttribute("textContent");
     }
 
     @Then("^I click on add user in project planner")
@@ -488,7 +488,9 @@ public class ProjectPlannerDefinition {
         Thread.sleep(2000);
         executor.executeScript("window.document.getElementById('SpreadBtn').click()");
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("idSpreadAmount")));
-        Select select = new Select(driver.findElement(By.id("idSpreadFinishPeriod")));
+		Select select = new Select(driver.findElement(By.id("idSpreadStartPeriod")));
+        select.selectByValue("Q46");
+        select = new Select(driver.findElement(By.id("idSpreadFinishPeriod")));
         select.selectByValue("Q47");
         Thread.sleep(2000);
         driver.findElement(By.xpath(".//*[@id='idSpreadDlgObj']/div/div[2]/div/input[1]")).click();
@@ -567,7 +569,7 @@ public class ProjectPlannerDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         System.out.print("The project created must be saved   : " + driver.getTitle());
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")));
-        assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")).getText());
+        assertEquals("Project Not Saved", createdProjectName, driver.findElement(By.id("ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_lblItemTitle")).getAttribute("textContent"));
     }
 
     @Then("^The project created must be deleted$")
@@ -576,7 +578,7 @@ public class ProjectPlannerDefinition {
         searchForCreatedProject(createdProjectName);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
-        assertEquals("Project Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+        assertEquals("Project Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getAttribute("textContent"));
     }
 
     @Then("^Close all browsers$")
@@ -609,7 +611,7 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
-        assertEquals("Title of Build Team page not appeared", "BUILD TEAM", driver.findElement(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")).getText());
+        assertEquals("Title of Build Team page not appeared", "BUILD TEAM", driver.findElement(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")).getAttribute("textContent"));
     }
 
     @Then("^The tasks page should be displayed$")
@@ -630,7 +632,7 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
-        assertEquals("Title of Select Planner Pop-up", "Select Planner", driver.findElement(By.id("dialogTitleSpan")).getText());
+        assertEquals("Title of Select Planner Pop-up", "Select Planner", driver.findElement(By.id("dialogTitleSpan")).getAttribute("textContent"));
     }
 
     @And("^I save after editing$")
@@ -681,8 +683,8 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")));
-        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getText().contains(arg0));
-        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getText().contains(arg1));
+        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getAttribute("textContent").contains(arg0));
+        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getAttribute("textContent").contains(arg1));
     }
 
     @And("^I click on Blank Plan$")
@@ -770,7 +772,7 @@ public class ProjectPlannerDefinition {
 
     @Then("^The cost Planner page should be displayed$")
     public void theCostPlannerPageShouldBeDisplayed() throws Throwable {
-        assertTrue("Verify Cost Edit Page", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Cost Planner"));
+        assertTrue("Verify Cost Edit Page", driver.findElement(By.id("dialogTitleSpan")).getAttribute("textContent").contains("Cost Planner"));
     }
 
     @When("^I enter some costs and I click on save button$")
@@ -830,7 +832,7 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
-        assertEquals("Title of Select Planner Pop-up", "Resource Planner - Project Mode", driver.findElement(By.id("dialogTitleSpan")).getText());
+        assertEquals("Title of Select Planner Pop-up", "Resource Planner - Project Mode", driver.findElement(By.id("dialogTitleSpan")).getAttribute("textContent"));
     }
 
     @Then("^Resource should be added to top section$")
@@ -839,7 +841,7 @@ public class ProjectPlannerDefinition {
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr"));
         if (!webElements.isEmpty()) {
             for (int i = 2; i < webElements.size(); i++) {
-                if (webElements.get(i).findElement(By.xpath("./td[3]")).getText().contains(userTobeAdded)) {
+                if (webElements.get(i).findElement(By.xpath("./td[3]")).getAttribute("textContent").contains(userTobeAdded)) {
                     TestCase.assertTrue("User added in ressource planner", true);
                     break;
                 } else {
@@ -855,7 +857,7 @@ public class ProjectPlannerDefinition {
     @Then("^Pop up should displayed asking the User if they want to \"([^\"]*)\"$")
     public void popUpShouldDisplayedAskingTheUserIfTheyWantTo(String arg0) throws Throwable {
         checkPageIsReady();
-        assertTrue("Title Add ressource pop up", driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_ctl00layoutDiv']/div[6]/div/div[3]")).getText().contains(arg0));
+        assertTrue("Title Add ressource pop up", driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_ctl00layoutDiv']/div[6]/div/div[3]")).getAttribute("textContent").contains(arg0));
     }
 
     @Then("^The \"([^\"]*)\" mark should turn to a green check mark next to the selected resources on the top grid$")
