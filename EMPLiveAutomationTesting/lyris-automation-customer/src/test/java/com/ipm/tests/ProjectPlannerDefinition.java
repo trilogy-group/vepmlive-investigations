@@ -691,8 +691,8 @@ public class ProjectPlannerDefinition {
     public void iClickOnBlankPlan() throws Throwable {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")));
-        driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlTemplate']/div[1]/a[1]/table/tbody/tr/td")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div/a[2]/table/tbody/tr/td")));
+        driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div/a[2]/table/tbody/tr/td")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
     }
 
