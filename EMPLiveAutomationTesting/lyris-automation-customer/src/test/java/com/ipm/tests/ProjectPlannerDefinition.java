@@ -285,7 +285,7 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        driver.switchTo().frame(1);
+        driver.SwitchTo().Frame(driver.FindElement(By.ClassName("ms-dlgFrame")));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
     }
 
