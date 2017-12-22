@@ -690,6 +690,7 @@ public class ProjectPlannerDefinition {
     @And("^I click on Blank Plan$")
     public void iClickOnBlankPlan() throws Throwable {
         checkPageIsReady();
+		driver.switchTo().frame(1);
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")).click();
