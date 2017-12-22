@@ -59,6 +59,9 @@ public class RessourceStepDefinition {
         driver.findElement(By.xpath("//input[@title='First Name']")).sendKeys(createdRessourceName);
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
+			
+			wait.until(ExpectedConditions.elementToBeClickable(By.id("Department_ddlShowAll")));
+            js.executeScript("window.document.getElementById('Department_ddlShowAll').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("Role_ddlShowAll")));
             js.executeScript("window.document.getElementById('Role_ddlShowAll').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));

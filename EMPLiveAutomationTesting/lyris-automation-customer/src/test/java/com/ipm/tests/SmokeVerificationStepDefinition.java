@@ -91,8 +91,8 @@ public class SmokeVerificationStepDefinition {
     public void editChangePageShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
-        System.out.println("Page Edit is open" + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
-        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("Edit"));
+        System.out.println("Page Edit is open " + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
+        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 
     @When("^I make some changes on Change item and I click on save button$")
@@ -329,7 +329,8 @@ public class SmokeVerificationStepDefinition {
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
-        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Center - New Item"));
+		System.out.println("Verify New Project Form Title " + driver.findElement(By.id("dialogTitleSpan")).getText() + " # " + driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText") + " # " + driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerHtml"));
+        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerHtml").contains("Project Center - New Item"));
     }
 
     @When("^I Provide value in required fields and I click on save button$")
