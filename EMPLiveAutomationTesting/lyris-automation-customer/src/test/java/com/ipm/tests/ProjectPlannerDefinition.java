@@ -683,8 +683,8 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")));
-        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getAttribute("innerText").contains(arg0));
-        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getAttribute("innerText").contains(arg1));
+        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getText().contains(arg0));
+        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getText().contains(arg1));
     }
 
     @And("^I click on Blank Plan$")

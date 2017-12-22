@@ -62,6 +62,8 @@ public class RessourceStepDefinition {
 			
 			wait.until(ExpectedConditions.elementToBeClickable(By.id("Department_ddlShowAll")));
             js.executeScript("window.document.getElementById('Department_ddlShowAll').click()");
+			wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
+            js.executeScript("window.document.getElementById('autoText_0').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("Role_ddlShowAll")));
             js.executeScript("window.document.getElementById('Role_ddlShowAll').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
