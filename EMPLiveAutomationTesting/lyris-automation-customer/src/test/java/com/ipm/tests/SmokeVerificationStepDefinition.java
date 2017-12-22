@@ -328,9 +328,10 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
-		System.out.println("Verify New Project Form Title " + driver.findElement(By.id("dialogTitleSpan")).getText() + " # " + driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText") + " # " + driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerHtml"));
-        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerHtml").contains("Project Center - New Item"));
+        checkPageIsReady();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
+        System.out.println("Page Edit is open " + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
+        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 
     @When("^I Provide value in required fields and I click on save button$")
@@ -379,7 +380,7 @@ public class SmokeVerificationStepDefinition {
     public void theCreateWorkspacePopupShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
-        assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText").contains("Create Workspace"));
+        assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerHtml").contains("Create Workspace"));
     }
 
     @When("^I  provide Workspace name and description$")
