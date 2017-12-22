@@ -91,8 +91,8 @@ public class SmokeVerificationStepDefinition {
     public void editChangePageShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
-        System.out.println("Page Edit is open" + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getAttribute("innerText"));
-        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getAttribute("innerText").contains("Edit"));
+        System.out.println("Page Edit is open" + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
+        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("Edit"));
     }
 
     @When("^I make some changes on Change item and I click on save button$")
@@ -329,7 +329,7 @@ public class SmokeVerificationStepDefinition {
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
-        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText").contains("Project Center - New Item"));
+        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Center - New Item"));
     }
 
     @When("^I Provide value in required fields and I click on save button$")
@@ -430,7 +430,7 @@ public class SmokeVerificationStepDefinition {
 //        Thread.sleep(10000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[6]/span[2]")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[6]/span[2]")));
 //        Thread.sleep(10000);
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
