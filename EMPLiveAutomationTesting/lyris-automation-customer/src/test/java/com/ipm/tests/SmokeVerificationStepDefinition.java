@@ -323,12 +323,12 @@ public class SmokeVerificationStepDefinition {
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
     }
 
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
         assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("textContent").contains("Project Center - New Item"));
     }
 
@@ -338,12 +338,12 @@ public class SmokeVerificationStepDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         driver.switchTo().defaultContent();
         driver.switchTo().frame(3);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdProjectName);
         //driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys("testing");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
         driver.findElement(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
     }
 
     @Then("^An Item will create and will get display in social stream$")
