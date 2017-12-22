@@ -328,9 +328,11 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
-		
 		checkPageIsReady();
-        assertTrue("Verify New Item Page", driver.getTitle().contains("Project Center - New Item"));
+		driver.switchTo().frame(1);
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
+        System.out.println("Page Edit is open " + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
+        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 
     @When("^I Provide value in required fields and I click on save button$")
