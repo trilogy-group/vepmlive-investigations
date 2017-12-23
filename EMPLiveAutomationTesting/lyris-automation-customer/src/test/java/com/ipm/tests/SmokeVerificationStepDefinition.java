@@ -323,7 +323,7 @@ public class SmokeVerificationStepDefinition {
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
     }
 
     @Then("^A new item page form should be displayed$")
