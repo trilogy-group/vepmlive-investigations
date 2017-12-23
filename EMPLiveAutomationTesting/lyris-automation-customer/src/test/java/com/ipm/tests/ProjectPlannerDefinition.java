@@ -285,7 +285,7 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        driver.switchTo().frame(driver.FindElement(By.ClassName("ms-dlgFrame")));
+        driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
     }
 
@@ -690,7 +690,7 @@ public class ProjectPlannerDefinition {
     @And("^I click on Blank Plan$")
     public void iClickOnBlankPlan() throws Throwable {
         checkPageIsReady();
-		driver.switchTo().frame(driver.FindElement(By.ClassName("ms-dlgFrame")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")).click();
