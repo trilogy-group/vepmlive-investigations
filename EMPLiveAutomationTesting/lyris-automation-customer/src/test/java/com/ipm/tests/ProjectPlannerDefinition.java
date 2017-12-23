@@ -287,7 +287,7 @@ public class ProjectPlannerDefinition {
         }
         wait.until(ExpectedConditions.presenceOfElementLocated(By.className("ms-dlgFrame")));
 		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
-		driver.switchTo().frame(0);
+		driver.switchTo().frame(1);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
     }
 
