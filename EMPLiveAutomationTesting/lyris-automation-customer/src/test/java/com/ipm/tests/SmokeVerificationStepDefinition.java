@@ -328,8 +328,9 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
-		checkPageIsReady();
-		driver.switchTo().frame(1);
+		
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.className("ms-dlgFrame")));
+		driver.switchTo().frame(By.className("ms-dlgFrame"));
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
         System.out.println("Page Edit is open " + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
         assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
