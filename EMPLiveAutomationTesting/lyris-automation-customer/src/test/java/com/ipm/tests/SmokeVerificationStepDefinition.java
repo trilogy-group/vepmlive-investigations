@@ -330,6 +330,8 @@ public class SmokeVerificationStepDefinition {
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
 		checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
         assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 

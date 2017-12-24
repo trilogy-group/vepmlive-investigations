@@ -287,6 +287,8 @@ public class ProjectPlannerDefinition {
         }
         checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
     }
 
     @When("^I am selecting the first user from the list")
@@ -690,8 +692,9 @@ public class ProjectPlannerDefinition {
     @And("^I click on Blank Plan$")
     public void iClickOnBlankPlan() throws Throwable {
         checkPageIsReady();
-		driver.switchTo().frame(1);
         WebDriverWait wait = new WebDriverWait(driver, 60);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
