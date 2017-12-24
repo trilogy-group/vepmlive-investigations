@@ -285,10 +285,8 @@ public class ProjectPlannerDefinition {
         } else {
             System.out.println("This driver does not support JavaScript!");
         }
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.className("ms-dlgFrame")));
-		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
-		driver.switchTo().frame(1);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.BuildTeam-title']/a/span[1]")));
+        checkPageIsReady();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
     }
 
     @When("^I am selecting the first user from the list")
