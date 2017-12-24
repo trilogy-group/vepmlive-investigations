@@ -346,7 +346,8 @@ public class SmokeVerificationStepDefinition {
         //driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys("testing");
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
         driver.findElement(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
+        driver.switchTo().defaultContent();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
     }
 
     @Then("^An Item will create and will get display in social stream$")
