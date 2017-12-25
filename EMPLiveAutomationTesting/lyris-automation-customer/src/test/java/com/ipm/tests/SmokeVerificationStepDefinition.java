@@ -382,6 +382,9 @@ public class SmokeVerificationStepDefinition {
     public void theCreateWorkspacePopupShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("OuterContainer")));
+		driver.switchTo().defaultContent();
         assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Create Workspace"));
     }
 
