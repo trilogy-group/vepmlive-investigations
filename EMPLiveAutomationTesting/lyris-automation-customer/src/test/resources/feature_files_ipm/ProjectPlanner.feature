@@ -10,7 +10,6 @@ Feature: Add, Edit and Delete Project
     And I select project status "(1) Proposed"
     And I select Overall Health "(2) At Risk"
     And I select Project Update "Schedule Driven"
-    And I enter a test as "testing"
     And I click on save button
     Then The project created must be saved
     When I click on edit button
@@ -31,11 +30,10 @@ Feature: Add, Edit and Delete Project
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
-    And I enter a test as "testing"
     And I click on save button
     And I Click on edit plan menu
     Then The Select Planner Page should be displayed
-    And I Click on project planner
+#    And I Click on project planner
     And I click on Blank Plan
     When I Click on edit team
     Then The Page Build Team should be displayed
@@ -62,7 +60,6 @@ Feature: Add, Edit and Delete Project
     When I click on new item
     And I enter a Project Name as "Test_EpmLive_Project"
     And I select project status "(1) Proposed"
-    And I enter a test as "testing"
     And I click on save button
     When I Click on Edit Resource Planner
     Then Resource Planner page should be displayed
