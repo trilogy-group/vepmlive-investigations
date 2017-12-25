@@ -255,7 +255,7 @@ namespace EPMLiveCore.Jobs
             }
             finally
             {
-                sErrors = sbErrors.ToString();
+                sErrors += sbErrors.ToString();
                 sbErrors = null;
                 if (web != null)
                     web.Dispose();
