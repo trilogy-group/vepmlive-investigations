@@ -21,10 +21,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
         // Internal Methods (3) 
 
-        internal static List<Type> GetUpgradeSteps(string version)
+        internal static Dictionary<double, Type> GetUpgradeSteps(string version)
         {
             var versionedSteps = new Dictionary<double, Type>();
-            var genericSteps = new Dictionary<double, Type>();
+            //var genericSteps = new Dictionary<double, Type>();
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
@@ -38,7 +38,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
                 if (attribute.Version == EPMLiveVersion.GENERIC)
                 {
-                    genericSteps.Add(attribute.SequenceOrder, type);
+                    versionedSteps.Add(0.0 - attribute.SequenceOrder, type);
                 }
                 else
                 {
@@ -57,10 +57,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                 }
             }
 
-            List<Type> steps = versionedSteps.OrderBy(s => s.Key).Select(s => s.Value).ToList();
-            steps.AddRange(genericSteps.OrderBy(s => s.Key).Select(source => source.Value));
+            //List<Type> steps = versionedSteps.OrderBy(s => s.Key).Select(s => s.Value).ToList();
+            //steps.AddRange(genericSteps.OrderBy(s => s.Key).Select(source => source.Value));
 
-            return steps;
+            return versionedSteps;
         }
 
         internal static SPField TryAddField(string internalName, string displayName, SPFieldType spFieldType,
