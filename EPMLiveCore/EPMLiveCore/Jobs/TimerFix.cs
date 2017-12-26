@@ -42,10 +42,9 @@ namespace EPMLiveCore.Jobs
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        cn.Open();
-                    });
+
+                    cn.Open();
+
                     using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                     {
                         sbc.DestinationTableName = "RESINFO";
