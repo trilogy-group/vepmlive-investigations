@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ArrayOfSiteCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SiteCollection>
+    <Id>646784d5-b4ad-40df-8d5a-6f7e788078ee</Id>
+    <Name>Test</Name>
+    <Url>http://win-6j09gf4nbp8/sites/Test03</Url>
+    <WebId>8e5582a9-842e-4f5b-80d5-84dc6e072f8a</WebId>
+  </SiteCollection>
+</ArrayOfSiteCollection>
