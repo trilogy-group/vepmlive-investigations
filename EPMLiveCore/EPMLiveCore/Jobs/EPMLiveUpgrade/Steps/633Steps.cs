@@ -42,16 +42,24 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             if (byteArrayFileContentsBefore.Length > 0)
                             {
                                 string strReportContentsBefore = enc.GetString(byteArrayFileContentsBefore);
-                                string strReportContentsAfter = strReportContentsBefore.Replace("cp.[PROJECT NAME], '' AS PROJECT_MANAGER", "cp.[PROJECT NAME], ProjectManagersText AS PROJECT_MANAGER");
-                                strReportContentsAfter = strReportContentsAfter.Replace("AND cp.PeriodID = cal.PeriodID\r\nwhere", "AND cp.PeriodID = cal.PeriodID\r\nINNER JOIN LSTProjectCenter on cp.projectid = LSTProjectCenter.ID\r\nwhere");
-                                strReportContentsAfter = strReportContentsAfter.Replace("???", "");//remove unneccessary string in the beginning of the file
-                                byte[] byteArrayFileContentsAfter = null;
-                                if (!strReportContentsAfter.Equals(""))
-                                {
-                                    byteArrayFileContentsAfter = enc.GetBytes(strReportContentsAfter);
-                                    spfile.SaveBinary(byteArrayFileContentsAfter); //save to the file.
-                                    LogMessage("Resource Capacity Heat Map report updated succesfully", 2);
 
+                                if (!strReportContentsBefore.Contains("cp.[PROJECT NAME], '' AS PROJECT_MANAGER") &&
+                                !strReportContentsBefore.Contains("AND cp.PeriodID = cal.PeriodID\r\nwhere"))
+                                    LogMessage("Resource Capacity Heat Map report is already up-to-date", 2);
+                                else
+                                {
+                                    string strReportContentsAfter = strReportContentsBefore.Substring(strReportContentsBefore.IndexOf('<')).Replace("cp.[PROJECT NAME], '' AS PROJECT_MANAGER", "cp.[PROJECT NAME], ProjectManagersText AS PROJECT_MANAGER");
+                                    strReportContentsAfter = strReportContentsAfter.Replace("AND cp.PeriodID = cal.PeriodID\r\nwhere", "AND cp.PeriodID = cal.PeriodID\r\nINNER JOIN LSTProjectCenter on cp.projectid = LSTProjectCenter.ID\r\nwhere");
+
+                                    byte[] byteArrayFileContentsAfter = null;
+                                    if (!strReportContentsAfter.Equals(""))
+                                    {
+                                        byteArrayFileContentsAfter = enc.GetBytes(strReportContentsAfter);
+                                        spfile.SaveBinary(byteArrayFileContentsAfter); //save to the file.
+                                        LogMessage("Resource Capacity Heat Map report updated succesfully", 2);
+                                    }
+                                    else
+                                        LogMessage("Resource Capacity Heat Map report is empty", MessageKind.FAILURE, 4);
                                 }
                             }
                         }
