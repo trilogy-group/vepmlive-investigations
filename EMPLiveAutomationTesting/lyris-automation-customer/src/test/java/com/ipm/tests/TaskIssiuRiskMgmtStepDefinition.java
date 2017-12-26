@@ -169,8 +169,8 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedTask(String projectname) {
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li[1]/a/span")));
-        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li[1]/a/span")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
+        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
@@ -200,12 +200,11 @@ public class TaskIssiuRiskMgmtStepDefinition {
 
     public void searchForCreatedIssue(String projectname) {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
-        driver.findElement(By.xpath(".//*[@id='actionmenu2Main']/div/ul[2]/li[1]/a/span")).click();
+        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-		driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 		int rounds = 0;
 		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
 		{
