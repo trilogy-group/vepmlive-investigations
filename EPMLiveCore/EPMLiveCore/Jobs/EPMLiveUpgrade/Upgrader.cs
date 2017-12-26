@@ -53,8 +53,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
                     }
                     else
                     {
-                        double lastVersionedSequence = web.AllProperties.ContainsKey("LastVersionedUpgrade") ? double.Parse(web.Properties["LastVersionedUpgrade"]) : 0.0;
-                        double lastGenericSequence = web.AllProperties.ContainsKey("LastGenericUpgrade") ? double.Parse(web.Properties["LastGenericUpgrade"]) : 0.0;
+                        double lastVersionedSequence = web.AllProperties.ContainsKey("LastVersionedUpgrade") ? double.Parse((string)web.AllProperties["LastVersionedUpgrade"]) : 0.0;
+                        double lastGenericSequence = web.AllProperties.ContainsKey("LastGenericUpgrade") ? double.Parse((string)web.AllProperties["LastGenericUpgrade"]) : 0.0;
 
                         steps = upgradeSteps.Where(item => item.Key > lastVersionedSequence).OrderBy(item => item.Key).ToList();
                         genericStartIndex = steps.Count;
