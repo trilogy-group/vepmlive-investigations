@@ -169,15 +169,17 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedTask(String projectname) {
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
-        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li[1]/a/span")));
+        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[1]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
+		int rounds = 0;
+        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
 		{
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			rounds++;
 		}
     }
 
@@ -188,23 +190,23 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
+		int rounds = 0;
+		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
 		{
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			rounds++;
 		}
     }
 
     public void searchForCreatedIssue(String projectname) {
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
-        driver.findElement(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
-        driver.findElement(By.id("searchtext0Main")).click();
-        driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
-        driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
-		{
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		}
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu2Main']/div/ul[2]/li[1]/a/span")));
+        driver.findElement(By.xpath(".//*[@id='actionmenu2Main']/div/ul[2]/li[1]/a/span")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext2Main")));
+        driver.findElement(By.id("searchtext2Main")).click();
+        driver.findElement(By.id("searchtext2Main")).sendKeys(projectname);
+        driver.findElement(By.id("searchtext2Main")).sendKeys(Keys.RETURN);
+		driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+		
     }
 
     @When("^I click on Risks on the left panel$")
