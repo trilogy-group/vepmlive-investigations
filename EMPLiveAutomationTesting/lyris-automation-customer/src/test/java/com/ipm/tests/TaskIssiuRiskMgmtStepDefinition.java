@@ -199,7 +199,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
     }
 
     public void searchForCreatedIssue(String projectname) {
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu2Main']/div/ul[2]/li[1]/a/span")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='actionmenu0Main']/div/ul[2]/li[1]/a/span")));
         driver.findElement(By.xpath(".//*[@id='actionmenu2Main']/div/ul[2]/li[1]/a/span")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("searchtext0Main")));
         driver.findElement(By.id("searchtext0Main")).click();
