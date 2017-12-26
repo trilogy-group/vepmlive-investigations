@@ -42,6 +42,9 @@ namespace EPMLiveCore.Jobs
             {
                 try
                 {
+
+                    cn.Open();
+
                     using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                     {
                         sbc.DestinationTableName = "RESINFO";
@@ -251,7 +254,7 @@ namespace EPMLiveCore.Jobs
             }
             finally
             {
-                sErrors = sbErrors.ToString();
+                sErrors += sbErrors.ToString();
                 sbErrors = null;
                 if (web != null)
                     web.Dispose();
