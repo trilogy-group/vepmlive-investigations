@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ArrayOfSiteCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SiteCollection>
+    <Id>1ef279bd-8b57-41cf-a39c-a9d83d86ded0</Id>
+    <Name>release633_v2</Name>
+    <Url>http://qaepmlive6/sites/release633_v2</Url>
+    <WebId>451a7078-93f7-4821-be93-64bdf070b401</WebId>
+  </SiteCollection>
+</ArrayOfSiteCollection>
