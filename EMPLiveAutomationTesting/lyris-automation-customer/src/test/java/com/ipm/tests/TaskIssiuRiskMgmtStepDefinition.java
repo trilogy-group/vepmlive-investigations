@@ -175,7 +175,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        while (!driver.getCurrentUrl().containes("searchvalue=" + projectname))
+        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
 		{
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		}
@@ -188,7 +188,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-		while (!driver.getCurrentUrl().containes("searchvalue=" + projectname))
+		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
 		{
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		}
@@ -201,7 +201,7 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        while (!driver.getCurrentUrl().containes("searchvalue=" + projectname))
+        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname))
 		{
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		}
