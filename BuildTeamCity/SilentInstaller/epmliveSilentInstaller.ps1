@@ -287,6 +287,7 @@ if ($deploySolutions -and $deployTimer)
 {
 	if ([string]::IsNullOrWhiteSpace($upgradeSitesFile) -ne $true)
 	{
+		Write-Host 'Upgrading Site(s)'
 		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
 		& $siteUpgrader -P $upgradeSitesFile 
 		if ($LastExitCode -ne 0) {
@@ -295,6 +296,7 @@ if ($deploySolutions -and $deployTimer)
 	}
 	elseif ($upgradeSites)
 	{
+		Write-Host 'Upgrading Site(s)'
 		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
 		$defaultSitesFile = Join-Path $ScriptDir 'SitesList.xml'
 		& $siteUpgrader -P $defaultSitesFile 
