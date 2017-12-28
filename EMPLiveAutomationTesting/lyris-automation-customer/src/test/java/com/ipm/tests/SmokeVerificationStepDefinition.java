@@ -84,14 +84,14 @@ public class SmokeVerificationStepDefinition {
     @Then("^Change should be created$")
     public void changeShouldBeCreated() throws Throwable {
         checkPageIsReady();
-        assertTrue("Change item is well created", driver.findElement(By.id("ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_lblItemTitle")).getText().contains(createdChangeTitle));
+        assertTrue("Change item is well created", driver.findElement(By.id("ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_lblItemTitle")).getAttribute("innerText").contains(createdChangeTitle));
     }
 
     @Then("^Edit Change page should be displayed$")
     public void editChangePageShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
-        System.out.println("Page Edit is open" + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
+        System.out.println("Page Edit is open " + driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText());
         assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 
@@ -110,8 +110,8 @@ public class SmokeVerificationStepDefinition {
     @Then("^Changes in change item should be saved$")
     public void changesInChangeItemShouldBeSaved() throws Throwable {
         checkPageIsReady();
-        assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]")).getText().contains("In Progress"));
-        assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[4]/td[2]")).getText().contains("(3) Low"));
+        assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]")).getAttribute("innerText").contains("In Progress"));
+        assertTrue("Changes after edit Change item not saved", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_e261ec3d_df46_4403_aa3e_754ef3260bc5_divQuickDetailsContent']/table/tbody/tr/td[1]/table/tbody/tr[4]/td[2]")).getAttribute("innerText").contains("(3) Low"));
     }
 
     @Then("^Change should be deleted$")
@@ -119,7 +119,7 @@ public class SmokeVerificationStepDefinition {
         checkPageIsReady();
         searchForCreatedChange(createdChangeTitle);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
-        assertEquals("Change item Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+        assertEquals("Change item Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getAttribute("innerText"));
     }
 
     public void searchForCreatedChange(String itemName) {
@@ -164,7 +164,7 @@ public class SmokeVerificationStepDefinition {
     @Then("^Report page should be displayed$")
     public void reportPageShouldBeDisplayed() throws Throwable {
         assertTrue("Verify Report page title", driver.getTitle().contains("Report"));
-        assertTrue("Verify Report List presence", driver.findElement(By.xpath(".//*[@id='WebPartTitleWPQ3']/h2/nobr/span[1]")).getText().contains("Report List"));
+        assertTrue("Verify Report List presence", driver.findElement(By.xpath(".//*[@id='WebPartTitleWPQ3']/h2/nobr/span[1]")).getAttribute("innerText").contains("Report List"));
     }
 
     @When("^I click on project List from the 'Report List'$")
@@ -184,7 +184,7 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Project health view should get displayed$")
     public void projectHealthViewShouldGetDisplayed() throws Throwable {
-        assertTrue("Verify title page", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Health"));
+        assertTrue("Verify title page", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText").contains("Project Health"));
     }
 
     @When("^I click on 'My Workplace' from left panel$")
@@ -206,7 +206,7 @@ public class SmokeVerificationStepDefinition {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Ribbon.MyTimesheet.WorkGroup.AddWork-Large")));
         boolean issubmitted = true;
         while (issubmitted) {
-            if (driver.findElement(By.id("mytimesheetstatus")).getText().equalsIgnoreCase("Submitted")) {
+            if (driver.findElement(By.id("mytimesheetstatus")).getAttribute("innerText").equalsIgnoreCase("Submitted")) {
                 driver.findElement(By.xpath(".//*[@id='tsnav']/nav/div/div/ul/li[2]/span[2]")).click();
                 Thread.sleep(5000);
             } else {
@@ -221,7 +221,7 @@ public class SmokeVerificationStepDefinition {
 
     @Then("^Tasks assigned to user will be displayed$")
     public void tasksAssignedToUserWillBeDisplayed() throws Throwable {
-        assertTrue("Add Work Title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Add Work"));
+        assertTrue("Add Work Title", driver.findElement(By.id("dialogTitleSpan")).getAttribute("innerText").contains("Add Work"));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tr[@class='GMDataRow ']")));
         assertTrue("Tasks assigned to user not displayed", !driver.findElements(By.xpath("//tr[@class='GMDataRow ']")).isEmpty());
     }
@@ -293,7 +293,7 @@ public class SmokeVerificationStepDefinition {
     public void timesheetShouldBeSubmitted() throws Throwable {
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mytimesheetstatus")));
         Thread.sleep(5000);
-        assertTrue("TimeSheet is not submitted", driver.findElement(By.id("mytimesheetstatus")).getText().contains("Submitted"));
+        assertTrue("TimeSheet is not submitted", driver.findElement(By.id("mytimesheetstatus")).getAttribute("innerText").contains("Submitted"));
     }
 
     @Then("^The 'My Timesheet' page should be displayed$")
@@ -313,22 +313,26 @@ public class SmokeVerificationStepDefinition {
         WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-items']/li[7]/span"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a")));
     }
+	
 
     @And("^Click on any of the link say : Project$")
     public void clickOnAnyOfTheLinkSayProject() throws Throwable {
         Thread.sleep(5000);
-        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-se-toolbar-item-68698cee-7bdb-4e09-8a54-42290feebe42']/a"));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-social-stream']/div/ul[2]/li[6]/a"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialogTitleSpan")));
     }
 
     @Then("^A new item page form should be displayed$")
     public void aNewItemPageFormShouldBeDisplayed() throws Throwable {
+		checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
-        assertTrue("Verify New Project Form Title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Project Center - New Item"));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")));
+        assertTrue("Page Edit is open", driver.findElement(By.xpath(".//*[@id='Ribbon.ListForm.Edit-title']/a/span[1]")).getText().contains("EDIT"));
     }
 
     @When("^I Provide value in required fields and I click on save button$")
@@ -337,12 +341,13 @@ public class SmokeVerificationStepDefinition {
         WebDriverWait wait = new WebDriverWait(driver, 60);
         driver.switchTo().defaultContent();
         driver.switchTo().frame(3);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")));
         driver.findElement(By.id("Title_fa564e0f-0c70-4ab9-b863-0177e6ddd247_$TextField")).sendKeys(createdProjectName);
-        driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys("testing");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
+        //driver.findElement(By.id("test_0507c843-dc05-40cf-bfc6-fac2494ae364_$TextField")).sendKeys("testing");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")));
         driver.findElement(By.id("ctl00_ctl36_g_a038f5c9_5a7c_4db2_a4d6_96bbca5d21ea_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
+        driver.switchTo().defaultContent();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-se-toolbar']/h3")));
     }
 
     @Then("^An Item will create and will get display in social stream$")
@@ -360,14 +365,14 @@ public class SmokeVerificationStepDefinition {
         checkPageIsReady();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span")));
     }
 
     @And("^I click on 'New Workspace'$")
     public void iClickOnNewWorkspace() throws Throwable {
         checkPageIsReady();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
-        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span"));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[3]/a/span"));
         JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
@@ -377,6 +382,9 @@ public class SmokeVerificationStepDefinition {
     public void theCreateWorkspacePopupShouldBeDisplayed() throws Throwable {
         checkPageIsReady();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("OuterContainer")));
+		driver.switchTo().defaultContent();
         assertTrue("The 'Create Workspace' popup title", driver.findElement(By.id("dialogTitleSpan")).getText().contains("Create Workspace"));
     }
 
@@ -429,7 +437,7 @@ public class SmokeVerificationStepDefinition {
 //        Thread.sleep(10000);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("epm-nav-top-workspaces")));
         driver.findElement(By.id("epm-nav-top-workspaces")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='epm-nav-link-F1A0C55EB6209A23CBB4243DB0D0FD58']/span")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='epm-nav-sub-workspaces-static-links']/li[6]/span[2]")));
 //        Thread.sleep(10000);
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(), '" + createdWorkSpaceName + "')]")));
@@ -465,7 +473,7 @@ public class SmokeVerificationStepDefinition {
         executor.executeScript("window.document.getElementById('EPMNavWSTSearch').click()");
         driver.switchTo().activeElement().sendKeys(createdWorkSpaceName);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")));
-        assertTrue("", driver.findElement(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")).getText().contains("No search results"));
+        assertTrue("", driver.findElement(By.xpath(".//*[@id='EPMNavWorkspacesTree']/div[2]")).getAttribute("innerText").contains("No search results"));
     }
 
     public void checkPageIsReady() {

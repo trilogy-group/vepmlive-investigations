@@ -9,12 +9,14 @@ Param(
 	[string] $comUserName = "epmldev\farmadmin",
     [string] $inPassword = "Pass@word1",
 	[string] $version = "6.1.0.0",
+	[string] $upgradeSitesFile = "",
 	[switch] $deploySolutions,
 	[switch] $deployGAC,
 	[switch] $deployCOM,
 	[switch] $deployTimer,
 	[switch] $deployPFE,
-	[switch] $createDB
+	[switch] $createDB,
+	[switch] $upgradeSites
 	
 )
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
@@ -196,6 +198,9 @@ if ($deploySolutions)
 	if ($LastExitCode -ne 0) {
 		throw "DB upgrader failed with exit code: $LastExitCode."
 	}
+	
+	
+	
 }
  
 #### Create Database ####
@@ -276,4 +281,27 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 		}
 	}
 	
+}
+
+if ($deploySolutions -and $deployTimer)
+{
+	if ([string]::IsNullOrWhiteSpace($upgradeSitesFile) -ne $true)
+	{
+		Write-Host 'Upgrading Site(s)'
+		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
+		& $siteUpgrader -P $upgradeSitesFile 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
+	elseif ($upgradeSites)
+	{
+		Write-Host 'Upgrading Site(s)'
+		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
+		$defaultSitesFile = Join-Path $ScriptDir 'SitesList.xml'
+		& $siteUpgrader -P $defaultSitesFile 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
 }

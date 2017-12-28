@@ -32,7 +32,7 @@ namespace EPMLiveCore
 
         private void loadData(SPList list, Guid siteuid)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {
@@ -253,7 +253,7 @@ namespace EPMLiveCore
 
                 }
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (var site = new SPSite(properties.SiteId))
                     {
@@ -394,7 +394,7 @@ namespace EPMLiveCore
                             }
                             catch { }
                         }
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             using (SPSite oSite = new SPSite(properties.SiteId))
                             {
@@ -406,6 +406,11 @@ namespace EPMLiveCore
                                     }
                                     catch { }
                                 }
+                                try
+                                {
+                                    oSite.RootWeb.RoleAssignments.Remove(uv.User);
+                                }
+                                catch { }
                             }
                         });
                     }
@@ -557,7 +562,7 @@ namespace EPMLiveCore
                         }
                     }
                     dr.Close();
-                    
+
                     location = "1019";
                     bool bhaspermsadded = setPermissions(properties, isAdd);    //SETUP PERMISSION Add/Edit mode
                     location = "1020";
@@ -822,7 +827,7 @@ namespace EPMLiveCore
 
         private void sendRequestEmail(Type thisClass, SPItemEventProperties properties, string requestorname)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(properties.SiteId))
                 {
@@ -894,7 +899,7 @@ namespace EPMLiveCore
             catch { }
             if (p == null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(properties.SiteId))
                     {
@@ -983,7 +988,7 @@ namespace EPMLiveCore
 
             if (CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite oSite = new SPSite(properties.SiteId))
                     {
