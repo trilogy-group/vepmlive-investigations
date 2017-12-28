@@ -417,6 +417,9 @@
         var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
         var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+        if (StartID == -1) {
+            StartID = this.UsingPeriods.CurrentPeriod.Value;
+        }
         var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
 
