@@ -437,7 +437,7 @@
 
 
         if (StartID == -1)
-            dataXml += ' PerInc = "1" FinishPeriod="' + FinishID + '" ';
+            dataXml += ' PerInc = "0" FinishPeriod="' + FinishID + '" ';
         else
             dataXml += ' PerInc = "0" '
 
