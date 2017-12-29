@@ -13,106 +13,19 @@ using System.Reflection;
 
 namespace TimerService
 {
-    public class SecurityClass
+    public class SecurityClass : ProcessorBase
     {
-        private Object thisLock = new Object();
-        private static Object qLock = new Object();
 
-        public struct RunnerData
+
+        public override bool startTimer()
         {
-            public string cn;
-            public DataRow dr;
-            public int index;
-        }
-
-        private class WorkerThreads
-        {
-            private BackgroundWorker[] _arrWorkers;
-            private int _maxThreads;
-
-            public WorkerThreads(int maxThreads)
-            {
-                _maxThreads = maxThreads;
-                _arrWorkers = new BackgroundWorker[maxThreads];
-            }
-
-            public int add(BackgroundWorker newBw)
-            {
-                lock (qLock)
-                {
-                    for (int i = 0; i < _maxThreads; i++)
-                    {
-                        if (_arrWorkers[i] == null)
-                        {
-                            _arrWorkers[i] = newBw;
-                            return i;
-                        }
-                    }
-                }
-                return -1;
-            }
-
-            public int remainingThreads()
-            {
-                int counter = 0;
-                lock (qLock)
-                {
-                    foreach (BackgroundWorker bw in _arrWorkers)
-                    {
-                        if (bw == null)
-                            counter++;
-                    }
-                }
-                return counter;
-            }
-
-            public void remove(int i)
-            {
-                lock (qLock)
-                {
-                    _arrWorkers[i] = null;
-                }
-            }
-
-            public void cleanup()
-            {
-                for (int i = 0; i < _maxThreads; i++)
-                    if (_arrWorkers[i] != null)
-                        if (!((BackgroundWorker)_arrWorkers[i]).IsBusy)
-                            _arrWorkers[i] = null;
-            }
-        }
-
-        private static WorkerThreads workingThreads;
-
-        public bool startTimer()
-        {
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS");
-            }
-            catch { }
-
-            logMessage("INIT", "STMR", "Starting Security Queue");
-
-            int maxThreads = 0;
-            try
-            {
-                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("SecQueueThreads"));
-            }
-            catch (Exception e)
-            {
-                logMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
-                //logMessage("INIT", "GTERR", e.Message);
-            }
-            workingThreads = new WorkerThreads(maxThreads);
-
-            logMessage("INIT", "STMR", "Setting Security Threads to: " + maxThreads);
+            if (!base.startTimer())
+                return false;
 
             //EPML-5787
             logMessage("INIT", "STMR", "Clearing Queue");
 
-            SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+            SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
@@ -120,7 +33,7 @@ namespace TimerService
                 {
                     using (var cn = new SqlConnection(sConn))
                     {
-                        
+
                         try
                         {
                             cn.Open();
@@ -142,86 +55,62 @@ namespace TimerService
             return true;
         }
 
-        private void logMessage(string type, string module, string message)
-        {
-            lock (thisLock)
-            {
-                DateTime dt = DateTime.Now;
 
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\SECLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
-
-                swLog.Close();
-            }
-        }
-
-        //private void logMessageinDatabase(string itemsecid, string message, SqlConnection cn)
-        //{
-        //    SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 2,resulttext = @errortext where ITEM_SEC_ID=@id", cn);
-        //    cmd.Parameters.AddWithValue("@errortext", message);
-        //    cmd.Parameters.AddWithValue("@id", itemsecid);
-        //    cmd.ExecuteNonQuery();
-        //}
-
-        public void runTimer()
+        public override void runTimer()
         {
             try
             {
-                workingThreads.cleanup();
-                int maxThreads = workingThreads.remainingThreads();
-                if (maxThreads > 0)
+
+                SPWebApplicationCollection _webcolections = GetWebApplications();
+                foreach (SPWebApplication webApp in _webcolections)
                 {
-                    SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
-                    foreach (SPWebApplication webApp in _webcolections)
+                    string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                    if (sConn != "")
                     {
-                        string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
-                        if (sConn != "")
+                        using (var cn = new SqlConnection(sConn))
                         {
-                            using (var cn = new SqlConnection(sConn))
+                            try
                             {
-                                try
+                                cn.Open();
+
+                                using (var cmd = new SqlCommand("spSecGetQueue", cn))
                                 {
-                                    cn.Open();
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
 
-                                    using (var cmd = new SqlCommand("spSecGetQueue", cn))
+                                    var ds = new DataSet();
+                                    using (var da = new SqlDataAdapter(cmd))
                                     {
-                                        cmd.CommandType = CommandType.StoredProcedure;
-                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                        cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-
-                                        var ds = new DataSet();
-                                        using (var da = new SqlDataAdapter(cmd))
+                                        da.Fill(ds);
+                                        if (ds.Tables.Count > 0)
                                         {
-                                            da.Fill(ds);
-                                            if (ds.Tables.Count > 0)
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
-                                                foreach (DataRow dr in ds.Tables[0].Rows)
+                                                var rd = new RunnerData { cn = sConn, dr = dr };
+                                                if (startProcess(rd))
                                                 {
-                                                    var rd = new RunnerData { cn = sConn, dr = dr };
-                                                    if (startProcess(rd))
+                                                    using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
                                                     {
-                                                        using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
-                                                        {
-                                                            cmd1.Parameters.Clear();
-                                                            cmd1.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                                                            cmd1.ExecuteNonQuery();
-                                                        }
+                                                        cmd1.Parameters.Clear();
+                                                        cmd1.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                                                        cmd1.ExecuteNonQuery();
                                                     }
                                                 }
                                             }
-
                                         }
+
                                     }
                                 }
-                                catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
-
-
-
                             }
+                            catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+
+
+
                         }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -229,49 +118,8 @@ namespace TimerService
             }
         }
 
-        //public bool startProcess(DataRow dr, SqlConnection cn)
-        public bool startProcess(RunnerData dr)
-        {
-            try
-            {
-                var bw = new BackgroundWorker { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
 
-                bw.DoWork += bw_DoWork;
-                //bw.ProgressChanged += bw_ProgressChanged;
-                //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-
-                bw.RunWorkerAsync(dr);
-
-                workingThreads.add(bw);
-
-                //RunnerData d = new RunnerData();
-                //d.cn = cn.ConnectionString;
-                //d.dr = dr;
-                //d.index = workingThreads.add(bw);
-
-                //if (d.index > -1)
-                //{
-                //    using (SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn))
-                //    {
-                //        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                //        cmd.ExecuteNonQuery();
-                //    }
-
-                //    bw.RunWorkerAsync(d);
-
-                //}
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logMessage("ERR", "STPR", ex.Message);
-                //logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
-                return false;
-            }
-        }
-
-        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        protected override void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(500);
             var rd = (RunnerData)e.Argument;
@@ -279,8 +127,6 @@ namespace TimerService
 
             try
             {
-                //try
-                //{
                 var secJob = new EPMLiveCore.Jobs.SecurityUpdate();
                 var listUid = new Guid(dr["LIST_ID"].ToString());
                 int itemID = int.Parse(dr["ITEM_ID"].ToString());
@@ -293,11 +139,7 @@ namespace TimerService
                         secJob.execute(site, web, listUid, itemID, userid, string.Empty);
                     }
                 }
-                //}
-                //catch (Exception ex)
-                //{
-                //    logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
-                //}
+
 
                 using (var cn = new SqlConnection(rd.cn))
                 {
@@ -333,18 +175,13 @@ namespace TimerService
                 }
             }
 
-            //workingThreads.remove(rd.index);
+
+        }
+        protected override string LogName {
+            get {
+                return "SECLOG";
+            }
         }
 
-
-        //static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        //{
-
-        //}
-        
-        public void stopTimer()
-        {
-            logMessage("STOP", "STMR", "Stopped Timer Service");
-        }
     }
 }

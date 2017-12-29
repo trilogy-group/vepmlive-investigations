@@ -77,6 +77,8 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="NotificationClass.cs" />
+    <Compile Include="ProcessorBase.cs" />
     <Compile Include="RollupClass.cs" />
     <Compile Include="EmailSystem.cs" />
     <Compile Include="HighTimerClass.cs" />
