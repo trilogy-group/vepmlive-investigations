@@ -33,7 +33,7 @@ namespace TimerService.Tests
                     closecon++;
                 };
                 
-                ShimTimerRunner.GetWebApplications = () =>
+                ShimProcessorBase.GetWebApplications = () =>
                 {
                     SPWebApplicationCollection webapp = new SPWebApplicationCollection(new SPWebService());
                     webapp.Add(new ShimSPWebApplication());
