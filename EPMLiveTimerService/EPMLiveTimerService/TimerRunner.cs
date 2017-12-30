@@ -66,11 +66,11 @@ namespace TimerService
         }
         void DoWork(ProcessorBase mc, IProgress<int> progress, CancellationToken token, string pollingProperty = "PollingInterval")
         {
-            if (mc.startTimer())
+            if (mc.StartTimer())
             {
                 while (true)
                 {
-                    mc.runTimer();
+                    mc.RunTimer(token);
                     token.ThrowIfCancellationRequested();
                     int poll = 5;
                     try

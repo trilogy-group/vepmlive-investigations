@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.ComponentModel;
-using System.Data.SqlClient;
 using Microsoft.SharePoint.Administration;
-using Microsoft.SharePoint;
-using System.Collections;
 using System.Data;
 using System.IO;
-using System.Reflection;
-using System.Xml;
-
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace TimerService
 {
@@ -31,7 +23,7 @@ namespace TimerService
         
         private class WorkerThreads
         {
-            private BackgroundWorker[] _arrWorkers;
+            private Task[] _arrWorkers;
             private int _maxThreads;
             public int MaxThreads {
                 get { return _maxThreads; }
@@ -40,22 +32,22 @@ namespace TimerService
             public WorkerThreads(int maxThreads)
             {
                 _maxThreads = maxThreads;
-                _arrWorkers = new BackgroundWorker[maxThreads];
+                _arrWorkers = new Task[maxThreads];
             }
 
-            public BackgroundWorker add()
+            public Task add(Action<RunnerData> action, RunnerData rd)
             {
 
                 for (int i = 0; i < _maxThreads; i++)
                     if (_arrWorkers[i] != null)
-                        if (!((BackgroundWorker)_arrWorkers[i]).IsBusy)
+                        if (_arrWorkers[i].IsCompleted)
                             _arrWorkers[i] = null;
 
                 for (int i = 0; i < _maxThreads; i++)
                 {
                     if (_arrWorkers[i] == null)
                     {
-                        BackgroundWorker bw = new BackgroundWorker();
+                        Task bw = Task.Run(() => { action(rd); });
                         _arrWorkers[i] = bw;
                         return bw;
                     }
@@ -71,21 +63,15 @@ namespace TimerService
             get { return workingThreads == null ? 0 : workingThreads.MaxThreads; }
         }
 
-        protected bool startProcess(RunnerData dr)
+        protected bool startProcess(RunnerData rd)
         {
             try
             {
-                BackgroundWorker bw = workingThreads.add();
+                Task bw = workingThreads.add(DoWork, rd);
                 if (bw == null)
                 {
                     return false;
                 }
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
-
-                bw.DoWork += bw_DoWork;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-                bw.RunWorkerAsync(dr);
                 return true;
             }
             catch (Exception ex)
@@ -111,7 +97,7 @@ namespace TimerService
         }
 
 
-        public virtual bool startTimer()
+        public virtual bool StartTimer()
         {
             try
             {
@@ -137,23 +123,17 @@ namespace TimerService
             workingThreads = new WorkerThreads(maxThreads);
             return true;
         }
-        public virtual void stopTimer()
+        public virtual void StopTimer()
         {
             logMessage("STOP", "STMR", "Stopped Timer Service");
         }
-
-        protected virtual void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-        }
-
         protected abstract string LogName {
             get;
         }
 
-        public abstract void runTimer();
+        public abstract void RunTimer(CancellationToken token);
 
-        protected abstract void bw_DoWork(object sender, DoWorkEventArgs e);
+        protected abstract void DoWork(RunnerData rd);
 
 
     }

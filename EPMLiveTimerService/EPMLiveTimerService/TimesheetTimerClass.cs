@@ -15,9 +15,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool startTimer()
+        public override bool StartTimer()
         {
-            if (!base.startTimer())
+            if (!base.StartTimer())
                 return false;
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -50,7 +50,7 @@ namespace TimerService
             return true;
         }
 
-        public override void runTimer()
+        public override void RunTimer(CancellationToken token)
         {
             try
             {
@@ -79,6 +79,7 @@ namespace TimerService
 
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
+
                                             var rd = new RunnerData { cn = sConn, dr = dr };
                                             if (startProcess(rd))
                                             {
@@ -88,6 +89,7 @@ namespace TimerService
                                                     cmd1.ExecuteNonQuery();
                                                 }
                                             }
+                                            token.ThrowIfCancellationRequested();
                                         }
                                     }
 
@@ -112,10 +114,8 @@ namespace TimerService
             }
         }
 
-        protected override void bw_DoWork(object sender, DoWorkEventArgs e)
+        protected override void DoWork(RunnerData rd)
         {
-            Thread.Sleep(2000);
-            RunnerData rd = (RunnerData)e.Argument;
             DataRow dr = rd.dr;
 
             try
