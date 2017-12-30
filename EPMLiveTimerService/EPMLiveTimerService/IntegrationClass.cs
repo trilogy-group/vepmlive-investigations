@@ -16,7 +16,7 @@ namespace TimerService
     public class IntegrationClass : ProcessorBase
     {
         
-        public override void runTimer()
+        public override void RunTimer(CancellationToken token)
         {
             try
             {
@@ -54,6 +54,7 @@ namespace TimerService
                                                     cmd1.ExecuteNonQuery();
                                                 }
                                             }
+                                            token.ThrowIfCancellationRequested();
                                         }
 
 
@@ -81,10 +82,8 @@ namespace TimerService
             }
         }
         
-        protected override void bw_DoWork(object sender, DoWorkEventArgs e)
+        protected override void DoWork(RunnerData rd)
         {
-            Thread.Sleep(2000);
-            RunnerData rd = (RunnerData)e.Argument;
             DataRow dr = rd.dr;
 
             try

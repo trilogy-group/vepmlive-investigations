@@ -15,7 +15,7 @@ namespace TimerService
 {
     public class NotificationClass : ProcessorBase
     {
-        public override void runTimer()
+        public override void RunTimer(CancellationToken token)
         {
             try
             {
@@ -45,7 +45,6 @@ namespace TimerService
                                     cmd1.ExecuteNonQuery();
                                 }
 
-                                //using (SqlCommand cmd2 = new SqlCommand("select * from vwNReadyEmails order by siteid", cn))
                                 using (var cmd2 = new SqlCommand("spNotificationGetQueue", cn))
                                 {
                                     cmd2.CommandType = CommandType.StoredProcedure;
@@ -90,13 +89,7 @@ namespace TimerService
                                             }
                                             catch (Exception ex)
                                             {
-                                                DateTime dt = DateTime.Now;
-
-                                                using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
-                                                {
-
-                                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tNOTIFICATIONS\t" + ex.Message);
-                                                }
+                                                logMessage("ERR", "NOTIFICATIONS", ex.Message);
                                             }
 
                                             using (SqlCommand cmd3 = new SqlCommand("spNSetBit", cn))
@@ -108,6 +101,7 @@ namespace TimerService
                                                 cmd3.Parameters.AddWithValue("@val", 1);
                                                 cmd3.ExecuteNonQuery();
                                             }
+                                            token.ThrowIfCancellationRequested();
                                         }
                                     }
 
@@ -136,7 +130,7 @@ namespace TimerService
             }
         }
 
-        protected override void bw_DoWork(object sender, DoWorkEventArgs e)
+        protected override void DoWork(RunnerData rd)
         {
         }
 

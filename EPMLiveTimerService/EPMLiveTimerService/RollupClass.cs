@@ -16,11 +16,9 @@ namespace TimerService
 {
     public class RollupClass : ProcessorBase
     {
-
-
-        public override bool startTimer()
+        public override bool StartTimer()
         {
-            if (!base.startTimer())
+            if (!base.StartTimer())
                 return false;
 
             logMessage("INIT", "STMR", "Clearing Queue");
@@ -55,7 +53,7 @@ namespace TimerService
         }
 
 
-        public override void runTimer()
+        public override void RunTimer(CancellationToken token)
         {
             try
             {
@@ -98,6 +96,7 @@ namespace TimerService
                                                     cmd1.ExecuteNonQuery();
                                                 }
                                             }
+                                            token.ThrowIfCancellationRequested();
                                         }
                                     }
                                 }
@@ -120,10 +119,9 @@ namespace TimerService
             }
         }
 
-        protected override void bw_DoWork(object sender, DoWorkEventArgs e)
+        protected override void DoWork(RunnerData rd)
         {
-            Thread.Sleep(200);
-            RunnerData rd = (RunnerData)e.Argument;
+
             DataRow dr = rd.dr;
 
             try
