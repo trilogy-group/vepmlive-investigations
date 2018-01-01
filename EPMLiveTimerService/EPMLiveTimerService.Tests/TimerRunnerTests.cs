@@ -9,6 +9,7 @@ using System.Data.SqlClient.Fakes;
 using Microsoft.SharePoint.Administration;
 using TimerService.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
 
 namespace TimerService.Tests
 {
@@ -46,6 +47,11 @@ namespace TimerService.Tests
 
               
             }
+        }
+        [TestMethod]
+        public void FaultyTasksTest()
+        {
+            (new TestTimerRunner()).startTimer();
         }
     }
 }

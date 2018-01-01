@@ -97,7 +97,7 @@ namespace TimerService
         }
 
 
-        public virtual bool StartTimer()
+        public virtual bool InitializeTask()
         {
             try
             {
@@ -131,7 +131,7 @@ namespace TimerService
             get;
         }
 
-        public abstract void RunTimer(CancellationToken token);
+        public abstract void RunTask(CancellationToken token);
 
         protected abstract void DoWork(RunnerData rd);
 

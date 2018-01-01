@@ -16,9 +16,9 @@ namespace TimerService
 {
     public class RollupClass : ProcessorBase
     {
-        public override bool StartTimer()
+        public override bool InitializeTask()
         {
-            if (!base.StartTimer())
+            if (!base.InitializeTask())
                 return false;
 
             logMessage("INIT", "STMR", "Clearing Queue");
@@ -53,7 +53,7 @@ namespace TimerService
         }
 
 
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {

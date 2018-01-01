@@ -17,9 +17,9 @@ namespace TimerService
     {
 
 
-        public override bool StartTimer()
+        public override bool InitializeTask()
         {
-            if (!base.StartTimer())
+            if (!base.InitializeTask())
                 return false;
 
             //EPML-5787
@@ -56,7 +56,7 @@ namespace TimerService
         }
 
 
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {

@@ -15,9 +15,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool StartTimer()
+        public override bool InitializeTask()
         {
-            if (!base.StartTimer())
+            if (!base.InitializeTask())
                 return false;
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -50,7 +50,7 @@ namespace TimerService
             return true;
         }
 
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {

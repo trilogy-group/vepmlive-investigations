@@ -15,7 +15,7 @@ namespace TimerService
 {
     public class NotificationClass : ProcessorBase
     {
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {

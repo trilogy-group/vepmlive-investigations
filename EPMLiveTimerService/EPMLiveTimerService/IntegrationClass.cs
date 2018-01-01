@@ -16,7 +16,7 @@ namespace TimerService
     public class IntegrationClass : ProcessorBase
     {
         
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {
