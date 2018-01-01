@@ -16,9 +16,9 @@ namespace TimerService
 {
     public class HighTimerClass : ProcessorBase
     {
-        public override bool StartTimer()
+        public override bool InitializeTask()
         {
-            if (!base.StartTimer())
+            if (!base.InitializeTask())
                 return false;
 
             logMessage("INIT", "STMR", "Clearing Queue");
@@ -51,8 +51,8 @@ namespace TimerService
 
             return true;
         }
-        
-        public override void RunTimer(CancellationToken token)
+
+        public override void RunTask(CancellationToken token)
         {
             try
             {
@@ -100,24 +100,24 @@ namespace TimerService
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (!(ex is OperationCanceledException)) 
                             {
                                 logMessage("ERR", "RUNT", ex.ToString());
                             }
-
+                           
                         }
 
                     }
 
                 }
-
+                
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUNT", ex.ToString());
             }
         }
-        
+
         protected override void DoWork(RunnerData rd)
         {
             DataRow dr = rd.dr;
@@ -189,7 +189,7 @@ namespace TimerService
                         m.Invoke(classObject, new object[] { });
                     }
                 }
-                }
+            }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("could not be found"))
@@ -209,8 +209,6 @@ namespace TimerService
                         {
                             logMessage("ERR", "PROC", exe.Message);
                         }
-
-
                     }
                 }
                 else
@@ -223,6 +221,11 @@ namespace TimerService
         protected override string LogName {
             get {
                 return "HTIMERLOG";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                return "HighQueueThreads";
             }
         }
     }

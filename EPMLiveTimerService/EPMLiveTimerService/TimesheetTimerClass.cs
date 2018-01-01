@@ -15,9 +15,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool StartTimer()
+        public override bool InitializeTask()
         {
-            if (!base.StartTimer())
+            if (!base.InitializeTask())
                 return false;
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -50,7 +50,7 @@ namespace TimerService
             return true;
         }
 
-        public override void RunTimer(CancellationToken token)
+        public override void RunTask(CancellationToken token)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace TimerService
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
                                 logMessage("ERR", "RUNT", ex.ToString());
                             }
@@ -108,7 +108,7 @@ namespace TimerService
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUN", ex.Message);
             }
@@ -189,6 +189,11 @@ namespace TimerService
         protected override string LogName {
             get {
                 return "TSLOG";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                return "TSQueueThreads";
             }
         }
     }

@@ -15,7 +15,11 @@ namespace TimerService
 {
     public class NotificationClass : ProcessorBase
     {
-        public override void RunTimer(CancellationToken token)
+        public override bool InitializeTask()
+        {
+            return base.InitializeTask(false);
+        }
+        public override void RunTask(CancellationToken token)
         {
             try
             {
@@ -107,7 +111,7 @@ namespace TimerService
 
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
                                 logMessage("ERR", "RUNT", ex.Message);
                             }
@@ -124,7 +128,7 @@ namespace TimerService
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUNT", ex.Message);
             }
@@ -132,11 +136,17 @@ namespace TimerService
 
         protected override void DoWork(RunnerData rd)
         {
+            throw new NotImplementedException();
         }
 
         protected override string LogName {
             get {
                 return "TIMERLOG_NOTIFICATIONS";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                throw new NotImplementedException();
             }
         }
     }
