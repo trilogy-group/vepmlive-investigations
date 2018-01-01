@@ -96,8 +96,12 @@ namespace TimerService
             }
         }
 
-
         public virtual bool InitializeTask()
+        {
+            return InitializeTask(true);
+        }
+
+        public virtual bool InitializeTask(bool initializeThreads)
         {
             try
             {
@@ -106,11 +110,12 @@ namespace TimerService
             catch { }
 
             logMessage("INIT", "STMR", "Starting Timer Service");
-
+            if (!initializeThreads)
+                return true;
             int maxThreads = 0;
             try
             {
-                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("QueueThreads"));
+                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting(ThreadsProperty));
             }
             catch (Exception e)
             {
@@ -135,6 +140,9 @@ namespace TimerService
 
         protected abstract void DoWork(RunnerData rd);
 
+        protected abstract string ThreadsProperty {
+            get;
+        }
 
     }
 }

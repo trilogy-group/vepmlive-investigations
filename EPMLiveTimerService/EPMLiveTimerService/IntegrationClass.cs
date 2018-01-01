@@ -65,7 +65,7 @@ namespace TimerService
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
                                 logMessage("ERR", "RUNT", ex.Message);
                             }
@@ -76,7 +76,7 @@ namespace TimerService
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUNT", ex.Message);
             }
@@ -136,6 +136,11 @@ namespace TimerService
         protected override string LogName {
             get {
                 return "INTLOG";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                return "IntQueueThreads";
             }
         }
     }

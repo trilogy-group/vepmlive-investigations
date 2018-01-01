@@ -11,7 +11,7 @@ namespace TimerService
     {
         public override bool InitializeTask()
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(false))
                 return false;
             return true;
         }
@@ -29,8 +29,13 @@ namespace TimerService
         }
         protected override void DoWork(RunnerData rd)
         {
-
+            throw new NotImplementedException();
         }
-
+        protected override string ThreadsProperty {
+            get {
+                throw new NotImplementedException();
+                
+            }
+        }
     }
 }

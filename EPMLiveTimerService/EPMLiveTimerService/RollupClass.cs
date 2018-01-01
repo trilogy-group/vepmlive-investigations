@@ -101,7 +101,7 @@ namespace TimerService
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
                                 logMessage("ERR", "RUNT", ex.ToString());
                             }
@@ -113,7 +113,7 @@ namespace TimerService
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUNT", ex.ToString());
             }
@@ -180,6 +180,11 @@ namespace TimerService
         protected override string LogName {
             get {
                 return "ROLLUPLOG";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                return "RollupQueueThreads";
             }
         }
     }

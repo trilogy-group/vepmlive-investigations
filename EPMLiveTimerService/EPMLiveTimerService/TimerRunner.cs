@@ -19,6 +19,7 @@ namespace TimerService
         {
             public DateTime FaultTime;
             public int FaultCount;
+            public bool Recovered = false;
         }
         protected Task[] tasks;
         protected IProgress<int>[] progress;
@@ -122,9 +123,10 @@ namespace TimerService
                 else
                 {
                     DateTime newFaultTime = DateTime.Now;
-                    TimeSpan sinceLastFault = newFaultTime - faultHistory[taskIndex].FaultTime;
+                    DateTime oldFaultTime = faultHistory[taskIndex].FaultTime;
+                    TimeSpan sinceLastFault = newFaultTime - oldFaultTime;
                     faultHistory[taskIndex].FaultTime = newFaultTime;
-                    if (sinceLastFault > new TimeSpan(0, 0, (2 ^ RETRIES) * 10))
+                    if (sinceLastFault > new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, RETRIES)) * 10))
                     {
                         faultHistory[taskIndex].FaultCount = 1;
                     }
@@ -133,6 +135,7 @@ namespace TimerService
                         faultHistory[taskIndex].FaultCount++;
                     }
                 }
+                faultHistory[taskIndex].Recovered = false;
             }
         }
         void RelaunchFaultedTasks()
@@ -140,11 +143,12 @@ namespace TimerService
             DateTime checkTime = DateTime.Now;
             for (int i = 0; i < faultHistory.Count; i++)
             {
-                if (faultHistory[i] == null)
+                if (faultHistory[i] == null || faultHistory[i].Recovered)
                     continue;
-                if (checkTime >  faultHistory[i].FaultTime + new TimeSpan(0, 0, (2 ^ faultHistory[i].FaultCount) * 10))
+                if (checkTime >  faultHistory[i].FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, faultHistory[i].FaultCount)) * 10))
                 {
                     tasks[i] = GetTask(i);
+                    faultHistory[i].Recovered = true;
                 }
             }
         }
@@ -172,7 +176,7 @@ namespace TimerService
                     throw new Exception("Could not start timer");
                 }
             }
-            catch
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 faultEvent.Set();
                 throw;

@@ -104,7 +104,8 @@ namespace TimerService
                                     }
                                 }
                             }
-                            catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
+                            { logMessage("ERR", "RUN", ex.Message); }
 
 
 
@@ -113,7 +114,7 @@ namespace TimerService
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUN", ex.Message);
             }
@@ -179,6 +180,11 @@ namespace TimerService
         protected override string LogName {
             get {
                 return "SECLOG";
+            }
+        }
+        protected override string ThreadsProperty {
+            get {
+                return "SecQueueThreads";
             }
         }
 

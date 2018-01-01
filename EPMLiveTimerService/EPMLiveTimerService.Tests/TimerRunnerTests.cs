@@ -10,10 +10,11 @@ using Microsoft.SharePoint.Administration;
 using TimerService.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using System.Threading;
 
 namespace TimerService.Tests
 {
-   // [TestClass()]
+   [TestClass]
    //TODO: Change test
     public class TimerRunnerTests
     {
@@ -51,7 +52,11 @@ namespace TimerService.Tests
         [TestMethod]
         public void FaultyTasksTest()
         {
-            (new TestTimerRunner()).startTimer();
+            TestTimerRunner runner = new TestTimerRunner();
+            runner.startTimer();
+            Thread.Sleep(60000);
+            runner.stopTimer();
+            Thread.Sleep(60000);
         }
     }
 }
