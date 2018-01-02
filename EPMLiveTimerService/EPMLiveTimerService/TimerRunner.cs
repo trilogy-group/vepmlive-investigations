@@ -158,10 +158,14 @@ namespace TimerService
             {
                 if (mc.InitializeTask())
                 {
+                    int completedRounds = 0;
                     while (true)
                     {
+                        if (completedRounds == 0)
+                            mc.HeartBeat();
                         token.ThrowIfCancellationRequested();
                         mc.RunTask(token);
+                        completedRounds = (++completedRounds) % 10;
                         int waitPeriod = WAIT;
                         try
                         {

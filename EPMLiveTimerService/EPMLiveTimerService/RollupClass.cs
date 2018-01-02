@@ -81,7 +81,7 @@ namespace TimerService
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-
+                                        int processed = 0;
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
                                             RunnerData rd = new RunnerData();
@@ -95,9 +95,11 @@ namespace TimerService
                                                     cmd1.Parameters.AddWithValue("@id", dr["eventid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
+                                                processed++;
                                             }
                                             token.ThrowIfCancellationRequested();
                                         }
+                                        logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
                                 }
                             }

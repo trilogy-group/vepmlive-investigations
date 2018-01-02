@@ -85,9 +85,11 @@ namespace TimerService
                                         da.Fill(ds);
                                         if (ds.Tables.Count > 0)
                                         {
+                                            int processed = 0;
                                             foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
                                                 var rd = new RunnerData { cn = sConn, dr = dr };
+                                               
                                                 if (startProcess(rd))
                                                 {
                                                     using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
@@ -96,9 +98,12 @@ namespace TimerService
                                                         cmd1.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
                                                         cmd1.ExecuteNonQuery();
                                                     }
+                                                    processed++;
                                                 }
+                                               
                                                 token.ThrowIfCancellationRequested();
                                             }
+                                            logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                         }
 
                                     }
