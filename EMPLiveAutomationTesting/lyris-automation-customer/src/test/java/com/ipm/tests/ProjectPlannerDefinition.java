@@ -454,12 +454,12 @@ public class ProjectPlannerDefinition {
 //            driver.switchTo().frame(iframe);
 //            System.out.println("webdriver size  :" + driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[2]")).size());
 //        }
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame(1);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
+		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")));
-        driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).click();
-        userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[3]")).getAttribute("innerText");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")));
+        driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")).click();
+        userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")).getAttribute("innerText");
     }
 
     @Then("^I click on add user in project planner")
@@ -685,8 +685,10 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]")));
-        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]")).getText().contains(arg0));
-        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]")).getText().contains(arg1));
+        assertTrue("Changed value of project worker", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[1]/td[2]")).getText().contains(arg0)
+		|| driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[5]/td[2]")).getText().contains(arg0));
+        assertTrue("Changed value of project Budget", driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]")).getText().contains(arg1)
+		|| driver.findElement(By.xpath(".//*[@id='ctl00_ctl36_g_caaf5b24_e68c_405e_8d73_605b42be2a51_divQuickDetailsContent']/table/tbody/tr/td[2]/table/tbody/tr[6]/td[2]")).getText().contains(arg1));
     }
 
     @And("^I click on Blank Plan$")
