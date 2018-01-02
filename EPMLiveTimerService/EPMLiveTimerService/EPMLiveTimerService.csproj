@@ -82,7 +82,6 @@
     <Compile Include="ProcessorBase.cs" />
     <Compile Include="RollupClass.cs" />
     <Compile Include="EmailSystem.cs" />
-    <Compile Include="HighTimerClass.cs" />
     <Compile Include="IntegrationClass.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

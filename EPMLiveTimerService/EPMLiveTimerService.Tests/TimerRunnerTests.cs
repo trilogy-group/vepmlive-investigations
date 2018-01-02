@@ -18,7 +18,7 @@ namespace TimerService.Tests
    //TODO: Change test
     public class TimerRunnerTests
     {
-        //[TestMethod()]
+        [TestMethod]
         public void startTimerTest()
         {
             using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
@@ -45,8 +45,11 @@ namespace TimerService.Tests
                 
                 TimerRunner tr = new TimerRunner();
                 tr.startTimer();
+                Thread.Sleep(60000);
+                tr.stopTimer();
+                Thread.Sleep(3000);
 
-              
+
             }
         }
         [TestMethod]
@@ -56,7 +59,7 @@ namespace TimerService.Tests
             runner.startTimer();
             Thread.Sleep(60000);
             runner.stopTimer();
-            Thread.Sleep(60000);
+            Thread.Sleep(3000);
         }
     }
 }

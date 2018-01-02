@@ -16,6 +16,14 @@ namespace TimerService
 {
     public class TimerClass : ProcessorBase
     {
+        bool highPriority = false;
+
+        public TimerClass(bool highPriority)
+        {
+            this.highPriority = highPriority;
+        }
+
+
         public override bool InitializeTask()
         {
             if (!base.InitializeTask())
@@ -71,23 +79,26 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-                                DateTime newRun = DateTime.Now;
-                                if (newRun.Minute < lastRun.Minute)
+                                if (highPriority)
                                 {
-                                    using (SqlCommand cmd = new SqlCommand("spQueueTimerJobs", cn))
+                                    DateTime newRun = DateTime.Now;
+                                    if (newRun.Minute < lastRun.Minute)
                                     {
-                                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                                        cmd.ExecuteNonQuery();
+                                        using (SqlCommand cmd = new SqlCommand("spQueueTimerJobs", cn))
+                                        {
+                                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                            cmd.ExecuteNonQuery();
+                                        }
                                     }
+                                    lastRun = newRun.AddHours(1).AddMinutes(-newRun.Minute - 1);
                                 }
-                                lastRun = newRun;
                                 using (SqlCommand cmd = new SqlCommand("spTimerGetQueue", cn))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
                                     cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
-                                    cmd.Parameters.AddWithValue("@minPriority", 10);
-                                    cmd.Parameters.AddWithValue("@maxPriority", 99);
+                                    cmd.Parameters.AddWithValue("@minPriority", highPriority? 0:10);
+                                    cmd.Parameters.AddWithValue("@maxPriority", highPriority? 10:99);
 
                                     DataSet ds = new DataSet();
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -234,12 +245,12 @@ namespace TimerService
 
         protected override string LogName {
             get {
-                return "TIMERLOG";
+                return highPriority ? "HTIMERLOG" : "TIMERLOG";
             }
         }
         protected override string ThreadsProperty {
             get {
-                return "QueueThreads";
+                return highPriority ? "HighQueueThreads" : "QueueThreads";
             }
         }
 

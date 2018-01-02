@@ -20,11 +20,11 @@ namespace TimerService
                 events = new ManualResetEvent[2];
                 faultHistory = new List<FaultItem> { null, null };
 
-                //=========================Run Main Queue
+                //=========================Run Initialization Exception 
                 events[0] = new ManualResetEvent(false);
                 progress[0] = new Progress<int>(value => { });
                 tasks[0] = GetTask(0);
-                //=========================Run High Priority Queue
+                //=========================Run Run Exception
                 events[1] = new ManualResetEvent(false);
                 progress[1] = new Progress<int>(value => { });
                 tasks[1] = GetTask(1);
