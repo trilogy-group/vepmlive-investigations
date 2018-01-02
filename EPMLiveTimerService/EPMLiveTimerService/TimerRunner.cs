@@ -165,7 +165,7 @@ namespace TimerService
                             mc.HeartBeat();
                         token.ThrowIfCancellationRequested();
                         mc.RunTask(token);
-                        completedRounds = (++completedRounds) % 10;
+                        completedRounds = (++completedRounds) % 20;
                         int waitPeriod = WAIT;
                         try
                         {
@@ -202,6 +202,7 @@ namespace TimerService
             try
             {
                 _cts.Cancel();
+                Task.WaitAll(tasks);
                 return true;
             }
             catch
