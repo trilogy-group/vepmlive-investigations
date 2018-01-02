@@ -103,7 +103,7 @@ namespace TimerService
                                                
                                                 token.ThrowIfCancellationRequested();
                                             }
-                                            logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                            if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                         }
 
                                     }

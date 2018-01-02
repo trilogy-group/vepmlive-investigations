@@ -94,7 +94,7 @@ namespace TimerService
                                             
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                     using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
