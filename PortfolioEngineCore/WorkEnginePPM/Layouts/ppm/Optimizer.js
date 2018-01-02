@@ -417,7 +417,7 @@
                         this.DeleteStratDlg.window("winDeleteStratDlg").button("minmax1").hide();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setModal(true);
                         this.DeleteStratDlg.window("winDeleteStratDlg").center();
-                        this.DeleteStratDlg.window("winDeleteStratDlg").setText("Delete Stratagy");
+                        this.DeleteStratDlg.window("winDeleteStratDlg").setText("Delete strategy");
                         this.DeleteStratDlg.window("winDeleteStratDlg").attachObject("idDeleteStratagy");
                         this.DeleteStratDlg.window("winDeleteStratDlg").button("close").attachEvent("onClick",
                               function () {
