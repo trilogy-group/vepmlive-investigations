@@ -20,58 +20,17 @@ namespace TimerService
             public string cn;
             public DataRow dr;
         }
-        
-        private class WorkerThreads
-        {
-            private Task[] _arrWorkers;
-            private int _maxThreads;
-            public int MaxThreads {
-                get { return _maxThreads; }
-            }
 
-            public WorkerThreads(int maxThreads)
-            {
-                _maxThreads = maxThreads;
-                _arrWorkers = new Task[maxThreads];
-            }
-
-            public Task add(Action<RunnerData> action, RunnerData rd)
-            {
-
-                for (int i = 0; i < _maxThreads; i++)
-                    if (_arrWorkers[i] != null)
-                        if (_arrWorkers[i].IsCompleted)
-                            _arrWorkers[i] = null;
-
-                for (int i = 0; i < _maxThreads; i++)
-                {
-                    if (_arrWorkers[i] == null)
-                    {
-                        Task bw = Task.Run(() => { action(rd); });
-                        _arrWorkers[i] = bw;
-                        return bw;
-                    }
-                }
-                return null;
-            }
-
-        }
-
-        private WorkerThreads workingThreads = null;
-
+        private int _maxThreads;
         protected int MaxThreads {
-            get { return workingThreads == null ? 0 : workingThreads.MaxThreads; }
+            get { return _maxThreads; }
         }
-
+  
         protected bool startProcess(RunnerData rd)
         {
             try
             {
-                Task bw = workingThreads.add(DoWork, rd);
-                if (bw == null)
-                {
-                    return false;
-                }
+                Task.Run(() => DoWork(rd));
                 return true;
             }
             catch (Exception ex)
@@ -125,7 +84,7 @@ namespace TimerService
                 return false;
 
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
-            workingThreads = new WorkerThreads(maxThreads);
+            _maxThreads = maxThreads;
             return true;
         }
         public virtual void StopTimer()

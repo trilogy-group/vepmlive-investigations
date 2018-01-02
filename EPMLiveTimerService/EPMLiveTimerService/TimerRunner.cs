@@ -176,7 +176,11 @@ namespace TimerService
                     throw new Exception("Could not start timer");
                 }
             }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
+            catch (OperationCanceledException)
+            {
+                mc.StopTimer();
+            }
+            catch (Exception)
             {
                 faultEvent.Set();
                 throw;
@@ -196,7 +200,7 @@ namespace TimerService
                 _cts.Cancel();
                 return true;
             }
-            catch (Exception)
+            catch
             {
                 return false;
             }
