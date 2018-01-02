@@ -454,9 +454,10 @@ public class ProjectPlannerDefinition {
 //            driver.switchTo().frame(iframe);
 //            System.out.println("webdriver size  :" + driver.findElements(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[3]/td[2]")).size());
 //        }
+		WebDriverWait wait = new WebDriverWait(driver, 60);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dialogTitleSpan")));
 		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
-        WebDriverWait wait = new WebDriverWait(driver, 60);
+        
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")));
         driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")).click();
         userTobeAdded = driver.findElement(By.xpath(".//*[@id='g_Res']/tbody/tr[3]/td[3]/div/div[1]/table/tbody/tr[2]/td[3]")).getAttribute("innerText");
