@@ -85,9 +85,9 @@ namespace TimerService
             switch (taskNumber)
             {
                 case 0:
-                    return Task.Run(() => DoWork(new TimerClass(), progress[0], events[0]), token);
+                    return Task.Run(() => DoWork(new TimerClass(false), progress[0], events[0]), token);
                 case 1:
-                    return Task.Run(() => DoWork(new HighTimerClass(), progress[1], events[1]), token);
+                    return Task.Run(() => DoWork(new TimerClass(true), progress[1], events[1]), token);
                 case 2:
                     return Task.Run(() => DoWork(new TimesheetTimerClass(), progress[2], events[2]), token);
                 case 3:
@@ -103,7 +103,7 @@ namespace TimerService
         }
 
         const int RETRIES = 5;
-        const int WAIT = 10;
+        const int WAIT = 20;
         protected void DoMonitoring()
         {
             while (true)
@@ -201,9 +201,5 @@ namespace TimerService
                 return false;
             }
         }
-
-
-
-
     }
 }
