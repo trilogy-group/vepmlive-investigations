@@ -104,12 +104,13 @@ namespace TimerService
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-
+                                        int processed = 0;
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
                                             RunnerData rd = new RunnerData();
                                             rd.cn = sConn;
                                             rd.dr = dr;
+                                            
                                             if (startProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
@@ -118,9 +119,12 @@ namespace TimerService
                                                     cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
+                                                processed++;
                                             }
+                                            
                                             token.ThrowIfCancellationRequested();
                                         }
+                                        logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
                                 }
 

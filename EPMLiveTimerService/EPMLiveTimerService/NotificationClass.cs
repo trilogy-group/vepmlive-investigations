@@ -59,7 +59,7 @@ namespace TimerService
                                         da.Fill(ds);
 
                                         Guid siteid = Guid.Empty; ;
-
+                                        int processed = 0;
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
                                             try
@@ -105,8 +105,10 @@ namespace TimerService
                                                 cmd3.Parameters.AddWithValue("@val", 1);
                                                 cmd3.ExecuteNonQuery();
                                             }
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
+                                        logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                 }

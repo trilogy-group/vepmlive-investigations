@@ -87,6 +87,10 @@ namespace TimerService
             _maxThreads = maxThreads;
             return true;
         }
+        public void HeartBeat()
+        {
+            logMessage("HTBT", "MNTH", "Dispatcher alive");
+        }
         public virtual void StopTimer()
         {
             logMessage("STOP", "STMR", "Stopped Timer Service");

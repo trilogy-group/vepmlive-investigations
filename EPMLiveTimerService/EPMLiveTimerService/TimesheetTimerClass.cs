@@ -76,11 +76,12 @@ namespace TimerService
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-
+                                        int processed = 0;
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
 
                                             var rd = new RunnerData { cn = sConn, dr = dr };
+                                            
                                             if (startProcess(rd))
                                             {
                                                 using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
@@ -88,9 +89,12 @@ namespace TimerService
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
+                                                processed++;
                                             }
+                                            
                                             token.ThrowIfCancellationRequested();
                                         }
+                                        logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                     using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
