@@ -297,8 +297,8 @@ public class ProjectPlannerDefinition {
         driver.switchTo().defaultContent();
         driver.switchTo().frame(1);
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]")));
-        WebElement element = driver.findElement(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[1]"));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]")));
+        WebElement element = driver.findElement(By.xpath(".//*[@id='ResourceGrid']/tbody/tr[3]/td[1]/div/div[1]/table/tbody/tr[2]/td[2]"));
         Actions builder = new Actions(driver);
         Action actn = builder.moveToElement(element).click().sendKeys("test").build();
         actn.perform();
@@ -362,7 +362,7 @@ public class ProjectPlannerDefinition {
         checkPageIsReady();
         List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
         Thread.sleep(5000);
-        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[8]")).click();
+        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[7]")).click();
         Thread.sleep(5000);
     }
 
