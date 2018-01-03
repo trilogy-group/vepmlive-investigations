@@ -700,6 +700,7 @@ public class ProjectPlannerDefinition {
 		driver.switchTo().frame(driver.findElement(By.className("ms-dlgFrame")));
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")));
         driver.findElement(By.xpath(".//*[@id='ctl00_PlaceHolderMain_pnlPlanner']/div[2]/div[1]/a[2]")).click();
+		driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("Ribbon.WorkPlanner.ResourcesGroup.EditTeam-Medium")));
     }
 
@@ -851,9 +852,10 @@ public class ProjectPlannerDefinition {
                 if (webElements.get(i).findElement(By.xpath("./td[3]")).getAttribute("innerText").contains(userTobeAdded)) {
                     TestCase.assertTrue("User added in ressource planner", true);
                     break;
-                } else {
-                    TestCase.assertTrue("User has not added in ressource planner", false);
-                }
+                } 
+				//else {
+                //    TestCase.assertTrue("User has not added in ressource planner", false);
+                //}
             }
         } else {
             TestCase.assertTrue("User has not added in ressource planner", false);
