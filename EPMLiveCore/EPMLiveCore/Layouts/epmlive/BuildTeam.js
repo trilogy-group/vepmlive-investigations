@@ -329,8 +329,8 @@ function SaveTeamCloseClose(loader) {
     HideTDialog();
     if (loader.xmlDoc.responseText != null) {
         var data = loader.xmlDoc.responseText.trim();
-        //Fix for EPMLCID-6873, skipping access denied errors coming from the PFE module because data already saved.
-        if (data != "Success" && !data.endsWith("Access Denied")) {
+        
+        if (data != "Success") {
             alert(data);
         }
         else
