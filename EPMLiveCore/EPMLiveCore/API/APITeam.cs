@@ -741,7 +741,7 @@ namespace EPMLiveCore.API
                     }
                     catch (UnauthorizedAccessException ex)
                     {
-                        string error = $"You do not have rights to access to Project: {li["Title"]}";
+                        string error = $"You do not have write access to project: {li["Title"]}";
                         throw new Exception(error, ex);
                     }
 
