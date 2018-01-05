@@ -2016,9 +2016,10 @@
 
                                                 if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
                                                     var registerWS = function () {
-                                                        var nl = window.epmLiveNavigation.buildLink(lnk);
+                                                        
 
                                                         if (window.epmLiveNavigation.buildLink) {
+                                                            var nl = window.epmLiveNavigation.buildLink(lnk);
                                                             var registered = false;
 
                                                             for (var i = 0; i < registeredLinks.length; i++) {
