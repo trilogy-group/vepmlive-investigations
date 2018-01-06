@@ -5,18 +5,17 @@ Param(
     [string] $dbService = "epmDB.epmldev.com",
     [string] $dbName = "epmlive",
     [string] $appPool = "SharePoint - qaepmlive680",
-    [string] $inUserName = "farmadmin@epmldev",
 	[string] $comUserName = "epmldev\farmadmin",
     [string] $inPassword = "Pass@word1",
 	[string] $version = "6.1.0.0",
 	[string] $upgradeSitesFile = "",
+	[string] $upgradeSite = "",
 	[switch] $deploySolutions,
-	[switch] $deployGAC,
-	[switch] $deployCOM,
 	[switch] $deployTimer,
 	[switch] $deployPFE,
 	[switch] $createDB,
 	[switch] $upgradeSites
+	
 	
 )
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
@@ -285,19 +284,26 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 
 if ($deploySolutions -and $deployTimer)
 {
+	$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
 	if ([string]::IsNullOrWhiteSpace($upgradeSitesFile) -ne $true)
 	{
-		Write-Host 'Upgrading Site(s)'
-		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
+		Write-Host "Upgrading Site(s) from $upgradeSitesFile"
 		& $siteUpgrader -P $upgradeSitesFile 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
+	elseif ([string]::IsNullOrWhiteSpace($upgradeSite) -ne $true)
+	{
+		Write-Host "Upgrading Site $upgradeSite"
+		& $siteUpgrader -S $upgradeSite 
 		if ($LastExitCode -ne 0) {
 			throw "Site upgrader failed with exit code: $LastExitCode."
 		}
 	}
 	elseif ($upgradeSites)
 	{
-		Write-Host 'Upgrading Site(s)'
-		$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
+		Write-Host 'Upgrading Site(s) from SitesList.xml'
 		$defaultSitesFile = Join-Path $ScriptDir 'SitesList.xml'
 		& $siteUpgrader -P $defaultSitesFile 
 		if ($LastExitCode -ne 0) {
