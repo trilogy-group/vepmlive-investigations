@@ -109,7 +109,8 @@ namespace TimerService
             while (true)
             {
                 int taskIndex = ManualResetEvent.WaitAny(events, new TimeSpan(0, 0, WAIT));
-                token.ThrowIfCancellationRequested();
+                if (token.IsCancellationRequested)
+                    break;
                 RelaunchFaultedTasks();
                 if (taskIndex == WaitHandle.WaitTimeout)
                 {
@@ -152,20 +153,25 @@ namespace TimerService
                 }
             }
         }
+
+        const int HEART_BEAT_MINUTES = 5;
         protected void DoWork(ProcessorBase mc, IProgress<int> progress, ManualResetEvent faultEvent, string pollingProperty = "PollingInterval")
         {
             try
             {
                 if (mc.InitializeTask())
                 {
-                    int completedRounds = 0;
+                    DateTime lastHeartBeat = DateTime.Now;
                     while (true)
                     {
-                        if (completedRounds == 0)
+                        DateTime newHeartBeat = DateTime.Now;
+                        if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
+                        {
                             mc.HeartBeat();
+                            lastHeartBeat = newHeartBeat;
+                        }
                         token.ThrowIfCancellationRequested();
                         mc.RunTask(token);
-                        completedRounds = (++completedRounds) % 20;
                         int waitPeriod = WAIT;
                         try
                         {
@@ -202,7 +208,9 @@ namespace TimerService
             try
             {
                 _cts.Cancel();
+                monitoringWorker.Wait();
                 Task.WaitAll(tasks);
+                
                 return true;
             }
             catch
