@@ -734,8 +734,16 @@ namespace EPMLiveCore.API
                         uvc.Remove(uv);
                     }
 
-                    li["AssignedTo"] = uvc;
-                    li.SystemUpdate();
+                    try
+                    {
+                        li["AssignedTo"] = uvc;
+                        li.SystemUpdate();
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        string error = $"You do not have write access to project: {li["Title"]}";
+                        throw new Exception(error, ex);
+                    }
 
 
                 }

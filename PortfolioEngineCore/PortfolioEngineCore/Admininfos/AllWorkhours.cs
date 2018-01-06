@@ -215,8 +215,6 @@ namespace PortfolioEngineCore
                 if (hours > 0 && haveholidays && deductHolidays)
                 {
                     hours = hours - GetHolidayHours(l_HolidayHours, thisDate);
-                    if (hours < 0)
-                        hours = 0;
                 }
                 totalhours += hours;
                 thisDate = thisDate.AddDays(1);

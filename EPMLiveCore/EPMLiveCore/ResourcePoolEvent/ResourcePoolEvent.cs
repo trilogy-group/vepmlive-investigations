@@ -168,59 +168,42 @@ namespace EPMLiveCore
                     //Add OR Edit functionality
                     if (isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
                     {
+                        
+
+                        if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
+                        {
+                            try
+                            {
+                                if (properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
+                                {
+                                    string title = properties.AfterProperties["Title"].ToString();
+                                    string[] sTitle = title.Split(' ');
+
+                                    properties.AfterProperties["FirstName"] = sTitle[0];
+                                    properties.AfterProperties["LastName"] = title.Substring(sTitle[0].Length + 1);
+                                }
+                                else
+                                {
+                                    properties.AfterProperties["Title"] = properties.AfterProperties["FirstName"].ToString().Trim() + " " + properties.AfterProperties["LastName"].ToString().Trim();
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
                         //CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
                         //ONLINE
                         if (isOnline)
                         {
-                            if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
-                            {
-                                try
-                                {
-                                    if (properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
-                                    {
-                                        string title = properties.AfterProperties["Title"].ToString();
-                                        string[] sTitle = title.Split(' ');
-
-                                        properties.AfterProperties["FirstName"] = sTitle[0];
-                                        properties.AfterProperties["LastName"] = title.Substring(sTitle[0].Length + 1);
-                                    }
-                                    else
-                                    {
-                                        properties.AfterProperties["Title"] = properties.AfterProperties["FirstName"].ToString().Trim() + " " + properties.AfterProperties["LastName"].ToString().Trim();
-                                    }
-                                }
-                                catch
-                                {
-
-                                }
-                            }
                             ProcessOnlineUser(properties, isAdd);
-                            disableAccount(properties);
                         }
                         //ON-PREM/ON-SITE
                         else
                         {
-                            if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
-                            {
-                                try
-                                {
-                                    if (properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
-                                    {
-                                        string title = properties.AfterProperties["Title"].ToString();
-                                        string[] sTitle = title.Split(' ');
-
-                                        properties.AfterProperties["FirstName"] = sTitle[0];
-                                        properties.AfterProperties["LastName"] = title.Substring(sTitle[0].Length + 1);
-                                    }
-                                    else
-                                    {
-                                        properties.AfterProperties["Title"] = properties.AfterProperties["FirstName"].ToString().Trim() + " " + properties.AfterProperties["LastName"].ToString().Trim();
-                                    }
-                                }
-                                catch { }
-                            }
                             setPermissions(properties, isAdd);
                         }
+                        disableAccount(properties);
                         ProcessLevel(properties);
                         ProcessDepartment(properties);
 

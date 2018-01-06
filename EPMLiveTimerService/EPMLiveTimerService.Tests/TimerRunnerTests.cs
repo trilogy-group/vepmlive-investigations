@@ -9,14 +9,16 @@ using System.Data.SqlClient.Fakes;
 using Microsoft.SharePoint.Administration;
 using TimerService.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.Threading;
 
 namespace TimerService.Tests
 {
-   // [TestClass()]
+   [TestClass]
    //TODO: Change test
     public class TimerRunnerTests
     {
-        //[TestMethod()]
+        [TestMethod]
         public void startTimerTest()
         {
             using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
@@ -33,7 +35,7 @@ namespace TimerService.Tests
                     closecon++;
                 };
                 
-                ShimTimerRunner.GetWebApplications = () =>
+                ShimProcessorBase.GetWebApplications = () =>
                 {
                     SPWebApplicationCollection webapp = new SPWebApplicationCollection(new SPWebService());
                     webapp.Add(new ShimSPWebApplication());
@@ -43,9 +45,21 @@ namespace TimerService.Tests
                 
                 TimerRunner tr = new TimerRunner();
                 tr.startTimer();
+                Thread.Sleep(60000);
+                tr.stopTimer();
+                Thread.Sleep(3000);
 
-              
+
             }
+        }
+        [TestMethod]
+        public void FaultyTasksTest()
+        {
+            TestTimerRunner runner = new TestTimerRunner();
+            runner.startTimer();
+            Thread.Sleep(60000);
+            runner.stopTimer();
+            Thread.Sleep(3000);
         }
     }
 }
