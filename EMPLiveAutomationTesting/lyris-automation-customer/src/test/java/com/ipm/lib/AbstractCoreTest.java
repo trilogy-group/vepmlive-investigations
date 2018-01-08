@@ -28,7 +28,8 @@ public class AbstractCoreTest {
     public WebDriver driver() {
         //Chrome
         Map<String, Object> prefs = new HashMap<>();
-        //System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\uploads\\chromedriver.exe");
+		if (System.getProperty("os.name").contains("Windows"))
+			System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\uploads\\chromedriver.exe");
         prefs.put("download.default_directory", System.getProperty("user.dir"));
         DesiredCapabilities caps = DesiredCapabilities.chrome();
         ChromeOptions options = new ChromeOptions();
