@@ -39,7 +39,7 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 		
 		WaitUntilServices $component.installAsService.name "Stopped"
 		Write-Host("Killing " + $component.installAsService.processname)
-		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
+		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue -Force -Confirm:$false
 	}
 	else
 	{
