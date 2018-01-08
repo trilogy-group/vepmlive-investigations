@@ -163,7 +163,16 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
-
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>2.20.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.zetten</groupId>
+			<artifactId>xvfb-maven-plugin</artifactId>
+			<version>1.4.0</version>
+		</dependency>
         <!-- end of test dependencies -->
     </dependencies>
     <!-- end of dependencies -->
@@ -268,6 +277,9 @@
 
                     <!-- Define here what goals you want to prepare your release -->
                     <preparationGoals>clean install</preparationGoals>
+					<environmentVariables>
+						<DISPLAY>${xvfb.display}</DISPLAY>
+					</environmentVariables>
                 </configuration>
             </plugin>
             <!-- end of release -->
