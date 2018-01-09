@@ -34,6 +34,8 @@ public class AbstractCoreTest {
         DesiredCapabilities caps = DesiredCapabilities.chrome();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
+		options.addArguments("--headless");
+		
         options.addArguments("--allow-running-insecure-content");
         options.setExperimentalOption("prefs", prefs);
         caps.setCapability(ChromeOptions.CAPABILITY, options);
