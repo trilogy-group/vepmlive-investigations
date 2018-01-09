@@ -370,8 +370,10 @@ public class ProjectPlannerDefinition {
     public void selectFirstUserForTask() throws InterruptedException {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
-        driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
+        //wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
+        //driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='TreeGridControls']/div/div/div/div[6]/div/div/div/div/div/div")));
+        driver.findElement(By.xpath(".//*[@id='TreeGridControls']/div/div/div/div[6]/div/div/div/div/div/div")).click();
         Thread.sleep(5000);
         driver.findElement(By.xpath("//*[contains(text(), 'OK')]")).click();
     }
