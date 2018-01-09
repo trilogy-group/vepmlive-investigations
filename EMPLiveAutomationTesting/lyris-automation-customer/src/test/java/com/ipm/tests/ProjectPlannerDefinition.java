@@ -360,9 +360,9 @@ public class ProjectPlannerDefinition {
     @Then("^I Click on user cell")
     public void clickOnUserCell() throws InterruptedException {
         checkPageIsReady();
-        List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[2]"));
+        List<WebElement> webElements = driver.findElements(By.xpath(".//*[@id='WorkPlannerGrid']/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr"));
         Thread.sleep(5000);
-        webElements.get(webElements.size() - 1).findElement(By.xpath("./td[7]")).click();
+        webElements.get(webElements.size() - 1).findElement(By.cssSelector(".HideCol6AssignedTo")).click();
         Thread.sleep(5000);
     }
 
@@ -370,8 +370,10 @@ public class ProjectPlannerDefinition {
     public void selectFirstUserForTask() throws InterruptedException {
         checkPageIsReady();
         WebDriverWait wait = new WebDriverWait(driver, 60);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
-        driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".GSMenuItemText.GSEnumMenuItemText")));
+        driver.findElement(By.cssSelector(".GSMenuItemText.GSEnumMenuItemText")).click();
+        //wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")));
+        //driver.findElement(By.xpath("//div[@class='GSMenuItemText GSEnumMenuItemText']")).click();
 		//wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(".//*[@id='TreeGridControls']/div/div/div/div[6]/div/div/div/div/div/div")));
         //driver.findElement(By.xpath(".//*[@id='TreeGridControls']/div/div/div/div[6]/div/div/div/div/div/div")).click();
         Thread.sleep(5000);
