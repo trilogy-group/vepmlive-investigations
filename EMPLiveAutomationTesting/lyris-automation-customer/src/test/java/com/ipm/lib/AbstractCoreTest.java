@@ -35,6 +35,7 @@ public class AbstractCoreTest {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
 		options.addArguments("--headless");
+		options.addArguments("--window-size=1200,1100");
 		
         options.addArguments("--allow-running-insecure-content");
         options.setExperimentalOption("prefs", prefs);
