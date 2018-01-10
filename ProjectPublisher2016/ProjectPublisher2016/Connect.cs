@@ -163,81 +163,6 @@ namespace ProjectPublisher2016
 		}
 
 		/***********************************************
-		* Procedure: versionCheck
-		* Purpose: Check for a new version of Project Publisher
-		* Parameters In: bool (to force a check)
-		* Parameters Out:
-		***********************************************/
-		private void versionCheck(bool force)
-		{
-			if(Connect.shouldCheck() || force)
-			{
-				try
-				{
-					bool isNewVersion = false;
-					string newVersion = getVersion();
-					string curVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-					string []newTemp = newVersion.Split('\n');
-
-					string newVersionFile = newTemp[1];
-					string newVersionUrl = newTemp[2];
-					string []newVersionArr = newTemp[0].Split('.');
-					string []curVersionArr = curVersion.Split('.');
-				
-					int nv;
-					int cv;
-					nv = int.Parse(newVersionArr[0]);
-					cv = int.Parse(curVersionArr[0]);
-					if(nv>cv)
-						isNewVersion = true;
-					else if(nv==cv)
-					{
-						nv = int.Parse(newVersionArr[1]);
-						cv = int.Parse(curVersionArr[1]);
-						if(nv>cv)
-							isNewVersion = true;
-						else if(nv==cv)
-						{
-							nv = int.Parse(newVersionArr[2]);
-							cv = int.Parse(curVersionArr[2]);
-							if(nv>cv)
-								isNewVersion = true;
-							else if(nv==cv)
-							{
-								nv = int.Parse(newVersionArr[3]);
-								cv = int.Parse(curVersionArr[3]);
-								if(nv>cv)
-									isNewVersion = true;
-							}
-						}
-					}
-					if(isNewVersion)
-					{
-						FormNewVersion frmNew = new FormNewVersion(newVersionUrl);
-						frmNew.ShowDialog();
-
-						RegistryClass.SaveSetting("Tr","versioncheck",frmNew.checkBox1.Checked.ToString());
-
-						if(frmNew.DialogResult == DialogResult.Yes)
-							Process.Start("iexplore",newVersionFile);
-						frmNew.Hide();
-						frmNew.Refresh();
-						frmNew.Dispose();
-					}
-					else if(force)
-					{
-						MessageBox.Show("You are running the most current version.");
-					}
-				}
-				catch(Exception)
-				{
-					//MessageBox.Show(ex.Message.ToString() + "\n\n" + ex.StackTrace.ToString());
-				}
-				
-			}
-		}
-		/***********************************************
 		* Procedure: getAttribute
 		* Purpose: Gets an attribute from an xml node and does error checking
 		* Parameters In: 
@@ -406,8 +331,7 @@ namespace ProjectPublisher2016
 					Connect.isProjServer = true;
 				}
 				else
-				{
-					versionCheck(false);
+				{					
 					Connect.isProjServer = false;
 				}
 
@@ -1170,11 +1094,7 @@ namespace ProjectPublisher2016
 				EPMLiveMenu = null;*/
 			}
 			catch{}
-		}
-		public void Updates()
-		{
-			versionCheck(true);
-		}
+		}		
 		/***********************************************
 		* Procedure: MyButtonOptions_Click
 		* Purpose: Runs when the Options button is clicked

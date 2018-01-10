@@ -87,12 +87,7 @@ namespace ProjectPublisher2016
         private void btnOnline_Click(object sender, RibbonControlEventArgs e)
         {
             Globals.ThisAddIn.c.Help();
-        }
-
-        private void btnUpdates_Click(object sender, RibbonControlEventArgs e)
-        {
-            Globals.ThisAddIn.c.Updates();
-        }
+        }        
 
         private void btnAbout_Click(object sender, RibbonControlEventArgs e)
         {
