@@ -119,7 +119,8 @@ public class SmokeVerificationStepDefinition {
         checkPageIsReady();
         searchForCreatedChange(createdChangeTitle);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")));
-        assertEquals("Change item Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+        //assertEquals("Change item Not Deleted", "No data found", driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']/tbody/tr[3]/td/div/table/tbody/tr/td/div")).getText());
+		assertTrue("Change item Not Deleted", null != driver.findElement(By.xpath(".//*[@id='GanttGrid0Main']//div[contains(text(), 'No data found')]")));
     }
 
     public void searchForCreatedChange(String itemName) {
