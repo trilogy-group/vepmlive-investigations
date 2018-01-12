@@ -22,6 +22,7 @@
     <DefineConstants>Debug</DefineConstants>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <LinkerAdditionalOptions>-sacl</LinkerAdditionalOptions>
+    <CompilerAdditionalOptions>-arch x86</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
