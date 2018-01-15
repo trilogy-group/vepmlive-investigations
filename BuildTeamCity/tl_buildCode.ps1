@@ -267,7 +267,6 @@ Log-SubSection "Building Project Publisher"
     /p:Platform="$PlatformToBuild" `
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
-    /p:GenerateSerializationAssemblies="Off" `
     /p:ReferencePath=$referencePath `
     /fl /flp:"$loggerArgs" `
     /m:4 `

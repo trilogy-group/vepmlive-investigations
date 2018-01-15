@@ -131,8 +131,8 @@ if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 
 $MSBuildExec = "c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 $VSExec = "c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.com"
-$signtool = "c:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe"
-
+$signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
+$sdkPath = "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.2 Tools"
 #$BuildDirectory = "$ScriptDir\..\..\"
 
 $NewReleaseNumber = "6.0.0.0"
@@ -290,7 +290,31 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 }
 
 Log-Section "Building WiX Projects . . ."
+$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("ProjectPublisher2016.csproj") -Recurse
 
+Log-SubSection "projectPath: '$projectPath'...."
+
+Log-SubSection "Building ProjectPublisher2016.csproj Release|AnyCPU..."
+& $MSBuildExec $projectPath `
+/t:build `
+/p:OutputPath="bin\Release" `
+/p:PreBuildEvent= `
+/p:PostBuildEvent= `
+/p:Configuration="Release" `
+/p:Platform="AnyCPU" `
+/p:langversion="$langversion" `
+/t:GenerateSerializationAssemblies `
+/p:ReferencePath=$referencePath `
+/fl /flp:"$loggerArgs" `
+/m:4 `
+$ToolsVersion `
+$DfMsBuildArgs `
+$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+	throw "Project build failed with exit code: $LastExitCode."
+}
+
+		
 $platforms = @("x64", "x86")
 $paths = @("\x64", "")
 $platformIndex = 0;
@@ -298,13 +322,12 @@ foreach ($platform in $platforms)
 {
 	$platformPath = $paths[$platformIndex]
 	
-	$wixProjects = @("ProjectPublisher2016.csproj", "PublisherSetup2016WiX.wixproj", "PublisherSetupBootstrapper.wixproj")
-	$serAssembly = @("/t:GenerateSerializationAssemblies", "", "")
+	$wixProjects = @("PublisherSetup2016WiX.wixproj", "PublisherSetupBootstrapper.wixproj")
+	
 	$projIndex = 0;
 	foreach($wixProject in $wixProjects)
 	{
 		$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("$wixProject") -Recurse
-		$genSerAssembly = $serAssembly[$projIndex]
 		
 		Log-SubSection "projectPath: '$projectPath'...."
 		
@@ -317,7 +340,6 @@ foreach ($platform in $platforms)
 	   /p:Configuration="Release" `
 	   /p:Platform="$platform" `
 	   /p:langversion="$langversion" `
-	   "$genSerAssembly" `
 	   /p:ReferencePath=$referencePath `
 		/fl /flp:"$loggerArgs" `
 		/m:4 `
@@ -331,7 +353,8 @@ foreach ($platform in $platforms)
 
 		Try
 		{
-			if ($projIndex -eq 1)
+			
+			if ($projIndex -eq 0)
 			{
 				exec {&$signtool sign /n "EPM Live, Inc." `
 					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
@@ -340,7 +363,7 @@ foreach ($platform in $platforms)
 					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
 				
 			}
-			if ($projIndex -eq 2)
+			if ($projIndex -eq 1)
 			{
 				exec {&$signtool sign /n "EPM Live, Inc." `
 					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe"}
@@ -356,7 +379,7 @@ foreach ($platform in $platforms)
 			$ErrorMessage = $_.Exception.Message
 			Write-Warning "Failed to sign $wixProject ($platform): $ErrorMessage" -WarningAction SilentlyContinue
 		}
-		if ($projIndex -eq 2)
+		if ($projIndex -eq 1)
 		{
 			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016$platform.msi" -Force
 			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe" -Force
