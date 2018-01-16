@@ -3,15 +3,17 @@
   <?if $(var.Platform) = x64 ?>
   <?define bitness = "(64 bit)" ?>
   <?define Win64 = "yes" ?>
+  <?define MyProductCode = "0F6B37FD-8646-4721-8F72-8884C335A3AF" ?>
+  <?define MyUpgradeCode = "555A36A7-8558-4CC2-9A65-6013F4316C84" ?>
   <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
   <?else ?>
   <?define bitness = "(32 bit)" ?>
   <?define Win64 = "no" ?>
+  <?define MyProductCode = "8E488175-5A20-428E-90B3-1AA2E28B2B5A" ?>
+  <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-
-  <Product Id="*" Name="Project Publisher 2016" Language="1033" Version="6.1.0" Manufacturer="EPM Live" UpgradeCode="555A36A7-8558-4CC2-9A65-6013F4316C84">
-
+  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016" Language="1033" Version="6.3.4" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MediaTemplate EmbedCab="yes" />

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
-  <Bundle Name="Project Publisher 2016" Version="6.1.0.0" Manufacturer="EPM Live" UpgradeCode="8c14fd8f-8f77-4c2d-998a-3b7c2e34bee0" IconSourceFile="..\EPMLive.ico">
+  <?if $(var.Platform) = x64 ?>
+  <?define bitness = "(64 bit)" ?>
+  <?define Win64 = "yes" ?>
+  <?define MyProductCode = "0F6B37FD-8646-4721-8F72-8884C335A3AF" ?>
+  <?define MyUpgradeCode = "555A36A7-8558-4CC2-9A65-6013F4316C84" ?>
+  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+  <?define bitness = "(32 bit)" ?>
+  <?define Win64 = "no" ?>
+  <?define MyProductCode = "8E488175-5A20-428E-90B3-1AA2E28B2B5A" ?>
+  <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
+  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+  <Bundle  Name="Project Publisher 2016" Version="6.3.4" Manufacturer="EPM Live" UpgradeCode="$(var.MyUpgradeCode)" IconSourceFile="..\EPMLive.ico">
     <!-- Bundle can only be installed on Windows >= 7 
   	         (see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx) -->
     <bal:Condition Message="Requires Windows >= 7">
@@ -17,7 +30,7 @@
 
     <Chain>
       <!-- TODO: Define the list of chained packages. -->
-      <MsiPackage Id="Shell" SourceFile="$(var.PublisherSetup2016WiX.TargetDir)PublisherSetup2016.msi">
+      <MsiPackage Id="Shell" SourceFile="$(var.PublisherSetup2016WiX.TargetDir)PublisherSetup2016.msi" >
         <!-- Pass a property value to Shell installer -->
         <!--MsiProperty Name="INSTALLSDK" Value="1" /-->
       </MsiPackage>
