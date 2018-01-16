@@ -290,31 +290,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 }
 
 Log-Section "Building WiX Projects . . ."
-$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("ProjectPublisher2016.csproj") -Recurse
 
-Log-SubSection "projectPath: '$projectPath'...."
-
-Log-SubSection "Building ProjectPublisher2016.csproj Release|AnyCPU..."
-& $MSBuildExec $projectPath `
-/t:build `
-/p:OutputPath="bin\Release" `
-/p:PreBuildEvent= `
-/p:PostBuildEvent= `
-/p:Configuration="Release" `
-/p:Platform="AnyCPU" `
-/p:langversion="$langversion" `
-/t:GenerateSerializationAssemblies `
-/p:ReferencePath=$referencePath `
-/fl /flp:"$loggerArgs" `
-/m:4 `
-$ToolsVersion `
-$DfMsBuildArgs `
-$MsBuildArguments  
-if ($LastExitCode -ne 0) {
-	throw "Project build failed with exit code: $LastExitCode."
-}
-
-		
 $platforms = @("x64", "x86")
 $paths = @("\x64", "")
 $platformIndex = 0;
