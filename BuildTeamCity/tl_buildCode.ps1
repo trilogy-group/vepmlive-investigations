@@ -259,7 +259,8 @@ if ($LastExitCode -ne 0) {
 }
 
 Log-SubSection "Building Project Publisher"
-$env:Sdk40ToolsPath = "$sdkPath\x64\"    
+$env:Sdk40ToolsPath = "$sdkPath\x64\"  
+$env:SdkToolsPath = "$sdkPath\x64\"   
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
     /p:PreBuildEvent= `
