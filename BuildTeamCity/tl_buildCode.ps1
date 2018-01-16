@@ -66,6 +66,7 @@ if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 # msbuild executable location
 # $MSBuildExec = "C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
 $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
+$sdkPath = "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.2 Tools"
 # VSTest executable
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
@@ -258,7 +259,7 @@ if ($LastExitCode -ne 0) {
 }
 
 Log-SubSection "Building Project Publisher"
-    
+$env.Sdk40ToolsPath = "$sdkPath\x64\"    
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
     /p:PreBuildEvent= `

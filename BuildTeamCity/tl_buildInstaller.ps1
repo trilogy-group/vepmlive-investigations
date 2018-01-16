@@ -308,6 +308,8 @@ foreach ($platform in $platforms)
 		Log-SubSection "projectPath: '$projectPath'...."
 		
 		Log-SubSection "Building $wixProject Release|$platform..."
+		$env.Sdk40ToolsPath = "$sdkPath$platformPath\"
+		
 	   & $MSBuildExec $projectPath `
 	   /t:build `
 	   /p:OutputPath="bin$platformPath\Release" `
