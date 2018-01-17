@@ -344,8 +344,8 @@ foreach ($platform in $platforms)
 		Write-Warning "Failed to sign $wixProject ($platform): $ErrorMessage" -WarningAction SilentlyContinue
 	}
 	
-	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016$platform.msi" -Force
-	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe" -Force
+	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\PublisherSetup2016$platform.msi" -Force
+	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\setup.exe" -Force
 	
 
 	$platformIndex++;
@@ -402,7 +402,7 @@ if (Test-Path "$BinariesDirectory\_PublishedWebsites\api") {
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\x64\Release\"
-ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\Release\"
+ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\x86\Release\"
 
 Log-Section "Install Shield"
 
