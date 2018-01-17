@@ -14,18 +14,21 @@ LABEL \
 SHELL ["powershell"]
 
 
-# Install required features
-RUN Install-WindowsFeature NET-Framework-45-Core ; \
-Install-WindowsFeature NET-Framework-45-ASPNET ; \
-Install-WindowsFeature Web-Asp-Net45 ; \
-New-Item -ItemType Directory C:\Sources
 
 # Download and install build tools 
-RUN Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
+RUN New-Item -ItemType Directory C:\Sources ; \
+Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
 $setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\BuildTools_Full.exe" -ArgumentList /Silent, /Full ; \
 If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitCode)\" } ; \
 setx PATH '%PATH%;C:\Program Files (x86)\MSBuild\14.0\Bin\' ; \
 Remove-Item "C:\Sources\BuildTools_Full.exe" 
+
+# Install required features
+RUN Install-WindowsFeature NET-Framework-45-Core ; \
+Install-WindowsFeature NET-Framework-45-ASPNET ; \
+Install-WindowsFeature Web-Asp-Net45
+
+
 
 #Download Net 4.6.2 dev pack
 RUN Invoke-WebRequest 'https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe' -OutFile "C:\Sources\devpack.exe" -UseBasicParsing  ; \
@@ -157,6 +160,14 @@ $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.Office.
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Library.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.BusinessData.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Flighting.Dll') 
+
+
+#Download Visual Studio GAC
+RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21441"&"authkey=AOQCThCg_ljgAwk' -OutFile "$env:TEMP\SDKTools.zip" -UseBasicParsing  ; \
+Add-Type -assembly 'system.io.compression.filesystem' ; \
+$sourceZip =  Join-Path $env:TEMP "SDKTools.zip" ; \
+[io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\Microsoft SDKs') ; \
+Remove-Item "$env:TEMP\SDKTools.zip" 
 
 #CMD while ($true) { Start-Sleep -Seconds 3600 }
 

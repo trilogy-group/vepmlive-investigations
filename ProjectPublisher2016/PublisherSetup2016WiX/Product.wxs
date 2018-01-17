@@ -13,7 +13,7 @@
   <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016" Language="1033" Version="6.3.4" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
+  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016  $(var.Platform)" Language="1033" Version="6.3.4" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MediaTemplate EmbedCab="yes" />

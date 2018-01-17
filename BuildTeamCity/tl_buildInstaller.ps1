@@ -292,83 +292,75 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 Log-Section "Building WiX Projects . . ."
 
 $platforms = @("x64", "x86")
-$paths = @("\x64", "")
+
+$wixProject = "ProjectPublisher2016.sln"
 $platformIndex = 0;
 foreach ($platform in $platforms)
 {
-	$platformPath = $paths[$platformIndex]
+	$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("$wixProject") -Recurse
+		
+	Log-SubSection "projectPath: '$projectPath'...."
 	
-	$wixProjects = @("PublisherSetup2016WiX.wixproj", "PublisherSetupBootstrapper.wixproj")
+	Log-SubSection "Building $wixProject Release|$platform..."
+	$sGenToolPath = "$sdkPath\"
 	
-	$projIndex = 0;
-	foreach($wixProject in $wixProjects)
+	if ($platformIndex -eq 0)
 	{
-		$projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("$wixProject") -Recurse
-		
-		Log-SubSection "projectPath: '$projectPath'...."
-		
-		Log-SubSection "Building $wixProject Release|$platform..."
-	   & $MSBuildExec $projectPath `
-	   /t:build `
-	   /p:OutputPath="bin$platformPath\Release" `
-	   /p:PreBuildEvent= `
-	   /p:PostBuildEvent= `
-	   /p:Configuration="Release" `
-	   /p:Platform="$platform" `
-	   /p:langversion="$langversion" `
-	   /p:ReferencePath=$referencePath `
-		/fl /flp:"$loggerArgs" `
-		/m:4 `
-		$ToolsVersion `
-		$DfMsBuildArgs `
-		$MsBuildArguments  
-		if ($LastExitCode -ne 0) {
-			throw "Project build failed with exit code: $LastExitCode."
-		}
+		$sGenToolPath = "$sdkPath\x64\"
+	}
+	Write-Host "SGEN: $sGenToolPath"
+	$sGenToolPath = $sGenToolPath -replace "\s","%20" 
+   & $MSBuildExec $projectPath `
+   /t:build `
+   /p:Configuration="Release" `
+   /p:Platform="$platform" `
+   /p:langversion="$langversion" `
+   /p:SGenToolPath="$sGenToolPath" `
+   /p:ReferencePath=$referencePath `
+	/fl /flp:"$loggerArgs" `
+	/m:4 `
+	$ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+	if ($LastExitCode -ne 0) {
+		throw "Project build failed with exit code: $LastExitCode."
+	}
 		
 
-		Try
-		{
-			
-			if ($projIndex -eq 0)
-			{
-				exec {&$signtool sign /n "EPM Live, Inc." `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
-				
-				exec {&$signtool timestamp /t http://timestamp.digicert.com `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi"}
-				
-			}
-			if ($projIndex -eq 1)
-			{
-				exec {&$signtool sign /n "EPM Live, Inc." `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe"}
-				
-				exec {&$signtool timestamp /t http://timestamp.digicert.com `
-					"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe"}
-					
-			}
-			
-		}
-		Catch
-		{
-			$ErrorMessage = $_.Exception.Message
-			Write-Warning "Failed to sign $wixProject ($platform): $ErrorMessage" -WarningAction SilentlyContinue
-		}
-		if ($projIndex -eq 1)
-		{
-			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin$platformPath\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\PublisherSetup2016$platform.msi" -Force
-			Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin$platformPath\Release\setup.exe" -Force
-			
-		}
+	Try
+	{
 		
-		$projIndex++
+		
+			exec {&$signtool sign /n "EPM Live, Inc." `
+				"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi"}
+			
+			exec {&$signtool timestamp /t http://timestamp.digicert.com `
+				"$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi"}
+			
+		
+			exec {&$signtool sign /n "EPM Live, Inc." `
+				"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platformP\Release\ProjectPublisher2016.exe"}
+			
+			exec {&$signtool timestamp /t http://timestamp.digicert.com `
+				"$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe"}
+		
+		
 	}
+	Catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Warning "Failed to sign $wixProject ($platform): $ErrorMessage" -WarningAction SilentlyContinue
+	}
+	
+	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\PublisherSetup2016$platform.msi" -Force
+	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\setup.exe" -Force
+	
+
 	$platformIndex++;
 
 }
 
-	
+
 
 Log-Section "Copying Files..."
 
@@ -418,7 +410,7 @@ if (Test-Path "$BinariesDirectory\_PublishedWebsites\api") {
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\x64\Release\"
-ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\Release\"
+ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\x86\Release\"
 
 Log-Section "Install Shield"
 

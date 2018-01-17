@@ -17,7 +17,7 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\WiX Toolset\v4\wix.targets</WixTargetsPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
     <SuppressPdbOutput>True</SuppressPdbOutput>
@@ -26,7 +26,7 @@
     </CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <LinkerAdditionalOptions>-sacl</LinkerAdditionalOptions>

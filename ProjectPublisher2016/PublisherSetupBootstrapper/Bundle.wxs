@@ -13,7 +13,7 @@
   <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-  <Bundle  Name="Project Publisher 2016" Version="6.3.4" Manufacturer="EPM Live" UpgradeCode="$(var.MyUpgradeCode)" IconSourceFile="..\EPMLive.ico">
+  <Bundle  Name="Project Publisher 2016 $(var.Platform)" Version="6.3.4" Manufacturer="EPM Live" UpgradeCode="$(var.MyUpgradeCode)" IconSourceFile="..\EPMLive.ico">
     <!-- Bundle can only be installed on Windows >= 7 
   	         (see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx) -->
     <bal:Condition Message="Requires Windows >= 7">
