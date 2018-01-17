@@ -270,8 +270,6 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 	Log-SubSection "projectPath: '$projectPath'...."
     
    & $MSBuildExec $projectPath `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
    /p:PreBuildEvent= `
