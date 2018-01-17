@@ -270,6 +270,8 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
 	Log-SubSection "projectPath: '$projectPath'...."
     
    & $MSBuildExec $projectPath `
+   /p:PreBuildEvent= `
+   /p:PostBuildEvent= `
    /t:build `
    /p:OutputPath="$BinariesDirectory" `
    /p:PreBuildEvent= `
@@ -302,12 +304,20 @@ foreach ($platform in $platforms)
 	Log-SubSection "projectPath: '$projectPath'...."
 	
 	Log-SubSection "Building $wixProject Release|$platform..."
+	$sGenToolPath = "$sdkPath\"
 	
+	if ($platformIndex -eq 0)
+	{
+		$sGenToolPath = "$sdkPath\x64\"
+	}
+	Write-Host "SGEN: $sGenToolPath"
+	$sGenToolPath = $sGenToolPath -replace "\s","%20" 
    & $MSBuildExec $projectPath `
    /t:build `
    /p:Configuration="Release" `
    /p:Platform="$platform" `
    /p:langversion="$langversion" `
+   /p:SGenToolPath="$sGenToolPath" `
    /p:ReferencePath=$referencePath `
 	/fl /flp:"$loggerArgs" `
 	/m:4 `

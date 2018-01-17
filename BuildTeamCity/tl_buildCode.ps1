@@ -259,6 +259,14 @@ if ($LastExitCode -ne 0) {
 }
 
 Log-SubSection "Building Project Publisher"
+$sGenToolPath = "$sdkPath\"
+
+if ($PlatformToBuild -eq "x64")
+{
+	$sGenToolPath = "$sdkPath\x64\"
+}
+Write-Host "SGEN: $sGenToolPath"
+$sGenToolPath = $sGenToolPath -replace "\s","%20" 
 
 # Run MSBuild
 & $MSBuildExec $projPublisherAbsPath `
@@ -269,6 +277,7 @@ Log-SubSection "Building Project Publisher"
 	/p:langversion="$langversion" `
     /p:WarningLevel=0 `
     /p:ReferencePath=$referencePath `
+	/p:SGenToolPath="$sGenToolPath" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
