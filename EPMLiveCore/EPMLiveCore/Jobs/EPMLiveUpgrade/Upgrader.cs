@@ -20,7 +20,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
             {
                 string[] passedParams =  data.Split(new char[] { '|' });
                 string secondParameter = passedParams.Length > 1 ? passedParams[1] : string.Empty;
-                Dictionary<double, Type> upgradeSteps = UpgradeUtilities.GetUpgradeSteps(passedParams.Length > 0? passedParams[0]:string.Empty);
+                Dictionary<long, Type> upgradeSteps = UpgradeUtilities.GetUpgradeSteps(passedParams.Length > 0? passedParams[0]:string.Empty);
                 if (!string.IsNullOrWhiteSpace(secondParameter) && secondParameter.ToLower().Trim().Equals("mark"))
                 {
                     web.AllowUnsafeUpdates = true;
@@ -42,7 +42,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
                 {
                     
                     bool isPfeSite = site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null;
-                    List<KeyValuePair<double,Type>> steps = null;
+                    List<KeyValuePair<long,Type>> steps = null;
                     int genericStartIndex = 0;
                     if (!string.IsNullOrWhiteSpace(secondParameter) && secondParameter.ToLower().Trim().Equals("force"))
                     {
@@ -53,8 +53,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
                     }
                     else
                     {
-                        double lastVersionedSequence = web.AllProperties.ContainsKey("LastVersionedUpgrade") ? double.Parse((string)web.AllProperties["LastVersionedUpgrade"]) : 0.0;
-                        double lastGenericSequence = web.AllProperties.ContainsKey("LastGenericUpgrade") ? double.Parse((string)web.AllProperties["LastGenericUpgrade"]) : 0.0;
+                        long lastVersionedSequence = web.AllProperties.ContainsKey("LastVersionedUpgrade") ? long.Parse((string)web.AllProperties["LastVersionedUpgrade"]) : 0;
+                        long lastGenericSequence = web.AllProperties.ContainsKey("LastGenericUpgrade") ? long.Parse((string)web.AllProperties["LastGenericUpgrade"]) : 0;
 
                         steps = upgradeSteps.Where(item => item.Key > lastVersionedSequence).OrderBy(item => item.Key).ToList();
                         genericStartIndex = steps.Count;
