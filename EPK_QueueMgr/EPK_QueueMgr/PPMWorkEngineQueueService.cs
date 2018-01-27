@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using WE_QueueMgr.MsmqIntegration;
@@ -21,19 +22,32 @@ namespace WE_QueueMgr
     public partial class PPMWorkEngineQueueService : ServiceBase, INotificationDispatcher
     {
         private ServiceHost serviceHost = null;
-        private Timer timerJobsTimer = null;
+
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
-        private long m_lMinutes;
         private long m_lExceptionCount = 0;
-        private long m_lElapsedMinutes = 0;
         private const int const_Frequency = 60;
-        private List<QMSite> sites;
+        private List<QMSite> m_sites;
+        private List<QMSite> Sites
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_sites;
+                }
+            }
+        }
         private IMessageQueue messageQueue;
+
 
         public void QueueNotification(Notification notification)
         {
-            var site = sites.Where(i => i.basePath == notification.BasePath).SingleOrDefault();
-            ManageQueueJobs(site);
+            List<QMSite> sites = Sites;
+            if (sites != null)
+            {
+                var site = sites.Where(i => i.basePath.Equals(notification.BasePath, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
+                ManageQueueJobs(site);
+            }
         }
 
         public PPMWorkEngineQueueService()
@@ -42,17 +56,9 @@ namespace WE_QueueMgr
             {
                 InitializeComponent();
 
-                m_lMinutes = DateTime.Now.Ticks / 600000000;
-                m_lElapsedMinutes = 0;
-
-                double interval = 30 * 1000;
-                timerJobsTimer = new Timer(interval);
-                timerJobsTimer.Elapsed += TimerElapsed;
-
                 messageQueue = new Msmq();
 
-                serviceHost?.Close();
-                serviceHost = new ServiceHost(this);
+
                 var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
                 messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
             }
@@ -67,24 +73,31 @@ namespace WE_QueueMgr
             ResumeProcessing();
             MessageHandler("Start", "OnStart", "");
         }
+
+        protected CancellationTokenSource _cts;
+        protected CancellationToken token;
+        private Task timerTask;
+        private Task monitorTask;
         private void ResumeProcessing()
         {
-            Task.Run(() =>
+            try
             {
-                try
+                string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
+                string basepaths = BuildSitesList();
+                _cts = new CancellationTokenSource();
+                token = _cts.Token;
+                timerTask = Task.Run(() => DoWork(), token);
+                monitorTask = Task.Run(() => DoMonitor(), token);
+                serviceHost = new ServiceHost(this);
+                serviceHost.Open();
+                if (!string.IsNullOrEmpty(basepaths))
                 {
-                    string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-
-                    string basepaths = BuildSitesList();
-                    timerJobsTimer.AutoReset = true;
-                    timerJobsTimer.Enabled = true;
-                    timerJobsTimer.Start();
-                    serviceHost.Open();
-                    if (!string.IsNullOrEmpty(basepaths))
+                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                    m_lExceptionCount = 0;
+                    List<QMSite> sites = Sites;
+                    if (sites != null)
                     {
-                        MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
-                        m_lExceptionCount = 0;
-
                         foreach (QMSite site in sites)
                         {
                             string sXML = BuildProductInfoString(site);
@@ -93,138 +106,141 @@ namespace WE_QueueMgr
                             ManageTimedJobs(site);
                         }
                     }
-                    else
-                    {
-                        ErrorHandler("Start", 99995);
-                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ExceptionHandler("OnStart", ex);
+                    ErrorHandler("Start", 99995);
                 }
-            });
-        }
-
-        private string BuildSitesList()
-        {
-            try
-            {
-                sites = new List<QMSite>();
-                string basepaths = "";
-                string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                RegistryKey rk = Registry.LocalMachine.OpenSubKey(const_subKey);
-                if (rk != null)
-                {
-                    string[] m_sBasePathSubkeys = rk.GetSubKeyNames();
-                    rk.Close();
-                    foreach (string sBasePath in m_sBasePathSubkeys)
-                    {
-                        string basePath = sBasePath.Trim();
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(basePath))
-                            {
-                                rk = Registry.LocalMachine.OpenSubKey(const_subKey + basePath);
-                                if (rk != null)
-                                {
-                                    QMSite site = null;
-                                    if (rk.GetValue("QMActive", "no").ToString().ToLower() == "yes")
-                                    {
-                                        site = new QMSite();
-                                        site.basePath = basePath;
-                                        var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = rk.GetValue("ConnectionString", string.Empty).ToString().Trim() };
-                                        dbConnectionStringBuilder.Remove("Provider");
-
-                                        site.connection = dbConnectionStringBuilder.ToString();
-                                        site.pid = rk.GetValue("PID", string.Empty).ToString().Trim();
-                                        site.cn = rk.GetValue("CN", string.Empty).ToString().Trim();
-                                        int nDefaultTraceChannels = 0;
-                                        Int32.TryParse(rk.GetValue("Trace", 0).ToString(), out nDefaultTraceChannels);
-                                        site.ActiveTraceChannels = nDefaultTraceChannels.ToString();
-
-                                    }
-                                    rk.Close();
-                                    if (site != null)
-                                    {
-                                        var m_oConnection = new SqlConnection();
-                                        m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
-                                        m_oConnection.Open();
-
-                                        SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection);
-                                        cmd.CommandType = CommandType.Text;
-                                        cmd.Parameters.AddWithValue("@WRES_NT_ACCOUNT", sNTUserName.ToLower());
-                                        SqlDataReader reader = cmd.ExecuteReader();
-                                        if (reader != null)
-                                        {
-                                            if (reader.Read())
-                                            {
-                                                site.WRES_ID = reader["WRES_ID"].ToString();
-                                                site.userName = reader["RES_NAME"].ToString();
-                                                site.NTAccount = sNTUserName.ToLower();
-                                                site.SessionInfo = Guid.NewGuid().ToString().ToUpper();
-                                                //int nResTrace = 0;
-                                                //Int32.TryParse(reader["WRES_TRACE"].ToString(), out nResTrace);
-                                                //int nActiveTrace = (nDefaultTraceChannels | nResTrace);
-                                                //site.ActiveTraceChannels = nActiveTrace.ToString();
-                                                //WebAdmin.SetSPSessionString(Context, basePath, "ProductFlags", nProductFlags.ToString());
-                                                //WebAdmin.SetSPSessionString(Context, basePath, "PID", sPID.ToString());
-
-                                                //string site = reader["ADM_WE_SERVERURL"].ToString().Trim();
-                                                //if (site != "")
-                                                //{
-                                                //    if (sites != "")
-                                                //        sites += ",";
-                                                //    sites += site + "/_vti_bin/webservice.asmx";
-                                                //}
-                                            }
-                                            reader.Close();
-                                            reader.Dispose();
-                                        }
-
-                                        if (m_oConnection.State != System.Data.ConnectionState.Closed)
-                                            m_oConnection.Close();
-                                        m_oConnection.Dispose();
-
-                                        sites.Add(site);
-                                        if (!string.IsNullOrEmpty(basepaths))
-                                            basepaths += ",";
-                                        basepaths += basePath.Trim();
-
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionHandler("BuildSitesList for basepath '" + basePath + "'", ex);
-                        }
-                    }
-                }
-                return basepaths;
             }
             catch (Exception ex)
             {
-                ExceptionHandler("BuildSitesList", ex);
-                return "";
+                ExceptionHandler("OnStart", ex);
             }
         }
-
-        protected override void OnStop()
+        private void PauseProcessing()
         {
-            timerJobsTimer.AutoReset = false;
-            timerJobsTimer.Enabled = false;
+            _cts.Cancel();
+            if (!monitorTask.IsCompleted)
+            {
+                monitorTask.Wait();
+                monitorTask = null;
+            }
+            if (!timerTask.IsCompleted)
+            {
+                timerTask.Wait();
+                timerTask = null;
+            }
             if (serviceHost != null)
             {
                 serviceHost.Close();
                 serviceHost = null;
             }
+            token = CancellationToken.None;
+            _cts = null;
+        }
+        private string BuildSitesList()
+        {
+            lock (this)
+            {
+                try
+                {
+
+                    m_sites = new List<QMSite>();
+                    string basepaths = "";
+                    string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                    RegistryKey rk = Registry.LocalMachine.OpenSubKey(const_subKey);
+                    if (rk != null)
+                    {
+                        string[] m_sBasePathSubkeys = rk.GetSubKeyNames();
+                        rk.Close();
+                        foreach (string sBasePath in m_sBasePathSubkeys)
+                        {
+                            string basePath = sBasePath.Trim();
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(basePath))
+                                {
+                                    rk = Registry.LocalMachine.OpenSubKey(const_subKey + basePath);
+                                    if (rk != null)
+                                    {
+                                        QMSite site = null;
+                                        if (rk.GetValue("QMActive", "no").ToString().ToLower() == "yes")
+                                        {
+                                            site = new QMSite();
+                                            site.basePath = basePath;
+                                            var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = rk.GetValue("ConnectionString", string.Empty).ToString().Trim() };
+                                            dbConnectionStringBuilder.Remove("Provider");
+
+                                            site.connection = dbConnectionStringBuilder.ToString();
+                                            site.pid = rk.GetValue("PID", string.Empty).ToString().Trim();
+                                            site.cn = rk.GetValue("CN", string.Empty).ToString().Trim();
+                                            int nDefaultTraceChannels = 0;
+                                            Int32.TryParse(rk.GetValue("Trace", 0).ToString(), out nDefaultTraceChannels);
+                                            site.ActiveTraceChannels = nDefaultTraceChannels.ToString();
+
+                                        }
+                                        rk.Close();
+                                        if (site != null)
+                                        {
+                                            var m_oConnection = new SqlConnection();
+                                            m_oConnection.ConnectionString = site.connection + ";Application Name=PfEQueueManager";
+                                            m_oConnection.Open();
+
+                                            SqlCommand cmd = new SqlCommand("SELECT WRES_ID,RES_NAME,WRES_TRACE FROM EPG_RESOURCES WHERE WRES_CAN_LOGIN = 1 AND WRES_USE_NT_LOGON = 1 AND WRES_NT_ACCOUNT=@WRES_NT_ACCOUNT", m_oConnection);
+                                            cmd.CommandType = CommandType.Text;
+                                            cmd.Parameters.AddWithValue("@WRES_NT_ACCOUNT", sNTUserName.ToLower());
+                                            SqlDataReader reader = cmd.ExecuteReader();
+                                            if (reader != null)
+                                            {
+                                                if (reader.Read())
+                                                {
+                                                    site.WRES_ID = reader["WRES_ID"].ToString();
+                                                    site.userName = reader["RES_NAME"].ToString();
+                                                    site.NTAccount = sNTUserName.ToLower();
+                                                    site.SessionInfo = Guid.NewGuid().ToString().ToUpper();
+                                                }
+                                                reader.Close();
+                                                reader.Dispose();
+                                            }
+
+                                            if (m_oConnection.State != System.Data.ConnectionState.Closed)
+                                                m_oConnection.Close();
+                                            m_oConnection.Dispose();
+
+                                            m_sites.Add(site);
+                                            if (!string.IsNullOrEmpty(basepaths))
+                                                basepaths += ",";
+                                            basepaths += basePath.Trim();
+
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ExceptionHandler("BuildSitesList for basepath '" + basePath + "'", ex);
+                            }
+                        }
+                    }
+                    return basepaths;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler("BuildSitesList", ex);
+                    return "";
+                }
+            }
+        }
+
+        protected override void OnStop()
+        {
+            PauseProcessing();
             MessageHandler("Stop", "OnStop", "Exceptions: " + m_lExceptionCount.ToString());
         }
 
         protected override void OnPause()
         {
-            timerJobsTimer.Stop();
-            serviceHost?.Close();
+            PauseProcessing();
             MessageHandler("Pause", "OnPause", "");
         }
 
@@ -234,30 +250,83 @@ namespace WE_QueueMgr
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        TimeSpan heartBeatPeriod = new TimeSpan(0, 1, 0);
+
+        TimeSpan doMonitorPeriod = new TimeSpan(0, 0, 15);
+
+        private void DoMonitor()
         {
-            timerJobsTimer.Stop();
-            try
+            DateTime lastCheck = DateTime.Now;
+            while (!token.IsCancellationRequested)
             {
-                var lMinutes = DateTime.Now.Ticks / 600000000;
+                if (timerTask.IsCompleted && !token.IsCancellationRequested)
+                    timerTask = Task.Run(() => DoWork(), token);
+                Thread.Sleep(new TimeSpan(0, 0, 15));
+                DateTime newCheck = DateTime.Now;
+                if (newCheck - lastCheck > heartBeatPeriod)
+                {
+                    lastCheck = newCheck;
+                    List<QMSite> sites = Sites;
+                    if (sites != null && sites.Count > 0)
+                    {
+                        string sXML = BuildProductInfoString(sites[0]);
+                        try
+                        {
+                            using (var qm = new QueueManager(sXML))
+                            {
+                                qm.AddHeartBeat();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ExceptionHandler("MonitorThread", ex);
+                        }
+                    }
+                }
+            }
+        }
+        TimeSpan queueJobsPeriod = new TimeSpan(1, 0, 0);
+        TimeSpan timedJobsPeriod = new TimeSpan(0, 1, 0);
+        TimeSpan doWorkPeriod = new TimeSpan(0, 0, 15);
+
+        private void DoWork()
+        {
+            DateTime queuedLastCheck = DateTime.Now;
+            DateTime timedLastCheck = DateTime.Now;
+            while (!token.IsCancellationRequested)
+            {
                 try
                 {
-                    var bNewMinute = (lMinutes != m_lMinutes);
-                    if (bNewMinute)
+                    DateTime queuedNewCheck = DateTime.Now;
+                    if (queuedNewCheck - queuedLastCheck > queueJobsPeriod)
                     {
-                        m_lElapsedMinutes++;
-                        if (m_lElapsedMinutes >= const_Frequency)
+                        queuedLastCheck = queuedNewCheck;
+                        string basepaths = BuildSitesList();
+                        if (!string.IsNullOrEmpty(basepaths))
+                            MessageHandler("Refresh", "Refresh site list",
+                                            "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                        List<QMSite> sites = Sites;
+                        if (sites != null)
                         {
-                            m_lElapsedMinutes = 0;
-                            string basepaths = BuildSitesList();
-                            if (!string.IsNullOrEmpty(basepaths))
-                                MessageHandler("Refresh", "Refresh site list",
-                                               "active basePaths :\n" + basepaths.Replace(',', '\n'));
                             foreach (QMSite site in sites)
                             {
                                 ManageQueueJobs(site);
+
                             }
                         }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler("ProcessTimerJobs", ex);
+                }
+                try
+                {
+                    DateTime timedNewCheck = DateTime.Now;
+                    if (timedNewCheck - timedLastCheck > timedJobsPeriod)
+                    {
+                        timedLastCheck = timedNewCheck;
+                        List<QMSite> sites = Sites;
                         if (sites != null)
                         {
                             foreach (QMSite site in sites)
@@ -268,19 +337,13 @@ namespace WE_QueueMgr
                             }
                         }
                     }
+
                 }
-                finally
+                catch (Exception ex)
                 {
-                    m_lMinutes = lMinutes;
+                    ExceptionHandler("ProcessTimerJobs", ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler("ProcessTimerJobs", ex);
-            }
-            finally
-            {
-                timerJobsTimer.Start();
+                Thread.Sleep(doWorkPeriod);
             }
         }
 
