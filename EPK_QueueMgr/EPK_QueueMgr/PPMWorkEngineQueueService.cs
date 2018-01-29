@@ -122,6 +122,7 @@ namespace WE_QueueMgr
             catch (Exception ex)
             {
                 ExceptionHandler("OnStart", ex);
+                throw;
             }
         }
         private void PauseProcessing()
