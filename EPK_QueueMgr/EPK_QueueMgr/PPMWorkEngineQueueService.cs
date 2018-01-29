@@ -245,18 +245,6 @@ namespace WE_QueueMgr
             MessageHandler("Stop", "OnStop", "Exceptions: " + m_lExceptionCount.ToString());
         }
 
-        protected override void OnPause()
-        {
-            PauseProcessing();
-            MessageHandler("Pause", "OnPause", "");
-        }
-
-        protected override void OnContinue()
-        {
-            ResumeProcessing();
-            MessageHandler("Continue", "OnContinue", "");
-        }
-
         TimeSpan heartBeatPeriod = new TimeSpan(0, 10, 0);
 
         TimeSpan doMonitorPeriod = new TimeSpan(0, 0, 15);
