@@ -191,7 +191,10 @@ namespace PortfolioEngineCore
             return -1;
         }
 
-           
+        public void AddHeartBeat()
+        {
+            AdminFunctions.AddHeartBeat(_dba);
+        }   
 
 
 
