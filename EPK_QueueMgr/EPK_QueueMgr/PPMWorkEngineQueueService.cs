@@ -21,6 +21,13 @@ namespace WE_QueueMgr
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class PPMWorkEngineQueueService : ServiceBase, INotificationDispatcher
     {
+        protected class FaultItem
+        {
+            public DateTime FaultTime;
+            public int FaultCount;
+            public bool Recovered = false;
+        }
+
         private ServiceHost serviceHost = null;
 
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
@@ -250,36 +257,74 @@ namespace WE_QueueMgr
             MessageHandler("Continue", "OnContinue", "");
         }
 
-        TimeSpan heartBeatPeriod = new TimeSpan(0, 1, 0);
+        TimeSpan heartBeatPeriod = new TimeSpan(0, 10, 0);
 
         TimeSpan doMonitorPeriod = new TimeSpan(0, 0, 15);
 
+        FaultItem workFault = null;
+        const int RETRIES = 5;
+        const int WAIT = 20;
         private void DoMonitor()
         {
             DateTime lastCheck = DateTime.Now;
             while (!token.IsCancellationRequested)
             {
+                //If task is faulted
                 if (timerTask.IsCompleted && !token.IsCancellationRequested)
+                {
+                    if (workFault == null)
+                    {
+                        workFault = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 };
+                    }
+                    else
+                    {
+                        DateTime newFaultTime = DateTime.Now;
+                        DateTime oldFaultTime = workFault.FaultTime;
+                        TimeSpan sinceLastFault = newFaultTime - oldFaultTime;
+                        workFault.FaultTime = newFaultTime;
+                        if (sinceLastFault > new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, RETRIES)) * 10))
+                        {
+                            workFault.FaultCount = 1;
+                        }
+                        else
+                        {
+                            workFault.FaultCount++;
+                        }
+                    }
+                    workFault.Recovered = false;
+                }
+
+
+                if (workFault != null && !workFault.Recovered && DateTime.Now > workFault.FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, workFault.FaultCount)) * 10))
+                {
                     timerTask = Task.Run(() => DoWork(), token);
+                    workFault.Recovered = true;
+                }
+            
+                
                 Thread.Sleep(new TimeSpan(0, 0, 15));
+
                 DateTime newCheck = DateTime.Now;
                 if (newCheck - lastCheck > heartBeatPeriod)
                 {
                     lastCheck = newCheck;
                     List<QMSite> sites = Sites;
-                    if (sites != null && sites.Count > 0)
+                    if (sites != null)
                     {
-                        string sXML = BuildProductInfoString(sites[0]);
-                        try
+                        foreach (QMSite site in sites)
                         {
-                            using (var qm = new QueueManager(sXML))
+                            string sXML = BuildProductInfoString(site);
+                            try
                             {
-                                qm.AddHeartBeat();
+                                using (var qm = new QueueManager(sXML))
+                                {
+                                    qm.AddHeartBeat();
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionHandler("MonitorThread", ex);
+                            catch (Exception ex)
+                            {
+                                ExceptionHandler("MonitorThread, Site: " + site.basePath, ex);
+                            }
                         }
                     }
                 }
