@@ -21,134 +21,25 @@ namespace WE_QueueMgr
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class PPMWorkEngineQueueService : ServiceBase, INotificationDispatcher
     {
-        protected class FaultItem
-        {
-            public DateTime FaultTime;
-            public int FaultCount;
-            public bool Recovered = false;
-        }
-
-        private ServiceHost serviceHost = null;
 
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
         private long m_lExceptionCount = 0;
-        private const int const_Frequency = 60;
+
         private List<QMSite> m_sites;
+        object sitesLock = new object();
         private List<QMSite> Sites
         {
             get
             {
-                lock (this)
+                lock (sitesLock)
                 {
                     return m_sites;
                 }
             }
         }
-        private IMessageQueue messageQueue;
-
-
-        public void QueueNotification(Notification notification)
-        {
-            List<QMSite> sites = Sites;
-            if (sites != null)
-            {
-                var site = sites.Where(i => i.basePath.Equals(notification.BasePath, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
-                ManageQueueJobs(site);
-            }
-        }
-
-        public PPMWorkEngineQueueService()
-        {
-            try
-            {
-                InitializeComponent();
-
-                messageQueue = new Msmq();
-
-
-                var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
-                messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler("InitializeComponent", ex);
-            }
-        }
-
-        protected override void OnStart(string[] args)
-        {
-            ResumeProcessing();
-            MessageHandler("Start", "OnStart", "");
-        }
-
-        protected CancellationTokenSource _cts;
-        protected CancellationToken token;
-        private Task timerTask;
-        private Task monitorTask;
-        private void ResumeProcessing()
-        {
-            try
-            {
-                string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-
-                string basepaths = BuildSitesList();
-                _cts = new CancellationTokenSource();
-                token = _cts.Token;
-                timerTask = Task.Run(() => DoWork(), token);
-                monitorTask = Task.Run(() => DoMonitor(), token);
-                serviceHost = new ServiceHost(this);
-                serviceHost.Open();
-                if (!string.IsNullOrEmpty(basepaths))
-                {
-                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
-                    m_lExceptionCount = 0;
-                    List<QMSite> sites = Sites;
-                    if (sites != null)
-                    {
-                        foreach (QMSite site in sites)
-                        {
-                            string sXML = BuildProductInfoString(site);
-                            new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
-                            ManageQueueJobs(site);
-                            ManageTimedJobs(site);
-                        }
-                    }
-                }
-                else
-                {
-                    ErrorHandler("Start", 99995);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler("OnStart", ex);
-                throw;
-            }
-        }
-        private void PauseProcessing()
-        {
-            _cts.Cancel();
-            if (!monitorTask.IsCompleted)
-            {
-                monitorTask.Wait();
-                monitorTask = null;
-            }
-            if (!timerTask.IsCompleted)
-            {
-                timerTask.Wait();
-                timerTask = null;
-            }
-            if (serviceHost != null)
-            {
-                serviceHost.Close();
-                serviceHost = null;
-            }
-            token = CancellationToken.None;
-            _cts = null;
-        }
         private string BuildSitesList()
         {
-            lock (this)
+            lock (sitesLock)
             {
                 try
                 {
@@ -240,58 +131,123 @@ namespace WE_QueueMgr
             }
         }
 
+        public void QueueNotification(Notification notification)
+        {
+            List<QMSite> sites = Sites;
+            if (sites != null)
+            {
+                var site = sites.Where(i => i.basePath.Equals(notification.BasePath, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
+                ManageQueueJobs(site);
+            }
+        }
+
+        private ServiceHost serviceHost = null;
+        private IMessageQueue messageQueue;
+        public PPMWorkEngineQueueService()
+        {
+            try
+            {
+                InitializeComponent();
+
+                messageQueue = new Msmq();
+
+
+                var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
+                messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler("InitializeComponent", ex);
+            }
+        }
+        protected CancellationTokenSource _cts;
+        protected CancellationToken token;
+        private Task timerTask;
+        private Task longRunTask;
+        private Task monitorTask;
+        protected override void OnStart(string[] args)
+        {
+            try
+            {
+                //System.Diagnostics.Debugger.Launch();
+                string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
+                string basepaths = BuildSitesList();
+                _cts = new CancellationTokenSource();
+                token = _cts.Token;
+                timerTask = Task.Run(() => DoWork(), token);
+                longRunTask = Task.Run(() => DoLongRun(), token);
+                monitorTask = Task.Run(() => DoMonitor(), token);
+                serviceHost = new ServiceHost(this);
+                serviceHost.Open();
+                if (!string.IsNullOrEmpty(basepaths))
+                {
+                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                    m_lExceptionCount = 0;
+                    List<QMSite> sites = Sites;
+                    if (sites != null)
+                    {
+                        foreach (QMSite site in sites)
+                        {
+                            string sXML = BuildProductInfoString(site);
+                            new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
+                            ManageQueueJobs(site);
+                            ManageTimedJobs(site);
+                        }
+                    }
+                }
+                else
+                {
+                    ErrorHandler("Start", 99995);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler("OnStart", ex);
+                throw;
+            }
+            MessageHandler("Start", "OnStart", "");
+        }
         protected override void OnStop()
         {
-            PauseProcessing();
+            _cts.Cancel();
+            monitorTask = null;
+            timerTask = null;
+            longRunTask = null;
+            if (serviceHost != null)
+            {
+                serviceHost.Close();
+            }
+            serviceHost = null;
             MessageHandler("Stop", "OnStop", "Exceptions: " + m_lExceptionCount.ToString());
         }
 
+        //Heartbeat every:
         TimeSpan heartBeatPeriod = new TimeSpan(0, 10, 0);
-
-        TimeSpan doMonitorPeriod = new TimeSpan(0, 0, 15);
-
+        //loop once every:
+        TimeSpan doMonitorPeriod = new TimeSpan(0, 1, 0);
         FaultItem workFault = null;
+        FaultItem longRunFault = null;
         const int RETRIES = 5;
-        const int WAIT = 20;
         private void DoMonitor()
         {
             DateTime lastCheck = DateTime.Now;
             while (!token.IsCancellationRequested)
             {
                 //If task is faulted
-                if (timerTask.IsCompleted && !token.IsCancellationRequested)
-                {
-                    if (workFault == null)
-                    {
-                        workFault = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 };
-                    }
-                    else
-                    {
-                        DateTime newFaultTime = DateTime.Now;
-                        DateTime oldFaultTime = workFault.FaultTime;
-                        TimeSpan sinceLastFault = newFaultTime - oldFaultTime;
-                        workFault.FaultTime = newFaultTime;
-                        if (sinceLastFault > new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, RETRIES)) * 10))
-                        {
-                            workFault.FaultCount = 1;
-                        }
-                        else
-                        {
-                            workFault.FaultCount++;
-                        }
-                    }
-                    workFault.Recovered = false;
-                }
-
+                CheckTaskFault(timerTask, ref workFault);
 
                 if (workFault != null && !workFault.Recovered && DateTime.Now > workFault.FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, workFault.FaultCount)) * 10))
                 {
                     timerTask = Task.Run(() => DoWork(), token);
                     workFault.Recovered = true;
                 }
-            
-                
-                Thread.Sleep(new TimeSpan(0, 0, 15));
+
+                if (longRunFault != null && !longRunFault.Recovered && DateTime.Now > longRunFault.FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, longRunFault.FaultCount)) * 10))
+                {
+                    longRunTask = Task.Run(() => DoLongRun(), token);
+                    longRunFault.Recovered = true;
+                }
 
                 DateTime newCheck = DateTime.Now;
                 if (newCheck - lastCheck > heartBeatPeriod)
@@ -317,11 +273,95 @@ namespace WE_QueueMgr
                         }
                     }
                 }
+                Thread.Sleep(doMonitorPeriod);
             }
         }
-        TimeSpan queueJobsPeriod = new TimeSpan(1, 0, 0);
+        void CheckTaskFault(Task task, ref FaultItem faultItem)
+        {
+            if (task.IsCompleted && !token.IsCancellationRequested)
+            {
+                if (faultItem == null)
+                {
+                    faultItem = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 };
+                }
+                else
+                {
+                    DateTime newFaultTime = DateTime.Now;
+                    DateTime oldFaultTime = faultItem.FaultTime;
+                    TimeSpan sinceLastFault = newFaultTime - oldFaultTime;
+                    faultItem.FaultTime = newFaultTime;
+                    if (sinceLastFault > new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, RETRIES)) * 10))
+                    {
+                        faultItem.FaultCount = 1;
+                    }
+                    else
+                    {
+                        faultItem.FaultCount++;
+                    }
+                }
+                faultItem.Recovered = false;
+            }
+        }
+
+        object longRunQueueLock = new object();
+        List<QMSite> longRunQueue = new List<QMSite>();
+        void EnqueueSite(QMSite site)
+        {
+            lock (longRunQueueLock)
+            {
+                if (!longRunQueue.Contains(site))
+                {
+                    longRunQueue.Add(site);
+                }
+
+            }
+        }
+        string GetExclusionList(QMSite matchSite)
+        {
+            string exclusion = "";
+            lock (longRunQueueLock)
+            {
+                foreach (QMSite site in longRunQueue)
+                {
+                    if (site.basePath.Equals(matchSite.basePath, StringComparison.OrdinalIgnoreCase))
+                        exclusion += "'" + site.JobId + "',";
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(exclusion))
+                exclusion = exclusion.Substring(0, exclusion.Length - 1);
+            return exclusion;
+        }
+        //Loop once every:
+        TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
+        void DoLongRun()
+        {
+            while (!token.IsCancellationRequested)
+            {
+                while (!token.IsCancellationRequested && longRunQueue.Count > 0)
+                {
+                    QMSite site = null;
+                    lock (longRunQueueLock)
+                    {
+                        site = longRunQueue[0];
+                    }
+                    
+                    Thread.Sleep(new TimeSpan(0, 2, 0));
+                    var s = InvokeWSSAdminRSVPRequest(site, true);
+                    lock (longRunQueueLock)
+                    {
+                       longRunQueue.RemoveAt(0);
+                    }
+                }
+                Thread.Sleep(longRunPeriod);
+            }
+        }
+
+        //Backup queue jobs processing call every:
+        TimeSpan queueJobsPeriod = new TimeSpan(0, 30, 0);
+        //check for timed jobs every:
         TimeSpan timedJobsPeriod = new TimeSpan(0, 1, 0);
-        TimeSpan doWorkPeriod = new TimeSpan(0, 0, 15);
+        //loop once every:
+        TimeSpan doWorkPeriod = new TimeSpan(0, 1, 0);
 
         private void DoWork()
         {
@@ -395,7 +435,8 @@ namespace WE_QueueMgr
                         // check the queue for .net items before using RSVP
                         using (var qm = new QueueManager(sXML))
                         {
-                            while (qm.ReadNextQueuedItem())
+
+                            while (qm.ReadNextQueuedItem(GetExclusionList(site)))
                             {
                                 new LogService(sXML).TraceLog("ManageQueueJobs", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
                                 // we have a queued item - try to handle it in portfolioenginecore first
@@ -410,16 +451,16 @@ namespace WE_QueueMgr
                                             qm.SetJobCompleted();
                                             ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
+                                        case 0:
+                                            site.JobId = qm.guidJob;
+                                            EnqueueSite(site);
+                                            break;
                                         default:
-                                            var s = InvokeComObject(site, "ManageQueue");
-                                            if (s.Contains("<Error"))
-                                            {
-                                                new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
-                                                EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
-                                            }
+                                            var s = InvokeWSSAdminRSVPRequest(site, false);
                                             break;
                                     }
                                 }
+
                             }
                         }
                     }
@@ -456,8 +497,6 @@ namespace WE_QueueMgr
             }
         }
 
-
-
         private string BuildProductInfoString(QMSite site)
         {
             CStruct xEPKServer = new CStruct();
@@ -475,7 +514,7 @@ namespace WE_QueueMgr
 
             return xEPKServer.XML();
         }
-
+      
         private void ExceptionHandler(string sLocation, Exception ex)
         {
             // don't flood the event log with exceptions
@@ -512,14 +551,14 @@ namespace WE_QueueMgr
             }
         }
 
-        private string InvokeComObject(QMSite site, string job)
+        private string InvokeWSSAdminRSVPRequest(QMSite site, bool doCustom)
         {
             object comObject = null;
             try
             {
                 var comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                 comObject = Activator.CreateInstance(comObjectType);
-                var myparams = new object[] { job, site.basePath };
+                var myparams = new object[] { "ManageQueue", site.basePath, doCustom, false };
                 return (string)comObjectType.InvokeMember("RSVPRequest",
                                                         BindingFlags.InvokeMethod,
                                                         null,
@@ -544,5 +583,18 @@ namespace WE_QueueMgr
         public string NTAccount;
         public string SessionInfo;
         public string ActiveTraceChannels;
+        public Guid JobId = Guid.Empty;
+        public override bool Equals(object obj)
+        {
+            if (obj is QMSite)
+                return basePath.Equals(((QMSite)obj).basePath, StringComparison.OrdinalIgnoreCase) && JobId.Equals(((QMSite)obj).JobId);
+            return base.Equals(obj);
+        }
+    }
+    internal class FaultItem
+    {
+        public DateTime FaultTime;
+        public int FaultCount;
+        public bool Recovered = false;
     }
 }
