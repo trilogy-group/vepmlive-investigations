@@ -76,7 +76,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        public bool ReadNextQueuedItem()
+        public bool ReadNextQueuedItem(string exclusion)
         {
             bool bItemToProcess = false;
             try
@@ -86,8 +86,8 @@ namespace PortfolioEngineCore
                 //  1 - Job started and being processed
                 // -1 - Job completed with no errors
                 // -2 - Job completed with errors
-                const string sCommand =
-                    "SELECT TOP 1 * FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 ORDER BY JOB_SUBMITTED";
+                string sCommand =
+                    "SELECT TOP 1 * FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 " + (string.IsNullOrWhiteSpace(exclusion)? "" : " AND  JOB_GUID NOT IN (" + exclusion + ") ") + " ORDER BY JOB_SUBMITTED";
                 SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection);
                 SqlDataReader reader = oCommand.ExecuteReader();
 
