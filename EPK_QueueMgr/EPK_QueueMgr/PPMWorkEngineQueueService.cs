@@ -344,8 +344,6 @@ namespace WE_QueueMgr
                     {
                         site = longRunQueue[0];
                     }
-                    
-                    Thread.Sleep(new TimeSpan(0, 2, 0));
                     var s = InvokeWSSAdminRSVPRequest(site, true);
                     lock (longRunQueueLock)
                     {
