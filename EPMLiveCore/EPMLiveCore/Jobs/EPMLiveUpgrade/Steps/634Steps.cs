@@ -1,8 +1,12 @@
 ﻿using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Client.WebParts;
+using Microsoft.SharePoint.WebPartPages;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Net;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -77,4 +81,60 @@ replace(cast([Xml] as nvarchar(max)),'Apr 01|| 2012 - Apr 07|| 2012','...'),'Bra
         #endregion
     }
 
+    [UpgradeStep(Version = EPMLiveVersion.V634, Order = 2.0, Description = "Replacing the upland logo URL")]
+    internal class ImageWebpartLogoUpdater : UpgradeStep
+    {
+        private SPWeb _spWeb;
+
+        #region Constructors (1) 
+        public ImageWebpartLogoUpdater(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            Guid webAppId = Web.Site.WebApplication.Id;
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    LogMessage("Getting home page webparts.", 2);
+
+                    SPFile file = _spWeb.GetFile(_spWeb.Url + "/SitePages/Home.aspx");
+                    SPLimitedWebPartManager manager = file.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+
+                    LogMessage("Getting the image webpart.", 2);
+
+                    if (manager.WebParts["g_5fd41ea1_c7df_4b4b_baca_b84b2a33500b"] != null)
+                    {
+                        var webpart = ((ImageWebPart)manager.WebParts["g_5fd41ea1_c7df_4b4b_baca_b84b2a33500b"]);
+                        webpart.ImageLink = _spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/images/epmlivelogo-white.png";
+
+                        _spWeb.AllowUnsafeUpdates = true;
+
+                        LogMessage("Saving the image webpart.", 2);
+                        manager.SaveChanges(webpart);
+                        LogMessage("URL has been updated successfully.", 2);
+                    }
+                    else
+                    {
+                        LogMessage("Home page does not have the image webpart so updating will be skipped.", 2);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                }
+                finally
+                {
+                    _spWeb.AllowUnsafeUpdates = false;
+                }
+            });
+            return true;
+        }
+
+        #endregion
+    }
 }

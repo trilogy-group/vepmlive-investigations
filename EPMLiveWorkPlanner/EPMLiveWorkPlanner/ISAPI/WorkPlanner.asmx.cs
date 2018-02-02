@@ -1044,7 +1044,7 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if (oField != null)
                     {
-                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup")
+                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup" && oField.TypeAsString != "FilteredLookup")
                         {
                             switch (oField.Type)
                             {

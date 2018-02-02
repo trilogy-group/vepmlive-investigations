@@ -315,7 +315,6 @@
             this.mnuHelp.Items.Add(this.btnProxy);
             this.mnuHelp.Items.Add(this.btnActivate);
             this.mnuHelp.Items.Add(this.btnOnline);
-            this.mnuHelp.Items.Add(this.btnUpdates);
             this.mnuHelp.Items.Add(this.btnEnablePPM);
             this.mnuHelp.Items.Add(this.separator3);
             this.mnuHelp.Items.Add(this.btnAbout);
@@ -342,14 +341,7 @@
             this.btnOnline.Label = "Online Help Guide";
             this.btnOnline.Name = "btnOnline";
             this.btnOnline.ShowImage = true;
-            this.btnOnline.Click += this.btnOnline_Click;
-            // 
-            // btnUpdates
-            // 
-            this.btnUpdates.Label = "Check For Updates";
-            this.btnUpdates.Name = "btnUpdates";
-            this.btnUpdates.ShowImage = true;
-            this.btnUpdates.Click += this.btnUpdates_Click;
+            this.btnOnline.Click += this.btnOnline_Click;           
             // 
             // btnEnablePPM
             // 

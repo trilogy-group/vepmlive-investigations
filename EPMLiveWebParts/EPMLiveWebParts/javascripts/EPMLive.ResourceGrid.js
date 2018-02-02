@@ -1974,7 +1974,7 @@ function registerEpmLiveResourceGridScript() {
                             }
                         }
                         var i = 1;
-                        
+
                         var splitReOrderCols = sAvailableFlds.split(',');
                         for (var i = 0; i < splitReOrderCols.length; i++) {
                             var sptIndValue = splitReOrderCols[i].split('|');
@@ -1983,7 +1983,7 @@ function registerEpmLiveResourceGridScript() {
                                 'checked': ($.inArray(sptIndValue[1].trim().toString(), aViewCols) != -1)
                             };
                         }
-                       
+
                         var viewSectionTemplate = {
                             'heading': 'none',
                             'divider': 'no',
@@ -2400,6 +2400,16 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [{
                                         'eventName': 'keypress',
                                         'function': function (e) {
+                                            var key = e.which;
+                                            if (key == 13)  // the enter key code
+                                            {
+                                                if ($("#toolBarResGridSelector").val() != '') {
+                                                    grid.ChangeFilter("Title", $("#toolBarResGridSelector").val(), 11, 0, 0, null);
+                                                }
+                                                else {
+                                                    grid.ChangeFilter('', '', '', 0, 0, null);
+                                                }
+                                            }
                                         }
                                     }]
                                 },

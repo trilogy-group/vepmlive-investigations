@@ -3,33 +3,35 @@
   <?if $(var.Platform) = x64 ?>
   <?define bitness = "(64 bit)" ?>
   <?define Win64 = "yes" ?>
+  <?define MyProductCode = "0F6B37FD-8646-4721-8F72-8884C335A3AF" ?>
+  <?define MyUpgradeCode = "555A36A7-8558-4CC2-9A65-6013F4316C84" ?>
   <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
   <?else ?>
   <?define bitness = "(32 bit)" ?>
   <?define Win64 = "no" ?>
+  <?define MyProductCode = "8E488175-5A20-428E-90B3-1AA2E28B2B5A" ?>
+  <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-  
-  <Product Id="*" Name="Project Publisher 2016" Language="1033" Version="6.1.0" Manufacturer="EPM Live" UpgradeCode="555A36A7-8558-4CC2-9A65-6013F4316C84">
-    
+  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016  $(var.Platform)" Language="1033" Version="6.3.4" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-    
-    <MediaTemplate EmbedCab="yes" /> 
-    
+
+    <MediaTemplate EmbedCab="yes" />
+
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" AllowSameVersionUpgrades="no" />
-    
-      <Feature Id="ProductFeature" Title="Publisher Setup 2016" Level="1">
+
+    <Feature Id="ProductFeature" Title="Publisher Setup 2016" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
-    
+
     <WixVariable Id="WixUIBannerBmp" Value="..\setuplogo.bmp" />
     <Icon Id="icon.ico" SourceFile="..\EPMLive.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
-    
+
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
-    
+
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    
+
     <UI>
       <UIRef Id="WixUI_InstallDir" />
       <Publish Dialog="WelcomeDlg"
@@ -43,7 +45,7 @@
             Value="WelcomeDlg"
             Order="2">1</Publish>
     </UI>
-  
+
   </Product>
 
   <Fragment>
@@ -59,10 +61,11 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER" >
       <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-      <Component Id="ProductComponent" Win64="$(var.Win64)" Guid="0089E29C-E076-4723-9067-FEA0231835D5">
+      <Component Id="FilesComponent" Win64="$(var.Win64)" Guid="0089E29C-E076-4723-9067-FEA0231835D5" KeyPath="yes">
         <!-- TODO: Insert files, registry keys, and other resources here. -->
-        <File Source="$(var.ProjectPublisher2016.TargetPath)" KeyPath="yes"/>
+        <File Source="$(var.ProjectPublisher2016.TargetPath)" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.dll.manifest" />
+        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.dll.config" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.vsto"/>
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.Common.dll" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.Office.Tools.Common.v4.0.Utilities.dll"/>
@@ -71,14 +74,25 @@
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.dll"/>
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.SharePoint.Client.Runtime.dll" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll"/>
-        
+        <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.XmlSerializers.dll" />
+
         <File Source="$(var.ProjectPublisher2016.TargetDir)PPMUtility.exe"/>
         <File Source="..\EPMLive.ico" />
         <File Source="..\setuplogo.jpg" />
-
+      </Component>
+      <Component Id="RegisteryComponent" Win64="$(var.Win64)" Guid="0089E29C-E076-4723-9067-FEA0231835D6">
+        <RegistryKey Root="HKLM"
+                     Key="SOFTWARE\Microsoft\Office\MS Project\Addins">
+          <RegistryKey Key='ProjectPublisher2016' Id='addonKey' ForceCreateOnInstall='yes' ForceDeleteOnUninstall="yes">
+            <RegistryValue Type="string" Name="Description" Value="Project Publisher 2016" KeyPath="yes"/>
+            <RegistryValue Type="string" Name="FriendlyName" Value="Project Publisher 2016" />
+            <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+            <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]ProjectPublisher2016.vsto|vstolocal"/>
+          </RegistryKey>
+        </RegistryKey>
       </Component>
     </ComponentGroup>
   </Fragment>
-  
-  
+
+
 </Wix>

@@ -3648,6 +3648,8 @@
     <Content Include="Layouts\epmlive\images\WESite.png" />
     <Content Include="Layouts\epmlive\images\WorkEngine-logo.gif" />
     <Content Include="Layouts\epmlive\images\Workspaces.png" />
+    <Content Include="Layouts\epmlive\img\glyphicons-halflings-white.png" />
+    <Content Include="Layouts\epmlive\img\glyphicons-halflings.png" />
     <Content Include="Layouts\epmlive\ImportResources.aspx" />
     <Content Include="Layouts\epmlive\ImportResourceStatus.aspx" />
     <Content Include="Layouts\epmlive\Integration\Add.aspx" />

@@ -1,8 +1,4 @@
-#FROM microsoft/windowsservercore
-#FROM microsoft/dotnet-framework:3.5-windowsservercore-10.0.14393.1593
-#FROM microsoft/dotnet-framework:3.5-windowsservercore-10.0.14393.1480
-#FROM microsoft/windowsservercore:10.0.14393.1715
-FROM microsoft/dotnet-framework:3.5-windowsservercore-10.0.14393.1715
+FROM jetbrains/teamcity-agent:latest-windowsservercore
 
 
 
@@ -12,47 +8,27 @@ LABEL \
     com.trilogy.product="eng.docker" \
     com.trilogy.service="tc-agent" \
     com.trilogy.stage="prod" \
-    com.trilogy.maintainer.email="alexey.rokhin@aurea.com" \
-    com.trilogy.maintainer.skype="AlexeyRokhin"
-
-ARG SERVER_URL='http://10.137.22.36'
-ARG ZIP7_INSTALLER_URL='http://www.7-zip.org/a/7z1604-x64.msi'
-ARG GIT_INSTALLER_URL='https://github.com/git-for-windows/git/releases/download/v2.13.3.windows.1/Git-2.13.3-64-bit.exe'
-ARG JRE_INSTALLER_URL='https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283&resid=FDD9E9CD6B4F4283%21420&authkey=AH5m155o_rMJ_aI'
-ARG DOCKER_INSTALLER_URL='https://get.docker.com/builds/Windows/x86_64/docker-17.03.1-ce.zip'
-ARG DOCKER_COMPOSE_INSTALLER_URL='https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Windows-x86_64.exe'
-ARG AWSTOOLS_INSTALLER_URL='http://sdk-for-net.amazonwebservices.com/latest/AWSToolsAndSDKForNet.msi'
-
-ENV \
-    SERVER_URL=$SERVER_URL \
-    AGENT_DIR='C:\BuildAgent' \
-    AGENT_NAME= \
-    AGENT_PROPERTIES='[]' \
-    TEAMCITY_AGENT_MEM_OPTS='-Xmx384m' \
-    TC_AGENT_WAIT_COUNT=20 \
-    TC_AGENT_WAIT_INTERVAL='00:00:15'
-
-COPY /assets /assets/
-
-WORKDIR /assets
-
-RUN powershell .\install_prereq.ps1
+    com.trilogy.maintainer.email="essam.elsayed@versata.com" \
+    com.trilogy.maintainer.skype="sama.safia"
 
 SHELL ["powershell"]
 
 
-# Install required features
-RUN Install-WindowsFeature NET-Framework-45-Core ; \
-Install-WindowsFeature NET-Framework-45-ASPNET ; \
-Install-WindowsFeature Web-Asp-Net45 ; \
-New-Item -ItemType Directory C:\Sources
 
 # Download and install build tools 
-RUN Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
+RUN New-Item -ItemType Directory C:\Sources ; \
+Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
 $setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\BuildTools_Full.exe" -ArgumentList /Silent, /Full ; \
 If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitCode)\" } ; \
 setx PATH '%PATH%;C:\Program Files (x86)\MSBuild\14.0\Bin\' ; \
 Remove-Item "C:\Sources\BuildTools_Full.exe" 
+
+# Install required features
+RUN Install-WindowsFeature NET-Framework-45-Core ; \
+Install-WindowsFeature NET-Framework-45-ASPNET ; \
+Install-WindowsFeature Web-Asp-Net45
+
+
 
 #Download Net 4.6.2 dev pack
 RUN Invoke-WebRequest 'https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe' -OutFile "C:\Sources\devpack.exe" -UseBasicParsing  ; \
@@ -186,11 +162,12 @@ $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.Busines
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Flighting.Dll') 
 
 
-EXPOSE 9090
-
-ENTRYPOINT powershell .\entrypoint.ps1
-
-HEALTHCHECK NONE
+#Download Visual Studio GAC
+RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21441"&"authkey=AOQCThCg_ljgAwk' -OutFile "$env:TEMP\SDKTools.zip" -UseBasicParsing  ; \
+Add-Type -assembly 'system.io.compression.filesystem' ; \
+$sourceZip =  Join-Path $env:TEMP "SDKTools.zip" ; \
+[io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\Microsoft SDKs') ; \
+Remove-Item "$env:TEMP\SDKTools.zip" 
 
 #CMD while ($true) { Start-Sleep -Seconds 3600 }
 
