@@ -137,7 +137,7 @@ namespace TimeSheets
                         ds = new DataSet();
                         da.Fill(ds);
 
-                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(','));
+                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView == null ? list.DefaultViewUrl : list.DefaultView.Url)).Split(','));
 
                         foreach (string field in fields)
                         {
@@ -392,34 +392,43 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    using (SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn))
+                                                    using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
+                                                            @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid 
+                                                            FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
+                                                            WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
+                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)", cn))
                                                     {
-                                                        cmd.Parameters.AddWithValue("@tsuid", TSUID);
-                                                        cmd.Parameters.AddWithValue("@uid", id);
-                                                        cmd.Parameters.AddWithValue("@webid", web.ID);
-                                                        cmd.Parameters.AddWithValue("@listid", list.ID);
-                                                        cmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                        cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
-                                                        cmd.Parameters.AddWithValue("@list", list.Title);
-                                                        cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
-                                                        cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
+                                                        itemInsertCmd.Parameters.AddWithValue("@currenttsuid", TSUID);
+                                                        itemInsertCmd.Parameters.AddWithValue("@currentperiodid", period);
+                                                        itemInsertCmd.Parameters.AddWithValue("@userid", userid);
+                                                        itemInsertCmd.Parameters.AddWithValue("@siteid", site.ID);
+                                                        itemInsertCmd.Parameters.AddWithValue("@worktype", itemtypeid);
+                                                        itemInsertCmd.Parameters.AddWithValue("@uidcurrent", id);
+                                                        itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
+                                                        itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
+                                                        itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
+                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                        itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
+                                                        itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
+                                                        itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
 
                                                         if (projectlist == "")
-                                                            cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
+                                                            itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                                         else
-                                                            cmd.Parameters.AddWithValue("@projectlistid", projectlist);
+                                                            itemInsertCmd.Parameters.AddWithValue("@projectlistid", projectlist);
 
                                                         if (projectid == 0)
                                                         {
-                                                            cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                            cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                            itemInsertCmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                            itemInsertCmd.Parameters.AddWithValue("@projectid", DBNull.Value);
                                                         }
                                                         else
                                                         {
-                                                            cmd.Parameters.AddWithValue("@project", project);
-                                                            cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                            itemInsertCmd.Parameters.AddWithValue("@project", project);
+                                                            itemInsertCmd.Parameters.AddWithValue("@projectid", projectid);
                                                         }
-                                                        cmd.ExecuteNonQuery();
+
+                                                        itemInsertCmd.ExecuteNonQuery();
                                                     }
                                                 }
 

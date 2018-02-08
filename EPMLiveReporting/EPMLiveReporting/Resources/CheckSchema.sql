@@ -137,10 +137,19 @@ BEGIN
 	);
 END
 
+IF  EXISTS(SELECT * FROM sys.default_constraints  WHERE name ='DF_SS_Logs_Kind')
+BEGIN
 ALTER TABLE [dbo].[SS_Logs] DROP CONSTRAINT [DF_SS_Logs_Kind]
+END
+
 ALTER TABLE [dbo].[SS_Logs] ALTER COLUMN [Kind] INT
 ALTER TABLE [dbo].[SS_Logs] ADD  CONSTRAINT [DF_SS_Logs_Kind]  DEFAULT ((0)) FOR [Kind]
+
+IF EXISTS(SELECT * FROM sys.default_constraints  WHERE name ='DF_SS_Logs_DateTime')
+BEGIN
 ALTER TABLE [dbo].[SS_Logs] DROP CONSTRAINT [DF_SS_Logs_DateTime]
+END
+
 ALTER TABLE [dbo].[SS_Logs] ADD  CONSTRAINT [DF_SS_Logs_DateTime]  DEFAULT (getutcdate()) FOR [DateTime]
 
 ---------------TABLE: SS_Streams----------------------

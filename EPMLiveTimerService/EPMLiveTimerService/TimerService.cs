@@ -20,7 +20,10 @@ namespace TimerService
 
         protected override void OnStart(string[] args)
         {
-            tr.startTimer();
+            if (!tr.startTimer())
+            {
+                throw new Exception("One or more of the timer tasks failed to start");
+            }
         }
 
         protected override void OnStop()

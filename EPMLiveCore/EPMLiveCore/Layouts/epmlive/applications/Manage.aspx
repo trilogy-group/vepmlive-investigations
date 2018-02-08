@@ -8,11 +8,11 @@
 
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Manage.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.applications.Manage" DynamicMasterPageFile="~masterurl/default.master" %>
 
-<asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
+<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <script src="../DHTML/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
     <script type="text/javascript">
 
-       
+
         function Del(id) {
             if (confirm('Are you sure you want to delete that Applicaton?')) {
 
@@ -23,8 +23,8 @@
                 if (resp.Status != "Success") {
                     alert(resp.Status + ": " + resp.Message);
                 }
-                else {                    
-                    location.href = "manage.aspx";
+                else {
+                    window.location.reload();
                 }
             }
         }
@@ -32,8 +32,13 @@
         function Edit(id) {
             var url = "<%=sWebUrl %>/lists/installed%20applications/editform.aspx?isdlg=1&ID=" + id;
 
-            var options = { url: url, width: 700, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
-
+            var options = {
+                url: url, width: 700, showClose: true, dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
+                }
+            };
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
@@ -41,7 +46,13 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/applications/addcommunity.aspx";
 
-            var options = { url: url, width: 600, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
+            var options = {
+                url: url, width: 600, showClose: true, dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
+                }
+            };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
@@ -50,8 +61,13 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/customquiklnch.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
-
+            var options = {
+                url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
+                }
+            };
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
@@ -59,8 +75,13 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/customtopnav.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
-
+            var options = {
+                url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
+                }
+            };
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
@@ -68,16 +89,20 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/applications/ManageApps.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
-
+            var options = {
+                url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
+                }
+            };
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
     </script>
+</asp:Content>
 
-</asp:content>
-
-<asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
+<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
     <table width="100%">
         <tr>
@@ -86,17 +111,17 @@
                     <Columns>
                         <asp:BoundField DataField="Icon" HeaderText="" HeaderStyle-HorizontalAlign="Left" ItemStyle-VerticalAlign="top" HtmlEncode="false" ItemStyle-Width="80" ItemStyle-Wrap="false" />
                         <asp:BoundField DataField="Title" HeaderText="Community" HeaderStyle-HorizontalAlign="Left" ItemStyle-VerticalAlign="top" HtmlEncode="false" ItemStyle-Width="100%" />
-                         <asp:TemplateField HeaderText="Position" ItemStyle-HorizontalAlign="Center" ItemStyle-VerticalAlign="top" HeaderStyle-Width="45px">
-                                <ItemTemplate>
-                                     <asp:DropDownList OnSelectedIndexChanged="ddlOrder_SelectedIndexChanged" AutoPostBack="true" ID="ddlOrder" runat="server">
-                                    </asp:DropDownList>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Position" ItemStyle-HorizontalAlign="Center" ItemStyle-VerticalAlign="top" HeaderStyle-Width="45px">
+                            <ItemTemplate>
+                                <asp:DropDownList OnSelectedIndexChanged="ddlOrder_SelectedIndexChanged" AutoPostBack="true" ID="ddlOrder" runat="server">
+                                </asp:DropDownList>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:BoundField DataField="Visible" HeaderText="Visible" HeaderStyle-HorizontalAlign="Left" ItemStyle-VerticalAlign="top" HtmlEncode="false" ItemStyle-Width="80" />
                         <asp:TemplateField HeaderText="Action" ItemStyle-VerticalAlign="top" ItemStyle-Wrap="false">
                             <ItemTemplate>
 
-                                <asp:LinkButton ID="LinkButton2" 
+                                <asp:LinkButton ID="LinkButton2"
                                     CommandArgument='<%# Eval("ID") %>'
                                     CommandName="EditRow" runat="server">
                                     Edit</asp:LinkButton><br />
@@ -120,7 +145,7 @@
                                 <input type="hidden" class="itemId" value='<%# Eval("ID") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                       
+
                     </Columns>
                     <RowStyle BackColor="White" Font-Names="Helvetica Neue, Helvetica, Arial, sans-serif" Font-Size="13px" BorderStyle="None" ForeColor="#333333" CssClass="itemidborder" />
                     <HeaderStyle Font-Bold="True" ForeColor="#333333" HorizontalAlign="Left" Font-Size="13px" CssClass="itemidborder" Font-Names="Helvetica Neue, Helvetica, Arial, sans-serif" />
@@ -132,9 +157,9 @@
                 <img style="position: absolute; top: -128px !important; left: 0px !important" alt="" src="/_layouts/images/fgimg.png" />
             </span>&nbsp;<a id="A3" class="ms-addnew" onclick="NewApplication();" href="#" target="_self">Create Community</a>
 
-            &nbsp; &nbsp;
-                <img style="position: relative;height: 15px; padding-top: 10px;" alt="" src="/_layouts/images/save32x32.png" />
-                            <asp:LinkButton Text="Save Communities Order" runat="server" class="ms-addnew" ID="lnkSaveOrder" OnClick="lnkSaveOrder_OnClicked"></asp:LinkButton>
+                &nbsp; &nbsp;
+                <img style="position: relative; height: 15px; padding-top: 10px;" alt="" src="/_layouts/images/save32x32.png" />
+                <asp:LinkButton Text="Save Communities Order" runat="server" class="ms-addnew" ID="lnkSaveOrder" OnClick="lnkSaveOrder_OnClicked"></asp:LinkButton>
             </td>
         </tr>
         <tr>
@@ -144,12 +169,12 @@
 
     </table>
 
-</asp:content>
+</asp:Content>
 
-<asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
+<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
     My Communities
-</asp:content>
+</asp:Content>
 
-<asp:content id="PageTitleInTitleArea" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
     My Communities
-</asp:content>
+</asp:Content>

@@ -77,13 +77,17 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="InitFaultyClass.cs" />
+    <Compile Include="NotificationClass.cs" />
+    <Compile Include="ProcessorBase.cs" />
     <Compile Include="RollupClass.cs" />
     <Compile Include="EmailSystem.cs" />
-    <Compile Include="HighTimerClass.cs" />
     <Compile Include="IntegrationClass.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunFaultyClass.cs" />
     <Compile Include="SecurityClass.cs" />
+    <Compile Include="TestTimerRunner.cs" />
     <Compile Include="TimerClass.cs" />
     <Compile Include="TimerRunner.cs" />
     <Compile Include="TimerService.cs">

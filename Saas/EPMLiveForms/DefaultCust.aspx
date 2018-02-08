@@ -59,45 +59,7 @@
                                 <span><a target="_blank" href="http://support.epmlive.com">Support</a></span>&nbsp;|&nbsp;<span><a href="https://epmlive.ideas.aha.io/" target="_blank">Feedback</a></span>&nbsp;|&nbsp;<span><a target="_blank" href="http://epmlive.com/epm-live-service-agreement">Legal</a></span>&nbsp;|&nbsp;<span><a target="_blank" href="http://epmlive.com/privacy-policy81/">Privacy Policy</a></span>
                             </div>
                         </div>
-                    </div>
-                    <div id="login-ad-main">
-                        <div id="login-ad-content">
-                            <div id="login-ad-bg">
-                                <div style="color: #ffffff; font-size: 25px; text-align: center; padding-top: 20px; line-height: 35px;">
-                                    Visit the new EPM Live Community<br>
-                                    for EPM Live
-                                </div>
-                                <a href="http://epmliveuniversity.com" target="_blank" style="text-decoration: none;">
-                                    <div class="call-to-action-button">
-                                        <span style="word-spacing: 3px;">Visit the Community</span>
-                                    </div>
-                                </a>
-                                <div class="support-links-wrapper">
-                                    <ul>
-                                        <li>
-                                            <a href="https://community.uplandsoftware.com/hc/en-us/community/topics" target="_blank" style="text-decoration: none;" />
-                                            <img alt="Forums" src="./img/forums2-final.png" />
-                                            <span>Forums</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="https://community.uplandsoftware.com/hc/en-us/categories/200348089" target="_blank" style="text-decoration: none;" />
-                                            <img alt="Knowledgebase" src="./img/KB-final.png" />
-                                            <span>Knowledge<br>
-                                                Base</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="https://community.uplandsoftware.com/hc/en-us/categories/200290999" target="_blank" style="text-decoration: none;" />
-                                            <img alt="video" src="./img/video-final.png" />
-                                            <span>Videos</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div>                   
                 </div>
 
             </LayoutTemplate>

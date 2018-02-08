@@ -101,12 +101,27 @@ function Test-ADCredential {
         [string]$UserName,
         [string]$Password
     )
-    if (!($UserName) -or !($Password)) {
+	
+	if ($UserName.IndexOf('\') -ge 0)
+	{
+		$trimmedUsername = $UserName.Substring($UserName.IndexOf('\') + 1, $UserName.Length - $UserName.IndexOf('\') - 1)
+	}
+	else
+	{
+		$trimmedUsername = $UserName
+	}
+    if (!($UserName) -or !($trimmedUsername)) {
         Write-Warning 'Test-ADCredential: Please specify both user name and password'
     } else {
         Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-        $DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('domain')
-        $DS.ValidateCredentials($UserName, $Password)
+		$CurrentDomain = 'LDAP://'+([ADSI]"").distinguishedName
+        $dom = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
+		$res =  $dom.name
+		if ($res -eq $null) {
+			return $False
+		}   else {
+			return $True
+		}
     }
 }
 

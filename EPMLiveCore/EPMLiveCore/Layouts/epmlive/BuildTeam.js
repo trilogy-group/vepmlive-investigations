@@ -329,6 +329,7 @@ function SaveTeamCloseClose(loader) {
     HideTDialog();
     if (loader.xmlDoc.responseText != null) {
         var data = loader.xmlDoc.responseText.trim();
+        
         if (data != "Success") {
             alert(data);
         }

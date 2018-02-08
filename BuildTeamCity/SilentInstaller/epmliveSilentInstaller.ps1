@@ -5,23 +5,24 @@ Param(
     [string] $dbService = "epmDB.epmldev.com",
     [string] $dbName = "epmlive",
     [string] $appPool = "SharePoint - qaepmlive680",
-    [string] $inUserName = "farmadmin@epmldev",
 	[string] $comUserName = "epmldev\farmadmin",
     [string] $inPassword = "Pass@word1",
 	[string] $version = "6.1.0.0",
+	[string] $upgradeSitesFile = "",
+	[string] $upgradeSite = "",
 	[switch] $deploySolutions,
-	[switch] $deployGAC,
-	[switch] $deployCOM,
 	[switch] $deployTimer,
 	[switch] $deployPFE,
-	[switch] $createDB
+	[switch] $createDB,
+	[switch] $upgradeSites
+	
 	
 )
 $config = Get-Content "config.json" | Out-String | ConvertFrom-Json
 . ".\routines.ps1"
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
-if (!(Test-ADCredential $inUserName $inPassword))
+if (!(Test-ADCredential $comUserName $inPassword))
 {
     Write-Host "Wrong credentials"
     return
@@ -33,10 +34,12 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 	if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
 	{
 		Write-Host ("Stop service:" + $component.installAsService.name)
+		Set-Service -Name $component.installAsService.name -StartupType Disabled
 		Stop-Service -Name $component.installAsService.name
+		
 		WaitUntilServices $component.installAsService.name "Stopped"
 		Write-Host("Killing " + $component.installAsService.processname)
-		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue
+		Stop-Process -processname $component.installAsService.processname -ErrorAction SilentlyContinue -Force -Confirm:$false
 	}
 	else
 	{
@@ -56,7 +59,7 @@ foreach ($component in $config.Components | Where-Object {($_.registerCOMplus -n
 			unregister-File (Join-Path $destination $file)
 		}
 
-		if (![string]::IsNullOrEmpty($component.registerCOMplus) -and $deployCOM)
+		if (![string]::IsNullOrEmpty($component.registerCOMplus))
 		{
 			Unregister-COMPlus $component.registerCOMplus.Name
 		}
@@ -75,16 +78,14 @@ foreach ($component in $config.Components)
 	
 	if ($component.destination.Equals("GAC"))
 	{
-		if ($deployGAC)
+		foreach ($file in $component.files)
 		{
-			foreach ($file in $component.files)
-			{
-				$fullName = Join-Path $folderName $file
-				Write-Host ("Add to GAC: $fullName")
-				$publish = New-Object System.EnterpriseServices.Internal.Publish            
-				$publish.GacInstall($fullName)
-			}
+			$fullName = Join-Path $folderName $file
+			Write-Host ("Add to GAC: $fullName")
+			$publish = New-Object System.EnterpriseServices.Internal.Publish            
+			$publish.GacInstall($fullName)
 		}
+		
 		continue;
 	}
 	
@@ -108,18 +109,17 @@ foreach ($component in $config.Components)
             $outDir = ClarifyPath $component.unzip
             Unzip $fullName $outDir  
         }
-		if ($deployCOM)
+	
+		if (![string]::IsNullOrEmpty($component.registerCOM))
 		{
-			if (![string]::IsNullOrEmpty($component.registerCOM))
-			{
-				Register-File (Join-Path $destination $file)
-			}
-
-			if (![string]::IsNullOrEmpty($component.registerCOMplus))
-			{
-				Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
-			}
+			Register-File (Join-Path $destination $file)
 		}
+
+		if (![string]::IsNullOrEmpty($component.registerCOMplus))
+		{
+			Register-COMPlus (Join-Path $destination $file) $component.registerCOMplus.ID $component.registerCOMplus.Name $comUserName $inPassword
+		}
+		
 		
     }
 }
@@ -191,6 +191,15 @@ if ($deploySolutions)
     }
 
     RestartSPTimerV4
+	Write-Host 'Upgrading DB'
+	$dbUpgrader = Join-Path $ScriptDir 'DBUpgrader\EPMLiveDBUpgrader.exe'
+	& $dbUpgrader -W $webAppName
+	if ($LastExitCode -ne 0) {
+		throw "DB upgrader failed with exit code: $LastExitCode."
+	}
+	
+	
+	
 }
  
 #### Create Database ####
@@ -242,14 +251,14 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 			$destination = ClarifyPath $component.destination
 			$destFileName =  Join-Path $destination $file
 			Write-Host "Install as service: $destFileName"
-			if ($component.installAsService.dependency -ne "")
+			if (![string]::IsNullOrEmpty($component.installAsService.dependency))
 			{
 			Install-Service-With-Dependency `
 				-serviceName $component.installAsService.name `
 				-displayName $component.installAsService.displayname `
 				-description $component.installAsService.description `
 				-path $destFileName `
-				-UserName $inUserName `
+				-UserName $comUserName `
 				-Password $inPassword `
 				-Dependency $component.installAsService.dependency
 			}
@@ -260,15 +269,46 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 				-displayName $component.installAsService.displayname `
 				-description $component.installAsService.description `
 				-path $destFileName `
-				-UserName $inUserName `
+				-UserName $comUserName `
 				-Password $inPassword 
 			}
 		}
 		if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
 		{
+			Set-Service -Name $component.installAsService.name -StartupType Automatic
 			Start-Service -Name $component.installAsService.name
 			WaitUntilServices $component.installAsService.name "Running"
 		}
 	}
 	
+}
+
+if ($deploySolutions -and $deployTimer)
+{
+	$siteUpgrader = Join-Path $ScriptDir 'SiteUpgrader\EPMLiveTimeJobSchedulerConsole.exe'
+	if ([string]::IsNullOrWhiteSpace($upgradeSitesFile) -ne $true)
+	{
+		Write-Host "Upgrading Site(s) from $upgradeSitesFile"
+		& $siteUpgrader -P $upgradeSitesFile 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
+	elseif ([string]::IsNullOrWhiteSpace($upgradeSite) -ne $true)
+	{
+		Write-Host "Upgrading Site $upgradeSite"
+		& $siteUpgrader -S $upgradeSite 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
+	elseif ($upgradeSites)
+	{
+		Write-Host 'Upgrading Site(s) from SitesList.xml'
+		$defaultSitesFile = Join-Path $ScriptDir 'SitesList.xml'
+		& $siteUpgrader -P $defaultSitesFile 
+		if ($LastExitCode -ne 0) {
+			throw "Site upgrader failed with exit code: $LastExitCode."
+		}
+	}
 }

@@ -67,6 +67,160 @@ namespace PortfolioEngineCore
             return (_dba.Status == StatusEnum.rsSuccess);
         }
 
+        struct TimedJob
+        {
+            public int UID;
+            public DateTime FirstRun;
+            public DateTime LastRun;
+            public DateTime NextRun;
+            public int FreqMode;
+            public string Session;
+            public int WResId;
+            public int Context;
+            public string ContextData;
+            public string Comment;
+        }
+        public static void AddHeartBeat(DBAccess dba)
+        {
+            SqlCommand oCommand;
+            string sCommand;
+
+            sCommand = "UPDATE EPG_ADMIN SET ADM_QM_HEARTBEAT_DATE = @ADM_QM_HEARTBEAT_DATE ";
+            oCommand = new SqlCommand(sCommand, dba.Connection);
+            oCommand.Parameters.Add("@ADM_QM_HEARTBEAT_DATE", SqlDbType.DateTime).Value = DateTime.Now;
+            oCommand.ExecuteNonQuery();
+        }
+        public static int ManageTimedJobs(DBAccess dba, string basePath)
+        {
+            
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            string sCommand;
+
+            // JOT_FREQ_MODE codes:
+            //  0 - don't run
+            //  1 - run once at start time
+            //  2 - run every hour
+            //  3 - run every day
+            //  4 - run every week
+            //  5 - run every same day of month
+            //  9 - run every minute - testing only
+
+            TimedJob thisJob = new TimedJob();
+            TimedJob selectedJob = new TimedJob();
+            DateTime dtNull = DateTime.MinValue;
+            DateTime dtTimeNow = DateTime.Now;
+            DateTime dtNextRun;
+
+
+            selectedJob.UID = 0;
+            sCommand = "SELECT * FROM EPG_JOBS_TIMER WHERE JOT_FREQ_MODE > 0 ORDER BY JOT_NEXT_RUN";
+            oCommand = new SqlCommand(sCommand, dba.Connection);
+            reader = oCommand.ExecuteReader();
+            bool jobsQueued = false;
+            while (reader.Read())
+            {
+
+                bool bNull;
+                thisJob.UID = DBAccess.ReadIntValue(reader["JOT_UID"], out bNull);
+                thisJob.FirstRun = DBAccess.ReadDateValue(reader["JOT_FIRST_RUN"], out bNull);
+                if (bNull) thisJob.FirstRun = dtNull;
+                thisJob.NextRun = DBAccess.ReadDateValue(reader["JOT_NEXT_RUN"], out bNull);
+                if (bNull) thisJob.NextRun = dtNull;
+                thisJob.LastRun = DBAccess.ReadDateValue(reader["JOT_LAST_RUN"], out bNull);
+                if (bNull) thisJob.LastRun = dtNull;
+                thisJob.FreqMode = DBAccess.ReadIntValue(reader["JOT_FREQ_MODE"], out bNull);
+                thisJob.Session = DBAccess.ReadStringValue(reader["JOT_SESSION"], out bNull);
+                thisJob.WResId = DBAccess.ReadIntValue(reader["WRES_ID"], out bNull);
+                thisJob.Context = DBAccess.ReadIntValue(reader["JOT_CONTEXT"], out bNull);
+                thisJob.ContextData = DBAccess.ReadStringValue(reader["JOT_CONTEXT_DATA"], out bNull);
+                thisJob.Comment = DBAccess.ReadStringValue(reader["JOT_COMMENT"], out bNull);
+
+                bool found = false;
+                if (thisJob.NextRun <= dtTimeNow)
+                {
+                    switch (thisJob.FreqMode)
+                    {
+                        case 1:  // run only once
+                            if (thisJob.LastRun == dtNull) { selectedJob = thisJob; found = true; }
+                            break;
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 9:
+                            if (thisJob.NextRun != dtNull || thisJob.FirstRun <= dtTimeNow) { selectedJob = thisJob; found = true; }
+                            break;
+                    }
+
+                }
+                if (!found)
+                    continue;
+
+                // need to calculate when this job should be started next
+                if (selectedJob.NextRun == dtNull)
+                    dtNextRun = selectedJob.FirstRun;
+                else
+                    dtNextRun = selectedJob.NextRun;
+
+                while (dtNextRun <= dtTimeNow)
+                {
+                    bool doBreak = false;
+                    switch (selectedJob.FreqMode)
+                    {
+                        case 1:  // run once
+                            dtNextRun = dtNull;
+                            doBreak = true;
+                            break;
+                        case 2:  //every hour
+                            dtNextRun = dtNextRun.AddHours(1);
+                            break;
+                        case 3:  //every day
+                            dtNextRun = dtNextRun.AddDays(1);
+                            break;
+                        case 4:  //every week
+                            dtNextRun = dtNextRun.AddDays(7);
+                            break;
+                        case 5:  //every month
+                            dtNextRun = dtNextRun.AddMonths(1);
+                            break;
+                        case 9:  //every minute - testing only
+                            dtNextRun = dtNextRun.AddMinutes(1);
+                            break;
+                        default:
+                            doBreak = true;
+                            break;
+                    }
+
+                    if (doBreak)
+                        break;
+                }
+
+                try
+                {
+
+                    sCommand = "UPDATE EPG_JOBS_TIMER SET JOT_NEXT_RUN = @JOT_NEXT_RUN, JOT_FIRST_RUN = @JOT_FIRST_RUN WHERE JOT_UID = " + selectedJob.UID;
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
+                    oCommand.Parameters.Add("@JOT_NEXT_RUN", SqlDbType.DateTime).Value = dtNextRun;
+                    oCommand.Parameters.Add("@JOT_FIRST_RUN", SqlDbType.DateTime).Value = (selectedJob.FirstRun == dtNull ? dtTimeNow : selectedJob.FirstRun);
+                    oCommand.ExecuteNonQuery();
+
+                    // insert the job into the job queue
+                    jobsQueued |= QueueJobRequest(dba, selectedJob.WResId, selectedJob.Context, selectedJob.Session, selectedJob.Comment, selectedJob.ContextData, basePath);
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+
+            reader.Close();
+            if (jobsQueued)
+                return (int)StatusEnum.rsSuccess;
+            else
+                return -1;
+        }
 
         public static bool CalcCategoryRates(DBAccess dba, out string sReply)
         {
@@ -345,6 +499,7 @@ namespace PortfolioEngineCore
         {
             return CalcInternalAvailabilities(dba, -1, "");
         }
+
 
         public static bool CalcInternalAvailabilities(DBAccess dba, int calendar, string reslist)
         {
@@ -1025,25 +1180,53 @@ namespace PortfolioEngineCore
 
         public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData, string basePath)
         {
-            bool bResult = false;
             CStruct xData = new CStruct();
             if (xData.LoadXML(sData) == false)
             {
                 dba.Status = StatusEnum.rsRequestInvalidParameter;
                 return false;
             }
-
+            return SubmitJobRequest(dba, WresID, xData.GetInt("JobContext", 0), "I'm a Session?", xData.GetString("Comment", "Job Request"), xData.GetString("Data", "No Context Data"), basePath);
+        }
+        public static bool SubmitJobRequest(DBAccess dba, int WresID, int context, string session, string comment, string contextData, string basePath)
+        {
+            bool bResult = false;
             try
             {
                 var job = new PfeJob()
                 {
-                    Context = xData.GetInt("JobContext", 0),
-                    Session = "I'm a Session?",
+                    Context = context,
+                    Session = session,
                     UserId = WresID,
-                    Comment = xData.GetString("Comment", "Job Request"),
-                    ContextData = xData.GetString("Data", "No Context Data")
+                    Comment = comment,
+                    ContextData = contextData
                 };
                 job.Queue(new DbRepository(dba), new Msmq(), basePath);
+            }
+            catch (Exception ex)
+            {
+                //sReply = HandleException("SubmitJobRequest", 99999, ex);
+                return false;
+            }
+            bResult = true;
+            return bResult;
+        }
+        public static bool QueueJobRequest(DBAccess dba, int WresID, int context, string session, string comment, string contextData, string basePath)
+        {
+            bool bResult = false;
+            try
+            {
+                var job = new PfeJob()
+                {
+                    Context = context,
+                    Session = session,
+                    UserId = WresID,
+                    Comment = comment,
+                    ContextData = contextData
+                };
+               
+               (new DbRepository(dba)).QueuePfeJob(job);
+
             }
             catch (Exception ex)
             {

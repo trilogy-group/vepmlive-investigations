@@ -14,6 +14,7 @@ using EPMLiveCore.API;
 using TimeSheets.Models;
 using System.ComponentModel;
 using TimeSheets.Log;
+using System.Transactions;
 
 namespace TimeSheets
 {
@@ -558,58 +559,63 @@ namespace TimeSheets
                 string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                int userid = 0;
-
-                if (dr.Read())
-                {
-                    userid = dr.GetInt32(0);
-                }
-                dr.Close();
-
                 string message = "";
 
-                if (userid != 0)
+                using (TransactionScope scope = new TransactionScope())
                 {
-                    SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
-
-                    if (user.ID != userid)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        cn.Open();
+                    });
+
+                    SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
+                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
+
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    int userid = 0;
+
+                    if (dr.Read())
+                    {
+                        userid = dr.GetInt32(0);
+                    }
+                    dr.Close();
+
+
+                    if (userid != 0)
+                    {
+                        SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
+
+                        if (user.ID != userid)
+                        {
+                            message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        }
+                        else
+                        {
+                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn);
+                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
+                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
+                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                            cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
+                            cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
+                            cmd.ExecuteNonQuery();
+
+                            TimesheetSettings settings = new TimesheetSettings(oWeb);
+
+                            if (settings.DisableApprovals)
+                            {
+                                ApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb);
+                            }
+
+                            message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
+                        }
                     }
                     else
-                    {
-                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                        cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
-                        cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
-                        cmd.ExecuteNonQuery();
+                        message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
 
-                        TimesheetSettings settings = new TimesheetSettings(oWeb);
-
-                        if (settings.DisableApprovals)
-                        {
-                            ApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb);
-                        }
-
-                        message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
-                    }
+                    scope.Complete();
                 }
-                else
-                    message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
-
                 ProcessFullMeta(oWeb.Site, cn, tsuid);
 
                 cn.Close();
@@ -3786,7 +3792,7 @@ namespace TimeSheets
                 {
                     try
                     {
-                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND ([AssignedToID] = -99 or [AssignedToID] = " + user.ID + ") AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                         DataTable myWorkDataTable = rptData.ExecuteSql(sql);
 
                         if (myWorkDataTable.Rows.Count > 0)
@@ -3794,12 +3800,13 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows[0]["Timesheet"].ToString() == "True")
                             {
-                                cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid)", cn);
+                                cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID,AssignedToID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid, @assignedtoid)", cn);
                                 cmd.Parameters.AddWithValue("@tsuid", tsuid);
                                 cmd.Parameters.AddWithValue("@webuid", drItem["WEB_UID"].ToString());
                                 cmd.Parameters.AddWithValue("@listuid", drItem["LIST_UID"].ToString());
                                 cmd.Parameters.AddWithValue("@itemid", drItem["ITEM_ID"].ToString());
                                 cmd.Parameters.AddWithValue("@title", drItem["TITLE"].ToString());
+                                cmd.Parameters.AddWithValue("@assignedtoid", user.ID);
 
                                 if (drItem["PROJECT"].ToString() == "")
                                     cmd.Parameters.AddWithValue("@project", DBNull.Value);
@@ -4161,7 +4168,14 @@ namespace TimeSheets
 
             if (!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                if (settings.AllowUnassigned)
+                {
+                    sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
+                }
+                else
+                {
+                    sql = string.Format(@"SELECT * FROM  (SELECT  *,ROW_NUMBER() OVER (PARTITION BY AssignedToID,Title,ID,ProjectID ORDER BY [Modified]) AS 'RANK' FROM LSTMyWork) a WHERE a.[RANK] = 1 AND [AssignedToID] = {3} AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"), userid);
+                }
             }
             else if (bOtherWork)
             {

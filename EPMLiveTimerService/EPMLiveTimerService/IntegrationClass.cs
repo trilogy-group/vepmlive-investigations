@@ -13,203 +13,78 @@ using System.Reflection;
 
 namespace TimerService
 {
-    public class IntegrationClass
+    public class IntegrationClass : ProcessorBase
     {
-        private Object thisLock = new Object();
-
-        public struct RunnerData
+        
+        public override void RunTask(CancellationToken token)
         {
-            public string cn;
-            public DataRow dr;
-        }
-
-        private class WorkerThreads
-        {
-            private BackgroundWorker[] _arrWorkers;
-            private int _maxThreads;
-
-            public WorkerThreads(int maxThreads)
+            try
             {
-                _maxThreads = maxThreads;
-                _arrWorkers = new BackgroundWorker[maxThreads];
-            }
-
-            public bool add(BackgroundWorker newBw)
-            {
-                for (int i = 0; i < _maxThreads; i++)
+                SPWebApplicationCollection _webcolections = GetWebApplications();
+                foreach (SPWebApplication webApp in _webcolections)
                 {
-                    if (_arrWorkers[i] == null)
+                    string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                    if (sConn != "")
                     {
-                        _arrWorkers[i] = newBw;
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public int remainingThreads()
-            {
-                int counter = 0;
-                foreach (BackgroundWorker bw in _arrWorkers)
-                {
-                    if (bw == null)
-                        counter++;
-                }
-                return counter;
-            }
-
-            public void cleanup()
-            {
-                for (int i = 0; i < _maxThreads; i++)
-                    if (_arrWorkers[i] != null)
-                        if (!((BackgroundWorker)_arrWorkers[i]).IsBusy)
-                            _arrWorkers[i] = null;
-            }
-        }
-
-        private WorkerThreads workingThreads;
-
-        public bool startTimer()
-        {
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS");
-            }
-            catch { }
-
-            logMessage("INIT", "STMR", "Starting Integration Queue");
-
-            int maxThreads = 0;
-            try
-            {
-                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("IntQueueThreads"));
-            }
-            catch (Exception e)
-            {
-                logMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
-                //logMessage("INIT", "GTERR", e.Message);
-            }
-            workingThreads = new WorkerThreads(maxThreads);
-
-            logMessage("INIT", "STMR", "Setting Integration Threads to: " + maxThreads);
-
-
-            return true;
-        }
-
-        private void logMessage(string type, string module, string message)
-        {
-            lock (thisLock)
-            {
-                DateTime dt = DateTime.Now;
-
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\INTLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
-
-                swLog.Close();
-            }
-        }
-
-        public void runTimer()
-        {
-            try
-            {
-                workingThreads.cleanup();
-                int maxThreads = workingThreads.remainingThreads();
-                if (maxThreads > 0)
-                {
-
-                    SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
-                    foreach (SPWebApplication webApp in _webcolections)
-                    {
-                        string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
-                        if (sConn != "")
+                        using (SqlConnection cn = new SqlConnection(sConn))
                         {
-                            using (SqlConnection cn = new SqlConnection(sConn))
+                            try
                             {
-                                try
+                                cn.Open();
+                                using (SqlCommand cmd = new SqlCommand("spINTGetQueue", cn))
                                 {
-                                    cn.Open();
-                                    using (SqlCommand cmd = new SqlCommand("spINTGetQueue", cn))
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    DataSet ds = new DataSet();
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
-                                        cmd.CommandType = CommandType.StoredProcedure;
-                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                        DataSet ds = new DataSet();
-                                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                        da.Fill(ds);
+                                        int processed = 0;
+                                        foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
-                                            da.Fill(ds);
-
-                                            foreach (DataRow dr in ds.Tables[0].Rows)
+                                            RunnerData rd = new RunnerData();
+                                            rd.cn = sConn;
+                                            rd.dr = dr;
+                                            if (startProcess(rd))
                                             {
-                                                RunnerData rd = new RunnerData();
-                                                rd.cn = sConn;
-                                                rd.dr = dr;
-                                                if (startProcess(rd))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
                                                 {
-                                                    using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
-                                                    {
-                                                        cmd1.Parameters.Clear();
-                                                        cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                                                        cmd1.ExecuteNonQuery();
-                                                    }
+                                                    cmd1.Parameters.Clear();
+                                                    cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
+                                                    cmd1.ExecuteNonQuery();
                                                 }
+                                                processed++;
                                             }
+                                            token.ThrowIfCancellationRequested();
+                                        }
+                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
 
-
-                                            using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
-                                            {
-                                                cmd.ExecuteNonQuery();
-                                            }
+                                        using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
+                                        {
+                                            cmd.ExecuteNonQuery();
                                         }
                                     }
                                 }
-                                catch (Exception ex)
-                                {
-                                    logMessage("ERR", "RUN", ex.Message);
-                                }
                             }
-
+                            catch (Exception ex) when (!(ex is OperationCanceledException))
+                            {
+                                logMessage("ERR", "RUNT", ex.Message);
+                            }
                         }
 
                     }
+
                 }
+
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUN", ex.Message);
+                logMessage("ERR", "RUNT", ex.Message);
             }
         }
-
-        public bool startProcess(RunnerData dr)
+        
+        protected override void DoWork(RunnerData rd)
         {
-            try
-            {
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
-
-                bw.DoWork += bw_DoWork;
-                //bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-
-                bw.RunWorkerAsync(dr);
-
-                workingThreads.add(bw);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logMessage("ERR", "STPR", ex.Message);
-                return false;
-            }
-        }
-
-        private void bw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Thread.Sleep(2000);
-            RunnerData rd = (RunnerData)e.Argument;
             DataRow dr = rd.dr;
 
             try
@@ -258,18 +133,16 @@ namespace TimerService
                 }
             }
         }
-
-
-
-
-        static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-
+        
+        protected override string LogName {
+            get {
+                return "INTLOG";
+            }
         }
-
-        public void stopTimer()
-        {
-            logMessage("STOP", "STMR", "Stopped Timer Service");
+        protected override string ThreadsProperty {
+            get {
+                return "IntQueueThreads";
+            }
         }
     }
 }

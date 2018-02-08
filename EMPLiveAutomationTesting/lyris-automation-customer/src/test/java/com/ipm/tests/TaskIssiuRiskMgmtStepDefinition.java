@@ -175,7 +175,12 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		int rounds = 0;
+        while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
+		{
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			rounds++;
+		}
     }
 
     public void searchForCreatedRisk(String projectname) {
@@ -185,7 +190,12 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		int rounds = 0;
+		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
+		{
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			rounds++;
+		}
     }
 
     public void searchForCreatedIssue(String projectname) {
@@ -195,7 +205,12 @@ public class TaskIssiuRiskMgmtStepDefinition {
         driver.findElement(By.id("searchtext0Main")).click();
         driver.findElement(By.id("searchtext0Main")).sendKeys(projectname);
         driver.findElement(By.id("searchtext0Main")).sendKeys(Keys.RETURN);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		int rounds = 0;
+		while (!driver.getCurrentUrl().contains("searchvalue=" + projectname) && rounds < 3)
+		{
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			rounds++;
+		}
     }
 
     @When("^I click on Risks on the left panel$")

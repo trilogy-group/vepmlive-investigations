@@ -815,21 +815,31 @@ Status_Error:
                 // Work Item (Status Date?)	                            6(60)	    No	        No	        COST_VALUES
                 // Resource Plans (Revenue + Status Date?)	            9(90,91,92)	No	        No	        COST_VALUES
                 List<CostCategory> costCategories;
-                List<CostCustomField> costCustomFields = null;
+                
                 switch (costType.EditMode)
                 {
                     case 1:     // editable
                     case 101:   // non-editable w/details
-
-                        if (GetCostCustomFields(dba, nCostTypeID, true, out costCustomFields) != StatusEnum.rsSuccess) goto Status_Error;
-                        if (BuildCostDetailsData(dba, nCalendarID, nCostTypeID, nProjectID, Ftemode, out costCategories) != StatusEnum.rsSuccess) goto Status_Error;
+                        {
+                            List<CostCustomField> costCustomFields = null;
+                            if (GetCostCustomFields(dba, nCostTypeID, true, out costCustomFields) != StatusEnum.rsSuccess) goto Status_Error;
+                            if (BuildCostDetailsData(dba, nCalendarID, nCostTypeID, nProjectID, Ftemode, out costCategories) != StatusEnum.rsSuccess) goto Status_Error;
+                            foreach (CostCategory category in costCategories)
+                                category.CustomFields = costCustomFields;
+                        }
                         break;
                     case 3:     // calculated
                     case 30:    // cumulative calculated
                         if (BuildCalculatedData(dba, nCalendarID, nCostTypeID, nProjectID, Ftemode, out costCategories) != StatusEnum.rsSuccess) goto Status_Error;
                         break;
                     default:
-                        if (BuildCostValuesData(dba, nCalendarID, nCostTypeID, nProjectID, Ftemode, out costCategories) != StatusEnum.rsSuccess) goto Status_Error;
+                        {
+                            List<CostCustomField> costCustomFields = null;
+                            if (GetCostCustomFields(dba, nCostTypeID, true, out costCustomFields) != StatusEnum.rsSuccess) goto Status_Error;
+                            if (BuildCostValuesData(dba, nCalendarID, nCostTypeID, nProjectID, Ftemode, out costCategories) != StatusEnum.rsSuccess) goto Status_Error;
+                            foreach (CostCategory category in costCategories)
+                                category.CustomFields = costCustomFields;
+                        }
                         break;
                 }
                 dba.Close();
@@ -897,7 +907,7 @@ Status_Error:
                 {
                     if (bNoRows || Loadallcostcategories)
                         costCategory.HasData = true;
-                    oGridData.AddCostCategory(costCategory, costCustomFields, nRowId++);
+                    oGridData.AddCostCategory(costCategory, costCategory.CustomFields, nRowId++);
                 }
                 sXML = oGridData.GetString();
                 return sXML;
@@ -1041,7 +1051,8 @@ Status_Error:
                 List<CostCategory> costCategories1;
                 CostType ct;
                 if (GetCostType(dba, cto.Id, out ct) != StatusEnum.rsSuccess) goto Status_Error;
-
+                List<CostCustomField> costCustomFields = null;
+                if (GetCostCustomFields(dba, ct.Id, true, out costCustomFields) != StatusEnum.rsSuccess) goto Status_Error;
                 switch (ct.EditMode)
                 {
                     case 1:
@@ -1052,6 +1063,8 @@ Status_Error:
                         if (BuildCostValuesData(dba, nCalendarID, ct.Id, nProjectID, Ftemode, out costCategories1) != StatusEnum.rsSuccess) goto Status_Error;
                         break;
                 }
+                foreach (CostCategory category in costCategories1)
+                    category.CustomFields = costCustomFields;
 
                 if (bFirst)
                 {
@@ -2281,6 +2294,7 @@ Exit_Function:
 
         internal class CostCategory
         {
+            public List<CostCustomField> CustomFields = null;
             public int Uid;
             public int Id;
             public string Name;

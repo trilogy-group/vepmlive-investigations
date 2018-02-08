@@ -170,7 +170,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         #region Methods (1) 
 
         // Public Methods (1) 
-
+        static object featureLock = new object();
         public override bool Perform()
         {
             try
@@ -185,7 +185,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         {new Guid(TIMESHEETS_FEATURE_ID), "WorkEngine Timesheets"}
                     })
                     {
-                        ResetFeature(feature, spSite);
+                        lock (featureLock)
+                        {
+                            ResetFeature(feature, spSite);
+                        }
                     }
                 }
             }

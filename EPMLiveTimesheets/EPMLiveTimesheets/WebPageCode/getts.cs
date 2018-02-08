@@ -829,7 +829,7 @@ namespace TimeSheets
             try
             {
                 SPQuery query = new SPQuery();
-                query.Query = "<OrderBy><FieldRef Name = 'FirstName' Ascending = 'True'/><FieldRef Name = 'LastName' Ascending = 'True'/></OrderBy></Query>";
+                query.Query = "<OrderBy><FieldRef Name = 'FirstName' Ascending = 'True'/><FieldRef Name = 'LastName' Ascending = 'True'/></OrderBy>";
                 SPListItemCollection listItems = list.GetItems(query);
                 if (listItems != null && listItems.Count > 0)
                 {

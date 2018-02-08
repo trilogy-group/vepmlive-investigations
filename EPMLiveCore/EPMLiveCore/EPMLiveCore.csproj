@@ -417,6 +417,8 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6311Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6312Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
@@ -3646,6 +3648,8 @@
     <Content Include="Layouts\epmlive\images\WESite.png" />
     <Content Include="Layouts\epmlive\images\WorkEngine-logo.gif" />
     <Content Include="Layouts\epmlive\images\Workspaces.png" />
+    <Content Include="Layouts\epmlive\img\glyphicons-halflings-white.png" />
+    <Content Include="Layouts\epmlive\img\glyphicons-halflings.png" />
     <Content Include="Layouts\epmlive\ImportResources.aspx" />
     <Content Include="Layouts\epmlive\ImportResourceStatus.aspx" />
     <Content Include="Layouts\epmlive\Integration\Add.aspx" />

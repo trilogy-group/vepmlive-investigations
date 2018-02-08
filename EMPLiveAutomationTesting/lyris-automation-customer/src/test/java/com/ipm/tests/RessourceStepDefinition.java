@@ -59,6 +59,15 @@ public class RessourceStepDefinition {
         driver.findElement(By.xpath("//input[@title='First Name']")).sendKeys(createdRessourceName);
         if (driver instanceof JavascriptExecutor) {
             JavascriptExecutor js = (JavascriptExecutor) driver;
+			wait.until(ExpectedConditions.presenceOfElementLocated(By.id("SharePointAccount_b28f2138-dab0-4d50-a6b3-83f8c99ccdef_$ClientPeoplePicker_NotificationSpan")));
+			js.executeScript("window.document.getElementById('SharePointAccount_b28f2138-dab0-4d50-a6b3-83f8c99ccdef_$ClientPeoplePicker_NotificationSpan').click()");
+			wait.until(ExpectedConditions.presenceOfElementLocated(By.className("sp-peoplepicker-editorInput")));
+			driver.findElement(By.className("sp-peoplepicker-editorInput")).sendKeys("test");
+			
+			wait.until(ExpectedConditions.elementToBeClickable(By.id("Department_ddlShowAll")));
+            js.executeScript("window.document.getElementById('Department_ddlShowAll').click()");
+			wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));
+            js.executeScript("window.document.getElementById('autoText_0').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("Role_ddlShowAll")));
             js.executeScript("window.document.getElementById('Role_ddlShowAll').click()");
             wait.until(ExpectedConditions.elementToBeClickable(By.id("autoText_0")));

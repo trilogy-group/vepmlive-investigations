@@ -76,7 +76,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        public bool ReadNextQueuedItem()
+        public bool ReadNextQueuedItem(string exclusion = null)
         {
             bool bItemToProcess = false;
             try
@@ -86,8 +86,8 @@ namespace PortfolioEngineCore
                 //  1 - Job started and being processed
                 // -1 - Job completed with no errors
                 // -2 - Job completed with errors
-                const string sCommand =
-                    "SELECT TOP 1 * FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 ORDER BY JOB_SUBMITTED";
+                string sCommand =
+                    "SELECT TOP 1 * FROM EPG_JOBS WHERE JOB_CONTEXT >= 0 AND JOB_STATUS = 0 " + (string.IsNullOrWhiteSpace(exclusion)? "" : " AND  JOB_GUID NOT IN (" + exclusion + ") ") + " ORDER BY JOB_SUBMITTED";
                 SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection);
                 SqlDataReader reader = oCommand.ExecuteReader();
 
@@ -175,6 +175,29 @@ namespace PortfolioEngineCore
             return bHandled;
         }
 
+        public int ManageTimedJobs()
+        {
+         
+            try
+            {
+
+                return AdminFunctions.ManageTimedJobs(_dba, this._basepath);
+
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("ManageTimedJobs", (StatusEnum)99999, ex);
+            }
+            return -1;
+        }
+
+        public void AddHeartBeat()
+        {
+            AdminFunctions.AddHeartBeat(_dba);
+        }   
+
+
+
         public bool SetJobStarted()
         {
             bool bSuccess = false;
@@ -231,7 +254,7 @@ namespace PortfolioEngineCore
                 // this is what we have to do to late bind to a 32bit com+ vb6 object from a 64bit .net process
                 Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                 object comObject = Activator.CreateInstance(comObjectType);
-                object[] myparams = new object[] { sContext, sXML, sRequest };
+                object[] myparams = new object[] { sContext, BasePath, false, true };
                 sReply = (string)comObjectType.InvokeMember("RSVPRequest", BindingFlags.InvokeMethod, null, comObject, myparams);
 
                 comObject = null;

@@ -15,7 +15,6 @@ namespace ProjectPublisher2016
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label3;
-		public System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.Label label2;
 		/// <summary>
 		/// Required designer variable.
@@ -60,7 +59,6 @@ namespace ProjectPublisher2016
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -68,7 +66,7 @@ namespace ProjectPublisher2016
             // 
             this.button1.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(222, 81);
+            this.button1.Location = new System.Drawing.Point(222, 74);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(72, 24);
             this.button1.TabIndex = 5;
@@ -94,14 +92,6 @@ namespace ProjectPublisher2016
             this.label3.TabIndex = 8;
             this.label3.Text = "label3";
             // 
-            // checkBox1
-            // 
-            this.checkBox1.Location = new System.Drawing.Point(6, 81);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(184, 16);
-            this.checkBox1.TabIndex = 14;
-            this.checkBox1.Text = "Check for updates.";
-            // 
             // label2
             // 
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -115,10 +105,9 @@ namespace ProjectPublisher2016
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(301, 110);
+            this.ClientSize = new System.Drawing.Size(301, 105);
             this.ControlBox = false;
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
@@ -136,17 +125,12 @@ namespace ProjectPublisher2016
 
 		private void button1_Click(object sender, System.EventArgs e)
 		{
-			RegistryClass.SaveSetting("Tr","versioncheck",(!checkBox1.Checked).ToString());
 			this.Hide();
 		}
 
 		private void FormAbout_Load(object sender, System.EventArgs e)
 		{
 			label3.Text = "Build: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-			if(Connect.shouldCheck())
-				this.checkBox1.Checked = true;
-			else
-				this.checkBox1.Checked = false;
 		}
 	}
 }

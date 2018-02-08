@@ -300,10 +300,10 @@
                     }
 
                     var commentActivity = activity.time <= comment.time;
-
-                    var userId = thread.activities[0].userId;
-                    thread.user = entityManager.getById(userId, data.users);
-
+                    if (thread.activities.length) {
+                        var userId = thread.activities[0].userId;
+                        thread.user = entityManager.getById(userId, data.users);
+                    }
                     if (thread.kind === 'Workspace') {
                         thread.icon = 'icon-tree-2';
                     } else if (thread.kind === 'StatusUpdate') {

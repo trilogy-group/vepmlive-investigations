@@ -28,11 +28,15 @@ public class AbstractCoreTest {
     public WebDriver driver() {
         //Chrome
         Map<String, Object> prefs = new HashMap<>();
-        System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\uploads\\chromedriver.exe");
+		if (System.getProperty("os.name").contains("Windows"))
+			System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\uploads\\chromedriver.exe");
         prefs.put("download.default_directory", System.getProperty("user.dir"));
         DesiredCapabilities caps = DesiredCapabilities.chrome();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
+		options.addArguments("--headless");
+		options.addArguments("--window-size=1200,1100");
+		
         options.addArguments("--allow-running-insecure-content");
         options.setExperimentalOption("prefs", prefs);
         caps.setCapability(ChromeOptions.CAPABILITY, options);

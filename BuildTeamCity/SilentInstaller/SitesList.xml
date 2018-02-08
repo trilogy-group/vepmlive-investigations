@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ArrayOfSiteCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SiteCollection>
+    <Id>3b53b39a-ef86-4503-998d-6518241c5eee</Id>
+    <Name>UI_Tests</Name>
+    <Url>http://qaepmlive6/sites/UI_Tests</Url>
+    <WebId>8ea75ab3-bf34-40f1-9114-12ba272d2e3a</WebId>
+  </SiteCollection>
+</ArrayOfSiteCollection>
