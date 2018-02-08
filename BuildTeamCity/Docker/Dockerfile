@@ -1,7 +1,5 @@
 FROM jetbrains/teamcity-agent:latest-windowsservercore
 
-
-
 LABEL \
     com.trilogy.company="Aurea" \
     com.trilogy.team="MS.DockerProduction" \
@@ -13,19 +11,18 @@ LABEL \
 
 SHELL ["powershell"]
 
-
-# Install required features
-RUN Install-WindowsFeature NET-Framework-45-Core ; \
-Install-WindowsFeature NET-Framework-45-ASPNET ; \
-Install-WindowsFeature Web-Asp-Net45 ; \
-New-Item -ItemType Directory C:\Sources
-
 # Download and install build tools 
-RUN Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
+RUN New-Item -ItemType Directory C:\Sources ; \
+Invoke-WebRequest "https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe" -OutFile "C:\Sources\BuildTools_Full.exe" -UseBasicParsing ; \
 $setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\BuildTools_Full.exe" -ArgumentList /Silent, /Full ; \
 If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitCode)\" } ; \
 setx PATH '%PATH%;C:\Program Files (x86)\MSBuild\14.0\Bin\' ; \
 Remove-Item "C:\Sources\BuildTools_Full.exe" 
+
+# Install required features
+RUN Install-WindowsFeature NET-Framework-45-Core ; \
+Install-WindowsFeature NET-Framework-45-ASPNET ; \
+Install-WindowsFeature Web-Asp-Net45
 
 #Download Net 4.6.2 dev pack
 RUN Invoke-WebRequest 'https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe' -OutFile "C:\Sources\devpack.exe" -UseBasicParsing  ; \
@@ -46,8 +43,6 @@ If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitC
 Remove-Item "C:\Sources\WebDeploy_amd64_en-US.msi" 
 
 #Install VS2017 test tools and intellitrace
-#Invoke-WebRequest "https://aka.ms/vs/15/release/vs_enterprise.exe" -OutFile "C:\Installer\vs_enterprise.exe" -UseBasicParsing ; \
-#& "C:\Installer\vs_enterprise.exe" --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Office --add Microsoft.VisualStudio.Component.TestTools.Core --includeOptional --nocache --quiet --wait --norestart --noUpdateInstaller | Out-Default
 RUN New-Item -ItemType directory -Path 'C:\Installer' ; \
 Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/100256481/ff220073505d38011e8af5b1ad85c6ef/vs_Enterprise.exe" -OutFile "C:\Installer\vs_enterprise.exe" -UseBasicParsing ; \
 & "C:\Installer\vs_enterprise.exe" --add Microsoft.VisualStudio.Component.TestTools.Core --add Microsoft.VisualStudio.Component.IntelliTrace.FrontEnd --includeOptional --nocache --quiet --wait --norestart --noUpdateInstaller | Out-Default
@@ -72,12 +67,14 @@ New-Item -ItemType directory -Path 'C:\Program Files (x86)\MSBuild\Microsoft\Vis
 Add-Type -assembly 'system.io.compression.filesystem' ; \
 $sourceZip =  Join-Path $env:TEMP "v14.0.zip" ; \
 [io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0') ; \
-Remove-Item "$env:TEMP\v14.0.zip" 
+Remove-Item "$env:TEMP\v14.0.zip"  ; \
+Write-Host 'v14.0.zip processed'
 
 # Install Certificate to Certificate Store
 RUN $PlainTextPass = '1kjS4dF3D5dt' ; \
 $pfxpass = $PlainTextPass |ConvertTo-SecureString -AsPlainText -Force ; \
-Import-PfxCertificate -FilePath 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\EPMLive.pfx' -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pfxpass
+Import-PfxCertificate -FilePath 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\EPMLive.pfx' -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pfxpass ; \
+Import-Certificate -FilePath 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\CACert.cer' -CertStoreLocation 'Cert:\LocalMachine\Root'
 
 # Install Certificate to Container
 RUN & 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\SN.exe' 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\EPMLive.pfx' 1kjS4dF3D5dt
@@ -157,6 +154,40 @@ $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.Office.
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Library.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.BusinessData.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Flighting.Dll') 
+
+#Download Visual Studio GAC
+RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21441"&"authkey=AOQCThCg_ljgAwk' -OutFile "$env:TEMP\SDKTools.zip" -UseBasicParsing  ; \
+Add-Type -assembly 'system.io.compression.filesystem' ; \
+$sourceZip =  Join-Path $env:TEMP "SDKTools.zip" ; \
+[io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\Microsoft SDKs') ; \
+Remove-Item "$env:TEMP\SDKTools.zip" 
+
+#Download NodeJS
+RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21448"&"authkey=AJcOpEA_rt-wZvA' -OutFile "C:\Sources\NodeJS.msi" -UseBasicParsing  ; \
+$setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\NodeJS.msi" -ArgumentList /q ; \
+If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitCode)\" } ; \
+Remove-Item "C:\Sources\NodeJS.msi" 
+
+
+#Download TS-Client
+RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21449"&"authkey=AF6KDO_FciQJ_lg' -OutFile "$env:TEMP\TSClient.zip" -UseBasicParsing  ; \
+Add-Type -assembly 'system.io.compression.filesystem' ; \
+$sourceZip =  Join-Path $env:TEMP "TSClient.zip" ; \
+[io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\ts-client') ; \
+Remove-Item "$env:TEMP\TSClient.zip" ; \
+CD C:\ts-client ; \
+npm install --production ; \
+setx TS_USER 'epm.live.ci.service' ; \ 
+setx TS_USERNAME 'epm.live.ci.service' ; \ 
+setx TS_PASSWORD 'nhf7Kpacdp2fPteq' ; \ 
+setx TS_API_KEY 'hm8qCcRjzp3ZWW3mPvXRf7gHsvkSBRAs47VHWvuD' ; \ 
+setx TS_PRODUCT_ID '167' ; \ 
+setx TS_REPO_ID '233' 
+
+#Add quality hosts entries
+RUN $hostsFile = Join-Path $env:windir "System32\drivers\etc\hosts" ; \
+'10.137.22.98 WIN-6J09GF4NBP8.epmldev.com' | Add-Content -PassThru $hostsFile ; \
+'10.137.22.98 qaepmlive6' | Add-Content -PassThru $hostsFile
 
 #CMD while ($true) { Start-Sleep -Seconds 3600 }
 
