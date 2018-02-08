@@ -67,8 +67,7 @@ New-Item -ItemType directory -Path 'C:\Program Files (x86)\MSBuild\Microsoft\Vis
 Add-Type -assembly 'system.io.compression.filesystem' ; \
 $sourceZip =  Join-Path $env:TEMP "v14.0.zip" ; \
 [io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0') ; \
-Remove-Item "$env:TEMP\v14.0.zip"  ; \
-Write-Host 'v14.0.zip processed'
+Remove-Item "$env:TEMP\v14.0.zip" 
 
 # Install Certificate to Certificate Store
 RUN $PlainTextPass = '1kjS4dF3D5dt' ; \
@@ -155,7 +154,7 @@ $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePo
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.BusinessData.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Flighting.Dll') 
 
-#Download Visual Studio GAC
+#Download SDK Tools
 RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21441"&"authkey=AOQCThCg_ljgAwk' -OutFile "$env:TEMP\SDKTools.zip" -UseBasicParsing  ; \
 Add-Type -assembly 'system.io.compression.filesystem' ; \
 $sourceZip =  Join-Path $env:TEMP "SDKTools.zip" ; \
