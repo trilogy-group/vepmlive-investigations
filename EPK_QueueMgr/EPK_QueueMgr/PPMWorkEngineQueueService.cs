@@ -152,7 +152,7 @@ namespace WE_QueueMgr
                 messageQueue = new Msmq();
 
 
-                var msmqAddress = serviceHost.Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
+                var msmqAddress = new ServiceHost(this).Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
                 messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
             }
             catch (Exception ex)
@@ -178,6 +178,7 @@ namespace WE_QueueMgr
                 timerTask = Task.Run(() => DoWork(), token);
                 longRunTask = Task.Run(() => DoLongRun(), token);
                 monitorTask = Task.Run(() => DoMonitor(), token);
+
                 serviceHost = new ServiceHost(this);
                 serviceHost.Open();
                 if (!string.IsNullOrEmpty(basepaths))
