@@ -178,7 +178,7 @@ namespace WE_QueueMgr
                 timerTask = Task.Run(() => DoWork(), token);
                 longRunTask = Task.Run(() => DoLongRun(), token);
                 monitorTask = Task.Run(() => DoMonitor(), token);
-                
+
                 serviceHost = new ServiceHost(this);
                 serviceHost.Open();
                 if (!string.IsNullOrEmpty(basepaths))
