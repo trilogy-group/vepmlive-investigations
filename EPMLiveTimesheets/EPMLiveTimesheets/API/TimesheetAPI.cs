@@ -551,6 +551,7 @@ namespace TimeSheets
 
         public static string SubmitTimesheet(string data, SPWeb oWeb)
         {
+            SqlTransaction transaction = null;
             try
             {
                 XmlDocument docTimesheet = new XmlDocument();
@@ -559,63 +560,78 @@ namespace TimeSheets
                 string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                    cn.Open();
+                });
+
+                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
+                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                int userid = 0;
+
+                if (dr.Read())
+                {
+                    userid = dr.GetInt32(0);
+                }
+                dr.Close();
+
                 string message = "";
 
-                using (TransactionScope scope = new TransactionScope())
+                if (userid != 0)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
+
+                    if (user.ID != userid)
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                        cn.Open();
-                    });
-
-                    SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    int userid = 0;
-
-                    if (dr.Read())
-                    {
-                        userid = dr.GetInt32(0);
+                        message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
                     }
-                    dr.Close();
-
-
-                    if (userid != 0)
+                    else
                     {
-                        SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
-
-                        if (user.ID != userid)
+                        transaction = cn.BeginTransaction();
+                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn, transaction);
+                        cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
+                        cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
+                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
+                        cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
+                        try
                         {
-                            message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (transaction != null)
+                                transaction.Rollback();
+                            throw ex;
+                        }
+
+                        TimesheetSettings settings = new TimesheetSettings(oWeb);
+
+                        if (settings.DisableApprovals)
+                        {
+                            XmlDocument docRet = new XmlDocument();
+                            docRet.LoadXml(AutoApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb, transaction));
+
+                            if (docRet.FirstChild.Attributes["Status"].Value == "1")
+                            {
+                                throw new Exception(System.Web.HttpUtility.HtmlDecode(docRet.FirstChild.SelectSingleNode("//Error").InnerText));
+                            }
                         }
                         else
                         {
-                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn);
-                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                            cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
-                            cmd.ExecuteNonQuery();
-
-                            TimesheetSettings settings = new TimesheetSettings(oWeb);
-
-                            if (settings.DisableApprovals)
-                            {
-                                ApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb);
-                            }
-
-                            message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
+                            transaction.Commit();
                         }
-                    }
-                    else
-                        message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
 
-                    scope.Complete();
+                        message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
+                    }
                 }
+                else
+                    message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
+
                 ProcessFullMeta(oWeb.Site, cn, tsuid);
 
                 cn.Close();
@@ -1521,6 +1537,14 @@ namespace TimeSheets
         private const int TIMESHEET_REJECTION_NOTIFICATION = 18;
         public static string ApproveTimesheets(string data, SPWeb oWeb)
         {
+            return ApproveTimesheetsCore(data, oWeb);
+        }
+        private static string AutoApproveTimesheets(string data, SPWeb oWeb, SqlTransaction transaction)
+        {
+            return ApproveTimesheetsCore(data, oWeb, transaction);
+        }
+        public static string ApproveTimesheetsCore(string data, SPWeb oWeb, SqlTransaction transaction = null)
+        {
             try
             {
                 XmlDocument doc = new XmlDocument();
@@ -1586,11 +1610,25 @@ namespace TimeSheets
                                     {
                                         //string[] tsData = tsUid.Split('|');
 
-                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
+                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", transaction == null ? cn : transaction.Connection);
+                                        if (transaction != null)
+                                            cmd.Transaction = transaction;
                                         cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
                                         cmd.Parameters.AddWithValue("@notes", TS.InnerText);
                                         cmd.Parameters.AddWithValue("@status", ApprovalStatus);
-                                        cmd.ExecuteNonQuery();
+                                        try
+                                        {                                            
+                                            cmd.ExecuteNonQuery();
+
+                                            if (transaction != null)
+                                                transaction.Commit();
+                                        }
+                                        catch
+                                        {
+                                            if (transaction != null)
+                                                transaction.Rollback();
+                                            throw;
+                                        }
 
                                         if (!liveHours)
                                         {
