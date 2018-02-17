@@ -566,18 +566,27 @@ namespace TimeSheets
                     cn.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
+                var cmd = new SqlCommand("SELECT dbo.TSUSER.USER_ID " +
+                                        "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET " +
+                                        "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
+                                        "WHERE TS_UID=@tsuid", cn);
                 cmd.Parameters.AddWithValue("@tsuid", tsuid);
 
-                SqlDataReader dr = cmd.ExecuteReader();
+                var dr = cmd.ExecuteReader();
 
                 int userid = 0;
 
-                if (dr.Read())
+                try
                 {
-                    userid = dr.GetInt32(0);
+                    if (dr.Read())
+                    {
+                        userid = dr.GetInt32(0);
+                    }
                 }
-                dr.Close();
+                finally
+                {
+                    dr.Close();
+                }
 
                 string message = "";
 
@@ -602,11 +611,13 @@ namespace TimeSheets
                         {
                             cmd.ExecuteNonQuery();
                         }
-                        catch (Exception ex)
+                        catch
                         {
                             if (transaction != null)
+                            {
                                 transaction.Rollback();
-                            throw ex;
+                            }
+                            throw;
                         }
 
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
@@ -630,7 +641,9 @@ namespace TimeSheets
                     }
                 }
                 else
+                {
                     message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
+                }
 
                 ProcessFullMeta(oWeb.Site, cn, tsuid);
 
@@ -1610,9 +1623,12 @@ namespace TimeSheets
                                     {
                                         //string[] tsData = tsUid.Split('|');
 
-                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", transaction == null ? cn : transaction.Connection);
+                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE()"
+                                            +"where ts_uid=@ts_uid", transaction == null ? cn : transaction.Connection);
                                         if (transaction != null)
+                                        {
                                             cmd.Transaction = transaction;
+                                        }
                                         cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
                                         cmd.Parameters.AddWithValue("@notes", TS.InnerText);
                                         cmd.Parameters.AddWithValue("@status", ApprovalStatus);
@@ -1621,12 +1637,16 @@ namespace TimeSheets
                                             cmd.ExecuteNonQuery();
 
                                             if (transaction != null)
+                                            {
                                                 transaction.Commit();
+                                            }
                                         }
                                         catch
                                         {
                                             if (transaction != null)
+                                            {
                                                 transaction.Rollback();
+                                            }
                                             throw;
                                         }
 
