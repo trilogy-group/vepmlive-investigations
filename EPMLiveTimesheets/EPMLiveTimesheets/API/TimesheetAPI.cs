@@ -552,6 +552,7 @@ namespace TimeSheets
         public static string SubmitTimesheet(string data, SPWeb oWeb)
         {
             SqlTransaction transaction = null;
+            SqlConnection cn = null;
             try
             {
                 XmlDocument docTimesheet = new XmlDocument();
@@ -559,7 +560,6 @@ namespace TimeSheets
 
                 string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
@@ -601,15 +601,31 @@ namespace TimeSheets
                     else
                     {
                         transaction = cn.BeginTransaction();
-                        cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn, transaction);
-                        cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                        cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
-                        cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
                         try
                         {
+                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn, transaction);
+                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
+                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
+                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                            cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
+                            cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
+
                             cmd.ExecuteNonQuery();
+
+                            TimesheetSettings settings = new TimesheetSettings(oWeb);
+
+                            if (settings.DisableApprovals)
+                            {
+                                XmlDocument docRet = new XmlDocument();
+                                docRet.LoadXml(AutoApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb, transaction));
+
+                                if (docRet.FirstChild.Attributes["Status"].Value == "1")
+                                {
+                                    throw new Exception(System.Web.HttpUtility.HtmlDecode(docRet.FirstChild.SelectSingleNode("//Error").InnerText));
+                                }
+                            }
+
+                            transaction.Commit();
                         }
                         catch
                         {
@@ -620,22 +636,6 @@ namespace TimeSheets
                             throw;
                         }
 
-                        TimesheetSettings settings = new TimesheetSettings(oWeb);
-
-                        if (settings.DisableApprovals)
-                        {
-                            XmlDocument docRet = new XmlDocument();
-                            docRet.LoadXml(AutoApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb, transaction));
-
-                            if (docRet.FirstChild.Attributes["Status"].Value == "1")
-                            {
-                                throw new Exception(System.Web.HttpUtility.HtmlDecode(docRet.FirstChild.SelectSingleNode("//Error").InnerText));
-                            }
-                        }
-                        else
-                        {
-                            transaction.Commit();
-                        }
 
                         message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
                     }
@@ -655,6 +655,11 @@ namespace TimeSheets
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
+            finally
+            {
+                if(cn != null)
+                    cn.Dispose();
+            }            
         }
 
         public static void ProcessFullMeta(SPSite site, SqlConnection cn, string ts_uid)
@@ -1632,23 +1637,8 @@ namespace TimeSheets
                                         cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
                                         cmd.Parameters.AddWithValue("@notes", TS.InnerText);
                                         cmd.Parameters.AddWithValue("@status", ApprovalStatus);
-                                        try
-                                        {                                            
-                                            cmd.ExecuteNonQuery();
-
-                                            if (transaction != null)
-                                            {
-                                                transaction.Commit();
-                                            }
-                                        }
-                                        catch
-                                        {
-                                            if (transaction != null)
-                                            {
-                                                transaction.Rollback();
-                                            }
-                                            throw;
-                                        }
+                                                                                  
+                                        cmd.ExecuteNonQuery();
 
                                         if (!liveHours)
                                         {
