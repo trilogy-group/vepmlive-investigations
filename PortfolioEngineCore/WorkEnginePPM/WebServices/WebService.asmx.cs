@@ -154,7 +154,7 @@ namespace WorkEnginePPM
                                                 WebAdmin.CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
                                                 Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                                                 object comObject = Activator.CreateInstance(comObjectType);
-                                                object[] myparams = new object[] {"ManageTimerJobs", basePath, false, true};
+                                                object[] myparams = new object[] {"ManageTimerJobs", basePath};
                                                 s = (string) comObjectType.InvokeMember("RSVPRequest",
                                                                                         BindingFlags.InvokeMethod,
                                                                                         null,

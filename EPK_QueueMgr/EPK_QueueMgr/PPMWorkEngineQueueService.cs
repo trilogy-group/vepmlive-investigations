@@ -345,7 +345,7 @@ namespace WE_QueueMgr
                     {
                         site = longRunQueue[0];
                     }
-                    var s = InvokeWSSAdminRSVPRequest(site, true);
+                    var s = InvokeWSSAdminRSVPRequest(site, site.JobId);
                     lock (longRunQueueLock)
                     {
                        longRunQueue.RemoveAt(0);
@@ -451,11 +451,18 @@ namespace WE_QueueMgr
                                             ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
                                         case 0:
-                                            site.JobId = qm.guidJob;
-                                            EnqueueSite(site);
+                                            if (qm.ContextData.Contains("<RequestNo>8</RequestNo>"))
+                                            {
+                                                site.JobId = qm.guidJob;
+                                                EnqueueSite(site);
+                                            }
+                                            else
+                                            {
+                                                InvokeWSSAdminRSVPRequest(site, qm.guidJob);
+                                            }
                                             break;
                                         default:
-                                            var s = InvokeWSSAdminRSVPRequest(site, false);
+                                            InvokeWSSAdminRSVPRequest(site, qm.guidJob);
                                             break;
                                     }
                                 }
@@ -550,14 +557,14 @@ namespace WE_QueueMgr
             }
         }
 
-        private string InvokeWSSAdminRSVPRequest(QMSite site, bool doCustom)
+        private string InvokeWSSAdminRSVPRequest(QMSite site, Guid jobId)
         {
             object comObject = null;
             try
             {
                 var comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                 comObject = Activator.CreateInstance(comObjectType);
-                var myparams = new object[] { "ManageQueue", site.basePath, doCustom, false };
+                var myparams = new object[] { "ManageQueue", site.basePath, jobId.ToString() };
                 return (string)comObjectType.InvokeMember("RSVPRequest",
                                                         BindingFlags.InvokeMethod,
                                                         null,
