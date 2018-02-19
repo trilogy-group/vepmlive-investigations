@@ -953,7 +953,7 @@ function SubmitTimesheet(gridid) {
 
                 }
                 else {
-                    alert(oResponse.SubmitTimesheet.Text);
+                    alert(decodeHtml(oResponse.SubmitTimesheet.Text));
                 }
 
                 StartCheckApproveStatus(gridid);
@@ -963,6 +963,12 @@ function SubmitTimesheet(gridid) {
     else {
         alert('You have a stopwatch currently running, please stop the stopwatch before you submit');
     }
+}
+
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
 }
 
 function DisableAllRows(grid) {
