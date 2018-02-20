@@ -155,8 +155,8 @@ opacity:.9;
         <ul>
             <a href="izenda/reporting.aspx" id="advanced"><li class="skyblue">
 		<div style="float:left;width:300px;">
-                <h2>Upland Analytics</h2>
-                <p>Access Upland Analytics for more advanced analytical reporting.</p>
+                <h2>EPM Live Analytics</h2>
+                <p>Access EPM Live Analytics for more advanced analytical reporting.</p>
 		</div>
 		<div style="float:right;" class="bi-chart">
 		<span class="icon-pie-5"></span>
