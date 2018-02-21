@@ -244,6 +244,8 @@ namespace WE_QueueMgr
                     workFault.Recovered = true;
                 }
 
+                CheckTaskFault(longRunTask, ref longRunFault);
+
                 if (longRunFault != null && !longRunFault.Recovered && DateTime.Now > longRunFault.FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, longRunFault.FaultCount)) * 10))
                 {
                     longRunTask = Task.Run(() => DoLongRun(), token);
@@ -306,13 +308,20 @@ namespace WE_QueueMgr
 
         object longRunQueueLock = new object();
         List<QMSite> longRunQueue = new List<QMSite>();
-        void EnqueueSite(QMSite site)
+        List<Guid> longRunJobIds = new List<Guid>();
+        void EnqueueSite(QMSite site, Guid jobId)
         {
             lock (longRunQueueLock)
             {
-                if (!longRunQueue.Contains(site))
+                int index = longRunQueue.IndexOf(site);
+                while (index >= 0 && !longRunJobIds[index].Equals(jobId))
+                {
+                    index = longRunQueue.IndexOf(site, index + 1);
+                }
+                if (index < 0)
                 {
                     longRunQueue.Add(site);
+                    longRunJobIds.Add(jobId);
                 }
 
             }
@@ -322,10 +331,10 @@ namespace WE_QueueMgr
             string exclusion = "";
             lock (longRunQueueLock)
             {
-                foreach (QMSite site in longRunQueue)
+                for (int i = 0; i < longRunQueue.Count; i++)
                 {
-                    if (site.basePath.Equals(matchSite.basePath, StringComparison.OrdinalIgnoreCase))
-                        exclusion += "'" + site.JobId + "',";
+                    if (longRunQueue[i].basePath.Equals(matchSite.basePath, StringComparison.OrdinalIgnoreCase))
+                        exclusion += "'" + longRunJobIds[i] + "',";
                 }
             }
             if (!string.IsNullOrWhiteSpace(exclusion))
@@ -341,14 +350,17 @@ namespace WE_QueueMgr
                 while (!token.IsCancellationRequested && longRunQueue.Count > 0)
                 {
                     QMSite site = null;
+                    Guid jobId;
                     lock (longRunQueueLock)
                     {
                         site = longRunQueue[0];
+                        jobId = longRunJobIds[0];
                     }
-                    var s = InvokeWSSAdminRSVPRequest(site, site.JobId);
+                    var s = InvokeWSSAdminRSVPRequest(site, jobId);
                     lock (longRunQueueLock)
                     {
-                       longRunQueue.RemoveAt(0);
+                        longRunQueue.RemoveAt(0);
+                        longRunJobIds.RemoveAt(0);
                     }
                 }
                 Thread.Sleep(longRunPeriod);
@@ -453,8 +465,7 @@ namespace WE_QueueMgr
                                         case 0:
                                             if (qm.ContextData.Contains("<EPKProcess>"))
                                             {
-                                                site.JobId = qm.guidJob;
-                                                EnqueueSite(site);
+                                                EnqueueSite(site, qm.guidJob);
                                             }
                                             else
                                             {
@@ -520,7 +531,7 @@ namespace WE_QueueMgr
 
             return xEPKServer.XML();
         }
-      
+
         private void ExceptionHandler(string sLocation, Exception ex)
         {
             // don't flood the event log with exceptions
@@ -589,11 +600,11 @@ namespace WE_QueueMgr
         public string NTAccount;
         public string SessionInfo;
         public string ActiveTraceChannels;
-        public Guid JobId = Guid.Empty;
+
         public override bool Equals(object obj)
         {
             if (obj is QMSite)
-                return basePath.Equals(((QMSite)obj).basePath, StringComparison.OrdinalIgnoreCase) && JobId.Equals(((QMSite)obj).JobId);
+                return basePath.Equals(((QMSite)obj).basePath, StringComparison.OrdinalIgnoreCase);
             return base.Equals(obj);
         }
     }
