@@ -451,7 +451,7 @@ namespace WE_QueueMgr
                                             ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
                                         case 0:
-                                            if (qm.ContextData.Contains("<RequestNo>8</RequestNo>"))
+                                            if (qm.ContextData.Contains("<EPKProcess>"))
                                             {
                                                 site.JobId = qm.guidJob;
                                                 EnqueueSite(site);
