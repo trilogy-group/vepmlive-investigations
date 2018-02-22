@@ -2237,7 +2237,7 @@ namespace EPMLiveWorkPlanner
 
 
 
-            if (ndTask.Attributes["Def"].Value == "Assignment" && ndTask.ParentNode.Attributes["TaskType"].Value == "Individual")
+            if (ndTask.Attributes["Def"].Value == "Assignment" && ndTask.ParentNode.Attributes["TaskType"].Value == "Individual" && ndTask.ParentNode.Attributes["Def"].Value == "Task")
             {
                 if (pdef != "External")
                 {
