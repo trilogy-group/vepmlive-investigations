@@ -6,7 +6,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data;
 using System.Xml;
-
+using EPMLiveCore;
 
 namespace TimeSheets
 {
@@ -18,10 +18,10 @@ namespace TimeSheets
             bool impersonate = false;
             string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
             //using (SPSite site = new SPSite(resUrl))
-            using(SPSite site = new SPSite(resUrl))
+            using (SPSite site = new SPSite(resUrl))
             {
                 //using (SPWeb rweb = site.OpenWeb())
-                using(SPWeb rweb = site.OpenWeb())
+                using (SPWeb rweb = site.OpenWeb())
                 {
                     SPList rlist = rweb.Lists["Resources"];
                     SPUser u = rweb.SiteUsers[curuser];
@@ -134,7 +134,7 @@ namespace TimeSheets
                                         li.Update();
 
                                         //processProject(dsProjects, wGuid, iWeb);
-                                        
+
                                     }
                                 }
                                 else
@@ -186,7 +186,7 @@ namespace TimeSheets
                                 }
                             }
                         }
-                        
+
                     }
                     catch (Exception exception)
                     {
@@ -315,7 +315,7 @@ namespace TimeSheets
                     try
                     {
                         Guid pcGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
-                        if(projectCenter == null || pcGuid != projectCenter.ID)
+                        if (projectCenter == null || pcGuid != projectCenter.ID)
                             projectCenter = iWeb.Lists[pcGuid];
 
                         string project = drProject["Project_id"].ToString();
@@ -334,29 +334,135 @@ namespace TimeSheets
                 }
             }
         }
+        static void GetPeriodDates(SqlConnection cn, string tsuid, out string prdStart, out string prdEnd)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand("Select TP.PERIOD_START,TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID=TP.PERIOD_ID where TS.TS_UID= @TS_UID", cn);
+                cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        prdStart = Convert.ToDateTime(dr["PERIOD_START"]).ToString("yyyy-MM-dd");
+                        prdEnd = Convert.ToDateTime(dr["PERIOD_END"]).ToString("yyyy-MM-dd");
+                    }
+                    else
+                    {
+                        prdStart = "";
+                        prdEnd = "";
+                    }
+                }
 
+            }
+            catch (Exception)
+            {
+                prdStart = "";
+                prdEnd = "";
+            }
+
+        }
+        static void GetResourcesEXTID(string rptConnectionstring, SPWeb web, string username, out string extid)
+        {
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(rptConnectionstring))
+                {
+                    cn.Open();
+                    var user = web.AllUsers[username];
+                    SqlCommand cmd = new SqlCommand("Select EXTID from LSTResourcepool where SharePointAccountID = @UID", cn);
+                    cmd.Parameters.AddWithValue("@UID", user.ID);
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            extid = Convert.ToString(dr["EXTID"]);
+
+                        }
+                        else
+                        {
+                            extid = "";
+
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                extid = "";
+            }
+
+        }
+
+        static string GetStandardRates(SqlConnection cn, string tsuid, SPWeb web, string username)
+        {
+            string rate = string.Empty;
+            try
+            {
+                string prdStart = string.Empty;
+                string prdEnd = string.Empty;
+                string extid = string.Empty;
+                GetPeriodDates(cn, tsuid, out prdStart, out prdEnd);
+                string rptConnectionstring = CoreFunctions.getReportingConnectionString(web.Site.WebApplication.Id, web.Site.ID);
+                GetResourcesEXTID(rptConnectionstring, web, username, out extid);
+                string basePath = CoreFunctions.getConfigSetting(web, "epkbasepath");
+
+                if (!string.IsNullOrEmpty(prdStart) && !string.IsNullOrEmpty(prdEnd) && !string.IsNullOrEmpty(extid))
+                {
+                    DataSet dsrates = Utilities.GetRoleRates(basePath, username, prdStart, prdEnd, extid);
+                    if (dsrates.Tables[0].Rows.Count > 0)
+                    {
+                        rate = web.Locale.NumberFormat.CurrencySymbol + Convert.ToString(dsrates.Tables[0].Rows[0]["BC_RATE"]);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(rate))
+                {
+                    DataSet dsResMeta = new DataSet();
+                    SqlCommand cmd = new SqlCommand("Select ColumnName,ColumnValue FROM TSRESMETA where TS_UID = @TS_UID", cn);
+                    cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(dsResMeta);
+                    if (dsResMeta.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow drMeta in dsResMeta.Tables[0].Rows)
+                        {
+                            if (Convert.ToString(drMeta["ColumnName"]).ToLower() == "standardrate")
+                            {
+                                rate = Convert.ToString(drMeta["ColumnValue"]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { rate = string.Empty; }
+            return rate;
+        }
         static internal void processResources(SqlConnection cn, string tsuid, SPWeb web, string username)
         {
+            string rate = GetStandardRates(cn, tsuid, web, username);
             SqlCommand cmd = new SqlCommand("DELETE FROM TSRESMETA where TS_UID = @TS_UID", cn);
             cmd.Parameters.AddWithValue("@TS_UID", tsuid);
             cmd.ExecuteNonQuery();
 
             string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
 
-            if(resUrl != "")
+            if (resUrl != "")
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         SPWeb resWeb = null;
 
-                        using(SPSite tempSite = new SPSite(resUrl))
+                        using (SPSite tempSite = new SPSite(resUrl))
                         {
 
                             resWeb = tempSite.OpenWeb();
 
-                            if(resWeb != null)
+                            if (resWeb != null)
                             {
 
                                 SPList list = resWeb.Lists["Resources"];
@@ -370,17 +476,31 @@ namespace TimeSheets
 
                                 SPListItem li = list.GetItems(query)[0];
 
-                                foreach(string field in fields)
+                                foreach (string field in fields)
                                 {
                                     SPField f = null;
                                     string val = "";
                                     try
                                     {
                                         f = list.Fields.GetFieldByInternalName(field);
-                                        val = f.GetFieldValueAsText(li[f.Id]);
+                                        if (field.ToLower() == "standardrate")
+                                        {
+                                            if (!string.IsNullOrEmpty(rate))
+                                            {
+                                                val = rate;
+                                            }
+                                            else
+                                            {
+                                                val = f.GetFieldValueAsText(li[f.Id]);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            val = f.GetFieldValueAsText(li[f.Id]);
+                                        }
                                     }
                                     catch { }
-                                    if(f != null)
+                                    if (f != null)
                                     {
                                         cmd = new SqlCommand("INSERT INTO TSRESMETA (TS_UID,UserName,ColumnName,DisplayName,ColumnValue) VALUES (@TS_UID,@username,@ColumnName,@DisplayName,@ColumnValue)", cn);
                                         cmd.Parameters.AddWithValue("@TS_UID", tsuid);
@@ -391,7 +511,7 @@ namespace TimeSheets
                                         cmd.ExecuteNonQuery();
                                     }
                                 }
-                                if(resWeb.ID != SPContext.Current.Web.ID)
+                                if (resWeb.ID != SPContext.Current.Web.ID)
                                     resWeb.Close();
 
                             }
@@ -435,7 +555,7 @@ namespace TimeSheets
                             val = f.GetFieldValueAsText(li[f.Id]);
                             break;
                     };
-                    
+
                 }
                 catch { }
                 if (f != null)
