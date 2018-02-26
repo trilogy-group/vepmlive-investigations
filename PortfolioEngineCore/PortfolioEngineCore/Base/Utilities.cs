@@ -216,14 +216,16 @@ namespace PortfolioEngineCore
             {
                 dba.Open();
                 DataSet dsRoleRates = new DataSet();
-                SqlCommand cmd = new SqlCommand("EPG_SP_GetResourceRates", dba.Connection);
-                cmd.Parameters.AddWithValue("@ResourceEXTID", extid);
-                cmd.Parameters.AddWithValue("@PRD_Start", prd_start);
-                cmd.Parameters.AddWithValue("@PRD_End", prd_end);
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsRoleRates);
-                return dsRoleRates;
+                using (SqlCommand cmd = new SqlCommand("EPG_SP_GetResourceRates", dba.Connection))
+                {
+                    cmd.Parameters.AddWithValue("@ResourceEXTID", extid);
+                    cmd.Parameters.AddWithValue("@PRD_Start", prd_start);
+                    cmd.Parameters.AddWithValue("@PRD_End", prd_end);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(dsRoleRates);
+                    return dsRoleRates;
+                }
             }
         }
         //End EPMLCID-16642

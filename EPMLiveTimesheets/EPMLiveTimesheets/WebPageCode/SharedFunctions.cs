@@ -338,19 +338,21 @@ namespace TimeSheets
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("Select TP.PERIOD_START,TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID=TP.PERIOD_ID where TS.TS_UID= @TS_UID", cn);
-                cmd.Parameters.AddWithValue("@TS_UID", tsuid);
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                using (SqlCommand cmd = new SqlCommand("Select TP.PERIOD_START,TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID=TP.PERIOD_ID where TS.TS_UID= @TS_UID", cn))
                 {
-                    if (dr.Read())
+                    cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                    using (SqlDataReader dr = cmd.ExecuteReader())
                     {
-                        prdStart = Convert.ToDateTime(dr["PERIOD_START"]).ToString("yyyy-MM-dd");
-                        prdEnd = Convert.ToDateTime(dr["PERIOD_END"]).ToString("yyyy-MM-dd");
-                    }
-                    else
-                    {
-                        prdStart = "";
-                        prdEnd = "";
+                        if (dr.Read())
+                        {
+                            prdStart = Convert.ToDateTime(dr["PERIOD_START"]).ToString("yyyy-MM-dd");
+                            prdEnd = Convert.ToDateTime(dr["PERIOD_END"]).ToString("yyyy-MM-dd");
+                        }
+                        else
+                        {
+                            prdStart = "";
+                            prdEnd = "";
+                        }
                     }
                 }
 
@@ -370,19 +372,21 @@ namespace TimeSheets
                 {
                     cn.Open();
                     var user = web.AllUsers[username];
-                    SqlCommand cmd = new SqlCommand("Select EXTID from LSTResourcepool where SharePointAccountID = @UID", cn);
-                    cmd.Parameters.AddWithValue("@UID", user.ID);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (SqlCommand cmd = new SqlCommand("Select EXTID from LSTResourcepool where SharePointAccountID = @UID", cn))
                     {
-                        if (dr.Read())
+                        cmd.Parameters.AddWithValue("@UID", user.ID);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            extid = Convert.ToString(dr["EXTID"]);
+                            if (dr.Read())
+                            {
+                                extid = Convert.ToString(dr["EXTID"]);
 
-                        }
-                        else
-                        {
-                            extid = "";
+                            }
+                            else
+                            {
+                                extid = "";
 
+                            }
                         }
                     }
                 }
@@ -420,18 +424,20 @@ namespace TimeSheets
                 if (string.IsNullOrEmpty(rate))
                 {
                     DataSet dsResMeta = new DataSet();
-                    SqlCommand cmd = new SqlCommand("Select ColumnName,ColumnValue FROM TSRESMETA where TS_UID = @TS_UID", cn);
-                    cmd.Parameters.AddWithValue("@TS_UID", tsuid);
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsResMeta);
-                    if (dsResMeta.Tables[0].Rows.Count > 0)
+                    using (SqlCommand cmd = new SqlCommand("Select ColumnName,ColumnValue FROM TSRESMETA where TS_UID = @TS_UID", cn))
                     {
-                        foreach (DataRow drMeta in dsResMeta.Tables[0].Rows)
+                        cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(dsResMeta);
+                        if (dsResMeta.Tables[0].Rows.Count > 0)
                         {
-                            if (Convert.ToString(drMeta["ColumnName"]).ToLower() == "standardrate")
+                            foreach (DataRow drMeta in dsResMeta.Tables[0].Rows)
                             {
-                                rate = Convert.ToString(drMeta["ColumnValue"]);
-                                break;
+                                if (Convert.ToString(drMeta["ColumnName"]).ToLower() == "standardrate")
+                                {
+                                    rate = Convert.ToString(drMeta["ColumnValue"]);
+                                    break;
+                                }
                             }
                         }
                     }
