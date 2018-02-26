@@ -355,7 +355,7 @@ namespace TimeSheets
                 }
 
             }
-            catch (Exception)
+            catch
             {
                 prdStart = "";
                 prdEnd = "";
@@ -388,7 +388,7 @@ namespace TimeSheets
                 }
 
             }
-            catch (Exception ex)
+            catch
             {
                 extid = "";
             }
