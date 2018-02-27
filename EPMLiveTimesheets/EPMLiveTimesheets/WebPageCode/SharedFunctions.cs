@@ -12,6 +12,7 @@ namespace TimeSheets
 {
     public class SharedFunctions
     {
+        private const string DefaultDateFormat = "yyyy-MM-dd";
         public static bool canUserImpersonate(string curuser, string iuser, SPWeb web, out string resName)
         {
             resName = "";
@@ -338,6 +339,8 @@ namespace TimeSheets
         {
             try
             {
+                prdStart = "";
+                prdEnd = "";
                 using (SqlCommand cmd = new SqlCommand("Select TP.PERIOD_START,TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID=TP.PERIOD_ID where TS.TS_UID= @TS_UID", cn))
                 {
                     cmd.Parameters.AddWithValue("@TS_UID", tsuid);
@@ -345,13 +348,16 @@ namespace TimeSheets
                     {
                         if (dr.Read())
                         {
-                            prdStart = Convert.ToDateTime(dr["PERIOD_START"]).ToString("yyyy-MM-dd");
-                            prdEnd = Convert.ToDateTime(dr["PERIOD_END"]).ToString("yyyy-MM-dd");
-                        }
-                        else
-                        {
-                            prdStart = "";
-                            prdEnd = "";
+                            DateTime periodStart;
+                            if (DateTime.TryParse(dr["PERIOD_START"].ToString(), out periodStart))
+                            {
+                                prdStart = periodStart.ToString(DefaultDateFormat);
+                            }
+                            DateTime periodEnd;
+                            if (DateTime.TryParse(dr["PERIOD_END"].ToString(), out periodEnd))
+                            {
+                                prdEnd = periodEnd.ToString(DefaultDateFormat);
+                            }
                         }
                     }
                 }
@@ -368,6 +374,7 @@ namespace TimeSheets
         {
             try
             {
+                extid = "";
                 using (SqlConnection cn = new SqlConnection(rptConnectionstring))
                 {
                     cn.Open();
@@ -380,17 +387,10 @@ namespace TimeSheets
                             if (dr.Read())
                             {
                                 extid = Convert.ToString(dr["EXTID"]);
-
-                            }
-                            else
-                            {
-                                extid = "";
-
                             }
                         }
                     }
                 }
-
             }
             catch
             {
