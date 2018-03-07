@@ -35,7 +35,7 @@ namespace PortfolioEngineCore
         {
             int ordinal = sqlDataReader.GetOrdinal(fieldName);
 
-            return !sqlDataReader.IsDBNull(ordinal) ? (byte?)sqlDataReader.GetByte(ordinal) : null;
+            return !sqlDataReader.IsDBNull(ordinal) ? (byte?) sqlDataReader.GetByte(ordinal) : null;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace PortfolioEngineCore
         {
             int ordinal = sqlDataReader.GetOrdinal(fieldName);
 
-            return !sqlDataReader.IsDBNull(ordinal) ? (DateTime?)sqlDataReader.GetDateTime(ordinal) : null;
+            return !sqlDataReader.IsDBNull(ordinal) ? (DateTime?) sqlDataReader.GetDateTime(ordinal) : null;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace PortfolioEngineCore
         {
             int ordinal = sqlDataReader.GetOrdinal(fieldName);
 
-            return !sqlDataReader.IsDBNull(ordinal) ? (decimal?)sqlDataReader.GetDecimal(ordinal) : null;
+            return !sqlDataReader.IsDBNull(ordinal) ? (decimal?) sqlDataReader.GetDecimal(ordinal) : null;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace PortfolioEngineCore
         {
             int ordinal = sqlDataReader.GetOrdinal(fieldName);
 
-            return !sqlDataReader.IsDBNull(ordinal) ? (int?)sqlDataReader.GetInt32(ordinal) : null;
+            return !sqlDataReader.IsDBNull(ordinal) ? (int?) sqlDataReader.GetInt32(ordinal) : null;
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace PortfolioEngineCore
         }
 
 
-        public static int ResolveNTNameintoWResID(SqlConnection sqlConnection, string ntname)
+        public static int ResolveNTNameintoWResID( SqlConnection sqlConnection, string ntname)
         {
             try
             {
@@ -207,28 +207,6 @@ namespace PortfolioEngineCore
 
         }
         //End EPML-4757
-
-        //Start EPMLCID-16642
-        public static DataSet GetRoleRates(string basepath, string username, string prd_start, string prd_end, string extid)
-        {
-            string ConnectionString = Utilities.GetConnectionString(basepath);
-            using (DBAccess dba = new DBAccess(ConnectionString))
-            {
-                dba.Open();
-                DataSet dsRoleRates = new DataSet();
-                using (SqlCommand cmd = new SqlCommand("EPG_SP_GetResourceRates", dba.Connection))
-                {
-                    cmd.Parameters.AddWithValue("@ResourceEXTID", extid);
-                    cmd.Parameters.AddWithValue("@PRD_Start", prd_start);
-                    cmd.Parameters.AddWithValue("@PRD_End", prd_end);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsRoleRates);
-                    return dsRoleRates;
-                }
-            }
-        }
-        //End EPMLCID-16642
         #endregion Methods
     }
 }

@@ -9391,37 +9391,6 @@ WHERE
 ORDER BY 1
 ')
  
- if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_GetResourceRates')
-begin
-    Print 'Creating Stored Procedure EPG_SP_GetResourceRates'
-    SET @createoralter = 'CREATE'
-end
-else
-begin
-    Print 'Updating Stored Procedure EPG_SP_GetResourceRates'
-    SET @createoralter = 'ALTER'
-end
-exec(@createoralter + ' PROCEDURE [dbo].[EPG_SP_GetResourceRates]
- @ResourceEXTID int,
-   @PRD_Start varchar(20),
-   @PRD_End varchar(20)
-AS
-BEgin
-Declare @BC_UID int=0
-set @BC_UID =(Select top 1  BC_UID From EPGP_COST_XREF  Where WRES_ID=@ResourceEXTID)
-SELECT distinct A.BC_UID,A.BC_EFFECTIVE_DATE as StartDate,(case when B.BC_EFFECTIVE_DATE>A.BC_EFFECTIVE_DATE then B.BC_EFFECTIVE_DATE else DATEADD(DAY, DATEDIFF(day, B.BC_EFFECTIVE_DATE, A.BC_EFFECTIVE_DATE)-1, A.BC_EFFECTIVE_DATE) end) as EndDate
-,A.BC_RATE into #Rates FROM EPG_COST_CATEGORY_RATE_VALUES A,EPG_COST_CATEGORY_RATE_VALUES B  Where A.BC_EFFECTIVE_DATE <> B.BC_EFFECTIVE_DATE
-AND A.BC_UID = B.BC_UID 
-ORDER BY A.BC_UID
-
-Select  *,rn = row_number()  over(PARTITION BY BC_UID,StartDate  order by BC_UID)  into #SegregatedData  from  #Rates
-		  
-Select cast((BC_RATE) as  decimal(16,2)) as BC_RATE from #SegregatedData where rn=1 and StartDate < @PRD_Start and EndDate > @PRD_End and BC_UID=@BC_UID
-Drop table #Rates 
-Drop table #SegregatedData 
-End
-')
-
  if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_FN_RPT_GetCostCategoryFullNameTable')
 begin
     Print 'Creating Function EPG_FN_RPT_GetCostCategoryFullNameTable'

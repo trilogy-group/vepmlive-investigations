@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -208,23 +207,6 @@ namespace EPMLiveCore
                 return null;
 
             return item.ParentList.GetItemByUniqueId(item.UniqueId);
-        }
-        public static DataSet GetRoleRates(string basepath, string username, string prd_start, string prd_end, string extid)
-        {
-            try
-            {
-                var args = new object[] { basepath, username, prd_start, prd_end, extid };
-                Assembly assembly =
-                Assembly.Load("PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-                Type type = assembly.GetType("PortfolioEngineCore.Utilities", true, true);
-                return (DataSet)type.GetMethod("GetRoleRates", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
-
-            }
-            catch (Exception ex)
-            {
-                return new DataSet();
-            }
-
         }
         #endregion Methods
     }
