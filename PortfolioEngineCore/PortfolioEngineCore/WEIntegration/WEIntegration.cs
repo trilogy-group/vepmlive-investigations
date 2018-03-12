@@ -195,7 +195,7 @@ namespace PortfolioEngineCore.WEIntegration
                 while (SqlReader.Read())
                 {
                     PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    PROJECT_EXT_UID = DBAccess.ReadStringValue(SqlReader["PROJECT_ID"]);
+                    PROJECT_EXT_UID = DBAccess.ReadStringValue(SqlReader["PROJECT_EXT_UID"]);
                     if (!projectIDs.ContainsKey(PROJECT_EXT_UID))
                     {
                         projectIDs.Add(PROJECT_EXT_UID, PROJECT_ID);
@@ -421,7 +421,13 @@ namespace PortfolioEngineCore.WEIntegration
             else
             {
                 // See if charge record we need already exists
-                ChgId = pfeCharges.FirstOrDefault(a => a.WresId == oCharge.WresId && a.PROJECT_ID == oCharge.ProjectID && a.MAJORCATEGORY == oCharge.MajorCategory && a.CATEGORY == oCharge.Category && a.DEPT_NAME == oCharge.Dept && a.DEPT_Id == oCharge.DeptId).CHG_UID;
+                try
+                {
+                    ChgId = pfeCharges.FirstOrDefault(a => a.WresId == oCharge.WresId && a.PROJECT_ID == oCharge.ProjectID && a.MAJORCATEGORY == oCharge.MajorCategory && a.CATEGORY == oCharge.Category && a.DEPT_NAME == oCharge.Dept && a.DEPT_Id == oCharge.DeptId).CHG_UID;
+                }
+                catch
+                { ChgId = 0; }
+
 
                 if (ChgId <= 0)
                 //  add new charge record
@@ -452,7 +458,12 @@ namespace PortfolioEngineCore.WEIntegration
             {
                 // see if we already have an ActualHours record for this date, if so update it, otherwise insert a new one
                 int oldChgId = 0;
-                oldChgId = pfEChargeDates.FirstOrDefault(a => a.Date == dWorkdate).CHG_UID;
+                try
+                {
+                    oldChgId = pfEChargeDates.FirstOrDefault(a => a.Date == dWorkdate).CHG_UID;
+                }
+                catch { oldChgId = 0; }
+
 
                 if (ChgId == oldChgId)
                 {

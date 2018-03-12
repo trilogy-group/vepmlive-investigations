@@ -135,7 +135,12 @@ namespace EPMLiveCore
                     else if (!string.IsNullOrEmpty(newStatus))
                         newPercent = getPercentFromStatus(newStatus, oldPercent);
                     else
-                        newPercent = "0";
+                    {
+                        if (properties.ListItem["PercentComplete"] != null)
+                            newPercent = properties.ListItem["PercentComplete"].ToString();
+                        else
+                            newPercent = "0";
+                    }
                 }
                 else if (!string.IsNullOrEmpty(newStatus))
                 {
