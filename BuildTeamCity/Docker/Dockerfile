@@ -6,8 +6,8 @@ LABEL \
     com.trilogy.product="eng.docker" \
     com.trilogy.service="tc-agent" \
     com.trilogy.stage="prod" \
-    com.trilogy.maintainer.email="essam.elsayed@versata.com" \
-    com.trilogy.maintainer.skype="sama.safia"
+    com.trilogy.maintainer.email="mehmet.salihkurt@aurea.com" \
+    com.trilogy.maintainer.skype="live:bymsk"
 
 SHELL ["powershell"]
 
@@ -185,8 +185,8 @@ setx TS_REPO_ID '233'
 
 #Add quality hosts entries
 RUN $hostsFile = Join-Path $env:windir "System32\drivers\etc\hosts" ; \
-'10.137.22.98 WIN-6J09GF4NBP8.epmldev.com' | Add-Content -PassThru $hostsFile ; \
-'10.137.22.98 qaepmlive6' | Add-Content -PassThru $hostsFile
+'10.18.2.31 WIN-6J09GF4NBP8.epmldev.com' | Add-Content -PassThru $hostsFile ; \
+'10.18.2.31 qaepmlive6' | Add-Content -PassThru $hostsFile
 
 #CMD while ($true) { Start-Sleep -Seconds 3600 }
 
