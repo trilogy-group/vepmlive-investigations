@@ -24,7 +24,7 @@ Write-Host "OpenCover path: " $openCoverPath
 Write-Host "=> Running Test Coverage" -ForegroundColor DarkCyan
 
 &$openCoverPath `
-    "-register:Path64" `
+    "-register:user" `
     "-target:$vsConsolePath" `
     "-targetargs:$targetFiles /InIsolation /Platform:x64 /Framework:Framework45" `
     "-filter:+[*]* -[*.tests]* -[*.Tests]* -[*.TestFakes]*" `
