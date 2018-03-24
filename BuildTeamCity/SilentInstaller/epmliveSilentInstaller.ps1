@@ -275,6 +275,7 @@ foreach ($component in $config.Components | Where-Object {$_.installAsService -n
 		}
 		if (Get-Service -Name $component.installAsService.name -ErrorAction SilentlyContinue)
 		{
+			Set-Service -Name $component.installAsService.name -StartupType Automatic
 			Start-Service -Name $component.installAsService.name
 			WaitUntilServices $component.installAsService.name "Running"
 		}

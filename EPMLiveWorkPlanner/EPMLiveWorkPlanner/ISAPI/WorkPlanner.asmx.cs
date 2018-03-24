@@ -1044,7 +1044,7 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if (oField != null)
                     {
-                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup")
+                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup" && oField.TypeAsString != "FilteredLookup")
                         {
                             switch (oField.Type)
                             {
@@ -2237,7 +2237,7 @@ namespace EPMLiveWorkPlanner
 
 
 
-            if (ndTask.Attributes["Def"].Value == "Assignment" && ndTask.ParentNode.Attributes["TaskType"].Value == "Individual")
+            if (ndTask.Attributes["Def"].Value == "Assignment" && ndTask.ParentNode.Attributes["TaskType"].Value == "Individual" && ndTask.ParentNode.Attributes["Def"].Value == "Task")
             {
                 if (pdef != "External")
                 {
