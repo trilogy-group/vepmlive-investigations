@@ -80,17 +80,23 @@ namespace PortfolioEngineCore
             public string ContextData;
             public string Comment;
         }
-        public static int ManageTimedJobs(DBAccess dba, string basePath)
+        public static void AddHeartBeat(DBAccess dba)
         {
             SqlCommand oCommand;
-            SqlDataReader reader;
-            StatusEnum eStatus = StatusEnum.rsSuccess;
             string sCommand;
 
             sCommand = "UPDATE EPG_ADMIN SET ADM_QM_HEARTBEAT_DATE = @ADM_QM_HEARTBEAT_DATE ";
             oCommand = new SqlCommand(sCommand, dba.Connection);
             oCommand.Parameters.Add("@ADM_QM_HEARTBEAT_DATE", SqlDbType.DateTime).Value = DateTime.Now;
             oCommand.ExecuteNonQuery();
+        }
+        public static int ManageTimedJobs(DBAccess dba, string basePath)
+        {
+            
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            string sCommand;
+
             // JOT_FREQ_MODE codes:
             //  0 - don't run
             //  1 - run once at start time
