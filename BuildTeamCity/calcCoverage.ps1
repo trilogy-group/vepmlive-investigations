@@ -7,7 +7,9 @@ $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 $ScriptDir = (get-item $ScriptDir).parent.FullName
 
 $openCoverPath = (Resolve-Path "$ScriptDir\packages\OpenCover.*\tools\OpenCover.Console.exe").ToString()
-$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+$CoverageAttributeFilter = "(*.ExcludeFromCoverageAttribute)|(*.CompilerGeneratedAttribute)|(*.DebuggerNonUserCodeAttribute)|(*.GeneratedCodeAttribute)"
 $a = New-Object -ComObject Scripting.FileSystemObject
 $f = $a.GetFile($vsConsolePath)
 $vsConsolePath = $f.ShortPath
@@ -18,7 +20,21 @@ $targetFiles= (@(Get-ChildItem "$ScriptDir" -Include *.Tests.dll -Recurse -File 
 
 Write-Host $targetFiles
 
-&$openCoverPath  -register:user -target:$vsConsolePath "-targetargs:$targetFiles" "-filter:+[*]* -[*.tests]* -[*.Tests]* -[*.TestFakes]*" -excludebyfile:"*\*Designer.cs" -output:$ScriptDir\opencovertests.xml -mergebyhash
+Write-Host "OpenCover path: " $openCoverPath
+Write-Host "=> Running Test Coverage" -ForegroundColor DarkCyan
+
+&$openCoverPath `
+    "-register:user" `
+    "-target:$vsConsolePath" `
+    "-targetargs:$targetFiles /InIsolation /Platform:x64 /Framework:Framework45" `
+    "-filter:+[*]* -[*.tests]* -[*.Tests]* -[*.TestFakes]*" `
+    "-output:$ScriptDir\opencovertests.xml" `
+    "-excludebyattribute:$CoverageAttributeFilter" `
+    "-mergebyhash" `
+    "-mergeoutput" `
+    "-hideskipped:Filter" `
+    "-skipautoprops" 
+Write-Host "=> Ended Test Coverage" -ForegroundColor DarkCyan   
 
 function PublishArtifact($artifactPath) {
     Write-Host ("`n`nPublishing Artifact") -ForegroundColor Yellow
