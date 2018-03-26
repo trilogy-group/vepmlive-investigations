@@ -8,7 +8,7 @@ $ScriptDir = (get-item $ScriptDir).parent.FullName
 
 $openCoverPath = (Resolve-Path "$ScriptDir\packages\OpenCover.*\tools\OpenCover.Console.exe").ToString()
 #$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 $CoverageAttributeFilter = "(*.ExcludeFromCoverageAttribute)|(*.CompilerGeneratedAttribute)|(*.DebuggerNonUserCodeAttribute)|(*.GeneratedCodeAttribute)"
 $a = New-Object -ComObject Scripting.FileSystemObject
 $f = $a.GetFile($vsConsolePath)
