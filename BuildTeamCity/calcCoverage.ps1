@@ -6,12 +6,9 @@ param (
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 $ScriptDir = (get-item $ScriptDir).parent.FullName
 
-#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
-$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+
 $covConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\TestAgent\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe"
-$a = New-Object -ComObject Scripting.FileSystemObject
-$f = $a.GetFile($vsConsolePath)
-$vsConsolePath = $f.ShortPath
+
 
 $targetFiles= (@(Get-ChildItem "$ScriptDir" -Include *.Tests.dll -Recurse -File |
     Where-Object {($_.DirectoryName -inotmatch '\\obj\\' -and ($_.DirectoryName -ilike "*\$ConfigurationToBuild" -or $_.DirectoryName -ilike "*\Test-Output"))}
@@ -22,6 +19,11 @@ Write-Host "=> Running Tests " -ForegroundColor DarkCyan
 $xmlCoverageFile = "$ScriptDir\CodeCoverage.xml"
 Remove-Item $xmlCoverageFile -ErrorAction SilentlyContinue
 
+#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+#$vsConsolePath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+#$a = New-Object -ComObject Scripting.FileSystemObject
+#$f = $a.GetFile($vsConsolePath)
+#$vsConsolePath = $f.ShortPath
 #& $vsConsolePath  $targetFiles /InIsolation /Platform:X64 /EnableCodeCoverage
 $coverageFile = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage)[0]
 & $covConsolePath  analyze  /output:$xmlCoverageFile $coverageFile 
