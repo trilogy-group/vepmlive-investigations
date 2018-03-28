@@ -285,9 +285,9 @@ namespace WE_QueueMgr
             {
                 if (faultItem == null)
                 {
-                    faultItem = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 };
+                    faultItem = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 , Recovered = false};
                 }
-                else
+                else if (faultItem.Recovered)
                 {
                     DateTime newFaultTime = DateTime.Now;
                     DateTime oldFaultTime = faultItem.FaultTime;
@@ -301,8 +301,9 @@ namespace WE_QueueMgr
                     {
                         faultItem.FaultCount++;
                     }
+                    faultItem.Recovered = false;
                 }
-                faultItem.Recovered = false;
+                
             }
         }
 
