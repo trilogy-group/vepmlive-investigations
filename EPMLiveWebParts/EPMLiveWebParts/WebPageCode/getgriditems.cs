@@ -33,6 +33,7 @@ namespace EPMLiveWebParts
 
         protected SPList list = null;
         protected SPView view = null;
+        private const string TitleProjectCenter = "Project Center";
         private bool DoesUserHavePermissionsViewListItems = false;
         private bool DoesUserHavePermissionsEditListItems = false;
         private bool DoesUserHavePermissionsManagePermissions = false;
@@ -1216,15 +1217,17 @@ namespace EPMLiveWebParts
                             string sPlannerID = "ProjectPlanner";
 
                             SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
-                            if (file != null)
+                            if (list.Title.Contains(TitleProjectCenter))
                             {
-                                if (file.Exists)
+                                if (file != null)
                                 {
-
-                                    var tVal = "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
-                                    val += tVal;
+                                    if (file.Exists)
+                                    {
+                                        val += "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
+                                    }
                                 }
                             }
+
                             if (bCleanValues)
                                 displayValue = val;
                             else
