@@ -1223,8 +1223,7 @@ namespace EPMLiveWebParts
                                 {
                                     if (file.Exists)
                                     {
-                                        var tVal = "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
-                                        val += tVal;
+                                        val += "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
                                     }
                                 }
                             }
