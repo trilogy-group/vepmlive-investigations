@@ -1216,15 +1216,19 @@ namespace EPMLiveWebParts
                             string sPlannerID = "ProjectPlanner";
 
                             SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
-                            if (file != null)
+                            if (list.Title.Contains("Project Center"))
                             {
-                                if (file.Exists)
+                                if (file != null)
                                 {
+                                    if (file.Exists)
+                                    {
 
-                                    var tVal = "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
-                                    val += tVal;
+                                        var tVal = "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
+                                        val += tVal;
+                                    }
                                 }
                             }
+
                             if (bCleanValues)
                                 displayValue = val;
                             else
