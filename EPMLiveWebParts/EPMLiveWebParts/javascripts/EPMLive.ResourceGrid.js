@@ -1258,16 +1258,18 @@ function registerEpmLiveResourceGridScript() {
                     var selectedRow = selectedRows[i];
 
                     if (selectedRow.Def.Name === 'R') {
-                        if ($.inArray(selectedRow['EXTID'], selectedRowIds) == -1)
+                        if ($.inArray(selectedRow['EXTID'], selectedRowIds) === -1) {
                             selectedRowIds.push(selectedRow['EXTID']);
+                        }
                     }
                     else {
                         if (selectedRow.Def.Name === 'Group') {
                             var child = selectedRow.firstChild;
 
                             while (child) {
-                                if ($.inArray(child['EXTID'], selectedRowIds) == -1)
+                                if ($.inArray(child['EXTID'], selectedRowIds) === -1) {
                                     selectedRowIds.push(child['EXTID']);
+                                }
                                 child = child.nextSibling;
                             }
                         }
