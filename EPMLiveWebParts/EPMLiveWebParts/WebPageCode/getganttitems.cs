@@ -749,6 +749,13 @@ namespace EPMLiveWebParts
             catch { }
             try
             {
+                XmlAttribute attr = doc.CreateAttribute("HasPlan");
+                attr.Value = ndRow.SelectSingleNode("userdata[@name='HasPlan']").InnerText;
+                ndNew.Attributes.Append(attr);
+            }
+            catch { }
+            try
+            {
                 XmlAttribute attr = doc.CreateAttribute("id");
                 attr.Value = (curId++).ToString();
                 ndNew.Attributes.Append(attr);

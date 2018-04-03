@@ -935,7 +935,44 @@ namespace EPMLiveWebParts
                 catch { }
             }
             //===========
+            //============Plan===================
+            {
+                try
+                {
+                    string HasPlan = "";
+                    if (list.Title.Contains(TitleProjectCenter))
+                    {
+                        var plannerExists = false;
+                        SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
+                        if (file != null)
+                        {
+                            plannerExists = file.Exists;
+                        }
+                        if (!plannerExists)
+                        {
+                            file = list.ParentWeb.GetFile("Project Schedules/MSProject/" + dr["Title"].ToString() + ".mpp");
+                            if (file != null)
+                            {
+                                plannerExists = file.Exists;
+                            }
+                        }
+                        if (plannerExists)
+                        {
+                            HasPlan = "1";
+                        }
+                    }
 
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasPlan";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasPlan;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
+            //===========
             try
             {
                 tsdisabled = dr["TSDisableItem"].ToString();
@@ -1214,30 +1251,7 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
-
-                            if (list.Title.Contains(TitleProjectCenter))
-                            {
-                                bool plannerExists = false;
-                                SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
-                                if (file != null)
-                                {
-                                    plannerExists = file.Exists;
-                                }
-                                if (!plannerExists)
-                                {
-                                    file = list.ParentWeb.GetFile("Project Schedules/MSProject/" + dr[field.InternalName].ToString() + ".mpp");
-                                    if (file != null)
-                                    {
-                                        plannerExists = file.Exists;
-                                    }
-                                }
-                                if (plannerExists)
-                                {
-                                    val += "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
-                                }
-                            }
-
-
+                            
                             if (bCleanValues)
                                 displayValue = val;
                             else
