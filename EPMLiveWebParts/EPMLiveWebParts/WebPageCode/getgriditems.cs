@@ -33,6 +33,7 @@ namespace EPMLiveWebParts
 
         protected SPList list = null;
         protected SPView view = null;
+        private const string sPlannerID = "ProjectPlanner";
         private const string TitleProjectCenter = "Project Center";
         private bool DoesUserHavePermissionsViewListItems = false;
         private bool DoesUserHavePermissionsEditListItems = false;
@@ -1214,19 +1215,28 @@ namespace EPMLiveWebParts
                         else if (field.InternalName == "Title")
                         {
 
-                            string sPlannerID = "ProjectPlanner";
-
-                            SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
                             if (list.Title.Contains(TitleProjectCenter))
                             {
+                                bool plannerExists = false;
+                                SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
                                 if (file != null)
                                 {
-                                    if (file.Exists)
+                                    plannerExists = file.Exists;
+                                }
+                                if (!plannerExists)
+                                {
+                                    file = list.ParentWeb.GetFile("Project Schedules/MSProject/" + dr[field.InternalName].ToString() + ".mpp");
+                                    if (file != null)
                                     {
-                                        val += "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
+                                        plannerExists = file.Exists;
                                     }
                                 }
+                                if (plannerExists)
+                                {
+                                    val += "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
+                                }
                             }
+
 
                             if (bCleanValues)
                                 displayValue = val;
