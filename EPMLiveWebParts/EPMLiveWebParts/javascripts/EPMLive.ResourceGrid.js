@@ -1,4 +1,4 @@
-﻿/// <version>4.4.0.32813</version>
+/// <version>4.4.0.32813</version>
 /// <reference path="references/knockout-1.2.1.debug.js" />
 /// <reference path="references/jquery-1.7.1.js" />
 
@@ -1252,24 +1252,25 @@ function registerEpmLiveResourceGridScript() {
 
                 var selectedRows = grid.GetSelRows();
 
-                if ($$.allSelected) {
-                    selectedRows = [];
-                    var rows = grid.Rows;
-
-                    for (var r in rows) {
-                        if (rows.hasOwnProperty(r)) {
-                            selectedRows.push(rows[r]);
-                        }
-                    }
-                }
-
                 var selectedRowIds = [];
 
                 for (var i = 0; i < selectedRows.length; i++) {
                     var selectedRow = selectedRows[i];
 
                     if (selectedRow.Def.Name === 'R') {
-                        selectedRowIds.push(selectedRow['EXTID']);
+                        if ($.inArray(selectedRow['EXTID'], selectedRowIds) == -1)
+                            selectedRowIds.push(selectedRow['EXTID']);
+                    }
+                    else {
+                        if (selectedRow.Def.Name === 'Group') {
+                            var child = selectedRow.firstChild;
+
+                            while (child) {
+                                if ($.inArray(child['EXTID'], selectedRowIds) == -1)
+                                    selectedRowIds.push(child['EXTID']);
+                                child = child.nextSibling;
+                            }
+                        }
                     }
                 }
 
