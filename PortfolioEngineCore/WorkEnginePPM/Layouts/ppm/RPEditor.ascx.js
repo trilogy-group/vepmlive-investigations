@@ -5457,15 +5457,18 @@
                 }
             }
         } else {
-            var cols = grid.GetShownCols(2);
-            for (var c = 0; c < cols.length; c++) {
+            try {
+               var cols = grid.GetShownCols(2);
+               for (var c = 0; c < cols.length; c++) {
                 var col = cols[c];
                 var sType = col.substring(0, 1);
                 if (sType == "Q") {
                     var periodid = col.substring(1);
                     this.RefreshResourceRowPeriod(grid, row, periodid, false);
+                  }
                 }
             }
+            catch(e){ }
         }
         if (bRefresh == true) grid.RefreshRow(row);
     };

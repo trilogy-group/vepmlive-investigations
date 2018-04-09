@@ -339,6 +339,11 @@ function GridOnGetHtmlValue(grid, row, col, val) {
             if (grid.GetValue(row, "wsurl") != "") {
                 val = val + "&nbsp;<a href=\"javascript:GridWorkspace('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/itemworkspace.png\" border=\"0\"></a>";
             }
+
+            if (grid.GetValue(row, "HasPlan") == "1") {
+                val = val + "&nbsp;<a href=\"#\"><span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span></a>";
+            }
+
             return val;
         }
     }

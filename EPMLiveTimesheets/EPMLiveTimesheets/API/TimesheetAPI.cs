@@ -1757,8 +1757,8 @@ namespace TimeSheets
                                         outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
                                     }
                                 }
-                                outData += "</Approve>";
                             }
+                            outData += "</Approve>";
                         }
                     });
 
