@@ -24,11 +24,11 @@ RUN Install-WindowsFeature NET-Framework-45-Core ; \
 Install-WindowsFeature NET-Framework-45-ASPNET ; \
 Install-WindowsFeature Web-Asp-Net45
 
-#Download Net 4.6.2 dev pack
-RUN Invoke-WebRequest 'https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe' -OutFile "C:\Sources\devpack.exe" -UseBasicParsing  ; \
-$setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\devpack.exe" -ArgumentList /quiet ; \
+#Download WindowsKit 8.0
+RUN Invoke-WebRequest 'http://download.microsoft.com/download/F/1/3/F1300C9C-A120-4341-90DF-8A52509B23AC/standalonesdk/sdksetup.exe' -OutFile "C:\Sources\sdksetup.exe" -UseBasicParsing  ; \
+$setupProcess = Start-Process -PassThru -Wait -FilePath "C:\Sources\sdksetup.exe" -ArgumentList /q ; \
 If($setupProcess.Exitcode -ne 0) {      Throw \"Errorlevel $($setupProcess.ExitCode)\" } ; \
-Remove-Item "C:\Sources\devpack.exe" 
+Remove-Item "C:\Sources\sdksetup.exe" 
 
 #Download and install inclusion list fix
 RUN Invoke-WebRequest "https://download.microsoft.com/download/7/A/F/7AFA5695-2B52-44AA-9A2D-FC431C231EDC/vstor_redist.exe" -OutFile "C:\Sources\vstor_redist.exe" -UseBasicParsing ; \
@@ -67,7 +67,7 @@ New-Item -ItemType directory -Path 'C:\Program Files (x86)\MSBuild\Microsoft\Vis
 Add-Type -assembly 'system.io.compression.filesystem' ; \
 $sourceZip =  Join-Path $env:TEMP "v14.0.zip" ; \
 [io.compression.zipfile]::ExtractToDirectory($sourceZip, 'C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0') ; \
-Remove-Item "$env:TEMP\v14.0.zip" 
+Remove-Item "$env:TEMP\v14.0.zip"  
 
 # Install Certificate to Certificate Store
 RUN $PlainTextPass = '1kjS4dF3D5dt' ; \
@@ -154,7 +154,7 @@ $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePo
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.BusinessData.dll') ; \
 $publish.GacInstall('C:\Program Files\Reference Assemblies\GAC\Microsoft.SharePoint.Flighting.Dll') 
 
-#Download SDK Tools
+#Download SDK Tools 
 RUN Invoke-WebRequest 'https://onedrive.live.com/download?cid=FDD9E9CD6B4F4283"&"resid=FDD9E9CD6B4F4283%21441"&"authkey=AOQCThCg_ljgAwk' -OutFile "$env:TEMP\SDKTools.zip" -UseBasicParsing  ; \
 Add-Type -assembly 'system.io.compression.filesystem' ; \
 $sourceZip =  Join-Path $env:TEMP "SDKTools.zip" ; \
