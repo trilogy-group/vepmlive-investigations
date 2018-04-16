@@ -6,8 +6,8 @@ LABEL \
     com.trilogy.product="eng.docker" \
     com.trilogy.service="tc-agent" \
     com.trilogy.stage="prod" \
-    com.trilogy.maintainer.email="essam.elsayed@aurea.com" \
-    com.trilogy.maintainer.skype="sama.safia"
+    com.trilogy.maintainer.email="mehmet.salihkurt@aurea.com" \
+    com.trilogy.maintainer.skype="live:bymsk"
 
 SHELL ["powershell"]
 
