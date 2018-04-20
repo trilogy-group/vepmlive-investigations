@@ -55,9 +55,7 @@
 </head>
 
 <body style="margin: 0px; padding: 0px;">
-    <%
-       
-        if (HttpContext.Current.Session[sitecollectionid +"Role"] != null && HttpContext.Current.Session[sitecollectionid+"Role"].ToString() != "Report Writers")
+    <%if (HttpContext.Current.Session["Role"] != null && HttpContext.Current.Session["Role"].ToString() != "Report Writers")
         {%>
     <style>
         .designer-only {
@@ -69,19 +67,19 @@
         }
     </style>
     <%}%>
-    
-        <%if (HttpContext.Current.Session["InFrame"] == "1")
-        { %> 
     <style>
-         .header
+        <%if (HttpContext.Current.Session["InFrame"] == "1")
+        {
+            %> .header;
+
         {
             display: none;
         }
-         </style>   
+
         <%
         }
         %>
-    
+    </style>
 
     <div class="layout">
         <div class="header applyStyles" id="whiteHeader" style="display: none !important">
@@ -134,17 +132,17 @@
         <div class="top-nav applyStyles" id="blueHeader">
             <div class="page">
                 <ul id="topnav" style="margin: 0px; padding: 0px;">
-                    <li class="top-nav-item"><a href="ReportList.aspx?sitecollectionid=<%=sitecollectionid%>">Reports</a></li>
-                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1&sitecollectionid=<%=sitecollectionid%>" onclick="ShowRlToDbLoading();">Dashboards</a></li>
+                    <li class="top-nav-item"><a href="ReportList.aspx">Reports</a></li>
+                    <li class="top-nav-item"><a href="Dashboards.aspx?clear=1" onclick="ShowRlToDbLoading();">Dashboards</a></li>
                     <li class="top-nav-item designer-only btn-group">
-                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectionid=<%= sitecollectionid%>"><span class="plus">+</span> New</a>
+                        <a class="btn" href="ReportDesigner.aspx?clear=1&tab=Data+Sources"><span class="plus">+</span> New</a>
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources&sitecollectionid=<%=sitecollectionid%>">Report</a></li>
-                            <li runat="server" id="irItem"><a href="InstantReport.aspx?sitecollectionid=<%=sitecollectionid%>">Instant Report</a></li>
-                            <li><a href="DashboardDesigner.aspx?clear=1&sitecollectionid=<%=sitecollectionid%>">Dashboard</a></li>
+                            <li><a href="ReportDesigner.aspx?clear=1&tab=Data+Sources">Report</a></li>
+                            <li runat="server" id="irItem"><a href="InstantReport.aspx">Instant Report</a></li>
+                            <li><a href="DashboardDesigner.aspx?clear=1">Dashboard</a></li>
                         </ul>
                     </li>
 
