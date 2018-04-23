@@ -1,4 +1,4 @@
-FROM selenium/node-chrome-debug:3.8.1-erbium
+FROM selenium/node-chrome-debug:latest
 LABEL authors=yahyaozturk
 
 USER seluser
