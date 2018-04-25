@@ -116,7 +116,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
 
-            Response.Redirect("ImportExcelFinish.aspx?isdlg=1&jobuid=" + tJob);
+            Response.Redirect(SPContext.Current.Site.Url + "/_layouts/epmlive/ImportExcelFinish.aspx?isdlg=1&jobuid=" + tJob);
 
         }
 
