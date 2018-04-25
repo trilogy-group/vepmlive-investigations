@@ -9,7 +9,7 @@ export class ButtonHelper extends ButtonHelperFactory {
             text,
             `@${HtmlHelper.attributes.value}`,
             isContains
-        )}]`;
-        return element.all(By.xpath(xpath)).first();
+        )}][1]`;
+        return element(By.xpath(xpath));
     }
 }

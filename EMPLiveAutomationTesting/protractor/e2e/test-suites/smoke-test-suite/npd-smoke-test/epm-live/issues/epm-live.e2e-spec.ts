@@ -1,7 +1,7 @@
 // tslint:disable-next-line:max-line-length
-import {IssueNewItemPageConstants} from '../../../../../page-objects/pages/create-new-page/new-item/issue-new-item/issue-new-item-page.constants';
+import {IssueNewItemPageConstants} from '../../../../../page-objects/pages/create-new-page/new-item/issue-item/issue-item-page.constants';
 // tslint:disable-next-line:max-line-length
-import {CommonNewItemPageHelper} from '../../../../../page-objects/pages/create-new-page/new-item/common-new-item/common-new-item-page.helper';
+import {CommonItemPageHelper} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item-page.helper';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
@@ -10,15 +10,18 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {CreateNewPage} from '../../../../../page-objects/pages/create-new-page/create-new.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/create-new-page/create-new-page.constants';
-import {CommonNewItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/common-new-item/common-new-item.po';
+import {CommonItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item.po';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-import {IssueNewItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/issue-new-item/issue-new-item.po';
+import {IssueNewItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/issue-item/issue-item.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
-import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {browser} from 'protractor';
+import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
+import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
+import {ElementHelper} from '../../../../../components/html/element-helper';
+import {Constants} from '../../../../../components/misc-utils/constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -46,8 +49,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonNewItemPage.titles.first());
-        await expect(await CommonNewItemPage.titles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
+        await expect(await CommonItemPage.titles.first().getText())
             .toBe(IssueNewItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueNewItemPageConstants.pageName));
 
@@ -65,7 +68,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Required values entered/selected in title Field');
         await expect(await TextboxHelper.hasValue(IssueNewItemPage.inputs.title, titleValue))
             .toBe(true,
-                ValidationsHelper.getFieldShouldValueValidation(labels.title, titleValue));
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
 
@@ -77,14 +80,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
             .toBe(true,
-                ValidationsHelper.getFieldShouldValueValidation(labels.project, projectName));
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Issues - New Item" window');
-        await PageHelper.click(CommonNewItemPage.formButtons.save);
+        await PageHelper.click(CommonItemPage.formButtons.save);
 
         stepLogger.verification('"Issues - New Item" window is closed');
-        await expect(await CommonNewItemPage.title.isPresent())
+        await expect(await CommonItemPage.title.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueNewItemPageConstants.pageName));
 
@@ -92,21 +95,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger
             .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonNewItemPageHelper.getNotificationByText(titleValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(IssueNewItemPageConstants.pageName));
 
         stepLogger.stepId(5);
-        stepLogger.step('Select "Navigation" icon  from left side menu');
-        await PageHelper.click(CommonPage.sidebarMenus.navigation);
-
-        stepLogger.step('Select Project -> Issues from the left side menu options displayed');
-        await PageHelper.click(HomePage.navigation.projects.issues);
-
-        stepLogger.verification('"Issues" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.issues))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.issues));
+        await CommonViewPageHelper.navigateToIssuePage(
+            HomePage.navigation.projects.issues,
+            CommonViewPage.pageHeaders.projects.issues,
+            CommonViewPageConstants.pageHeaders.projects.issues,
+            stepLogger);
 
         // Give it sometime to create, Created Issue is not reflecting immediately
         await browser.sleep(PageHelper.timeout.s);
@@ -115,7 +113,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonViewPage.actionMenuIcons.search);
 
         stepLogger.step('Select column name as Title');
-        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPage.columnNames.title);
+        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
 
         stepLogger.step('Enter search term');
         await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
@@ -125,4 +123,112 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
+
+    fit('Edit Issues Functionality - [1124275]', async () => {
+        const stepLogger = new StepLogger(1124275);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToIssuePage(
+            HomePage.navigation.projects.issues,
+            CommonViewPage.pageHeaders.projects.issues,
+            CommonViewPageConstants.pageHeaders.projects.issues,
+            stepLogger);
+
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over the Issue created as per pre requisites that need to be edited');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
+        await ElementHelper.actionHoverOver(CommonViewPage.record);
+
+        stepLogger.step('Click on the Ellipses button (...)');
+        await PageHelper.click(CommonViewPage.ellipse);
+
+        stepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
+
+        stepLogger.verification('"Edit Issue" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
+        await expect(await CommonItemPage.titles.first().getText())
+            .not.toBe(Constants.EMPTY_STRING,
+                ValidationsHelper.getPageDisplayedValidation(IssueNewItemPageConstants.editPageName));
+
+        stepLogger.verification('Values selected/entered while creating the Issue are pre populated in respective fields');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
+        await expect(await TextboxHelper.hasValue(IssueNewItemPage.inputs.title, Constants.EMPTY_STRING))
+            .toBe(false,
+                ValidationsHelper.getFieldShouldNotHaveValueValidation(IssueNewItemPageConstants.inputLabels.title,
+                    Constants.EMPTY_STRING));
+
+        stepLogger.stepId(4);
+        stepLogger.step('Enter/Select required details in "Edit Issue" page as described below');
+
+        const labels = IssueNewItemPageConstants.inputLabels;
+        stepLogger.step('Title *: Random New Issue Item');
+        const uniqueId = PageHelper.getUniqueId();
+        const titleValue = `${labels.title} ${uniqueId}`;
+        await TextboxHelper.sendKeys(IssueNewItemPage.inputs.title, titleValue);
+
+        stepLogger.step('Title *: Random New Issue Item');
+        await PageHelper.sendKeysToInputField(IssueNewItemPage.inputs.status, titleValue);
+
+        stepLogger.step('Status: Select the value "In Progress"');
+        const status = IssueNewItemPageConstants.statuses.inProgress;
+        await PageHelper.sendKeysToInputField(IssueNewItemPage.inputs.status, status);
+
+        const priority = IssueNewItemPageConstants.priorities.high;
+        stepLogger.step('Priority: Select the value "(1) High"');
+        await PageHelper.sendKeysToInputField(IssueNewItemPage.inputs.priority, priority);
+
+        stepLogger.verification('Required values Entered/Selected in "Edit Issue" Page');
+        stepLogger.verification('Verify - Title *: Random New Issue Item');
+        await expect(await TextboxHelper.hasValue(IssueNewItemPage.inputs.title, titleValue))
+            .toBe(true,
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
+
+        stepLogger.verification('Verify - Status: Select the value "In Progress"');
+        await expect(await ElementHelper.hasSelectedOption(IssueNewItemPage.inputs.status, status))
+            .toBe(true,
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.status, status));
+
+        stepLogger.verification('Verify - Priority: Select the value "(1) High"');
+        await expect(await ElementHelper.hasOption(IssueNewItemPage.inputs.priority, priority))
+            .toBe(true,
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));
+
+        stepLogger.stepId(5);
+        stepLogger.step('Click "Save" button in "Edit Issue" page');
+        await PageHelper.click(CommonItemPage.formButtons.save);
+
+
+        stepLogger.verification('"Issues" page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.issues))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.issues));
+
+        stepLogger.verification('"Edit Issue" page is closed');
+        await expect(await CommonItemPage.formButtons.save.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueNewItemPageConstants.editPageName));
+
+        stepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
+        await CommonViewPageHelper.showColumns(CommonViewPageHelper.importantColumnsToShow);
+
+        // Give it sometime to create, Created Issue is not reflecting immediately
+        await browser.sleep(PageHelper.timeout.s);
+
+        stepLogger.step('Click on search');
+        await PageHelper.click(CommonViewPage.actionMenuIcons.search);
+
+        stepLogger.step('Select column name as Title');
+        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
+
+        stepLogger.step('Enter search term');
+        await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
+
+        const columnValues = [titleValue, status, priority];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(columnValues)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(columnValues.join(' and ')));
+    });
+
 });

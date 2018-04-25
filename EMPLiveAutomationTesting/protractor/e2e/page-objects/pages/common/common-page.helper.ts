@@ -1,7 +1,7 @@
 import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {CommonNewItemPage} from '../create-new-page/new-item/common-new-item/common-new-item.po';
+import {CommonItemPage} from '../create-new-page/new-item/common-item/common-item.po';
 import {PageHelper} from '../../../components/html/page-helper';
 
 export class CommonPageHelper {
@@ -46,10 +46,18 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        return PageHelper.switchToFrame(CommonNewItemPage.contentFrame);
+        return PageHelper.switchToFrame(CommonItemPage.contentFrame);
     }
 
     static getAutoCompleteItemByDescription(description: string) {
         return element(By.css(`[description='${description}']`));
+    }
+
+    static getRowForTableData(columnText: string[]) {
+        const columnXpaths: string[] = [];
+        for (let index = 0; index < columnText.length; index++) {
+            columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
+        }
+        return element(By.xpath(`//tr[${columnXpaths.join('and')}]`));
     }
 }

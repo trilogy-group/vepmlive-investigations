@@ -96,7 +96,7 @@ export class HtmlHelper extends HtmlHelperFactory {
             sAmp: 'samp',
             script: 'script',
             section: 'section',
-            select: 'section',
+            select: 'select',
             small: 'small',
             source: 'source',
             span: 'span',

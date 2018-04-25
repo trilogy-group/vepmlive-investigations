@@ -12,8 +12,16 @@ export class ValidationsHelper {
         };
     }
 
-    static getFieldShouldValueValidation(fieldLabel: string, value: string) {
-        return `${this.types.field} ${fieldLabel} should have value as ${value}`;
+    static getFieldShouldHaveValueValidation(fieldLabel: string, value: string) {
+        return this.getFieldValueValidation(fieldLabel, value);
+    }
+
+    static getFieldShouldNotHaveValueValidation(fieldLabel: string, value: string) {
+        return this.getFieldValueValidation(fieldLabel, value, 'not');
+    }
+
+    static getFieldValueValidation(fieldLabel: string, value: string, status = '') {
+        return `${this.types.field} ${fieldLabel} should ${status} have value as ${value}`;
     }
 
     static getPageDisplayedValidation(name: string) {
@@ -67,6 +75,7 @@ export class ValidationsHelper {
     static getWindowShouldNotBeDisplayedValidation(name: string) {
         return `${this.types.window} ${this.getNotDisplayedValidation(name)}`;
     }
+
 
     static getNotificationDisplayedValidation(name: string) {
         return `${this.types.notification} ${this.getDisplayedValidation(name)}`;
