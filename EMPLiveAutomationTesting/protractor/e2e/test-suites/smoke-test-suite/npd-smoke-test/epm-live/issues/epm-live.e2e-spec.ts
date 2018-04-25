@@ -22,7 +22,21 @@ import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/c
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {Constants} from '../../../../../components/misc-utils/constants';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
+let searchItemByTitle = async function (titleValue: string, stepLogger: StepLogger) {
+// Give it sometime to create, Created Issue is not reflecting immediately
+    await browser.sleep(PageHelper.timeout.s);
+
+    stepLogger.step('Click on search');
+    await PageHelper.click(CommonViewPage.actionMenuIcons.search);
+
+    stepLogger.step('Select column name as Title');
+    await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
+
+    stepLogger.step('Enter search term');
+    await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
+};
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     beforeEach(async () => {
@@ -106,17 +120,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        // Give it sometime to create, Created Issue is not reflecting immediately
-        await browser.sleep(PageHelper.timeout.s);
-
-        stepLogger.step('Click on search');
-        await PageHelper.click(CommonViewPage.actionMenuIcons.search);
-
-        stepLogger.step('Select column name as Title');
-        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
-
-        stepLogger.step('Enter search term');
-        await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
+        await searchItemByTitle(titleValue, stepLogger);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
@@ -168,9 +172,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const titleValue = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(IssueNewItemPage.inputs.title, titleValue);
 
-        stepLogger.step('Title *: Random New Issue Item');
-        await PageHelper.sendKeysToInputField(IssueNewItemPage.inputs.status, titleValue);
-
         stepLogger.step('Status: Select the value "In Progress"');
         const status = IssueNewItemPageConstants.statuses.inProgress;
         await PageHelper.sendKeysToInputField(IssueNewItemPage.inputs.status, status);
@@ -199,7 +200,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click "Save" button in "Edit Issue" page');
         await PageHelper.click(CommonItemPage.formButtons.save);
 
-
         stepLogger.verification('"Issues" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.issues))
             .toBe(true,
@@ -211,24 +211,24 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueNewItemPageConstants.editPageName));
 
         stepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
-        await CommonViewPageHelper.showColumns(CommonViewPageHelper.importantColumnsToShow);
+        await CommonViewPageHelper.showColumns([
+            CommonViewPageConstants.columns.title,
+            CommonViewPageConstants.columns.status,
+            CommonViewPageConstants.columns.priority]);
 
-        // Give it sometime to create, Created Issue is not reflecting immediately
-        await browser.sleep(PageHelper.timeout.s);
+        await searchItemByTitle(titleValue, stepLogger);
 
-        stepLogger.step('Click on search');
-        await PageHelper.click(CommonViewPage.actionMenuIcons.search);
+        await PageHelper.click(CommonViewPage.record);
 
-        stepLogger.step('Select column name as Title');
-        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
-
-        stepLogger.step('Enter search term');
-        await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
-
-        const columnValues = [titleValue, status, priority];
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(columnValues)))
+        const firstTableColumns = [titleValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
-                ValidationsHelper.getRecordContainsMessage(columnValues.join(' and ')));
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+
+        const secondTableColumns = [status, priority];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
 });

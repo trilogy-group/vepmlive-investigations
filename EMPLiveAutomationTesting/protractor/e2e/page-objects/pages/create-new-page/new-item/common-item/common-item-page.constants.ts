@@ -1,4 +1,4 @@
-export class CommonNewItemPageConstants {
+export class CommonItemPageConstants {
     static readonly pageName = 'Create New';
 
     static get ribbonLabels() {

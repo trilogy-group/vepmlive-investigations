@@ -7,16 +7,9 @@ import {ComponentHelpers} from '../../../../components/devfactory/component-help
 import {CommonViewPage} from './common-view.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class CommonViewPageHelper {
-    static get importantColumnsToShow() {
-        const map = new Map<ElementFinder, ElementFinder>();
-        map.set(CommonViewPage.columns.title, CommonViewPage.selectColumnOptions.title);
-        map.set(CommonViewPage.columns.status, CommonViewPage.selectColumnOptions.status);
-        map.set(CommonViewPage.columns.priority, CommonViewPage.selectColumnOptions.priority);
-        return map;
-    };
-
     static getPageHeaderByTitle(title: string) {
         return element(By.css(`a[title="${title}"]`));
     }
@@ -44,25 +37,30 @@ export class CommonViewPageHelper {
         await expect(await PageHelper.isElementDisplayed(pageHeader))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
-    };
-
-    static getColumnHeaderByText(text: string) {
-        return element(By.xpath(`//td[contains(@class,'GMHeaderText') and '${ComponentHelpers.getXPathFunctionForDot(text)}']`));
     }
 
-    static async showColumns(map: Map<ElementFinder, ElementFinder>) {
+    static getColumnHeaderByText(text: string) {
+        return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    }
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.selectColumnPanel);
-        const isApplyRequired = false;
-        await map.forEach(async (key, value) => {
-            const isTitleAvailable = await key.isDisplayed();
-            if (!isTitleAvailable) {
-                await PageHelper.click(CommonViewPage.actionMenuIcons.selectColumns);
-                await CheckboxHelper.markCheckbox(value, true);
+    static async showColumns(columnNames: string[]) {
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.ganttGrid);
+        let isApplyRequired = false;
+        let promises = await Array.from(columnNames, async (key: string) => {
+            const isOptionAvailable = await CommonViewPageHelper.getColumnHeaderByText(key).isPresent();
+            if (!isOptionAvailable) {
                 isApplyRequired = true;
             }
+            return;
         });
+        await Promise.all(promises);
         if (isApplyRequired) {
+            await PageHelper.click(CommonViewPage.actionMenuIcons.selectColumns);
+            await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.selectColumnPanel);
+            promises = await Array.from(columnNames, async (key: string) => {
+                await CheckboxHelper.markCheckbox(CommonPageHelper.getCheckboxByExactText(key), true);
+            });
+            await Promise.all(promises);
             await PageHelper.click(CommonViewPage.applySelectColumnButton);
         }
     }

@@ -1,7 +1,7 @@
 import {CommonViewPageConstants} from './common-view-page.constants';
 import {CommonViewPageHelper} from './common-view-page.helper';
 import {By, element} from 'protractor';
-import {LabelHelper} from '../../../../components/html/label-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class CommonViewPage {
     static get pageHeaders() {
@@ -39,29 +39,33 @@ export class CommonViewPage {
         return element(By.xpath(`//div[contains(@class,'grouping-apply')]//a[normalize-space(.)='Apply']`));
     }
 
+    static get ganttGrid() {
+        return element(By.id('GanttGrid2Main'));
+    }
+
     static get selectColumnOptions() {
         const label = CommonViewPageConstants.columns;
         return {
-            assignedTo: LabelHelper.getLabelByExactText(label.assignedTo),
-            comments: LabelHelper.getLabelByExactText(label.comments),
-            createdBy: LabelHelper.getLabelByExactText(label.createdBy),
-            daysOverdue: LabelHelper.getLabelByExactText(label.daysOverdue),
-            description: LabelHelper.getLabelByExactText(label.description),
-            dueDate: LabelHelper.getLabelByExactText(label.dueDate),
-            due: LabelHelper.getLabelByExactText(label.due),
-            effort: LabelHelper.getLabelByExactText(label.effort),
-            id: LabelHelper.getLabelByExactText(label.id),
-            modifiedBy: LabelHelper.getLabelByExactText(label.modifiedBy),
-            priority: LabelHelper.getLabelByExactText(label.priority),
-            project: LabelHelper.getLabelByExactText(label.project),
-            relatedIssues: LabelHelper.getLabelByExactText(label.relatedIssues),
-            resolution: LabelHelper.getLabelByExactText(label.resolution),
-            scheduleStatus: LabelHelper.getLabelByExactText(label.scheduleStatus),
-            startDate: LabelHelper.getLabelByExactText(label.startDate),
-            status: LabelHelper.getLabelByExactText(label.status),
-            title: LabelHelper.getLabelByExactText(label.title),
-            specialColumns: LabelHelper.getLabelByExactText(label.specialColumns),
-            ganttChart: LabelHelper.getLabelByExactText(label.ganttChart)
+            assignedTo: CommonPageHelper.getCheckboxByExactText(label.assignedTo),
+            comments: CommonPageHelper.getCheckboxByExactText(label.comments),
+            createdBy: CommonPageHelper.getCheckboxByExactText(label.createdBy),
+            daysOverdue: CommonPageHelper.getCheckboxByExactText(label.daysOverdue),
+            description: CommonPageHelper.getCheckboxByExactText(label.description),
+            dueDate: CommonPageHelper.getCheckboxByExactText(label.dueDate),
+            due: CommonPageHelper.getCheckboxByExactText(label.due),
+            effort: CommonPageHelper.getCheckboxByExactText(label.effort),
+            id: CommonPageHelper.getCheckboxByExactText(label.id),
+            modifiedBy: CommonPageHelper.getCheckboxByExactText(label.modifiedBy),
+            priority: CommonPageHelper.getCheckboxByExactText(label.priority),
+            project: CommonPageHelper.getCheckboxByExactText(label.project),
+            relatedIssues: CommonPageHelper.getCheckboxByExactText(label.relatedIssues),
+            resolution: CommonPageHelper.getCheckboxByExactText(label.resolution),
+            scheduleStatus: CommonPageHelper.getCheckboxByExactText(label.scheduleStatus),
+            startDate: CommonPageHelper.getCheckboxByExactText(label.startDate),
+            status: CommonPageHelper.getCheckboxByExactText(label.status),
+            title: CommonPageHelper.getCheckboxByExactText(label.title),
+            specialColumns: CommonPageHelper.getCheckboxByExactText(label.specialColumns),
+            ganttChart: CommonPageHelper.getCheckboxByExactText(label.ganttChart)
         };
     }
     static get searchControls() {
@@ -73,7 +77,7 @@ export class CommonViewPage {
     }
 
     static get record() {
-        return element(By.xpath(`${this.selectorForRecords}[1]`));
+        return element(By.xpath(`(${this.selectorForRecords})[1]`));
     }
 
     static get records() {
@@ -107,26 +111,26 @@ export class CommonViewPage {
     static get columns() {
         const label = CommonViewPageConstants.columns;
         return {
-            assignedTo: CommonViewPageHelper.getPageHeaderByTitle(label.assignedTo),
-            comments: CommonViewPageHelper.getPageHeaderByTitle(label.comments),
-            createdBy: CommonViewPageHelper.getPageHeaderByTitle(label.createdBy),
-            daysOverdue: CommonViewPageHelper.getPageHeaderByTitle(label.daysOverdue),
-            description: CommonViewPageHelper.getPageHeaderByTitle(label.description),
-            dueDate: CommonViewPageHelper.getPageHeaderByTitle(label.dueDate),
-            due: CommonViewPageHelper.getPageHeaderByTitle(label.due),
-            effort: CommonViewPageHelper.getPageHeaderByTitle(label.effort),
-            id: CommonViewPageHelper.getPageHeaderByTitle(label.id),
-            modifiedBy: CommonViewPageHelper.getPageHeaderByTitle(label.modifiedBy),
-            priority: CommonViewPageHelper.getPageHeaderByTitle(label.priority),
-            project: CommonViewPageHelper.getPageHeaderByTitle(label.project),
-            relatedIssues: CommonViewPageHelper.getPageHeaderByTitle(label.relatedIssues),
-            resolution: CommonViewPageHelper.getPageHeaderByTitle(label.resolution),
-            scheduleStatus: CommonViewPageHelper.getPageHeaderByTitle(label.scheduleStatus),
-            startDate: CommonViewPageHelper.getPageHeaderByTitle(label.startDate),
-            status: CommonViewPageHelper.getPageHeaderByTitle(label.status),
-            title: CommonViewPageHelper.getPageHeaderByTitle(label.title),
-            specialColumns: CommonViewPageHelper.getPageHeaderByTitle(label.specialColumns),
-            ganttChart: CommonViewPageHelper.getPageHeaderByTitle(label.ganttChart)
+            assignedTo: CommonViewPageHelper.getColumnHeaderByText(label.assignedTo),
+            comments: CommonViewPageHelper.getColumnHeaderByText(label.comments),
+            createdBy: CommonViewPageHelper.getColumnHeaderByText(label.createdBy),
+            daysOverdue: CommonViewPageHelper.getColumnHeaderByText(label.daysOverdue),
+            description: CommonViewPageHelper.getColumnHeaderByText(label.description),
+            dueDate: CommonViewPageHelper.getColumnHeaderByText(label.dueDate),
+            due: CommonViewPageHelper.getColumnHeaderByText(label.due),
+            effort: CommonViewPageHelper.getColumnHeaderByText(label.effort),
+            id: CommonViewPageHelper.getColumnHeaderByText(label.id),
+            modifiedBy: CommonViewPageHelper.getColumnHeaderByText(label.modifiedBy),
+            priority: CommonViewPageHelper.getColumnHeaderByText(label.priority),
+            project: CommonViewPageHelper.getColumnHeaderByText(label.project),
+            relatedIssues: CommonViewPageHelper.getColumnHeaderByText(label.relatedIssues),
+            resolution: CommonViewPageHelper.getColumnHeaderByText(label.resolution),
+            scheduleStatus: CommonViewPageHelper.getColumnHeaderByText(label.scheduleStatus),
+            startDate: CommonViewPageHelper.getColumnHeaderByText(label.startDate),
+            status: CommonViewPageHelper.getColumnHeaderByText(label.status),
+            title: CommonViewPageHelper.getColumnHeaderByText(label.title),
+            specialColumns: CommonViewPageHelper.getColumnHeaderByText(label.specialColumns),
+            ganttChart: CommonViewPageHelper.getColumnHeaderByText(label.ganttChart)
         };
     }
 }

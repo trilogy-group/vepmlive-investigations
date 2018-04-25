@@ -3,6 +3,7 @@ import {ComponentHelpers} from '../../../components/devfactory/component-helpers
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {CommonItemPage} from '../create-new-page/new-item/common-item/common-item.po';
 import {PageHelper} from '../../../components/html/page-helper';
+import {CommonPageConstants} from './common-page.constants';
 
 export class CommonPageHelper {
     static getSidebarLinkByTextUnderList(title: string) {
@@ -58,6 +59,13 @@ export class CommonPageHelper {
         for (let index = 0; index < columnText.length; index++) {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
-        return element(By.xpath(`//tr[${columnXpaths.join('and')}]`));
+        const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    public static getCheckboxByExactText(text: string, isContains = false) {
+        const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
+        //input[@type='checkbox']`;
+        return element.all(By.xpath(xpath)).first();
     }
 }

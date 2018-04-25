@@ -4,4 +4,8 @@ export class CommonPageConstants {
             dev: 'dev'
         };
     }
+
+    static get and() {
+        return ' and ';
+    }
 }
