@@ -1,5 +1,5 @@
 import {BasePage} from '../../../base-page';
-import {IssueNewItemPageConstants} from './issue-new-item-page.constants';
+import {IssueNewItemPageConstants} from './issue-item-page.constants';
 import {CommonPageHelper} from '../../../common/common-page.helper';
 import {By, element} from 'protractor';
 

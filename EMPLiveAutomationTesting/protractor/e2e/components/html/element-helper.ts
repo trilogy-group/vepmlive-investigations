@@ -1,6 +1,7 @@
 import {browser, by, By, element, ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from './wait-helper';
 import {PageHelper} from './page-helper';
+import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
 
 export class ElementHelper {
     private static readonly EC = protractor.ExpectedConditions;
@@ -54,6 +55,10 @@ export class ElementHelper {
         return select
             .element(by.cssContainingText('option', option))
             .isPresent();
+    }
+
+    static async hasSelectedOption(select: ElementFinder, option: string) {
+        return select.element(by.xpath(`//option[${ComponentHelpers.getXPathFunctionForDot(option)}]`)).isSelected();
     }
 
     static async getFocusedElement() {

@@ -1,8 +1,9 @@
 import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {CommonNewItemPage} from '../create-new-page/new-item/common-new-item/common-new-item.po';
+import {CommonItemPage} from '../create-new-page/new-item/common-item/common-item.po';
 import {PageHelper} from '../../../components/html/page-helper';
+import {CommonPageConstants} from './common-page.constants';
 
 export class CommonPageHelper {
     static getSidebarLinkByTextUnderList(title: string) {
@@ -46,10 +47,25 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        return PageHelper.switchToFrame(CommonNewItemPage.contentFrame);
+        return PageHelper.switchToFrame(CommonItemPage.contentFrame);
     }
 
     static getAutoCompleteItemByDescription(description: string) {
         return element(By.css(`[description='${description}']`));
+    }
+
+    static getRowForTableData(columnText: string[]) {
+        const columnXpaths: string[] = [];
+        for (let index = 0; index < columnText.length; index++) {
+            columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
+        }
+        const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    public static getCheckboxByExactText(text: string, isContains = false) {
+        const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
+        //input[@type='checkbox']`;
+        return element.all(By.xpath(xpath)).first();
     }
 }
