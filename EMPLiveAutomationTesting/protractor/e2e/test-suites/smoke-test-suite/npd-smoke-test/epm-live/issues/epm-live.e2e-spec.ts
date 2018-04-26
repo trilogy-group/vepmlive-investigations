@@ -17,26 +17,12 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {browser} from 'protractor';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {Constants} from '../../../../../components/misc-utils/constants';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
-let searchItemByTitle = async function (titleValue: string, stepLogger: StepLogger) {
-// Give it sometime to create, Created Issue is not reflecting immediately
-    await browser.sleep(PageHelper.timeout.s);
-
-    stepLogger.step('Click on search');
-    await PageHelper.click(CommonViewPage.actionMenuIcons.search);
-
-    stepLogger.step('Select column name as Title');
-    await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
-
-    stepLogger.step('Enter search term');
-    await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
-};
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     beforeEach(async () => {
@@ -120,7 +106,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        await searchItemByTitle(titleValue, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue, stepLogger);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
@@ -128,7 +114,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
-    fit('Edit Issues Functionality - [1124275]', async () => {
+    it('Edit Issues Functionality - [1124275]', async () => {
         const stepLogger = new StepLogger(1124275);
         stepLogger.stepId(1);
 
@@ -216,7 +202,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.columns.status,
             CommonViewPageConstants.columns.priority]);
 
-        await searchItemByTitle(titleValue, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue, stepLogger);
 
         await PageHelper.click(CommonViewPage.record);
 

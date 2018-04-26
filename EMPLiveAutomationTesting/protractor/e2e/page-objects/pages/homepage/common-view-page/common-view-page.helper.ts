@@ -1,4 +1,4 @@
-import {By, element, ElementFinder} from 'protractor';
+import {browser, By, element, ElementFinder} from 'protractor';
 import {CommonPage} from '../../common/common.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
@@ -8,6 +8,8 @@ import {CommonViewPage} from './common-view.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import {CommonViewPageConstants} from './common-view-page.constants';
+import {TextboxHelper} from '../../../../components/html/textbox-helper';
 
 export class CommonViewPageHelper {
     static getPageHeaderByTitle(title: string) {
@@ -41,6 +43,20 @@ export class CommonViewPageHelper {
 
     static getColumnHeaderByText(text: string) {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    }
+
+    static async searchItemByTitle(titleValue: string, stepLogger: StepLogger) {
+        // Give it sometime to create, Created Issue is not reflecting immediately
+        await browser.sleep(PageHelper.timeout.s);
+
+        stepLogger.step('Click on search');
+        await PageHelper.click(CommonViewPage.actionMenuIcons.search);
+
+        stepLogger.step('Select column name as Title');
+        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
+
+        stepLogger.step('Enter search term');
+        await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);
     }
 
     static async showColumns(columnNames: string[]) {
