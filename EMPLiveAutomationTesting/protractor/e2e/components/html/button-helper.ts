@@ -5,11 +5,11 @@ import {By, element} from 'protractor';
 
 export class ButtonHelper extends ButtonHelperFactory {
     public static getInputButtonByExactTextXPath(text: string, isContains = false) {
-        const xpath = `//input[${ComponentHelpers.getXPathFunctionForStringComparison(
+        const xpath = `(//input[${ComponentHelpers.getXPathFunctionForStringComparison(
             text,
             `@${HtmlHelper.attributes.value}`,
             isContains
-        )}][1]`;
+        )}])[1]`;
         return element(By.xpath(xpath));
     }
 }

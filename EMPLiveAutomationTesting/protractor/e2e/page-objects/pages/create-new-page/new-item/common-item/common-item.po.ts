@@ -5,7 +5,8 @@ import {ButtonHelper} from '../../../../../components/html/button-helper';
 import {browser, By, element} from 'protractor';
 
 export class CommonItemPage extends BasePage {
-    static readonly titleId = '#dialogTitleSpan,#pageTitle';
+    static readonly dialogTitleId = '#dialogTitleSpan';
+    static readonly titleId = '#pageTitle';
 
     static get ribbonItems() {
         const labels = CommonItemPageConstants.ribbonLabels;
@@ -29,6 +30,14 @@ export class CommonItemPage extends BasePage {
 
     static get title() {
         return element(By.css(this.titleId));
+    }
+
+    static get dialogTitles() {
+        return element.all(By.css(this.dialogTitleId));
+    }
+
+    static get dialogTitle() {
+        return element(By.css(this.dialogTitleId));
     }
 
     static get contentFrame() {

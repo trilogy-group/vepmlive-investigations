@@ -49,8 +49,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await expect(await CommonItemPage.titles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
+
+        await expect(await CommonItemPage.dialogTitles.first().getText())
             .toBe(IssueNewItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueNewItemPageConstants.pageName));
 
@@ -87,7 +88,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonItemPage.formButtons.save);
 
         stepLogger.verification('"Issues - New Item" window is closed');
-        await expect(await CommonItemPage.title.isPresent())
+        await expect(await CommonItemPage.dialogTitles.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueNewItemPageConstants.pageName));
 
