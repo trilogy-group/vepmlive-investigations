@@ -10,10 +10,13 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonViewPageConstants} from './common-view-page.constants';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
+import {CommonItemPage} from '../../create-new-page/new-item/common-item/common-item.po';
 
 export class CommonViewPageHelper {
     static getPageHeaderByTitle(title: string) {
-        return element(By.css(`a[title="${title}"]`));
+        const xpath = `//*[@id='${CommonItemPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        console.log(xpath);
+        return element(By.xpath(xpath));
     }
 
     static getActionMenuIcons(title: string) {
@@ -25,10 +28,10 @@ export class CommonViewPageHelper {
         return element(By.xpath(xpath));
     }
 
-    static async navigateToIssuePage(linkOfThePage: ElementFinder,
-                                     pageHeader: ElementFinder,
-                                     pageName: string,
-                                     stepLogger: StepLogger) {
+    static async navigateToItemPage(linkOfThePage: ElementFinder,
+                                    pageHeader: ElementFinder,
+                                    pageName: string,
+                                    stepLogger: StepLogger) {
         stepLogger.step('Select "Navigation" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
 

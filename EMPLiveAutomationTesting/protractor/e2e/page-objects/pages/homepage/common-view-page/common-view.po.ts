@@ -10,7 +10,7 @@ export class CommonViewPage {
             projects: {
                 requests: CommonViewPageHelper.getPageHeaderByTitle(labels.requests),
                 portfolios: CommonViewPageHelper.getPageHeaderByTitle(labels.portfolios),
-                projects: CommonViewPageHelper.getPageHeaderByTitle(labels.projects),
+                projectsCenter: CommonViewPageHelper.getPageHeaderByTitle(labels.projectCenter),
                 tasks: CommonViewPageHelper.getPageHeaderByTitle(labels.tasks),
                 risks: CommonViewPageHelper.getPageHeaderByTitle(labels.risks),
                 issues: CommonViewPageHelper.getPageHeaderByTitle(labels.issues),
@@ -68,6 +68,7 @@ export class CommonViewPage {
             ganttChart: CommonPageHelper.getCheckboxByExactText(label.ganttChart)
         };
     }
+
     static get searchControls() {
         return {
             text: element(By.id('searchtext2Main')),

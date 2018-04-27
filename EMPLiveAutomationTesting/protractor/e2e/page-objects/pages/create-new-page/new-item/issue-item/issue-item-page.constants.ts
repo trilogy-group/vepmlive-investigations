@@ -1,4 +1,4 @@
-export class IssueNewItemPageConstants {
+export class IssueItemPageConstants {
     static readonly pageName = 'Issues - New Item';
     static readonly editPageName = 'Issues Page Edit Mode';
 

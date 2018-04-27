@@ -1,11 +1,11 @@
 import {BasePage} from '../../../base-page';
-import {IssueNewItemPageConstants} from './issue-item-page.constants';
+import {IssueItemPageConstants} from './issue-item-page.constants';
 import {CommonPageHelper} from '../../../common/common-page.helper';
 import {By, element} from 'protractor';
 
-export class IssueNewItemPage extends BasePage {
+export class IssueItemPage extends BasePage {
     static get inputs() {
-        const labels = IssueNewItemPageConstants.inputLabels;
+        const labels = IssueItemPageConstants.inputLabels;
         return {
             title: CommonPageHelper.getTextBoxByLabel(labels.title),
             project: CommonPageHelper.getFirstAutoCompleteByLabel(labels.project),
