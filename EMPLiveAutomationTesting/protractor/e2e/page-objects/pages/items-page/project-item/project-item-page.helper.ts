@@ -1,11 +1,11 @@
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-import {PageHelper} from '../../../../../components/html/page-helper';
 import {ProjectItemPage} from './project-item.po';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {CommonItemPage} from '../common-item/common-item.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
+import {StepLogger} from '../../../../../core/logger/step-logger';
+import {TextboxHelper} from '../../../../components/html/textbox-helper';
+import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
+import {PageHelper} from '../../../../components/html/page-helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,

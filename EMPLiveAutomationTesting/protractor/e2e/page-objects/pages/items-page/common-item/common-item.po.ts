@@ -9,7 +9,6 @@ export class CommonItemPage extends BasePage {
     static readonly dialogTitleId = 'dialogTitleSpan';
     static readonly titleId = 'pageTitle';
 
-
     static get ribbonTitles() {
         const titles = CommonItemPageConstants.ribbonMenuTitles;
         return {

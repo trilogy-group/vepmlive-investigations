@@ -9,7 +9,6 @@ import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
-import {CommonItemPage} from '../../create-new-page/new-item/common-item/common-item.po';
 
 export class CommonViewPageHelper {
     static getPageHeaderByTitle(title: string) {

@@ -76,7 +76,6 @@ export class ValidationsHelper {
         return `${this.types.window} ${this.getNotDisplayedValidation(name)}`;
     }
 
-
     static getNotificationDisplayedValidation(name: string) {
         return `${this.types.notification} ${this.getDisplayedValidation(name)}`;
     }

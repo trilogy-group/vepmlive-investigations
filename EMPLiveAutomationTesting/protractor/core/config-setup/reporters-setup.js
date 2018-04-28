@@ -14,7 +14,7 @@ const commonConfigSetup = {
             origFn.call(browser.driver.controlFlow(), function () {
                 //increase or reduce time value, its in millisecond
                 return protractor.promise.delayed(5);
-            })
+            });
             return origFn.apply(browser.driver.controlFlow(), args);
         };
         const log4js = require('log4js');
