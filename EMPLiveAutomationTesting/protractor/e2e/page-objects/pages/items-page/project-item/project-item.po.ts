@@ -1,7 +1,7 @@
-import {BasePage} from '../../../base-page';
 import {By, element} from 'protractor';
-import {CommonPageHelper} from '../../../common/common-page.helper';
 import {ProjectItemPageConstants} from './project-item-page.constants';
+import {BasePage} from '../../base-page';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {

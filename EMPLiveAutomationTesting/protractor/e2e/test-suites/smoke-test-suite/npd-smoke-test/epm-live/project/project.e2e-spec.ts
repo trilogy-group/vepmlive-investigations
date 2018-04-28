@@ -1,23 +1,21 @@
-// tslint:disable-next-line:max-line-length
-import {ProjectItemPageConstants} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.constants';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {CommonItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item.po';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
-import {ProjectItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {ProjectItemPageHelper} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.helper';
-// tslint:disable-next-line:max-line-length
-import {ProjectItemPageValidations} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.validations';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -167,6 +165,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
-
     });
 });

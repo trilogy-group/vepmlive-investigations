@@ -113,7 +113,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
-    fit('Edit Risks Functionality - [1124272]', async () => {
+    it('Edit Risks Functionality - [1124272]', async () => {
         const stepLogger = new StepLogger(1124272);
         stepLogger.stepId(1);
 
