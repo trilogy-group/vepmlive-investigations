@@ -60,14 +60,12 @@ export class CommonPageHelper {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
         const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
-        console.log(xpath);
         return element(By.xpath(xpath));
     }
 
     public static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;
-        console.log(xpath);
         return element.all(By.xpath(xpath)).first();
     }
 }
