@@ -82,7 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Project Functionality - [1124173]', async () => {
-        const stepLogger = new StepLogger(1124275);
+        const stepLogger = new StepLogger(1124173);
         stepLogger.stepId(1);
 
         // Step #1 Inside this function

@@ -26,8 +26,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    it('Add Changes Functionality - [1124271]', async () => {
-        const stepLogger = new StepLogger(1124271);
+    it('Add Changes Functionality - [1124277]', async () => {
+        const stepLogger = new StepLogger(1124277);
 
         stepLogger.stepId(1);
 
