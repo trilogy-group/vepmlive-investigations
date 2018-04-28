@@ -1,7 +1,7 @@
 import {CommonViewPageConstants} from './common-view-page.constants';
 import {CommonViewPageHelper} from './common-view-page.helper';
 import {By, element} from 'protractor';
-import {CommonPageHelper} from '../../common/common-page.helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class CommonViewPage {
     static get pageHeaders() {
@@ -40,40 +40,14 @@ export class CommonViewPage {
     }
 
     static get ganttGrid() {
-        return element(By.id('GanttGrid2Main'));
-    }
-
-    static get selectColumnOptions() {
-        const label = CommonViewPageConstants.columns;
-        return {
-            assignedTo: CommonPageHelper.getCheckboxByExactText(label.assignedTo),
-            comments: CommonPageHelper.getCheckboxByExactText(label.comments),
-            createdBy: CommonPageHelper.getCheckboxByExactText(label.createdBy),
-            daysOverdue: CommonPageHelper.getCheckboxByExactText(label.daysOverdue),
-            description: CommonPageHelper.getCheckboxByExactText(label.description),
-            dueDate: CommonPageHelper.getCheckboxByExactText(label.dueDate),
-            due: CommonPageHelper.getCheckboxByExactText(label.due),
-            effort: CommonPageHelper.getCheckboxByExactText(label.effort),
-            id: CommonPageHelper.getCheckboxByExactText(label.id),
-            modifiedBy: CommonPageHelper.getCheckboxByExactText(label.modifiedBy),
-            priority: CommonPageHelper.getCheckboxByExactText(label.priority),
-            project: CommonPageHelper.getCheckboxByExactText(label.project),
-            relatedIssues: CommonPageHelper.getCheckboxByExactText(label.relatedIssues),
-            resolution: CommonPageHelper.getCheckboxByExactText(label.resolution),
-            scheduleStatus: CommonPageHelper.getCheckboxByExactText(label.scheduleStatus),
-            startDate: CommonPageHelper.getCheckboxByExactText(label.startDate),
-            status: CommonPageHelper.getCheckboxByExactText(label.status),
-            title: CommonPageHelper.getCheckboxByExactText(label.title),
-            specialColumns: CommonPageHelper.getCheckboxByExactText(label.specialColumns),
-            ganttChart: CommonPageHelper.getCheckboxByExactText(label.ganttChart)
-        };
+        return ElementHelper.getElementByStartsWithId('GanttGrid');
     }
 
     static get searchControls() {
         return {
-            text: element(By.id('searchtext2Main')),
-            type: element(By.id('searchtype2Main')),
-            column: element(By.id('search2Main'))
+            text: ElementHelper.getElementByStartsWithId('searchtext'),
+            type: ElementHelper.getElementByStartsWithId('searchtype'),
+            column: ElementHelper.getElementByStartsWithId('search')
         };
     }
 
@@ -90,7 +64,7 @@ export class CommonViewPage {
     }
 
     static get selectColumnPanel() {
-        return element(By.id('msColumns2Main_ul_menu'));
+        return element(By.xpath('//*[contains(@id,"msColumns") and contains(@id,"_ul_menu")'));
     }
 
     static get ellipse() {
@@ -109,29 +83,4 @@ export class CommonViewPage {
         };
     }
 
-    static get columns() {
-        const label = CommonViewPageConstants.columns;
-        return {
-            assignedTo: CommonViewPageHelper.getColumnHeaderByText(label.assignedTo),
-            comments: CommonViewPageHelper.getColumnHeaderByText(label.comments),
-            createdBy: CommonViewPageHelper.getColumnHeaderByText(label.createdBy),
-            daysOverdue: CommonViewPageHelper.getColumnHeaderByText(label.daysOverdue),
-            description: CommonViewPageHelper.getColumnHeaderByText(label.description),
-            dueDate: CommonViewPageHelper.getColumnHeaderByText(label.dueDate),
-            due: CommonViewPageHelper.getColumnHeaderByText(label.due),
-            effort: CommonViewPageHelper.getColumnHeaderByText(label.effort),
-            id: CommonViewPageHelper.getColumnHeaderByText(label.id),
-            modifiedBy: CommonViewPageHelper.getColumnHeaderByText(label.modifiedBy),
-            priority: CommonViewPageHelper.getColumnHeaderByText(label.priority),
-            project: CommonViewPageHelper.getColumnHeaderByText(label.project),
-            relatedIssues: CommonViewPageHelper.getColumnHeaderByText(label.relatedIssues),
-            resolution: CommonViewPageHelper.getColumnHeaderByText(label.resolution),
-            scheduleStatus: CommonViewPageHelper.getColumnHeaderByText(label.scheduleStatus),
-            startDate: CommonViewPageHelper.getColumnHeaderByText(label.startDate),
-            status: CommonViewPageHelper.getColumnHeaderByText(label.status),
-            title: CommonViewPageHelper.getColumnHeaderByText(label.title),
-            specialColumns: CommonViewPageHelper.getColumnHeaderByText(label.specialColumns),
-            ganttChart: CommonViewPageHelper.getColumnHeaderByText(label.ganttChart)
-        };
-    }
 }

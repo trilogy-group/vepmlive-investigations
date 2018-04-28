@@ -167,4 +167,8 @@ export class ElementHelper {
         const text = await elem.getText();
         return text.trim();
     }
+
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
+    }
 }

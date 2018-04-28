@@ -34,7 +34,7 @@ export class CommonPageHelper {
     }
 
     static getFirstAutoCompleteByLabel(title: string) {
-        return this.getInputByLabel('*[contains(@class,"autocomplete")][1]', title);
+        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*[contains(@class,"autoText")][1]', title);
     }
 
     static getSelectByLabel(title: string) {
@@ -43,6 +43,7 @@ export class CommonPageHelper {
 
     static getInputByLabel(type: string, title: string) {
         const xpath = `//table[contains(@class,"ms-formtable")]//td[normalize-space(.)='${title}']//parent::tr//${type}`;
+        console.log(xpath);
         return element(By.xpath(xpath));
     }
 
@@ -51,7 +52,8 @@ export class CommonPageHelper {
     }
 
     static getAutoCompleteItemByDescription(description: string) {
-        return element(By.css(`[description='${description}']`));
+        console.log(`[description="${description}"]`);
+        return element(By.css(`[description="${description}"]`));
     }
 
     static getRowForTableData(columnText: string[]) {

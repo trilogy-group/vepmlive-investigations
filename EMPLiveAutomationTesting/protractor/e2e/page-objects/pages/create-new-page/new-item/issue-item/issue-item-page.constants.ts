@@ -19,6 +19,31 @@ export class IssueItemPageConstants {
         };
     }
 
+    static get columnNames() {
+        return {
+            assignedTo: 'Assigned To',
+            comments: 'Comments',
+            createdBy: 'Created By',
+            daysOverdue: 'Days Overdue',
+            description: 'Description',
+            dueDate: 'Due Date',
+            due: 'Due',
+            effort: 'Effort',
+            id: 'ID',
+            modifiedBy: 'Modified By',
+            priority: 'Priority',
+            project: 'Project',
+            relatedIssues: 'Related Issues',
+            resolution: 'Resolution',
+            scheduleStatus: 'Schedule Status',
+            startDate: 'Start Date',
+            status: 'Status',
+            title: 'Title',
+            specialColumns: 'Special Columns',
+            ganttChart: 'Gantt Chart'
+        };
+    }
+
     static get statuses() {
         return {
             notStarted: 'Not Started',

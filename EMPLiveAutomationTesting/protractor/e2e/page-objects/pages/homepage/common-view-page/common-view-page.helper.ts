@@ -8,7 +8,6 @@ import {CommonViewPage} from './common-view.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {CommonViewPageConstants} from './common-view-page.constants';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {CommonItemPage} from '../../create-new-page/new-item/common-item/common-item.po';
 
@@ -20,7 +19,8 @@ export class CommonViewPageHelper {
     }
 
     static getActionMenuIcons(title: string) {
-        return element(By.css(`#actionmenu2Main li[title="${title}"]`));
+        const xpath = `//*[${ComponentHelpers.getXPathFunctionForStringComparison('actionmenu', '@id', true)}]//li[@title="${title}"]`;
+        return element(By.xpath(xpath));
     }
 
     static getContextMenuItemByText(text: string) {
@@ -48,15 +48,15 @@ export class CommonViewPageHelper {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
-    static async searchItemByTitle(titleValue: string, stepLogger: StepLogger) {
-        // Give it sometime to create, Created Issue is not reflecting immediately
-        await browser.sleep(PageHelper.timeout.s);
+    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger) {
+        // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
+        await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.step('Click on search');
         await PageHelper.click(CommonViewPage.actionMenuIcons.search);
 
         stepLogger.step('Select column name as Title');
-        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, CommonViewPageConstants.columns.title);
+        await PageHelper.sendKeysToInputField(CommonViewPage.searchControls.column, columnName);
 
         stepLogger.step('Enter search term');
         await TextboxHelper.sendKeys(CommonViewPage.searchControls.text, titleValue, true);

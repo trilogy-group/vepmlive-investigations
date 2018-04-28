@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    it('Add Issues Functionality - [1124274]', async () => {
+    fit('Add Issues Functionality - [1124274]', async () => {
         const stepLogger = new StepLogger(1124274);
 
         stepLogger.stepId(1);
@@ -107,7 +107,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title, stepLogger);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
@@ -199,11 +199,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
         await CommonViewPageHelper.showColumns([
-            CommonViewPageConstants.columns.title,
-            CommonViewPageConstants.columns.status,
-            CommonViewPageConstants.columns.priority]);
+            IssueItemPageConstants.columnNames.title,
+            IssueItemPageConstants.columnNames.status,
+            IssueItemPageConstants.columnNames.priority]);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title, stepLogger);
 
         await PageHelper.click(CommonViewPage.record);
 

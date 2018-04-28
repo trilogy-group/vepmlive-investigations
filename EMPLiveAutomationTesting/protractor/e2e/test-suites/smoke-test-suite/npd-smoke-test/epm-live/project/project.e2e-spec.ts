@@ -1,5 +1,4 @@
 // tslint:disable-next-line:max-line-length
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item-page.helper';
 // tslint:disable-next-line:max-line-length
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.constants';
 import {SuiteNames} from '../../../../helpers/suite-names';
@@ -9,8 +8,6 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {CommonItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item.po';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
@@ -18,6 +15,7 @@ import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepag
 import {ProjectItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {browser} from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -27,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    fit('Add Project Functionality - [1124170]', async () => {
+    it('Add Project Functionality - [1124170]', async () => {
         const stepLogger = new StepLogger(1124170);
 
         stepLogger.stepId(1);
@@ -66,7 +64,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
 
         // Add portfolio name
-        stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
+        /*stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
         await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
         const portfolioName = await inputs.portfolio.getText();
@@ -76,6 +74,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
+        */
 
         // Add Project Description
         stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
@@ -135,26 +134,21 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
 
-        await PageHelper.switchToDefaultContent();
-        stepLogger
-            .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
-
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(projectNameValue)))
-            .toBe(true,
-                ValidationsHelper.getNotificationDisplayedValidation(ProjectItemPageConstants.pageName));
-
         stepLogger.stepId(5);
+        stepLogger.verification('Navigate to page');
         await CommonViewPageHelper.navigateToItemPage(
             HomePage.navigation.projects.projects,
             CommonViewPage.pageHeaders.projects.projectsCenter,
             CommonViewPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(projectNameValue, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(projectNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+
+        browser.sleep(90000);
     });
 });
