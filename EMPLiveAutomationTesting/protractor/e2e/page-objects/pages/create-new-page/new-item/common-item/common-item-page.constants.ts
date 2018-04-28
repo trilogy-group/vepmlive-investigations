@@ -4,7 +4,16 @@ export class CommonItemPageConstants {
     static get ribbonLabels() {
         return {
             save: 'Save',
-            cancel: 'Cancel'
+            cancel: 'Cancel',
+            editItem: 'EditItem'
+        };
+    }
+
+    static get ribbonMenuTitles() {
+        return {
+            hide: `Hide`,
+            items: `Items`,
+            list: `List`
         };
     }
 }

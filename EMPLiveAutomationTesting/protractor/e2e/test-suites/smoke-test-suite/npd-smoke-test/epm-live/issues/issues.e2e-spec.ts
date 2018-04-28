@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    fit('Add Issues Functionality - [1124274]', async () => {
+    it('Add Issues Functionality - [1124274]', async () => {
         const stepLogger = new StepLogger(1124274);
 
         stepLogger.stepId(1);
@@ -198,13 +198,16 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
 
         stepLogger.verification('Updated Issue details (Title, Status, Priority) displayed in "Issues" page');
+        stepLogger.verification('Show columns whatever is required');
         await CommonViewPageHelper.showColumns([
             IssueItemPageConstants.columnNames.title,
             IssueItemPageConstants.columnNames.status,
             IssueItemPageConstants.columnNames.priority]);
 
+        stepLogger.verification('Search item by title');
         await CommonViewPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title, stepLogger);
 
+        stepLogger.verification('Click on searched record');
         await PageHelper.click(CommonViewPage.record);
 
         const firstTableColumns = [titleValue];

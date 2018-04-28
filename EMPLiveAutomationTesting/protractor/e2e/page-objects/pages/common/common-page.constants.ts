@@ -15,4 +15,5 @@ export class CommonPageConstants {
             editItem: ' - Edit Item'
         };
     }
+
 }

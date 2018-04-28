@@ -1,5 +1,4 @@
 // tslint:disable-next-line:max-line-length
-// tslint:disable-next-line:max-line-length
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.constants';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -7,15 +6,18 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {CommonItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/common-item/common-item.po';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {ProjectItemPage} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
-import {browser} from 'protractor';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.helper';
+// tslint:disable-next-line:max-line-length
+import {ProjectItemPageValidations} from '../../../../../page-objects/pages/create-new-page/new-item/project-item/project-item-page.validations';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -51,90 +53,21 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = ProjectItemPageConstants.inputLabels;
-        const inputs = ProjectItemPage.inputs;
-
-        // Add project name
-        stepLogger.step('Title *: Random New Issue Item');
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
-        await TextboxHelper.sendKeys(inputs.projectName, projectNameValue);
-
-        stepLogger.verification('Required values entered/selected in name Field');
-        await expect(await TextboxHelper.hasValue(inputs.projectName, projectNameValue))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
-
-        // Add portfolio name
-        /*stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
-        await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
-        const portfolioName = await inputs.portfolio.getText();
-        await PageHelper.click(inputs.portfolio);
-
-        stepLogger.verification('Required values selected in Portfolio Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
-        */
-
-        // Add Project Description
-        stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
-        await TextboxHelper.sendKeys(inputs.projectDescription, projectDescription);
-
-        stepLogger.verification('Required values entered in Description Field');
-        await expect(await TextboxHelper.hasValue(inputs.projectDescription, projectDescription))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectDescription, projectDescription));
-
-        // Add Benefits
-        stepLogger.step('Benefits: Test Smoke');
         const benefits = `${labels.benefits} ${uniqueId}`;
-        await TextboxHelper.sendKeys(inputs.benefits, benefits);
-
-        stepLogger.verification('Required values entered in "Benefits" Field');
-        await expect(await TextboxHelper.hasValue(inputs.benefits, benefits))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.benefits, benefits));
-
-        // Add State
-        stepLogger.step('State: Select the value \'(2) Active\'');
-        await PageHelper.sendKeysToInputField(inputs.state, ProjectItemPageConstants.states.active);
-
-        stepLogger.verification('Required values selected in "State" Field');
-        await expect(await TextboxHelper.hasValue(inputs.benefits, benefits))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.benefits, benefits));
-
-        // Add Overall Health
-        stepLogger.step('Overall Health: Select the value "(1) On Track"');
         const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.onTrack;
-        await PageHelper.sendKeysToInputField(inputs.overallHealth, overallHealthOnTrack);
-
-        stepLogger.verification('Verify - Overall Health: Select the value "(1) On Track"');
-        await expect(await ElementHelper.hasSelectedOption(inputs.overallHealth, overallHealthOnTrack))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.overallHealth, overallHealthOnTrack));
-
-        // Add Project Update
-        stepLogger.step('Project Update: Select the value "Manual"');
         const projectUpdateManual = ProjectItemPageConstants.projectUpdate.manual;
-        await PageHelper.sendKeysToInputField(inputs.projectUpdate, projectUpdateManual);
 
-        stepLogger.verification('Verify - Project Update : Select the value "Manual"');
-        await expect(await ElementHelper.hasSelectedOption(inputs.projectUpdate, projectUpdateManual))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectUpdate, projectUpdateManual));
+        await ProjectItemPageHelper.fillForm(
+            projectNameValue,
+            projectDescription,
+            benefits,
+            overallHealthOnTrack,
+            projectUpdateManual,
+            stepLogger);
 
         stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Project - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
-
-        stepLogger.verification('"Project - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
-
-        stepLogger.stepId(5);
         stepLogger.verification('Navigate to page');
         await CommonViewPageHelper.navigateToItemPage(
             HomePage.navigation.projects.projects,
@@ -148,7 +81,90 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(projectNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+    });
 
-        browser.sleep(90000);
+    fit('Edit Project Functionality - [1124173]', async () => {
+        const stepLogger = new StepLogger(1124275);
+        stepLogger.stepId(1);
+
+        // Step #1 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.projects,
+            CommonViewPage.pageHeaders.projects.projectsCenter,
+            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        stepLogger.stepId(2);
+        stepLogger.step('Select the check box for project created');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
+        await PageHelper.click(CommonViewPage.record);
+
+        stepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonItemPage.ribbonTitles.items);
+
+        stepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonItemPage.ribbonItems.editItem);
+
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = ProjectItemPageConstants.inputLabels;
+        const projectNameValue = `${labels.projectName} ${uniqueId}`;
+        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
+        const benefits = `${labels.benefits} ${uniqueId}`;
+        const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.onTrack;
+        const projectUpdateManual = ProjectItemPageConstants.projectUpdate.manual;
+
+        await expect(await ProjectItemPage.inputs.projectName.isPresent())
+            .toBe(true,
+                ProjectItemPageValidations.projectNameShouldBeEditable);
+
+        await ProjectItemPageHelper.fillForm(
+            projectNameValue,
+            projectDescription,
+            benefits,
+            overallHealthOnTrack,
+            projectUpdateManual,
+            stepLogger);
+
+        stepLogger.stepId(4);
+        stepLogger.verification('Navigate to page');
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.projects,
+            CommonViewPage.pageHeaders.projects.projectsCenter,
+            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        stepLogger.verification('Show columns whatever is required');
+        const columnNames = ProjectItemPageConstants.columnNames;
+        await CommonViewPageHelper.showColumns([
+            columnNames.title,
+            columnNames.notes,
+            columnNames.benefits,
+            columnNames.overallHealth,
+            columnNames.projectUpdate]);
+
+        stepLogger.verification('Search item by title');
+        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
+
+        stepLogger.verification('Click on searched record');
+        await PageHelper.click(CommonViewPage.record);
+
+        const firstTableColumns = [projectNameValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+
+        const secondTableColumns = [projectDescription, benefits, overallHealthOnTrack, projectUpdateManual];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+
     });
 });
