@@ -83,7 +83,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });
 
-    fit('Edit Project Functionality - [1124173]', async () => {
+    it('Edit Project Functionality - [1124173]', async () => {
         const stepLogger = new StepLogger(1124275);
         stepLogger.stepId(1);
 
@@ -118,8 +118,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
         const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.onTrack;
-        const projectUpdateManual = ProjectItemPageConstants.projectUpdate.manual;
+        const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.offTrack;
+        const projectUpdateManual = ProjectItemPageConstants.projectUpdate.scheduleDriven;
 
         await expect(await ProjectItemPage.inputs.projectName.isPresent())
             .toBe(true,
@@ -141,6 +141,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
+        stepLogger.verification('Search item by title');
+        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
+
         stepLogger.verification('Show columns whatever is required');
         const columnNames = ProjectItemPageConstants.columnNames;
         await CommonViewPageHelper.showColumns([
@@ -150,17 +153,16 @@ describe(SuiteNames.smokeTestSuite, () => {
             columnNames.overallHealth,
             columnNames.projectUpdate]);
 
-        stepLogger.verification('Search item by title');
-        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
-
         stepLogger.verification('Click on searched record');
         await PageHelper.click(CommonViewPage.record);
 
+        stepLogger.verification('Verify record by title');
         const firstTableColumns = [projectNameValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
+        stepLogger.verification('Verify by other properties');
         const secondTableColumns = [projectDescription, benefits, overallHealthOnTrack, projectUpdateManual];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,

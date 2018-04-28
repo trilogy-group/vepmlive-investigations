@@ -210,11 +210,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Click on searched record');
         await PageHelper.click(CommonViewPage.record);
 
+        stepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
+        stepLogger.verification('Verify by other properties');
         const secondTableColumns = [status, priority];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,

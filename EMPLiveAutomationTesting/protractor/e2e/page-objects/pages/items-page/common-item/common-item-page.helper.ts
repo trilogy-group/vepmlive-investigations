@@ -1,5 +1,5 @@
 import {By, element} from 'protractor';
-import {ComponentHelpers} from '../../../../../components/devfactory/component-helpers/component-helpers';
+import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class CommonItemPageHelper {
     static getNotificationByText(text: string) {

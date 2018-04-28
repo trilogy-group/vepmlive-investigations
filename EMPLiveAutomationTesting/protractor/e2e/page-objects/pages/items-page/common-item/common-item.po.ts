@@ -1,7 +1,7 @@
-import {BasePage} from '../../../base-page';
-import {CommonPageHelper} from '../../../common/common-page.helper';
+import {BasePage} from '../../base-page';
+import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonItemPageConstants} from './common-item-page.constants';
-import {ButtonHelper} from '../../../../../components/html/button-helper';
+import {ButtonHelper} from '../../../../components/html/button-helper';
 import {browser, By, element} from 'protractor';
 import {CommonItemPageHelper} from './common-item-page.helper';
 
@@ -18,6 +18,7 @@ export class CommonItemPage extends BasePage {
             list: CommonItemPageHelper.getMenuItemFromRibbonContainer(titles.list)
         };
     }
+
     static get ribbonItems() {
         const labels = CommonItemPageConstants.ribbonLabels;
         return {

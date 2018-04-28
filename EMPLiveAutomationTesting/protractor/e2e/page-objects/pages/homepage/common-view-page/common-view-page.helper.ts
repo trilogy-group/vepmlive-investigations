@@ -14,7 +14,6 @@ import {CommonItemPage} from '../../create-new-page/new-item/common-item/common-
 export class CommonViewPageHelper {
     static getPageHeaderByTitle(title: string) {
         const xpath = `//*[@id='${CommonItemPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
-        console.log(xpath);
         return element(By.xpath(xpath));
     }
 

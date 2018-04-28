@@ -52,6 +52,7 @@ export class CommonViewPage {
     }
 
     static get record() {
+        console.log(`(${this.selectorForRecords})[1]`);
         return element(By.xpath(`(${this.selectorForRecords})[1]`));
     }
 

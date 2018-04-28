@@ -1,4 +1,4 @@
-import {CommonPageConstants} from '../../../common/common-page.constants';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';

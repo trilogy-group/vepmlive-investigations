@@ -43,7 +43,6 @@ export class CommonPageHelper {
 
     static getInputByLabel(type: string, title: string) {
         const xpath = `//table[contains(@class,"ms-formtable")]//td[normalize-space(.)='${title}']//parent::tr//${type}`;
-        console.log(xpath);
         return element(By.xpath(xpath));
     }
 
@@ -52,7 +51,6 @@ export class CommonPageHelper {
     }
 
     static getAutoCompleteItemByDescription(description: string) {
-        console.log(`[description="${description}"]`);
         return element(By.css(`[description="${description}"]`));
     }
 
@@ -62,12 +60,14 @@ export class CommonPageHelper {
             columnXpaths.push(`td[normalize-space(.)='${columnText[index]}']`);
         }
         const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
+        console.log(xpath);
         return element(By.xpath(xpath));
     }
 
     public static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;
+        console.log(xpath);
         return element.all(By.xpath(xpath)).first();
     }
 }
