@@ -26,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    it('Add Changes Functionality - [1124277]', async () => {
+    fit('Add Changes Functionality - [1124277]', async () => {
         const stepLogger = new StepLogger(1124277);
 
         stepLogger.stepId(1);
@@ -35,13 +35,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
         stepLogger.step('Various Create New options are displayed');
-        await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.risk))
+        await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.change))
             .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.risk));
+                ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.change));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on "Change" link from the options displayed');
-        await PageHelper.click(CreateNewPage.navigation.listApps.risk);
+        await PageHelper.click(CreateNewPage.navigation.listApps.change);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
@@ -66,10 +66,10 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
-
+        stepLogger.step('Click on projectShowAllButton');
         await PageHelper.click(ChangeItemPage.projectShowAllButton);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ChangeItemPage.inputs.project);
+        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         const projectName = await ChangeItemPage.inputs.project.getText();
         await PageHelper.click(ChangeItemPage.inputs.project);
 
@@ -98,9 +98,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         await CommonViewPageHelper.navigateToItemPage(
-            HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            HomePage.navigation.projects.changes,
+            CommonViewPage.pageHeaders.projects.changes,
+            CommonViewPageConstants.pageHeaders.projects.changes,
             stepLogger);
 
         await CommonViewPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu, stepLogger);

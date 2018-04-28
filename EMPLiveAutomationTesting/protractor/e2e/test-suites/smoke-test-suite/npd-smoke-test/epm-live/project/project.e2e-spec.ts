@@ -116,7 +116,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
         const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.offTrack;
+        const overallHealthOffTrack = ProjectItemPageConstants.overallHealth.offTrack;
         const projectUpdateManual = ProjectItemPageConstants.projectUpdate.scheduleDriven;
 
         await expect(await ProjectItemPage.inputs.projectName.isPresent())
@@ -127,7 +127,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             projectNameValue,
             projectDescription,
             benefits,
-            overallHealthOnTrack,
+            overallHealthOffTrack,
             projectUpdateManual,
             stepLogger);
 
@@ -161,7 +161,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         stepLogger.verification('Verify by other properties');
-        const secondTableColumns = [projectDescription, benefits, overallHealthOnTrack, projectUpdateManual];
+        const secondTableColumns = [projectDescription, benefits, overallHealthOffTrack, projectUpdateManual];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));

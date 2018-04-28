@@ -6,12 +6,13 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {browser} from 'protractor';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
                           benefits: string,
-                          overallHealthOnTrack: string,
+                          overallHealth: string,
                           projectUpdateManual: string,
                           stepLogger: StepLogger) {
         const labels = ProjectItemPageConstants.inputLabels;
@@ -57,29 +58,20 @@ export class ProjectItemPageHelper {
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.benefits, benefits));
 
-        // Add State
-        stepLogger.step('State: Select the value \'(2) Active\'');
-        await PageHelper.sendKeysToInputField(inputs.state, ProjectItemPageConstants.states.active);
-
-        stepLogger.verification('Required values selected in "State" Field');
-        await expect(await TextboxHelper.hasValue(inputs.benefits, benefits))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.benefits, benefits));
-
         // Add Overall Health
-        stepLogger.step('Overall Health: Select the value "(1) On Track"');
-        await PageHelper.sendKeysToInputField(inputs.overallHealth, overallHealthOnTrack);
+        stepLogger.step(`Overall Health: Select the value ${overallHealth}`);
+        await PageHelper.sendKeysToInputField(inputs.overallHealth, overallHealth);
 
-        stepLogger.verification('Verify - Overall Health: Select the value "(1) On Track"');
-        await expect(await ElementHelper.hasSelectedOption(inputs.overallHealth, overallHealthOnTrack))
+        stepLogger.verification(`Verify - Overall Health: Select the value ${overallHealth}`);
+        await expect(await ElementHelper.hasSelectedOption(inputs.overallHealth, overallHealth))
             .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.overallHealth, overallHealthOnTrack));
-
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.overallHealth, overallHealth));
+        await browser.sleep(10000);
         // Add Project Update
-        stepLogger.step('Project Update: Select the value "Manual"');
+        stepLogger.step(`Project Update: Select the value "${projectUpdateManual}"`);
         await PageHelper.sendKeysToInputField(inputs.projectUpdate, projectUpdateManual);
 
-        stepLogger.verification('Verify - Project Update : Select the value "Manual"');
+        stepLogger.verification(`Verify - Project Update : Select the value "${projectUpdateManual}"`);
         await expect(await ElementHelper.hasSelectedOption(inputs.projectUpdate, projectUpdateManual))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectUpdate, projectUpdateManual));
