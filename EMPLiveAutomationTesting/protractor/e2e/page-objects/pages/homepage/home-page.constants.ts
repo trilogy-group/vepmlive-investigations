@@ -7,6 +7,7 @@ export class HomePageConstants {
                 requests: 'Requests',
                 portfolios: 'Portfolios',
                 projects: 'Projects',
+                projectCenter: 'Project Center',
                 tasks: 'Tasks',
                 risks: 'Risks',
                 issues: 'Issues',

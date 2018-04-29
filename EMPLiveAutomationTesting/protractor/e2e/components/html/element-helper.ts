@@ -58,7 +58,7 @@ export class ElementHelper {
     }
 
     static async hasSelectedOption(select: ElementFinder, option: string) {
-        return select.element(by.xpath(`//option[${ComponentHelpers.getXPathFunctionForDot(option)}]`)).isSelected();
+        return select.element(by.xpath(`./option[${ComponentHelpers.getXPathFunctionForDot(option)}]`)).isSelected();
     }
 
     static async getFocusedElement() {
@@ -166,5 +166,9 @@ export class ElementHelper {
     static async getText(elem: ElementFinder) {
         const text = await elem.getText();
         return text.trim();
+    }
+
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
     }
 }

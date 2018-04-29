@@ -14,4 +14,8 @@ export class CommonPage extends BasePage {
             workspaces: element(By.id(`${idPrefix}workspaces`))
         };
     }
+
+    static get addNewLink() {
+        return element(By.css('[title="New Item"] a'));
+    }
 }

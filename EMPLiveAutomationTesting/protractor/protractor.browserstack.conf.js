@@ -13,7 +13,7 @@ exports.config = {
     framework: defaultConfigSetup.framework,
     jasmineNodeOpts: defaultConfigSetup.jasmineNodeOpts,
     seleniumAddress: "http://hub-cloud.browserstack.com/wd/hub",
-    maxSessions: process.env.MAX_SESSIONS || setupUtilities.getParam(5, "--params.maxSessions", false), // unlimited, change to desired number based on parallel count for BS account
+    maxSessions: process.env.MAX_SESSIONS || defaultConfigSetup.getParam(5, "--params.maxSessions", false), // unlimited, change to desired number based on parallel count for BS account
     multiCapabilities: defaultConfigSetup.bsMultiCapabilities,
     onPrepare: function () {
         reportersSetup.configureAllReporters();

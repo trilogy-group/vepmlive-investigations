@@ -7,7 +7,6 @@ export class AnchorHelper {
             text,
             isContains
         )}]`;
-        console.log(xpath);
         return element.all(By.xpath(xpath)).first();
     }
 }

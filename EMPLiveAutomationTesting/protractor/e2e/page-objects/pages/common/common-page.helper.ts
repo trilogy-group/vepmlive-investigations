@@ -1,9 +1,9 @@
 import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {CommonItemPage} from '../create-new-page/new-item/common-item/common-item.po';
 import {PageHelper} from '../../../components/html/page-helper';
 import {CommonPageConstants} from './common-page.constants';
+import {CommonItemPage} from '../items-page/common-item/common-item.po';
 
 export class CommonPageHelper {
     static getSidebarLinkByTextUnderList(title: string) {
@@ -34,7 +34,7 @@ export class CommonPageHelper {
     }
 
     static getFirstAutoCompleteByLabel(title: string) {
-        return this.getInputByLabel('*[contains(@class,"autocomplete")][1]', title);
+        return this.getInputByLabel('*[contains(@class,"autocomplete")]//*[contains(@class,"autoText")][1]', title);
     }
 
     static getSelectByLabel(title: string) {
@@ -51,7 +51,7 @@ export class CommonPageHelper {
     }
 
     static getAutoCompleteItemByDescription(description: string) {
-        return element(By.css(`[description='${description}']`));
+        return element(By.css(`[description="${description}"]`));
     }
 
     static getRowForTableData(columnText: string[]) {
