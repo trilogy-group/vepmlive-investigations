@@ -222,4 +222,30 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
+    fit('Search Risk - [1176333]', async () => {
+        const stepLogger = new StepLogger(1176333);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.risks,
+            CommonViewPage.pageHeaders.projects.risks,
+            CommonViewPageConstants.pageHeaders.projects.risks,
+            stepLogger);
+        const titleValue = await RiskItemPage.riskItems.first().getText();
+        stepLogger.verification('Search item by title');
+        await CommonViewPageHelper.searchItemByTitle(titleValue, RiskItemPageConstants.columnNames.title, stepLogger);
+
+        stepLogger.verification('Verify record by title');
+        const firstTableColumns = [titleValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+
+        stepLogger.verification('Verify that there should be only one record');
+        await expect(await RiskItemPage.riskItems.count())
+            .toBe(1,
+                ValidationsHelper.getOnlyOneRecordShouldBeDisplayedInGrid(titleValue));
+
+    });
 });

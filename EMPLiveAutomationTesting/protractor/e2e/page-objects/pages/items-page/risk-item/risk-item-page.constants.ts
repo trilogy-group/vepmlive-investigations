@@ -1,11 +1,9 @@
-import {ProjectItemPageConstants} from '../project-item/project-item-page.constants';
 import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class RiskItemPageConstants {
     static readonly pagePrefix = 'Risks';
-    static readonly pageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
-    static readonly editPageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
-
+    static readonly pageName = `${RiskItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
+    static readonly editPageName = `${RiskItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
 
     static get inputLabels() {
         return {

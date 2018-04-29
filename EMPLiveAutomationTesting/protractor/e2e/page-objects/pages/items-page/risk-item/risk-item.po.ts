@@ -27,6 +27,10 @@ export class RiskItemPage extends BasePage {
         };
     }
 
+    static get riskItems() {
+        return element.all(By.xpath(`//a[contains(text(),'${RiskItemPageConstants.inputLabels.title}')]`));
+    }
+
     static get projectShowAllButton() {
         return element(By.id('Project_ddlShowAll'));
     }
