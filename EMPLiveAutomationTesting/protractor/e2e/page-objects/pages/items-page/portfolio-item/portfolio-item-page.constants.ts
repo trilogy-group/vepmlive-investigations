@@ -2,8 +2,8 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class PortfolioItemPageConstants {
     static readonly pagePrefix = 'Project Portfolios';
-    static readonly pageName = `${PortfolioItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
-    static readonly editPageName = `${PortfolioItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly pageName = `${PortfolioItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
+    static readonly editPageName = `${PortfolioItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
     static get inputLabels() {
         return {

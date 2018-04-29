@@ -30,7 +30,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    fit('Create New Portfolio - [1125567]', async () => {
+    it('Create New Portfolio - [1125567]', async () => {
         const stepLogger = new StepLogger(1125567);
 
         stepLogger.stepId(1);
@@ -79,11 +79,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         await CommonViewPageHelper.navigateToItemPage(
             HomePage.navigation.projects.portfolios,
-            CommonViewPage.pageHeaders.projects.portfolios,
-            CommonViewPageConstants.pageHeaders.projects.portfolios,
+            CommonViewPage.pageHeaders.projects.projectPortfolios,
+            CommonViewPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(portfolioNameValue, PortfolioItemPageConstants.columnNames.title, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(portfolioNameValue,
+            PortfolioItemPageConstants.columnNames.title,
+            stepLogger);
 
         stepLogger.verification('Newly created Portfolio [Ex: New Portfolio Item 1] displayed in "Portfolios" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(portfolioNameValue)))
@@ -98,8 +100,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Step #1 and #2 Inside this function
         await CommonViewPageHelper.navigateToItemPage(
             HomePage.navigation.projects.portfolios,
-            CommonViewPage.pageHeaders.projects.portfolios,
-            CommonViewPageConstants.pageHeaders.projects.portfolios,
+            CommonViewPage.pageHeaders.projects.projectPortfolios,
+            CommonViewPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
 
         stepLogger.stepId(3);
@@ -180,5 +182,4 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
-
 });
