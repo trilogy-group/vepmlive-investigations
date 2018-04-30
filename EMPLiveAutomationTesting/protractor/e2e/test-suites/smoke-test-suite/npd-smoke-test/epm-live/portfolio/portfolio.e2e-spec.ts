@@ -88,8 +88,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(portfolioNameValue,
             PortfolioItemPageConstants.columnNames.title,
-            stepLogger,
-            true);
+            stepLogger);
 
         stepLogger.verification('Newly created Portfolio [Ex: New Portfolio Item 1] displayed in "Portfolios" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(portfolioNameValue)))

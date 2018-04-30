@@ -104,8 +104,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(titleValue,
             ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger,
-            true);
+            stepLogger);
 
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))

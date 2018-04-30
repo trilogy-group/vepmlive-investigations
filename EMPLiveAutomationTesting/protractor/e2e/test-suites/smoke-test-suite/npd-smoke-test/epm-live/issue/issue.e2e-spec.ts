@@ -107,8 +107,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(titleValue,
             IssueItemPageConstants.columnNames.title,
-            stepLogger,
-            true);
+            stepLogger);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))

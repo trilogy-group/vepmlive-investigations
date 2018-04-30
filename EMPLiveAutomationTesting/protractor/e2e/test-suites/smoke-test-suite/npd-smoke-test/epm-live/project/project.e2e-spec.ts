@@ -77,8 +77,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(projectNameValue,
             ProjectItemPageConstants.columnNames.title,
-            stepLogger,
-            true);
+            stepLogger);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(projectNameValue)))
