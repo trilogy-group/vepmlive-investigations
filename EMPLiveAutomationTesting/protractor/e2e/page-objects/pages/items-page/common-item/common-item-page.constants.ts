@@ -5,6 +5,7 @@ export class CommonItemPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
+            viewItem: 'ViewItem',
             editItem: 'EditItem'
         };
     }

@@ -21,6 +21,7 @@ export class CommonItemPage extends BasePage {
     static get ribbonItems() {
         const labels = CommonItemPageConstants.ribbonLabels;
         return {
+            viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel)

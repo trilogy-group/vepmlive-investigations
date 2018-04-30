@@ -144,7 +144,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonItemPageHelper.editItemViaRibbon(stepLogger);
+        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
 
         await RiskItemPageHelper.editRisk(stepLogger);
     });
@@ -180,5 +180,25 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(1,
                 ValidationsHelper.getOnlyOneRecordShouldBeDisplayedInGrid(titleValue));
 
+    });
+
+    it('View Item in Risk - [1176338]', async () => {
+        const stepLogger = new StepLogger(1176338);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.risks,
+            CommonViewPage.pageHeaders.projects.risks,
+            CommonViewPageConstants.pageHeaders.projects.risks,
+            stepLogger);
+
+        const titleValue = await RiskItemPage.riskItems.first().getText();
+        await CommonItemPageHelper.viewOptionViaRibbon(stepLogger);
+
+        stepLogger.verification('Verify that item is available in View page mode');
+        await expect(await CommonPage.contentTitleInViewMode.getText())
+            .toBe(titleValue,
+                ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 });

@@ -18,4 +18,8 @@ export class CommonPage extends BasePage {
     static get addNewLink() {
         return element(By.css('[title="New Item"] a'));
     }
+
+    static get contentTitleInViewMode() {
+        return element(By.css('span.dispFormFancyTitle'));
+    }
 }

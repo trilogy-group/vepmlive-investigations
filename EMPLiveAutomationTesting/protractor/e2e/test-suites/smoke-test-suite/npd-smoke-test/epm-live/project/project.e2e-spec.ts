@@ -96,7 +96,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPage.pageHeaders.projects.projectsCenter,
             CommonViewPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await CommonItemPageHelper.editItemViaRibbon(stepLogger);
+
+        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
 
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
