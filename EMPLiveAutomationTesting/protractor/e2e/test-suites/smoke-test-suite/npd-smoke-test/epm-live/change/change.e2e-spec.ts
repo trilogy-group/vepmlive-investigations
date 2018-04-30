@@ -4,7 +4,6 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
@@ -14,9 +13,12 @@ import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepag
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
-import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
-import {ChangeItemPage} from '../../../../../page-objects/pages/items-page/change-item/change-item.po';
 import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
+import {ChangeItemPageHelper} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.helper';
+import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -53,33 +55,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
+        const titleValue = `${labels.title} ${uniqueId}`;
+        const priority = ChangeItemPageConstants.priorities.high;
 
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
-        stepLogger.step('Title *: Random New Change Item');
-        const titleValue = `${labels.title} ${uniqueId}`;
-        await TextboxHelper.sendKeys(ChangeItemPage.inputs.title, titleValue);
-
-        stepLogger.verification('Required values entered/selected in title Field');
-        await expect(await TextboxHelper.hasValue(ChangeItemPage.inputs.title, titleValue))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
-
-        stepLogger.step('Click on projectShowAllButton');
-        await PageHelper.click(ChangeItemPage.projectShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ChangeItemPage.inputs.project);
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
-        const projectName = await ChangeItemPage.inputs.project.getText();
-        await PageHelper.click(ChangeItemPage.inputs.project);
-
-        stepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
-
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Changes - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Changes - New Item" window is closed');
         await expect(await CommonItemPage.dialogTitles.isPresent())
@@ -112,4 +93,67 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
+    it('Edit Changes Functionality - [1124278]', async () => {
+        const stepLogger = new StepLogger(1124275);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.changes,
+            CommonViewPage.pageHeaders.projects.changes,
+            CommonViewPageConstants.pageHeaders.projects.changes,
+            stepLogger);
+
+        // Step #3
+        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+
+        stepLogger.verification('"Edit Change" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
+            .toBe(ChangeItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+
+        stepLogger.stepId(4);
+        stepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = ChangeItemPageConstants.inputLabels;
+        const titleValue = `${labels.title} ${uniqueId}`;
+        const priority = ChangeItemPageConstants.priorities.low;
+        const projectName = await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
+
+        stepLogger.verification('"Change" page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.changes))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.changes));
+
+        stepLogger.verification('"Edit Issue" page is closed');
+        await expect(await CommonItemPage.formButtons.save.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
+
+
+        stepLogger.verification('Search item by title');
+        await CommonViewPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu, stepLogger);
+
+        stepLogger.verification('Show columns whatever is required');
+        await CommonViewPageHelper.showColumns([
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
+            ChangeItemPageConstants.columnNames.project,
+            ChangeItemPageConstants.columnNames.priority]);
+
+        stepLogger.verification('Click on searched record');
+        await PageHelper.click(CommonViewPage.record);
+
+        stepLogger.verification('Verify record by title');
+        const firstTableColumns = [titleValue];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+
+        stepLogger.verification('Verify by other properties');
+        const secondTableColumns = [priority, projectName];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+    });
 });
