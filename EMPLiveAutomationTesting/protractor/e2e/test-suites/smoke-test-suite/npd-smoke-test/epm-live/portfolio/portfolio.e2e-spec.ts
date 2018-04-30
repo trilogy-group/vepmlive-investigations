@@ -146,18 +146,18 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PortfolioItemPageConstants.editPageName));
 
         stepLogger.verification('Updated Portfolio details (Title, Status, Priority) displayed in "Portfolios" page');
+        stepLogger.verification('Search item by portfolioName');
+        await CommonViewPageHelper.searchItemByTitle(
+            portfolioNameValue,
+            PortfolioItemPageConstants.columnNames.title,
+            stepLogger);
+
         stepLogger.verification('Show columns whatever is required');
         await CommonViewPageHelper.showColumns([
             PortfolioItemPageConstants.columnNames.title,
             PortfolioItemPageConstants.columnNames.portfolioType,
             PortfolioItemPageConstants.columnNames.notes,
             PortfolioItemPageConstants.columnNames.stateIcon]);
-
-        stepLogger.verification('Search item by portfolioName');
-        await CommonViewPageHelper.searchItemByTitle(
-            portfolioNameValue,
-            PortfolioItemPageConstants.columnNames.title,
-            stepLogger);
 
         stepLogger.verification('Click on searched record');
         await PageHelper.click(CommonViewPage.record);
@@ -169,7 +169,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
         stepLogger.verification('Verify by other properties');
-        const secondTableColumns = [portfolioDescriptionValue, portfolioTypeValue, stateValue];
+        const secondTableColumns = [portfolioDescriptionValue, portfolioTypeValue];
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
