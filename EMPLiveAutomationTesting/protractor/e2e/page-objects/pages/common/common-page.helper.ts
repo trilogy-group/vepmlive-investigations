@@ -79,7 +79,8 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
     }
-    public static getCheckboxByExactText(text: string, isContains = false) {
+
+    static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;
         return element.all(By.xpath(xpath)).first();
