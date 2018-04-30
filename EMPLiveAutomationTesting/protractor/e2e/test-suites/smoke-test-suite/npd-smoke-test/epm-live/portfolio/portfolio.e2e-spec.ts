@@ -137,9 +137,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('"Portfolios" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.portfolios))
+        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.projectPortfolios))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.portfolios));
+                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.projectPortfolios));
 
         stepLogger.verification('"Edit Portfolio" page is closed');
         await expect(await CommonItemPage.formButtons.save.isPresent())

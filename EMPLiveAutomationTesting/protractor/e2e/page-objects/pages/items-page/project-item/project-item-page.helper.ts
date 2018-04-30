@@ -7,6 +7,8 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {browser} from 'protractor';
+import {WaitHelper} from '../../../../components/html/wait-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -28,17 +30,16 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
 
         // Add portfolio name
-        /*stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
-            await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
-            await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
-            const portfolioName = await inputs.portfolio.getText();
-            await PageHelper.click(inputs.portfolio);
+        stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
+        await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
+        const portfolioName = await inputs.portfolio.getText();
+        stepLogger.verification('Required values selected in Portfolio Field');
 
-            stepLogger.verification('Required values selected in Portfolio Field');
-            await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
-                .toBe(true,
-                    ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
-            */
+        await PageHelper.click(inputs.portfolio);
+        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
+            .toBe(true,
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
 
         // Add Project Description
         stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');

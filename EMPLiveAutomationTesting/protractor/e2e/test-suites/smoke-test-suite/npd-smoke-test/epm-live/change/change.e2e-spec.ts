@@ -45,7 +45,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Changes - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
-
         await expect(await CommonItemPage.dialogTitles.first().getText())
             .toBe(ChangeItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
@@ -105,7 +104,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(titleValue,
             ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger, true);
+            stepLogger,
+            true);
 
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))
