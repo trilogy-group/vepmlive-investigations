@@ -11,7 +11,6 @@ import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
-import {ElementHelper} from '../../../../../components/html/element-helper';
 import {Constants} from '../../../../../components/misc-utils/constants';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
@@ -21,6 +20,7 @@ import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page
 import {PortfolioItemPageConstants} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item-page.constants';
 import {PortfolioItemPage} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item.po';
 import {PortfolioItemPageHelper} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item-page.helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -54,6 +54,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(PortfolioItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(PortfolioItemPageConstants.pageName));
 
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToFirstContentFrame();
+
         stepLogger.stepId(3);
         stepLogger.step('Enter/Select required details in "Portfolios - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
@@ -85,10 +88,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonViewPageHelper.searchItemByTitle(portfolioNameValue,
             PortfolioItemPageConstants.columnNames.title,
-            stepLogger);
+            stepLogger,
+            true);
 
         stepLogger.verification('Newly created Portfolio [Ex: New Portfolio Item 1] displayed in "Portfolios" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(portfolioNameValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(portfolioNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(portfolioNameValue));
     });
@@ -103,26 +107,15 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPage.pageHeaders.projects.projectPortfolios,
             CommonViewPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
-
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
-        await ElementHelper.actionHoverOver(CommonViewPage.record);
-
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonViewPage.ellipse);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
+        await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
         stepLogger.verification('"Edit Portfolio" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title.first());
-        await expect(await CommonItemPage.title.first().getText())
-            .not.toBe(Constants.EMPTY_STRING,
-                ValidationsHelper.getPageDisplayedValidation(PortfolioItemPageConstants.editPageName));
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
+            .toBe(PortfolioItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.verification('Values selected/entered while creating the Portfolio are pre populated in respective fields');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title.first());
         await expect(await TextboxHelper.hasValue(PortfolioItemPage.inputs.portfolioName, Constants.EMPTY_STRING))
             .toBe(false,
                 ValidationsHelper.getFieldShouldNotHaveValueValidation(PortfolioItemPageConstants.inputLabels.portfolioName,

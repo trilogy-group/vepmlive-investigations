@@ -2,6 +2,7 @@ import {BasePage} from '../../base-page';
 import {RiskItemPageConstants} from './risk-item-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class RiskItemPage extends BasePage {
     static get inputs() {
@@ -28,7 +29,8 @@ export class RiskItemPage extends BasePage {
     }
 
     static get riskItems() {
-        return element.all(By.xpath(`//a[contains(text(),'${RiskItemPageConstants.inputLabels.title}')]`));
+        return AnchorHelper
+            .getElementsByTextXPathInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
     static get projectShowAllButton() {

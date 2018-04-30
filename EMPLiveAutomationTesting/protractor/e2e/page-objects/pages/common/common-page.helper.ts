@@ -4,6 +4,10 @@ import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {PageHelper} from '../../../components/html/page-helper';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonItemPage} from '../items-page/common-item/common-item.po';
+import {WaitHelper} from '../../../components/html/wait-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
+import {CommonViewPage} from '../homepage/common-view-page/common-view.po';
+import {StepLogger} from '../../../../core/logger/step-logger';
 
 export class CommonPageHelper {
     static getSidebarLinkByTextUnderList(title: string) {
@@ -63,6 +67,18 @@ export class CommonPageHelper {
         return element(By.xpath(xpath));
     }
 
+    static async editItemViaContextMenu(stepLogger: StepLogger) {
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
+        await ElementHelper.actionHoverOver(CommonViewPage.record);
+
+        stepLogger.step('Click on the Ellipses button (...)');
+        await PageHelper.click(CommonViewPage.ellipse);
+
+        stepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
+    }
     public static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;

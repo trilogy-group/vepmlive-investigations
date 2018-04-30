@@ -47,9 +47,11 @@ export class CommonViewPageHelper {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
-    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger) {
-        // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
-        await browser.sleep(PageHelper.timeout.m);
+    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger, shouldWait = false) {
+        if (shouldWait) {
+            // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
+            await browser.sleep(PageHelper.timeout.m);
+        }
 
         stepLogger.step('Click on search');
         await PageHelper.click(CommonViewPage.actionMenuIcons.search);

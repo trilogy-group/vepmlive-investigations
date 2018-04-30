@@ -1,6 +1,5 @@
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonPageHelper} from '../../common/common-page.helper';
 import {PortfolioItemPage} from './portfolio-item.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
@@ -15,8 +14,7 @@ export class PortfolioItemPageHelper {
                           stateValue: string,
                           stepLogger: StepLogger) {
         const labels = PortfolioItemPageConstants.inputLabels;
-        stepLogger.step('Switch to frame');
-        await CommonPageHelper.switchToFirstContentFrame();
+
         stepLogger.step('Portfolio Name *: Enter a Name for Portfolio [Ex: Smoke_Test_Portfolio1]');
         await TextboxHelper.sendKeys(PortfolioItemPage.inputs.portfolioName, portfolioNameValue);
 
