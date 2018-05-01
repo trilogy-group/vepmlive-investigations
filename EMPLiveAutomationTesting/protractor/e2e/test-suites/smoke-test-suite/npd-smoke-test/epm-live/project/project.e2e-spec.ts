@@ -3,10 +3,7 @@ import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
-import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
@@ -32,10 +29,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
-            CommonViewPage.pageHeaders.projects.projectsCenter,
-            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
         stepLogger.stepId(2);
@@ -69,13 +66,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.verification('Navigate to page');
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
-            CommonViewPage.pageHeaders.projects.projectsCenter,
-            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(projectNameValue,
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
             ProjectItemPageConstants.columnNames.title,
             stepLogger);
 
@@ -90,10 +87,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
-            CommonViewPage.pageHeaders.projects.projectsCenter,
-            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
         await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
@@ -128,18 +125,18 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.verification('Navigate to page');
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
-            CommonViewPage.pageHeaders.projects.projectsCenter,
-            CommonViewPageConstants.pageHeaders.projects.projectCenter,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
         stepLogger.verification('Search item by title');
-        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
+        await CommonPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
 
         stepLogger.verification('Show columns whatever is required');
         const columnNames = ProjectItemPageConstants.columnNames;
-        await CommonViewPageHelper.showColumns([
+        await CommonPageHelper.showColumns([
             columnNames.title,
             columnNames.notes,
             columnNames.benefits,
@@ -147,7 +144,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             columnNames.projectUpdate]);
 
         stepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonViewPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.verification('Verify record by title');
         const firstTableColumns = [projectNameValue];

@@ -2,7 +2,7 @@ import {BasePage} from '../base-page';
 import {MyWorkplaceConstants} from './my-workplace.constants';
 import {CommonPageHelper} from '../common/common-page.helper';
 
-export class CreateNewPage extends BasePage {
+export class MyWorkplacePage extends BasePage {
     static get navigation() {
         const labels = MyWorkplaceConstants.navigationLabels;
         return {

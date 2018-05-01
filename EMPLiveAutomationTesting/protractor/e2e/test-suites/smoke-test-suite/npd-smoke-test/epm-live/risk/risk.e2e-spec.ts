@@ -1,17 +1,11 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
-import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
@@ -19,6 +13,9 @@ import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-pag
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
 import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -98,13 +95,13 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getNotificationDisplayedValidation(RiskItemPageConstants.pageName));
 
         stepLogger.stepId(5);
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue,
+        await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
             stepLogger);
 
@@ -119,10 +116,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         // Common functionality to edit any item
@@ -137,10 +134,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
@@ -153,20 +150,20 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         const titleValue = await RiskItemPage.riskItems.first().getText();
         stepLogger.verification('Search item by title');
-        await CommonViewPageHelper.searchItemByTitle(titleValue,
+        await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
             stepLogger);
 
         stepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonViewPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
@@ -186,10 +183,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         const titleValue = await RiskItemPage.riskItems.first().getText();

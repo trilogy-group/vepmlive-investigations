@@ -3,7 +3,7 @@ import {ComponentHelpers} from '../../../../components/devfactory/component-help
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonItemPage} from './common-item.po';
 import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonViewPage} from '../../homepage/common-view-page/common-view.po';
+import {CommonPage} from '../../common-page/common.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 
 export class CommonItemPageHelper {
@@ -36,8 +36,8 @@ export class CommonItemPageHelper {
     private static async selectRecordFromGrid(stepLogger: StepLogger) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for project created');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
-        await PageHelper.click(CommonViewPage.record);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonItemPage.ribbonTitles.items);
