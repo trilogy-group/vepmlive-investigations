@@ -4,6 +4,8 @@
 import {browser, ElementFinder, WebElement} from 'protractor';
 import {WaitHelper} from './wait-helper';
 
+const remote = require('selenium-webdriver/remote');
+
 export class PageHelper {
     static MAX_RETRY_ATTEMPTS = 3;
     // noinspection JSValidateJSDoc
@@ -205,5 +207,11 @@ export class PageHelper {
     public static getUniqueId(): string {
         const shortId = require('shortid');
         return shortId.generate();
+    }
+
+    static async uploadFile(item: ElementFinder, filePath: string) {
+        browser.setFileDetector(new remote.FileDetector());
+        await WaitHelper.getInstance().waitForElementToBePresent(item);
+        await item.sendKeys(filePath);
     }
 }

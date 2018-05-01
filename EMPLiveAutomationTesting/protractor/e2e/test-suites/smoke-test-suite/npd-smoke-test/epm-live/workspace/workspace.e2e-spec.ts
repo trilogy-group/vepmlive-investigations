@@ -16,6 +16,7 @@ import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
 import {By, element} from 'protractor';
+import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -181,8 +182,8 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(url));
     });
 
-    it('Create new Pictures from Workplace - [1175271]', async () => {
-        const stepLogger = new StepLogger(1175272);
+    fit('Create new Pictures from Workplace - [1175271]', async () => {
+        const stepLogger = new StepLogger(1175271);
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -191,5 +192,18 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.pictures,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,
             stepLogger);
+
+        await PageHelper.click(PicturePage.uploadButton);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await PageHelper.uploadFile(PicturePage.browseButton, CommonPageConstants.uploadFilePath);
+
+        /*var fs = require('fs');
+
+        var inStr = fs.createReadStream('/your/path/to/file');
+        var outStr = fs.createWriteStream('/your/path/to/destination');
+
+        inStr.pipe(outStr);*/
+
     });
 });

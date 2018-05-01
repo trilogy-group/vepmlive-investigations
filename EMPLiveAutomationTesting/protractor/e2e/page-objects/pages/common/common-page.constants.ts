@@ -3,6 +3,8 @@ import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
+    static uploadFileName = 'example.jpg';
+    static uploadFilePath = __dirname + '\\' + CommonPageConstants.uploadFileName;
 
     static get dataConstants() {
         return {

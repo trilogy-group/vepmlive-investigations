@@ -12,6 +12,7 @@ import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 
 export class CommonPageHelper {
+
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
