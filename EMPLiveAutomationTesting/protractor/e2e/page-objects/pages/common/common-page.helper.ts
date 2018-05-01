@@ -45,6 +45,9 @@ export class CommonPageHelper {
         return this.getInputByLabel(HtmlHelper.tags.input, title);
     }
 
+    static getTextBoxesByLabel(title: string) {
+        return this.getInputsByLabel(HtmlHelper.tags.input, title);
+    }
     static getTextAreaByLabel(title: string) {
         return this.getInputByLabel(HtmlHelper.tags.textArea, title);
     }
@@ -58,8 +61,15 @@ export class CommonPageHelper {
     }
 
     static getInputByLabel(type: string, title: string) {
-        const xpath = `//table[contains(@class,"ms-formtable")]//td[normalize-space(.)='${title}']//parent::tr//${type}`;
-        return element(By.xpath(xpath));
+        return element(By.xpath(this.getXpathForInputByLabel(type, title)));
+    }
+
+    static getInputsByLabel(type: string, title: string) {
+        return element.all(By.xpath(this.getXpathForInputByLabel(type, title)));
+    }
+
+    static getXpathForInputByLabel(type: string, title: string) {
+        return `//table[contains(@class,"ms-formtable")]//td[normalize-space(.)='${title}']//parent::tr//${type}`;
     }
 
     static async switchToFirstContentFrame() {
@@ -90,6 +100,11 @@ export class CommonPageHelper {
 
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editItem);
+    }
+
+    static getElementByTitle(title: string) {
+        const xpath = `[title="${title}"]`;
+        return element(By.css(xpath));
     }
 
     static getPageHeaderByTitle(title: string) {

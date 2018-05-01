@@ -158,6 +158,9 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
+    static get singleSearchTextBox() {
+        return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
+    }
     static get contextMenuOptions() {
         const options = CommonPageConstants.contextMenuOptions;
         return {
