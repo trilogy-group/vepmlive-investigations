@@ -1,10 +1,14 @@
 import {BasePage} from '../base-page';
-import {By, element} from 'protractor';
-import {CommonPageConstants} from '../common-page/common-page.constants';
-import {CommonPageHelper} from '../common-page/common-page.helper';
+import {browser, By, element} from 'protractor';
 import {ElementHelper} from '../../../components/html/element-helper';
+import {CommonPageConstants} from './common-page.constants';
+import {CommonPageHelper} from './common-page.helper';
+import {ButtonHelper} from '../../../components/html/button-helper';
 
 export class CommonPage extends BasePage {
+
+    static readonly dialogTitleId = 'dialogTitleSpan';
+    static readonly titleId = 'pageTitle';
 
     static get sidebarMenus() {
         const idPrefix = 'epm-nav-top-';
@@ -58,6 +62,53 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get ribbonTitles() {
+        const titles = CommonPageConstants.ribbonMenuTitles;
+        return {
+            hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
+            items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
+            list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
+        };
+    }
+
+    static get ribbonItems() {
+        const labels = CommonPageConstants.ribbonLabels;
+        return {
+            viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
+            save: CommonPageHelper.getRibbonButtonByText(labels.save),
+            editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
+            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel)
+        };
+    }
+
+    static get formButtons() {
+        const labels = CommonPageConstants.ribbonLabels;
+        return {
+            save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
+            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.save)
+        };
+    }
+
+    static get titles() {
+        return element.all(By.id(this.titleId));
+    }
+
+    static get title() {
+        return element(By.id(this.titleId));
+    }
+
+    static get dialogTitles() {
+        return element.all(By.id(this.dialogTitleId));
+    }
+
+    static get dialogTitle() {
+        return element(By.id(this.dialogTitleId));
+    }
+
+    static get contentFrame() {
+        // element(By.css('.ms-dlgFrame')) never works in case of iframe
+        return browser.driver.findElement(By.css('.ms-dlgFrame'));
+    }
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {

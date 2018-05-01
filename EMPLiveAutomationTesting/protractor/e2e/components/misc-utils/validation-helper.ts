@@ -1,13 +1,13 @@
 export class ValidationsHelper {
-    static get types(){
+    static get types() {
         return {
-            field:  'Field',
-            page:  'Page',
-            button:  'Button',
-            label:  'Label',
+            field: 'Field',
+            page: 'Page',
+            button: 'Button',
+            label: 'Label',
             window: 'Window',
             notification: 'Notification',
-            grid:  'Grid',
+            grid: 'Grid',
             menu: 'Menu',
         };
     }
@@ -41,7 +41,7 @@ export class ValidationsHelper {
     }
 
     static getLabelDisplayedValidation(name: string) {
-        return `'${this.types.label}' ${this.getDisplayedValidation(name)}`;
+        return `${this.types.label} '${this.getDisplayedValidation(name)}'`;
     }
 
     static getGridDisplayedValidation(name: string) {

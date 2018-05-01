@@ -4,16 +4,14 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -41,8 +39,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
@@ -53,8 +51,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
         const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOnTrack = ProjectItemPageConstants.overallHealth.onTrack;
-        const projectUpdateManual = ProjectItemPageConstants.projectUpdate.manual;
+        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
+        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
         await ProjectItemPageHelper.fillForm(
             projectNameValue,
@@ -93,11 +91,11 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
 
         stepLogger.verification('"Edit Project" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
@@ -108,8 +106,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
         const projectDescription = `${labels.projectDescription} ${uniqueId}`;
         const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOffTrack = ProjectItemPageConstants.overallHealth.offTrack;
-        const projectUpdateManual = ProjectItemPageConstants.projectUpdate.scheduleDriven;
+        const overallHealthOffTrack = CommonPageConstants.overallHealth.offTrack;
+        const projectUpdateManual = CommonPageConstants.projectUpdate.scheduleDriven;
 
         await expect(await ProjectItemPage.inputs.projectName.isPresent())
             .toBe(true,

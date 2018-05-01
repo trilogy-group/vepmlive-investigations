@@ -46,32 +46,4 @@ export class PortfolioItemPageConstants {
         };
     }
 
-    static get portfolioTypes() {
-        return {
-            other: 'Other',
-            customer: 'Customer',
-            development: 'Development',
-            enhancement: 'Enhancement',
-            support: 'Support',
-            program: 'Program',
-            marketing: 'Marketing'
-        };
-    }
-
-    static get portfolioGoals() {
-        return {
-            customerSatisfaction: 'Customer Satisfaction',
-            growBusiness: 'Grow Business',
-            runBusiness: 'Run Business',
-            transformation: 'Transformation'
-        };
-    }
-
-    static get states() {
-        return {
-            proposed: '(1) Proposed',
-            active: '(2) Active',
-            closed: '(3) Closed',
-        };
-    }
 }

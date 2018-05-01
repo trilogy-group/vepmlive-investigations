@@ -1,33 +1,40 @@
-import {By, element, ElementFinder} from 'protractor';
+import {browser, By, element, ElementFinder} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {PageHelper} from '../../../components/html/page-helper';
 import {CommonPageConstants} from './common-page.constants';
-import {CommonItemPage} from '../items-page/common-item/common-item.po';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {ElementHelper} from '../../../components/html/element-helper';
-import {CommonPage} from '../common-page/common.po';
 import {StepLogger} from '../../../../core/logger/step-logger';
-import {CommonPageHelper} from '../common-page/common-page.helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 
 export class CommonPageHelper {
-    static getSidebarLinkByTextUnderList(title: string) {
-        return this.getElementUnderSections(HtmlHelper.tags.li, title);
+    static getSidebarLinkByTextUnderCreateNew(title: string) {
+        return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
+            HtmlHelper.tags.li,
+            title);
     }
 
-    static getElementUnderSections(elementType: string, title: string) {
+    static getSidebarLinkByTextUnderMyWorkPlace(title: string) {
+        return this.getElementUnderSections(CommonPageConstants.menuContainerIds.myWorkplace,
+            HtmlHelper.tags.li,
+            title);
+    }
+
+    static getElementUnderSections(id: string, elementType: string, title: string) {
         const cls = 'contains(@class,"epm-nav-node")';
         const textSelector = ComponentHelpers.getXPathFunctionForDot(title);
-        const xpath = `//${elementType}[${cls}]//a[${textSelector}]`;
+        const xpath = `//*[@id="${id}"]//${elementType}[${cls}]//a[${textSelector}]`;
         return element(By.xpath(xpath));
     }
 
-    static getSidebarLinkByTextUnderTableData(title: string) {
-        return this.getElementUnderSections(HtmlHelper.tags.td, title);
+    static getSidebarLinkByTextUnderNavigation(title: string) {
+        return this.getElementUnderSections(CommonPageConstants.menuContainerIds.navigation,
+            HtmlHelper.tags.td,
+            title);
     }
 
     static getRibbonButtonByText(title: string) {
@@ -56,7 +63,7 @@ export class CommonPageHelper {
     }
 
     static async switchToFirstContentFrame() {
-        return PageHelper.switchToFrame(CommonItemPage.contentFrame);
+        return PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
     static getAutoCompleteItemByDescription(description: string) {
@@ -86,7 +93,7 @@ export class CommonPageHelper {
     }
 
     static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonItemPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -170,9 +177,45 @@ export class CommonPageHelper {
         }
     }
 
+    static getNotificationByText(text: string) {
+        return element(By.xpath(`//h2[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    }
+
+    static getPageNumberByTitle(title: string) {
+        return element(By.xpath(`//a[contains(@class,'pageNumber') and contains(@title,"${title}")]`));
+    }
+
+    static getMenuItemFromRibbonContainer(title: string) {
+        return element(By.css(`#RibbonContainer li[title="${title}"]`));
+    }
+
+    static async editOptionViaRibbon(stepLogger: StepLogger) {
+        await this.selectRecordFromGrid(stepLogger);
+
+        stepLogger.step('Select "Edit Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editItem);
+    }
+
+    static async viewOptionViaRibbon(stepLogger: StepLogger) {
+        await this.selectRecordFromGrid(stepLogger);
+
+        stepLogger.step('Select "View Item" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.viewItem);
+    }
+
     public static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;
         return element.all(By.xpath(xpath)).first();
+    }
+
+    private static async selectRecordFromGrid(stepLogger: StepLogger) {
+        stepLogger.stepId(2);
+        stepLogger.step('Select the check box for project created');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
+        await PageHelper.click(CommonPage.record);
+
+        stepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 }

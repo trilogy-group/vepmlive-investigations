@@ -15,13 +15,13 @@ export class ChangeItemPage extends BasePage {
             startDate: CommonPageHelper.getTextBoxByLabel(labels.startDate),
             dueDate: CommonPageHelper.getTextBoxByLabel(labels.dueDate),
             effort: CommonPageHelper.getTextBoxByLabel(labels.effort),
-            category: CommonPageHelper.getSelectByLabel(labels.effort),
-            inScope: CommonPageHelper.getSelectByLabel(labels.effort),
-            benefitsOfTheChange: CommonPageHelper.getTextAreaByLabel(labels.effort),
-            impactOfNotMakingTheChange: CommonPageHelper.getTextAreaByLabel(labels.effort),
-            costImpact: CommonPageHelper.getTextBoxByLabel(labels.effort),
-            scheduleImpact: CommonPageHelper.getTextAreaByLabel(labels.effort),
-            resourceImpact: CommonPageHelper.getTextAreaByLabel(labels.effort)
+            category: CommonPageHelper.getSelectByLabel(labels.category),
+            inScope: CommonPageHelper.getSelectByLabel(labels.inScope),
+            benefitsOfTheChange: CommonPageHelper.getTextAreaByLabel(labels.benefitsOfTheChange),
+            impactOfNotMakingTheChange: CommonPageHelper.getTextAreaByLabel(labels.impactOfNotMakingTheChange),
+            costImpact: CommonPageHelper.getTextBoxByLabel(labels.costImpact),
+            scheduleImpact: CommonPageHelper.getTextAreaByLabel(labels.scheduleImpact),
+            resourceImpact: CommonPageHelper.getTextAreaByLabel(labels.resourceImpact)
         };
     }
 

@@ -2,6 +2,8 @@ import {HomePageConstants} from '../homepage/home-page.constants';
 import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 
 export class CommonPageConstants {
+    static readonly pageName = 'Create New';
+
     static get dataConstants() {
         return {
             dev: 'dev'
@@ -16,6 +18,23 @@ export class CommonPageConstants {
         return {
             newItem: ' - New Item',
             editItem: ' - Edit Item'
+        };
+    }
+
+    static get ribbonLabels() {
+        return {
+            save: 'Save',
+            cancel: 'Cancel',
+            viewItem: 'ViewItem',
+            editItem: 'EditItem'
+        };
+    }
+
+    static get ribbonMenuTitles() {
+        return {
+            hide: `Hide`,
+            items: `Items`,
+            list: `List`
         };
     }
 
@@ -46,6 +65,76 @@ export class CommonPageConstants {
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
             comments: 'Comments'
+        };
+    }
+
+    static get menuContainerIds() {
+        return {
+            navigation: 'EPMLiveNav',
+            createNew: 'epm-nav-sub-new',
+            myWorkplace: 'epm-nav-sub-workplace-static-links'
+        };
+    }
+
+    static get statuses() {
+        return {
+            notStarted: 'Not Started',
+            inProgress: 'In Progress',
+            completed: 'Completed',
+            deferred: 'Deferred',
+            waitingOnSomeoneElse: 'Waiting on someone else'
+        };
+    }
+
+    static get priorities() {
+        return {
+            high: '(1) High',
+            normal: '(2) Normal',
+            low: '(3) Low',
+        };
+    }
+
+    static get portfolioTypes() {
+        return {
+            other: 'Other',
+            customer: 'Customer',
+            development: 'Development',
+            enhancement: 'Enhancement',
+            support: 'Support',
+            program: 'Program',
+            marketing: 'Marketing'
+        };
+    }
+
+    static get portfolioGoals() {
+        return {
+            customerSatisfaction: 'Customer Satisfaction',
+            growBusiness: 'Grow Business',
+            runBusiness: 'Run Business',
+            transformation: 'Transformation'
+        };
+    }
+
+    static get states() {
+        return {
+            proposed: '(1) Proposed',
+            active: '(2) Active',
+            closed: '(3) Closed',
+        };
+    }
+
+    static get projectUpdate() {
+        return {
+            manual: 'Manual',
+            scheduleDriven: 'Schedule Driven'
+        };
+    }
+
+    static get overallHealth() {
+        return {
+            onTrack: '(1) On Track',
+            atRisk: '(2) At Risk',
+            offTrack: '(3) Off Track',
         };
     }
 }

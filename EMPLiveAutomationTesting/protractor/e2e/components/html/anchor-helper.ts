@@ -7,7 +7,7 @@ export class AnchorHelper {
     }
 
     public static getElementsByTextXPathInsideGrid(text: string, isContains = false) {
-        const xpath = `//td[contains(@class,'GMClassReadOnly')]//a[${ComponentHelpers.getXPathFunctionForDot(
+        const xpath = `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
             text,
             isContains
         )}]`;

@@ -117,26 +117,4 @@ export class ProjectItemPageConstants {
         };
     }
 
-    static get states() {
-        return {
-            proposed: '(1) Proposed',
-            active: '(2) Active',
-            closed: '(3) Closed',
-        };
-    }
-
-    static get projectUpdate() {
-        return {
-            manual: 'Manual',
-            scheduleDriven: 'Schedule Driven'
-        };
-    }
-
-    static get overallHealth() {
-        return {
-            onTrack: '(1) On Track',
-            atRisk: '(2) At Risk',
-            offTrack: '(3) Off Track',
-        };
-    }
 }

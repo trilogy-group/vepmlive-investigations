@@ -6,16 +6,16 @@ export class MyWorkplacePage extends BasePage {
     static get navigation() {
         const labels = MyWorkplaceConstants.navigationLabels;
         return {
-            myWork: CommonPageHelper.getSidebarLinkByTextUnderList(labels.myWork),
-            myTimeSheet: CommonPageHelper.getSidebarLinkByTextUnderList(labels.myTimeSheet),
-            myTimeOff: CommonPageHelper.getSidebarLinkByTextUnderList(labels.myTimeOff),
-            toDo: CommonPageHelper.getSidebarLinkByTextUnderList(labels.toDo),
-            discussions: CommonPageHelper.getSidebarLinkByTextUnderList(labels.discussions),
-            events: CommonPageHelper.getSidebarLinkByTextUnderList(labels.events),
-            wikis: CommonPageHelper.getSidebarLinkByTextUnderList(labels.wikis),
-            sharedDocuments: CommonPageHelper.getSidebarLinkByTextUnderList(labels.sharedDocuments),
-            pictures: CommonPageHelper.getSidebarLinkByTextUnderList(labels.pictures),
-            links: CommonPageHelper.getSidebarLinkByTextUnderList(labels.links)
+            myWork: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.myWork),
+            myTimeSheet: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.myTimeSheet),
+            myTimeOff: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.myTimeOff),
+            toDo: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.toDo),
+            discussions: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.discussions),
+            events: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.events),
+            wikis: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.wikis),
+            sharedDocuments: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.sharedDocuments),
+            pictures: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.pictures),
+            links: CommonPageHelper.getSidebarLinkByTextUnderMyWorkPlace(labels.links)
         };
     }
 }

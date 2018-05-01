@@ -8,10 +8,8 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
 import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
@@ -43,9 +41,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
 
-        await expect(await CommonItemPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(RiskItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(RiskItemPageConstants.pageName));
 
@@ -79,10 +77,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Risks - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Risks - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitles.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName));
 
@@ -90,7 +88,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger
             .verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(titleValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(RiskItemPageConstants.pageName));
 
@@ -140,7 +138,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
 
         await RiskItemPageHelper.editRisk(stepLogger);
     });
@@ -190,7 +188,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         const titleValue = await RiskItemPage.riskItems.first().getText();
-        await CommonItemPageHelper.viewOptionViaRibbon(stepLogger);
+        await CommonPageHelper.viewOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Verify that item is available in View page mode');
         await expect(await CommonPage.contentTitleInViewMode.getText())

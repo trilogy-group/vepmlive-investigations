@@ -8,23 +8,23 @@ export class CreateNewPage extends BasePage {
         const libraryAppsLabels = CreateNewPageConstants.navigationLabels.libraryApps;
         return {
             listApps: {
-                change: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.change),
-                discussion: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.discussion),
-                event: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.event),
-                issue: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.issue),
-                link: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.link),
-                project: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.project),
-                portfolio: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.portfolio),
-                projectRequest: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.projectRequest),
-                risk: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.risk),
-                timeOff: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.timeOff),
-                toDo: CommonPageHelper.getSidebarLinkByTextUnderList(listAppsLabels.toDo)
+                change: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.change),
+                discussion: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.discussion),
+                event: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.event),
+                issue: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.issue),
+                link: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.link),
+                project: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.project),
+                portfolio: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.portfolio),
+                projectRequest: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.projectRequest),
+                risk: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.risk),
+                timeOff: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.timeOff),
+                toDo: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(listAppsLabels.toDo)
             },
             libraryApps: {
-                pictures: CommonPageHelper.getSidebarLinkByTextUnderList(libraryAppsLabels.pictures),
-                projectDocument: CommonPageHelper.getSidebarLinkByTextUnderList(libraryAppsLabels.projectDocument),
-                sharedDocument: CommonPageHelper.getSidebarLinkByTextUnderList(libraryAppsLabels.sharedDocument),
-                sitePages: CommonPageHelper.getSidebarLinkByTextUnderList(libraryAppsLabels.sitePages)
+                pictures: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(libraryAppsLabels.pictures),
+                projectDocument: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(libraryAppsLabels.projectDocument),
+                sharedDocument: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(libraryAppsLabels.sharedDocument),
+                sitePages: CommonPageHelper.getSidebarLinkByTextUnderCreateNew(libraryAppsLabels.sitePages)
             }
         };
     }

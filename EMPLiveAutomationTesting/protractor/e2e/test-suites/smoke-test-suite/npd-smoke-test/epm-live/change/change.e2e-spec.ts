@@ -7,15 +7,13 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ChangeItemPageConstants} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.constants';
 import {ChangeItemPageHelper} from '../../../../../page-objects/pages/items-page/change-item/change-item-page.helper';
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -43,8 +41,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
-        await expect(await CommonItemPage.dialogTitles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(ChangeItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
 
@@ -53,14 +51,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
         const titleValue = `${labels.title} ${uniqueId}`;
-        const priority = ChangeItemPageConstants.priorities.high;
+        const priority = CommonPageConstants.priorities.high;
 
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
         await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Changes - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitles.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName));
 
@@ -69,7 +67,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .verification('Notification about New Changes created [Ex: New Change Item 1]' +
                 ' displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(titleValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(ChangeItemPageConstants.pageName));
 
@@ -105,8 +103,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
         stepLogger.verification('"Edit Change" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(ChangeItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
@@ -115,7 +113,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
         const titleValue = `${labels.title} ${uniqueId}`;
-        const priority = ChangeItemPageConstants.priorities.low;
+        const priority = CommonPageConstants.priorities.low;
         const projectName = await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Change" page is displayed');
@@ -124,10 +122,9 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.changes));
 
         stepLogger.verification('"Edit Issue" page is closed');
-        await expect(await CommonItemPage.formButtons.save.isPresent())
+        await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
-
 
         stepLogger.verification('Search item by title');
         await CommonPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu, stepLogger);

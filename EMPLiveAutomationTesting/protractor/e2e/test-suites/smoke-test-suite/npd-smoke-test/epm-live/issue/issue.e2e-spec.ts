@@ -9,11 +9,12 @@ import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 import {IssueItemPage} from '../../../../../page-objects/pages/items-page/issue-item/issue-item.po';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -41,9 +42,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
 
-        await expect(await CommonItemPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(IssueItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueItemPageConstants.pageName));
 
@@ -77,10 +78,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Issues - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Issues - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitles.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.pageName));
 
@@ -88,7 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger
             .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(titleValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(IssueItemPageConstants.pageName));
 
@@ -123,15 +124,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
         stepLogger.verification('"Edit Issue" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.titles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.verification('Values selected/entered while creating the Issue are pre populated in respective fields');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
@@ -145,10 +146,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
         stepLogger.step('Status: Select the value "In Progress"');
-        const status = IssueItemPageConstants.statuses.inProgress;
+        const status = CommonPageConstants.statuses.inProgress;
         await PageHelper.sendKeysToInputField(IssueItemPage.inputs.status, status);
 
-        const priority = IssueItemPageConstants.priorities.high;
+        const priority = CommonPageConstants.priorities.high;
         stepLogger.step('Priority: Select the value "(1) High"');
         await PageHelper.sendKeysToInputField(IssueItemPage.inputs.priority, priority);
 
@@ -164,13 +165,13 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.status, status));
 
         stepLogger.verification('Verify - Priority: Select the value "(1) High"');
-        await expect(await ElementHelper.hasOption(IssueItemPage.inputs.priority, priority))
+        await expect(await ElementHelper.hasSelectedOption(IssueItemPage.inputs.priority, priority))
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));
 
         stepLogger.stepId(5);
         stepLogger.step('Click "Save" button in "Edit Issue" page');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Issues" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.issues))
@@ -178,7 +179,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.issues));
 
         stepLogger.verification('"Edit Issue" page is closed');
-        await expect(await CommonItemPage.formButtons.save.isPresent())
+        await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(IssueItemPageConstants.editPageName));
 
