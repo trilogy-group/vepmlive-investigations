@@ -26,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await homePage.goTo();
     });
 
-    xit('Add Changes Functionality - [1124277]', async () => {
+    it('Add Changes Functionality - [1124277]', async () => {
         const stepLogger = new StepLogger(1124277);
 
         stepLogger.stepId(1);
@@ -45,7 +45,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Changes - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
-
         await expect(await CommonItemPage.dialogTitles.first().getText())
             .toBe(ChangeItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
@@ -103,10 +102,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.changes,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue, ChangeItemPageConstants.columnNames.linkTitleNoMenu, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
+            stepLogger);
 
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });

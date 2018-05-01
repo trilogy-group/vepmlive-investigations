@@ -11,8 +11,6 @@ import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
-import {ElementHelper} from '../../../../../components/html/element-helper';
-import {Constants} from '../../../../../components/misc-utils/constants';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
@@ -20,6 +18,7 @@ import {CommonItemPage} from '../../../../../page-objects/pages/items-page/commo
 import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
 import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
+import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -105,10 +104,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue, RiskItemPageConstants.columnNames.title, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue,
+            RiskItemPageConstants.columnNames.title,
+            stepLogger);
 
         stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
@@ -124,87 +125,47 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Risk created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
-        await ElementHelper.actionHoverOver(CommonViewPage.record);
+        // Common functionality to edit any item
+        await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonViewPage.ellipse);
+        // Common functionality to edit risk
+        await RiskItemPageHelper.editRisk(stepLogger);
+    });
 
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
+    it('Edit view in Risk - [1176329]', async () => {
+        const stepLogger = new StepLogger(1176329);
+        stepLogger.stepId(1);
 
-        stepLogger.verification('"Edit Risk" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await expect(await CommonItemPage.titles.first().getText())
-            .not.toBe(Constants.EMPTY_STRING,
-                ValidationsHelper.getPageDisplayedValidation(RiskItemPageConstants.editPageName));
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.risks,
+            CommonViewPage.pageHeaders.projects.risks,
+            CommonViewPageConstants.pageHeaders.projects.risks,
+            stepLogger);
 
-        stepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await expect(await TextboxHelper.hasValue(RiskItemPage.inputs.title, Constants.EMPTY_STRING))
-            .toBe(false,
-                ValidationsHelper.getFieldShouldNotHaveValueValidation(RiskItemPageConstants.inputLabels.title,
-                    Constants.EMPTY_STRING));
+        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
 
-        stepLogger.stepId(4);
-        stepLogger.step('Enter/Select required details in "Edit Risk" page as described below');
+        await RiskItemPageHelper.editRisk(stepLogger);
+    });
 
-        const labels = RiskItemPageConstants.inputLabels;
-        stepLogger.step('Title *: Random New Risk Item');
-        const uniqueId = PageHelper.getUniqueId();
-        const titleValue = `${labels.title} ${uniqueId}`;
-        await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
+    it('Search Risk - [1176333]', async () => {
+        const stepLogger = new StepLogger(1176333);
+        stepLogger.stepId(1);
 
-        stepLogger.step('Status: Select the value "In Progress"');
-        const status = RiskItemPageConstants.statuses.notStarted;
-        await PageHelper.sendKeysToInputField(RiskItemPage.inputs.status, status);
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.risks,
+            CommonViewPage.pageHeaders.projects.risks,
+            CommonViewPageConstants.pageHeaders.projects.risks,
+            stepLogger);
 
-        const priority = RiskItemPageConstants.priorities.low;
-        stepLogger.step('Priority: Select the value "(1) High"');
-        await PageHelper.sendKeysToInputField(RiskItemPage.inputs.priority, priority);
+        await WaitHelper.getInstance().waitForElement(RiskItemPage.riskItem);
 
-        stepLogger.verification('Required values Entered/Selected in "Edit Risk" Page');
-        stepLogger.verification('Verify - Title *: Random New Risk Item');
-        await expect(await TextboxHelper.hasValue(RiskItemPage.inputs.title, titleValue))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
-
-        stepLogger.verification('Verify - Status: Select the value "In Progress"');
-        await expect(await ElementHelper.hasSelectedOption(RiskItemPage.inputs.status, status))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.status, status));
-
-        stepLogger.verification('Verify - Priority: Select the value "(1) High"');
-        await expect(await ElementHelper.hasOption(RiskItemPage.inputs.priority, priority))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));
-
-        stepLogger.stepId(5);
-        stepLogger.step('Click "Save" button in "Edit Risk" page');
-        await PageHelper.click(CommonItemPage.formButtons.save);
-
-        stepLogger.verification('"Risks" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.risks))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.risks));
-
-        stepLogger.verification('"Edit Risk" page is closed');
-        await expect(await CommonItemPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(RiskItemPageConstants.editPageName));
-
-        stepLogger.verification('Updated Risk details (Title, Status, Priority) displayed in "Risks" page');
-
+        const titleValue = await RiskItemPage.riskItem.getText();
         stepLogger.verification('Search item by title');
-        await CommonViewPageHelper.searchItemByTitle(titleValue, RiskItemPageConstants.columnNames.title, stepLogger);
-
-        stepLogger.verification('Show columns whatever is required');
-        await CommonViewPageHelper.showColumns([
+        await CommonViewPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
-            RiskItemPageConstants.columnNames.status,
-            RiskItemPageConstants.columnNames.priority]);
+            stepLogger);
 
         stepLogger.verification('Click on searched record');
         await PageHelper.click(CommonViewPage.record);
@@ -215,11 +176,30 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
 
-        stepLogger.verification('Verify by other properties');
-        const secondTableColumns = [status, priority];
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
-            .toBe(true,
-                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+        stepLogger.verification('Verify that there should be only one record');
+        await expect(await RiskItemPage.riskItems.count())
+            .toBe(1,
+                ValidationsHelper.getOnlyOneRecordShouldBeDisplayedInGrid(titleValue));
+
     });
 
+    it('View Item in Risk - [1176338]', async () => {
+        const stepLogger = new StepLogger(1176338);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonViewPageHelper.navigateToItemPage(
+            HomePage.navigation.projects.risks,
+            CommonViewPage.pageHeaders.projects.risks,
+            CommonViewPageConstants.pageHeaders.projects.risks,
+            stepLogger);
+
+        const titleValue = await RiskItemPage.riskItems.first().getText();
+        await CommonItemPageHelper.viewOptionViaRibbon(stepLogger);
+
+        stepLogger.verification('Verify that item is available in View page mode');
+        await expect(await CommonPage.contentTitleInViewMode.getText())
+            .toBe(titleValue,
+                ValidationsHelper.getLabelDisplayedValidation(titleValue));
+    });
 });

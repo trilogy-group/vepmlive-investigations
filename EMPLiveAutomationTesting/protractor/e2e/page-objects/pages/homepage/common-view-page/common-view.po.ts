@@ -10,6 +10,7 @@ export class CommonViewPage {
             projects: {
                 requests: CommonViewPageHelper.getPageHeaderByTitle(labels.requests),
                 portfolios: CommonViewPageHelper.getPageHeaderByTitle(labels.portfolios),
+                projectPortfolios: CommonViewPageHelper.getPageHeaderByTitle(labels.projectPortfolios),
                 projectsCenter: CommonViewPageHelper.getPageHeaderByTitle(labels.projectCenter),
                 tasks: CommonViewPageHelper.getPageHeaderByTitle(labels.tasks),
                 risks: CommonViewPageHelper.getPageHeaderByTitle(labels.risks),
@@ -45,9 +46,9 @@ export class CommonViewPage {
 
     static get searchControls() {
         return {
-            text: ElementHelper.getElementByStartsWithId('searchtext'),
-            type: ElementHelper.getElementByStartsWithId('searchtype'),
-            column: ElementHelper.getElementByStartsWithId('search')
+            text: element(By.css('#searchtext0Main,#searchtext2Main')),
+            type: element(By.css('#searchtype0Main,#searchtype2Main')),
+            column: element(By.css('#search0Main,#search2Main'))
         };
     }
 

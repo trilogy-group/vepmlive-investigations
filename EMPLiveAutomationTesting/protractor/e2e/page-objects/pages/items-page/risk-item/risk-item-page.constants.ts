@@ -1,6 +1,9 @@
+import {CommonPageConstants} from '../../common/common-page.constants';
+
 export class RiskItemPageConstants {
-    static readonly pageName = 'Risks - New Item';
-    static readonly editPageName = 'Risks Page Edit Mode';
+    static readonly pagePrefix = 'Risks';
+    static readonly pageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
+    static readonly editPageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
     static get inputLabels() {
         return {

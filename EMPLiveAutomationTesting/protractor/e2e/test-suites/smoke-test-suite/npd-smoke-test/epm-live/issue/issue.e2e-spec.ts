@@ -12,7 +12,6 @@ import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
 import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {Constants} from '../../../../../components/misc-utils/constants';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
@@ -20,6 +19,7 @@ import {CommonItemPage} from '../../../../../page-objects/pages/items-page/commo
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 import {IssueItemPage} from '../../../../../page-objects/pages/items-page/issue-item/issue-item.po';
 import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -105,10 +105,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue, IssueItemPageConstants.columnNames.title, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(titleValue,
+            IssueItemPageConstants.columnNames.title,
+            stepLogger);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(titleValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
@@ -124,29 +126,20 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Issue created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
-        await ElementHelper.actionHoverOver(CommonViewPage.record);
-
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonViewPage.ellipse);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonViewPage.contextMenuOptions.editItem);
+        await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
         stepLogger.verification('"Edit Issue" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await expect(await CommonItemPage.titles.first().getText())
-            .not.toBe(Constants.EMPTY_STRING,
-                ValidationsHelper.getPageDisplayedValidation(IssueItemPageConstants.editPageName));
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
+            .toBe(IssueItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.verification('Values selected/entered while creating the Issue are pre populated in respective fields');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.titles.first());
-        await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, Constants.EMPTY_STRING))
-            .toBe(false,
-                ValidationsHelper.getFieldShouldNotHaveValueValidation(IssueItemPageConstants.inputLabels.title,
-                    Constants.EMPTY_STRING));
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
+            .toBe(IssueItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Edit Issue" page as described below');

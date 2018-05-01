@@ -83,4 +83,8 @@ export class ValidationsHelper {
     static getNotDisplayedValidation(name: string) {
         return `${name} should not be displayed`;
     }
+
+    static getOnlyOneRecordShouldBeDisplayedInGrid(name: string) {
+        return `There should only be 1 record displayed in grid with title ${name}`;
+    }
 }

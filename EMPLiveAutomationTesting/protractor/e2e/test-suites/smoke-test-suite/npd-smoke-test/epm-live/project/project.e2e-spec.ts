@@ -16,6 +16,7 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
+import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -43,9 +44,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await expect(await CommonItemPage.titles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
+        await expect(await CommonItemPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.pageName));
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.stepId(3);
         stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
@@ -73,10 +75,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(projectNameValue, ProjectItemPageConstants.columnNames.title, stepLogger);
+        await CommonViewPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+            stepLogger);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByExactTextXPath(projectNameValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(projectNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });
@@ -92,16 +96,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonViewPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.stepId(2);
-        stepLogger.step('Select the check box for project created');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonViewPage.record);
-        await PageHelper.click(CommonViewPage.record);
-
-        stepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonItemPage.ribbonTitles.items);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonItemPage.ribbonItems.editItem);
+        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
 
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
