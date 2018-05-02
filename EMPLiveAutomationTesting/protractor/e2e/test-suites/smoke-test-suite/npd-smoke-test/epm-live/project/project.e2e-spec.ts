@@ -75,7 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(projectNameValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });

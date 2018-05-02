@@ -75,7 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('Newly created To Do item [Ex: New To Do 1] details displayed in read only mode');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(title)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(title));
     });

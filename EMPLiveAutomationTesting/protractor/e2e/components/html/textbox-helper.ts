@@ -8,7 +8,7 @@ export class TextboxHelper {
      * Clears the existing text from an input elements
      * @param {ElementFinder} locator
      */
-    public static async clearText(locator: ElementFinder) {
+    static async clearText(locator: ElementFinder) {
         let ctrl = protractor.Key.CONTROL;
 
         if (browser.platform && browser.platform.indexOf('Mac')) {
@@ -25,9 +25,9 @@ export class TextboxHelper {
      * @param {string} value to be sent
      * @param {boolean} sendEnter for sending an enter key
      */
-    public static async sendKeys(locator: ElementFinder,
-                                 value: string,
-                                 sendEnter = false) {
+    static async sendKeys(locator: ElementFinder,
+                          value: string,
+                          sendEnter = false) {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(locator);
         await this.clearText(locator);
 
@@ -44,7 +44,7 @@ export class TextboxHelper {
      * @param {string} text
      * @returns {PromiseLike<boolean> | Promise<boolean> | Q.Promise<any> | promise.Promise<any> | Q.IPromise<any>}
      */
-    public static async hasValue(locator: ElementFinder, text: string) {
+    static async hasValue(locator: ElementFinder, text: string) {
         const val = await PageHelper.getAttributeValue(
             locator,
             HtmlHelper.attributes.value

@@ -30,12 +30,12 @@ export class RiskItemPage extends BasePage {
 
     static get riskItems() {
         return AnchorHelper
-            .getElementsByTextXPathInsideGrid(RiskItemPageConstants.inputLabels.title, true);
+            .getElementsByTextInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
     static get riskItem() {
         return AnchorHelper
-            .getElementByTextXPathInsideGrid(RiskItemPageConstants.inputLabels.title, true);
+            .getElementByTextInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
     static get projectShowAllButton() {

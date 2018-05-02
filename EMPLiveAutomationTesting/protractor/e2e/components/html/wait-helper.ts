@@ -25,9 +25,9 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    public async waitForElement(targetElement: ElementFinder,
-                                timeout = PageHelper.DEFAULT_TIMEOUT,
-                                message = 'Element should exist') {
+    async waitForElement(targetElement: ElementFinder,
+                         timeout = PageHelper.DEFAULT_TIMEOUT,
+                         message = 'Element should exist') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
@@ -39,9 +39,9 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    public async waitForElementToBeDisplayed(targetElement: ElementFinder,
-                                             timeout = PageHelper.DEFAULT_TIMEOUT,
-                                             message = 'Element should be visible') {
+    async waitForElementToBeDisplayed(targetElement: ElementFinder,
+                                      timeout = PageHelper.DEFAULT_TIMEOUT,
+                                      message = 'Element should be visible') {
         return browser.wait(this.EC.visibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -54,9 +54,9 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    public async waitForElementToBePresent(targetElement: ElementFinder,
-                                           timeout = PageHelper.DEFAULT_TIMEOUT,
-                                           message = 'Element should be visible') {
+    async waitForElementToBePresent(targetElement: ElementFinder,
+                                    timeout = PageHelper.DEFAULT_TIMEOUT,
+                                    message = 'Element should be visible') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -70,9 +70,9 @@ export class WaitHelper {
      * @param {string} message
      * @returns {any}
      */
-    public async waitForElementToBeHidden(targetElement: ElementFinder,
-                                          timeout = PageHelper.DEFAULT_TIMEOUT,
-                                          message = 'Element should not be visible') {
+    async waitForElementToBeHidden(targetElement: ElementFinder,
+                                   timeout = PageHelper.DEFAULT_TIMEOUT,
+                                   message = 'Element should not be visible') {
         return browser.wait(this.EC.invisibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
@@ -84,18 +84,18 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    public async waitForElementToBeClickable(targetElement: ElementFinder,
-                                             timeout = PageHelper.DEFAULT_TIMEOUT,
-                                             message = 'Element not clickable') {
+    async waitForElementToBeClickable(targetElement: ElementFinder,
+                                      timeout = PageHelper.DEFAULT_TIMEOUT,
+                                      message = 'Element not clickable') {
         return browser.wait(this.EC.elementToBeClickable(targetElement),
             timeout,
             targetElement.locator().toString() + message);
     }
 
-    public async waitForElementToResolve(promiseCall: Function,
-                                         resolver: Function,
-                                         timeout = PageHelper.DEFAULT_TIMEOUT,
-                                         message = '') {
+    async waitForElementToResolve(promiseCall: Function,
+                                  resolver: Function,
+                                  timeout = PageHelper.DEFAULT_TIMEOUT,
+                                  message = '') {
         let result = false;
         return browser.wait(() => {
             promiseCall().then((value: any) => (result = resolver(value)));
@@ -103,11 +103,11 @@ export class WaitHelper {
         }, timeout, message);
     }
 
-    public async waitForElementToHaveText(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT, message = '') {
+    async waitForElementToHaveText(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT, message = '') {
         return this.waitForElementToResolve(() => targetElement.getText(), (text: string) => text.length > 0, timeout, message);
     }
 
-    public async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
+    async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
         const isDisplayed = this.EC.presenceOf(targetElement);
         return browser.wait(isDisplayed, timeout).then(function () {
             return true;

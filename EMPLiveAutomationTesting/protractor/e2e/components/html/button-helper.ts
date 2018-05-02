@@ -4,7 +4,7 @@ import {HtmlHelper} from '../misc-utils/html-helper';
 import {By, element} from 'protractor';
 
 export class ButtonHelper extends ButtonHelperFactory {
-    public static getInputButtonByExactTextXPath(text: string, isContains = false) {
+    static getInputButtonByExactTextXPath(text: string, isContains = false) {
         const xpath = `(//td//input[${ComponentHelpers.getXPathFunctionForStringComparison(
             text,
             `@${HtmlHelper.attributes.value}`,

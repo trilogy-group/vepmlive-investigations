@@ -13,7 +13,7 @@ export class PageHelper {
      * Timeout collection to meet various needs
      * @type {{xs: number; s: number; m: number; l: number; xl: number; xxl: number; xxxl: number}}
      */
-    public static timeout = {
+    static timeout = {
         xs: 2000,
         s: 5000,
         m: 10000,
@@ -65,7 +65,7 @@ export class PageHelper {
     /**
      * To maximize the browser window
      */
-    public static async maximizeWindow() {
+    static async maximizeWindow() {
         class Size {
             width: number;
             height: number;
@@ -88,7 +88,7 @@ export class PageHelper {
      * @param {number} width
      * @param {number} height
      */
-    public static async setWindowSize(width: number, height: number) {
+    static async setWindowSize(width: number, height: number) {
         return browser.driver
             .manage()
             .window()
@@ -101,8 +101,8 @@ export class PageHelper {
      * @param varAargs
      * @returns {promise.Promise<any>}
      */
-    public static async executeScript(script: string | Function,
-                                      ...varAargs: any[]) {
+    static async executeScript(script: string | Function,
+                               ...varAargs: any[]) {
         return browser.driver.executeScript(script, varAargs);
     }
 
@@ -110,7 +110,7 @@ export class PageHelper {
      * Wrapper to return an active element
      * @returns {WebElementPromise}
 
-     public static async getFocusedElement() {
+     static async getFocusedElement() {
     return browser.driver.switchTo().activeElement()
   } */
 
@@ -118,7 +118,7 @@ export class PageHelper {
      * Switch to a new tab if browser has availability
      * @returns {PromiseLike<boolean> | Promise<boolean> | Q.Promise<any> | promise.Promise<any> | Q.IPromise<any>}
      */
-    public static async switchToNewTabIfAvailable(windowNumber = 1) {
+    static async switchToNewTabIfAvailable(windowNumber = 1) {
         const handles = await browser.getAllWindowHandles();
         const newWindowHandle = handles[windowNumber]; // this is your new window
         if (newWindowHandle) {
@@ -140,8 +140,8 @@ export class PageHelper {
      * @param {string} attribute
      * @returns {string} attribute value
      */
-    public static async getAttributeValue(elem: ElementFinder,
-                                          attribute: string) {
+    static async getAttributeValue(elem: ElementFinder,
+                                   attribute: string) {
         const attributeValue = await elem.getAttribute(attribute);
         return attributeValue.trim();
     }
@@ -151,7 +151,7 @@ export class PageHelper {
      * @param {ElementFinder} targetElement
      * @returns {any}
      */
-    public static async click(targetElement: ElementFinder) {
+    static async click(targetElement: ElementFinder) {
         await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
         return targetElement.click();
     }
@@ -161,7 +161,7 @@ export class PageHelper {
      * @param {ElementFinder} targetElement
      * @returns {PromiseLike<boolean> | Promise<boolean> | Q.Promise<any> | promise.Promise<any> | Q.IPromise<any>}
      */
-    public static async clickAndWaitForElementToHide(targetElement: ElementFinder) {
+    static async clickAndWaitForElementToHide(targetElement: ElementFinder) {
         await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
         await targetElement.click();
         return WaitHelper.getInstance().waitForElementToBeHidden(targetElement);
@@ -171,15 +171,15 @@ export class PageHelper {
      * Gets promise for current url
      * @returns {any}
      */
-    public static async currentUrl() {
+    static async currentUrl() {
         return browser.getCurrentUrl();
     }
 
-    public static async switchToDefaultContent() {
+    static async switchToDefaultContent() {
         return browser.switchTo().defaultContent();
     }
 
-    public static async switchToFrame(frameEle: WebElement) {
+    static async switchToFrame(frameEle: WebElement) {
         return browser.driver.switchTo().frame(frameEle);
     }
 
@@ -190,21 +190,21 @@ export class PageHelper {
      * @param {boolean} toWait
      * @returns {Promise<any>}
      */
-    public static async isElementDisplayed(targetElement: ElementFinder, toWait = true) {
+    static async isElementDisplayed(targetElement: ElementFinder, toWait = true) {
         if (toWait) {
             return await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
         }
         return targetElement.isDisplayed();
     }
 
-    public static async isElementPresent(targetElement: ElementFinder, toWait = true) {
+    static async isElementPresent(targetElement: ElementFinder, toWait = true) {
         if (toWait) {
             return await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
         }
         return targetElement.isPresent();
     }
 
-    public static getUniqueId(): string {
+    static getUniqueId(): string {
         const shortId = require('shortid');
         return shortId.generate();
     }
