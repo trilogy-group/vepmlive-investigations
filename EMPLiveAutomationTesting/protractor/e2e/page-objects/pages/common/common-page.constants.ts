@@ -3,8 +3,18 @@ import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
-    static uploadFileName = 'example.jpg';
-    static uploadFilePath = __dirname + '\\' + CommonPageConstants.uploadFileName;
+    static filesDirectoryName = 'files';
+    static readonly currentDir = __dirname;
+
+    static get imageFile() {
+        return {
+            fileType: '.jpg',
+            jpegFileName: 'jpeg-image',
+            filePath: () => {
+                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.imageFile.jpegFileName}${this.imageFile.fileType}`;
+            }
+        };
+    }
 
     static get dataConstants() {
         return {
@@ -29,6 +39,14 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem'
+        };
+    }
+
+    static get formLabels() {
+        return {
+            save: 'Save',
+            cancel: 'Cancel',
+            ok: 'OK'
         };
     }
 
@@ -139,4 +157,5 @@ export class CommonPageConstants {
             offTrack: '(3) Off Track',
         };
     }
+
 }

@@ -11,7 +11,21 @@ import {ValidationsHelper} from '../../../components/misc-utils/validation-helpe
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 
+const fs = require('fs');
+
 export class CommonPageHelper {
+
+    static get uniqueImageFilePath() {
+        const imageFile = CommonPageConstants.imageFile;
+        const newFileName = `${imageFile.jpegFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
+        const dir = CommonPageConstants.filesDirectoryName;
+        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${imageFile.fileType}`;
+
+        fs.createReadStream(imageFile.filePath())
+            .pipe(fs.createWriteStream(fullFilePath));
+
+        return {fullFilePath, newFileName};
+    }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
@@ -49,6 +63,7 @@ export class CommonPageHelper {
     static getTextBoxesByLabel(title: string) {
         return this.getInputsByLabel(HtmlHelper.tags.input, title);
     }
+
     static getTextAreaByLabel(title: string) {
         return this.getInputByLabel(HtmlHelper.tags.textArea, title);
     }
@@ -225,7 +240,7 @@ export class CommonPageHelper {
         return element.all(By.xpath(xpath)).first();
     }
 
-    private static async selectRecordFromGrid(stepLogger: StepLogger) {
+    static async selectRecordFromGrid(stepLogger: StepLogger) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for project created');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);

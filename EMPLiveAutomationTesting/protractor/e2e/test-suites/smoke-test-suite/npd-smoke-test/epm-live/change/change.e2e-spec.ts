@@ -58,7 +58,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Changes - New Item" window is closed');
-        await expect(await CommonPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName));
 

@@ -171,4 +171,8 @@ export class ElementHelper {
     static getElementByStartsWithId(id: string, endsWith = 'Main') {
         return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
     }
+
+    static getElementByText(text: string) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
 }

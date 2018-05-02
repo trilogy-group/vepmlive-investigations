@@ -5,6 +5,7 @@ export class ValidationsHelper {
             page: 'Page',
             button: 'Button',
             label: 'Label',
+            image: 'Image',
             window: 'Window',
             notification: 'Notification',
             grid: 'Grid',
@@ -42,6 +43,10 @@ export class ValidationsHelper {
 
     static getLabelDisplayedValidation(name: string) {
         return `${this.types.label} '${this.getDisplayedValidation(name)}'`;
+    }
+
+    static getImageDisplayedValidation(name: string) {
+        return `${this.types.image} '${this.getDisplayedValidation(name)}'`;
     }
 
     static getGridDisplayedValidation(name: string) {

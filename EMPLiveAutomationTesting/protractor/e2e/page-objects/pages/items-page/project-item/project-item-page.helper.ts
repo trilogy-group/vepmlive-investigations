@@ -82,7 +82,7 @@ export class ProjectItemPageHelper {
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Project - New Item" window is closed');
-        await expect(await CommonPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
     }

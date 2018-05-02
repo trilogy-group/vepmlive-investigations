@@ -5,7 +5,7 @@ import {By, element} from 'protractor';
 
 export class ButtonHelper extends ButtonHelperFactory {
     public static getInputButtonByExactTextXPath(text: string, isContains = false) {
-        const xpath = `(//input[${ComponentHelpers.getXPathFunctionForStringComparison(
+        const xpath = `(//td//input[${ComponentHelpers.getXPathFunctionForStringComparison(
             text,
             `@${HtmlHelper.attributes.value}`,
             isContains
