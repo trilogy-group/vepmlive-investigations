@@ -157,7 +157,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecordsWithoutGreenTick() {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
+        return '//*[contains(@class,"GMDataRow")]';
     }
 
     static get selectColumnPanel() {
