@@ -141,15 +141,23 @@ export class CommonPage extends BasePage {
     }
 
     static get record() {
-        return element(By.xpath(`(${this.selectorForRecords})[1]`));
+        return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
+    }
+
+    static get recordWithoutGreenTicket() {
+        return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }
 
     static get records() {
-        return element.all(By.xpath(this.selectorForRecords));
+        return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
     }
 
-    static get selectorForRecords() {
-        return '//*[contains(@class,"GMDataRow")]';
+    static get selectorForRecordsWithGreenTick() {
+        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
+    }
+
+    static get selectorForRecordsWithoutGreenTick() {
+        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
     }
 
     static get selectColumnPanel() {

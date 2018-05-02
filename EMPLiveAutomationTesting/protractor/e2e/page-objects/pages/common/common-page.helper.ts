@@ -105,11 +105,11 @@ export class CommonPageHelper {
         return element(By.xpath(xpath));
     }
 
-    static async editItemViaContextMenu(stepLogger: StepLogger) {
+    static async editItemViaContextMenu(stepLogger: StepLogger, item = CommonPage.record) {
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
-        await ElementHelper.actionHoverOver(CommonPage.record);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
 
         stepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
