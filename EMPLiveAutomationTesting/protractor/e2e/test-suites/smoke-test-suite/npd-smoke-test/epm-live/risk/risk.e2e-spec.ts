@@ -154,7 +154,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        const titleValue = await RiskItemPage.riskItems.first().getText();
+        await WaitHelper.getInstance().waitForElement(RiskItemPage.riskItem);
+
+        const titleValue = await RiskItemPage.riskItem.getText();
         stepLogger.verification('Search item by title');
         await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,

@@ -234,7 +234,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.viewItem);
     }
 
-    public static getCheckboxByExactText(text: string, isContains = false) {
+    static getCheckboxByExactText(text: string, isContains = false) {
         const xpath = `//${HtmlHelper.tags.label}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]
         //input[@type='checkbox']`;
         return element.all(By.xpath(xpath)).first();

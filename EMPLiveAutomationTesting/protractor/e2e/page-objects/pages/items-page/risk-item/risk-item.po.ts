@@ -33,6 +33,11 @@ export class RiskItemPage extends BasePage {
             .getElementsByTextXPathInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
+    static get riskItem() {
+        return AnchorHelper
+            .getElementByTextXPathInsideGrid(RiskItemPageConstants.inputLabels.title, true);
+    }
+
     static get projectShowAllButton() {
         return element(By.id('Project_ddlShowAll'));
     }
