@@ -110,6 +110,7 @@ export class CommonPage extends BasePage {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
     }
+
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
@@ -148,7 +149,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecords() {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
+        return '//*[contains(@class,"GMDataRow")]';
     }
 
     static get selectColumnPanel() {
@@ -162,6 +163,7 @@ export class CommonPage extends BasePage {
     static get singleSearchTextBox() {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
+
     static get contextMenuOptions() {
         const options = CommonPageConstants.contextMenuOptions;
         return {

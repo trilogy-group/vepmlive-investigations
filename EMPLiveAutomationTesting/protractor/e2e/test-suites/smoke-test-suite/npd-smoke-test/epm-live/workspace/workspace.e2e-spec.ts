@@ -18,6 +18,7 @@ import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link
 import {By, element} from 'protractor';
 import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
+import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -51,42 +52,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step(`Enter/Select below details in 'New To Do' page`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = ToDoPageConstants.inputLabels;
-        const title = `${ToDoPageConstants.inputLabels.title} ${uniqueId}`;
+        const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.notStarted;
-        const description = `${ToDoPageConstants.inputLabels.description} ${uniqueId}`;
-        stepLogger.step(`Title *: New To Do 1`);
-        await TextboxHelper.sendKeys(ToDoPage.inputs.title, title);
-
-        stepLogger.step(` Status: Select value 'Not Started'', if not selected already`);
-        await PageHelper.sendKeysToInputField(ToDoPage.inputs.status, status);
-
-        stepLogger.step(`Description: Enter some text [Ex: Description for New To Do 1]`);
-        await TextboxHelper.sendKeys(ToDoPage.inputs.description, description);
-
-        stepLogger.verification('Required values Entered/Selected in "Edit To Do" Page');
-        stepLogger.verification('Verify - Title *: Random New To Do Item');
-        await expect(await TextboxHelper.hasValue(ToDoPage.inputs.title, title))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, title));
-
-        stepLogger.verification('Verify - Status: Select the value "In Progress"');
-        await expect(await ElementHelper.hasSelectedOption(ToDoPage.inputs.status, status))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.status, status));
-
-        stepLogger.verification('Verify - Description: Random value');
-        await expect(await TextboxHelper.hasValue(ToDoPage.inputs.description, description))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.description, description));
-
-        stepLogger.stepId(5);
-        stepLogger.step('Click on save');
-        await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"New To Do" page is closed');
-        await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
+        const description = `${labels.description} ${uniqueId}`;
+        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
 
         stepLogger.verification('Newly created To Do item [Ex: New To Do 1] details displayed in read only mode');
         await expect(await CommonPage.contentTitleInViewMode.getText())
@@ -109,6 +78,75 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(title)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(title));
+    });
+
+    it('Edit To Do from Workplace - [1175263]', async () => {
+        const stepLogger = new StepLogger(1175263);
+        stepLogger.stepId(1);
+
+        // Step #1  and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.toDo,
+            CommonPage.pageHeaders.myWorkplace.toDo,
+            CommonPageConstants.pageHeaders.myWorkplace.toDo,
+            stepLogger);
+
+        // Step #3 Inside this function
+        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ToDoPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.editPageName));
+
+        stepLogger.stepId(4);
+        stepLogger.step(`Enter/Select below details in 'New To Do' page`);
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = ToDoPageConstants.inputLabels;
+        const title = `${labels.title} ${uniqueId}`;
+        const status = CommonPageConstants.statuses.inProgress;
+        const description = `${labels.description} ${uniqueId}`;
+
+        // Step #4 & #5 Inside this function
+        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
+
+        // #5
+        stepLogger.verification(`'Edit To Do' page is closed`);
+        await expect(await ToDoPage.inputs.title.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
+
+        stepLogger.verification(`To Do page is displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+
+        stepLogger.step('Updated To Do item details (Title, Status) displayed in the list');
+        stepLogger.step('Search item by title');
+        await CommonPageHelper.searchItemByTitle(title, ToDoPageConstants.columnNames.title, stepLogger);
+
+        stepLogger.step('Show columns whatever is required');
+        const columnNames = ToDoPageConstants.columnNames;
+        await CommonPageHelper.showColumns([
+            columnNames.title,
+            columnNames.status,
+            columnNames.body]);
+
+        stepLogger.step('Click on searched record');
+        await PageHelper.click(CommonPage.record);
+
+        stepLogger.verification('Verify record by title');
+        const firstTableColumns = [title];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(firstTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(firstTableColumns.join(CommonPageConstants.and)));
+
+        stepLogger.verification('Verify by other properties');
+        const secondTableColumns = [status, description];
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
+            .toBe(true,
+                ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
     it('Create new Links from Workplace - [1175272]', async () => {
@@ -180,7 +218,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(url));
     });
 
-    fit('Create new Pictures from Workplace - [1175271]', async () => {
+    it('Create new Pictures from Workplace - [1175271]', async () => {
         const stepLogger = new StepLogger(1175271);
         stepLogger.stepId(1);
 
