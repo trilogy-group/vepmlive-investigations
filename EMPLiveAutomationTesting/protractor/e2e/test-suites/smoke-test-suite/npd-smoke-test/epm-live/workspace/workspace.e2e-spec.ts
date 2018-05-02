@@ -134,7 +134,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             columnNames.body]);
 
         stepLogger.step('Click on searched record');
-        await PageHelper.click(CommonPage.record);
+        await PageHelper.click(CommonPage.recordWithoutGreenTicket);
 
         stepLogger.verification('Verify record by title');
         const firstTableColumns = [title];
