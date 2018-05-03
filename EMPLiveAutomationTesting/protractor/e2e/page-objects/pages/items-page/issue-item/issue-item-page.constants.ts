@@ -47,21 +47,4 @@ export class IssueItemPageConstants {
         };
     }
 
-    static get statuses() {
-        return {
-            notStarted: 'Not Started',
-            inProgress: 'In Progress',
-            completed: 'Completed',
-            deferred: 'Deferred',
-            waitingOnSomeoneElse: 'Waiting on someone else'
-        };
-    }
-
-    static get priorities() {
-        return {
-            high: '(1) High',
-            normal: '(2) Normal',
-            low: '(3) Low',
-        };
-    }
 }

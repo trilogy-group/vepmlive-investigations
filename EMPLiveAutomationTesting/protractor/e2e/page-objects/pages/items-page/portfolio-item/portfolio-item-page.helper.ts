@@ -3,9 +3,9 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {PortfolioItemPage} from './portfolio-item.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {CommonItemPage} from '../common-item/common-item.po';
 import {PortfolioItemPageConstants} from './portfolio-item-page.constants';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {CommonPage} from '../../common/common.po';
 
 export class PortfolioItemPageHelper {
     static async fillForm(portfolioNameValue: string,
@@ -49,10 +49,10 @@ export class PortfolioItemPageHelper {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Portfolios - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Portfolios - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PortfolioItemPageConstants.pageName));
     }

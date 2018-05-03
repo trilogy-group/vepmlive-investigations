@@ -1,6 +1,5 @@
 import {ProjectItemPage} from './project-item.po';
 import {ProjectItemPageConstants} from './project-item-page.constants';
-import {CommonItemPage} from '../common-item/common-item.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
@@ -9,6 +8,7 @@ import {ElementHelper} from '../../../../components/html/element-helper';
 import {browser} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import {CommonPage} from '../../common/common.po';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -79,10 +79,10 @@ export class ProjectItemPageHelper {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Project - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Project - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
     }

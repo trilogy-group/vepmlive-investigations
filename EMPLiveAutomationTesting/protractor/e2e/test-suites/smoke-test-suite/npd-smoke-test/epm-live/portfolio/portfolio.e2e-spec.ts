@@ -1,26 +1,21 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
-import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
 import {Constants} from '../../../../../components/misc-utils/constants';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {PortfolioItemPageConstants} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item-page.constants';
 import {PortfolioItemPage} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item.po';
 import {PortfolioItemPageHelper} from '../../../../../page-objects/pages/items-page/portfolio-item/portfolio-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -48,9 +43,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.portfolio);
 
         stepLogger.verification('"Portfolios - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
 
-        await expect(await CommonItemPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(PortfolioItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(PortfolioItemPageConstants.pageName));
 
@@ -63,8 +58,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const labels = PortfolioItemPageConstants.inputLabels;
         const portfolioNameValue = `${labels.portfolioName} ${uniqueId}`;
         const portfolioDescriptionValue = `${labels.portfolioDescription} ${uniqueId}`;
-        const portfolioTypeValue = PortfolioItemPageConstants.portfolioTypes.development;
-        const stateValue = PortfolioItemPageConstants.states.active;
+        const portfolioTypeValue = CommonPageConstants.portfolioTypes.development;
+        const stateValue = CommonPageConstants.states.active;
         await PortfolioItemPageHelper.fillForm(portfolioNameValue,
             portfolioDescriptionValue,
             portfolioTypeValue,
@@ -75,23 +70,23 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger
             .verification('Notification about New Portfolios created [Ex: New Portfolio Item 1] displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(portfolioNameValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(portfolioNameValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(PortfolioItemPageConstants.pageName));
 
         stepLogger.stepId(5);
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.portfolios,
-            CommonViewPage.pageHeaders.projects.projectPortfolios,
-            CommonViewPageConstants.pageHeaders.projects.projectPortfolios,
+            CommonPage.pageHeaders.projects.projectPortfolios,
+            CommonPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(portfolioNameValue,
+        await CommonPageHelper.searchItemByTitle(portfolioNameValue,
             PortfolioItemPageConstants.columnNames.title,
             stepLogger);
 
         stepLogger.verification('Newly created Portfolio [Ex: New Portfolio Item 1] displayed in "Portfolios" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(portfolioNameValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(portfolioNameValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(portfolioNameValue));
     });
@@ -101,16 +96,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.portfolios,
-            CommonViewPage.pageHeaders.projects.projectPortfolios,
-            CommonViewPageConstants.pageHeaders.projects.projectPortfolios,
+            CommonPage.pageHeaders.projects.projectPortfolios,
+            CommonPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
         await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
         stepLogger.verification('"Edit Portfolio" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.title);
-        await expect(await CommonItemPage.title.getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
             .toBe(PortfolioItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
@@ -127,8 +122,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const labels = PortfolioItemPageConstants.inputLabels;
         const portfolioNameValue = `${labels.portfolioName} ${uniqueId}`;
         const portfolioDescriptionValue = `${labels.portfolioDescription} ${uniqueId}`;
-        const portfolioTypeValue = PortfolioItemPageConstants.portfolioTypes.development;
-        const stateValue = PortfolioItemPageConstants.states.proposed;
+        const portfolioTypeValue = CommonPageConstants.portfolioTypes.development;
+        const stateValue = CommonPageConstants.states.proposed;
         await PortfolioItemPageHelper.fillForm(portfolioNameValue,
             portfolioDescriptionValue,
             portfolioTypeValue,
@@ -136,31 +131,31 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('"Portfolios" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonViewPage.pageHeaders.projects.projectPortfolios))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPortfolios))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonViewPageConstants.pageHeaders.projects.projectPortfolios));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPortfolios));
 
         stepLogger.verification('"Edit Portfolio" page is closed');
-        await expect(await CommonItemPage.formButtons.save.isPresent())
+        await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PortfolioItemPageConstants.editPageName));
 
         stepLogger.verification('Updated Portfolio details (Title, Status, Priority) displayed in "Portfolios" page');
         stepLogger.verification('Search item by portfolioName');
-        await CommonViewPageHelper.searchItemByTitle(
+        await CommonPageHelper.searchItemByTitle(
             portfolioNameValue,
             PortfolioItemPageConstants.columnNames.title,
             stepLogger);
 
         stepLogger.verification('Show columns whatever is required');
-        await CommonViewPageHelper.showColumns([
+        await CommonPageHelper.showColumns([
             PortfolioItemPageConstants.columnNames.title,
             PortfolioItemPageConstants.columnNames.portfolioType,
             PortfolioItemPageConstants.columnNames.notes,
             PortfolioItemPageConstants.columnNames.stateIcon]);
 
         stepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonViewPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.verification('Verify record by portfolioName');
         const firstTableColumns = [portfolioNameValue];

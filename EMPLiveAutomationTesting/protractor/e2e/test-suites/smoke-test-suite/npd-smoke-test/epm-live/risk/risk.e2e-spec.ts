@@ -1,24 +1,19 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {CommonViewPage} from '../../../../../page-objects/pages/homepage/common-view-page/common-view.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
-import {CommonViewPageHelper} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.helper';
-import {CommonViewPageConstants} from '../../../../../page-objects/pages/homepage/common-view-page/common-view-page.constants';
-import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CreateNewPage} from '../../../../../page-objects/pages/items-page/create-new.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
-import {CommonItemPage} from '../../../../../page-objects/pages/items-page/common-item/common-item.po';
 import {RiskItemPageConstants} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.constants';
 import {RiskItemPage} from '../../../../../page-objects/pages/items-page/risk-item/risk-item.po';
-import {CommonItemPageHelper} from '../../../../../page-objects/pages/items-page/common-item/common-item-page.helper';
 import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/risk-item/risk-item-page.helper';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -46,9 +41,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonItemPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
 
-        await expect(await CommonItemPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(RiskItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(RiskItemPageConstants.pageName));
 
@@ -82,10 +77,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Risks - New Item" window');
-        await PageHelper.click(CommonItemPage.formButtons.save);
+        await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"Risks - New Item" window is closed');
-        await expect(await CommonItemPage.dialogTitles.isPresent())
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName));
 
@@ -93,23 +88,23 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger
             .verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
 
-        await expect(await PageHelper.isElementDisplayed(CommonItemPageHelper.getNotificationByText(titleValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
             .toBe(true,
                 ValidationsHelper.getNotificationDisplayedValidation(RiskItemPageConstants.pageName));
 
         stepLogger.stepId(5);
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonViewPageHelper.searchItemByTitle(titleValue,
+        await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
             stepLogger);
 
         stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextXPathInsideGrid(titleValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
@@ -119,10 +114,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         // Common functionality to edit any item
@@ -137,13 +132,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await CommonItemPageHelper.editOptionViaRibbon(stepLogger);
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
 
         await RiskItemPageHelper.editRisk(stepLogger);
     });
@@ -153,22 +148,22 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
         await WaitHelper.getInstance().waitForElement(RiskItemPage.riskItem);
 
         const titleValue = await RiskItemPage.riskItem.getText();
         stepLogger.verification('Search item by title');
-        await CommonViewPageHelper.searchItemByTitle(titleValue,
+        await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
             stepLogger);
 
         stepLogger.verification('Click on searched record');
-        await PageHelper.click(CommonViewPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.verification('Verify record by title');
         const firstTableColumns = [titleValue];
@@ -188,14 +183,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
-        await CommonViewPageHelper.navigateToItemPage(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
-            CommonViewPage.pageHeaders.projects.risks,
-            CommonViewPageConstants.pageHeaders.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        const titleValue = await RiskItemPage.riskItems.first().getText();
-        await CommonItemPageHelper.viewOptionViaRibbon(stepLogger);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.riskItem);
+
+        const titleValue = await RiskItemPage.riskItem.getText();
+        await CommonPageHelper.viewOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Verify that item is available in View page mode');
         await expect(await CommonPage.contentTitleInViewMode.getText())

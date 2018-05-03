@@ -3,21 +3,21 @@ import {ComponentHelpers} from '../devfactory/component-helpers/component-helper
 
 export class AnchorHelper {
 
-    public static getElementsByTextXPathInsideGridXpath(text: string, isContains = false) {
-        const xpath = `//td[contains(@class,'GMClassReadOnly')]//a[${ComponentHelpers.getXPathFunctionForDot(
+    static getElementsByTextXPathInsideGrid(text: string, isContains = false) {
+        const xpath = `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
             text,
             isContains
         )}]`;
         return xpath;
     }
 
-    public static getElementByTextXPathInsideGrid(text: string, isContains = false) {
-        const xpath = this.getElementsByTextXPathInsideGridXpath(text, isContains);
+    static getElementByTextInsideGrid(text: string, isContains = false) {
+        const xpath = this.getElementsByTextXPathInsideGrid(text, isContains);
         return element(By.xpath(`(${xpath})[1]`));
     }
 
-    public static getElementsByTextXPathInsideGrid(text: string, isContains = false) {
-        const xpath = this.getElementsByTextXPathInsideGridXpath(text, isContains);
+    static getElementsByTextInsideGrid(text: string, isContains = false) {
+        const xpath = this.getElementsByTextXPathInsideGrid(text, isContains);
         return element.all(By.xpath(xpath));
     }
 }

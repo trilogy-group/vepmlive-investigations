@@ -9,16 +9,16 @@ export class HomePage extends BasePage {
         const labels = HomePageConstants.navigationLabels.projects;
         return {
             projects: {
-                requests: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.requests),
-                portfolios: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.portfolios),
-                projects: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.projects),
-                tasks: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.tasks),
-                risks: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.risks),
-                issues: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.issues),
-                changes: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.changes),
-                documents: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.documents),
-                resources: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.resources),
-                reports: CommonPageHelper.getSidebarLinkByTextUnderTableData(labels.reports)
+                requests: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.requests),
+                portfolios: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.portfolios),
+                projects: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.projects),
+                tasks: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.tasks),
+                risks: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.risks),
+                issues: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.issues),
+                changes: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.changes),
+                documents: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.documents),
+                resources: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.resources),
+                reports: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.reports)
             }
         };
     }
