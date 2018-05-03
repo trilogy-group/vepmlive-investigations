@@ -92,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #3 Inside this function
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+        await CommonPageHelper.editItemViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket);
 
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -134,7 +134,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             columnNames.body]);
 
         stepLogger.step('Click on searched record');
-        await PageHelper.click(CommonPage.record);
+        await PageHelper.click(CommonPage.recordWithoutGreenTicket);
 
         stepLogger.verification('Verify record by title');
         const firstTableColumns = [title];

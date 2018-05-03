@@ -189,7 +189,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        const titleValue = await RiskItemPage.riskItems.first().getText();
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.riskItem);
+
+        const titleValue = await RiskItemPage.riskItem.getText();
         await CommonPageHelper.viewOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Verify that item is available in View page mode');
