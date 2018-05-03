@@ -16,6 +16,16 @@ export class CommonPageConstants {
         };
     }
 
+    static get documentFile() {
+        return {
+            fileType: '.pdf',
+            documentFileName: 'pdf-file',
+            filePath: () => {
+                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.documentFile.documentFileName}${this.documentFile.fileType}`;
+            }
+        };
+    }
+
     static get dataConstants() {
         return {
             dev: 'dev'

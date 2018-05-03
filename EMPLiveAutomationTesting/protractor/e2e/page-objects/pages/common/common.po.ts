@@ -45,7 +45,8 @@ export class CommonPage extends BasePage {
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
                 documents: CommonPageHelper.getPageHeaderByTitle(projectsLabels.documents),
                 resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources),
-                reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports)
+                reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
+                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting)
             },
             myWorkplace: {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),

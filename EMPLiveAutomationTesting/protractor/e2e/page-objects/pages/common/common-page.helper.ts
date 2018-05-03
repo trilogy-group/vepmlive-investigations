@@ -27,6 +27,18 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
+    static get uniqueDocumentFilePath() {
+        const documentFile = CommonPageConstants.documentFile;
+        const newFileName = `${documentFile.documentFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
+        const dir = CommonPageConstants.filesDirectoryName;
+        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${documentFile.fileType}`;
+
+        fs.createReadStream(documentFile.filePath())
+            .pipe(fs.createWriteStream(fullFilePath));
+
+        return {fullFilePath, newFileName};
+    }
+
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -135,6 +147,16 @@ export class CommonPageHelper {
 
     static getContextMenuItemByText(text: string) {
         const xpath = `//ul[contains(@class,"epm-nav-contextual-menu")]//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getElementUsingText(text: string, isContains: boolean) {
+        const xpath = `//*[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
+        return element.all(By.xpath(xpath)).first();
+    }
+
+    static getElementUsingTextContent(text: string, isContains: boolean) {
+        const xpath = `//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
