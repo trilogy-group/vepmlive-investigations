@@ -19,6 +19,8 @@ import {By, element} from 'protractor';
 import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
+import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
+import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -267,5 +269,52 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
+    });
+
+    it('Add Time Off From My Workplace - [1124447]', async () => {
+        const stepLogger = new StepLogger(1124447);
+
+        stepLogger.step('Navigate to My Time Off page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myTimeOff,
+            CommonPage.pageHeaders.myWorkplace.TimeOff,
+            MyTimeOffPageConstants.pagePrefix,
+            stepLogger);
+
+        stepLogger.verification('"Time Off - New Item" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(MyTimeOffPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pagePrefix));
+
+        stepLogger.step('Click on "+ New Item" link displayed on top of "Time Off" page');
+        await PageHelper.click(CommonPage.addNewLink);
+
+        stepLogger.step(`Enter/Select below details in 'My Time Off' page`);
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = MyTimeOffPageConstants.inputLabels;
+        const title = `${labels.title} ${uniqueId}`;
+        const timeOffType = CommonPageConstants.timeOffTypes.holiday;
+        const requestor = labels.requestorValue;
+        const startDate = labels.startDate;
+        const finishDate = labels.finishDate;
+        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
+
+        stepLogger.verification('Newly created Time Off item details displayed in read only mode');
+        await expect(await CommonPage.contentTitleInViewMode.getText())
+            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
+
+        stepLogger.verification('Navigate to page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myTimeOff,
+            CommonPage.pageHeaders.myWorkplace.TimeOff,
+            MyTimeOffPageConstants.pagePrefix,
+            stepLogger);
+
+        await CommonPageHelper.searchItemByTitle(title, MyTimeOffPageConstants.columnNames.title, stepLogger);
+
+        stepLogger.verification('Newly created Time off item details displayed in read only mode');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 });

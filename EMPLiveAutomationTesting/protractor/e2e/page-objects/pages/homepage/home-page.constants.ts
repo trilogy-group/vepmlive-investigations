@@ -1,5 +1,6 @@
 export class HomePageConstants {
     static readonly pageName = 'Home page';
+    static readonly comment = 'This is a test comment';
 
     static get navigationLabels() {
         return {

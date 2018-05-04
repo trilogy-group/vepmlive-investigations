@@ -6,6 +6,7 @@ export class MyWorkplaceConstants {
             myWork: 'My Work',
             myTimeSheet: 'My Timesheet',
             myTimeOff: 'My Time Off',
+            TimeOff: 'Time Off',
             toDo: 'To Do',
             discussions: 'Discussions',
             events: 'Events',

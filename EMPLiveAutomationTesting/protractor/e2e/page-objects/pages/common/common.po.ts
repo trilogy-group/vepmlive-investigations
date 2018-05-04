@@ -52,6 +52,7 @@ export class CommonPage extends BasePage {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),
                 myTimeSheet: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeSheet),
                 myTimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeOff),
+                TimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.TimeOff),
                 toDo: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.toDo),
                 discussions: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.discussions),
                 events: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.events),
@@ -125,6 +126,16 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get textBoxForTitle() {
+        const titles = CommonPageConstants.textBoxTitles;
+        return {
+            projectName: CommonPageHelper.getTextBoxByLabel(titles.projectName),
+            state: CommonPageHelper.getTextBoxByLabel(titles.state),
+            overallHealth: CommonPageHelper.getTextBoxByLabel(titles.overallHealth),
+            projectUpdate: CommonPageHelper.getTextBoxByLabel(titles.projectUpdate),
+        };
+    }
+
     static get applySelectColumnButton() {
         return element(By.xpath(`//div[contains(@class,'grouping-apply')]//a[normalize-space(.)='Apply']`));
     }
@@ -186,6 +197,19 @@ export class CommonPage extends BasePage {
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+        };
+    }
+
+    static get toolBarMenuItems() {
+        const options = CommonPageConstants.toolBarMenuOptions;
+        return {
+            change: CommonPageHelper.getToolBarItemsByText(options.change),
+            discussion: CommonPageHelper.getToolBarItemsByText(options.discussion),
+            event: CommonPageHelper.getToolBarItemsByText(options.event),
+            issue: CommonPageHelper.getToolBarItemsByText(options.issue),
+            link: CommonPageHelper.getToolBarItemsByText(options.link),
+            project: CommonPageHelper.getToolBarItemsByText(options.project),
+            more: CommonPageHelper.getToolBarItemsByText(options.more)
         };
     }
 }
