@@ -66,7 +66,7 @@ if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 # msbuild executable location
 # $MSBuildExec = "C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
 $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
-$sdkPath = "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.2 Tools"
+$sdkPath = "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\bin\NETFX 4.0 Tools"
 # VSTest executable
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
@@ -82,72 +82,17 @@ $referencePath = "C:\Program Files\Reference Assemblies\Microsoft\VSTO40\v4.0.Fr
 $referencePath = $referencePath -replace "\s","%20" 
 $referencePath = $referencePath -replace ";","%3B"
 
-
-if ($TestsOnly)
-{
-	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests")
-	
-	# Directory for outputs
-	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
-	if (!(Test-Path -Path $OutputDirectory)){
-		New-Item $OutputDirectory -ItemType Directory
-	}
-	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
-    
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
-
-
-    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
-	Log-SubSection "projectPath: '$projectPath'...."
-	
-	& $MSBuildExec $projectPath `
-	/t:Build `
-	/p:OutputPath="$OutputDirectory" `
-    /p:PreBuildEvent= `
-    /p:PostBuildEvent= `
-    /p:Configuration="Debug" `
-    /p:Platform="$PlatformToBuild" `
-	/p:langversion="$langversion" `
-    /p:WarningLevel=0 `
-    /p:GenerateSerializationAssemblies="Off" `
-    /p:ReferencePath=$referencePath `
-    /fl /flp:"$loggerArgs" `
-    /m:4 `
-    $ToolsVersion `
-	$DfMsBuildArgs `
-	$MsBuildArguments  
-	if ($LastExitCode -ne 0) {
-		throw "Project build failed with exit code: $LastExitCode."
-	}
-
-}
-}
-else
-{
-# Directory for outputs
-$OutputDirectory = Join-Path $SourcesDirectory "output"
-# Initialize Binaries Directory
-$BinariesDirectory = Join-Path $OutputDirectory "binaries"
-# Initialize merged binaries folder
-# This directory holds "Single-Folder" build output of all projects
-# This is used as a repository to look up dependent DLLs for projects when  
-# packaging libs for each project in a separate folder.
-# Initialize Libraries Directory
-$LibrariesDirectory = "$OutputDirectory\libraries"
-# Initialize intermediates directory (PDB)
-$IntermediatesDirectory = "$OutputDirectory\intermediate"
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projSSRSPath = Join-Path $SourcesDirectory "\EPMLiveNativeSSRSComponents\EPMLiveNativeSSRSComponents.sln"
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
-
+$OutputDirectory = Join-Path $SourcesDirectory "output"
+$BinariesDirectory = Join-Path $OutputDirectory "binaries"
+$LibrariesDirectory = "$OutputDirectory\libraries"
+$IntermediatesDirectory = "$OutputDirectory\intermediate"
 
 ### Build preparation steps
-
-# set timezone to UTC - for aline to correctly report on time spent in build tasks
-#& tzutil /s "UTC"
-
 
 Log-Section "Build configuration"
 Log-Message "`t Configuration: '$ConfigurationToBuild'"
@@ -227,6 +172,51 @@ Log-Section "Restoring missing packages . . ."
 & $nugetPath `
 restore `
 $projAbsPath
+
+
+if ($TestsOnly)
+{
+	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests")
+	
+	# Directory for outputs
+	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
+	if (!(Test-Path -Path $OutputDirectory)){
+		New-Item $OutputDirectory -ItemType Directory
+	}
+	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
+    
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
+
+
+    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
+	Log-SubSection "projectPath: '$projectPath'...."
+	
+	& $MSBuildExec $projectPath `
+	/t:Build `
+	/p:OutputPath="$OutputDirectory" `
+    /p:PreBuildEvent= `
+    /p:PostBuildEvent= `
+    /p:Configuration="Debug" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath=$referencePath `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+	if ($LastExitCode -ne 0) {
+		throw "Project build failed with exit code: $LastExitCode."
+	}
+
+}
+}
+else
+{
+
+
 
 # ### Make build the same way SolutionPackager does
 
