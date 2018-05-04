@@ -136,7 +136,7 @@ export class CommonPageHelper {
     }
 
     static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
         return element(By.xpath(xpath));
     }
 

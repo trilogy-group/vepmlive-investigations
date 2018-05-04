@@ -8,6 +8,7 @@ import {ReportsItemPage} from '../../../../../page-objects/pages/items-page/repo
 import {ReportsItemPageConstants} from '../../../../../page-objects/pages/items-page/reports-item/reports-item-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -19,63 +20,60 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('View Reports Functionality - [1124270]', async () => {
         const stepLogger = new StepLogger(1124270);
+        const projectReportListItem = ReportsItemPageConstants.reportListItems.projects;
 
         stepLogger.step('Navigate to Reports page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.reports,
-            ReportsItemPage.reportsLandingPage.businessIntelligenceCenter,
-            ReportsItemPageConstants.reportsLandingPage.businessIntelligenceCenter,
+            ReportsItemPage.businessIntelligenceCenter,
+            ReportsItemPageConstants.businessIntelligenceCenter,
             stepLogger);
 
         stepLogger.verification('Verify EPM Live Analytics option is displayed');
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingPage.epmLiveAnalytics))
+        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingMenu.epmLiveAnalytics))
             .toBe(true,
-                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.reportsLandingPage.epmLiveAnalytics));
+                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.epmLiveAnalytics));
 
         stepLogger.verification('Verify Classic Reporting option is displayed');
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingPage.classicReporting))
+        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingMenu.classicReporting))
             .toBe(true,
-                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.reportsLandingPage.classicReporting));
+                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.classicReporting));
 
         stepLogger.step('Click on Classic Reporting option');
-        await PageHelper.click(ReportsItemPage.reportsLandingPage.classicReporting);
+        await PageHelper.click(ReportsItemPage.reportsLandingMenu.classicReporting);
+
         stepLogger.verification(`Classic Reporting page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingPage.reportsHeader))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.reports))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(ReportsItemPageConstants.reportsHeader));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.reports));
 
         stepLogger.step('Click on Projects and expand the list');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ReportsItemPage.classicReporting.expandProjectsList);
-        await PageHelper.click(ReportsItemPage.classicReporting.expandProjectsList);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(
+            await ReportsItemPage.expandReportListItem(ReportsItemPageConstants.reportListItems.projects.projects));
+        await PageHelper.click(
+            await ReportsItemPage.expandReportListItem(ReportsItemPageConstants.reportListItems.projects.projects));
 
         stepLogger.verification(`Project health link is displayed`);
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.classicReporting.projectHealthOption))
+        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportListItems.project.projectHealth))
             .toBe(true,
-                ValidationsHelper.getButtonDisplayedValidation(ReportsItemPageConstants.classicReportingPage.projectHealth));
+                ValidationsHelper.getButtonDisplayedValidation(projectReportListItem.projectHealth));
 
         stepLogger.step('Click on Projects health option');
-        await PageHelper.click(ReportsItemPage.classicReporting.projectHealthOption);
+        await PageHelper.click(ReportsItemPage.reportListItems.project.projectHealth);
 
         stepLogger.verification(`Project health view is displayed`);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ReportsItemPage.classicReporting.projectHealthHeader);
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.classicReporting.projectHealthHeader))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(ReportsItemPageConstants.classicReportingPage.projectHealth));
-
-        stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(ReportsItemPageConstants.classicReportingPage.projectHealth,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ReportsItemPageConstants.classicReportingPage.projectHealth));
+            .toBe(projectReportListItem.projectHealth,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListItem.projectHealth));
 
         stepLogger.step('Click on close button');
-        await WaitHelper.getInstance().waitForElementToBeClickable(ReportsItemPage.classicReporting.closeButton);
-        await PageHelper.click(ReportsItemPage.classicReporting.closeButton);
+        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.closeButton);
+        await PageHelper.click(CommonPage.closeButton);
 
         stepLogger.verification(`Classic Reporting page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingPage.reportsHeader))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.reports))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(ReportsItemPageConstants.reportsHeader));
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.reports));
     });
 });

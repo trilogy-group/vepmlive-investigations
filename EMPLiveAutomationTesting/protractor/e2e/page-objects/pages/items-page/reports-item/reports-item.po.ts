@@ -5,25 +5,29 @@ import {By, element} from 'protractor';
 
 export class ReportsItemPage extends BasePage {
 
-    static get reportsLandingPage() {
-        const landingPage = ReportsItemPageConstants.reportsLandingPage;
+    static get reportsLandingMenu() {
+        const landingPage = ReportsItemPageConstants.landingPageMenu;
         return {
-            businessIntelligenceCenter: CommonPageHelper.getElementUsingText(landingPage.businessIntelligenceCenter, false),
-            reportsHeader: CommonPageHelper.getElementUsingText(ReportsItemPageConstants.reportsHeader, false),
             epmLiveAnalytics: element(By.id(landingPage.epmLiveAnalytics)),
             classicReporting: element(By.id(landingPage.classicReporting)),
         };
     }
 
-    static get classicReporting() {
-        const label = ReportsItemPageConstants.classicReportingPage;
-        const xpathExpandProjectsList = '//div[normalize-space(.)="' +
-            label.projectsTitleForExpandSign + '"]//img[contains(@src,"plus")]';
+    static get reportListItems() {
+        const label = ReportsItemPageConstants.reportListItems.projects;
         return {
-            expandProjectsList: element(By.xpath(xpathExpandProjectsList)),
-            projectHealthOption: element(By.linkText(label.projectHealth)),
-            projectHealthHeader: CommonPageHelper.getElementByTitle(label.projectHealth),
-            closeButton: element(By.className(label.closeButton))
+            project: {
+                projectHealth: element(By.linkText(label.projectHealth))
+            }
         };
+    }
+
+    static get businessIntelligenceCenter() {
+        return CommonPageHelper.getElementUsingText(ReportsItemPageConstants.businessIntelligenceCenter, false);
+    }
+
+    static async expandReportListItem(itemName: string) {
+        const xpathExpandProjectsList = `//div[normalize-space(.)="${itemName}"]//img[contains(@src,"plus")]`;
+        return element(By.xpath(xpathExpandProjectsList));
     }
 }

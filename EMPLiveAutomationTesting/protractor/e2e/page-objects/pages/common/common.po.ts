@@ -173,6 +173,10 @@ export class CommonPage extends BasePage {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
+    static get closeButton() {
+        return element(By.css('.ms-dlgCloseBtn'));
+    }
+
     static get contextMenuOptions() {
         const options = CommonPageConstants.contextMenuOptions;
         return {

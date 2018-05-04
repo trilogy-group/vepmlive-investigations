@@ -1,21 +1,20 @@
 export class ReportsItemPageConstants {
     static readonly pagePrefix = 'Reporting';
-    static readonly reportsHeader = 'Reports';
+    static readonly businessIntelligenceCenter = 'Business Intelligence Center';
 
-    static get reportsLandingPage() {
+    static get landingPageMenu() {
         return {
-            businessIntelligenceCenter: 'Business Intelligence Center',
             epmLiveAnalytics: 'advanced',
             classicReporting: 'classic'
         };
     }
 
-    static get classicReportingPage() {
+    static get reportListItems() {
         return {
-            plusSign : 'plus.gif',
-            projectsTitleForExpandSign : 'Projects',
-            projectHealth : 'Project Health',
-            closeButton : 'ms-dlgCloseBtn'
+            projects: {
+                projects: 'Projects',
+                projectHealth: 'Project Health'
+            }
         };
     }
 }
