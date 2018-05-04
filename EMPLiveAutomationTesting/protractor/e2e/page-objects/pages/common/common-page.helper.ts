@@ -249,4 +249,16 @@ export class CommonPageHelper {
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
+
+    static getSpanByText(text: string) {
+        return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getInputByTitle(title: string) {
+        return element(By.xpath(`//input[contains(@title,'${title}')]`));
+    }
+
+    static getDivByRole(role: string) {
+        return element(By.xpath(`//div[contains(@role,'${role}')]`));
+    }
 }
