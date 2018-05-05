@@ -9,15 +9,15 @@ export class DiscussionsPage {
     }
 
     static get subjectTextField() {
-         return CommonPageHelper.getInputByTitle(DiscussionsPageConstants.subjectInputTitle);
+         return CommonPageHelper.getElementByTitle(DiscussionsPageConstants.subjectInputTitle);
     }
 
     static get bodyTextBox() {
-        return CommonPageHelper.getDivByRole(HtmlHelper.tags.textBox);
+        return CommonPageHelper.getElementByRole(HtmlHelper.tags.textBox);
    }
 
    static get questionCheckbox() {
-    return CommonPageHelper.getInputByTitle(DiscussionsPageConstants.question);
+    return CommonPageHelper.getElementByTitle(DiscussionsPageConstants.question);
     }
 
 }

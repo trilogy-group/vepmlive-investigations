@@ -254,11 +254,8 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
-    static getInputByTitle(title: string) {
-        return element(By.xpath(`//input[contains(@title,'${title}')]`));
-    }
-
-    static getDivByRole(role: string) {
-        return element(By.xpath(`//div[contains(@role,'${role}')]`));
+    static getElementByRole(role: string) {
+        const xpath = `[role="${role}"]`;
+        return element(By.css(xpath));
     }
 }
