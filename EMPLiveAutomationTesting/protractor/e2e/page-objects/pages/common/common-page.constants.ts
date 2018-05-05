@@ -98,32 +98,11 @@ export class CommonPageConstants {
         };
     }
 
-    static get toolBarMenuOptions() {
-        return {
-            change: 'Change',
-            discussion: 'Discussion',
-            event: 'Event',
-            issue: 'Issue',
-            link: 'Link',
-            project: 'Project',
-            more: 'More'
-        };
-    }
-
     static get menuContainerIds() {
         return {
             navigation: 'EPMLiveNav',
             createNew: 'epm-nav-sub-new',
             myWorkplace: 'epm-nav-sub-workplace-static-links'
-        };
-    }
-
-    static get textBoxTitles() {
-        return {
-            projectName: 'Project Name *',
-            state: 'State *',
-            overallHealth: 'Overall Health *',
-            projectUpdate: 'Project Update *'
         };
     }
 
@@ -188,16 +167,4 @@ export class CommonPageConstants {
             offTrack: '(3) Off Track',
         };
     }
-
-    static get timeOffTypes() {
-        return {
-            bereavement: 'Bereavement',
-            doctorAppointment: 'Doctor Appointment',
-            holiday: 'Holiday',
-            juryDuty: 'Jury Duty',
-            sickTime: 'Sick Time',
-            vacation: 'Vacation'
-        };
-    }
-
 }

@@ -94,11 +94,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TextboxHelper.sendKeys(HomePage.whatAreYouWorkingOnTextBox, HomePageConstants.comment);
 
         stepLogger.verification('Verify Comment entered and posted is displayed in Activity Stream of user Home Page');
-        await expect(await PageHelper.isElementDisplayed(HomePage.comment))
+        await expect(await PageHelper.isElementDisplayed(HomePage.commentField))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(HomePageConstants.comment));
 
         stepLogger.step('Click on "Project" Link on the top menu bar');
-        await ElementHelper.click(CommonPage.toolBarMenuItems.project);
+        await ElementHelper.click(HomePage.toolBarMenuItems.project);
 
         stepLogger.verification('Verify Project Center - New Item window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);

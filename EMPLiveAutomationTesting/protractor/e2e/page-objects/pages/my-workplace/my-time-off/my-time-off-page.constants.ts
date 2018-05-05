@@ -12,6 +12,11 @@ export class MyTimeOffPageConstants {
             requestor: 'Requestor *',
             start: 'Start *',
             finish: 'Finish *',
+        };
+    }
+
+    static get inputValues() {
+        return {
             requestorValue: 'NonAdmin User',
             startDate: '1/1/2019',
             finishDate: '2/1/2019'
@@ -20,7 +25,30 @@ export class MyTimeOffPageConstants {
 
     static get columnNames() {
         return {
-            title: 'Title'
+            complete: 'Complete',
+            daysOverdue: 'Days Overdue',
+            description: 'Description',
+            finish: 'Finish',
+            hours: 'Hours',
+            manager: 'Manager',
+            requestDate: 'Request Date',
+            requestor: 'Requestor',
+            scheduleStatus: 'Schedule Status',
+            start: 'Start',
+            timeOffType: 'Time Off Type',
+            title: 'Title',
+            workDetail: 'Work Detail',
+        };
+    }
+
+    static get timeOffTypes() {
+        return {
+            bereavement: 'Bereavement',
+            doctorAppointment: 'Doctor Appointment',
+            holiday: 'Holiday',
+            juryDuty: 'Jury Duty',
+            sickTime: 'Sick Time',
+            vacation: 'Vacation'
         };
     }
 }

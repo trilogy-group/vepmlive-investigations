@@ -277,7 +277,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Navigate to My Time Off page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
-            CommonPage.pageHeaders.myWorkplace.TimeOff,
+            CommonPage.pageHeaders.myWorkplace.timeOff,
             MyTimeOffPageConstants.pagePrefix,
             stepLogger);
 
@@ -293,11 +293,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step(`Enter/Select below details in 'My Time Off' page`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = MyTimeOffPageConstants.inputLabels;
+        const input = MyTimeOffPageConstants.inputValues;
         const title = `${labels.title} ${uniqueId}`;
-        const timeOffType = CommonPageConstants.timeOffTypes.holiday;
-        const requestor = labels.requestorValue;
-        const startDate = labels.startDate;
-        const finishDate = labels.finishDate;
+        const timeOffType = MyTimeOffPageConstants.timeOffTypes.holiday;
+        const requestor = input.requestorValue;
+        const startDate = input.startDate;
+        const finishDate = input.finishDate;
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
 
         stepLogger.verification('Newly created Time Off item details displayed in read only mode');
@@ -307,7 +308,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Navigate to page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.myTimeOff,
-            CommonPage.pageHeaders.myWorkplace.TimeOff,
+            CommonPage.pageHeaders.myWorkplace.timeOff,
             MyTimeOffPageConstants.pagePrefix,
             stepLogger);
 
