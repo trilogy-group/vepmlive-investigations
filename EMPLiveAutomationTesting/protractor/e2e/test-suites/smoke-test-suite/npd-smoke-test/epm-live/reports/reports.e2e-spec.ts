@@ -22,6 +22,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(1124270);
         const projectReportListConstant = ReportsItemPageConstants.reportListItems.projects;
         const projectReportListElement = ReportsItemPage.reportListItems.project;
+        const projectCommonPageConstant = CommonPage.pageHeaders.projects;
+        const projectCommonPageElement = CommonPageConstants.pageHeaders.projects;
 
         stepLogger.step('Navigate to Reports page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -44,9 +46,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ReportsItemPage.reportsLandingMenu.classicReporting);
 
         stepLogger.verification(`Classic Reporting page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.reports))
+        await expect(await PageHelper.isElementDisplayed(projectCommonPageConstant.reports))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.reports));
+                ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
 
         stepLogger.step('Click on Projects and expand the list');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(
@@ -73,8 +75,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.closeButton);
 
         stepLogger.verification(`Classic Reporting page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.reports))
+        await expect(await PageHelper.isElementDisplayed(projectCommonPageConstant.reports))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.reports));
+                ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
     });
 });
