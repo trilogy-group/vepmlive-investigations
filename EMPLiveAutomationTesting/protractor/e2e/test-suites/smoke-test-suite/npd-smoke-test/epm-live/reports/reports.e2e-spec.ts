@@ -20,7 +20,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('View Reports Functionality - [1124270]', async () => {
         const stepLogger = new StepLogger(1124270);
-        const projectReportListItem = ReportsItemPageConstants.reportListItems.projects;
+        const projectReportListConstant = ReportsItemPageConstants.reportListItems.projects;
+        const projectReportListElement = ReportsItemPage.reportListItems.project;
 
         stepLogger.step('Navigate to Reports page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -49,23 +50,23 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Click on Projects and expand the list');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(
-            await ReportsItemPage.expandReportListItem(ReportsItemPageConstants.reportListItems.projects.projects));
+            await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
         await PageHelper.click(
-            await ReportsItemPage.expandReportListItem(ReportsItemPageConstants.reportListItems.projects.projects));
+            await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
 
         stepLogger.verification(`Project health link is displayed`);
-        await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportListItems.project.projectHealth))
+        await expect(await PageHelper.isElementDisplayed(projectReportListElement.projectHealth))
             .toBe(true,
-                ValidationsHelper.getButtonDisplayedValidation(projectReportListItem.projectHealth));
+                ValidationsHelper.getButtonDisplayedValidation(projectReportListConstant.projectHealth));
 
         stepLogger.step('Click on Projects health option');
-        await PageHelper.click(ReportsItemPage.reportListItems.project.projectHealth);
+        await PageHelper.click(projectReportListElement.projectHealth);
 
         stepLogger.verification(`Project health view is displayed`);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(projectReportListItem.projectHealth,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListItem.projectHealth));
+            .toBe(projectReportListConstant.projectHealth,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListConstant.projectHealth));
 
         stepLogger.step('Click on close button');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.closeButton);
