@@ -130,7 +130,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Project displayed in "Project" page');
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(projectNameValue));
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
@@ -167,7 +167,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(title));
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
