@@ -33,7 +33,14 @@ export class HomePage extends BasePage {
             issue: CommonPageHelper.getToolBarItemsByText(options.issue),
             link: CommonPageHelper.getToolBarItemsByText(options.link),
             project: CommonPageHelper.getToolBarItemsByText(options.project),
-            more: CommonPageHelper.getToolBarItemsByText(options.more)
+            portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
+            projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
+            more: this.moreButton,
+            risk: CommonPageHelper.getToolBarItemsByText(options.risk),
+            timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
+            toDo: CommonPageHelper.getToolBarItemsByText(options.toDo),
+            projectDocument: CommonPageHelper.getToolBarItemsByText(options.projectDocument),
+            sharedDocument: CommonPageHelper.getToolBarItemsByText(options.sharedDocument)
         };
     }
 
@@ -51,5 +58,9 @@ export class HomePage extends BasePage {
 
     static get commentField() {
         return CommonPageHelper.getElementUsingText(HomePageConstants.comment, false);
+    }
+
+    static get moreButton() {
+        return element(By.css('.epm-se-show-more'));
     }
 }

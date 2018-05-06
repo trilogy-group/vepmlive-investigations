@@ -38,7 +38,14 @@ export class HomePageConstants {
             issue: 'Issue',
             link: 'Link',
             project: 'Project',
-            more: 'More'
+            more: 'More',
+            portfolio: 'Portfolio',
+            projectRequest: 'Project Request',
+            risk: 'Risk',
+            timeOff: 'Time Off',
+            toDo: 'To Do',
+            projectDocument: 'Project Document',
+            sharedDocument: 'Shared Document'
         };
     }
 }

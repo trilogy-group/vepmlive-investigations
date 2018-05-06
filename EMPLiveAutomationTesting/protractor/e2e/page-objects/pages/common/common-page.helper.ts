@@ -69,7 +69,8 @@ export class CommonPageHelper {
     }
 
     static getToolBarItemsByText(title: string) {
-        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[text()='${title}']`));
+        return element(By.xpath(`//ul[@id='epm-se-toolbar-items-all']//a[text()='${title}']|
+        //ul[@id='epm-se-toolbar-items']//a[text()='${title}']`));
     }
 
     static getTextBoxByLabel(title: string) {
