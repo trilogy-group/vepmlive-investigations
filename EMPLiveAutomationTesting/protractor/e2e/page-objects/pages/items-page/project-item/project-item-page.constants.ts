@@ -2,8 +2,8 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
-    static readonly pageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
-    static readonly editPageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
+    static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
     static readonly nonAdminUser = 'Non Admin User';
 
