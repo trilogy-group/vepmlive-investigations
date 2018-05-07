@@ -122,7 +122,8 @@ export class HtmlHelper extends HtmlHelperFactory {
             ul: 'ul',
             var: 'var',
             video: 'video',
-            wbr: 'wbr'
+            wbr: 'wbr',
+            textBox: 'textbox',
         };
     }
 }

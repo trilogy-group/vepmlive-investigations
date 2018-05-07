@@ -27,6 +27,18 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
+    static get uniqueDocumentFilePath() {
+        const documentFile = CommonPageConstants.documentFile;
+        const newFileName = `${documentFile.documentFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
+        const dir = CommonPageConstants.filesDirectoryName;
+        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${documentFile.fileType}`;
+
+        fs.createReadStream(documentFile.filePath())
+            .pipe(fs.createWriteStream(fullFilePath));
+
+        return {fullFilePath, newFileName};
+    }
+
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -54,6 +66,10 @@ export class CommonPageHelper {
 
     static getRibbonButtonByText(title: string) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+    }
+
+    static getToolBarItemsByText(title: string) {
+        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[text()='${title}']`));
     }
 
     static getTextBoxByLabel(title: string) {
@@ -124,7 +140,7 @@ export class CommonPageHelper {
     }
 
     static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -135,6 +151,16 @@ export class CommonPageHelper {
 
     static getContextMenuItemByText(text: string) {
         const xpath = `//ul[contains(@class,"epm-nav-contextual-menu")]//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getElementUsingText(text: string, isContains: boolean) {
+        const xpath = `//*[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
+        return element.all(By.xpath(xpath)).first();
+    }
+
+    static getElementUsingTextContent(text: string, isContains: boolean) {
+        const xpath = `//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -248,5 +274,14 @@ export class CommonPageHelper {
 
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
+    }
+
+    static getSpanByText(text: string) {
+        return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getElementByRole(role: string) {
+        const xpath = `[role="${role}"]`;
+        return element(By.css(xpath));
     }
 }

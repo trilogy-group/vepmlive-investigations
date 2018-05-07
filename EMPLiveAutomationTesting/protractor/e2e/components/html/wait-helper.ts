@@ -115,4 +115,11 @@ export class WaitHelper {
             return false;
         });
     }
+
+    /**
+     * Wait for element to Load
+     */
+    public async staticWait(timeoutInMS = PageHelper.timeout.xs) {
+        return browser.sleep(timeoutInMS);
+    }
 }
