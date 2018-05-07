@@ -77,7 +77,8 @@ export class CommonPage extends BasePage {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
-            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel)
+            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
+            editTeam: element(By.linkText(labels.editTeam)),
         };
     }
 
@@ -86,7 +87,9 @@ export class CommonPage extends BasePage {
         return {
             save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
             ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel)
+            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel),
+            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
+            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
         };
     }
 

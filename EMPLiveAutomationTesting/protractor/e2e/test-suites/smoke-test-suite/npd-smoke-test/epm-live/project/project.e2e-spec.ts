@@ -12,6 +12,7 @@ import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/proj
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -155,5 +156,41 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+    });
+
+    it('Check behavior of "Save and Close" button - [743175]', async () => {
+        const stepLogger = new StepLogger(743175);
+        const uniqueId = PageHelper.getUniqueId();
+
+        stepLogger.step('Create a new project and navigate to build team page');
+        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, stepLogger);
+
+        stepLogger.verification('Verify Save and Close button is disabled by default');
+        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndCloseButton, 'class'))
+            .toContain('disabled', 'Save & Close Button is disabled');
+
+        stepLogger.step('Add resource to Current team and verify');
+        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
+
+    });
+
+    it('Add resources under "Current Team" - [743144]', async () => {
+        const stepLogger = new StepLogger(743144);
+        const uniqueId = PageHelper.getUniqueId();
+
+        stepLogger.step('Create a new project and navigate to build team page');
+        await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, stepLogger);
+
+        stepLogger.verification('Verify Resource Pool is displayed');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.buildTeamContainers.resourcePool))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.columnNames.resourcePool));
+
+        stepLogger.verification('Verify Current team is displayed');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.buildTeamContainers.currentTeam))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.columnNames.currentTeam));
+
+        stepLogger.step('Add resource to Current team and verify');
+        await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
+
     });
 });
