@@ -1,6 +1,7 @@
 import {BasePage} from '../base-page';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
+import {By, element} from 'protractor';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -21,5 +22,13 @@ export class HomePage extends BasePage {
                 reports: CommonPageHelper.getSidebarLinkByTextUnderNavigation(labels.reports)
             }
         };
+    }
+
+    static get browseButton() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get newButton() {
+        return element(By.css('.js-listview-qcbNewButton'));
     }
 }
