@@ -24,11 +24,32 @@ export class HomePage extends BasePage {
         };
     }
 
+    static get toolBarMenuItems() {
+        const options = HomePageConstants.toolBarMenuOptions;
+        return {
+            change: CommonPageHelper.getToolBarItemsByText(options.change),
+            discussion: CommonPageHelper.getToolBarItemsByText(options.discussion),
+            event: CommonPageHelper.getToolBarItemsByText(options.event),
+            issue: CommonPageHelper.getToolBarItemsByText(options.issue),
+            link: CommonPageHelper.getToolBarItemsByText(options.link),
+            project: CommonPageHelper.getToolBarItemsByText(options.project),
+            more: CommonPageHelper.getToolBarItemsByText(options.more)
+        };
+    }
+
     static get browseButton() {
         return element(By.css('.ms-fileinput'));
     }
 
     static get newButton() {
         return element(By.css('.js-listview-qcbNewButton'));
+    }
+
+    static get whatAreYouWorkingOnTextBox() {
+        return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
+    }
+
+    static get commentField() {
+        return CommonPageHelper.getElementUsingText(HomePageConstants.comment, false);
     }
 }

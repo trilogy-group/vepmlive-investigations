@@ -167,5 +167,4 @@ export class CommonPageConstants {
             offTrack: '(3) Off Track',
         };
     }
-
 }

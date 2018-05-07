@@ -9,6 +9,9 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -81,5 +84,53 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
+    });
+
+    it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
+        const stepLogger = new StepLogger(743926);
+
+        stepLogger.step('Enter some comments for text area displaying text What are you working on?');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
+        await TextboxHelper.sendKeys(HomePage.whatAreYouWorkingOnTextBox, HomePageConstants.comment);
+
+        stepLogger.verification('Verify Comment entered and posted is displayed in Activity Stream of user Home Page');
+        await expect(await PageHelper.isElementDisplayed(HomePage.commentField))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(HomePageConstants.comment));
+
+        stepLogger.step('Click on "Project" Link on the top menu bar');
+        await ElementHelper.click(HomePage.toolBarMenuItems.project);
+
+        stepLogger.verification('Verify Project Center - New Item window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(ProjectItemPageConstants.pageName,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
+
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
+        const uniqueId = PageHelper.getUniqueId();
+        const labels = ProjectItemPageConstants.inputLabels;
+        const projectNameValue = `${labels.projectName} ${uniqueId}`;
+        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
+        const benefits = `${labels.benefits} ${uniqueId}`;
+        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
+        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
+
+        await ProjectItemPageHelper.fillForm(
+            projectNameValue,
+            projectDescription,
+            benefits,
+            overallHealthOnTrack,
+            projectUpdateManual,
+            stepLogger);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger.verification('Newly created Project displayed in "Project" page');
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+
     });
 });

@@ -68,6 +68,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
     }
 
+    static getToolBarItemsByText(title: string) {
+        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[text()='${title}']`));
+    }
+
     static getTextBoxByLabel(title: string) {
         return this.getInputByLabel(HtmlHelper.tags.input, title);
     }

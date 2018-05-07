@@ -52,6 +52,7 @@ export class CommonPage extends BasePage {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),
                 myTimeSheet: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeSheet),
                 myTimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeOff),
+                timeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.timeOff),
                 toDo: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.toDo),
                 discussions: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.discussions),
                 events: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.events),
