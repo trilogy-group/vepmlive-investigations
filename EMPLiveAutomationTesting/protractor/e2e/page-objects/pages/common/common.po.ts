@@ -45,12 +45,14 @@ export class CommonPage extends BasePage {
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
                 documents: CommonPageHelper.getPageHeaderByTitle(projectsLabels.documents),
                 resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources),
-                reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports)
+                reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
+                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting)
             },
             myWorkplace: {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),
                 myTimeSheet: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeSheet),
                 myTimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeOff),
+                timeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.timeOff),
                 toDo: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.toDo),
                 discussions: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.discussions),
                 events: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.events),
@@ -170,6 +172,10 @@ export class CommonPage extends BasePage {
 
     static get singleSearchTextBox() {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
+    }
+
+    static get closeButton() {
+        return element(By.css('.ms-dlgCloseBtn'));
     }
 
     static get contextMenuOptions() {

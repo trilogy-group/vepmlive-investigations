@@ -2,10 +2,10 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
-    static readonly pageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
-    static readonly editPageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
     static readonly editTeamPageName = 'Edit Team';
     static readonly editTeamCloseBtn = 'Close Button';
+    static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
+    static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
     static get inputLabels() {
         return {

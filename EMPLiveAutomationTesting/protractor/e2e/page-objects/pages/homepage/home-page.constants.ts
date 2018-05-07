@@ -1,5 +1,6 @@
 export class HomePageConstants {
     static readonly pageName = 'Home page';
+    static readonly comment = 'This is a test comment';
 
     static get navigationLabels() {
         return {
@@ -15,9 +16,29 @@ export class HomePageConstants {
                 changes: 'Changes',
                 documents: 'Documents',
                 resources: 'Resources',
-                reports: 'Reports'
+                reports: 'Reports',
+                reporting: 'Reporting'
             }
         };
     }
 
+    static get addADocumentWindow() {
+        return{
+            addADocumentTitle: 'Add a document',
+            chooseFiles: 'Choose Files',
+            overwriteExistingFilesLabel: 'Overwrite existing files',
+        };
+    }
+
+    static get toolBarMenuOptions() {
+        return {
+            change: 'Change',
+            discussion: 'Discussion',
+            event: 'Event',
+            issue: 'Issue',
+            link: 'Link',
+            project: 'Project',
+            more: 'More'
+        };
+    }
 }
