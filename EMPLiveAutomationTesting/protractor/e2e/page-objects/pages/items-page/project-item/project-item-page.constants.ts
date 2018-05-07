@@ -4,6 +4,8 @@ export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix} ${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly editTeamPageName = 'Edit Team';
+    static readonly editTeamCloseBtn = 'Close Button';
 
     static get inputLabels() {
         return {
@@ -114,6 +116,13 @@ export class ProjectItemPageConstants {
             workHealth: 'Work Health',
             workStatus: 'Work Status',
             workspaceDriven: 'Workspace Driven'
+        };
+    }
+
+    static get teamSectionlabels() {
+        return {
+            currentTeam: 'Current Team',
+            resourcePool: 'Resource Pool'
         };
     }
 

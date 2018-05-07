@@ -183,4 +183,20 @@ export class CommonPage extends BasePage {
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
         };
     }
+
+    static get selectFirstProject(){
+        return element(By.xpath(`(${this.selectProject})[2]`));
+    }
+
+    static get selectProject()    {
+        return '//*[contains(@class,"GMPx1xx")]';
+    }
+
+    static get editTeamButton(){
+        return element(By.xpath('//img[@alt="Edit Team"]'));
+    }
+
+    static get contentIframe(){
+        return element(By.css('.ms-dlgFrame'));
+    }
 }

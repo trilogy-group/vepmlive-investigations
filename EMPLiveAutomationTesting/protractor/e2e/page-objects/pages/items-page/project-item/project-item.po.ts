@@ -2,6 +2,7 @@ import {By, element} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import { ProjectItemPageHelper } from './project-item-page.helper';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -31,7 +32,19 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get teamSection() {
+        const labels = ProjectItemPageConstants.teamSectionlabels;
+        return {
+            currentTeam: ProjectItemPageHelper.getTeamSectionsByText(labels.currentTeam),
+            resourcePool: ProjectItemPageHelper.getTeamSectionsByText(labels.resourcePool)
+        };
+    }
+
     static get portfolioShowAllButton() {
         return element(By.id('Portfolio_ddlShowAll'));
+    }
+
+    static get editTeamCloseButton() {
+        return element(By.xpath('//a[contains(@id,"Ribbon.BuildTeam.StandardGroup.CloseButton-Large")]'));
     }
 }
