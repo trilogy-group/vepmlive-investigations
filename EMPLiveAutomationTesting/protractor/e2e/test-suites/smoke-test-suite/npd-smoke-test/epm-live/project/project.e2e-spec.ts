@@ -171,7 +171,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Add resource to Current team and verify');
         await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
-
     });
 
     it('Add resources under "Current Team" - [743144]', async () => {
