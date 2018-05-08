@@ -179,6 +179,7 @@ export class CommonPageHelper {
                                                     stepLogger: StepLogger) {
         stepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
+        stepLogger.stepId(2);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
     }
 
@@ -283,5 +284,26 @@ export class CommonPageHelper {
     static getElementByRole(role: string) {
         const xpath = `[role="${role}"]`;
         return element(By.css(xpath));
+    }
+
+    static getSpanByTextInsideUnorderedListByRole(role: string, text: string) {
+        return element(By.xpath(`//ul[@role='${role}']//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getSpanContainsId(id: string) {
+        return element(By.xpath(`//span[contains(@id,'${id}')]`));
+    }
+
+    static getOptionByText(option: string) {
+        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getDivContainsTitle(title: string) {
+        return element(By.xpath(`//div[contains(@title,'${title}')]`));
+    }
+
+    static getAllElementsByType(type: string) {
+        const xpath = `[type="${type}"]`;
+        return element.all(By.css(xpath));
     }
 }

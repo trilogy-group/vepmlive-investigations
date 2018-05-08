@@ -5,6 +5,8 @@ export class CommonPageConstants {
     static readonly pageName = 'Create New';
     static filesDirectoryName = 'files';
     static readonly currentDir = __dirname;
+    static readonly tabPanel = 'Tab Panel';
+    static readonly title = 'Title';
 
     static get imageFile() {
         return {
