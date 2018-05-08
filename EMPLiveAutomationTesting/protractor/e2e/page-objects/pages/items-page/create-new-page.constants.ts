@@ -10,6 +10,7 @@ export class CreateNewPageConstants {
                 issue: 'Issue',
                 link: 'Link',
                 project: 'Project',
+                more: 'More',
                 portfolio: 'Portfolio',
                 projectRequest: 'Project Request',
                 risk: 'Risk',

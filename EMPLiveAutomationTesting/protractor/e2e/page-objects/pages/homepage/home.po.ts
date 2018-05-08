@@ -2,6 +2,7 @@ import {BasePage} from '../base-page';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
 import {By, element} from 'protractor';
+import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -25,22 +26,22 @@ export class HomePage extends BasePage {
     }
 
     static get toolBarMenuItems() {
-        const options = HomePageConstants.toolBarMenuOptions;
+        const options = CreateNewPageConstants.navigationLabels;
         return {
-            change: CommonPageHelper.getToolBarItemsByText(options.change),
-            discussion: CommonPageHelper.getToolBarItemsByText(options.discussion),
-            event: CommonPageHelper.getToolBarItemsByText(options.event),
-            issue: CommonPageHelper.getToolBarItemsByText(options.issue),
-            link: CommonPageHelper.getToolBarItemsByText(options.link),
-            project: CommonPageHelper.getToolBarItemsByText(options.project),
-            portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
-            projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
+            change: CommonPageHelper.getToolBarItemsByText(options.listApps.change),
+            discussion: CommonPageHelper.getToolBarItemsByText(options.listApps.discussion),
+            event: CommonPageHelper.getToolBarItemsByText(options.listApps.event),
+            issue: CommonPageHelper.getToolBarItemsByText(options.listApps.issue),
+            link: CommonPageHelper.getToolBarItemsByText(options.listApps.link),
+            project: CommonPageHelper.getToolBarItemsByText(options.listApps.project),
+            portfolio: CommonPageHelper.getToolBarItemsByText(options.listApps.portfolio),
+            projectRequest: CommonPageHelper.getToolBarItemsByText(options.listApps.projectRequest),
             more: this.moreButton,
-            risk: CommonPageHelper.getToolBarItemsByText(options.risk),
-            timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
-            toDo: CommonPageHelper.getToolBarItemsByText(options.toDo),
-            projectDocument: CommonPageHelper.getToolBarItemsByText(options.projectDocument),
-            sharedDocument: CommonPageHelper.getToolBarItemsByText(options.sharedDocument)
+            risk: CommonPageHelper.getToolBarItemsByText(options.listApps.risk),
+            timeOff: CommonPageHelper.getToolBarItemsByText(options.listApps.timeOff),
+            toDo: CommonPageHelper.getToolBarItemsByText(options.listApps.toDo),
+            projectDocument: CommonPageHelper.getToolBarItemsByText(options.libraryApps.projectDocument),
+            sharedDocument: CommonPageHelper.getToolBarItemsByText(options.libraryApps.sharedDocument)
         };
     }
 

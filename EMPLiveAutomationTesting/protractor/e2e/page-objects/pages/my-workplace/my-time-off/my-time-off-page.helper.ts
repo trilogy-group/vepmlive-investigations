@@ -65,6 +65,7 @@ export class MyTimeOffPageHelper {
         stepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
 
+        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
         await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
 
         stepLogger.verification('"New Time Off" page is closed');
