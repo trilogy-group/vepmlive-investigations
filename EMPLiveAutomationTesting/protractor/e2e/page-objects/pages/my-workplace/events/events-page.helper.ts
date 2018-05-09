@@ -9,7 +9,7 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 
 export class EventsPageHelper {
 
-    static async fillNewEventsFormAndVerify(title: string, stepLogger: StepLogger) {
+    static async fillNewEventsFormAndVerifyEventCreated(title: string, stepLogger: StepLogger) {
 
         stepLogger.step(`Title *: New Event 1`);
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);

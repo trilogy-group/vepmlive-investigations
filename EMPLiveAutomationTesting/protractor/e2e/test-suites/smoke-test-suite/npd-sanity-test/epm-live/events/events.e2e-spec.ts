@@ -62,6 +62,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const labels = EventsPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();
         const title = `${labels.title} ${uniqueId}`;
-        await EventsPageHelper.fillNewEventsFormAndVerify(title, stepLogger);
+        await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
     });
 });

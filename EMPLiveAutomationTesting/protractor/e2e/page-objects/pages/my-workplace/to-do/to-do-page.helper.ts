@@ -9,7 +9,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 
 export class ToDoPageHelper {
 
-    static async fillFormAndVerify(title: string, status: string, description: string, stepLogger: StepLogger) {
+    static async fillFormAndSave(title: string, status: string, description: string, stepLogger: StepLogger) {
         const labels = ToDoPageConstants.inputLabels;
 
         stepLogger.step(`Title *: New To Do 1`);

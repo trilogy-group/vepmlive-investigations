@@ -48,7 +48,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.pageName));
 
-        // Step#2 and Step#3 are inside function
         stepLogger.stepId(2);
         stepLogger.step(`Enter/Select below details in 'New To Do' page`);
         const uniqueId = PageHelper.getUniqueId();
@@ -56,7 +55,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.notStarted;
         const description = `${labels.description} ${uniqueId}`;
-        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
+        // step#3 is inside this function
+        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
 
         stepLogger.stepId(4);
         stepLogger.step(`click on Close button`);
@@ -76,8 +76,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.toDo,
             stepLogger);
 
-        // step#1 and step#2 are inside function
         stepLogger.stepId(1);
+        // step#2 is inside this function
         await CommonPageHelper.editItemViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -92,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.inProgress;
         const description = `${labels.description} ${uniqueId}`;
-        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
+        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
         stepLogger.verification(`'Edit To Do' page is closed`);
         await expect(await ToDoPage.inputs.title.isPresent())
             .toBe(false,

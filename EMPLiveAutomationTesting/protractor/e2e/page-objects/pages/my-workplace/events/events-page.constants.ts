@@ -7,19 +7,36 @@ export class EventsPageConstants {
     static readonly pageName = `${EventsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly newEventItem= 'Events.New.NewListItem';
     static readonly editPageName = `${EventsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
-    static readonly titleInput= 'Title Required Field';
-    static readonly startTimeField= 'Start Time Required Field';
-    static readonly categoryField= 'Category: Choice Drop Down';
 
     static get inputLabels() {
         return {
             title: 'Title *',
+            location: 'Location',
+            startTime: 'Start Time *',
+            endTime: 'End Time *',
+            description: 'Description',
+            category: 'Category',
         };
     }
 
     static get categoryOption() {
         return {
             meeting: 'Meeting',
+            workHours: 'Work hours',
+            business: 'Business',
+            holiday: 'Holiday',
+            getTogether: 'Get-together',
+            gifts: 'Gifts',
+            birthday: 'Birthday',
+            anniversary: 'Anniversary'
+        };
+    }
+
+    static get inputFields() {
+        return {
+            title: 'Title Required Field',
+            category: 'Category: Choice Drop Down',
+            startTime: 'Start Time Required Field',
         };
     }
 }

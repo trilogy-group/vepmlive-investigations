@@ -10,15 +10,15 @@ export class EventsPage {
     }
 
     static get newEvent() {
-        return CommonPageHelper.getSpanContainsId(EventsPageConstants.newEventItem);
+        return CommonPageHelper.getElementContainsId(EventsPageConstants.newEventItem);
     }
 
     static get titleTextField() {
-         return CommonPageHelper.getElementByTitle(EventsPageConstants.titleInput);
+         return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.title);
     }
 
     static get categoryField() {
-        return CommonPageHelper.getElementByTitle(EventsPageConstants.categoryField);
+        return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.category);
     }
 
     static get categoryOption() {
@@ -26,6 +26,6 @@ export class EventsPage {
     }
 
     static get calenderBlock() {
-        return CommonPageHelper.getDivContainsTitle(CommonPageConstants.title);
+        return CommonPageHelper.getElementContainsTitle(CommonPageConstants.title);
     }
 }
