@@ -79,7 +79,9 @@ export class CommonPage extends BasePage {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
-            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel)
+            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
+            editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
+            close: CommonPageHelper.getRibbonButtonByText(labels.close)
         };
     }
 
@@ -191,18 +193,10 @@ export class CommonPage extends BasePage {
     }
 
     static get selectFirstProject(){
-        return element(By.xpath(`(${this.selectProject})[2]`));
+        return element(By.xpath(`(${this.selectProject})[1]`));
     }
 
     static get selectProject()    {
-        return '//*[contains(@class,"GMPx1xx")]';
-    }
-
-    static get editTeamButton(){
-        return element(By.xpath('//img[@alt="Edit Team"]'));
-    }
-
-    static get contentIframe(){
-        return element(By.css('.ms-dlgFrame'));
+        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"active")]';
     }
 }

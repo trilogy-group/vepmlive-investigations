@@ -49,7 +49,9 @@ export class CommonPageConstants {
             save: 'Save',
             cancel: 'Cancel',
             viewItem: 'ViewItem',
-            editItem: 'EditItem'
+            editItem: 'EditItem',
+            editTeam: 'Edit Team',
+            close: 'Close'
         };
     }
 

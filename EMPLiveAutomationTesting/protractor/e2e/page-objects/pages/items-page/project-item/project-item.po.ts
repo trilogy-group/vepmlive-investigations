@@ -43,8 +43,4 @@ export class ProjectItemPage extends BasePage {
     static get portfolioShowAllButton() {
         return element(By.id('Portfolio_ddlShowAll'));
     }
-
-    static get editTeamCloseButton() {
-        return element(By.xpath('//a[contains(@id,"Ribbon.BuildTeam.StandardGroup.CloseButton-Large")]'));
-    }
 }
