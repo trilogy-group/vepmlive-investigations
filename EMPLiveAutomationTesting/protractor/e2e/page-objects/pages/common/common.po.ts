@@ -191,12 +191,4 @@ export class CommonPage extends BasePage {
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
         };
     }
-
-    static get selectFirstProject(){
-        return element(By.xpath(`(${this.selectProject})[1]`));
-    }
-
-    static get selectProject()    {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"active")]';
-    }
 }

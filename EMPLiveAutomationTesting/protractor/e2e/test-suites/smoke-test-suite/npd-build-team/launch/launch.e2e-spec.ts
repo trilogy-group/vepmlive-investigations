@@ -32,7 +32,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project');
-        await PageHelper.click(CommonPage.selectFirstProject);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -85,9 +85,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.verification('All previously created Projects are displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.selectFirstProject))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.record))
                 .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.firstProject));
-
+                    ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.record));
     });
 });

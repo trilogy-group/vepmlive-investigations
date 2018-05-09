@@ -69,7 +69,7 @@ export class CommonPageHelper {
     }
 
     static getRibbonSmallButtonByTitle(title: string) {
-        return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and contains(@title,'${title}')]`));
+        return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and @title='${title}']`));
     }
 
     static getToolBarItemsByText(title: string) {
