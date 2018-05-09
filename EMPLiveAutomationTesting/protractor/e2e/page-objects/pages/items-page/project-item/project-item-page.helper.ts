@@ -191,18 +191,19 @@ export class ProjectItemPageHelper {
         const projectNameValue = `${labels.projectName} ${uniqueId}`;
 
         stepLogger.step('Select a user from resource pool and add');
-        await CheckboxHelper.markCheckbox(await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser), true);
+        const userCheckBoxForResourcePool = await ProjectItemPage.getUserCheckBoxForTeamType(
+            ProjectItemPageConstants.buildTeamContentIDs.resourcePool, ProjectItemPageConstants.nonAdminUser);
+        await CheckboxHelper.markCheckbox(userCheckBoxForResourcePool, true);
 
         stepLogger.step('Click on Add resource');
         await PageHelper.click(CommonPage.formButtons.add);
 
         stepLogger.verification('Verify Save and Close button is enabled after addition of resource');
-        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndCloseButton, 'class'))
-            .not.toContain('disabled', 'Save & Close Button is enabled');
+        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndClose, 'class'))
+            .not.toContain('disabled', '2 Save & Close Button is enabled');
 
         stepLogger.step('Click on Save & Close button');
-        await PageHelper.click(ProjectItemPage.saveAndCloseButton);
+        await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
         await PageHelper.switchToDefaultContent();
 
@@ -222,10 +223,10 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger);
 
         stepLogger.verification('Verify User is moved under Current team');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser));
-        await expect(PageHelper.isElementDisplayed(await ProjectItemPage.getUserCheckBoxForTeamType(
-            ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser)))
+        const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
+            ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(userCheckBoxForCurrentTeam);
+        await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }
 }

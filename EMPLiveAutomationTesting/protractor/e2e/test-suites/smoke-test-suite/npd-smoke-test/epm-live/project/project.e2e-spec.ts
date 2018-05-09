@@ -166,7 +166,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, stepLogger);
 
         stepLogger.verification('Verify Save and Close button is disabled by default');
-        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndCloseButton, 'class'))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.saveAndClose);
+        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndClose, 'class'))
             .toContain('disabled', 'Save & Close Button is disabled');
 
         stepLogger.step('Add resource to Current team and verify');

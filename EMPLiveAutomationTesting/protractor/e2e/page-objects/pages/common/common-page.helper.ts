@@ -65,7 +65,8 @@ export class CommonPageHelper {
     }
 
     static getRibbonButtonByText(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and (${ComponentHelpers.
+        getXPathFunctionForDot(title)} or ${ComponentHelpers.getXPathFunctionForText(title)})]`));
     }
 
     static getToolBarItemsByText(title: string) {

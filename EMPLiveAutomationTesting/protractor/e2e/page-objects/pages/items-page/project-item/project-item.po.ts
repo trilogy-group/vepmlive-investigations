@@ -36,12 +36,13 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Portfolio_ddlShowAll'));
     }
 
-    static get saveAndCloseButton() {
+    static get saveAndClose() {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
     static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
-        const xpathForUser = `//td[@id="${teamType}"]//a[text()="${userName}"]//parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
+        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
+        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
         return element(By.xpath(xpathForUser));
     }
 
