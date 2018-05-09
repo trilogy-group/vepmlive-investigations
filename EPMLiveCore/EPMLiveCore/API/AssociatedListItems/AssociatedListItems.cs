@@ -57,7 +57,7 @@ namespace EPMLiveCore.API
 
                         arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(list);
 
-                        if (arrAssociatedLists != null)
+                        if (arrAssociatedLists != null && arrAssociatedLists.Count>0)
                         {
                             #region Prepare DataTable for Associated Items
 
@@ -267,7 +267,7 @@ namespace EPMLiveCore.API
 
                         arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(list);
 
-                        if (arrAssociatedLists != null)
+                        if (arrAssociatedLists != null && arrAssociatedLists.Count > 0)
                         {
                             #region Prepare DataTable for Associated Items
 
