@@ -17,13 +17,13 @@ public class LoginPageObject extends AbstractPage {
 		PageFactory.initElements(driver, this);
 	}
 
-	@FindBy(xpath = ".//input[@id='txtBizPassUserID']")
-	WebElement usernameTextbox;   
-	
-	@FindBy(xpath = ".//input[@id='txtBizPassUserPassword']")
-	WebElement passwordTextbox; 
-	
-	@FindBy(xpath = ".//input[@id='login']")
+	@FindBy(css = "input[id*='signInControl_UserName']")
+	WebElement usernameTextbox;
+
+	@FindBy(css = "input[id*='signInControl_password']")
+	WebElement passwordTextbox;
+
+	@FindBy(css = "input[id*='signInControl_login']")
 	WebElement loginButton;
 	
 	
@@ -31,15 +31,12 @@ public class LoginPageObject extends AbstractPage {
 	WebElement homePageTab;
 	
 	public void enterTheLoginCredentials(String username, String password) {
-		
 		usernameTextbox.sendKeys(username);
 		passwordTextbox.sendKeys(password);
 	}  
 	
-    public void clickOnLoginButton() {
-		
+  public void clickOnLoginButton() {
 		loginButton.click();
-		
 	}
     
     public void validateHomePage() throws InterruptedException {
