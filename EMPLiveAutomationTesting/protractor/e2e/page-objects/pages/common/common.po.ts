@@ -4,6 +4,7 @@ import {ElementHelper} from '../../../components/html/element-helper';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
+import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 
 export class CommonPage extends BasePage {
 
@@ -189,4 +190,8 @@ export class CommonPage extends BasePage {
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
         };
     }
+
+    static get tabPanel() {
+        return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+   }
 }

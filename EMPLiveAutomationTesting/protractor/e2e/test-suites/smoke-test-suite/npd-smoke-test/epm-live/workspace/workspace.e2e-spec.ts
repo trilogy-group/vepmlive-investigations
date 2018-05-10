@@ -57,7 +57,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const title = `${labels.title} ${uniqueId}`;
         const status = CommonPageConstants.statuses.notStarted;
         const description = `${labels.description} ${uniqueId}`;
-        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
+        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
 
         stepLogger.verification('Newly created To Do item [Ex: New To Do 1] details displayed in read only mode');
         await expect(await CommonPage.contentTitleInViewMode.getText())
@@ -111,7 +111,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const description = `${labels.description} ${uniqueId}`;
 
         // Step #4 & #5 Inside this function
-        await ToDoPageHelper.fillFormAndVerify(title, status, description, stepLogger);
+        await ToDoPageHelper.fillFormAndSave(title, status, description, stepLogger);
 
         // #5
         stepLogger.verification(`'Edit To Do' page is closed`);
