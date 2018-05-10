@@ -128,4 +128,16 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get buildTeamContentClass() {
+        return {
+            saveAndCloseDisabled: 'ms-cui-disabled'
+        };
+    }
+
+    static get messageText() {
+        return {
+            saveAndCloseDisabled: 'Save & Close Button is disabled',
+            saveAndCloseEnabled: 'Save & Close Button is enabled'
+        };
+    }
 }

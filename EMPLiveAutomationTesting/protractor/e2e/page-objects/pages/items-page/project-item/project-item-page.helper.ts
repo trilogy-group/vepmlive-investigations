@@ -199,8 +199,9 @@ export class ProjectItemPageHelper {
         await PageHelper.click(CommonPage.formButtons.add);
 
         stepLogger.verification('Verify Save and Close button is enabled after addition of resource');
-        await expect(await ElementHelper.getAttributeValue(ProjectItemPage.saveAndClose, 'class'))
-            .not.toContain('disabled', '2 Save & Close Button is enabled');
+        await expect(await ElementHelper.hasClass(ProjectItemPage.saveAndClose,
+            ProjectItemPageConstants.buildTeamContentClass.saveAndCloseDisabled))
+            .toBe(false, ProjectItemPageConstants.messageText.saveAndCloseEnabled);
 
         stepLogger.step('Click on Save & Close button');
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
