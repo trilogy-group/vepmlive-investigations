@@ -138,6 +138,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 foreach (SPWeb w in site.AllWebs)
                 {
+                    // indicates whether the site is the top-level Web site of the site collection and skip the workspace sites.
+                    if (!w.IsRootWeb)
+                        continue;
+                
                     // IGNORE spdispose 130, w is being disposed 
                     var dt = new DataTable();
                     try
