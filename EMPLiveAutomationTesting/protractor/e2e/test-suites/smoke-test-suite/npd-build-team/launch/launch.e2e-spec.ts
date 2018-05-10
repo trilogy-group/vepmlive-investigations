@@ -87,6 +87,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
                 .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.record));
+                    ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
 });
