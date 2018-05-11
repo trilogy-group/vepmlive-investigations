@@ -2,6 +2,7 @@ import {By, element} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import { ProjectItemPageHelper } from './project-item-page.helper';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -28,6 +29,14 @@ export class ProjectItemPage extends BasePage {
             employeeSatisfaction: CommonPageHelper.getSelectByLabel(labels.employeeSatisfaction),
             risk: CommonPageHelper.getSelectByLabel(labels.risk),
             projectUpdate: CommonPageHelper.getSelectByLabel(labels.projectUpdate)
+        };
+    }
+
+    static get teamSection() {
+        const labels = ProjectItemPageConstants.teamSectionlabels;
+        return {
+            currentTeam: ProjectItemPageHelper.getTeamSectionsByText(labels.currentTeam),
+            resourcePool: ProjectItemPageHelper.getTeamSectionsByText(labels.resourcePool)
         };
     }
 

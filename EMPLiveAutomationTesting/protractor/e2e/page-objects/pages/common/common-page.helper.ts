@@ -68,8 +68,12 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
     }
 
+    static getRibbonSmallButtonByTitle(title: string) {
+        return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
+    }
+
     static getToolBarItemsByText(title: string) {
-        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[text()='${title}']`));
+        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[normalize-space(text())='${title}']`));
     }
 
     static getTextBoxByLabel(title: string) {
@@ -140,7 +144,7 @@ export class CommonPageHelper {
     }
 
     static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
         return element(By.xpath(xpath));
     }
 
