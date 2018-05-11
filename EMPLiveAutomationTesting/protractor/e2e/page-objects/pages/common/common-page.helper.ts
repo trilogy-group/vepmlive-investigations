@@ -295,8 +295,16 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
+    static getElementById(id: string) {
+        return element(By.id(`${id}`));
+    }
+
     static getOptionByText(option: string) {
         return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getDivByText(option: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
 
     static getElementContainsTitle(title: string) {
