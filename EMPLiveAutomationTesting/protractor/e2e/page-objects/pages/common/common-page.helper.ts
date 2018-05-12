@@ -310,7 +310,9 @@ export class CommonPageHelper {
     static getAllElementsByType(type: string) {
         const xpath = `[type="${type}"]`;
         return element.all(By.css(xpath));
-      static getTeamRecordsByTeamId(id: string) {
+    }
+
+    static getTeamRecordsByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//*[contains(@class,'GMCellPanel')]`));
     }
 
