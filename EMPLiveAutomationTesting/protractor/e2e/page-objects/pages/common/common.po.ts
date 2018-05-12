@@ -189,7 +189,8 @@ export class CommonPage extends BasePage {
             workFlows: CommonPageHelper.getContextMenuItemByText(options.workFlows),
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
-            comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+            comments: CommonPageHelper.getContextMenuItemByText(options.comments),
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam)
         };
     }
 
