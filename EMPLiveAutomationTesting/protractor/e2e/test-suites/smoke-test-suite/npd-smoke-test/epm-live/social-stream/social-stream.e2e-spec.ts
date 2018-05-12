@@ -14,13 +14,15 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import {LoginPageHelper} from '../../../../../page-objects/pages/login/login-page.helper';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goTo();
+        loginPage = new LoginPage();
+        await loginPage.goTo();
     });
 
     it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {
@@ -138,6 +140,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Add Time Off - [891123]', async () => {
         const stepLogger = new StepLogger(891123);
+
+        stepLogger.step('Login');
+        await LoginPageHelper.login(CommonPageHelper.adminEmailId, CommonPageHelper.adminPassword);
 
         stepLogger.step('Click on "More" Link on the top menu bar');
         await ElementHelper.click(HomePage.toolBarMenuItems.more);

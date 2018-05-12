@@ -275,4 +275,12 @@ export class CommonPageHelper {
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
+
+    static get adminEmailId(): string {
+        return browser.params.login.admin.user;
+    }
+
+    static get adminPassword(): string {
+        return browser.params.login.admin.password;
+    }
 }
