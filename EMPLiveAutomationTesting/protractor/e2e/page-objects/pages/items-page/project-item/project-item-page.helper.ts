@@ -101,7 +101,7 @@ export class ProjectItemPageHelper {
         const label = ProjectItemPage.teamRecordsName.currentTeam;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
         size = await label.count();
-        for (let index = 0; index < size; index++) {
+        for (let index = 0; index < size && !resourceFound; index++) {
             await label.get(index).getText().then(function(text) {
                 if (text === resourceName) {
                     resourceFound = true;
