@@ -170,4 +170,11 @@ export class CommonPageConstants {
             offTrack: '(3) Off Track',
         };
     }
+
+    static get teamId() {
+        return {
+            currentTeam: 'TeamGrid',
+            resourcePool: 'ResourceGrid'
+        };
+    }
 }

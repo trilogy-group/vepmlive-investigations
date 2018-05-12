@@ -288,4 +288,12 @@ export class CommonPageHelper {
         const xpath = `[role="${role}"]`;
         return element(By.css(xpath));
     }
+
+    static getTeamRecordsByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//*[contains(@class,'GMCellPanel')]`));
+    }
+
+    static getTeamRecordsNameByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
 }

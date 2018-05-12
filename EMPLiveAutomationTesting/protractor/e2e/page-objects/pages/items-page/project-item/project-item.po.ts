@@ -3,6 +3,7 @@ import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import { ProjectItemPageHelper } from './project-item-page.helper';
+import { CommonPageConstants } from '../../common/common-page.constants';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -46,15 +47,15 @@ export class ProjectItemPage extends BasePage {
 
     static get teamRecords() {
         return {
-            currentTeam: ProjectItemPageHelper.getTeamRecordsByTeamId('TeamGrid'),
-            resourcePool: ProjectItemPageHelper.getTeamRecordsByTeamId('ResourceGrid')
+            currentTeam: CommonPageHelper.getTeamRecordsByTeamId(CommonPageConstants.teamId.currentTeam),
+            resourcePool: CommonPageHelper.getTeamRecordsByTeamId(CommonPageConstants.teamId.resourcePool)
         };
     }
 
     static get teamRecordsName() {
         return {
-            currentTeam: ProjectItemPageHelper.getTeamRecordsNameByTeamId('TeamGrid'),
-            resourcePool: ProjectItemPageHelper.getTeamRecordsNameByTeamId('ResourceGrid')
+            currentTeam: CommonPageHelper.getTeamRecordsNameByTeamId(CommonPageConstants.teamId.currentTeam),
+            resourcePool: CommonPageHelper.getTeamRecordsNameByTeamId(CommonPageConstants.teamId.resourcePool)
         };
     }
 
