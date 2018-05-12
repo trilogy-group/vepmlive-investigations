@@ -104,12 +104,16 @@ export class HtmlHelper extends HtmlHelperFactory {
             strong: 'strong',
             style: 'style',
             sub: 'sub',
+            submit: 'submit',
             summary: 'summary',
             sup: 'sup',
             table: 'table',
+            tabPanel: 'tabpanel',
+            tabList: 'tablist',
             tBody: 'tbody',
             td: 'td',
             textArea: 'textarea',
+            textBox: 'textbox',
             tFoot: 'tfoot',
             th: 'th',
             tHead: 'thead',
@@ -123,7 +127,6 @@ export class HtmlHelper extends HtmlHelperFactory {
             var: 'var',
             video: 'video',
             wbr: 'wbr',
-            textBox: 'textbox',
         };
     }
 }

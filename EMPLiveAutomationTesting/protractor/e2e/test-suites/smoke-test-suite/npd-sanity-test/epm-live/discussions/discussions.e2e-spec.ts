@@ -23,7 +23,6 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Navigate to Discussions page - [785609]', async () => {
         const stepLogger = new StepLogger(785609);
         stepLogger.stepId(1);
-        stepLogger.stepId(2);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.discussions,
             CommonPage.pageHeaders.myWorkplace.discussions,
@@ -50,7 +49,6 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
 
         stepLogger.stepId(2);
-        stepLogger.stepId(3);
         stepLogger.step(`Enter/Select below details in 'New Discussion' page`);
         const labels = DiscussionsPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();

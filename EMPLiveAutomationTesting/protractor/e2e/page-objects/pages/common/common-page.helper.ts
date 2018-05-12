@@ -183,6 +183,7 @@ export class CommonPageHelper {
                                                     stepLogger: StepLogger) {
         stepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
+        stepLogger.stepId(2);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
     }
 
@@ -289,7 +290,27 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getTeamRecordsByTeamId(id: string) {
+    static getSpanByTextInsideUnorderedListByRole(role: string, text: string) {
+        return element(By.xpath(`//ul[normalize-space(@role)='${role}']//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getElementContainsId(id: string) {
+        const xpath = `[id*="${id}"]`;
+        return element(By.css(xpath));
+    }
+
+    static getOptionByText(option: string) {
+        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getElementContainsTitle(title: string) {
+        return element(By.css(`[title*="${title}"]`));
+    }
+
+    static getAllElementsByType(type: string) {
+        const xpath = `[type="${type}"]`;
+        return element.all(By.css(xpath));
+      static getTeamRecordsByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//*[contains(@class,'GMCellPanel')]`));
     }
 
