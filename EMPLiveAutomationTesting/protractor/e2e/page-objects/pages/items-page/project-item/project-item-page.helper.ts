@@ -91,4 +91,34 @@ export class ProjectItemPageHelper {
     static getTeamSectionsByText(text: string) {
         return element(By.xpath(`//div[contains(@class,'gridHeader') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
+
+    static getTeamRecordsByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//*[contains(@class,'GMCellPanel')]`));
+    }
+
+    static getTeamRecordsNameByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    static getTeamChangeButtonByValue(value: string) {
+        return element(By.xpath(`//*[@value='${value}']`));
+    }
+
+    static async checkResourceAddedInCurrentTeam(resourceName: string) {
+        let size = 0, resourceFound = false;
+        const label = ProjectItemPage.teamRecordsName.currentTeam;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        await label.count().then(function (count) {
+            size = count;
+        });
+        for (let index = 0; index < size; index++) {
+            await label.get(index).getText().then(function(text) {
+                if (text === resourceName) {
+                    resourceFound = true;
+                }
+            }
+        );
+        }
+        return resourceFound;
+    }
 }

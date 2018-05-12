@@ -81,7 +81,8 @@ export class CommonPage extends BasePage {
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
-            close: CommonPageHelper.getRibbonButtonByText(labels.close)
+            close: CommonPageHelper.getRibbonButtonByText(labels.close),
+            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose)
         };
     }
 

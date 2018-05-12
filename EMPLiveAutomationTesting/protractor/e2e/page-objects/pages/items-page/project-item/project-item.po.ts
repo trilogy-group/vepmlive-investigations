@@ -43,4 +43,27 @@ export class ProjectItemPage extends BasePage {
     static get portfolioShowAllButton() {
         return element(By.id('Portfolio_ddlShowAll'));
     }
+
+    static get teamRecords() {
+        return {
+            currentTeam: ProjectItemPageHelper.getTeamRecordsByTeamId('TeamGrid'),
+            resourcePool: ProjectItemPageHelper.getTeamRecordsByTeamId('ResourceGrid')
+        };
+    }
+
+    static get teamRecordsName() {
+        return {
+            currentTeam: ProjectItemPageHelper.getTeamRecordsNameByTeamId('TeamGrid'),
+            resourcePool: ProjectItemPageHelper.getTeamRecordsNameByTeamId('ResourceGrid')
+        };
+    }
+
+    static get teamChangeButtons() {
+        const label = ProjectItemPageConstants.teamChangeButtons;
+        return {
+            add: ProjectItemPageHelper.getTeamChangeButtonByValue(label.add),
+            remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
+        };
+    }
+
 }

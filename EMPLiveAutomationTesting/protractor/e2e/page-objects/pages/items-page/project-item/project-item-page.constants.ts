@@ -124,4 +124,11 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get teamChangeButtons() {
+        return {
+            add: '< Add',
+            remove: 'Remove >'
+        };
+    }
+
 }
