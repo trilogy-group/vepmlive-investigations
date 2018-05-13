@@ -236,7 +236,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(PicturePage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(PicturePageConstants.addAPicture,
@@ -317,5 +317,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Newly created Time off item details displayed in read only mode');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+    });
+
+    it('Create new Shared Document from Workplace - [1175269]', async () => {
     });
 });

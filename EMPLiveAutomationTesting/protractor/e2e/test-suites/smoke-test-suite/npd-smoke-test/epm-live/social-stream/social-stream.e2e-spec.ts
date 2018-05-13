@@ -32,7 +32,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.newButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
@@ -65,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.newButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
@@ -105,7 +105,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.project);
 
         stepLogger.verification('Verify Project Center - New Item window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ProjectItemPageConstants.pageName,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
@@ -151,7 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.timeOff);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(MyTimeOffPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));

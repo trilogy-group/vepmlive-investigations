@@ -65,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(projectReportListElement.projectHealth);
 
         stepLogger.verification(`Project health view is displayed`);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(projectReportListConstant.projectHealth,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListConstant.projectHealth));

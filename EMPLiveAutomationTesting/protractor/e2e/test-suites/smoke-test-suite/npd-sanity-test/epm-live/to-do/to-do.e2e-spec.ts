@@ -102,4 +102,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
+
+    it('Attach File - [852049]', async () => {
+
+    });
 });
