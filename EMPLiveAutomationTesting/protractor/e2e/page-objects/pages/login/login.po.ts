@@ -1,19 +1,19 @@
 import {BasePage} from '../base-page';
-import { LoginPageConstants } from './login-page.constants';
-import {By, element} from 'protractor';
+import {LoginPageConstants} from './login-page.constants';
+import {LoginPageHelper} from './login-page.helper';
 
 export class LoginPage extends BasePage {
     url = 'EPMLiveForms/DefaultCust.aspx';
 
     static get usernameTextBox() {
-        return element(By.className(`${LoginPageConstants.usernameTextBoxClass}`));
+        return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.userName);
     }
 
     static get passwordTextBox() {
-        return element(By.id(`${LoginPageConstants.passwordTextBoxID}`));
+        return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.password);
     }
 
     static get loginButton() {
-        return element(By.className(LoginPageConstants.signInButtonClass));
+        return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.login);
     }
 }

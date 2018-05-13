@@ -17,7 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Navigate to Event Page - [785879]', async () => {
@@ -52,8 +52,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Events - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
-                    .toBe(EventsPageConstants.pageName,
-                        ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+            .toBe(EventsPageConstants.pageName,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
 

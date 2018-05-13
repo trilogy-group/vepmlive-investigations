@@ -3,9 +3,9 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from './login.po';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
+import {By, element} from 'protractor';
 
-export class LoginPageHelper{
-
+export class LoginPageHelper {
     static async verifyLoginPageDisplayed() {
         await expect(await PageHelper.isElementDisplayed(LoginPage.loginButton, true))
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(
@@ -16,5 +16,9 @@ export class LoginPageHelper{
         await TextboxHelper.sendKeys(LoginPage.usernameTextBox, username);
         await TextboxHelper.sendKeys(LoginPage.passwordTextBox, password);
         await PageHelper.click(LoginPage.loginButton);
+    }
+
+    static getFormControlById(partialId: string) {
+        return element(By.css(`[id*='signInControl_${partialId}']`));
     }
 }

@@ -39,6 +39,14 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
+    static get adminEmailId(): string {
+        return browser.params.login.admin.user;
+    }
+
+    static get adminPassword(): string {
+        return browser.params.login.admin.password;
+    }
+
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -281,14 +289,6 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
-
-    static get adminEmailId(): string {
-        return browser.params.login.admin.user;
-    }
-
-    static get adminPassword(): string {
-        return browser.params.login.admin.password;
-    }
     static getSpanByText(text: string) {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }

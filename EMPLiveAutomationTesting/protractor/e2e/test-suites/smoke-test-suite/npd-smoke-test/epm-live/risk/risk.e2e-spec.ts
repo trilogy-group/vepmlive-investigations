@@ -20,14 +20,12 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Add Risks Functionality - [1124271]', async () => {
         const stepLogger = new StepLogger(1124271);
-
         stepLogger.stepId(1);
-
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
@@ -143,7 +141,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await RiskItemPageHelper.editRisk(stepLogger);
     });
 
-    it('Search Risk - [1176333]', async () => {
+    fit('Search Risk - [1176333]', async () => {
         const stepLogger = new StepLogger(1176333);
         stepLogger.stepId(1);
 
