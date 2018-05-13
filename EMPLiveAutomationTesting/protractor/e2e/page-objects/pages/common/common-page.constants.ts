@@ -53,7 +53,8 @@ export class CommonPageConstants {
             editItem: 'EditItem',
             editTeam: 'Edit Team',
             close: 'Close',
-            saveAndClose: 'Save &Close'
+            saveAndClose: 'Save &Close',
+            assignmentPlanner: 'Assignment Planner'
         };
     }
 

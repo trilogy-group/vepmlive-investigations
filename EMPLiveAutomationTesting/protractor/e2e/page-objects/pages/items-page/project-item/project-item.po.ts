@@ -1,4 +1,4 @@
-import {By, element} from 'protractor';
+import {By, element, browser} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
@@ -65,6 +65,10 @@ export class ProjectItemPage extends BasePage {
             add: ProjectItemPageHelper.getTeamChangeButtonByValue(label.add),
             remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
+    }
+
+    static get assignmentPlannerFrame () {
+        return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
 }
