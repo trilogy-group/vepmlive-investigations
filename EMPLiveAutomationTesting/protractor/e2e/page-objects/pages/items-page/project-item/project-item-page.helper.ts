@@ -97,17 +97,15 @@ export class ProjectItemPageHelper {
     }
 
     static async checkResourceAddedInCurrentTeam(resourceName: string) {
-        let size = 0, resourceFound = false;
+        let size = 0, resourceFound = false, text;
         const label = ProjectItemPage.teamRecordsName.currentTeam;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
         size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
-            await label.get(index).getText().then(function(text) {
-                if (text === resourceName) {
+            text = await label.get(index).getText();
+            if (text === resourceName) {
                     resourceFound = true;
                 }
-            }
-        );
         }
         return resourceFound;
     }
