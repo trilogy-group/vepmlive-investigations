@@ -141,7 +141,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await RiskItemPageHelper.editRisk(stepLogger);
     });
 
-    fit('Search Risk - [1176333]', async () => {
+    it('Search Risk - [1176333]', async () => {
         const stepLogger = new StepLogger(1176333);
         stepLogger.stepId(1);
 
