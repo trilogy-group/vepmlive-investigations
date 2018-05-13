@@ -1,5 +1,6 @@
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ToDoPageConstants} from './to-do-page.constants';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
 export class ToDoPage {
     static get inputs() {
@@ -15,4 +16,9 @@ export class ToDoPage {
             description: CommonPageHelper.getTextAreaByLabel(labels.description)
         };
     }
+
+    static get closeButton() {
+        return CommonPageHelper.getAllElementsByType(HtmlHelper.tags.submit);
+   }
+
 }

@@ -6,6 +6,8 @@ export class CommonPageConstants {
     static readonly pageName = 'Create New';
     static filesDirectoryName = 'files';
     static readonly currentDir = __dirname;
+    static readonly tabPanel = 'Tab Panel';
+    static readonly title = 'Title';
 
     static get imageFile() {
         return {
@@ -49,7 +51,9 @@ export class CommonPageConstants {
             save: 'Save',
             cancel: 'Cancel',
             viewItem: 'ViewItem',
-            editItem: 'EditItem'
+            editItem: 'EditItem',
+            editTeam: 'Edit Team',
+            close: 'Close'
         };
     }
 

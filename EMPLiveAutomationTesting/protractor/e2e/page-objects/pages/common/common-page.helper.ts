@@ -68,6 +68,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
 }
 
+    static getRibbonSmallButtonByTitle(title: string) {
+        return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
+    }
+
     static getToolBarItemsByText(title: string) {
         return element(By.xpath(`//ul[contains(@id,'epm-se-toolbar-items')]//a[text()='${title}']`));
     }
@@ -140,7 +144,7 @@ export class CommonPageHelper {
     }
 
     static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -179,6 +183,7 @@ export class CommonPageHelper {
                                                     stepLogger: StepLogger) {
         stepLogger.step('Select "My Workplace" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.myWorkplace);
+        stepLogger.stepId(2);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
     }
 
@@ -276,11 +281,42 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
+
     static get adminEmailId(): string {
         return browser.params.login.admin.user;
     }
 
     static get adminPassword(): string {
         return browser.params.login.admin.password;
+    }
+    static getSpanByText(text: string) {
+        return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getElementByRole(role: string) {
+        const xpath = `[role="${role}"]`;
+        return element(By.css(xpath));
+    }
+
+    static getSpanByTextInsideUnorderedListByRole(role: string, text: string) {
+        return element(By.xpath(`//ul[normalize-space(@role)='${role}']//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getElementContainsId(id: string) {
+        const xpath = `[id*="${id}"]`;
+        return element(By.css(xpath));
+    }
+
+    static getOptionByText(option: string) {
+        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static getElementContainsTitle(title: string) {
+        return element(By.css(`[title*="${title}"]`));
+    }
+
+    static getAllElementsByType(type: string) {
+        const xpath = `[type="${type}"]`;
+        return element.all(By.css(xpath));
     }
 }

@@ -4,6 +4,7 @@ import {ElementHelper} from '../../../components/html/element-helper';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
+import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 
 export class CommonPage extends BasePage {
 
@@ -79,7 +80,9 @@ export class CommonPage extends BasePage {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
-            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel)
+            cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
+            editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
+            close: CommonPageHelper.getRibbonButtonByText(labels.close)
         };
     }
 
@@ -189,4 +192,8 @@ export class CommonPage extends BasePage {
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
         };
     }
+
+    static get tabPanel() {
+        return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+   }
 }

@@ -117,4 +117,11 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get teamSectionlabels() {
+        return {
+            currentTeam: 'Current Team',
+            resourcePool: 'Resource Pool'
+        };
+    }
+
 }

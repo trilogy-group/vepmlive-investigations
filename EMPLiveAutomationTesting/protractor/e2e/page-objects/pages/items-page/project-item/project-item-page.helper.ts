@@ -5,10 +5,11 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser} from 'protractor';
+import {browser, element, By} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
+import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -87,4 +88,7 @@ export class ProjectItemPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
     }
 
+    static getTeamSectionsByText(text: string) {
+        return element(By.xpath(`//div[contains(@class,'gridHeader') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    }
 }
