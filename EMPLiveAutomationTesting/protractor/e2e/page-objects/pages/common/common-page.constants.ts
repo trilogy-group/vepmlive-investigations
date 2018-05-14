@@ -54,7 +54,13 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             close: 'Close',
             saveAndClose: 'Save &Close',
-            assignmentPlanner: 'Assignment Planner'
+            assignmentPlanner: 'Assignment Planner',
+            viewReports: 'View Reports',
+            resourceAvailableVsPlannedByDept: 'Resource Available vs. Planned by Dept',
+            resourceCapacityHeatMap: 'Resource Capacity Heat Map',
+            resourceCommitments: 'Resource Commitments',
+            resourceRequirements: 'Resource Requirements',
+            resourceWorkVsCapacity: 'Resource Work vs. Capacity'
         };
     }
 
