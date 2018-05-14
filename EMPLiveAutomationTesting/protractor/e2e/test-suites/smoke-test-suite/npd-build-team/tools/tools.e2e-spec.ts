@@ -9,7 +9,6 @@ import { WaitHelper } from '../../../../components/html/wait-helper';
 import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
 import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import { browser, by } from 'protractor';
 import { ElementHelper } from '../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -18,12 +17,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
         await homePage.goTo();
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_UserName')).sendKeys('admin.user');
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_password')).sendKeys('Pass@word1');
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_login')).click();
     });
 
-    /*it('Launch "Assignment Planner" - [743177]', async () => {
+    it('Launch "Assignment Planner" - [743177]', async () => {
         const stepLogger = new StepLogger(743177);
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -131,10 +127,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
-    });*/
+    });
 
-    it('Launch "Assignment Planner" - [743177]', async () => {
-        const stepLogger = new StepLogger(743177);
+    it('View the options under "Reports" drop-down" - [743178]', async () => {
+        const stepLogger = new StepLogger(743178);
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
