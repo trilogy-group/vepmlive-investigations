@@ -52,7 +52,8 @@ export class CommonPageConstants {
             viewItem: 'ViewItem',
             editItem: 'EditItem',
             editTeam: 'Edit Team',
-            close: 'Close'
+            close: 'Close',
+            saveAndClose: 'Save &Close'
         };
     }
 
@@ -169,6 +170,13 @@ export class CommonPageConstants {
             onTrack: '(1) On Track',
             atRisk: '(2) At Risk',
             offTrack: '(3) Off Track',
+        };
+    }
+
+    static get teamId() {
+        return {
+            currentTeam: 'TeamGrid',
+            resourcePool: 'ResourceGrid'
         };
     }
 }

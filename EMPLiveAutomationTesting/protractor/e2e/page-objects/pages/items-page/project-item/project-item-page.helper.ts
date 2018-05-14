@@ -91,4 +91,22 @@ export class ProjectItemPageHelper {
     static getTeamSectionsByText(text: string) {
         return element(By.xpath(`//div[contains(@class,'gridHeader') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
+
+    static getTeamChangeButtonByValue(value: string) {
+        return element(By.css(`[value = "${value}"]`));
+    }
+
+    static async checkResourceAddedInCurrentTeam(resourceName: string) {
+        let size = 0, resourceFound = false, text;
+        const label = ProjectItemPage.teamRecordsName.currentTeam;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        size = await label.count();
+        for (let index = 0; index < size && !resourceFound; index++) {
+            text = await label.get(index).getText();
+            if (text === resourceName) {
+                    resourceFound = true;
+                }
+        }
+        return resourceFound;
+    }
 }
