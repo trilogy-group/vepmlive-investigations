@@ -42,9 +42,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
@@ -78,6 +78,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Assignment Planner" is displayed in new window');
+        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed
         await expect(await CommonPage.dialogTitles.get(1).getText())
             .toBe(CommonPageConstants.ribbonLabels.assignmentPlanner,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
@@ -94,13 +95,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Assignment Planner" window is closed');
+        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed.
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.get(1)))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
@@ -116,7 +118,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Edit Team" window is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.first()))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
