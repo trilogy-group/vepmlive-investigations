@@ -4,6 +4,7 @@ import {ElementHelper} from '../../../components/html/element-helper';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
+import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 
 export class CommonPage extends BasePage {
 
@@ -80,7 +81,8 @@ export class CommonPage extends BasePage {
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
-            editTeam: element(By.linkText(labels.editTeam)),
+            editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
+            close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose)
         };
     }
@@ -190,7 +192,12 @@ export class CommonPage extends BasePage {
             workFlows: CommonPageHelper.getContextMenuItemByText(options.workFlows),
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
-            comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+            comments: CommonPageHelper.getContextMenuItemByText(options.comments),
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam)
         };
     }
+
+    static get tabPanel() {
+        return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+   }
 }

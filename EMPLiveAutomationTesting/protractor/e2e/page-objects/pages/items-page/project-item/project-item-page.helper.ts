@@ -5,7 +5,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser} from 'protractor';
+import {browser, element, By} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -13,6 +13,7 @@ import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
+import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -229,5 +230,27 @@ export class ProjectItemPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(userCheckBoxForCurrentTeam);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
+    }
+
+    static getTeamSectionsByText(text: string) {
+        return element(By.xpath(`//div[contains(@class,'gridHeader') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    }
+
+    static getTeamChangeButtonByValue(value: string) {
+        return element(By.css(`[value = "${value}"]`));
+    }
+
+    static async checkResourceAddedInCurrentTeam(resourceName: string) {
+        let size = 0, resourceFound = false, text;
+        const label = ProjectItemPage.teamRecordsName.currentTeam;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        size = await label.count();
+        for (let index = 0; index < size && !resourceFound; index++) {
+            text = await label.get(index).getText();
+            if (text === resourceName) {
+                    resourceFound = true;
+                }
+        }
+        return resourceFound;
     }
 }

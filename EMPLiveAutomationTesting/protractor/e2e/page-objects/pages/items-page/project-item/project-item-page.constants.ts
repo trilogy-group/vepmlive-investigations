@@ -140,4 +140,18 @@ export class ProjectItemPageConstants {
             saveAndCloseEnabled: 'Save & Close Button is enabled'
         };
     }
+
+    static get teamSectionlabels() {
+        return {
+            currentTeam: 'Current Team',
+            resourcePool: 'Resource Pool'
+        };
+    }
+
+    static get teamChangeButtons() {
+        return {
+            add: '< Add',
+            remove: 'Remove >'
+        };
+    }
 }

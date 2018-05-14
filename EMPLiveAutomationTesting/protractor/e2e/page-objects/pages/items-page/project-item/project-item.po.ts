@@ -3,6 +3,8 @@ import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import { ProjectItemPageHelper } from './project-item-page.helper';
+import { CommonPageConstants } from '../../common/common-page.constants';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -32,6 +34,14 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get teamSection() {
+        const labels = ProjectItemPageConstants.teamSectionlabels;
+        return {
+            currentTeam: ProjectItemPageHelper.getTeamSectionsByText(labels.currentTeam),
+            resourcePool: ProjectItemPageHelper.getTeamSectionsByText(labels.resourcePool)
+        };
+    }
+
     static get portfolioShowAllButton() {
         return element(By.id('Portfolio_ddlShowAll'));
     }
@@ -51,6 +61,28 @@ export class ProjectItemPage extends BasePage {
         return {
             currentTeam: ElementHelper.getElementByStartsWithId(buildTeamSection.currentTeam, buildTeamSection.currentTeam),
             resourcePool: ElementHelper.getElementByStartsWithId(buildTeamSection.resourcePool, buildTeamSection.resourcePool),
+        };
+    }
+
+    static get teamRecords() {
+        return {
+            currentTeam: CommonPageHelper.getTeamRecordsByTeamId(CommonPageConstants.teamId.currentTeam),
+            resourcePool: CommonPageHelper.getTeamRecordsByTeamId(CommonPageConstants.teamId.resourcePool)
+        };
+    }
+
+    static get teamRecordsName() {
+        return {
+            currentTeam: CommonPageHelper.getTeamRecordsNameByTeamId(CommonPageConstants.teamId.currentTeam),
+            resourcePool: CommonPageHelper.getTeamRecordsNameByTeamId(CommonPageConstants.teamId.resourcePool)
+        };
+    }
+
+    static get teamChangeButtons() {
+        const label = ProjectItemPageConstants.teamChangeButtons;
+        return {
+            add: ProjectItemPageHelper.getTeamChangeButtonByValue(label.add),
+            remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
     }
 }
