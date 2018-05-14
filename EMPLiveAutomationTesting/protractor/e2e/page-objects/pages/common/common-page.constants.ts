@@ -99,7 +99,8 @@ export class CommonPageConstants {
             workFlows: 'Workflows',
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
-            comments: 'Comments'
+            comments: 'Comments',
+            editTeam: 'Edit Team'
         };
     }
 
