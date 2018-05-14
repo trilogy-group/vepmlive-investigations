@@ -68,6 +68,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
     }
 
+    static getDisabledRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@class,"ms-cui-disabled")][@aria-disabled="true"][contains(@id,'${id}')]`));
+    }
+
     static getRibbonSmallButtonByTitle(title: string) {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
     }
