@@ -8,7 +8,7 @@ export class CommonPageConstants {
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
     static readonly title = 'Title';
-
+    static readonly newItem = 'New Item';
     static get imageFile() {
         return {
             fileType: '.jpg',

@@ -236,7 +236,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(PicturePage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(PicturePageConstants.addAPicture,

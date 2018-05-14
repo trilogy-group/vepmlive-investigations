@@ -23,8 +23,9 @@ export class CommonPage extends BasePage {
         };
     }
 
+
     static get addNewLink() {
-        return element(By.css('[title="New Item"] a'));
+        return element(By.css(`[title="${CommonPageConstants.newItem}"] a`));
     }
 
     static get contentTitleInViewMode() {
@@ -158,7 +159,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecordsWithGreenTick() {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
+        return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green")]`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -191,6 +192,10 @@ export class CommonPage extends BasePage {
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
             comments: CommonPageHelper.getContextMenuItemByText(options.comments)
         };
+    }
+
+    static get projectShowAllButton() {
+        return element(By.id('Project_ddlShowAll'));
     }
 
     static get tabPanel() {

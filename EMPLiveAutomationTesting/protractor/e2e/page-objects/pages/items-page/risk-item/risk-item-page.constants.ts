@@ -4,6 +4,7 @@ export class RiskItemPageConstants {
     static readonly pagePrefix = 'Risks';
     static readonly pageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly attachFilePopupTitle = 'Attach File';
 
     static get inputLabels() {
         return {
@@ -49,24 +50,6 @@ export class RiskItemPageConstants {
             title: 'Title',
             specialColumns: 'Special Columns',
             ganttChart: 'Gantt Chart'
-        };
-    }
-
-    static get statuses() {
-        return {
-            notStarted: 'Not Started',
-            inProgress: 'In Progress',
-            completed: 'Completed',
-            deferred: 'Deferred',
-            waitingOnSomeoneElse: 'Waiting on someone else'
-        };
-    }
-
-    static get priorities() {
-        return {
-            high: '(1) High',
-            normal: '(2) Normal',
-            low: '(3) Low',
         };
     }
 }

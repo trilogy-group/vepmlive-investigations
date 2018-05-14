@@ -10,15 +10,12 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {HomePageConstants} from '../../homepage/home-page.constants';
 
 export class RiskItemPageHelper {
 
     static async editRisk(stepLogger: StepLogger) {
-        stepLogger.verification('"Edit Risk" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(RiskItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+        await this.verifyPage(stepLogger);
 
         stepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -98,5 +95,47 @@ export class RiskItemPageHelper {
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getRowForTableData(secondTableColumns)))
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
+    }
+
+    static async verifyPage(stepLogger: StepLogger) {
+        stepLogger.verification('"Edit Risk" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(RiskItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+    }
+
+    static async attachFile(stepLogger: StepLogger) {
+        stepLogger.stepId(6);
+        stepLogger.step('Click on "Attachments +" ');
+        await PageHelper.click(RiskItemPage.attachmentButton);
+
+        stepLogger.verification('The popup appears with Choose Files option');
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(RiskItemPageConstants.attachFilePopupTitle,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+        stepLogger.stepId(7);
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        const newFile = CommonPageHelper.uniqueDocumentFilePath;
+        stepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
+        await PageHelper.uploadFile(RiskItemPage.browseButton, newFile.fullFilePath);
+
+        stepLogger.verification('The File name appears under "Choose Files"');
+        await expect(await ElementHelper.getValue(RiskItemPage.browseButton))
+            .toBe(newFile.fullFilePath,
+                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPage.));
+
+
+        stepLogger.step('Click on OK');
+        await PageHelper.click(CommonPage.formButtons.ok);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
+        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     }
 }

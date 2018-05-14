@@ -2,6 +2,7 @@ import {browser, by, By, element, ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from './wait-helper';
 import {PageHelper} from './page-helper';
 import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
+import {HtmlHelper} from '../misc-utils/html-helper';
 
 export class ElementHelper {
     private static readonly EC = protractor.ExpectedConditions;
@@ -110,6 +111,11 @@ export class ElementHelper {
         return classes && classes.split(' ').indexOf(klass) !== -1;
     }
 
+    static async getValue(locator: ElementFinder) {
+        const value = await PageHelper.getAttributeValue(locator, HtmlHelper.attributes.value);
+        return value;
+    }
+
     static async hasClassRegex(locator: ElementFinder, klass: string) {
         const classAttribute = await locator.getAttribute('class');
         const pattern = new RegExp('(^|\\s)' + klass + '(\\s|$)');
@@ -142,8 +148,8 @@ export class ElementHelper {
                                            kClass: string,
                                            timeout = PageHelper.DEFAULT_TIMEOUT,
                                            message = '') {
-       return WaitHelper.getInstance().waitForElementToResolve(
-           () => this.hasClass(targetElement, kClass),
+        return WaitHelper.getInstance().waitForElementToResolve(
+            () => this.hasClass(targetElement, kClass),
             (result: any) => result, timeout, message);
     }
 

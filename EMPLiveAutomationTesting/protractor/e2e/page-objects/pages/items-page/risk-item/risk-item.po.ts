@@ -38,7 +38,11 @@ export class RiskItemPage extends BasePage {
             .getElementByTextInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
-    static get projectShowAllButton() {
-        return element(By.id('Project_ddlShowAll'));
+    static get browseButton() {
+        return element(By.css('[id*="fileUploadControl"]'));
+    }
+
+    static get attachmentButton() {
+        return element(By.css('.upload-attach'));
     }
 }
