@@ -82,7 +82,8 @@ export class CommonPage extends BasePage {
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
-            close: CommonPageHelper.getRibbonButtonByText(labels.close)
+            close: CommonPageHelper.getRibbonButtonByText(labels.close),
+            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose)
         };
     }
 
@@ -189,7 +190,8 @@ export class CommonPage extends BasePage {
             workFlows: CommonPageHelper.getContextMenuItemByText(options.workFlows),
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
-            comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+            comments: CommonPageHelper.getContextMenuItemByText(options.comments),
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam)
         };
     }
 
