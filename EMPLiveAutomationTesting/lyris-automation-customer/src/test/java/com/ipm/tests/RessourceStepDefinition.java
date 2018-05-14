@@ -62,7 +62,7 @@ public class RessourceStepDefinition {
 			wait.until(ExpectedConditions.presenceOfElementLocated(By.id("SharePointAccount_b28f2138-dab0-4d50-a6b3-83f8c99ccdef_$ClientPeoplePicker_NotificationSpan")));
 			js.executeScript("window.document.getElementById('SharePointAccount_b28f2138-dab0-4d50-a6b3-83f8c99ccdef_$ClientPeoplePicker_NotificationSpan').click()");
 			wait.until(ExpectedConditions.presenceOfElementLocated(By.className("sp-peoplepicker-editorInput")));
-			driver.findElement(By.className("sp-peoplepicker-editorInput")).sendKeys("test");
+			driver.findElement(By.className("sp-peoplepicker-editorInput")).sendKeys("admembers\\test1");
 			
 			wait.until(ExpectedConditions.elementToBeClickable(By.id("Department_ddlShowAll")));
             js.executeScript("window.document.getElementById('Department_ddlShowAll').click()");
