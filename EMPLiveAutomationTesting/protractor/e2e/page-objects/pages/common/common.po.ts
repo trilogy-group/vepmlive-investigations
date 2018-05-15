@@ -92,7 +92,9 @@ export class CommonPage extends BasePage {
         return {
             save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
             ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel)
+            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel),
+            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
+            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
         };
     }
 
