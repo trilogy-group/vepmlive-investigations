@@ -1,5 +1,6 @@
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
+import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
@@ -52,8 +53,9 @@ export class CommonPageConstants {
             viewItem: 'ViewItem',
             editItem: 'EditItem',
             editTeam: 'Edit Team',
+            saveAndClose: 'Save &',
             close: 'Close',
-            saveAndClose: 'Save &Close'
+            saveAndCloseSecond: 'Save &Close'
         };
     }
 
@@ -61,7 +63,9 @@ export class CommonPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
-            ok: 'OK'
+            ok: 'OK',
+            add:  '< Add',
+            remove: 'Remove >'
         };
     }
 
@@ -76,7 +80,8 @@ export class CommonPageConstants {
     static get pageHeaders() {
         return {
             projects: HomePageConstants.navigationLabels.projects,
-            myWorkplace: MyWorkplaceConstants.navigationLabels
+            myWorkplace: MyWorkplaceConstants.navigationLabels,
+            createNew: CreateNewPageConstants.navigationLabels
         };
     }
 

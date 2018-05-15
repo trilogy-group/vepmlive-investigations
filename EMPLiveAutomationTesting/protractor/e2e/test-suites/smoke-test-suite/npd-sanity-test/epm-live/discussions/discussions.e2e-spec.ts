@@ -17,7 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Navigate to Discussions page - [785609]', async () => {

@@ -69,9 +69,42 @@ const configSetup = {
             localIdentifier: '',//Don't specify anything here it's just for a reference purpose that it can be a param
             build: '',//Don't specify anything here it's just for a reference purpose that it can be a param
         },
-
+        login: {
+            admin: {
+                user: "admin.user",
+                password: "Pass@word1"
+            },
+            projectManager: {
+                user: "project.manager",
+                password: "Pass@word1"
+            },
+            teamMember: {
+                user: "team.member",
+                password: "Pass@word1"
+            },
+            portfolioManager: {
+                user: "portfolio.manager",
+                password: "Pass@word1"
+            },
+            reportViewer: {
+                user: "report.viewer",
+                password: "Pass@word1"
+            },
+            reportWriter: {
+                user: "report.writer",
+                password: "Pass@word1"
+            },
+            resourceManager : {
+                user: "resource.manager",
+                password: "Pass@word1"
+            },
+            executiveUser : {
+                user: "executive.user",
+                password: "Pass@word1"
+            }
+        }
     },
-    baseUrl: 'http://ajay.suwalka:Pass%40word1@qaepmlive6/',
+    baseUrl: 'http://qaepmlive6/',
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,
