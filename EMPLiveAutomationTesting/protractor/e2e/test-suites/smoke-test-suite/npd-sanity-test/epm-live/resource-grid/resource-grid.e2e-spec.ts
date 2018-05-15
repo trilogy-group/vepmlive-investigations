@@ -10,13 +10,14 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {ResourcesPage} from '../../../../../page-objects/pages/navigation/resources/resources.po';
 import {ResourcesPageConstants} from '../../../../../page-objects/pages/navigation/resources/resources-page.constants';
 import {ResourcesPageHelper} from '../../../../../page-objects/pages/navigation/resources/resources-page.helper';
+import {browser} from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Navigate to Resources page - [910192]', async () => {
@@ -39,6 +40,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
         stepLogger.stepId(1);
         stepLogger.step('Click on "+ Invite" link displayed on top of "Resources" page');
+        await browser.sleep(PageHelper.timeout.l);
+        await expect(await PageHelper.isElementDisplayed(ResourcesPage.newInviteLink, true))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(ResourcesPageConstants.inviteLink));
         await PageHelper.click(ResourcesPage.newInviteLink);
         stepLogger.verification('"Resources - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);

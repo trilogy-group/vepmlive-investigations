@@ -45,12 +45,12 @@ export class CommonPage extends BasePage {
                 issues: CommonPageHelper.getPageHeaderByTitle(projectsLabels.issues),
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
                 documents: CommonPageHelper.getPageHeaderByTitle(projectsLabels.documents),
-                resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources),
+                resources: CommonPageHelper.getPageHeader(projectsLabels.resources),
                 reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
                 reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting)
             },
             myWorkplace: {
-                myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),
+                myWork: CommonPageHelper.getPageHeader(myWorkplaceLabels.myWork),
                 myTimeSheet: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeSheet),
                 myTimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeOff),
                 timeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.timeOff),

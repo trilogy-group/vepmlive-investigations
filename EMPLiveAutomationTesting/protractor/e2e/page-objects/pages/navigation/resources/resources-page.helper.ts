@@ -37,12 +37,10 @@ export class ResourcesPageHelper {
 
         stepLogger.verification('"New Resource" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ResourcesPageConstants.editPageName));
+            .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ResourcesPageConstants.editPageName));
 
         stepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(displayName));
+        await expect(await PageHelper.isElementDisplayed(AnchorHelper.getElementByTextInsideGrid(displayName)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
     }
 }
