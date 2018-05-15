@@ -53,7 +53,9 @@ export class CommonPageConstants {
             viewItem: 'ViewItem',
             editItem: 'EditItem',
             editTeam: 'Edit Team',
-            close: 'Close'
+            saveAndClose: 'Save &',
+            close: 'Close',
+            saveAndCloseSecond: 'Save &Close'
         };
     }
 
@@ -61,7 +63,9 @@ export class CommonPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
-            ok: 'OK'
+            ok: 'OK',
+            add:  '< Add',
+            remove: 'Remove >'
         };
     }
 
@@ -100,7 +104,8 @@ export class CommonPageConstants {
             workFlows: 'Workflows',
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
-            comments: 'Comments'
+            comments: 'Comments',
+            editTeam: 'Edit Team'
         };
     }
 
@@ -171,6 +176,13 @@ export class CommonPageConstants {
             onTrack: '(1) On Track',
             atRisk: '(2) At Risk',
             offTrack: '(3) Off Track',
+        };
+    }
+
+    static get teamId() {
+        return {
+            currentTeam: 'TeamGrid',
+            resourcePool: 'ResourceGrid'
         };
     }
 }

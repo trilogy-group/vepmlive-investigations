@@ -82,7 +82,8 @@ export class CommonPage extends BasePage {
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
-            close: CommonPageHelper.getRibbonButtonByText(labels.close)
+            close: CommonPageHelper.getRibbonButtonByText(labels.close),
+            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose)
         };
     }
 
@@ -91,7 +92,9 @@ export class CommonPage extends BasePage {
         return {
             save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
             ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel)
+            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel),
+            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
+            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
         };
     }
 
@@ -189,7 +192,8 @@ export class CommonPage extends BasePage {
             workFlows: CommonPageHelper.getContextMenuItemByText(options.workFlows),
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
-            comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+            comments: CommonPageHelper.getContextMenuItemByText(options.comments),
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam)
         };
     }
 

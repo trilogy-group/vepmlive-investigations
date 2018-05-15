@@ -4,6 +4,8 @@ export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly buildTeamPage = 'Build Team';
+    static readonly nonAdminUser = 'Non Admin User';
 
     static get inputLabels() {
         return {
@@ -54,6 +56,7 @@ export class ProjectItemPageConstants {
             cost: 'Cost',
             costReduction: 'Cost Reduction',
             costReductionWeight: 'Cost Reduction Rating',
+            currentTeam: 'Current Team',
             decision: 'Decision',
             defaultPlanner: 'Default Planner',
             duration: 'Duration',
@@ -98,6 +101,7 @@ export class ProjectItemPageConstants {
             risk: 'Risk',
             riskWeight: 'Risk Rating',
             roi: 'ROI',
+            resourcePool: 'Resource Pool',
             scheduleStatus: 'Schedule Status',
             site: 'Site',
             stageGateOwner: 'Stage Gate Owner',
@@ -117,6 +121,26 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get buildTeamContentIDs() {
+        return {
+            resourcePool: 'tdRes',
+            currentTeam: 'tdTeam'
+        };
+    }
+
+    static get buildTeamContentClass() {
+        return {
+            saveAndCloseDisabled: 'ms-cui-disabled'
+        };
+    }
+
+    static get messageText() {
+        return {
+            saveAndCloseDisabled: 'Save & Close Button is disabled',
+            saveAndCloseEnabled: 'Save & Close Button is enabled'
+        };
+    }
+
     static get teamSectionlabels() {
         return {
             currentTeam: 'Current Team',
@@ -124,4 +148,10 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get teamChangeButtons() {
+        return {
+            add: '< Add',
+            remove: 'Remove >'
+        };
+    }
 }
