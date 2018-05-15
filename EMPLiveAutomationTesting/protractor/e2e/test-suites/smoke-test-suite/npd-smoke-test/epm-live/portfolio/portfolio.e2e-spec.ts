@@ -22,7 +22,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Create New Portfolio - [1125567]', async () => {

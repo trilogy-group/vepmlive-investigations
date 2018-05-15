@@ -29,16 +29,4 @@ export class HomePageConstants {
             overwriteExistingFilesLabel: 'Overwrite existing files',
         };
     }
-
-    static get toolBarMenuOptions() {
-        return {
-            change: 'Change',
-            discussion: 'Discussion',
-            event: 'Event',
-            issue: 'Issue',
-            link: 'Link',
-            project: 'Project',
-            more: 'More'
-        };
-    }
 }

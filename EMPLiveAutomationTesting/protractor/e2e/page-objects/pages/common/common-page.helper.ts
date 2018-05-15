@@ -39,6 +39,14 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
+    static get adminEmailId(): string {
+        return browser.params.login.admin.user;
+    }
+
+    static get adminPassword(): string {
+        return browser.params.login.admin.password;
+    }
+
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -65,7 +73,8 @@ export class CommonPageHelper {
     }
 
     static getRibbonButtonByText(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and (${ComponentHelpers.
+        getXPathFunctionForDot(title)} or ${ComponentHelpers.getXPathFunctionForText(title)})]`));
     }
 
     static getRibbonSmallButtonByTitle(title: string) {
@@ -77,7 +86,7 @@ export class CommonPageHelper {
     }
 
     static getToolBarItemsByText(title: string) {
-        return element(By.xpath(`//ul[@id='epm-se-toolbar-items']//a[normalize-space(text())='${title}']`));
+        return element(By.xpath(`//ul[contains(@id,'epm-se-toolbar-items')]//a[text()='${title}']`));
     }
 
     static getTextBoxByLabel(title: string) {
@@ -147,8 +156,8 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+    static getPageHeaderByTitle(title: string, isContains= false) {
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -301,10 +310,6 @@ export class CommonPageHelper {
     static getElementContainsId(id: string) {
         const xpath = `[id*="${id}"]`;
         return element(By.css(xpath));
-    }
-
-    static getOptionByText(option: string) {
-        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
 
     static getElementContainsTitle(title: string) {
