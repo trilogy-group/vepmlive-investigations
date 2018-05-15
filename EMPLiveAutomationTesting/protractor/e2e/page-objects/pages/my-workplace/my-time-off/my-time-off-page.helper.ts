@@ -18,7 +18,7 @@ export class MyTimeOffPageHelper {
         stepLogger.step(`Title *: New Time Off`);
         await TextboxHelper.sendKeys(MyTimeOffPage.inputs.title, title);
 
-        stepLogger.step(` Time Off Type: Select value 'Holiday'', if not selected already`);
+        stepLogger.step(` Time Off Type: Select value if not selected already`);
         await PageHelper.sendKeysToInputField(MyTimeOffPage.inputs.timeOffType, timeOffType);
 
         stepLogger.step('Select any Time OFf type from the drop down');
@@ -64,6 +64,9 @@ export class MyTimeOffPageHelper {
 
         stepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
+
+        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
 
         stepLogger.verification('"New Time Off" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())

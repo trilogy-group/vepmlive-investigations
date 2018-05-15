@@ -2,6 +2,8 @@ import {BasePage} from '../base-page';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
 import {By, element} from 'protractor';
+import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import {LoginPageHelper} from '../login/login-page.helper';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -25,7 +27,8 @@ export class HomePage extends BasePage {
     }
 
     static get toolBarMenuItems() {
-        const options = HomePageConstants.toolBarMenuOptions;
+        const options = CreateNewPageConstants.navigationLabels.listApps;
+        const optionsLibraryApps = CreateNewPageConstants.navigationLabels.libraryApps;
         return {
             change: CommonPageHelper.getToolBarItemsByText(options.change),
             discussion: CommonPageHelper.getToolBarItemsByText(options.discussion),
@@ -33,7 +36,14 @@ export class HomePage extends BasePage {
             issue: CommonPageHelper.getToolBarItemsByText(options.issue),
             link: CommonPageHelper.getToolBarItemsByText(options.link),
             project: CommonPageHelper.getToolBarItemsByText(options.project),
-            more: CommonPageHelper.getToolBarItemsByText(options.more)
+            portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
+            projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
+            more: this.moreButton,
+            risk: CommonPageHelper.getToolBarItemsByText(options.risk),
+            timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
+            toDo: CommonPageHelper.getToolBarItemsByText(options.toDo),
+            projectDocument: CommonPageHelper.getToolBarItemsByText(optionsLibraryApps.projectDocument),
+            sharedDocument: CommonPageHelper.getToolBarItemsByText(optionsLibraryApps.sharedDocument)
         };
     }
 
@@ -51,5 +61,14 @@ export class HomePage extends BasePage {
 
     static get commentField() {
         return CommonPageHelper.getElementUsingText(HomePageConstants.comment, false);
+    }
+
+    static get moreButton() {
+        return element(By.css('.epm-se-show-more'));
+    }
+
+    async goToAndLogin(username = CommonPageHelper.adminEmailId, password = CommonPageHelper.adminPassword) {
+        this.goTo();
+        await LoginPageHelper.login(username, password);
     }
 }
