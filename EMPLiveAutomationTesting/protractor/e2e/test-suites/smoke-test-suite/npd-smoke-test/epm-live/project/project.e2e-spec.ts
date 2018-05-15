@@ -158,7 +158,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
-    fit('Check behavior of "Save and Close" button - [743175]', async () => {
+    it('Check behavior of "Save and Close" button - [743175]', async () => {
         const stepLogger = new StepLogger(743175);
         const uniqueId = PageHelper.getUniqueId();
 

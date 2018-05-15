@@ -152,8 +152,8 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+    static getPageHeaderByTitle(title: string, isContains= false) {
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -306,10 +306,6 @@ export class CommonPageHelper {
     static getElementContainsId(id: string) {
         const xpath = `[id*="${id}"]`;
         return element(By.css(xpath));
-    }
-
-    static getOptionByText(option: string) {
-        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
 
     static getElementContainsTitle(title: string) {
