@@ -16,7 +16,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Launch Build Team from Project Center - [743139]', async () => {
