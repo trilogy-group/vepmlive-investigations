@@ -4,7 +4,7 @@ const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
 const configSetup = {
-    restartBrowserBetweenTests: false,
+    restartBrowserBetweenTests: true,
     SELENIUM_PROMISE_MANAGER: false,
     multiCapabilities: [{
         browserName: 'chrome',

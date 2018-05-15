@@ -152,13 +152,8 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
-        return element(By.xpath(xpath));
-    }
-
-    static getPageHeader(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//span[${ComponentHelpers.getXPathFunctionForDot(title, true)}]`;
+    static getPageHeaderByTitle(title: string, isContains= false) {
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
