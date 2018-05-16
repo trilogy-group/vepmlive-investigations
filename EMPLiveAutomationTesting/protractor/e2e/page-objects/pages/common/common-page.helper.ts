@@ -77,6 +77,10 @@ export class CommonPageHelper {
         getXPathFunctionForDot(title)} or ${ComponentHelpers.getXPathFunctionForText(title)})]`));
     }
 
+    static getDisabledRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@class,"ms-cui-disabled")][@aria-disabled="true"][contains(@id,'${id}')]`));
+    }
+
     static getRibbonSmallButtonByTitle(title: string) {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
     }

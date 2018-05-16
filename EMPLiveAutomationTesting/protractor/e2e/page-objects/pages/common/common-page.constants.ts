@@ -60,6 +60,12 @@ export class CommonPageConstants {
         };
     }
 
+    static get disabledribbonbuttonsId() {
+        return {
+            saveAndClose: 'SaveCloseButton'
+        };
+    }
+
     static get formLabels() {
         return {
             save: 'Save',
