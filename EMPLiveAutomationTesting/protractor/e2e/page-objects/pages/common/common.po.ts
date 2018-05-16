@@ -94,6 +94,13 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get disabledribbonItems() {
+        const labels = CommonPageConstants.disabledribbonbuttonsId;
+        return {
+            saveAndClose: CommonPageHelper.getDisabledRibbonButtonById(labels.saveAndClose)
+        };
+    }
+
     static get formButtons() {
         const labels = CommonPageConstants.formLabels;
         return {

@@ -92,4 +92,20 @@ export class ValidationsHelper {
     static getOnlyOneRecordShouldBeDisplayedInGrid(name: string) {
         return `There should only be 1 record displayed in grid with title ${name}`;
     }
+
+    static getDisabledValidation(name: string) {
+        return `${name} should be disabled`;
+    }
+
+    static getEnabledValidation(name: string) {
+        return `${name} should be enabled`;
+    }
+
+    static getButtonDisabledValidation(name: string) {
+        return `${this.types.button} ${this.getDisabledValidation(name)}`;
+    }
+
+    static getButtonEnabledValidation(name: string) {
+        return `${this.types.button} ${this.getEnabledValidation(name)}`;
+    }
 }
