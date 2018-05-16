@@ -55,7 +55,8 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             saveAndClose: 'Save &',
             close: 'Close',
-            saveAndCloseSecond: 'Save &Close'
+            saveAndClose: 'Save &Close',
+            assignmentPlanner: 'Assignment Planner'
         };
     }
 

@@ -81,6 +81,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
     }
 
+    static getRibbonMediumButtonByTitle(title: string) {
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-mediumlabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+    }
+
     static getToolBarItemsByText(title: string) {
         return element(By.xpath(`//ul[contains(@id,'epm-se-toolbar-items')]//a[text()='${title}']`));
     }
