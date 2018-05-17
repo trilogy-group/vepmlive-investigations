@@ -33,7 +33,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
     });
 
-    fit('Create New Changes - [855545]', async () => {
+    it('Create New Changes - [855545]', async () => {
         const stepLogger = new StepLogger(855545);
         stepLogger.stepId(1);
         // step#2 is inside this function
@@ -69,7 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    fit('Create New Issue - [855547]', async () => {
+    it('Create New Issue - [855547]', async () => {
         const stepLogger = new StepLogger(855547);
         stepLogger.stepId(1);
         // step#2 is inside this function
@@ -104,7 +104,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyWorkPageHelper.fillFormAndSave(stepLogger);
     });
 
-    fit('Create New Risks - [855550]', async () => {
+    it('Create New Risks - [855550]', async () => {
         const stepLogger = new StepLogger(855550);
         stepLogger.stepId(1);
         // step#2 is inside this function
@@ -139,7 +139,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyWorkPageHelper.fillFormAndSave(stepLogger);
     });
 
-    fit('Create New Time Off - [855551]', async () => {
+    it('Create New Time Off - [855551]', async () => {
         const stepLogger = new StepLogger(855551);
         stepLogger.stepId(1);
         // step#2 is inside this function
@@ -174,7 +174,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyWorkPageHelper.fillTimeOffFormAndSave(stepLogger);
     });
 
-    fit('Create New To Do item - [855560]', async () => {
+    it('Create New To Do item - [855560]', async () => {
         const stepLogger = new StepLogger(855560);
         stepLogger.stepId(1);
         // step#2 is inside this function
