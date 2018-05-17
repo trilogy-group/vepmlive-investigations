@@ -10,7 +10,6 @@ import {MyWorkPage} from './my-work.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {browser} from 'protractor';
 import {MyWorkplacePage} from '../my-workplace.po';
-import {MyTimeOffPageConstants} from '../my-time-off/my-time-off-page.constants';
 
 const uniqueId = PageHelper.getUniqueId();
 const labels = MyWorkPageConstants.inputLabels;
@@ -88,10 +87,8 @@ export class MyWorkPageHelper {
 
         stepLogger.stepId(6);
         stepLogger.verification('"Navigate to My Time Off page');
+        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.myTimeOff))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementsByTextInsideGrid(titleValue).first()))
                     .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
