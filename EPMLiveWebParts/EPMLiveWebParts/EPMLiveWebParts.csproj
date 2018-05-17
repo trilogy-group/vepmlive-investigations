@@ -513,12 +513,15 @@
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
+    <None Include="bundleconfig.json" />
     <None Include="javascripts\EPMLive.SocialStream.Logs.min.js.map" />
     <None Include="javascripts\EPMLive.SocialStream.min.js.map" />
     <None Include="javascripts\libraries\bundles\moment.js.bundle" />
     <None Include="javascripts\libraries\bundles\moment.min.js.map" />
     <None Include="javascripts\libraries\moment-timezone.data.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map">
+      <DependentUpon>GanttGrid.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.css.map" />
     <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.less" />
     <None Include="Layouts\epmlive\Stylesheets\SocialStream.css.map" />
@@ -1033,7 +1036,9 @@
     <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="Layouts\epmlive\images\white-avatar.png" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
-    <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js">
+      <DependentUpon>GanttGrid.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\jquery.fancybox.js" />
     <Content Include="Layouts\epmlive\javascripts\nativeviewer.js" />
