@@ -85,6 +85,7 @@ export class ProjectItemPage extends BasePage {
             remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
     }
+  
     static get assignmentPlannerFrame () {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }

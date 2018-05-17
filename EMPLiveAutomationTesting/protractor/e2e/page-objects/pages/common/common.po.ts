@@ -84,7 +84,13 @@ export class CommonPage extends BasePage {
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
-            assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner)
+            assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner),
+            viewReports: CommonPageHelper.getRibbonMediumButtonByTitle(labels.viewReports),
+            resourceAvailableVsPlannedByDept: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceAvailableVsPlannedByDept),
+            resourceCapacityHeatMap: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCapacityHeatMap),
+            resourceCommitments: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCommitments),
+            resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
+            resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity)
         };
     }
 
