@@ -6,6 +6,7 @@ export class ProjectItemPageConstants {
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
     static readonly nonAdminUser = 'Non Admin User';
+    static readonly actionsDropdown = 'Actions Dropdown';
 
     static get inputLabels() {
         return {
@@ -152,6 +153,26 @@ export class ProjectItemPageConstants {
         return {
             add: '< Add',
             remove: 'Remove >'
+        };
+    }
+
+    static get reportParameter() {
+        return {
+            periodStart: 'Period Start',
+            periodEnd: 'Period End',
+            department: 'Department'
+        };
+    }
+
+    static get reportHeaders(){
+        return {
+            refresh: 'Refresh',
+            firstPage: 'First Page',
+            previousPage: 'Previous Page',
+            nextPage: 'Next Page',
+            lastPage: 'Last Page',
+            findTextInReport: 'Find Text in Report',
+            nextFind: 'Next Find'
         };
     }
 }

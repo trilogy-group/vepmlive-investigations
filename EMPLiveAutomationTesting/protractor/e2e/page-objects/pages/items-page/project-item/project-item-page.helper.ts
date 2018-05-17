@@ -253,4 +253,16 @@ export class ProjectItemPageHelper {
         }
         return resourceFound;
     }
+
+    static getReportParametersByTitle(title: string) {
+        return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
+    }
+
+    static getReportPagingHeaderByTitle(title: string) {
+        return element(By.xpath(`//a[contains(@name,"RptControls")][contains(@class,"sqlrv-Image")][@title='${title}'`));
+    }
+
+    static getReportTextFunctionHeaderByTitle(title: string) {
+        return element(By.xpath(`//*[contains(@class,"sqlrv")][@title='${title}']`));
+    }
 }

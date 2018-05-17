@@ -85,9 +85,35 @@ export class ProjectItemPage extends BasePage {
             remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
     }
-  
+
     static get assignmentPlannerFrame () {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
+    }
+
+    static get reportParameters() {
+        const label = ProjectItemPageConstants.reportParameter;
+        return {
+            periodStart: ProjectItemPageHelper.getReportParametersByTitle(label.periodStart),
+            periodEnd: ProjectItemPageHelper.getReportParametersByTitle(label.periodEnd),
+            department: ProjectItemPageHelper.getReportParametersByTitle(label.department),
+        };
+    }
+
+    static get reportHeaders() {
+        const label = ProjectItemPageConstants.reportHeaders;
+        return {
+            refresh: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.refresh),
+            firstPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.firstPage),
+            previousPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.previousPage),
+            nextPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.nextPage),
+            lastPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.lastPage),
+            findTextInReport: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.findTextInReport),
+            nextFind: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.nextFind)
+        };
+    }
+
+    static get Actionsdropdown() {
+        return element(By.xpath(`//a[contains(@class,"sqlrv")][@title="Open Menu"]`));
     }
 
 }
