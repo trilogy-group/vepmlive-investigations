@@ -7,15 +7,6 @@ namespace WorkEnginePPM.Layouts.ppm
 {
     public partial class gridaction : System.Web.UI.Page
     {
-        private class GenerateTicketResponse
-        {
-            public string Id { get; set; }
-
-            public string Error { get; set; }
-
-            public bool Success { get; set; }
-        }
-
         protected string data;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -57,7 +48,18 @@ namespace WorkEnginePPM.Layouts.ppm
                                     }
                                 }
 
-                                url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/_layouts/ppm/" + Request["epkcontrol"] + ".aspx?dataid=" + ticket + "&epkurl=" + System.Web.HttpUtility.UrlEncode(epkurl) + "&view=" + Request["view"] + "&listid=" + Request["listid"] + "&isresource=0";
+                                var serverRelativeUrl = web.ServerRelativeUrl == "/"
+                                    ? string.Empty
+                                    : web.ServerRelativeUrl;
+
+                                var pathAndQuery = "/_layouts/ppm/" + Request["epkcontrol"] +
+                                                 ".aspx?dataid=" + ticket +
+                                                 "&epkurl=" + System.Web.HttpUtility.UrlEncode(epkurl) +
+                                                 "&view=" + Request["view"] +
+                                                 "&listid=" + Request["listid"] +
+                                                 "&isresource=0";
+
+                                url = serverRelativeUrl + pathAndQuery;
                             }
                             break;
                     }

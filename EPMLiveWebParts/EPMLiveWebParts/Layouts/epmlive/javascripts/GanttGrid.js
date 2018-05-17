@@ -329,10 +329,13 @@ function GridOnGetHtmlValue(grid, row, col, val) {
 
             // get the grid action url
             var url = GetGridItemUrl(grid, row);
-            if (!url || url === '') url = 'javascript:;'
+            if (!url) {
+                url = 'javascript:;';
+            }
 
-            if (eval("mygrid" + gridid + ".LinkType") != "")
+            if (eval("mygrid" + gridid + ".LinkType")) {
                 val = "<a onclick=\"GridGoToItem('" + grid.id + "','" + row.id + "'); return false;\" href=\"" + url + "\">" + val + "</a>";
+            }
 
             if (grid.GetValue(row, "HasComments") == "1") {
                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";

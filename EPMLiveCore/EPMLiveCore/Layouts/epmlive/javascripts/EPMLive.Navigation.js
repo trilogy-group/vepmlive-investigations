@@ -849,6 +849,7 @@
                     var rpUrl = (url + '/_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&').replace(/\/\//g, '/');
                     var redirectUrl = '';
                     var errorMessageForRightClick = '';
+                    var kindString = kind + '';
 
                     // the default result
                     var result = {
@@ -941,12 +942,12 @@
                     }
 
                     // final adjustment for web url
-                    if (result.webUrl && kind != '0' && kind != '1' && result.webUrl.indexOf('action=errorMessage') == -1) {
+                    if (result.webUrl && kindString !== '0' && kindString !== '1' && result.webUrl.indexOf('action=errorMessage') === -1) {
                         result.webUrl += '&IsDlg=0';
                     }
 
                     // final adjustment for dialog url
-                    if (result.dialogUrl && (kind == '2' || kind == '3')) {
+                    if (result.dialogUrl && (kindString === '2' || kindString === '3')) {
                         result.dialogUrl += '&IsDlg=1';
                     }
 
