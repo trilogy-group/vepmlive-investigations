@@ -55,7 +55,20 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             saveAndClose: 'Save &',
             close: 'Close',
-            saveAndCloseSecond: 'Save &Close'
+            saveAndClose: 'Save &Close',
+            assignmentPlanner: 'Assignment Planner',
+            viewReports: 'View Reports',
+            resourceAvailableVsPlannedByDept: 'Resource Available vs. Planned by Dept',
+            resourceCapacityHeatMap: 'Resource Capacity Heat Map',
+            resourceCommitments: 'Resource Commitments',
+            resourceRequirements: 'Resource Requirements',
+            resourceWorkVsCapacity: 'Resource Work vs. Capacity'
+        };
+    }
+
+    static get disabledribbonbuttonsId() {
+        return {
+            saveAndClose: 'SaveCloseButton'
         };
     }
 

@@ -83,7 +83,21 @@ export class CommonPage extends BasePage {
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
-            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose)
+            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
+            assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner),
+            viewReports: CommonPageHelper.getRibbonMediumButtonByTitle(labels.viewReports),
+            resourceAvailableVsPlannedByDept: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceAvailableVsPlannedByDept),
+            resourceCapacityHeatMap: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCapacityHeatMap),
+            resourceCommitments: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCommitments),
+            resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
+            resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity)
+        };
+    }
+
+    static get disabledribbonItems() {
+        const labels = CommonPageConstants.disabledribbonbuttonsId;
+        return {
+            saveAndClose: CommonPageHelper.getDisabledRibbonButtonById(labels.saveAndClose)
         };
     }
 
