@@ -324,4 +324,33 @@ export class CommonPageHelper {
     static getTeamRecordsNameByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
     }
+
+    public static get getCurrentDate() {
+        return new Date().getDate();
+    }
+
+    public static get getPreviousDate() {
+        const date = this.getCurrentDate;
+        const yesterday = date - 1;
+        return yesterday;
+    }
+
+    public static get getCurrentMonth() {
+        const month = new Date().getMonth();
+        return month + 1; // January is 0!
+    }
+
+    public static get getCurrentYear() {
+        return new Date().getFullYear();
+    }
+
+    public static get getTodayInMMDDYYYY(){
+        const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
+        return currentDate;
+    }
+
+    public static get getYesterdayInMMDDYYYY(){
+        const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
+        return tomorrowDate;
+    }
 }
