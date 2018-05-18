@@ -108,12 +108,12 @@ export class ProjectItemPage extends BasePage {
             nextPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.nextPage),
             lastPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.lastPage),
             findTextInReport: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.findTextInReport),
-            nextFind: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.nextFind)
+            findNext: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.findNext)
         };
     }
 
-    static get Actionsdropdown() {
-        return element(By.xpath(`//a[contains(@class,"sqlrv")][@title="Open Menu"]`));
+    static get actionsdropdown() {
+        return element(By.xpath(`//a[contains(@id,"RSActionMenu_ctl01")][@title="Open Menu"]`));
     }
 
 }

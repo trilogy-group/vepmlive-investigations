@@ -172,7 +172,7 @@ export class ProjectItemPageConstants {
             nextPage: 'Next Page',
             lastPage: 'Last Page',
             findTextInReport: 'Find Text in Report',
-            nextFind: 'Next Find'
+            findNext: 'Find Next'
         };
     }
 }

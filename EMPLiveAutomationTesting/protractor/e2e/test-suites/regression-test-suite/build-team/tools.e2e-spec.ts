@@ -59,14 +59,68 @@ describe(SuiteNames.regressionTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
 
+        stepLogger.step('Click on "Resource Capacity Heat Map"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceCapacityHeatMap);
         await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceCapacityHeatMap);
         await PageHelper.switchToDefaultContent();
 
+        stepLogger.step('Verify Reporting Services page will be displayed with below fields');
+        stepLogger.step('Verify "Period Start"');
         await PageHelper.switchToNewTabIfAvailable(2);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.reportParameters.periodStart);
-        await expect(WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.reportParameters.periodStart))
+        await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportParameters.periodStart);
+        await expect(await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.reportParameters.periodStart))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportParameter.periodStart));
+
+        stepLogger.step('Verify "Period End"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportParameters.periodEnd))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportParameter.periodEnd));
+
+        stepLogger.step('Verify "Departments"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportParameters.department))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportParameter.department));
+
+        stepLogger.step('Verify "Refresh"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.refresh))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.refresh));
+
+        stepLogger.step('Verify "First Page"');
+        await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.firstPage);
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.firstPage))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.firstPage));
+
+        stepLogger.step('Verify "Previous Page"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.previousPage))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.previousPage));
+
+        stepLogger.step('Verify "Next Page"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.nextPage))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.nextPage));
+
+        stepLogger.step('Verify "Last Page"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.lastPage))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.lastPage));
+
+        stepLogger.step('Verify "Find Text in Report"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.findTextInReport))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.findTextInReport));
+
+        stepLogger.step('Verify "Next Find"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.reportHeaders.findNext))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.reportHeaders.findNext));
+
+        stepLogger.step('Verify "Actions dropdwon"');
+        await expect(await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.actionsdropdown))
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.actionsDropdown));
     });
 });

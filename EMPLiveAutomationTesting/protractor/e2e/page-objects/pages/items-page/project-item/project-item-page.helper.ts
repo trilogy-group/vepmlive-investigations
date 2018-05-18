@@ -259,7 +259,7 @@ export class ProjectItemPageHelper {
     }
 
     static getReportPagingHeaderByTitle(title: string) {
-        return element(By.xpath(`//a[contains(@name,"RptControls")][contains(@class,"sqlrv-Image")][@title='${title}'`));
+        return element(By.xpath(`//input[contains(@name,"RptControls")][contains(@class,"sqlrv-Image")][@title='${title}']`));
     }
 
     static getReportTextFunctionHeaderByTitle(title: string) {
