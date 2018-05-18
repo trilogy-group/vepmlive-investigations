@@ -8,7 +8,7 @@ import { CommonPageConstants } from '../../../page-objects/pages/common/common-p
 import { WaitHelper } from '../../../components/html/wait-helper';
 import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
 import { ElementHelper } from '../../../components/html/element-helper';
-import {browser, by} from 'protractor';
+import {browser} from 'protractor';
 import { ProjectItemPage } from '../../../page-objects/pages/items-page/project-item/project-item.po';
 import { ProjectItemPageConstants } from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
@@ -18,9 +18,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
         await homePage.goTo();
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_UserName')).sendKeys('admin.user');
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_password')).sendKeys('Pass@word1');
-        await browser.findElement(by.id('ctl00_PlaceHolderMain_signInControl_login')).click();
     });
 
     it('View the options on "Resource Capacity Heat map" report page" - [743179]', async () => {
