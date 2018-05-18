@@ -64,15 +64,15 @@ export class MyWorkPage {
      static get dropdownAll() {
         const dropdownLabel = CommonPageConstants.dropdownShowAllButton;
         return {
-            project: this.getDropdownValue(dropdownLabel.project),
-            timeOffType: this.getDropdownValue(dropdownLabel.timeOffType),
+            project: element(By.id(dropdownLabel.project)),
+            timeOffType: element(By.id(dropdownLabel.timeOffType)),
             timeOffInput: this.selectDropdownOption(MyWorkPageConstants.inputDropdownValues.Holiday),
         };
     }
 
-    static getDropdownValue(id: string) {
+    /* static getDropdownValue(id: string) {
         return element(By.id(`${id}`));
-    }
+    }*/
 
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
