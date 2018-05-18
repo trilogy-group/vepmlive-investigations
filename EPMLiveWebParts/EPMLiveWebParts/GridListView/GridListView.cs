@@ -1155,7 +1155,7 @@ namespace EPMLiveWebParts
                 {
                     ribbonExtensions = new XmlDocument();
                     ribbonExtensions.LoadXml(@"<Button
-                    Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
+                    Id=""Ribbon.ListItem.Manage.EPKResourcePlanner.MultiAction""
                     Sequence=""43""
                     Command=""EPKMultiAction""
                     CommandValueId=""ResourcePlanner""
@@ -1169,7 +1169,7 @@ namespace EPMLiveWebParts
                 {
                     ribbonExtensions = new XmlDocument();
                     ribbonExtensions.LoadXml(@"<Button
-                    Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
+                    Id=""Ribbon.ListItem.Manage.EPKResourcePlanner.SingleAction""
                     Sequence=""44""
                     Command=""EPKSingleAction""
                     CommandValueId=""ResourcePlanner""
