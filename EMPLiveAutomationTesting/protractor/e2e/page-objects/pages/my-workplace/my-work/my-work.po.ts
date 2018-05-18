@@ -70,10 +70,6 @@ export class MyWorkPage {
         };
     }
 
-    /* static getDropdownValue(id: string) {
-        return element(By.id(`${id}`));
-    }*/
-
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
