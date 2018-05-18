@@ -120,11 +120,11 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get actionsdropdown() {
-        return element(By.xpath(`//a[contains(@id,"RSActionMenu_ctl01")][@title="Open Menu"]`));
+        return element(By.css(`a[id*="RSActionMenu_ctl01"][title="Open Menu"]`));
     }
 
     static get applyParameterButton() {
-        return element(By.xpath(`//input[contains(@name,"ApplyParameters")][@value="Apply"]`));
+        return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
 
 }
