@@ -96,6 +96,13 @@ export class ProjectItemPage extends BasePage {
             periodStart: ProjectItemPageHelper.getReportParametersByTitle(label.periodStart),
             periodEnd: ProjectItemPageHelper.getReportParametersByTitle(label.periodEnd),
             department: ProjectItemPageHelper.getReportParametersByTitle(label.department),
+            resource: ProjectItemPageHelper.getReportParametersByTitle(label.resource),
+            projectName: ProjectItemPageHelper.getReportParametersByTitle(label.projectName),
+            resources: ProjectItemPageHelper.getReportParametersByTitle(label.resources),
+            scope: ProjectItemPageHelper.getReportParametersByTitle(label.scope),
+            from: ProjectItemPageHelper.getReportParametersByTitle(label.from),
+            to: ProjectItemPageHelper.getReportParametersByTitle(label.to),
+            units: ProjectItemPageHelper.getReportParametersByTitle(label.units)
         };
     }
 
@@ -114,6 +121,10 @@ export class ProjectItemPage extends BasePage {
 
     static get actionsdropdown() {
         return element(By.xpath(`//a[contains(@id,"RSActionMenu_ctl01")][@title="Open Menu"]`));
+    }
+
+    static get applyParameterButton() {
+        return element(By.xpath(`//input[contains(@name,"ApplyParameters")][@value="Apply"]`));
     }
 
 }

@@ -7,6 +7,7 @@ export class ProjectItemPageConstants {
     static readonly buildTeamPage = 'Build Team';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly actionsDropdown = 'Actions Dropdown';
+    static readonly applyButton = 'Apply Button';
 
     static get inputLabels() {
         return {
@@ -160,7 +161,14 @@ export class ProjectItemPageConstants {
         return {
             periodStart: 'Period Start',
             periodEnd: 'Period End',
-            department: 'Department'
+            department: 'Department',
+            resource: 'Resource',
+            projectName: 'Project Name',
+            resources: 'Resources',
+            scope: 'Scope',
+            from: 'From',
+            to: 'To',
+            units: 'Units'
         };
     }
 
