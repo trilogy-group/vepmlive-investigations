@@ -21,6 +21,8 @@ import {PicturePageConstants} from '../../../../../page-objects/pages/my-workpla
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import { EventsPageConstants } from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
+import { EventsPage } from '../../../../../page-objects/pages/my-workplace/events/events.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -317,5 +319,43 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Newly created Time off item details displayed in read only mode');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+    });
+
+    fit('Create a NewEvent from Workspace Functionality - [1124296]', async () => {
+        const stepLogger = new StepLogger(1124296);
+
+        // Step #1 and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.events,
+            CommonPage.pageHeaders.myWorkplace.events,
+            EventsPageConstants.pagePrefix,
+            stepLogger);
+
+        stepLogger.verification('"Events" Page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(EventsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pagePrefix));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over on the date for which event to be created');
+        stepLogger.step('Click on "+ Add" link displayed on the date square box');
+        await ElementHelper.actionHoverOverAndClick(EventsPage.calenderTomorrow, EventsPage.addNewEvent);
+        // await ElementHelper.actionHoverOver(EventsPage.calenderTomorrow);
+        // await ElementHelper.actionClick(EventsPage.addNewEvent);
+
+
+        // await WaitHelper.getInstance().waitForElementToBeDisplayed(EventsPage.newEvent);
+        // stepLogger.verification('"Events - New Item" window is displayed');
+        //  await expect(await CommonPage.title.getText())
+        //     .toBe(EventsPageConstants.newEventWindow,
+        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.newEventWindow));
+                
+        // // Step #4 and #5 Inside this function
+        // const labels = EventsPageConstants.inputLabels;
+        // const uniqueId = PageHelper.getUniqueId();
+        // const title = `${labels.title} ${uniqueId}`;
+        // await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
+ 
     });
 });
