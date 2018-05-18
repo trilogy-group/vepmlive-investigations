@@ -8,18 +8,16 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {MyWorkPage} from './my-work.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
-import {browser} from 'protractor';
 import {MyWorkplacePage} from '../my-workplace.po';
-
-const uniqueId = PageHelper.getUniqueId();
-const labels = MyWorkPageConstants.inputLabels;
 
 export class MyWorkPageHelper {
 
     static async fillFormAndSave(stepLogger: StepLogger) {
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
 
         stepLogger.step(`Title *: New Item`);
-        const titleValue = `${labels.title} ${uniqueId}`;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
 
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
@@ -30,13 +28,12 @@ export class MyWorkPageHelper {
 
         stepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true, ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
+            .toBe(true, ValidationsHelper.getFieldShouldHaveValueValidation(inputLabels.project, projectName));
 
         stepLogger.step(`Assigned To: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, CommonPageHelper.adminEmailId);
-        await browser.sleep(PageHelper.timeout.s);
         stepLogger.step(`select assignedTo value`);
-        await PageHelper.click(MyWorkPage.selectInputValue(CommonPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(CommonPageHelper.adminEmailId));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on save');
@@ -49,14 +46,16 @@ export class MyWorkPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
 
         stepLogger.verification('Newly created Item [Ex: Title 1] displayed in "My Work" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementsByTextInsideGrid(titleValue).first()))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
 
     static async fillTimeOffFormAndSave(stepLogger: StepLogger) {
 
+        const uniqueId = PageHelper.getUniqueId();
+
         stepLogger.step(`Title *: New Item`);
-        const titleValue = `${labels.title} ${uniqueId}`;
+        const titleValue = `${MyWorkPageConstants.inputLabels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
 
         stepLogger.step('Time Off Type *: Select any type from the drop down [Ex: Holiday])');
@@ -65,9 +64,8 @@ export class MyWorkPageHelper {
 
         stepLogger.step(`Requestor* : New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, CommonPageHelper.adminEmailId);
-        await browser.sleep(PageHelper.timeout.s);
         stepLogger.step(`select Requester* value`);
-        await PageHelper.click(MyWorkPage.selectInputValue(CommonPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(CommonPageHelper.adminEmailId));
 
         stepLogger.step(`Enter Start Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.start, CommonPageHelper.getTodayInMMDDYYYY);
@@ -87,10 +85,9 @@ export class MyWorkPageHelper {
 
         stepLogger.stepId(6);
         stepLogger.verification('"Navigate to My Time Off page');
-        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementsByTextInsideGrid(titleValue).first()))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
                     .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
 

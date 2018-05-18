@@ -5,17 +5,6 @@ export class MyWorkPageConstants {
     static readonly pagePostfix = `${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
-    static get newItemMenu() {
-        return {
-            newItem: 'Ribbon.MyWork.New.NewItem-Large',
-            changesItem: 'Ribbon.MyWork.NewItem.Changes-Menu32',
-            issuesItem: 'Ribbon.MyWork.NewItem.Issues-Menu32',
-            risksItem: 'Ribbon.MyWork.NewItem.Risks-Menu32',
-            timeOffItem: 'Ribbon.MyWork.NewItem.Time Off-Menu32',
-            toDoItem: 'Ribbon.MyWork.NewItem.To Do-Menu32',
-        };
-    }
-
     static get pageName() {
         return {
             changes: `Changes${CommonPageConstants.pagePostFix.newItem}`,
@@ -28,6 +17,8 @@ export class MyWorkPageConstants {
 
     static get title() {
         return {
+            newItem: 'NewItem',
+            changesItem: 'NewItem.Changes',
             changes: 'Changes',
             issues: 'Issues',
             risks: 'Risks',
@@ -45,13 +36,6 @@ export class MyWorkPageConstants {
             finish: 'Finish Required Field',
             timeOffType: 'Time Off Type *',
             requestor: 'Requestor',
-        };
-    }
-
-    static get inputShowAllDropdown() {
-        return {
-            project: 'Project_ddlShowAll',
-            timeOffType: 'TimeOffType_ddlShowAll',
         };
     }
 
