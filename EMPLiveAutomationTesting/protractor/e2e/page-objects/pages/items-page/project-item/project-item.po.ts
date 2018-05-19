@@ -85,9 +85,21 @@ export class ProjectItemPage extends BasePage {
             remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
     }
-  
+
     static get assignmentPlannerFrame () {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
+    static get newTask() {
+        return element(By.id('txtNewTask'));
+    }
+
+    static get selectPlanner() {
+        const label = ProjectItemPageConstants.plannerLabels;
+        return {
+            microsoftProject: CommonPageHelper.getElementUsingText(label.microsoftProject, false),
+            projectPlanner: CommonPageHelper.getElementUsingText(label.projectPlanner, false)
+
+        };
+    }
 }

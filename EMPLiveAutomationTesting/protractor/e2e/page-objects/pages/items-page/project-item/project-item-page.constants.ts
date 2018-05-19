@@ -154,4 +154,11 @@ export class ProjectItemPageConstants {
             remove: 'Remove >'
         };
     }
+
+    static get plannerLabels() {
+        return {
+            microsoftProject: 'Microsoft Project',
+            projectPlanner: 'Project Planner'
+        };
+    }
 }
