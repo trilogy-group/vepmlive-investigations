@@ -120,7 +120,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get actionsdropdown() {
-        return element(By.css(`a[id*="RSActionMenu_ctl01"][title="Open Menu"]`));
+        return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
     }
 
     static get applyParameterButton() {
