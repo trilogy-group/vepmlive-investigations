@@ -262,7 +262,9 @@ export class ProjectItemPageHelper {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
 
-    static getReportTextFunctionHeaderByTitle(title: string) {
-        return element(By.css(`.sqlrv[title="${title}"]`));
+    static async clickOnViewReports() {
+        await PageHelper.click(CommonPage.ribbonItems.viewReports);
+        await browser.sleep(PageHelper.timeout.xs);
     }
+
 }

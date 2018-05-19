@@ -114,8 +114,8 @@ export class ProjectItemPage extends BasePage {
             previousPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.previousPage),
             nextPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.nextPage),
             lastPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.lastPage),
-            findTextInReport: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.findTextInReport),
-            findNext: ProjectItemPageHelper.getReportTextFunctionHeaderByTitle(label.findNext)
+            findTextInReport: CommonPageHelper.getElementByTitle(label.findTextInReport),
+            findNext: CommonPageHelper.getElementByTitle(label.findNext)
         };
     }
 

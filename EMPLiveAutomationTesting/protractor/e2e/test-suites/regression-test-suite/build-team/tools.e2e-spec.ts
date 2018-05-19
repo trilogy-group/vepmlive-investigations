@@ -8,9 +8,9 @@ import { CommonPageConstants } from '../../../page-objects/pages/common/common-p
 import { WaitHelper } from '../../../components/html/wait-helper';
 import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
 import { ElementHelper } from '../../../components/html/element-helper';
-import {browser} from 'protractor';
 import { ProjectItemPage } from '../../../page-objects/pages/items-page/project-item/project-item.po';
 import { ProjectItemPageConstants } from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import { ProjectItemPageHelper } from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let homePage: HomePage;
@@ -53,14 +53,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
-        await PageHelper.click(CommonPage.ribbonItems.viewReports);
-        // It is taking 2-3 seconds time to load options in view reports dropdown else it throws stale Element reference error
-        await WaitHelper.getInstance().staticWait(2000);
+        await ProjectItemPageHelper.clickOnViewReports();
 
         stepLogger.step('Click on "Resource Capacity Heat Map"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceCapacityHeatMap);
-        await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceCapacityHeatMap);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceCapacityHeatMap);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Verify Reporting Services page will be displayed with below fields');
@@ -154,16 +151,12 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.stepId(3);
-        stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
-        await PageHelper.click(CommonPage.ribbonItems.viewReports);
-        // It is taking 2-3 seconds time to load options in view reports dropdown else it throws stale Element reference error
-        await WaitHelper.getInstance().staticWait(2000);
+        await ProjectItemPageHelper.clickOnViewReports();
 
         stepLogger.step('Click on "Resource Commitment"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceCommitments);
-        await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceCommitments);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceCommitments);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Verify Reporting Services page will be displayed with below fields');
@@ -254,14 +247,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
-        await PageHelper.click(CommonPage.ribbonItems.viewReports);
-        // It is taking 2-3 seconds time to load options in view reports dropdown else it throws stale Element reference error
-        await WaitHelper.getInstance().staticWait(2000);
+        await ProjectItemPageHelper.clickOnViewReports();
 
         stepLogger.step('Click on "Resource Available Vs. Planned by Dept"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceAvailableVsPlannedByDept);
-        await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceAvailableVsPlannedByDept);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceAvailableVsPlannedByDept);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Verify Reporting Services page will be displayed with below fields');
@@ -362,14 +352,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
-        await PageHelper.click(CommonPage.ribbonItems.viewReports);
-        // It is taking 2-3 seconds time to load options in view reports dropdown else it throws stale Element reference error
-        await WaitHelper.getInstance().staticWait(2000);
+        await ProjectItemPageHelper.clickOnViewReports();
 
         stepLogger.step('Click on "Resource Requirements"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceRequirements);
-        await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceRequirements);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceRequirements);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Verify Reporting Services page will be displayed with below fields');
@@ -455,14 +442,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
-        await PageHelper.click(CommonPage.ribbonItems.viewReports);
-        // It is taking 2-3 seconds time to load options in view reports dropdown else it throws stale Element reference error
-        await WaitHelper.getInstance().staticWait(2000);
+        await ProjectItemPageHelper.clickOnViewReports();
 
         stepLogger.step('Click on "Resource Work vs. Capacity"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.resourceWorkVsCapacity);
-        await browser.executeScript('arguments[0].click();', CommonPage.ribbonItems.resourceWorkVsCapacity);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.resourceWorkVsCapacity);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Verify Reporting Services page will be displayed with below fields');
