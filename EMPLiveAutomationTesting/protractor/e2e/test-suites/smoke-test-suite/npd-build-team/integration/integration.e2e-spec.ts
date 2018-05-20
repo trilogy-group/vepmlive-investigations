@@ -98,14 +98,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('click on Project Planner');
-        // Edit planner takes around 7-8 seconds to open pop up for select Planner
-        await PageHelper.timeout.m;
 
         // If user has default planner selected then then selectPlanner PopUp won't appear
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
-
-        // After select Planner, It takes around 15-20 seconds to Loading view and Randering data
-        await PageHelper.timeout.l;
 
         stepLogger.verification('Observe that the "Project Planner" is displayed');
         stepLogger.verification('"Project Planner" window is displayed');
