@@ -10,15 +10,16 @@ import { ValidationsHelper } from '../../../../components/misc-utils/validation-
 import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import { ProjectItemPageHelper } from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { Key } from 'protractor';
 import { ElementHelper } from '../../../../components/html/element-helper';
+import { TextboxHelper } from '../../../../components/html/textbox-helper';
+import { ProjectItemPageValidations } from '../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('View the Build Team-Current team members in Project Planner - [743198]', async () => {
@@ -64,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
@@ -98,13 +99,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         stepLogger.step('click on Project Planner');
         // Edit planner takes around 7-8 seconds to open pop up for select Planner
-        await WaitHelper.getInstance().staticWait(7000);
+        await PageHelper.timeout.m;
 
         // If user has default planner selected then then selectPlanner PopUp won't appear
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         // After select Planner, It takes around 15-20 seconds to Loading view and Randering data
-        await WaitHelper.getInstance().staticWait(20000);
+        await PageHelper.timeout.l;
 
         stepLogger.verification('Observe that the "Project Planner" is displayed');
         stepLogger.verification('"Project Planner" window is displayed');
@@ -115,8 +116,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step('Enter New Task in the "Add a Task"');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.newTask);
-        await PageHelper.sendKeysToInputField(ProjectItemPage.newTask, uniqueId);
-        await PageHelper.sendKeysToInputField(ProjectItemPage.newTask, Key.ENTER);
+        await TextboxHelper.sendKeys(ProjectItemPage.newTask, uniqueId, true);
 
         stepLogger.step('click on "Edit Team" button');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editTeamProjectPlanner);
@@ -132,6 +132,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 });
