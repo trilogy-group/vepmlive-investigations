@@ -22,7 +22,7 @@ namespace WorkEnginePPM.Events.Tests
             {
                 ShimSPItemEventProperties shimitemeveprop = new ShimSPItemEventProperties()
                 {
-                    OpenWeb = () =>
+                    WebGet = () =>
                     {
                         ShimSPWeb spweb = new ShimSPWeb();
                         spweb.Dispose = () => { };

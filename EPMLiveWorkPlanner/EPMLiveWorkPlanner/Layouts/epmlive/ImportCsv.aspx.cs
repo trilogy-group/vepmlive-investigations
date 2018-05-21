@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveWorkPlanner.Layouts.epmlive
 {
@@ -121,7 +122,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             //});
             EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
 
-            Response.Redirect("ImportExcelFinish.aspx?isdlg=1&jobuid=" + tJob);
+            Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/ImportExcelFinish.aspx?isdlg=1&jobuid=" + tJob, SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+        
         }
 
         protected void btnUpload_Click(object sender, EventArgs e)
