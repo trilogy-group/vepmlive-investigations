@@ -71,4 +71,9 @@ export class HomePage extends BasePage {
         this.goTo();
         await LoginPageHelper.login(username, password);
     }
+
+    async goToAndLoginAsTeamMember(username = CommonPageHelper.TeamMemberEmailId, password = CommonPageHelper.TeamMemberPassword) {
+        this.goTo();
+        await LoginPageHelper.login(username, password);
+    }
 }

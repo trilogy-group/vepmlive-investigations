@@ -23,4 +23,13 @@ export class MyTimeOffPage {
     static getInputByLabel(title: string) {
         return element(By.xpath(MyTimeOffPageHelper.getXpathForInputByLabel(HtmlHelper.tags.input, title)));
     }
+
+    static get timeOffTitleInViewWindow() {
+        return element(By.xpath(`//span[contains(@id,'ItemTitle')]`));
+    }
+
+    static closeButton(type: string) {
+        const xpath = `[type="${type}"]`;
+        return element(By.css(xpath));
+   }
 }
