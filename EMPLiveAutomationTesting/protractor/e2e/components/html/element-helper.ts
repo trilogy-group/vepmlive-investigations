@@ -135,7 +135,7 @@ export class ElementHelper {
     }
 
     static async clickUsingJsNoWait(targetElement: ElementFinder) {
-        return browser.executeScript('arguments[0].click();', targetElement.getElementFinder());
+        return browser.executeScript('arguments[0].click();', targetElement);
     }
 
     static async waitForElementToHaveClass(targetElement: ElementFinder,

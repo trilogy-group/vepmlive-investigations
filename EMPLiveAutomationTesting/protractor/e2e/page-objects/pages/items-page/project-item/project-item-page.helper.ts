@@ -253,4 +253,18 @@ export class ProjectItemPageHelper {
         }
         return resourceFound;
     }
+
+    static getReportParametersByTitle(title: string) {
+        return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
+    }
+
+    static getReportPagingHeaderByTitle(title: string) {
+        return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
+    }
+
+    static async clickOnViewReports() {
+        await PageHelper.click(CommonPage.ribbonItems.viewReports);
+        await browser.sleep(PageHelper.timeout.xs);
+    }
+
 }
