@@ -6,6 +6,8 @@ export class ProjectItemPageConstants {
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
     static readonly nonAdminUser = 'Non Admin User';
+    static readonly actionsDropdown = 'Actions Dropdown';
+    static readonly applyButton = 'Apply Button';
 
     static get inputLabels() {
         return {
@@ -155,10 +157,36 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get reportParameter() {
+        return {
+            periodStart: 'Period Start',
+            periodEnd: 'Period End',
+            department: 'Department',
+            resource: 'Resource',
+            projectName: 'Project Name',
+            resources: 'Resources',
+            scope: 'Scope',
+            from: 'From',
+            to: 'To',
+            units: 'Units'
+        };
+    }
+
+    static get reportHeaders(){
+        return {
+            refresh: 'Refresh',
+            firstPage: 'First Page',
+            previousPage: 'Previous Page',
+            nextPage: 'Next Page',
+            lastPage: 'Last Page',
+            findTextInReport: 'Find Text in Report',
+            findNext: 'Find Next'
+        };
+    }
     static get plannerLabels() {
         return {
             microsoftProject: 'Microsoft Project',
             projectPlanner: 'Project Planner'
-        };
+      };
     }
 }

@@ -17,7 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        await homePage.goToAndLogin();
     });
 
     it('Add resources under "Current Team" - [778264]', async () => {
