@@ -30,4 +30,8 @@ export class EventsPage {
     static get calenderBlock() {
         return CommonPageHelper.getElementContainsTitle(CommonPageConstants.title);
     }
+    
+    static eventPageByTitle(title:string) {
+        return CommonPageHelper.getElementUsingTextContent(title,true);
+    }
 }

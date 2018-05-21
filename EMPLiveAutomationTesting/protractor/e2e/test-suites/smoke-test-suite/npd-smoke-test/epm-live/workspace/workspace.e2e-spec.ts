@@ -21,6 +21,9 @@ import {PicturePageConstants} from '../../../../../page-objects/pages/my-workpla
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import { EventsPage } from '../../../../../page-objects/pages/my-workplace/events/events.po';
+// import { EventsPageConstants } from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
+import { EventsPageHelper } from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -317,5 +320,35 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Newly created Time off item details displayed in read only mode');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+    });
+    fit('Edit Event from Workplace - [1175266]', async () => {  
+        const stepLogger = new StepLogger(1175266);
+
+        stepLogger.step('PRECONDITION: Create a New Event using steps in test case C1124296');
+        const title = await EventsPageHelper.createNewEvent();
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Event Name link displayed in Events Page for the event created as per pre requisites');
+        const eventTitleElement = EventsPage.eventPageByTitle(title);
+        await PageHelper.click(eventTitleElement);
+        // stepLogger.verification('Event Details Quick View Page is shown and all event details displayed in Read Only mode');        
+        // await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        // await expect(await CommonPage.dialogTitles.first().getText())
+        //     .toBe(EventsPageConstants.pageName,
+        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+
+        // stepLogger.stepId(4);
+        // stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
+        // stepLogger.verification('"Edit Event" page is displayed');        
+        // await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        // await expect(await CommonPage.dialogTitles.first().getText())
+        //     .toBe(EventsPageConstants.pageName,
+        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+
+        // // steps 5,6 7 are verified here
+        // const labels = EventsPageConstants.inputLabels;
+        // const uniqueId = PageHelper.getUniqueId();
+        // const title = `${labels.title} ${uniqueId}`;
+        // await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title,stepLogger);
     });
 });
