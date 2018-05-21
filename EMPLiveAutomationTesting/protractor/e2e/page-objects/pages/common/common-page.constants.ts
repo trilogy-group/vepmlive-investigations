@@ -197,4 +197,15 @@ export class CommonPageConstants {
             resourcePool: 'ResourceGrid'
         };
     }
+
+    static get dropdownShowAllButton() {
+        return {
+            project: 'Project_ddlShowAll',
+            timeOffType: 'TimeOffType_ddlShowAll',
+            role: 'Role_ddlShowAll',
+            holidaySchedule: 'HolidaySchedule_ddlShowAll',
+            workHours: 'WorkHours_ddlShowAll',
+            portfolio: 'Portfolio_ddlShowAll',
+        };
+    }
 }
