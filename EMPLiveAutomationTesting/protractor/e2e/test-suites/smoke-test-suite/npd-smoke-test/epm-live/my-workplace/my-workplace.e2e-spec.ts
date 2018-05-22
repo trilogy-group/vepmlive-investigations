@@ -323,7 +323,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
-    fit('Edit Event from Workplace - [1175266]', async () => {  
+    it('Edit Event from Workplace - [1175266]', async () => {  
         const stepLogger = new StepLogger(1175266);
 
         stepLogger.step('PRECONDITION: Create a New Event using steps in test case C1124296');
