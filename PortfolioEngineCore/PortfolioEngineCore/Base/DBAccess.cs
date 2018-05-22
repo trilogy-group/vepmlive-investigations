@@ -63,11 +63,23 @@ namespace PortfolioEngineCore
                     //else
                     //    m_oConnection.ConnectionString = dbConnectionStringBuilder.ToString() + ";UID=" + m_sEPKUID + ";PWD=" + m_sEPKPWD + ";Application Name=PortfolioEngine";
 
-                    if(!string.IsNullOrEmpty(dbConnectionStringBuilder.ToString()))
+                    if (!string.IsNullOrEmpty(dbConnectionStringBuilder.ToString()))
+                    {
                         m_oConnection.Open();
+                    }
                     else
-                        HandleStatusError(SeverityEnum.Error, "Sql.Open", (StatusEnum)99959, 
-                            "Empty PPM connection string, database connection skipped " + m_oConnection != null? ": " + m_oConnection.ConnectionString : "", true);
+                    {
+                        var connectionString = m_oConnection != null
+                            ? ": " + m_oConnection.ConnectionString
+                            : string.Empty;
+
+                        HandleStatusError(
+                            SeverityEnum.Error,
+                            "Sql.Open",
+                            (StatusEnum)99959,
+                            "Empty PPM connection string, database connection skipped " + connectionString,
+                            true);
+                    }
                 }
             }
             catch (Exception ex)
