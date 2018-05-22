@@ -155,7 +155,7 @@ export class ElementHelper {
     }
 
     static async scrollToElement(elementt: ElementFinder) {
-        browser.executeScript('arguments[0].scrollIntoView();', elementt.getElementFinder());
+        browser.executeScript('arguments[0].scrollIntoView();', elementt);
     }
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
