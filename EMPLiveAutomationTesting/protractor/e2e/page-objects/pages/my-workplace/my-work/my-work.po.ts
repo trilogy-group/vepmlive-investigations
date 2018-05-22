@@ -3,7 +3,7 @@ import {element, By} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {MyWorkPageHelper} from './my-work-page.helper';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class MyWorkPage {
 
@@ -76,7 +76,6 @@ export class MyWorkPage {
     }
 
     static get lastButton() {
-        return MyWorkPageHelper.getButtonText(MyWorkPageConstants.last);
+        return AnchorHelper.getAnchorByText(MyWorkPageConstants.last);
     }
-
 }

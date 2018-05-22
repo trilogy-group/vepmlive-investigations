@@ -25,7 +25,7 @@ export class MyTimeOffPage {
     }
 
     static get timeOffTitleInViewWindow() {
-        return element(By.xpath(`//span[contains(@id,'ItemTitle')]`));
+        return element(By.css(`span[id*='ItemTitle']`));
     }
 
     static get closeButton() {

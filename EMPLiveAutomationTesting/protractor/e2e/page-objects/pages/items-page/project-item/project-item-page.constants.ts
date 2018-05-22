@@ -183,4 +183,10 @@ export class ProjectItemPageConstants {
             findNext: 'Find Next'
         };
     }
+    static get plannerLabels() {
+        return {
+            microsoftProject: 'Microsoft Project',
+            projectPlanner: 'Project Planner'
+      };
+    }
 }

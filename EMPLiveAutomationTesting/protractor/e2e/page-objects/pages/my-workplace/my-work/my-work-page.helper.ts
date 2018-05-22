@@ -10,8 +10,6 @@ import {MyWorkPage} from './my-work.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
-import {element, By} from 'protractor';
-import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class MyWorkPageHelper {
 
@@ -92,12 +90,7 @@ export class MyWorkPageHelper {
         stepLogger.verification('"Click on last button');
         await PageHelper.click(MyWorkPage.lastButton);
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementsByTextInsideGrid(titleValue).last()))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
                     .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
-
-    static getButtonText(text: string) {
-        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
-    }
-
 }

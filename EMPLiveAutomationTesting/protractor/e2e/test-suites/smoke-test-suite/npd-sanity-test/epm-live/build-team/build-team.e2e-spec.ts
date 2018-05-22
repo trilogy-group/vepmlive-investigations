@@ -10,6 +10,7 @@ import { SuiteNames } from '../../../../helpers/suite-names';
 import { StepLogger } from '../../../../../../core/logger/step-logger';
 import { WaitHelper } from '../../../../../components/html/wait-helper';
 import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import { ProjectItemPageValidations } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -85,7 +86,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
@@ -128,7 +129,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(7);
         stepLogger.step('Click "Close" button in "Edit Team" window');
@@ -204,7 +205,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(6);
         stepLogger.step('check status of "Save & Close" button');
@@ -254,7 +255,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
         .toBe(true,
-            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(9);
         stepLogger.step('Click "Close" button in "Edit Team" window');
