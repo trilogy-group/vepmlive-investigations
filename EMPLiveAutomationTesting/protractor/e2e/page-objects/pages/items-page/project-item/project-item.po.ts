@@ -90,6 +90,18 @@ export class ProjectItemPage extends BasePage {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
+    static get newTask() {
+        return element(By.id('txtNewTask'));
+    }
+
+    static get selectPlanner() {
+        const label = ProjectItemPageConstants.plannerLabels;
+        return {
+            microsoftProject: CommonPageHelper.getElementUsingText(label.microsoftProject, false),
+            projectPlanner: CommonPageHelper.getElementUsingText(label.projectPlanner, false)
+
+        };
+    }
     static get reportParameters() {
         const label = ProjectItemPageConstants.reportParameter;
         return {
@@ -126,5 +138,4 @@ export class ProjectItemPage extends BasePage {
     static get applyParameterButton() {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
-
 }

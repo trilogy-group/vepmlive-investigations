@@ -117,7 +117,8 @@ export class CommonPageConstants {
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
             comments: 'Comments',
-            editTeam: 'Edit Team'
+            editTeam: 'Edit Team',
+            editPlan: 'Edit Plan'
         };
     }
 

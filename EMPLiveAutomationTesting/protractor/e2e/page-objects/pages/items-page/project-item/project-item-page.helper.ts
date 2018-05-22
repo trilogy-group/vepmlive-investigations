@@ -5,7 +5,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, element, By} from 'protractor';
+import {browser, element, By, ElementFinder} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -246,6 +246,7 @@ export class ProjectItemPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
         size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
+            ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
             if (text === resourceName) {
                     resourceFound = true;
@@ -254,6 +255,13 @@ export class ProjectItemPageHelper {
         return resourceFound;
     }
 
+    static async selectPlannerIfPopUpAppears(planner: ElementFinder) {
+        if (await element.all(By.tagName('iframe')).count() >= 1) {
+            await PageHelper.switchToFrame(CommonPage.contentFrame);
+            await PageHelper.click(planner);
+            await PageHelper.switchToDefaultContent();
+        }
+    }
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }
@@ -266,5 +274,4 @@ export class ProjectItemPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);
     }
-
 }
