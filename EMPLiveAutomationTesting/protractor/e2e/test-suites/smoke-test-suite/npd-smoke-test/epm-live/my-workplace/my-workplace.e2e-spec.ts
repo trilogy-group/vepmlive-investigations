@@ -22,8 +22,9 @@ import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import { EventsPage } from '../../../../../page-objects/pages/my-workplace/events/events.po';
-// import { EventsPageConstants } from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
 import { EventsPageHelper } from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
+import { EventsPageConstants } from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
+
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -321,6 +322,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
+
     fit('Edit Event from Workplace - [1175266]', async () => {  
         const stepLogger = new StepLogger(1175266);
 
@@ -331,24 +333,37 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on Event Name link displayed in Events Page for the event created as per pre requisites');
         const eventTitleElement = EventsPage.eventPageByTitle(title);
         await PageHelper.click(eventTitleElement);
-        // stepLogger.verification('Event Details Quick View Page is shown and all event details displayed in Read Only mode');        
-        // await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        // await expect(await CommonPage.dialogTitles.first().getText())
-        //     .toBe(EventsPageConstants.pageName,
-        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+        stepLogger.verification('Event Details Quick View Page is shown and all event details displayed in Read Only mode');        
+        const eventTitleDetails = CommonPageHelper.getElementUsingText(title,true);
+        await expect(await PageHelper.isElementPresent(eventTitleDetails))
+            .toBe(true, eventTitleDetails);
 
-        // stepLogger.stepId(4);
-        // stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
-        // stepLogger.verification('"Edit Event" page is displayed');        
-        // await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        // await expect(await CommonPage.dialogTitles.first().getText())
-        //     .toBe(EventsPageConstants.pageName,
-        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+        stepLogger.stepId(4);
+        stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
+        await PageHelper.click(EventsPage.editEvent);
+        stepLogger.verification('"Edit Event" page is displayed');            
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save',false));
+        await expect(await CommonPage.title.getText())
+            .toBe(EventsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
 
-        // // steps 5,6 7 are verified here
-        // const labels = EventsPageConstants.inputLabels;
-        // const uniqueId = PageHelper.getUniqueId();
-        // const title = `${labels.title} ${uniqueId}`;
-        // await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title,stepLogger);
+        // steps 5,6 are verified here
+        const labels = EventsPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const newTitle = `${labels.title} ${uniqueId}`;
+        await EventsPageHelper.fillNewEventForm(newTitle,stepLogger);
+
+        stepLogger.stepId(7);
+        stepLogger.step('Click "Close" button in Event Details Quick View Page');
+        await PageHelper.click(EventsPage.closeEventButton);
+        stepLogger.verification('"Events" Page is displayed'); 
+            await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.events))
+                .toBe(true,
+                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.events));
+ 
+        stepLogger.verification('Updated event is highlighted on the calendar for the date and time with blue background');           
+        const newEventTitle = CommonPageHelper.getElementUsingText(newTitle,true);
+        await expect(await PageHelper.isElementPresent(newEventTitle))
+            .toBe(true, newEventTitle);
     });
 });

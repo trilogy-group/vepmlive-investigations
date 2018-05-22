@@ -30,5 +30,3 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EventsPageHelper.createNewEvent();
     });
 });
-
-

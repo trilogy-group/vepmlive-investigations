@@ -34,4 +34,12 @@ export class EventsPage {
     static eventPageByTitle(title:string) {
         return CommonPageHelper.getElementUsingTextContent(title,true);
     }
+
+    static get editEvent() {
+        return element.all(By.className('ms-cui-ctl-largelabel')).first();
+    }
+    
+    static get closeEventButton() {
+        return element(By.css('[value = "Close"]'));
+    }
 }

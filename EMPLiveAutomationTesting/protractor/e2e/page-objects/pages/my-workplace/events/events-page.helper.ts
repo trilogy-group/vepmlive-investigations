@@ -12,7 +12,7 @@ import { WaitHelper } from '../../../../components/html/wait-helper';
 
 export class EventsPageHelper {
 
-    static async fillNewEventsFormAndVerifyEventCreated(title: string, stepLogger: StepLogger) {
+    static async fillNewEventForm(title: string, stepLogger: StepLogger) {
 
         stepLogger.step(`Title *: New Event 1`);
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);
@@ -24,8 +24,12 @@ export class EventsPageHelper {
         stepLogger.stepId(4);
         stepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
-        await PageHelper.switchToDefaultContent();
 
+    }
+
+    static async verifyNewEventCreated(stepLogger: StepLogger) {
+
+        await PageHelper.switchToDefaultContent();
         stepLogger.verification('"New Event" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
@@ -35,16 +39,20 @@ export class EventsPageHelper {
         await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock, true))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
     }
+
     static async createNewEvent() {
         const stepLogger = new StepLogger(786942);
+
         stepLogger.step('PRECONDITION: navigate to Events page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.events, CommonPage.pageHeaders.myWorkplace.events, CommonPageConstants.pageHeaders.myWorkplace.events, stepLogger);
+        
         stepLogger.stepId(1);
         stepLogger.step('Click on "Events" tab displayed on top of "Events" page');
         await PageHelper.click(EventsPage.eventsTab);
         stepLogger.verification('Tab Panel of the Events should get displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel, true))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.tabPanel));
+        
         stepLogger.stepId(2);
         stepLogger.step('Click on "New Event" option from Events tab panel');
         await PageHelper.click(EventsPage.newEvent);
@@ -52,6 +60,7 @@ export class EventsPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(EventsPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+        
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
         stepLogger.stepId(3);
@@ -59,7 +68,8 @@ export class EventsPageHelper {
         const labels = EventsPageConstants.inputLabels;
         const uniqueId = PageHelper.getUniqueId();
         const title = `${labels.title} ${uniqueId}`;
-        await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
+        await EventsPageHelper.fillNewEventForm(title, stepLogger);
+        await EventsPageHelper.verifyNewEventCreated(stepLogger);
         return title;
     }
 }
