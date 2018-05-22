@@ -28,8 +28,8 @@ export class MyTimeOffPage {
         return element(By.xpath(`//span[contains(@id,'ItemTitle')]`));
     }
 
-    static closeButton(type: string) {
-        const xpath = `[type="${type}"]`;
-        return element(By.css(xpath));
-   }
+    static get closeButton() {
+        return MyTimeOffPageHelper.getElementByType(HtmlHelper.tags.submit);
+    }
+
 }

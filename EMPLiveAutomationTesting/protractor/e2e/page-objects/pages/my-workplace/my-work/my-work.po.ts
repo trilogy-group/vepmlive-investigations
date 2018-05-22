@@ -3,6 +3,7 @@ import {element, By} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {MyWorkPageHelper} from './my-work-page.helper';
 
 export class MyWorkPage {
 
@@ -72,6 +73,10 @@ export class MyWorkPage {
 
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static get lastButton() {
+        return MyWorkPageHelper.getButtonText(MyWorkPageConstants.last);
     }
 
 }

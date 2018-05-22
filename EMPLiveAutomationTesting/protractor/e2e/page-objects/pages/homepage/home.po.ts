@@ -3,7 +3,6 @@ import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
 import {By, element} from 'protractor';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
-import {LoginPageHelper} from '../login/login-page.helper';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -65,15 +64,5 @@ export class HomePage extends BasePage {
 
     static get moreButton() {
         return element(By.css('.epm-se-show-more'));
-    }
-
-    async goToAndLogin(username = CommonPageHelper.adminEmailId, password = CommonPageHelper.adminPassword) {
-        this.goTo();
-        await LoginPageHelper.login(username, password);
-    }
-
-    async goToAndLoginAsTeamMember(username = CommonPageHelper.TeamMemberEmailId, password = CommonPageHelper.TeamMemberPassword) {
-        this.goTo();
-        await LoginPageHelper.login(username, password);
     }
 }

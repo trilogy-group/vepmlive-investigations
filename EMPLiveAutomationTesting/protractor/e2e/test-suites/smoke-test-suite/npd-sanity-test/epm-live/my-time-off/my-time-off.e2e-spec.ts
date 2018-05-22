@@ -1,5 +1,4 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
@@ -11,14 +10,14 @@ import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workp
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {MyTimeOffPage} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off.po';
-import {HtmlHelper} from '../../../../../components/misc-utils/html-helper';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLoginAsTeamMember();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLoginAsTeamMember();
     });
 
     it('Navigate to My Time off page - [785492]', async () => {
@@ -63,7 +62,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(title, true);
         stepLogger.step(`click on Close button`);
-        await PageHelper.click(MyTimeOffPage.closeButton(HtmlHelper.tags.submit));
+        await PageHelper.click(MyTimeOffPage.closeButton);
     });
 
     it('View Time Off - [785496]', async () => {
@@ -78,7 +77,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#2 is inside this function
         const timeOffTitle = await CommonPage.recordWithoutGreenTicket.getText();
-        await CommonPageHelper.viewItemViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
+                                                            CommonPage.contextMenuOptions.viewItem);
         stepLogger.verification('"View TimeOff" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))

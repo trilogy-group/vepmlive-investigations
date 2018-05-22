@@ -39,22 +39,6 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
-    static get adminEmailId(): string {
-        return browser.params.login.admin.user;
-    }
-
-    static get adminPassword(): string {
-        return browser.params.login.admin.password;
-    }
-
-    static get TeamMemberEmailId(): string {
-        return browser.params.login.teamMember.user;
-    }
-
-    static get TeamMemberPassword(): string {
-        return browser.params.login.teamMember.password;
-    }
-
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -148,19 +132,6 @@ export class CommonPageHelper {
         }
         const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
         return element(By.xpath(xpath));
-    }
-
-    static async editItemViaContextMenu(stepLogger: StepLogger, item = CommonPage.record) {
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
-        await ElementHelper.actionHoverOver(item);
-
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonPage.ellipse);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonPage.contextMenuOptions.editItem);
     }
 
     static getElementByTitle(title: string) {
@@ -370,7 +341,7 @@ export class CommonPageHelper {
         return tomorrowDate;
     }
 
-    static async viewItemViaContextMenu(stepLogger: StepLogger, item = CommonPage.record) {
+    static async actionTakenViaContextMenu(stepLogger: StepLogger, item: ElementFinder, actionItem: ElementFinder) {
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
@@ -380,6 +351,6 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ellipse);
 
         stepLogger.step('Select "View Item" from the options displayed');
-        await PageHelper.click(CommonPage.contextMenuOptions.viewItem);
+        await PageHelper.click(actionItem);
     }
 }

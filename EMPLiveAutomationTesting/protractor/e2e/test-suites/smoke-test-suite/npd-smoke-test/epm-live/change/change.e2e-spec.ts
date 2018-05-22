@@ -14,13 +14,14 @@ import {ChangeItemPageHelper} from '../../../../../page-objects/pages/items-page
 import {IssueItemPageConstants} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.constants';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Add Changes Functionality - [1124277]', async () => {
@@ -100,7 +101,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #3
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
         stepLogger.verification('"Edit Change" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);

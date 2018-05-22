@@ -9,6 +9,9 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyWorkPage} from './my-work.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {MyWorkplacePage} from '../my-workplace.po';
+import {LoginPageHelper} from '../../login/login-page.helper';
+import {element, By} from 'protractor';
+import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class MyWorkPageHelper {
 
@@ -31,9 +34,9 @@ export class MyWorkPageHelper {
             .toBe(true, ValidationsHelper.getFieldShouldHaveValueValidation(inputLabels.project, projectName));
 
         stepLogger.step(`Assigned To: New Item`);
-        await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, CommonPageHelper.adminEmailId);
+        await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
         stepLogger.step(`select assignedTo value`);
-        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(CommonPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on save');
@@ -63,9 +66,9 @@ export class MyWorkPageHelper {
         await PageHelper.click(MyWorkPage.dropdownAll.timeOffInput);
 
         stepLogger.step(`Requestor* : New Item`);
-        await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, CommonPageHelper.adminEmailId);
+        await TextboxHelper.sendKeys(MyWorkPage.inputs.requestor, LoginPageHelper.adminEmailId);
         stepLogger.step(`select Requester* value`);
-        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(CommonPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
 
         stepLogger.step(`Enter Start Date: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.start, CommonPageHelper.getTodayInMMDDYYYY);
@@ -86,9 +89,15 @@ export class MyWorkPageHelper {
         stepLogger.stepId(6);
         stepLogger.verification('"Navigate to My Time Off page');
         await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
+        stepLogger.verification('"Click on last button');
+        await PageHelper.click(MyWorkPage.lastButton);
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementsByTextInsideGrid(titleValue).last()))
                     .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+    }
+
+    static getButtonText(text: string) {
+        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
 }
