@@ -124,8 +124,7 @@ export class RiskItemPageHelper {
         stepLogger.verification('The File name appears under "Choose Files"');
         await expect(await ElementHelper.getValue(RiskItemPage.browseButton))
             .toBe(newFile.fullFilePath,
-                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPage.));
-
+                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPageConstants.attachFilePopupTitle, newFile.fullFilePath));
 
         stepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.ok);

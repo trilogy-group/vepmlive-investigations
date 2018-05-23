@@ -5,6 +5,7 @@ import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class RiskItemPage extends BasePage {
+
     static get inputs() {
         const labels = RiskItemPageConstants.inputLabels;
         return {

@@ -23,7 +23,6 @@ export class CommonPage extends BasePage {
         };
     }
 
-
     static get addNewLink() {
         return element(By.css(`[title="${CommonPageConstants.newItem}"] a`));
     }
@@ -194,11 +193,15 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get settingButton() {
+        return element(By.css('[data-original-title="settings"]'));
+    }
+
     static get projectShowAllButton() {
         return element(By.id('Project_ddlShowAll'));
     }
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-   }
+    }
 }

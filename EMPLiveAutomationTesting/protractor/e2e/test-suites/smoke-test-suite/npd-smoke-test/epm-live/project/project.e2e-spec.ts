@@ -80,7 +80,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });
 
-    it('Edit Project Functionality - [1124173]', async () => {
+    fit('Edit Project Functionality - [1124173]', async () => {
         const stepLogger = new StepLogger(1124173);
         stepLogger.stepId(1);
 
