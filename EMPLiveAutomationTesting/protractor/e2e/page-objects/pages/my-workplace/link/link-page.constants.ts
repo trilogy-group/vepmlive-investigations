@@ -13,7 +13,7 @@ export class LinkPageConstants {
     }
     static get navigationLabels() {
         return {
-            Next: 'Next',
+            next: 'Next',
         };
     }
 }

@@ -51,11 +51,8 @@ export class LinkPageHelper {
         stepLogger.verification('"New Link" page is closed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
+        .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
 
-        return{
-            description, url
-            }
+        return description;
     }
 }

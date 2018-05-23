@@ -14,7 +14,6 @@ import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
-import {By, element} from 'protractor';
 import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
@@ -173,17 +172,16 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
         
         // Step #4 and #5 Inside this function
-        const eventDetails = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
+        const description = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
 
         stepLogger.step(`click on next page`);
-        while (await CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.Next).isPresent()) {
-            await ElementHelper.click(CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.Next));
+        while (await CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next).isPresent()) {
+            await ElementHelper.click(CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next));
         }
 
         stepLogger.verification('Newly created Link item [Ex: New Link 1] details displayed in read only mode');
-        await expect(await element(By.linkText(eventDetails.description)).isDisplayed())
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(eventDetails.url));
+        await expect(await LinkPage.getElementByLinkText(description).isDisplayed())
+        .toBe(true, ValidationsHelper.getDisplayedValidation(description));
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
