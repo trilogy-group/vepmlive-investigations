@@ -14,4 +14,8 @@ export class LinkPage {
     static get newLink() {
         return element(By.id('idHomePageNewLink'));
     }
+
+    static get linkItem() {
+        return element.all(By.xpath(`//ul[contains(@id,'epm-se-toolbar-items')]//a[text()='Link']`)).last();
+    }
 }

@@ -14,6 +14,12 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import { LinkPage } from '../../../../../page-objects/pages/my-workplace/link/link.po';
+import { LinkPageConstants } from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
+import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
+import { element } from 'protractor';
+import { By } from 'selenium-webdriver';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -171,4 +177,49 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
+
+    it('Add an item from Social Stream - [1124294]', async () => {
+        const stepLogger = new StepLogger(1124294);
+
+        // Step #1 and #2 Inside this function
+        stepLogger.stepId(2);
+        stepLogger.step(`Click on '+ More' button displayed in 'CREATE' options in social stream`);
+        await ElementHelper.click(HomePage.moreButton);
+
+        stepLogger.stepId(3);
+        stepLogger.step(`Click on the LINK icon  displayed in 'CREATE' options in social stream`);
+        await ElementHelper.click(LinkPage.linkItem);
+
+        stepLogger.verification(`Links - New Item' window is displayed`);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await expect(await CommonPage.dialogTitles.first().getText())
+            .toBe(LinkPageConstants.pageName,
+                ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
+
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToFirstContentFrame();
+        const eventDetails = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
+
+        stepLogger.stepId(6);
+        stepLogger.step(`Select 'My Workplace' icon  from left side menu`);
+        stepLogger.step(`Click on 'Links' item from the options displayed`);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.links,
+            CommonPage.pageHeaders.myWorkplace.links,
+            CommonPageConstants.pageHeaders.myWorkplace.links,
+            stepLogger);
+
+        stepLogger.step(`click on next page`);
+        while (await CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.Next).isPresent()) {
+            await ElementHelper.click(CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.Next));
+        }
+
+        stepLogger.verification(`'Links' page is displayed`);
+        stepLogger.verification('Newly added Link details are displayed in the list');
+        await expect(await element(By.linkText(eventDetails.description)).isDisplayed())
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(eventDetails.url));
+
+    });
+
 });
