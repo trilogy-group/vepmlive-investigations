@@ -339,23 +339,24 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Mouse over on the date for which event to be created');
+        await ElementHelper.actionMouseMove(EventsPage.calenderTomorrow);
         stepLogger.step('Click on "+ Add" link displayed on the date square box');
-        await ElementHelper.actionHoverOverAndClick(EventsPage.calenderTomorrow, EventsPage.addNewEvent);
-        // await ElementHelper.actionHoverOver(EventsPage.calenderTomorrow);
-        // await ElementHelper.actionClick(EventsPage.addNewEvent);
+        await ElementHelper.clickUsingJs(EventsPage.addNewEvent(EventsPageConstants.addEvent));
 
+        stepLogger.verification('"Events - New Item" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await expect(await CommonPage.dialogTitles.first().getText())
+        .toBe(EventsPageConstants.pageName,
+            ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
 
-        // await WaitHelper.getInstance().waitForElementToBeDisplayed(EventsPage.newEvent);
-        // stepLogger.verification('"Events - New Item" window is displayed');
-        //  await expect(await CommonPage.title.getText())
-        //     .toBe(EventsPageConstants.newEventWindow,
-        //         ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.newEventWindow));
-                
-        // // Step #4 and #5 Inside this function
-        // const labels = EventsPageConstants.inputLabels;
-        // const uniqueId = PageHelper.getUniqueId();
-        // const title = `${labels.title} ${uniqueId}`;
-        // await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToFirstContentFrame();
+
+        // Step #4 and #5 Inside this function
+        const labels = EventsPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const title = `${labels.title} ${uniqueId}`;
+        await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
  
     });
 });
