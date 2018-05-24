@@ -135,7 +135,7 @@ namespace PortfolioEngineCore
 
             // Adding hidden column for note to be exported in excel
             xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "ExportNote");
+            xC.CreateStringAttr("Name", "ExportRowStatus");
             xC.CreateStringAttr("Type", "Html");
             xC.CreateIntAttr("CanEdit", 0);
             xC.CreateIntAttr("CanMove", 0);
@@ -144,7 +144,7 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("CanResize", 0);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("Width", 50);
-            xHeader1.CreateStringAttr("ExportNote", "Note");
+            xHeader1.CreateStringAttr("ExportRowStatus", "Status");
 
             //xC = xLeftCols.CreateSubStruct("C");
             //xC.CreateStringAttr("Name", "RowEvent");
@@ -173,21 +173,6 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("Width", 25);
             xHeader1.CreateStringAttr("RowStatus", " ");
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "ExportRowStatus");
-            xC.CreateStringAttr("Align", "Center");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("CanEdit", 0);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanExport", 1);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("Width", 30);
-            xHeader1.CreateStringAttr("ExportRowStatus", "Status");
-            xC.CreateIntAttr("Visible", 0);
 
             bool bNegotiationMode = (xPlanData.GetIntAttr("OpMode") == 0);
 
