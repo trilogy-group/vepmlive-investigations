@@ -11,13 +11,14 @@ import {ResourcesPage} from '../../../../../page-objects/pages/navigation/resour
 import {ResourcesPageConstants} from '../../../../../page-objects/pages/navigation/resources/resources-page.constants';
 import {ResourcesPageHelper} from '../../../../../page-objects/pages/navigation/resources/resources-page.helper';
 import {browser} from 'protractor';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Navigate to Resources page - [910192]', async () => {

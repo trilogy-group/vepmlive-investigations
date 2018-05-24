@@ -13,13 +13,14 @@ import {ProjectItemPageValidations} from '../../../../../page-objects/pages/item
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Add Project Functionality - [1124170]', async () => {

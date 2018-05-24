@@ -1,6 +1,5 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
@@ -13,13 +12,15 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {MyWorkPageHelper} from '../../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {LoginPageHelper} from '../../../../../page-objects/pages/login/login-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Navigate to My Work page - [855540]', async () => {
@@ -200,9 +201,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         const titleValue = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);
         stepLogger.step(`Assigned To: New Item`);
-        await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, CommonPageHelper.adminEmailId);
+        await TextboxHelper.sendKeys(MyWorkPage.inputs.assignedTo, LoginPageHelper.adminEmailId);
         stepLogger.step(`select assignedTo value`);
-        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(CommonPageHelper.adminEmailId));
+        await PageHelper.click(MyWorkPage.selectValueFromSuggestions(LoginPageHelper.adminEmailId));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on save');
