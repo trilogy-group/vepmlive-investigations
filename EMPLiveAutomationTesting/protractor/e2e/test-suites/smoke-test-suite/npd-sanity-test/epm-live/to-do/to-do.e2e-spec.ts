@@ -79,7 +79,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#2 is inside this function
         await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
-                                                            CommonPage.contextMenuOptions.editItem);
+            CommonPage.contextMenuOptions.editItem);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())

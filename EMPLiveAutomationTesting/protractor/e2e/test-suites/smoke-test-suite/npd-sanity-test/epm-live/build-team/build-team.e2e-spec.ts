@@ -1,16 +1,16 @@
-import { PageHelper } from './../../../../../components/html/page-helper';
-import { ProjectItemPageConstants } from './../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import { ProjectItemPage } from './../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import { ValidationsHelper } from './../../../../../components/misc-utils/validation-helper';
-import { CommonPageConstants } from './../../../../../page-objects/pages/common/common-page.constants';
-import { CommonPage } from './../../../../../page-objects/pages/common/common.po';
-import { CommonPageHelper } from './../../../../../page-objects/pages/common/common-page.helper';
-import { HomePage } from '../../../../../page-objects/pages/homepage/home.po';
-import { SuiteNames } from '../../../../helpers/suite-names';
-import { StepLogger } from '../../../../../../core/logger/step-logger';
-import { WaitHelper } from '../../../../../components/html/wait-helper';
-import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { ProjectItemPageValidations } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
+import {PageHelper} from './../../../../../components/html/page-helper';
+import {ProjectItemPageConstants} from './../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ProjectItemPage} from './../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ValidationsHelper} from './../../../../../components/misc-utils/validation-helper';
+import {CommonPageConstants} from './../../../../../page-objects/pages/common/common-page.constants';
+import {CommonPage} from './../../../../../page-objects/pages/common/common.po';
+import {CommonPageHelper} from './../../../../../page-objects/pages/common/common-page.helper';
+import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
+import {SuiteNames} from '../../../../helpers/suite-names';
+import {StepLogger} from '../../../../../../core/logger/step-logger';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -61,19 +61,19 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
-                .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.verification('"Current Team" section will list the resources attached to the project');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamRecords.currentTeam.first()))
-                .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.verification('"Resource Pool" section will list the resources other than "Current Team" section');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamRecords.resourcePool.first()))
-                .toBe(true,
-                    ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
+            .toBe(true,
+                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.stepId(4);
         stepLogger.step('Select check-box for any of the resources displayed in "Resource Pool" (Right side)');
@@ -85,8 +85,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
@@ -100,13 +100,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.first()))
-        .toBe(false,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-        .toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(6);
         stepLogger.step('Select check-box for any Project');
@@ -128,8 +128,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(7);
         stepLogger.step('Click "Close" button in "Edit Team" window');
@@ -140,18 +140,18 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.first()))
-        .toBe(false,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-        .toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
-                .toBe(true,
-                    ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
 
     it('Check behavior of "Save and Close" button - [778301]', async () => {
@@ -204,8 +204,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(6);
         stepLogger.step('check status of "Save & Close" button');
@@ -226,13 +226,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.first()))
-        .toBe(false,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-        .toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(8);
         stepLogger.step('Select check-box for any Project');
@@ -254,8 +254,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(9);
         stepLogger.step('Click "Close" button in "Edit Team" window');
@@ -266,17 +266,17 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.first()))
-        .toBe(false,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-        .toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
-                .toBe(true,
-                    ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
 });

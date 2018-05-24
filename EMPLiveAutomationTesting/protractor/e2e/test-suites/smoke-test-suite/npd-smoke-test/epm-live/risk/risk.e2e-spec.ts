@@ -210,8 +210,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Common functionality to edit any item
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
-
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
     });
 
     it('Add attachment in Risk - [1176340]', async () => {

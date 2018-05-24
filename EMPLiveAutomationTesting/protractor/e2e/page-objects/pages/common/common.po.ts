@@ -110,9 +110,9 @@ export class CommonPage extends BasePage {
             ok: ButtonHelper.getInputButtonByTextUnderTable(labels.ok),
             okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
             okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
-            cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel)
-            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
-            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
+            cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel),
+            add: ButtonHelper.getInputButtonByTextUnderTable(labels.add),
+            remove: ButtonHelper.getInputButtonByTextUnderTable(labels.remove)
         };
     }
 

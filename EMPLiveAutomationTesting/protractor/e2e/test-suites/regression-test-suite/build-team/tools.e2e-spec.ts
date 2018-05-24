@@ -1,16 +1,16 @@
-import { SuiteNames } from '../../helpers/suite-names';
-import { HomePage } from '../../../page-objects/pages/homepage/home.po';
-import { PageHelper } from '../../../components/html/page-helper';
-import { StepLogger } from '../../../../core/logger/step-logger';
-import { CommonPageHelper } from '../../../page-objects/pages/common/common-page.helper';
-import { CommonPage } from '../../../page-objects/pages/common/common.po';
-import { CommonPageConstants } from '../../../page-objects/pages/common/common-page.constants';
-import { WaitHelper } from '../../../components/html/wait-helper';
-import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
-import { ElementHelper } from '../../../components/html/element-helper';
-import { ProjectItemPage } from '../../../page-objects/pages/items-page/project-item/project-item.po';
-import { ProjectItemPageConstants } from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import { ProjectItemPageHelper } from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {SuiteNames} from '../../helpers/suite-names';
+import {HomePage} from '../../../page-objects/pages/homepage/home.po';
+import {PageHelper} from '../../../components/html/page-helper';
+import {StepLogger} from '../../../../core/logger/step-logger';
+import {CommonPageHelper} from '../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
+import {WaitHelper} from '../../../components/html/wait-helper';
+import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
+import {ProjectItemPage} from '../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let homePage: HomePage;
@@ -44,8 +44,8 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('"Edit Team" pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-                .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -144,8 +144,8 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('"Edit Team" pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-                .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -238,8 +238,8 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('"Edit Team" pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-                .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -343,8 +343,8 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('"Edit Team" pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-                .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -433,8 +433,8 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('"Edit Team" pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
-                .toBe(CommonPageConstants.ribbonLabels.editTeam,
-                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);

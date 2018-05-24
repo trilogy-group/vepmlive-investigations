@@ -78,7 +78,7 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             ok: 'OK',
             okWithSmallK: 'Ok',
-            add:  '< Add',
+            add: '< Add',
             remove: 'Remove >'
         };
     }

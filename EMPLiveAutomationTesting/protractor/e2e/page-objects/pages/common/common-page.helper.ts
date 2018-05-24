@@ -59,12 +59,12 @@ export class CommonPageHelper {
         return new Date().getFullYear();
     }
 
-    public static get getTodayInMMDDYYYY(){
+    public static get getTodayInMMDDYYYY() {
         const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
         return currentDate;
     }
 
-    public static get getYesterdayInMMDDYYYY(){
+    public static get getYesterdayInMMDDYYYY() {
         const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
         return tomorrowDate;
     }
@@ -95,8 +95,8 @@ export class CommonPageHelper {
     }
 
     static getRibbonButtonByText(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and (${ComponentHelpers.
-        getXPathFunctionForDot(title)})]`));
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
+         and (${ComponentHelpers.getXPathFunctionForDot(title)})]`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
@@ -169,7 +169,7 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string, isContains= false) {
+    static getPageHeaderByTitle(title: string, isContains = false) {
         const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
