@@ -8,6 +8,7 @@ export class CommonPageConstants {
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
     static readonly title = 'Title';
+    static readonly viewAll = 'View All';
     static readonly newItem = 'New Item';
     static get imageFile() {
         return {
@@ -171,6 +172,13 @@ export class CommonPageConstants {
             onTrack: '(1) On Track',
             atRisk: '(2) At Risk',
             offTrack: '(3) Off Track',
+        };
+    }
+
+    static get paginationTitle() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
         };
     }
 }

@@ -2,6 +2,31 @@ import {SettingsPageConstants} from './settings-page.constants';
 import {By, element} from 'protractor';
 
 export class SettingsPage {
+    static get pagination() {
+        return {
+            next: element(By.linkText(SettingsPageConstants.pagination.next)),
+            previous: element(By.linkText(SettingsPageConstants.pagination.next))
+        };
+    }
+
+    static get permissionsAndManagement() {
+        const labels = SettingsPageConstants.permissionsAndManagement;
+        return {
+            deleteThisList: element(By.linkText(labels.deleteThisList)),
+            saveListAsTemplate: element(By.linkText(labels.saveListAsTemplate)),
+            permissionsForThisList: element(By.linkText(labels.permissionsForThisList)),
+            workflowSettings: element(By.linkText(labels.workflowSettings)),
+            viewPermissionSettings: element(By.linkText(labels.viewPermissionSettings))
+        };
+    }
+
+    static get communications() {
+        const communications = SettingsPageConstants.communications;
+        return {
+            rssSettings: element(By.linkText(communications.rssSettings))
+        };
+    }
+
     static get generalSettings() {
         const generalSettings = SettingsPageConstants.generalSettings;
         return {

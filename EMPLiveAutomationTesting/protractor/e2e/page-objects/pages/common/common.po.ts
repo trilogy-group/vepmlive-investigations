@@ -89,9 +89,10 @@ export class CommonPage extends BasePage {
     static get formButtons() {
         const labels = CommonPageConstants.formLabels;
         return {
-            save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
-            ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel)
+            save: ButtonHelper.getInputButtonByExactTextUnderTable(labels.save),
+            ok: ButtonHelper.getInputButtonByExactTextUnderTable(labels.ok),
+            okOutsideTable: ButtonHelper.getInputButtonsByExactText(labels.ok),
+            cancel: ButtonHelper.getInputButtonByExactTextUnderTable(labels.cancel)
         };
     }
 
@@ -158,7 +159,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecordsWithGreenTick() {
-        return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green")]`;
+        return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -203,5 +204,20 @@ export class CommonPage extends BasePage {
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+    }
+
+    static get viewAll() {
+        return element(By.linkText(CommonPageConstants.viewAll));
+    }
+
+    static get paginationControlsByTitle() {
+        return {
+            next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
+            previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
+        };
+    }
+
+    static get paging() {
+        return element(By.css('.ms-paging'));
     }
 }

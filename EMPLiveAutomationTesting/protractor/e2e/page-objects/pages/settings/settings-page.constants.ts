@@ -1,5 +1,13 @@
 export class SettingsPageConstants {
     static readonly epmLive = `(EPM Live)`;
+
+    static get pagination() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
+        };
+    }
+
     static get generalSettings() {
         return {
             listName: `List name, description and navigation`,
@@ -30,6 +38,29 @@ export class SettingsPageConstants {
     static get communications() {
         return {
             rssSettings: 'RSS settings'
+        };
+    }
+
+    static get editableMenuOptions() {
+        return {
+            onNewItemDisplayField: 'On new item, display field',
+            onDisplayItemDisplayField: 'On display item, display field :',
+            onEditItemDisplayField: 'On edit item, display field',
+            onEditItemEditable: 'On edit item, editable:'
+        };
+    }
+
+    static get editableMenuConfigurationOptions() {
+        return {
+            always: 'Always',
+            never: 'Never',
+            where: 'Where'
+        };
+    }
+
+    static get editableMenuTitles() {
+        return {
+            projectName: 'Project Name'
         };
     }
 }

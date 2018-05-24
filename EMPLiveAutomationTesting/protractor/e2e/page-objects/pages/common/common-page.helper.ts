@@ -74,7 +74,7 @@ export class CommonPageHelper {
 
     static getRibbonButtonByText(title: string) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
-}
+    }
 
     static getRibbonSmallButtonByTitle(title: string) {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));

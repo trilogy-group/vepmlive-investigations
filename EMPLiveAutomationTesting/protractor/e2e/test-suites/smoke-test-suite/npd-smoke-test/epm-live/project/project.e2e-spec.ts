@@ -9,9 +9,11 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {SettingsPageHelper} from '../../../../../page-objects/pages/settings/settings-page.helper';
+import {SettingsPageConstants} from '../../../../../page-objects/pages/settings/settings-page.constants';
+import {SettingsPage} from '../../../../../page-objects/pages/settings/settings.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -80,7 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
     });
 
-    fit('Edit Project Functionality - [1124173]', async () => {
+    it('Edit Project Functionality - [1124173]', async () => {
         const stepLogger = new StepLogger(1124173);
         stepLogger.stepId(1);
 
@@ -109,9 +111,27 @@ describe(SuiteNames.smokeTestSuite, () => {
         const overallHealthOffTrack = CommonPageConstants.overallHealth.offTrack;
         const projectUpdateManual = CommonPageConstants.projectUpdate.scheduleDriven;
 
-        await expect(await ProjectItemPage.inputs.projectName.isPresent())
-            .toBe(true,
-                ProjectItemPageValidations.projectNameShouldBeEditable);
+        const projectNameEditable = await ProjectItemPage.inputs.projectName.isPresent();
+        if (!projectNameEditable) {
+            stepLogger.step('Additional step - Click on cancel button to go back to setting page which is available via list page');
+            await PageHelper.click(CommonPage.formButtons.cancel);
+            stepLogger.step('Additional step - Click on setting button');
+            await PageHelper.click(CommonPage.settingButton);
+            stepLogger.step('Additional step - Click on manaage editable field');
+            await PageHelper.click(SettingsPage.generalSettings.manageEditableFields);
+            stepLogger.step('Additional step - Make project name editable');
+            await SettingsPageHelper.configureEditableField(SettingsPageConstants.editableMenuTitles.projectName,
+                SettingsPageConstants.editableMenuOptions.onEditItemEditable,
+                SettingsPageConstants.editableMenuConfigurationOptions.always);
+
+            await CommonPageHelper.navigateToItemPageUnderNavigation(
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
+                stepLogger);
+
+            await CommonPageHelper.editOptionViaRibbon(stepLogger);
+        }
 
         await ProjectItemPageHelper.fillForm(
             projectNameValue,

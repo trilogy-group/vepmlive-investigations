@@ -15,7 +15,7 @@ import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
-import {By, element} from 'protractor';
+import {browser, By, element} from 'protractor';
 import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
@@ -151,7 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
-    it('Create new Links from Workplace - [1175272]', async () => {
+    fit('Create new Links from Workplace - [1175272]', async () => {
         const stepLogger = new StepLogger(1175272);
         stepLogger.stepId(1);
 
@@ -215,7 +215,18 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
 
         stepLogger.verification('Newly created Link item [Ex: New Link 1] details displayed in read only mode');
-        await expect(await element(By.linkText(description)).isDisplayed())
+        const item = element(By.linkText(description));
+        let pagingText = await CommonPage.paging.getText();
+        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
+            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
+
+            // Wait if page is not the next one, Ajax operation
+            await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
+            pagingText = await CommonPage.paging.getText();
+        }
+
+        // Always Description appears whereas we want url to assert
+        await expect(await item.isDisplayed())
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(url));
     });
