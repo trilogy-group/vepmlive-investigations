@@ -10,6 +10,7 @@ import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
+import * as path from 'path';
 
 const fs = require('fs');
 
@@ -19,24 +20,24 @@ export class CommonPageHelper {
         const imageFile = CommonPageConstants.imageFile;
         const newFileName = `${imageFile.jpegFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
         const dir = CommonPageConstants.filesDirectoryName;
-        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${imageFile.fileType}`;
+        const fullFilePath = path.join(__dirname, dir, newFileName + imageFile.fileType);
 
         fs.createReadStream(imageFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName};
+        return {fullFilePath, newFileName: newFileName + imageFile.fileType};
     }
 
     static get uniqueDocumentFilePath() {
         const documentFile = CommonPageConstants.documentFile;
         const newFileName = `${documentFile.documentFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
         const dir = CommonPageConstants.filesDirectoryName;
-        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${documentFile.fileType}`;
+        const fullFilePath = path.join(__dirname, dir, newFileName + documentFile.fileType);
 
         fs.createReadStream(documentFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName};
+        return {fullFilePath, newFileName: newFileName + documentFile.fileType};
     }
 
     static get adminEmailId(): string {

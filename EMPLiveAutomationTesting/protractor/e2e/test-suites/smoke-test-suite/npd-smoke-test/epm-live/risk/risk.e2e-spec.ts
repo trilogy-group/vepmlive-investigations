@@ -212,7 +212,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.editItemViaContextMenu(stepLogger);
 
     });
-    it('Add attachment in Risk - [1176340]', async () => {
+
+    fit('Add attachment in Risk - [1176340]', async () => {
         const stepLogger = new StepLogger(1176340);
         stepLogger.stepId(1);
 

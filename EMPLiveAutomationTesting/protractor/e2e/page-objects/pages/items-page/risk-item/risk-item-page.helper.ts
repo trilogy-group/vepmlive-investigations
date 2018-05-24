@@ -123,17 +123,17 @@ export class RiskItemPageHelper {
 
         stepLogger.verification('The File name appears under "Choose Files"');
         await expect(await ElementHelper.getValue(RiskItemPage.browseButton))
-            .toBe(newFile.fullFilePath,
-                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPageConstants.attachFilePopupTitle, newFile.fullFilePath));
+            .toContain(newFile.newFileName,
+                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPageConstants.attachFilePopupTitle, newFile.newFileName));
 
         stepLogger.step('Click on OK');
-        await PageHelper.click(CommonPage.formButtons.ok);
+        await PageHelper.click(CommonPage.formButtons.okWithSmallK);
 
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+        await expect(await ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     }

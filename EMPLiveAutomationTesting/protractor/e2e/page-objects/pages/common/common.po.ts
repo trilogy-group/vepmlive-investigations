@@ -91,6 +91,7 @@ export class CommonPage extends BasePage {
         return {
             save: ButtonHelper.getInputButtonByExactTextUnderTable(labels.save),
             ok: ButtonHelper.getInputButtonByExactTextUnderTable(labels.ok),
+            okWithSmallK: ButtonHelper.getInputButtonByExactTextUnderTable(labels.okWithSmallK),
             okOutsideTable: ButtonHelper.getInputButtonsByExactText(labels.ok),
             cancel: ButtonHelper.getInputButtonByExactTextUnderTable(labels.cancel)
         };
