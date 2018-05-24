@@ -151,7 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     });
 
-    fit('Create new Links from Workplace - [1175272]', async () => {
+    it('Create new Links from Workplace - [1175272]', async () => {
         const stepLogger = new StepLogger(1175272);
         stepLogger.stepId(1);
 

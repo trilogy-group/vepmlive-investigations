@@ -213,7 +213,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    fit('Add attachment in Risk - [1176340]', async () => {
+    it('Add attachment in Risk - [1176340]', async () => {
         const stepLogger = new StepLogger(1176340);
         stepLogger.stepId(1);
 
