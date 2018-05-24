@@ -89,11 +89,11 @@ export class CommonPage extends BasePage {
     static get formButtons() {
         const labels = CommonPageConstants.formLabels;
         return {
-            save: ButtonHelper.getInputButtonByExactTextUnderTable(labels.save),
-            ok: ButtonHelper.getInputButtonByExactTextUnderTable(labels.ok),
-            okWithSmallK: ButtonHelper.getInputButtonByExactTextUnderTable(labels.okWithSmallK),
-            okOutsideTable: ButtonHelper.getInputButtonsByExactText(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextUnderTable(labels.cancel)
+            save: ButtonHelper.getInputButtonByTextUnderTable(labels.save),
+            ok: ButtonHelper.getInputButtonByTextUnderTable(labels.ok),
+            okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
+            okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
+            cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel)
         };
     }
 
