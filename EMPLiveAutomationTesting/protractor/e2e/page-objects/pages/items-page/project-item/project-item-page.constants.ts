@@ -4,6 +4,10 @@ export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly buildTeamPage = 'Build Team';
+    static readonly nonAdminUser = 'Non Admin User';
+    static readonly actionsDropdown = 'Actions Dropdown';
+    static readonly applyButton = 'Apply Button';
 
     static get inputLabels() {
         return {
@@ -54,6 +58,7 @@ export class ProjectItemPageConstants {
             cost: 'Cost',
             costReduction: 'Cost Reduction',
             costReductionWeight: 'Cost Reduction Rating',
+            currentTeam: 'Current Team',
             decision: 'Decision',
             defaultPlanner: 'Default Planner',
             duration: 'Duration',
@@ -98,6 +103,7 @@ export class ProjectItemPageConstants {
             risk: 'Risk',
             riskWeight: 'Risk Rating',
             roi: 'ROI',
+            resourcePool: 'Resource Pool',
             scheduleStatus: 'Schedule Status',
             site: 'Site',
             stageGateOwner: 'Stage Gate Owner',
@@ -117,6 +123,26 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get buildTeamContentIDs() {
+        return {
+            resourcePool: 'tdRes',
+            currentTeam: 'tdTeam'
+        };
+    }
+
+    static get buildTeamContentClass() {
+        return {
+            saveAndCloseDisabled: 'ms-cui-disabled'
+        };
+    }
+
+    static get messageText() {
+        return {
+            saveAndCloseDisabled: 'Save & Close Button is disabled',
+            saveAndCloseEnabled: 'Save & Close Button is enabled'
+        };
+    }
+
     static get teamSectionlabels() {
         return {
             currentTeam: 'Current Team',
@@ -124,4 +150,43 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get teamChangeButtons() {
+        return {
+            add: '< Add',
+            remove: 'Remove >'
+        };
+    }
+
+    static get reportParameter() {
+        return {
+            periodStart: 'Period Start',
+            periodEnd: 'Period End',
+            department: 'Department',
+            resource: 'Resource',
+            projectName: 'Project Name',
+            resources: 'Resources',
+            scope: 'Scope',
+            from: 'From',
+            to: 'To',
+            units: 'Units'
+        };
+    }
+
+    static get reportHeaders(){
+        return {
+            refresh: 'Refresh',
+            firstPage: 'First Page',
+            previousPage: 'Previous Page',
+            nextPage: 'Next Page',
+            lastPage: 'Last Page',
+            findTextInReport: 'Find Text in Report',
+            findNext: 'Find Next'
+        };
+    }
+    static get plannerLabels() {
+        return {
+            microsoftProject: 'Microsoft Project',
+            projectPlanner: 'Project Planner'
+      };
+    }
 }

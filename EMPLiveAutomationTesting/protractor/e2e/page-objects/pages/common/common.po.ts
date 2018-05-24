@@ -45,12 +45,13 @@ export class CommonPage extends BasePage {
                 issues: CommonPageHelper.getPageHeaderByTitle(projectsLabels.issues),
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
                 documents: CommonPageHelper.getPageHeaderByTitle(projectsLabels.documents),
-                resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources),
+                resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources, true),
                 reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
-                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting)
+                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting),
+                projectPlanner: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPlanner, true)
             },
             myWorkplace: {
-                myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork),
+                myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork, true),
                 myTimeSheet: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeSheet),
                 myTimeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myTimeOff),
                 timeOff: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.timeOff),
@@ -82,7 +83,23 @@ export class CommonPage extends BasePage {
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
-            close: CommonPageHelper.getRibbonButtonByText(labels.close)
+            close: CommonPageHelper.getRibbonButtonByText(labels.close),
+            saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
+            assignmentPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.assignmentPlanner),
+            viewReports: CommonPageHelper.getRibbonMediumButtonByTitle(labels.viewReports),
+            resourceAvailableVsPlannedByDept: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceAvailableVsPlannedByDept),
+            resourceCapacityHeatMap: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCapacityHeatMap),
+            resourceCommitments: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCommitments),
+            resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
+            resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
+            editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
+        };
+    }
+
+    static get disabledribbonItems() {
+        const labels = CommonPageConstants.disabledribbonbuttonsId;
+        return {
+            saveAndClose: CommonPageHelper.getDisabledRibbonButtonById(labels.saveAndClose)
         };
     }
 
@@ -94,6 +111,8 @@ export class CommonPage extends BasePage {
             okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
             okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
             cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel)
+            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
+            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
         };
     }
 
@@ -191,7 +210,9 @@ export class CommonPage extends BasePage {
             workFlows: CommonPageHelper.getContextMenuItemByText(options.workFlows),
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
-            comments: CommonPageHelper.getContextMenuItemByText(options.comments)
+            comments: CommonPageHelper.getContextMenuItemByText(options.comments),
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam),
+            editPlan: CommonPageHelper.getContextMenuItemByText(options.editPlan)
         };
     }
 

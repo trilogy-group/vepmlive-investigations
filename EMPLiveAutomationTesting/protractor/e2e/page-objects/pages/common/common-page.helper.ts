@@ -40,12 +40,33 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName: newFileName + documentFile.fileType};
     }
 
-    static get adminEmailId(): string {
-        return browser.params.login.admin.user;
+    public static get getCurrentDate() {
+        return new Date().getDate();
     }
 
-    static get adminPassword(): string {
-        return browser.params.login.admin.password;
+    public static get getPreviousDate() {
+        const date = this.getCurrentDate;
+        const yesterday = date - 1;
+        return yesterday;
+    }
+
+    public static get getCurrentMonth() {
+        const month = new Date().getMonth();
+        return month + 1; // January is 0!
+    }
+
+    public static get getCurrentYear() {
+        return new Date().getFullYear();
+    }
+
+    public static get getTodayInMMDDYYYY(){
+        const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
+        return currentDate;
+    }
+
+    public static get getYesterdayInMMDDYYYY(){
+        const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
+        return tomorrowDate;
     }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
@@ -74,11 +95,20 @@ export class CommonPageHelper {
     }
 
     static getRibbonButtonByText(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and (${ComponentHelpers.
+        getXPathFunctionForDot(title)})]`));
+    }
+
+    static getDisabledRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@class,"ms-cui-disabled")][@aria-disabled="true"][contains(@id,'${id}')]`));
     }
 
     static getRibbonSmallButtonByTitle(title: string) {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
+    }
+
+    static getRibbonMediumButtonByTitle(title: string) {
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-mediumlabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
     }
 
     static getToolBarItemsByText(title: string) {
@@ -134,26 +164,13 @@ export class CommonPageHelper {
         return element(By.xpath(xpath));
     }
 
-    static async editItemViaContextMenu(stepLogger: StepLogger, item = CommonPage.record) {
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
-        await ElementHelper.actionHoverOver(item);
-
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonPage.ellipse);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonPage.contextMenuOptions.editItem);
-    }
-
     static getElementByTitle(title: string) {
         const xpath = `[title="${title}"]`;
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string) {
-        const xpath = `//*[@id='${CommonPage.titleId}']//a[${ComponentHelpers.getXPathFunctionForDot(title)}]`;
+    static getPageHeaderByTitle(title: string, isContains= false) {
+        const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
 
@@ -308,10 +325,6 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getOptionByText(option: string) {
-        return element(By.xpath(`//option[${ComponentHelpers.getXPathFunctionForText(option)}]`));
-    }
-
     static getElementContainsTitle(title: string) {
         return element(By.css(`[title*="${title}"]`));
     }
@@ -319,5 +332,26 @@ export class CommonPageHelper {
     static getAllElementsByType(type: string) {
         const xpath = `[type="${type}"]`;
         return element.all(By.css(xpath));
+    }
+
+    static getTeamRecordsByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//*[contains(@class,'GMCellPanel')]`));
+    }
+
+    static getTeamRecordsNameByTeamId(id: string) {
+        return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    static async actionTakenViaContextMenu(stepLogger: StepLogger, item: ElementFinder, actionItem: ElementFinder) {
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
+
+        stepLogger.step('Click on the Ellipses button (...)');
+        await PageHelper.click(CommonPage.ellipse);
+
+        stepLogger.step('Select "View Item" from the options displayed');
+        await PageHelper.click(actionItem);
     }
 }

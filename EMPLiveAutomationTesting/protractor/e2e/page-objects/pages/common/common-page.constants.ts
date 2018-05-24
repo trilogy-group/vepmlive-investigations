@@ -54,7 +54,21 @@ export class CommonPageConstants {
             viewItem: 'ViewItem',
             editItem: 'EditItem',
             editTeam: 'Edit Team',
-            close: 'Close'
+            close: 'Close',
+            saveAndClose: 'Save &Close',
+            assignmentPlanner: 'Assignment Planner',
+            viewReports: 'View Reports',
+            resourceAvailableVsPlannedByDept: 'Resource Available vs. Planned by Dept',
+            resourceCapacityHeatMap: 'Resource Capacity Heat Map',
+            resourceCommitments: 'Resource Commitments',
+            resourceRequirements: 'Resource Requirements',
+            resourceWorkVsCapacity: 'Resource Work vs. Capacity'
+        };
+    }
+
+    static get disabledribbonbuttonsId() {
+        return {
+            saveAndClose: 'SaveCloseButton'
         };
     }
 
@@ -64,6 +78,8 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             ok: 'OK',
             okWithSmallK: 'Ok',
+            add:  '< Add',
+            remove: 'Remove >'
         };
     }
 
@@ -102,7 +118,9 @@ export class CommonPageConstants {
             workFlows: 'Workflows',
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
-            comments: 'Comments'
+            comments: 'Comments',
+            editTeam: 'Edit Team',
+            editPlan: 'Edit Plan'
         };
     }
 
@@ -173,6 +191,24 @@ export class CommonPageConstants {
             onTrack: '(1) On Track',
             atRisk: '(2) At Risk',
             offTrack: '(3) Off Track',
+        };
+    }
+
+    static get teamId() {
+        return {
+            currentTeam: 'TeamGrid',
+            resourcePool: 'ResourceGrid'
+        };
+    }
+
+    static get dropdownShowAllButton() {
+        return {
+            project: 'Project_ddlShowAll',
+            timeOffType: 'TimeOffType_ddlShowAll',
+            role: 'Role_ddlShowAll',
+            holidaySchedule: 'HolidaySchedule_ddlShowAll',
+            workHours: 'WorkHours_ddlShowAll',
+            portfolio: 'Portfolio_ddlShowAll',
         };
     }
 

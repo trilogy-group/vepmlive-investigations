@@ -7,6 +7,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import {By, element} from 'protractor';
 
 export class MyTimeOffPageHelper {
 
@@ -78,4 +79,8 @@ export class MyTimeOffPageHelper {
         return `//table[contains(@class,"ms-formtable")]//td[normalize-space(.)='${title}']//parent::tr//${type}[not(@type='hidden')]`;
     }
 
+    static getElementByType(type: string) {
+        const xpath = `[type="${type}"]`;
+        return element(By.css(xpath));
+   }
 }

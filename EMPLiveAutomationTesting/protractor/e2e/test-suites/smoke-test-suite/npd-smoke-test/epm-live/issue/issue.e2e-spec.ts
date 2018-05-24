@@ -15,13 +15,14 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Add Issues Functionality - [1124274]', async () => {
@@ -121,7 +122,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
         stepLogger.verification('"Edit Issue" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.titles.first());

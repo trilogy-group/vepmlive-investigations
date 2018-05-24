@@ -14,13 +14,14 @@ import {RiskItemPageHelper} from '../../../../../page-objects/pages/items-page/r
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Add Risks Functionality - [1124271]', async () => {
@@ -119,7 +120,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Common functionality to edit any item
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk(stepLogger);

@@ -141,7 +141,7 @@ export class ElementHelper {
     }
 
     static async clickUsingJsNoWait(targetElement: ElementFinder) {
-        return browser.executeScript('arguments[0].click();', targetElement.getElementFinder());
+        return browser.executeScript('arguments[0].click();', targetElement);
     }
 
     static async waitForElementToHaveClass(targetElement: ElementFinder,
@@ -161,7 +161,7 @@ export class ElementHelper {
     }
 
     static async scrollToElement(elementt: ElementFinder) {
-        browser.executeScript('arguments[0].scrollIntoView();', elementt.getElementFinder());
+        browser.executeScript('arguments[0].scrollIntoView();', elementt);
     }
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
