@@ -1685,8 +1685,9 @@
 
             this.ModeSettings = sb.toString();
 
-            if (issueServerRequest === false)
+            if (issueServerRequest === false) {
                 return true;
+            }
 
             try {
                 this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);

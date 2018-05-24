@@ -79,6 +79,9 @@ namespace CADataCache
     [Serializable()]
     public class CostAnalyzerDataCache
     {
+        private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
+        private const string HideRowsWithAllZerosXmlValueAttribute = "Value";
+
         clsCostData m_clsda = null;
         private List<clsColDisp> m_topgridcln = null;
         private List<clsColDisp> m_bottomgridcln = null;
@@ -754,9 +757,9 @@ namespace CADataCache
                 return true;
             }
 
-            double quantityValue = 0;
-            double costValue = 0;
-            double fteValue = 0;
+            var quantityValue = 0.0;
+            var costValue = 0.0;
+            var fteValue = 0.0;
 
             var totalPeriods = details.zFTE.Length - 1;
             for (var i = 1; i <= totalPeriods; i++)
@@ -891,10 +894,11 @@ namespace CADataCache
             if (xval != null)
                 m_show_rhs_dec_costs = (xval.GetIntAttr("Value") != 0);
 
-            xval = xData.GetSubStruct("HideRowsWithAllZeros");
+            xval = xData.GetSubStruct(HideRowsWithAllZerosXmlNode);
             if (xval != null)
-                _hideRowsWithAllZeros = (xval.GetIntAttr("Value") != 0);
-
+            {
+                _hideRowsWithAllZeros = xval.GetIntAttr(HideRowsWithAllZerosXmlValueAttribute) != 0;
+            }
         }
 
         public String GetDisplayMode()
@@ -914,8 +918,8 @@ namespace CADataCache
             xNode = xRoot.CreateSubStruct("DECOST");
             xNode.CreateBooleanAttr("Value", m_show_rhs_dec_costs);
 
-            xNode = xRoot.CreateSubStruct("HideRowsWithAllZeros");
-            xNode.CreateBooleanAttr("Value", _hideRowsWithAllZeros);
+            xNode = xRoot.CreateSubStruct(HideRowsWithAllZerosXmlNode);
+            xNode.CreateBooleanAttr(HideRowsWithAllZerosXmlValueAttribute, _hideRowsWithAllZeros);
 
             return xRoot.XML();
         }
