@@ -1,6 +1,5 @@
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
@@ -23,13 +22,14 @@ import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workp
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import { WorkspacesConstants } from '../../../../../page-objects/pages/workspaces/workspaces.constants';
 import { workspacesPage } from '../../../../../page-objects/pages/workspaces/workspaces.po';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Create A New To Do From Workplace - [1124261]', async () => {
@@ -96,7 +96,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #3 Inside this function
-        await CommonPageHelper.editItemViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
+            CommonPage.contextMenuOptions.editItem);
 
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);

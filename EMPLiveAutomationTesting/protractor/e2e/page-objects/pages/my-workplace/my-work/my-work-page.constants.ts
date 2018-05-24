@@ -1,9 +1,11 @@
-import { CommonPageConstants } from '../../common/common-page.constants';
+import {CommonPageConstants} from '../../common/common-page.constants';
+
 export class MyWorkPageConstants {
 
     static readonly pagePrefix = 'My Work';
     static readonly pagePostfix = `${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly last = 'Last';
 
     static get pageName() {
         return {

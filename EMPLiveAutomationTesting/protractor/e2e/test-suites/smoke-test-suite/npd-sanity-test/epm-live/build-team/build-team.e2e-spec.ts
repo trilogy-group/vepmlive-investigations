@@ -11,13 +11,14 @@ import { StepLogger } from '../../../../../../core/logger/step-logger';
 import { WaitHelper } from '../../../../../components/html/wait-helper';
 import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import { ProjectItemPageValidations } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Add resources under "Current Team" - [778264]', async () => {

@@ -16,13 +16,14 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Create New Portfolio - [1125567]', async () => {
@@ -101,7 +102,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectPortfolios,
             CommonPageConstants.pageHeaders.projects.projectPortfolios,
             stepLogger);
-        await CommonPageHelper.editItemViaContextMenu(stepLogger);
+        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
 
         stepLogger.verification('"Edit Portfolio" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);

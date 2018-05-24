@@ -13,13 +13,14 @@ import { ProjectItemPageHelper } from '../../../../page-objects/pages/items-page
 import { ElementHelper } from '../../../../components/html/element-helper';
 import { TextboxHelper } from '../../../../components/html/textbox-helper';
 import { ProjectItemPageValidations } from '../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
+import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('View the Build Team-Current team members in Project Planner - [743198]', async () => {
