@@ -147,6 +147,7 @@ namespace EPMLiveCore.API
         {
             try
             {
+                view = System.Web.HttpUtility.UrlDecode(view);
                 Views.Remove(view);
             }
             catch { }

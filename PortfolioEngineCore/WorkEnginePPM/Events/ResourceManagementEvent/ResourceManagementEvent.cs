@@ -215,7 +215,8 @@ namespace WorkEnginePPM.Events
 
         private void CalculateResourceAvailabilities(string pfeResourceId, SPWeb spWeb)
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 using (var resourceManager = new ResourceManager(spWeb))
                 {
                     resourceManager.CalculateResourceAvailabilities(int.Parse(pfeResourceId));
@@ -225,43 +226,41 @@ namespace WorkEnginePPM.Events
 
         public static void UpdateUser(SPItemEventProperties properties)
         {
-            using (SPWeb spWeb = properties.OpenWeb())
+            SPWeb spWeb = properties.Web;
+            SPFieldUserValue user = new SPFieldUserValue(spWeb, properties.ListItem["SharePointAccount"].ToString());
+            if (user.LookupId == spWeb.Site.SystemAccount.ID)
+                return;
+            SPList myList = spWeb.Lists["Resources"];
+
+            SPQuery curQry = new SPQuery();
+            //Get resource with Sp Account Id       					
+            string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", user.LookupId);
+            curQry.Query = query;
+            string UserName = string.Empty;
+            if (myList != null && myList.ItemCount > 0)
             {
-                SPFieldUserValue user = new SPFieldUserValue(spWeb, properties.ListItem["SharePointAccount"].ToString());
-                if (user.LookupId == spWeb.Site.SystemAccount.ID)
-                    return;
-                SPList myList = spWeb.Lists["Resources"];
-
-                SPQuery curQry = new SPQuery();
-                //Get resource with Sp Account Id       					
-                string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", user.LookupId);
-                curQry.Query = query;
-                string UserName = string.Empty;
-                if (myList != null && myList.ItemCount > 0)
+                if (myList.Fields.ContainsField("UserHasPermission"))
                 {
-                    if (myList.Fields.ContainsField("UserHasPermission"))
+                    SPListItemCollection myItems = myList.GetItems(curQry);
+                    foreach (SPListItem item in myItems)
                     {
-                        SPListItemCollection myItems = myList.GetItems(curQry);
-                        foreach (SPListItem item in myItems)
+                        if (Convert.ToString(item["Generic"]).ToUpper() == "YES")
                         {
-                            if (Convert.ToString(item["Generic"]).ToUpper() == "YES")
-                            {
-                                return;
-                            }
+                            return;
+                        }
 
-                            int ResourceLevel = Convert.ToInt32(item["ResourceLevel"]);
-                            bool ResourceLevelPermission = false;
-                            if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
-                                ResourceLevelPermission = true;
-                            UserName = CoreFunctions.GetRealUserName(user.User.LoginName);
-                            string basePath = CoreFunctions.getConfigSetting(spWeb, "epkbasepath");
-                            bool ResourcePlanPermission = EPMLiveCore.Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermission;
-                            var newitem = EPMLiveCore.Utilities.ReloadListItem(item);
-                            newitem["UserHasPermission"] = ResourcePlanPermission;
-                            using (var scope = new DisabledItemEventScope())
-                            {
-                                newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
-                            }
+                        int ResourceLevel = Convert.ToInt32(item["ResourceLevel"]);
+                        bool ResourceLevelPermission = false;
+                        if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
+                            ResourceLevelPermission = true;
+                        UserName = CoreFunctions.GetRealUserName(user.User.LoginName);
+                        string basePath = CoreFunctions.getConfigSetting(spWeb, "epkbasepath");
+                        bool ResourcePlanPermission = EPMLiveCore.Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermission;
+                        var newitem = EPMLiveCore.Utilities.ReloadListItem(item);
+                        newitem["UserHasPermission"] = ResourcePlanPermission;
+                        using (var scope = new DisabledItemEventScope())
+                        {
+                            newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
                         }
                     }
                 }

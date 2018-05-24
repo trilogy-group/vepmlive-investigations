@@ -1,0 +1,104 @@
+span.ReportTitle {
+font-weight:300 !important;
+font-family:Open Sans,Helvetica,Arial !important;
+}
+
+.blue-panel {
+background-color:#FFFFFF !important;
+}
+
+
+.top-nav-item a:hover {
+background-color:#E7E7E7 !important;
+}
+
+.top-nav .btn-group.open, .top-nav .btn-group:hover {
+background-color:#E7E7E7 !important;
+}
+.top-nav .top-nav-item a:hover {
+background-color:#E7E7E7 !important;
+}
+#topnav .plus {
+color:#999999 !important;
+}
+.top-nav a:hover {
+background-color:#E7E7E7 !important;
+}
+.top-nav .btn-group.open .btn.dropdown-toggle, .top-nav .btn:hover, .top-nav a:hover {
+background-color:#E7E7E7 !important;
+}
+.top-nav, ul#topnav ul {
+    background-color: #FFFFFF;
+}
+.top-nav .btn-group .btn, .top-nav .dropdown-menu a {
+    color: #666666;
+}
+#topnav .top-nav-item ul li a:hover {
+background-color:#E6F2FB !important;
+color: #666666 !important;
+}
+
+/* Styles for grids */
+
+tr.ReportHeader {
+background-color:#ffffff !important;
+background-image:none !important;
+border-bottom:2px solid #DDDDDD;
+}
+
+tr.ReportHeader td, thead.ReportHeader td {
+color:#666666 !important;
+}
+
+table.ReportTable td {
+font-family:Open Sans,Helvetica,Arial !important;
+font-weight:400 !important; 
+font-size:14px !important;
+
+}
+
+table.ReportTable {
+width:100%;
+}
+
+tr.ReportHeader td {
+background:none !important;
+padding:8px !important;
+border:none !important;
+font-weight:600;
+text-align:left;
+color:#333333 !important;
+}
+
+
+tr.ReportItem {
+color:#666666 !important;
+border-top:1px solid #DDDDDD !important;
+}
+
+tr.AlternatingItem {
+color:#666666 !important;
+
+border-top:1px solid #DDDDDD !important;
+}
+
+tr.AlternatingItem td {
+
+padding:8px !important;
+border-right-style:none !important;
+border-left-style:none !important;
+border-bottom-style:none !important;
+border-top-style:none !important;
+border-color:#dddddd !important;
+}
+
+tr.ReportItem td {
+
+padding:8px !important;
+border-right-style:none !important;
+border-left-style:none !important;
+border-bottom-style:none !important;
+border-top-style:none !important;
+border-color:#dddddd !important;
+}
+
