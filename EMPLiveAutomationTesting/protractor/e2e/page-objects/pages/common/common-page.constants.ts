@@ -10,6 +10,7 @@ export class CommonPageConstants {
     static readonly title = 'Title';
     static readonly viewAll = 'View All';
     static readonly newItem = 'New Item';
+
     static get imageFile() {
         return {
             fileType: '.jpg',
@@ -53,6 +54,7 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',
+            attachFile: 'AttachFile',
             editTeam: 'Edit Team',
             close: 'Close',
             saveAndClose: 'Save &Close',
@@ -86,6 +88,7 @@ export class CommonPageConstants {
     static get ribbonMenuTitles() {
         return {
             hide: `Hide`,
+            manage: `Manage`,
             items: `Items`,
             list: `List`
         };

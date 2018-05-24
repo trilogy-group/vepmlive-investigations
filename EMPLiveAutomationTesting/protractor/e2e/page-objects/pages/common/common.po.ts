@@ -71,6 +71,7 @@ export class CommonPage extends BasePage {
         return {
             hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
             items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
+            manage: CommonPageHelper.getMenuItemFromRibbonContainer(titles.manage),
             list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
         };
     }
@@ -79,6 +80,7 @@ export class CommonPage extends BasePage {
         const labels = CommonPageConstants.ribbonLabels;
         return {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
+            attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),

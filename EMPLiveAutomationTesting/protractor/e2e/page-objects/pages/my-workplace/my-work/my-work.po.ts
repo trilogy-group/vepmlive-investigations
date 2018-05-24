@@ -8,7 +8,8 @@ import {AnchorHelper} from '../../../../components/html/anchor-helper';
 export class MyWorkPage {
 
     static get newItem() {
-        return element(By.xpath(`//*[contains(@id,'${MyWorkPageConstants.title.newItem}')]//span[@class='ms-cui-ctl-largelabel']`));
+        return element(By.xpath(`//*[contains(@id,'${MyWorkPageConstants.title.newItem}')]
+        //span[contains(@class,'ms-cui-ctl-largelabel')]`));
     }
 
     static get newItemMenu() {
@@ -55,12 +56,16 @@ export class MyWorkPage {
         };
     }
 
+    static get fileUploadControl() {
+        return element(By.id('onetidIOFile'));
+    }
+
     static get lastButton() {
         return AnchorHelper.getAnchorByText(MyWorkPageConstants.last);
     }
 
     static menuItem(option: string) {
-        return element(By.xpath(`//*[contains(@id,'${option}')]`));
+        return element(By.css(`[id*='${option}']`));
     }
 
     static dialogWindowTitle(title: string) {
@@ -68,11 +73,11 @@ export class MyWorkPage {
     }
 
     static getInputByTitle(text: string) {
-        return element(By.xpath(`//input[@title='${text}']`));
+        return element(By.css(`input[title*='${text}']`));
     }
 
     static selectValueFromSuggestions(text: string) {
-        return element(By.xpath(`//div[.='${text}']`));
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
     static selectDropdownOption(option: string) {

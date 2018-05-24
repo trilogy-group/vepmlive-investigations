@@ -277,8 +277,8 @@ export class CommonPageHelper {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
 
-    static async editOptionViaRibbon(stepLogger: StepLogger) {
-        await this.selectRecordFromGrid(stepLogger);
+    static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
 
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
@@ -297,11 +297,11 @@ export class CommonPageHelper {
         return element.all(By.xpath(xpath)).first();
     }
 
-    static async selectRecordFromGrid(stepLogger: StepLogger) {
+    static async selectRecordFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
         stepLogger.stepId(2);
-        stepLogger.step('Select the check box for project created');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
-        await PageHelper.click(CommonPage.record);
+        stepLogger.step('Select the check box for record');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await PageHelper.click(item);
 
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
