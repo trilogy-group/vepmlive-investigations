@@ -1,4 +1,7 @@
 ﻿function ResPlanAnalyzer(thisID, params) {
+    // define global instance reference
+    var $this = this;
+
     // NB Constructor code at end of function
     var MakeDelegate = function (target, method) {
         if (method === null) {
@@ -9,9 +12,6 @@
             return method.apply(target, arguments);
         }
     }
-
-    //  General page settings
-
 
     ResPlanAnalyzer.prototype.OnLoad = function (event) {
         try {
@@ -423,7 +423,8 @@
         var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
 
-
+        var hideRowsWithAllZeros = this.viewTab.getButtonState("hideRowsWithAllZerosButton") ? 1 : 0;
+        
         var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
 				+ isViewDefault + '" Personal="' + isViewPersonal + '">'
 				+ sTopGrid
@@ -433,9 +434,8 @@
 				+ this.DetailsSettings
 				+ this.DisplayMode
 				+ '</OtherData>'
-				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '"';
-
-
+				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '" HideRowsWithAllZeros="' + hideRowsWithAllZeros + '"';
+                
         if (StartID == -1)
             dataXml += ' PerInc = "0" FinishPeriod="' + FinishID + '" ';
         else
@@ -783,9 +783,9 @@
                         }
 
                         if (showLoading) {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); rESAnalyzerInstance.HideWorkingPopup("divLoading"); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.HideWorkingPopup("divLoading"); $this.ApplyRowFilters(grid); }, 10);
                         } else {
-                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); $this.ApplyRowFilters(grid); }, 10);
                         }
                     }
 
@@ -1019,15 +1019,25 @@
                 }
 
                 if (showLoading) {
-                    setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); rESAnalyzerInstance.HideWorkingPopup("divLoading"); }, 10);
+                    setTimeout(function() {
+                        grid.ChangeColsVisibility(showTemp, hideTemp, 0);
+                        $this.HideWorkingPopup("divLoading");
+                        $this.ApplyRowFilters(grid);
+                    }, 10);
                 } else {
-                    setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
+                    setTimeout(function () {
+                        grid.ChangeColsVisibility(showTemp, hideTemp, 0);
+                        $this.ApplyRowFilters(grid);
+                    }, 10);
                 }
             }
 
             try {
                 if (bDoRender == true)
                     grid.Render();
+                else {
+                    this.ApplyRowFilters(grid);
+                }
             }
             catch (e) { };
 
@@ -2513,7 +2523,12 @@
 									{ type: "select", id: "idAnalyzerTab_SelView", onchange: "dialogEvent('AnalyzerTab_SelView_Changed');", width: "100px" },
 									{ type: "select", id: "idAnalyzerTab_SelMode", onchange: "dialogEvent('AnalyzerTab_SelMode_Changed');", width: "100px" }
 							    ]
-							}
+							},
+					        {
+					            items: [
+					                { type: "mediumtext", id: "hideRowsWithAllZerosButton", name: "Hide rows with all zeros", tooltip: "Hide rows with all zeros", onclick: "dialogEvent('HideRowsWithAllZerosButtonOnClick');" }
+					            ]
+					        }
 					    ]
 					},
 					   {
@@ -2597,6 +2612,7 @@
             this.ChartVTDisableList.push("idAnalyzerCollapsAll");
             this.ChartVTDisableList.push("idAnalyzerTab_SelView");
             this.ChartVTDisableList.push("idAnalyzerTab_SelMode");
+            this.ChartVTDisableList.push("hideRowsWithAllZerosButton");
 
             this.ChartBTDisableList.push("idTotCol");
 
@@ -3065,8 +3081,19 @@
             if (this.refreshIconsInTotGrid != null)
                 window.setTimeout(HandleRerenderDelegate, 400);
         }
+
+        this.ApplyRowFilters(grid);
     }
 
+    ResPlanAnalyzer.prototype.ApplyRowFilters = function (grid) {
+        try {
+            var hideRowsWithAllZeros = this.viewTab.getButtonState("hideRowsWithAllZerosButton") ? 1 : 0;
+            this.analyzerHelper.ApplyRowFilters(grid, hideRowsWithAllZeros);
+        }
+        catch (e) {
+            this.HandleException("ApplyRowFilters", e);
+        }
+    }
 
     ResPlanAnalyzer.prototype.HandleRerender = function () {
         if (this.refreshIconsInTotGrid != null) {
@@ -5761,13 +5788,14 @@
         var param = sbDataxml.toString();
 
         this.flashRibbonSelect("idAnalyzerTab_SelView");
+        var hideRowsWithAllZeros;
 
         if (this.selectedView != null) {
 
 
             this.AnalyzerShowBarschecked = false;
             this.AnalyzerHideDetailschecked = false;
-
+            
             try {
                 this.AnalyzerShowBarschecked = (this.selectedView.ViewSettings.ShowBars == "1");
             } catch (e) {
@@ -5782,6 +5810,15 @@
                 this.showingTotDet = (this.selectedView.ViewSettings.ShowBotDet == "1");
             } catch (e) {
                 this.showingTotDet = false;
+            }
+
+            try {
+                if (this.selectedView.ViewSettings &&
+                    this.selectedView.ViewSettings.HideRowsWithAllZeros !== undefined) {
+                    hideRowsWithAllZeros = this.selectedView.ViewSettings.HideRowsWithAllZeros !== "0";
+                }
+            } catch (e) {
+                console.log(e);
             }
 
             try {
@@ -5844,6 +5881,11 @@
                 this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
             }
 
+            if (hideRowsWithAllZeros === undefined || hideRowsWithAllZeros === true) {
+                this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
+            } else {
+                this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
+            }
 
             if (this.showingTotDet == true) {
                 this.totTab.setButtonStateOn("idBTSDet");
@@ -6459,6 +6501,15 @@
 
                     break;
 
+                case "HideRowsWithAllZerosButtonOnClick":
+                    if (this.viewTab.getButtonState("hideRowsWithAllZerosButton") !== true)
+                        this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
+                    else
+                        this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
+
+                    this.flashGridView(Grids["g_1"].id, true, false, false);
+                    this.flashGridView(Grids["bottomg_1"].id, true, false, false);
+                    break;
 
                 case "AnalyzerTab_RenameView":
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
@@ -8470,7 +8521,7 @@
 
 
         this.InitVars();
-        var rESAnalyzerInstance = this;
+        this.analyzerHelper = new AnalyzerHelper();
         this.maxPeriodLimitExceeds = false;
         this.extracolumninbottomgrid = false;
         var maxPeriodLimitExceedsConfirm = undefined;
@@ -8597,7 +8648,6 @@
     catch (e) {
         alert("Resource Plan Analyzer Initialization error");
     }
-
 }
 
 function HideUnusedGroupRows(grid, row, level) {
