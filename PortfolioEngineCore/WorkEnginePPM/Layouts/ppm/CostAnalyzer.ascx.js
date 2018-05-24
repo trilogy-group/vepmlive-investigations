@@ -2396,14 +2396,22 @@
                 this.viewTab.setButtonStateOn("chksDecCosts");
             else
                 this.viewTab.setButtonStateOff("chksDecCosts");
-
-            if (this.ModeSettings.HideRowsWithAllZeros.Value != "0")
-                this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
-            else
-                this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
-
         }
         catch (e) { }
+
+        try {
+            if (this.ModeSettings &&
+                this.ModeSettings.HideRowsWithAllZeros &&
+                this.ModeSettings.HideRowsWithAllZeros.Value === "0") {
+                this.viewTab.setButtonStateOff("hideRowsWithAllZerosButton");
+            }
+            else {
+                // enable by default or when HideRowsWithAllZeros value is not 0
+                this.viewTab.setButtonStateOn("hideRowsWithAllZerosButton");
+            }
+        } catch (e) {
+            console.log(e);
+        }
     }
     CostAnalyzer.prototype.PopulateUI = function () {
 
