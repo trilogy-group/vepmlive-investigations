@@ -17,14 +17,14 @@ import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplac
 import { LinkPageConstants } from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
-import { element, By, browser } from 'protractor';
+import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {

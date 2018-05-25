@@ -117,7 +117,8 @@ export class CommonPageConstants {
             permissions: 'Permissions',
             deleteItem: 'Delete Item',
             comments: 'Comments',
-            editTeam: 'Edit Team'
+            editTeam: 'Edit Team',
+            editPlan: 'Edit Plan'
         };
     }
 
@@ -202,6 +203,17 @@ export class CommonPageConstants {
         return {
             next: 'Next',
             previous: 'Previous'
+        }
+    }
+
+    static get dropdownShowAllButton() {
+        return {
+            project: 'Project_ddlShowAll',
+            timeOffType: 'TimeOffType_ddlShowAll',
+            role: 'Role_ddlShowAll',
+            holidaySchedule: 'HolidaySchedule_ddlShowAll',
+            workHours: 'WorkHours_ddlShowAll',
+            portfolio: 'Portfolio_ddlShowAll',
         };
     }
 }

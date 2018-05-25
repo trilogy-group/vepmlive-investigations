@@ -39,14 +39,6 @@ export class CommonPageHelper {
         return {fullFilePath, newFileName};
     }
 
-    static get adminEmailId(): string {
-        return browser.params.login.admin.user;
-    }
-
-    static get adminPassword(): string {
-        return browser.params.login.admin.password;
-    }
-
     static getSidebarLinkByTextUnderCreateNew(title: string) {
         return this.getElementUnderSections(CommonPageConstants.menuContainerIds.createNew,
             HtmlHelper.tags.li,
@@ -140,19 +132,6 @@ export class CommonPageHelper {
         }
         const xpath = `//tr[contains(@class,'GMClassSelected')][${columnXpaths.join(CommonPageConstants.and)}]`;
         return element(By.xpath(xpath));
-    }
-
-    static async editItemViaContextMenu(stepLogger: StepLogger, item = CommonPage.record) {
-        stepLogger.stepId(3);
-        stepLogger.step('Mouse over the Portfolio created as per pre requisites that need to be edited');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
-        await ElementHelper.actionHoverOver(item);
-
-        stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonPage.ellipse);
-
-        stepLogger.step('Select "Edit Item" from the options displayed');
-        await PageHelper.click(CommonPage.contextMenuOptions.editItem);
     }
 
     static getElementByTitle(title: string) {
@@ -331,5 +310,47 @@ export class CommonPageHelper {
 
     static getTeamRecordsNameByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    public static get getCurrentDate() {
+        return new Date().getDate();
+    }
+
+    public static get getPreviousDate() {
+        const date = this.getCurrentDate;
+        const yesterday = date - 1;
+        return yesterday;
+    }
+
+    public static get getCurrentMonth() {
+        const month = new Date().getMonth();
+        return month + 1; // January is 0!
+    }
+
+    public static get getCurrentYear() {
+        return new Date().getFullYear();
+    }
+
+    public static get getTodayInMMDDYYYY(){
+        const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
+        return currentDate;
+    }
+
+    public static get getYesterdayInMMDDYYYY(){
+        const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
+        return tomorrowDate;
+    }
+
+    static async actionTakenViaContextMenu(stepLogger: StepLogger, item: ElementFinder, actionItem: ElementFinder) {
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await ElementHelper.actionHoverOver(item);
+
+        stepLogger.step('Click on the Ellipses button (...)');
+        await PageHelper.click(CommonPage.ellipse);
+
+        stepLogger.step('Select "View Item" from the options displayed');
+        await PageHelper.click(actionItem);
     }
 }

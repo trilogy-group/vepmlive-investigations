@@ -47,7 +47,8 @@ export class CommonPage extends BasePage {
                 documents: CommonPageHelper.getPageHeaderByTitle(projectsLabels.documents),
                 resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources, true),
                 reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
-                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting)
+                reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting),
+                projectPlanner: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPlanner, true)
             },
             myWorkplace: {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork, true),
@@ -90,7 +91,8 @@ export class CommonPage extends BasePage {
             resourceCapacityHeatMap: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCapacityHeatMap),
             resourceCommitments: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceCommitments),
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
-            resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity)
+            resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
+            editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
         };
     }
 
@@ -207,7 +209,8 @@ export class CommonPage extends BasePage {
             permissions: CommonPageHelper.getContextMenuItemByText(options.permissions),
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
             comments: CommonPageHelper.getContextMenuItemByText(options.comments),
-            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam)
+            editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam),
+            editPlan: CommonPageHelper.getContextMenuItemByText(options.editPlan)
         };
     }
 
