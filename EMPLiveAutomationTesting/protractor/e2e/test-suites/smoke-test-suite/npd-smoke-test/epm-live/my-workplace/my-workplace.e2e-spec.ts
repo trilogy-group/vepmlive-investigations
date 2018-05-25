@@ -340,7 +340,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
-        await PageHelper.click(EventsPage.editEvent);
+        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
         stepLogger.verification('"Edit Event" page is displayed');            
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save',false));
         await expect(await CommonPage.title.getText())
@@ -364,6 +364,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Updated event is highlighted on the calendar for the date and time with blue background');           
         const newEventTitle = CommonPageHelper.getElementUsingText(newTitle,true);
         await expect(await PageHelper.isElementPresent(newEventTitle))
-            .toBe(true, newEventTitle);
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
 });
