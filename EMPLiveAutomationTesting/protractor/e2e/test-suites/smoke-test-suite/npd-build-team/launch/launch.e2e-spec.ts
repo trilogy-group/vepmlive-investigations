@@ -10,13 +10,14 @@ import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-p
 import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
 import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import { ElementHelper } from '../../../../components/html/element-helper';
+import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
-        await homePage.goToAndLogin();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Launch Build Team from Project Center - [743139]', async () => {

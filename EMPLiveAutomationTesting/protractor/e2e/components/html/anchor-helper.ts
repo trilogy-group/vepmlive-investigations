@@ -13,11 +13,15 @@ export class AnchorHelper {
 
     static getElementByTextInsideGrid(text: string, isContains = false) {
         const xpath = this.getElementsByTextXPathInsideGrid(text, isContains);
-        return element(By.xpath(`(${xpath})[1]`));
+        return element(By.xpath(`(${xpath})`));
     }
 
     static getElementsByTextInsideGrid(text: string, isContains = false) {
         const xpath = this.getElementsByTextXPathInsideGrid(text, isContains);
         return element.all(By.xpath(xpath));
+    }
+
+    static getAnchorByText(text: string) {
+        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 }
