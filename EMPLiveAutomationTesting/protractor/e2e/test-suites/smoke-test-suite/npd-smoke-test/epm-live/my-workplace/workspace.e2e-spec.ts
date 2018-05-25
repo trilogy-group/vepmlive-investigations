@@ -175,21 +175,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Step #4 and #5 Inside this function
         const details = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
 
-        stepLogger.verification('Newly added Link details are displayed in the list');
-        const item = element(By.linkText(details.description));
-        let pagingText = await CommonPage.paging.getText();
-        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
-            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
-
-            // Wait if page is not the next one, Ajax operation
-           await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
-            pagingText = await CommonPage.paging.getText();
-        }
-
-        // Always Description appears whereas we want url to assert
-        await expect(await PageHelper.isElementDisplayed(item))
-             .toBe(true,
-                 ValidationsHelper.getDisplayedValidation(details.url));
+        await LinkPageHelper.verifyNewLinkAdded(stepLogger, details);
 
     });
 
