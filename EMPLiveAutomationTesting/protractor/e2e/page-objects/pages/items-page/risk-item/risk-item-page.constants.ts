@@ -4,7 +4,6 @@ export class RiskItemPageConstants {
     static readonly pagePrefix = 'Risks';
     static readonly pageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${RiskItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
-    static readonly attachFilePopupTitle = 'Attach File';
 
     static get inputLabels() {
         return {

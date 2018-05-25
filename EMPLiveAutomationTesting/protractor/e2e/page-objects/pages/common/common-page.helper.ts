@@ -11,6 +11,7 @@ import {ValidationsHelper} from '../../../components/misc-utils/validation-helpe
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 import * as path from 'path';
+import {HomePageConstants} from '../homepage/home-page.constants';
 
 const fs = require('fs');
 
@@ -353,5 +354,36 @@ export class CommonPageHelper {
 
         stepLogger.step('Select "View Item" from the options displayed');
         await PageHelper.click(actionItem);
+    }
+
+    static async attachFile(attachmentFileButton: ElementFinder,
+                            browseFileControl: ElementFinder,
+                            stepLogger: StepLogger) {
+        stepLogger.stepId(6);
+        stepLogger.step('Click on button to attach files');
+        await PageHelper.click(attachmentFileButton);
+
+        stepLogger.verification('The popup appears with Choose Files option');
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(CommonPageConstants.attachFilePopupTitle,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+        stepLogger.stepId(7);
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        const newFile = CommonPageHelper.uniqueDocumentFilePath;
+        stepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
+        await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
+
+        stepLogger.verification('The File name appears under "Choose Files"');
+        await expect(await ElementHelper.getValue(browseFileControl))
+            .toContain(newFile.newFileName,
+                ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.attachFilePopupTitle, newFile.newFileName));
+
+        stepLogger.step('Click on OK');
+        await PageHelper.click(CommonPage.formButtons.okWithSmallK);
+
+        await PageHelper.switchToDefaultContent();
+
+        return newFile;
     }
 }

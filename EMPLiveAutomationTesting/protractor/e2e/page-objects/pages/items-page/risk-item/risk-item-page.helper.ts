@@ -10,7 +10,6 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {HomePageConstants} from '../../homepage/home-page.constants';
 
 export class RiskItemPageHelper {
 
@@ -105,36 +104,4 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
     }
 
-    static async attachFile(stepLogger: StepLogger) {
-        stepLogger.stepId(6);
-        stepLogger.step('Click on "Attachments +" ');
-        await PageHelper.click(RiskItemPage.attachmentButton);
-
-        stepLogger.verification('The popup appears with Choose Files option');
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(RiskItemPageConstants.attachFilePopupTitle,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
-
-        stepLogger.stepId(7);
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-        const newFile = CommonPageHelper.uniqueDocumentFilePath;
-        stepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
-        await PageHelper.uploadFile(RiskItemPage.browseButton, newFile.fullFilePath);
-
-        stepLogger.verification('The File name appears under "Choose Files"');
-        await expect(await ElementHelper.getValue(RiskItemPage.browseButton))
-            .toContain(newFile.newFileName,
-                ValidationsHelper.getFieldShouldHaveValueValidation(RiskItemPageConstants.attachFilePopupTitle, newFile.newFileName));
-
-        stepLogger.step('Click on OK');
-        await PageHelper.click(CommonPage.formButtons.okWithSmallK);
-
-        await PageHelper.switchToDefaultContent();
-
-        stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(newFile.newFileName));
-    }
 }

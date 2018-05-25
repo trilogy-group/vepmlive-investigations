@@ -49,7 +49,7 @@ export class HomePage extends BasePage {
     static get browseButton() {
         return element(By.css('.ms-fileinput'));
     }
-    
+
     static get newButton() {
         return element(By.css('.js-listview-qcbNewButton'));
     }

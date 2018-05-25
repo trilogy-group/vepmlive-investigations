@@ -10,6 +10,7 @@ export class CommonPageConstants {
     static readonly title = 'Title';
     static readonly viewAll = 'View All';
     static readonly newItem = 'New Item';
+    static readonly attachFilePopupTitle = 'Attach File';
 
     static get imageFile() {
         return {

@@ -222,7 +222,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
-    fit('Edit Item - Attach File - [855672]', async () => {
+    it('Edit Item - Attach File - [855672]', async () => {
         const stepLogger = new StepLogger(1176340);
         stepLogger.stepId(1);
 
@@ -272,7 +272,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
         console.log(fullFilePath);
-        await PageHelper.sendKeysToInputField(MyWorkPage.fileUploadControl, fullFilePath);
+        await PageHelper.uploadFile(MyWorkPage.fileUploadControl, fullFilePath);
 
         stepLogger.verification('Selected file name should be displayed in popup');
         await expect(await ElementHelper.getValue(MyWorkPage.fileUploadControl))
