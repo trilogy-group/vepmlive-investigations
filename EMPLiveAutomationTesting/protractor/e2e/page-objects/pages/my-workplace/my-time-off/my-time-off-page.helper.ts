@@ -75,8 +75,6 @@ export class MyTimeOffPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
 
-        stepLogger.verification('verify "New Time Off" details');
-        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(title, true);
         stepLogger.step(`click on Close button`);
         await PageHelper.click(MyTimeOffPage.closeButton);
 

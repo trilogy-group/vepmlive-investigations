@@ -57,7 +57,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
 
         stepLogger.stepId(3);
-        const label = DiscussionsPageHelper.getAllDiscussionsListing(labels.subject);
+        const label = DiscussionsPage.allDiscussionItems;
         stepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
         await CommonPageHelper.checkItemCreated(subject, label);
     });

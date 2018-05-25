@@ -31,9 +31,10 @@ export class DiscussionsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
     }
 
-    static getAllDiscussionsListing(text: string) {
+    static getAllDiscussionsItem(classAttribute: string, text: string) {
         const xpath = element.all(By.xpath
-            (`//div[contains(@class,'postMainContainer')]//span[${ComponentHelpers.getXPathFunctionForDot(text, true)}]`));
+            (`//div[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]//span[
+                ${ComponentHelpers.getXPathFunctionForDot(text, true)}]`));
         return xpath;
     }
 }

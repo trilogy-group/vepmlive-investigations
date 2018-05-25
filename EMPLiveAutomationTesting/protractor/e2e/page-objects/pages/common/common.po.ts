@@ -227,11 +227,11 @@ export class CommonPage extends BasePage {
         };
     }
 
-    static get performSearch(){
+    static get searchIcon(){
         return element(By.css(`[src*='find_icon']`));
     }
 
     static get noDataFound() {
-        return CommonPageHelper.getMessageNoDataFound(CommonPageConstants.messages.noDataFound);
+        return CommonPageHelper.getMessageNoDataFound(HtmlHelper.attributeValue.gmNoDataRow, CommonPageConstants.messages.noDataFound);
     }
 }

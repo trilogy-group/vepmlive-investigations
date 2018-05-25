@@ -365,13 +365,9 @@ export class CommonPageHelper {
         await PageHelper.click(actionItem);
     }
 
-    static getDivByClass(className: string) {
-        const xpath = `div[@class="${className}"]`;
-        return element(By.css(xpath));
-    }
-
-    static getMessageNoDataFound(text: string) {
-        const xpath = element(By.xpath(`//div[@class='GMNoDataRow' and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    static getMessageNoDataFound(classAttribute: string, text: string) {
+        const xpath = element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)} and
+            ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
         return xpath;
     }
 
@@ -380,7 +376,7 @@ export class CommonPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
         size = await label.count();
         for (let index = 0; index < size && !itemFound; index++) {
-            ElementHelper.scrollToElement(label.get(index));
+            await ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
             if (text === titleValue) {
                     itemFound = true;

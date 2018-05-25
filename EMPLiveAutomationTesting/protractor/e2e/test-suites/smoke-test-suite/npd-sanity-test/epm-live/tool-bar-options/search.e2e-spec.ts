@@ -47,7 +47,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on perform search button');
 
         stepLogger.stepId(6);
-        await PageHelper.click(CommonPage.performSearch);
+        await PageHelper.click(CommonPage.searchIcon);
         stepLogger.verification('"No data found" message should be shown');
         await expect(await PageHelper.isElementDisplayed(CommonPage.noDataFound))
             .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.messages.noDataFound));

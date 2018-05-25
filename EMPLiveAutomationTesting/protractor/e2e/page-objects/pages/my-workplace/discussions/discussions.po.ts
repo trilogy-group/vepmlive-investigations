@@ -1,6 +1,7 @@
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
+import {DiscussionsPageHelper} from './discussions-page.helper';
 
 export class DiscussionsPage {
 
@@ -20,4 +21,8 @@ export class DiscussionsPage {
     return CommonPageHelper.getElementByTitle(DiscussionsPageConstants.question);
     }
 
+    static get allDiscussionItems() {
+        return DiscussionsPageHelper.getAllDiscussionsItem(HtmlHelper.attributeValue.postMainContainer,
+            DiscussionsPageConstants.inputLabels.subject);
+        }
 }
