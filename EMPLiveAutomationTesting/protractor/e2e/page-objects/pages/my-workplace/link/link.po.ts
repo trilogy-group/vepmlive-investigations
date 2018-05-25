@@ -15,7 +15,4 @@ export class LinkPage {
         return element(By.id('idHomePageNewLink'));
     }
 
-    static getElementByLinkText(text:string) {
-        return element(By.linkText(text));
-    }
 }

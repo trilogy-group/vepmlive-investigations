@@ -20,6 +20,7 @@ import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
+import { element, By, browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -172,16 +173,24 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
         
         // Step #4 and #5 Inside this function
-        const description = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
+        const details = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
 
-        stepLogger.step(`click on next page`);
-        while (await CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next).isPresent()) {
-            await ElementHelper.click(CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next));
+        stepLogger.verification('Newly added Link details are displayed in the list');
+        const item = element(By.linkText(details.description));
+        let pagingText = await CommonPage.paging.getText();
+        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
+            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
+
+            // Wait if page is not the next one, Ajax operation
+           await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
+            pagingText = await CommonPage.paging.getText();
         }
 
-        stepLogger.verification('Newly created Link item [Ex: New Link 1] details displayed in read only mode');
-        await expect(await LinkPage.getElementByLinkText(description).isDisplayed())
-        .toBe(true, ValidationsHelper.getDisplayedValidation(description));
+        // Always Description appears whereas we want url to assert
+        await expect(await PageHelper.isElementDisplayed(item))
+             .toBe(true,
+                 ValidationsHelper.getDisplayedValidation(details.url));
+
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {

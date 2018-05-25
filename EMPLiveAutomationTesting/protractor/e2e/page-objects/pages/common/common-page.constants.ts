@@ -197,4 +197,11 @@ export class CommonPageConstants {
             resourcePool: 'ResourceGrid'
         };
     }
+
+    static get paginationTitle() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
+        };
+    }
 }

@@ -53,6 +53,8 @@ export class LinkPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
         .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
 
-        return description;
+        return {
+            description, url
+        };
     }
 }

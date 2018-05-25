@@ -214,4 +214,15 @@ export class CommonPage extends BasePage {
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
    }
+
+    static get paginationControlsByTitle() {
+        return {
+            next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
+            previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
+        };
+    }
+
+    static get paging() {
+        return element(By.css('.ms-paging'));
+    }
 }

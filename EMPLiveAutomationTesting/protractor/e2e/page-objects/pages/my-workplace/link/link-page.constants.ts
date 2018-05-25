@@ -11,9 +11,4 @@ export class LinkPageConstants {
             notes: 'Notes'
         };
     }
-    static get navigationLabels() {
-        return {
-            next: 'Next',
-        };
-    }
 }

@@ -14,10 +14,10 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
-import { LinkPage } from '../../../../../page-objects/pages/my-workplace/link/link.po';
 import { LinkPageConstants } from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
+import { element, By, browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -192,7 +192,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
-        const description = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
+        const details = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
 
         stepLogger.stepId(6);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -207,16 +207,21 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(LinkPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pagePrefix));
 
+        stepLogger.verification('Newly added Link details are displayed in the list');
+        const item = element(By.linkText(details.description));
+        let pagingText = await CommonPage.paging.getText();
+        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
+            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
 
-        stepLogger.step(`click on next page`);
-        while (await CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next).isPresent()) {
-            await ElementHelper.click(CommonPageHelper.getElementByTitle(LinkPageConstants.navigationLabels.next));
+            // Wait if page is not the next one, Ajax operation
+           await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
+            pagingText = await CommonPage.paging.getText();
         }
 
-        stepLogger.verification('Newly added Link details are displayed in the list');
-        await expect(await LinkPage.getElementByLinkText(description).isDisplayed())
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(description));
+        // Always Description appears whereas we want url to assert
+        await expect(await PageHelper.isElementDisplayed(item))
+             .toBe(true,
+                 ValidationsHelper.getDisplayedValidation(details.url));
 
     });
 
