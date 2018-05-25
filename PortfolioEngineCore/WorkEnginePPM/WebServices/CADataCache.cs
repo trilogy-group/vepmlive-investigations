@@ -79,6 +79,9 @@ namespace CADataCache
     [Serializable()]
     public class CostAnalyzerDataCache
     {
+        private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
+        private const string HideRowsWithAllZerosXmlValueAttribute = "Value";
+
         clsCostData m_clsda = null;
         private List<clsColDisp> m_topgridcln = null;
         private List<clsColDisp> m_bottomgridcln = null;
@@ -100,6 +103,7 @@ namespace CADataCache
         private bool   bUseQTY = false;
         private bool   bUseCosts = true;
         private bool  m_show_rhs_dec_costs = true;
+        private bool _hideRowsWithAllZeros = true;
 
         private List<clsDataItem> m_TotalRoot = new List<clsDataItem>();
         private Dictionary<string, clsDetailRowData> m_total_dets = null, m_target_dets = null;
@@ -731,31 +735,63 @@ namespace CADataCache
 
             oGrid.FinalizeGridLayout();
             oGrid.InitializeGridData();
-            //clsPIData oPIData;
-
-
-            //displist = TGStandard;
-
+            
             i = 0;
             foreach (clsDetailRowData oDet in m_clnsort)
             {
-
-                oDet.rowid = i;
-
-                oGrid.AddDetailRow(oDet, ++i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-
-                //    m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
-                //    oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
+                oDet.rowid = ++i;
+                if (IsRowVisible(oDet, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs, _hideRowsWithAllZeros))
+                {
+                    oGrid.AddDetailRow(oDet, i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
+                }
             }
 
             s = oGrid.GetString();
-
             return s;
-
-
-
         }
- 
+
+        private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)
+        {
+            if (!hideRowsWithAllZeros)
+            {
+                return true;
+            }
+
+            var quantityValue = 0.0;
+            var costValue = 0.0;
+            var fteValue = 0.0;
+
+            var totalPeriods = details.zFTE.Length - 1;
+            for (var i = 1; i <= totalPeriods; i++)
+            {
+                costValue = 0;
+                quantityValue = 0;
+                fteValue = 0;
+
+                if (showQuantityColumn && details.zValue[i] != double.MinValue)
+                {
+                    quantityValue = details.zValue[i];
+                }
+
+                if (showFte && details.zFTE[i] != double.MinValue)
+                {
+                    fteValue = details.zFTE[i];
+                }
+
+                if (showCostColumn)
+                {
+                    costValue = showCostDecimals ? details.zCost[i] : Math.Round(details.zCost[i]);
+                }
+
+                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
+                {
+                    break;
+                }
+            }
+
+            return costValue + quantityValue + fteValue > 0;
+        }
+
         public string GetBottomGrid()
         {
 
@@ -858,11 +894,15 @@ namespace CADataCache
             if (xval != null)
                 m_show_rhs_dec_costs = (xval.GetIntAttr("Value") != 0);
 
+            xval = xData.GetSubStruct(HideRowsWithAllZerosXmlNode);
+            if (xval != null)
+            {
+                _hideRowsWithAllZeros = xval.GetIntAttr(HideRowsWithAllZerosXmlValueAttribute) != 0;
+            }
         }
 
         public String GetDisplayMode()
         {
-
             CStruct xRoot = new CStruct();
             xRoot.Initialize("DisplayMode");
 
@@ -878,9 +918,10 @@ namespace CADataCache
             xNode = xRoot.CreateSubStruct("DECOST");
             xNode.CreateBooleanAttr("Value", m_show_rhs_dec_costs);
 
+            xNode = xRoot.CreateSubStruct(HideRowsWithAllZerosXmlNode);
+            xNode.CreateBooleanAttr(HideRowsWithAllZerosXmlValueAttribute, _hideRowsWithAllZeros);
+
             return xRoot.XML();
-          
-     
         }
 
         public void GetStartFinishDataPeriods(out int istart, out int ifinish)
