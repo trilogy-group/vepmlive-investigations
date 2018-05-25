@@ -176,7 +176,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
-    fit('Add an item from Social Stream - [1124294]', async () => {
+    it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);
 
         // // Step #1 and #2 and #3 Inside this function
