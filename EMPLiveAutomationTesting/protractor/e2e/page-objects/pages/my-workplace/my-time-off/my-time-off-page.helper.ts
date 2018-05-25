@@ -8,6 +8,7 @@ import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
+import {MyWorkPage} from '../my-work/my-work.po';
 
 export class MyTimeOffPageHelper {
 
@@ -73,6 +74,14 @@ export class MyTimeOffPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
+
+        stepLogger.verification('verify "New Time Off" details');
+        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(title, true);
+        stepLogger.step(`click on Close button`);
+        await PageHelper.click(MyTimeOffPage.closeButton);
+
+        stepLogger.verification('"Click on last button');
+        await PageHelper.click(MyWorkPage.lastButton);
     }
 
     static getXpathForInputByLabel(type: string, title: string) {

@@ -209,4 +209,18 @@ export class CommonPageConstants {
             portfolio: 'Portfolio_ddlShowAll',
         };
     }
+
+    static get searchControl() {
+        return {
+           searchComponentDropdown : 'Component dropdown',
+           searchOperatorDropdown: 'Search Operator dropdown',
+           searchField : 'Search Field',
+        };
+    }
+
+    static get messages() {
+        return {
+           noDataFound : 'No data found',
+        };
+    }
 }

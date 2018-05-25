@@ -11,6 +11,7 @@ import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplac
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {MyTimeOffPage} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -60,9 +61,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
 
         stepLogger.stepId(5);
-        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(title, true);
-        stepLogger.step(`click on Close button`);
-        await PageHelper.click(MyTimeOffPage.closeButton);
+        const label = AnchorHelper.getElementsByTextInsideGrid(labels.title, true);
+        stepLogger.step(`Newly created TimeOff [Ex: Title 1] displayed in "My TimeOff" page`);
+        await CommonPageHelper.checkItemCreated(title, label);
     });
 
     it('View Time Off - [785496]', async () => {

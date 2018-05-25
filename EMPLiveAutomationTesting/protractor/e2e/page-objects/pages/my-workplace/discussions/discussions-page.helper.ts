@@ -5,6 +5,8 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
+import {element, By} from 'protractor';
+import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class DiscussionsPageHelper {
 
@@ -27,5 +29,11 @@ export class DiscussionsPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
+    }
+
+    static getAllDiscussionsListing(text: string) {
+        const xpath = element.all(By.xpath
+            (`//div[contains(@class,'postMainContainer')]//span[${ComponentHelpers.getXPathFunctionForDot(text, true)}]`));
+        return xpath;
     }
 }

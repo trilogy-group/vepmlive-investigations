@@ -55,5 +55,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         const subject = `${labels.subject} ${uniqueId}`;
         const body = `${labels.body} ${uniqueId}`;
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
+
+        stepLogger.stepId(3);
+        const label = DiscussionsPageHelper.getAllDiscussionsListing(labels.subject);
+        stepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
+        await CommonPageHelper.checkItemCreated(subject, label);
     });
 });

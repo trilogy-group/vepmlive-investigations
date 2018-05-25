@@ -1,4 +1,4 @@
-import {browser, By, element, ElementFinder} from 'protractor';
+import { browser, By, element, ElementFinder, ElementArrayFinder } from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {PageHelper} from '../../../components/html/page-helper';
@@ -197,7 +197,7 @@ export class CommonPageHelper {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
-    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger) {
+    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger, verifySearchControl = false) {
 
         // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
         // and search option also requires some time to settle down
@@ -206,6 +206,17 @@ export class CommonPageHelper {
         stepLogger.step('Click on search');
         await PageHelper.click(CommonPage.actionMenuIcons.search);
 
+        if (verifySearchControl === true) {
+            stepLogger.verification('Search Component dropdown is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.column))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchComponentDropdown));
+            stepLogger.verification('Search Operator dropdown is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.type))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchOperatorDropdown));
+            stepLogger.verification('Search field is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.text))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchField));
+        }
         stepLogger.step('Select column name as Title');
         await PageHelper.sendKeysToInputField(CommonPage.searchControls.column, columnName);
 
@@ -352,5 +363,29 @@ export class CommonPageHelper {
 
         stepLogger.step('Select "View Item" from the options displayed');
         await PageHelper.click(actionItem);
+    }
+
+    static getDivByClass(className: string) {
+        const xpath = `div[@class="${className}"]`;
+        return element(By.css(xpath));
+    }
+
+    static getMessageNoDataFound(text: string) {
+        const xpath = element(By.xpath(`//div[@class='GMNoDataRow' and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+        return xpath;
+    }
+
+    static async checkItemCreated(titleValue: string, label: ElementArrayFinder) {
+        let size = 0, itemFound = false, text;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        size = await label.count();
+        for (let index = 0; index < size && !itemFound; index++) {
+            ElementHelper.scrollToElement(label.get(index));
+            text = await label.get(index).getText();
+            if (text === titleValue) {
+                    itemFound = true;
+                }
+        }
+        return itemFound;
     }
 }

@@ -62,9 +62,15 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Changes - New Item" window');
-        // step#5 is inside this function
-        await MyWorkPageHelper.fillFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
+        await MyWorkPageHelper.fillFormAndSave(titleValue, stepLogger);
 
+        stepLogger.stepId(5);
+        stepLogger.step(`Newly created Change [Ex: Title 1] displayed in "My Work" page`);
+        const label = AnchorHelper.getElementsByTextInsideGrid(inputLabels.title, true);
+        await CommonPageHelper.checkItemCreated(titleValue, label);
     });
 
     it('Create New Issue - [855547]', async () => {
@@ -96,8 +102,15 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Issues - New Item" window');
-        // step#5 is inside this function
-        await MyWorkPageHelper.fillFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
+        await MyWorkPageHelper.fillFormAndSave(titleValue, stepLogger);
+
+        stepLogger.stepId(5);
+        stepLogger.step(`Newly created Issues [Ex: Title 1] displayed in "My Work" page`);
+        const label = AnchorHelper.getElementsByTextInsideGrid(MyWorkPageConstants.inputLabels.title, true);
+        await CommonPageHelper.checkItemCreated(titleValue, label);
     });
 
     it('Create New Risks - [855550]', async () => {
@@ -129,8 +142,15 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Risks - New Item" window');
-        // step#5 is inside this function
-        await MyWorkPageHelper.fillFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
+        await MyWorkPageHelper.fillFormAndSave(titleValue, stepLogger);
+
+        stepLogger.stepId(5);
+        stepLogger.step(`Newly created Risks [Ex: Title 1] displayed in "My Work" page`);
+        const label = AnchorHelper.getElementsByTextInsideGrid(inputLabels.title, true);
+        await CommonPageHelper.checkItemCreated(titleValue, label);
     });
 
     it('Create New Time Off - [855551]', async () => {
@@ -162,8 +182,20 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Time Off - New Item" window');
-        // step#5 and step#6 are inside this function
-        await MyWorkPageHelper.fillTimeOffFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
+        // step#5 is inside this function
+        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue, stepLogger);
+
+        stepLogger.stepId(6);
+        stepLogger.verification('"Navigate to My Time Off page');
+        await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
+        stepLogger.verification('"Click on last button');
+        await PageHelper.click(MyWorkPage.lastButton);
+        const label = AnchorHelper.getElementsByTextInsideGrid(inputLabels.title, true);
+        stepLogger.step(`Newly created Time Off [Ex: Title 1] displayed in "My Time Off" page`);
+        await CommonPageHelper.checkItemCreated(titleValue, label);
     });
 
     it('Create New To Do item - [855560]', async () => {
@@ -214,9 +246,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
+        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
 
         stepLogger.verification('Newly created ToDo Item [Ex: Title 1] displayed in "My Work" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        const label = AnchorHelper.getElementsByTextInsideGrid(MyWorkPageConstants.inputLabels.title, true);
+        stepLogger.step(`Newly created ToDo [Ex: Title 1] displayed in "My Work" page`);
+        await CommonPageHelper.checkItemCreated(titleValue, label);
     });
 });

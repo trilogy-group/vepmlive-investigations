@@ -11,6 +11,7 @@ import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -64,7 +65,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification(`To Do page is displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+        ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+        const label = AnchorHelper.getElementsByTextInsideGrid(labels.title);
+        stepLogger.step(`Newly created ToDo [Ex: Title 1] displayed in "ToDo" page`);
+        await CommonPageHelper.checkItemCreated(title, label);
     });
 
     it('Edit To Do from Workplace - [785584]', async () => {
@@ -102,5 +106,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.toDo))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+        const label = AnchorHelper.getElementsByTextInsideGrid(labels.title, true);
+        stepLogger.step(`Modified Title of ToDo [Ex: Title 1] displayed in "ToDo" page`);
+        await CommonPageHelper.checkItemCreated(title, label);
     });
 });
