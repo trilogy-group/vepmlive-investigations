@@ -43,9 +43,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(IssueItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueItemPageConstants.pageName));
 

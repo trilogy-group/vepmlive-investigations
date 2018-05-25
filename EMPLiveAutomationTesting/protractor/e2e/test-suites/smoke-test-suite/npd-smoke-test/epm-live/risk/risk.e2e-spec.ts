@@ -40,9 +40,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(RiskItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(RiskItemPageConstants.pageName));
 

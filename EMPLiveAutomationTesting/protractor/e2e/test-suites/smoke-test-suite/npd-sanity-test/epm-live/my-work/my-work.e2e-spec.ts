@@ -15,6 +15,7 @@ import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {LoginPageHelper} from '../../../../../page-objects/pages/login/login-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {browser} from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -52,7 +53,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.changesItem);
 
         stepLogger.verification('Wait for "Changes - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.changes, true))
@@ -86,7 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.issuesItem);
 
         stepLogger.verification('Wait for "Issues - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.issues, true))
@@ -119,7 +120,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.risksItem);
 
         stepLogger.verification('Wait for "Risks - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.risks, true))
@@ -152,7 +153,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.timeOffItem);
 
         stepLogger.verification('Wait for "Time Off - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.timeOff, true))
@@ -185,7 +186,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.toDoItem);
 
         stepLogger.verification('Wait for "To Do - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"To Do - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.toDo, true))
@@ -238,6 +239,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
+        const selectedTitle = await MyWorkPage.selectedTitle.getText();
         stepLogger.step('Click on "Manage" tab');
         await PageHelper.click(CommonPage.ribbonTitles.manage);
         stepLogger.step('Click on "Edit Item" button');
@@ -245,7 +247,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Edit work item pop-up should load successfully');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(true,
                 ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
 
@@ -254,8 +256,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
+        // Avoiding - Element is not clickable at point (-9553, -9859)
+        await browser.sleep(PageHelper.timeout.s);
+
         stepLogger.stepId(4);
-        stepLogger.step('Click on "Attach File" button from button menu of "Issues - New Issue 1" popup');
+        stepLogger.step('Click on "Attach File" button from button menu of popup');
         await PageHelper.click(CommonPage.ribbonItems.attachFile);
 
         stepLogger.verification('A popup displayed to attach file');
@@ -266,7 +271,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
-        await TextboxHelper.sendKeys(MyWorkPage.fileUploadControl, fullFilePath);
+        console.log(fullFilePath);
+        await PageHelper.sendKeysToInputField(MyWorkPage.fileUploadControl, fullFilePath);
 
         stepLogger.verification('Selected file name should be displayed in popup');
         await expect(await ElementHelper.getValue(MyWorkPage.fileUploadControl))
@@ -278,31 +284,45 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Attached file is displayed at bottom of popup page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFileName));
-        await expect(await ElementHelper.getElementByText(newFileName).isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName, true)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 
         stepLogger.stepId(7);
         stepLogger.step('Click on "Save" button in popup');
         await PageHelper.click(CommonPage.formButtons.save);
+        await PageHelper.switchToDefaultContent();
+
+        // Nothing else is working to have it invisible
+        await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.verification('Popup window is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
 
         stepLogger.stepId(8);
         stepLogger.step('Click on the row of item to which attachment is added [Ex: New Issue 1]');
+        await TextboxHelper.sendKeys(MyWorkPage.searchTextBox, selectedTitle, true);
+        await PageHelper.click(item);
+
+        stepLogger.step('Click on "Manage" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.manage);
 
         stepLogger.step('Click on "View Item" button');
-
-        stepLogger.step('Scroll down till the "Attachments" section is displayed');
+        await PageHelper.click(CommonPage.ribbonItems.viewItem);
 
         stepLogger.verification('Popup window is shown');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(true,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.viewItem));
 
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(newFileName));
     });
 });

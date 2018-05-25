@@ -50,8 +50,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "New Event" option from Events tab panel');
         await PageHelper.click(EventsPage.newEvent);
         stepLogger.verification('"Events - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(EventsPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
         stepLogger.step('Switch to frame');

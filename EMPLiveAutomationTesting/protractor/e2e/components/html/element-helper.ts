@@ -178,7 +178,7 @@ export class ElementHelper {
         return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
     }
 
-    static getElementByText(text: string) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 }

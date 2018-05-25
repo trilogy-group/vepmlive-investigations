@@ -42,8 +42,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(ChangeItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
 

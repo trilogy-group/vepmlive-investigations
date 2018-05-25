@@ -227,7 +227,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         }
 
         // Always Description appears whereas we want url to assert
-        await expect(await item.isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(item))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(url));
     });
@@ -278,7 +278,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.pictures));
 
-        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     });

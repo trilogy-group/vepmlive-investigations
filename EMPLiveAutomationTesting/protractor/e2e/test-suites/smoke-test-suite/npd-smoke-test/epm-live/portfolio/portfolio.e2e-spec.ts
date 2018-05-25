@@ -44,9 +44,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.portfolio);
 
         stepLogger.verification('"Portfolios - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(PortfolioItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(PortfolioItemPageConstants.pageName));
 

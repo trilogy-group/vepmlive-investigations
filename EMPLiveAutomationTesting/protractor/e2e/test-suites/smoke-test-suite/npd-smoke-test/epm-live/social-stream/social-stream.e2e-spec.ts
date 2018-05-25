@@ -84,7 +84,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });

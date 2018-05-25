@@ -64,6 +64,14 @@ export class MyWorkPage {
         return AnchorHelper.getAnchorByText(MyWorkPageConstants.last);
     }
 
+    static get selectedTitle() {
+        return element(By.css('.GMClassSelected .EPMLiveMyWorkTitle div'));
+    }
+
+    static get searchTextBox() {
+        return element(By.id('MWG_Search'));
+    }
+
     static menuItem(option: string) {
         return element(By.css(`[id*='${option}']`));
     }

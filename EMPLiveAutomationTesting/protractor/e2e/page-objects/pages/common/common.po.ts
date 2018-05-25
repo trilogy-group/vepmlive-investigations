@@ -123,7 +123,7 @@ export class CommonPage extends BasePage {
     }
 
     static get title() {
-        return element(By.id(this.titleId));
+        return element(By.xpath(`(//*[contains(@id,'${this.titleId}')])[1]`));
     }
 
     static get dialogTitles() {
@@ -131,7 +131,7 @@ export class CommonPage extends BasePage {
     }
 
     static get dialogTitle() {
-        return element(By.id(this.dialogTitleId));
+        return element(By.xpath(`(//*[contains(@id,'${this.dialogTitleId}')])[1]`));
     }
 
     static get contentFrame() {
