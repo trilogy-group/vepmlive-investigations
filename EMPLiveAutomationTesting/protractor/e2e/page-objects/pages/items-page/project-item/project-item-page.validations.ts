@@ -4,4 +4,9 @@ export class ProjectItemPageValidations {
         'on top right corner -> Click on "Manage Editable Fields (EPM Live)" link -> Using the top number links ' +
         'go to the page where you see "Project Name" field (Page 11 in the instance I am using) -> Set the value ' +
         'as "Always" in drop down "On edit item, editable:"]';
+
+    static getResourceAddedValidation(name: string) {
+        return `Resournce Pool Resource should be added in ${name}`;
+    }
+
 }

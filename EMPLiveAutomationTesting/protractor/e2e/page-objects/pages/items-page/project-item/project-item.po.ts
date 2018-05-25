@@ -85,9 +85,57 @@ export class ProjectItemPage extends BasePage {
             remove: ProjectItemPageHelper.getTeamChangeButtonByValue(label.remove)
         };
     }
-  
+
     static get assignmentPlannerFrame () {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
+    static get newTask() {
+        return element(By.id('txtNewTask'));
+    }
+
+    static get selectPlanner() {
+        const label = ProjectItemPageConstants.plannerLabels;
+        return {
+            microsoftProject: CommonPageHelper.getElementUsingText(label.microsoftProject, false),
+            projectPlanner: CommonPageHelper.getElementUsingText(label.projectPlanner, false)
+
+        };
+    }
+    static get reportParameters() {
+        const label = ProjectItemPageConstants.reportParameter;
+        return {
+            periodStart: ProjectItemPageHelper.getReportParametersByTitle(label.periodStart),
+            periodEnd: ProjectItemPageHelper.getReportParametersByTitle(label.periodEnd),
+            department: ProjectItemPageHelper.getReportParametersByTitle(label.department),
+            resource: ProjectItemPageHelper.getReportParametersByTitle(label.resource),
+            projectName: ProjectItemPageHelper.getReportParametersByTitle(label.projectName),
+            resources: ProjectItemPageHelper.getReportParametersByTitle(label.resources),
+            scope: ProjectItemPageHelper.getReportParametersByTitle(label.scope),
+            from: ProjectItemPageHelper.getReportParametersByTitle(label.from),
+            to: ProjectItemPageHelper.getReportParametersByTitle(label.to),
+            units: ProjectItemPageHelper.getReportParametersByTitle(label.units)
+        };
+    }
+
+    static get reportHeaders() {
+        const label = ProjectItemPageConstants.reportHeaders;
+        return {
+            refresh: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.refresh),
+            firstPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.firstPage),
+            previousPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.previousPage),
+            nextPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.nextPage),
+            lastPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.lastPage),
+            findTextInReport: CommonPageHelper.getElementByTitle(label.findTextInReport),
+            findNext: CommonPageHelper.getElementByTitle(label.findNext)
+        };
+    }
+
+    static get actionsdropdown() {
+        return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
+    }
+
+    static get applyParameterButton() {
+        return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
+    }
 }

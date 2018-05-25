@@ -21,14 +21,6 @@ export class ResourcesPageConstants {
         };
     }
 
-    static get inputShowAllDropdown() {
-        return {
-            role: 'Role_ddlShowAll',
-            holidaySchedule: 'HolidaySchedule_ddlShowAll',
-            workHours: 'WorkHours_ddlShowAll',
-        };
-    }
-
     static get inputDropdownValues() {
         return {
             employee: 'Employee',

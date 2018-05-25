@@ -3,7 +3,7 @@ import {LoginPageConstants} from './login-page.constants';
 import {LoginPageHelper} from './login-page.helper';
 
 export class LoginPage extends BasePage {
-    url = 'EPMLiveForms/DefaultCust.aspx';
+    url = '/sites/devtestautomation';
 
     static get usernameTextBox() {
         return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.userName);
@@ -15,5 +15,15 @@ export class LoginPage extends BasePage {
 
     static get loginButton() {
         return LoginPageHelper.getFormControlById(LoginPageConstants.signInFormIDs.login);
+    }
+
+    async goToAndLogin(username = LoginPageHelper.adminEmailId, password = LoginPageHelper.adminPassword) {
+        this.goTo();
+        await LoginPageHelper.login(username, password);
+    }
+
+    async goToAndLoginAsTeamMember(username = LoginPageHelper.teamMemberEmailId, password = LoginPageHelper.teamMemberPassword) {
+        this.goTo();
+        await LoginPageHelper.login(username, password);
     }
 }

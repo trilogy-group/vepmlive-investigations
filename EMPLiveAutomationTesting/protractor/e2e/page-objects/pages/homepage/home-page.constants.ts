@@ -17,7 +17,8 @@ export class HomePageConstants {
                 documents: 'Documents',
                 resources: 'Resources',
                 reports: 'Reports',
-                reporting: 'Reporting'
+                reporting: 'Reporting',
+                projectPlanner: 'Project Planner'
             }
         };
     }

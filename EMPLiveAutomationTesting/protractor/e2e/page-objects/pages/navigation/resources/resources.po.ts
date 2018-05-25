@@ -3,6 +3,7 @@ import {CommonPageHelper} from '../../common/common-page.helper';
 import {ResourcesPageConstants} from './resources-page.constants';
 import {element, By} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class ResourcesPage extends BasePage {
 
@@ -11,7 +12,7 @@ export class ResourcesPage extends BasePage {
     }
 
     static get inputs() {
-        const dropdownLabel = ResourcesPageConstants.inputShowAllDropdown;
+        const dropdownLabel = CommonPageConstants.dropdownShowAllButton;
         const inputLabel = ResourcesPageConstants.inputLabels;
         const dropdownValueLabel = ResourcesPageConstants.inputDropdownValues;
         return {
