@@ -112,8 +112,7 @@ export class ElementHelper {
     }
 
     static async getValue(locator: ElementFinder) {
-        const value = await PageHelper.getAttributeValue(locator, HtmlHelper.attributes.value);
-        return value;
+        return PageHelper.getAttributeValue(locator, HtmlHelper.attributes.value);
     }
 
     static async hasClassRegex(locator: ElementFinder, klass: string) {

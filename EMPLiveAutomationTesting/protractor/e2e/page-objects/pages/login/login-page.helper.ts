@@ -7,18 +7,26 @@ import {browser, By, element} from 'protractor';
 
 export class LoginPageHelper {
     static get adminEmailId(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
         return browser.params.login.admin.user;
     }
 
     static get adminPassword(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
         return browser.params.login.admin.password;
     }
 
     static get teamMemberEmailId(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
         return browser.params.login.teamMember.user;
     }
 
     static get teamMemberPassword(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
         return browser.params.login.teamMember.password;
     }
 

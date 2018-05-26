@@ -214,7 +214,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.actionClick(CommonPage.ribbonItems.viewReports);
 
         // view Reports dropdown takes 2-3 seconds time to close and after that only close button is accessible else it thows exception
-        WaitHelper.getInstance().staticWait(3000);
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
 
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);

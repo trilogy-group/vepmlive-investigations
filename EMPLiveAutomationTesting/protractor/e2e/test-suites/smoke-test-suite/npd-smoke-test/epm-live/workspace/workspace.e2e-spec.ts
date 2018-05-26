@@ -22,6 +22,7 @@ import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workp
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -242,45 +243,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.pictures,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,
             stepLogger);
-
-        stepLogger.stepId(3);
-        stepLogger.step('Click on the "+ New" button link displayed on top of "Pictures" page');
-        await PageHelper.click(PicturePage.uploadButton);
-
-        stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(PicturePageConstants.addAPicture,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
-
-        stepLogger.step('Switch to frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        const newFile = CommonPageHelper.uniqueImageFilePath;
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
-        stepLogger.step('Browse and select the file that need to be added as a picture');
-        await PageHelper.uploadFile(PicturePage.browseButton, newFile.fullFilePath);
-
-        stepLogger.step('Click "OK" button');
-        await PageHelper.click(CommonPage.formButtons.ok);
-
-        await PageHelper.switchToDefaultContent();
-
-        stepLogger.verification('"Add a picture" window is closed');
-        await expect(await CommonPage.dialogTitle.isDisplayed())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
-
-        stepLogger.verification(`Pictures page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.pictures))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.pictures));
-
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
-            .toBe(true,
-                ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
+        // await CommonPageHelper.uploadDocument(stepLogger);
     });
 
     it('Add Time Off From My Workplace - [1124447]', async () => {
@@ -332,5 +295,53 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Create new Shared Document from Workplace - [1175269]', async () => {
+        const stepLogger = new StepLogger(1175269);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.sharedDocuments,
+            CommonPage.pageHeaders.myWorkplace.sharedDocuments,
+            CommonPageConstants.pageHeaders.myWorkplace.sharedDocuments,
+            stepLogger);
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on the "+ New" button link displayed on top of "Pictures" page');
+        await PageHelper.click(PicturePage.uploadButton);
+
+        stepLogger.step('Waiting for page to open');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(PicturePageConstants.addAPicture,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+
+        stepLogger.step('Switch to frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        const newFile = CommonPageHelper.uniqueImageFilePath;
+        stepLogger.stepId(4);
+        stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
+        stepLogger.step('Browse and select the file that need to be added as a picture');
+        await PageHelper.uploadFile(PicturePage.browseButton, newFile.fullFilePath);
+
+        stepLogger.step('Click "OK" button');
+        await PageHelper.click(CommonPage.formButtons.ok);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger.verification('"Add a picture" window is closed');
+        await expect(await CommonPage.dialogTitle.isDisplayed())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+
+        stepLogger.verification(`Pictures page is displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.pictures))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.pictures));
+
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+            .toBe(true,
+                ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     });
 });

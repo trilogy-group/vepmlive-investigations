@@ -12,6 +12,8 @@ import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
+import {PicturePageConstants} from '../my-workplace/picture/picture-page.constants';
+import {PicturePage} from '../my-workplace/picture/picture.po';
 
 const fs = require('fs');
 
@@ -385,5 +387,47 @@ export class CommonPageHelper {
         await PageHelper.switchToDefaultContent();
 
         return newFile;
+    }
+
+
+    static async uploadDocument(pageName: string, stepLogger: StepLogger) {
+        stepLogger.stepId(3);
+        stepLogger.step('Click on the "+ New" button link displayed on top of "Pictures" page');
+        await PageHelper.click(PicturePage.uploadButton);
+
+        stepLogger.step('Waiting for page to open');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(PicturePageConstants.addAPicture,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+
+        stepLogger.step('Switch to frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        const newFile = CommonPageHelper.uniqueImageFilePath;
+        stepLogger.stepId(4);
+        stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
+        stepLogger.step('Browse and select the file that need to be added as a picture');
+        await PageHelper.uploadFile(PicturePage.browseButton, newFile.fullFilePath);
+
+        stepLogger.step('Click "OK" button');
+        await PageHelper.click(CommonPage.formButtons.ok);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger.verification('"Add a picture" window is closed');
+        await expect(await CommonPage.dialogTitle.isDisplayed())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+
+        stepLogger.verification(`${pageName} page is displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.pictures))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(pageName));
+
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+            .toBe(true,
+                ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
 }
