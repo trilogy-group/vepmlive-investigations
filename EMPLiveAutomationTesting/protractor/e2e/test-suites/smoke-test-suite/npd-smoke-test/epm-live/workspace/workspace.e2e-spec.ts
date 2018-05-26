@@ -296,7 +296,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
-    fit('Create new Shared Document from Workplace - [1175269]', async () => {
+    it('Create new Shared Document from Workplace - [1175269]', async () => {
         const stepLogger = new StepLogger(1175269);
         stepLogger.stepId(1);
 

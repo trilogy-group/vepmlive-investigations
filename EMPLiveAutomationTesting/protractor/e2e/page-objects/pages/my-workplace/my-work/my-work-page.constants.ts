@@ -5,8 +5,6 @@ export class MyWorkPageConstants {
     static readonly pagePrefix = 'My Work';
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
-    static readonly last = 'Last';
-    static readonly fileUpload = 'fileUpload';
 
     static get pageName() {
         return {

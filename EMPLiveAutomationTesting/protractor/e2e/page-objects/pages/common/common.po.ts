@@ -5,6 +5,7 @@ import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 export class CommonPage extends BasePage {
 
@@ -123,6 +124,7 @@ export class CommonPage extends BasePage {
     }
 
     static get title() {
+        // Css doesn't allow to limit the no of elements
         return element(By.xpath(`(//*[contains(@id,'${this.titleId}')])[1]`));
     }
 
@@ -131,6 +133,7 @@ export class CommonPage extends BasePage {
     }
 
     static get dialogTitle() {
+        // Css doesn't allow to limit the no of elements
         return element(By.xpath(`(//*[contains(@id,'${this.dialogTitleId}')])[1]`));
     }
 
@@ -239,6 +242,22 @@ export class CommonPage extends BasePage {
             next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
             previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
         };
+    }
+
+    static get fileUploadControl() {
+        return element(By.id('onetidIOFile'));
+    }
+
+    static get lastButton() {
+        return AnchorHelper.getAnchorByText(CommonPageConstants.last);
+    }
+
+    static get searchTextBox() {
+        return element(By.id('MWG_Search'));
+    }
+
+    static get selectedTitle() {
+        return element(By.css('.GMClassSelected .EPMLiveMyWorkTitle div'));
     }
 
     static get uploadButton() {

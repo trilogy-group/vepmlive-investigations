@@ -3,7 +3,6 @@ import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class MyWorkPage {
 
@@ -54,22 +53,6 @@ export class MyWorkPage {
             timeOffType: element(By.id(dropdownLabel.timeOffType)),
             timeOffInput: this.selectDropdownOption(MyWorkPageConstants.inputDropdownValues.Holiday),
         };
-    }
-
-    static get fileUploadControl() {
-        return element(By.id('onetidIOFile'));
-    }
-
-    static get lastButton() {
-        return AnchorHelper.getAnchorByText(MyWorkPageConstants.last);
-    }
-
-    static get selectedTitle() {
-        return element(By.css('.GMClassSelected .EPMLiveMyWorkTitle div'));
-    }
-
-    static get searchTextBox() {
-        return element(By.id('MWG_Search'));
     }
 
     static menuItem(option: string) {

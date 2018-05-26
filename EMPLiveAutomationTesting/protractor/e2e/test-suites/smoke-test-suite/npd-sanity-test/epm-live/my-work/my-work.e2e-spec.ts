@@ -239,7 +239,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
-        const selectedTitle = await MyWorkPage.selectedTitle.getText();
+        const selectedTitle = await CommonPage.selectedTitle.getText();
         stepLogger.step('Click on "Manage" tab');
         await PageHelper.click(CommonPage.ribbonTitles.manage);
         stepLogger.step('Click on "Edit Item" button');
