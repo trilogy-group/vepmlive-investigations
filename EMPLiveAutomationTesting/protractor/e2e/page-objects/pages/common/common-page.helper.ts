@@ -12,8 +12,6 @@ import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
-import {PicturePageConstants} from '../my-workplace/picture/picture-page.constants';
-import {PicturePage} from '../my-workplace/picture/picture.po';
 
 const fs = require('fs');
 
@@ -389,40 +387,42 @@ export class CommonPageHelper {
         return newFile;
     }
 
-
-    static async uploadDocument(pageName: string, stepLogger: StepLogger) {
+    static async uploadDocument(page: ElementFinder,
+                                addWindowTitle: string,
+                                pageName: string,
+                                stepLogger: StepLogger,
+                                newFile = CommonPageHelper.uniqueImageFilePath) {
         stepLogger.stepId(3);
-        stepLogger.step('Click on the "+ New" button link displayed on top of "Pictures" page');
-        await PageHelper.click(PicturePage.uploadButton);
+        stepLogger.step(`Click on the "+ New" button link displayed on top of "${pageName}" page`);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(PicturePageConstants.addAPicture,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+            .toBe(addWindowTitle,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
         stepLogger.step('Switch to frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
-        const newFile = CommonPageHelper.uniqueImageFilePath;
         stepLogger.stepId(4);
         stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
         stepLogger.step('Browse and select the file that need to be added as a picture');
-        await PageHelper.uploadFile(PicturePage.browseButton, newFile.fullFilePath);
+        await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         stepLogger.step('Click "OK" button');
         await PageHelper.click(CommonPage.formButtons.ok);
 
         await PageHelper.switchToDefaultContent();
 
-        stepLogger.verification('"Add a picture" window is closed');
+        stepLogger.verification(`"${addWindowTitle}" window is closed`);
         await expect(await CommonPage.dialogTitle.isDisplayed())
             .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(PicturePageConstants.addAPicture));
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
 
         stepLogger.verification(`${pageName} page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.pictures))
+        await expect(await PageHelper.isElementDisplayed(page))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 

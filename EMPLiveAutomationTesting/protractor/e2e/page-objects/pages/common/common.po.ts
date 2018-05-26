@@ -241,6 +241,14 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get uploadButton() {
+        return element(By.css('.js-listview-qcbUploadButton'));
+    }
+
+    static get browseButton() {
+        return element(By.css('.ms-fileinput'));
+    }
+
     static get paging() {
         return element(By.css('.ms-paging'));
     }
