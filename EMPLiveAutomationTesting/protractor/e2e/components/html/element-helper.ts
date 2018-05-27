@@ -34,13 +34,9 @@ export class ElementHelper {
         }
     }
 
-    static async actionClick(optElementOrButton ?: ElementFinder | string, optButton ?: string) {
-        if (optElementOrButton) {
-            return browser.actions().click(optElementOrButton).perform();
-        }
-        if (optButton) {
-            return browser.actions().click(optButton).perform();
-        }
+    static async actionClick(locator: ElementFinder) {
+        return browser.actions().click(locator).perform();
+
     }
 
     static async actionHoverOver(locator: ElementFinder) {

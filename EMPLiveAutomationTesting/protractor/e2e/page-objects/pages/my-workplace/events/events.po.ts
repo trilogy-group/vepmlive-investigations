@@ -1,3 +1,4 @@
+const moment = require('moment');
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {EventsPageConstants} from './events-page.constants';
@@ -30,12 +31,27 @@ export class EventsPage {
     static get calenderBlock() {
         return CommonPageHelper.getElementContainsTitle(CommonPageConstants.title);
     }
+
+    static get calenderTomorrow() {
+        const currentDate = Date.now();
+        var tomorrow = moment(currentDate).add(1, 'days');
+        tomorrow = moment(tomorrow).format('M/DD/YYYY');
+        return element(By.css(`td[date='${tomorrow}']`));
+    }
+
+    static get closeEventButton() {
+        return element(By.css('[value = "Close"]'));
+    }
+
+    static addNewEvent(title:string) {
+        return element(By.css(`a[title='${title}']`));
+    }
+
+    static getElementByLinkText(text:string) {
+        return element(By.linkText(text));
+    }
     
     static eventPageByTitle(title:string) {
         return CommonPageHelper.getElementUsingTextContent(title,true);
-    }
-    
-    static get closeEventButton() {
-        return element(By.css('[value = "Close"]'));
     }
 }
