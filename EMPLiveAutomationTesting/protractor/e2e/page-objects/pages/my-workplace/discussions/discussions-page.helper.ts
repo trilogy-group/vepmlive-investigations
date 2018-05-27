@@ -5,6 +5,10 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
+import { CommonPageHelper } from '../../common/common-page.helper';
+import { WaitHelper } from '../../../../components/html/wait-helper';
+import { MyWorkplacePage } from '../my-workplace.po';
+import { CommonPageConstants } from '../../common/common-page.constants';
 
 export class DiscussionsPageHelper {
 
@@ -28,4 +32,23 @@ export class DiscussionsPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
     }
+    static async addDiscussion(stepLogger: StepLogger) {
+        stepLogger.step('PRECONDITION: navigate to Discussions page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.discussions, 
+            CommonPage.pageHeaders.myWorkplace.discussions, CommonPageConstants.pageHeaders.myWorkplace.discussions, stepLogger);
+        stepLogger.stepId(1);
+        stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
+        await PageHelper.click(DiscussionsPage.newDiscussionLink);
+        stepLogger.verification('"Discussion - New Item" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(DiscussionsPageConstants.pagePrefix, ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
+        stepLogger.stepId(2);
+        stepLogger.step(`Enter/Select below details in 'New Discussion' page`);
+        const labels = DiscussionsPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const subject = `${labels.subject} ${uniqueId}`;
+        const body = `${labels.body} ${uniqueId}`;
+        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
+    }    
 }

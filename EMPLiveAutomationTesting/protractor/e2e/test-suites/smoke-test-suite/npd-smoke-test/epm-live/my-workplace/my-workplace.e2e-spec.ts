@@ -18,9 +18,10 @@ import {By, element} from 'protractor';
 import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import { DiscussionsPageHelper } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
+import { DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+import { DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -272,51 +273,33 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     });
 
-    it('Add Time Off From My Workplace - [1124447]', async () => {
-        const stepLogger = new StepLogger(1124447);
+    fit('Reply to a Discussion - [785614]', async () => {
+        const stepLogger = new StepLogger(785614);
+        
+        // steps 1,2,3 are inside this function
+        stepLogger.step('PRECONDITION: Create new Discussion');        
+        await DiscussionsPageHelper.addDiscussion(stepLogger);
 
-        stepLogger.step('Navigate to My Time Off page');
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.myTimeOff,
-            CommonPage.pageHeaders.myWorkplace.timeOff,
-            MyTimeOffPageConstants.pagePrefix,
-            stepLogger);
-
-        stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(MyTimeOffPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pagePrefix));
-
-        stepLogger.step('Click on "+ New Item" link displayed on top of "Time Off" page');
-        await PageHelper.click(CommonPage.addNewLink);
-
-        stepLogger.step(`Enter/Select below details in 'My Time Off' page`);
+        stepLogger.stepId(4);
+        stepLogger.step(`Click on 'Discussion' added by Admin User`);
+        const title = await ElementHelper.getText(DiscussionsPage.openDiscussionLink)
+        await PageHelper.click(DiscussionsPage.openDiscussionLink);
+        
+        stepLogger.verification('the Discussion should get selected');
+        await expect(await DiscussionsPage.Discussiontitle.getText())
+            .toBe(title, ValidationsHelper.getPageDisplayedValidation(title));
+            
+        stepLogger.stepId(4);
+        stepLogger.step(`Click on 'Reply' Enter a response Click 'Reply' button`);
         const uniqueId = PageHelper.getUniqueId();
-        const labels = MyTimeOffPageConstants.inputLabels;
-        const input = MyTimeOffPageConstants.inputValues;
-        const title = `${labels.title} ${uniqueId}`;
-        const timeOffType = MyTimeOffPageConstants.timeOffTypes.holiday;
-        const requestor = input.requestorValue;
-        const startDate = input.startDate;
-        const finishDate = input.finishDate;
-        await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
+        const labels = DiscussionsPageConstants.inputLabels;
+        const replyMsg = `${labels.reply} ${uniqueId}`;
+        await TextboxHelper.sendKeys(DiscussionsPage.replyMsg,replyMsg);
+        await PageHelper.click(DiscussionsPage.replyButton);
 
-        stepLogger.verification('Newly created Time Off item details displayed in read only mode');
-        await expect(await CommonPage.contentTitleInViewMode.getText())
-            .toBe(title, ValidationsHelper.getLabelDisplayedValidation(title));
-
-        stepLogger.verification('Navigate to page');
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.myTimeOff,
-            CommonPage.pageHeaders.myWorkplace.timeOff,
-            MyTimeOffPageConstants.pagePrefix,
-            stepLogger);
-
-        await CommonPageHelper.searchItemByTitle(title, MyTimeOffPageConstants.columnNames.title, stepLogger);
-
-        stepLogger.verification('Newly created Time off item details displayed in read only mode');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+        stepLogger.verification('Reply should be displayed below the discussion');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(DiscussionsPage.replyBody);
+        await expect(await DiscussionsPage.replyBody.getText())
+            .toBe(replyMsg, ValidationsHelper.getLabelDisplayedValidation(replyMsg));
     });
 });
