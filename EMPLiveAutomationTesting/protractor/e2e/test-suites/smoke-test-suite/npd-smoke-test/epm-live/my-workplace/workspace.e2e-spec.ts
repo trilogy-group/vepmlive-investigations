@@ -13,7 +13,6 @@ import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
-import {PicturePage} from '../../../../../page-objects/pages/my-workplace/picture/picture.po';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
@@ -22,6 +21,7 @@ import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplac
 import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -95,8 +95,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #3 Inside this function
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
-            CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
+            CommonPage.contextMenuOptions.editItem,
+            stepLogger);
 
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -194,7 +195,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Click on the "+ New" button link displayed on top of "Pictures" page');
-        await PageHelper.click(PicturePage.uploadButton);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -210,7 +211,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(4);
         stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
         stepLogger.step('Browse and select the file that need to be added as a picture');
-        await PageHelper.uploadFile(PicturePage.browseButton, newFile.fullFilePath);
+        await PageHelper.uploadFile(CommonPage.uploadButton, newFile.fullFilePath);
 
         stepLogger.step('Click "OK" button');
         await PageHelper.click(CommonPage.formButtons.ok);
