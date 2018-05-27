@@ -3,7 +3,7 @@ import {CommonPageHelper} from '../../common/common-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {EventsPageConstants} from './events-page.constants';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {element, By} from 'protractor';
+import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class EventsPage {
@@ -34,7 +34,7 @@ export class EventsPage {
 
     static get calenderTomorrow() {
         const currentDate = Date.now();
-        var tomorrow = moment(currentDate).add(1, 'days');
+        let tomorrow = moment(currentDate).add(1, 'days');
         tomorrow = moment(tomorrow).format('M/DD/YYYY');
         return element(By.css(`td[date='${tomorrow}']`));
     }
@@ -43,15 +43,15 @@ export class EventsPage {
         return element(By.css('[value = "Close"]'));
     }
 
-    static addNewEvent(title:string) {
+    static addNewEvent(title: string) {
         return element(By.css(`a[title='${title}']`));
     }
 
-    static getElementByLinkText(text:string) {
+    static getElementByLinkText(text: string) {
         return element(By.linkText(text));
     }
-    
-    static eventPageByTitle(title:string) {
-        return CommonPageHelper.getElementUsingTextContent(title,true);
+
+    static eventPageByTitle(title: string) {
+        return CommonPageHelper.getElementUsingTextContent(title, true);
     }
 }
