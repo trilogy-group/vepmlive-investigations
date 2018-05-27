@@ -3,15 +3,15 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import { LinkPageConstants } from './link-page.constants';
-import { LinkPage } from './link.po';
-import { WaitHelper } from '../../../../components/html/wait-helper';
-import { element, By, browser } from 'protractor';
+import {LinkPageConstants} from './link-page.constants';
+import {LinkPage} from './link.po';
+import {WaitHelper} from '../../../../components/html/wait-helper';
+import {browser, By, element} from 'protractor';
 
 export class LinkPageHelper {
 
     static async fillNewLinkFormAndVerification(stepLogger: StepLogger) {
-        
+
         stepLogger.stepId(4);
         stepLogger.step(`Enter/Select below details in 'New Link' page`);
         const uniqueId = PageHelper.getUniqueId();
@@ -52,12 +52,13 @@ export class LinkPageHelper {
         stepLogger.verification('"New Link" page is closed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.formButtons.save.isPresent())
-        .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
+            .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
 
         return {
             description, url
         };
     }
+
     static async verifyNewLinkAdded(stepLogger: StepLogger, details: { description: string; url: string; }) {
         stepLogger.verification('Newly added Link details are displayed in the list');
         const item = element(By.linkText(details.description));
@@ -72,5 +73,5 @@ export class LinkPageHelper {
         await expect(await PageHelper.isElementDisplayed(item))
             .toBe(true, ValidationsHelper.getDisplayedValidation(details.url));
     }
-    
+
 }

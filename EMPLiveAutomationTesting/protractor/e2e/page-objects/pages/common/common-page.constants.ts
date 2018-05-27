@@ -203,7 +203,7 @@ export class CommonPageConstants {
         return {
             next: 'Next',
             previous: 'Previous'
-        }
+        };
     }
 
     static get dropdownShowAllButton() {

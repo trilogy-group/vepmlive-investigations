@@ -14,9 +14,9 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
-import { LinkPageConstants } from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
-import { MyWorkplacePage } from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
-import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
+import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
+import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -200,7 +200,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.links,
             CommonPageConstants.pageHeaders.myWorkplace.links,
             stepLogger);
-            
+
         stepLogger.verification(`'Links' page is displayed`);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())

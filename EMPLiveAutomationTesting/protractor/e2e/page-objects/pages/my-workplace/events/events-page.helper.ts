@@ -6,9 +6,9 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {EventsPageConstants} from './events-page.constants';
 import {EventsPage} from './events.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import { CommonPageHelper } from '../../common/common-page.helper';
-import { MyWorkplacePage } from '../my-workplace.po';
-import { WaitHelper } from '../../../../components/html/wait-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
+import {MyWorkplacePage} from '../my-workplace.po';
+import {WaitHelper} from '../../../../components/html/wait-helper';
 
 export class EventsPageHelper {
 
@@ -44,15 +44,18 @@ export class EventsPageHelper {
         const stepLogger = new StepLogger(786942);
 
         stepLogger.step('PRECONDITION: navigate to Events page');
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.events, CommonPage.pageHeaders.myWorkplace.events, CommonPageConstants.pageHeaders.myWorkplace.events, stepLogger);
-        
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.events,
+            CommonPage.pageHeaders.myWorkplace.events,
+            CommonPageConstants.pageHeaders.myWorkplace.events,
+            stepLogger);
+
         stepLogger.stepId(1);
         stepLogger.step('Click on "Events" tab displayed on top of "Events" page');
         await PageHelper.click(EventsPage.eventsTab);
         stepLogger.verification('Tab Panel of the Events should get displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel, true))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.tabPanel));
-        
+
         stepLogger.stepId(2);
         stepLogger.step('Click on "New Event" option from Events tab panel');
         await PageHelper.click(EventsPage.newEvent);
@@ -60,7 +63,7 @@ export class EventsPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(EventsPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
-        
+
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
         stepLogger.stepId(3);

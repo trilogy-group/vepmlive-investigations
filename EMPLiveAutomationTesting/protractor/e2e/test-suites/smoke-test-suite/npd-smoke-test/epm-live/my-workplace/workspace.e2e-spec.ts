@@ -18,9 +18,9 @@ import {PicturePageConstants} from '../../../../../page-objects/pages/my-workpla
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
-import { EventsPageConstants } from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
-import { EventsPage } from '../../../../../page-objects/pages/my-workplace/events/events.po';
-import { LinkPageHelper } from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
+import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
+import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
+import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -305,8 +305,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Events - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
-        .toBe(EventsPageConstants.pageName,
-            ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+            .toBe(EventsPageConstants.pageName,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
 
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
