@@ -3,7 +3,7 @@ export class SettingsPageConstants {
         return {
             collaborationSettings: {
                 rootId: 'epm-nav-sub-settings-collaboration-settings',
-                childLabels: {
+                childMenuLabels: {
                     notificationSettings: 'Notification Settings',
                     userAlerts: 'User Alerts',
                     workSettings: 'Work Settings'
@@ -11,7 +11,7 @@ export class SettingsPageConstants {
             },
             configurationSettings: {
                 rootId: 'epm-nav-sub-settings-configuration',
-                childLabels: {
+                childMenuLabels: {
                     listSynchronization: 'List Synchronization',
                     manageApps: 'Manage Apps',
                     manageCommunities: 'Manage Communities',
@@ -25,7 +25,7 @@ export class SettingsPageConstants {
             },
             costManagement: {
                 rootId: 'epm-nav-sub-settings-cost-management',
-                childLabels: {
+                childMenuLabels: {
                     calendarsPeriods: 'Calendars & Periods',
                     costCategories: 'Cost Categories',
                     costModels: 'Cost Models',
@@ -38,29 +38,29 @@ export class SettingsPageConstants {
             },
             enterpriseReporting: {
                 rootId: 'epm-nav-sub-settings-enterprise-reporting',
-                childLabels: {
-                    advancedReports: 'Advanced Reports',
+                childMenuLabels: {
+                    ReportingSettings: 'Advanced Reports',
                     classicReports: 'Classic Reports',
                     reportingSettings: 'Reporting Settings'
                 }
             },
             lookAndFeel: {
                 rootId: 'epm-nav-sub-settings-look-feel',
-                childLabels: {
+                childMenuLabels: {
                     regionalSettings: 'Regional Settings',
                     titleAndLogo: 'Title and Logo'
                 }
             },
             plannerSettings: {
                 rootId: 'epm-nav-sub-settings-planner-settings',
-                childLabels: {
+                childMenuLabels: {
                     plannerTemplates: 'Planner Templates',
                     planners: 'Planners'
                 }
             },
             resourceManagement: {
                 rootId: 'epm-nav-sub-settings-resource-management',
-                childLabels: {
+                childMenuLabels: {
                     calendarsPeriods: 'Calendars & Periods',
                     fieldMapping: 'Field Mapping',
                     fields: 'Fields',
@@ -69,7 +69,7 @@ export class SettingsPageConstants {
             },
             systemSettings: {
                 rootId: 'epm-nav-sub-settings-system-settings',
-                childLabels: {
+                childMenuLabels: {
                     generalSettings: 'General Settings',
                     timerSettings: 'Timer Settings',
                     workspaceSettings: 'Workspace Settings'
@@ -77,13 +77,13 @@ export class SettingsPageConstants {
             },
             timeSheetSettings: {
                 rootId: 'epm-nav-sub-settings-timesheet-settings',
-                childLabels: {
+                childMenuLabels: {
                     timeSheetSettings: 'Timesheet Settings',
                 }
             },
             userManagement: {
                 rootId: 'epm-nav-sub-settings-user-management',
-                childLabels: {
+                childMenuLabels: {
                     departments: 'Departments',
                     holidaySchedules: 'Holiday Schedules',
                     nonWork: 'Non Work',
@@ -94,7 +94,7 @@ export class SettingsPageConstants {
             },
             utilities: {
                 rootId: 'epm-nav-sub-settings-utilities',
-                childLabels: {
+                childMenuLabels: {
                     portfolioDBAdmin: 'Portfolio DB Admin',
                     portfolioQueue: 'Portfolio Queue',
                     recycleBin: 'Recycle Bin',
