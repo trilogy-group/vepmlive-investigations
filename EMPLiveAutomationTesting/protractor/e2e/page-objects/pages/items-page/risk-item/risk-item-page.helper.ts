@@ -14,11 +14,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 export class RiskItemPageHelper {
 
     static async editRisk(stepLogger: StepLogger) {
-        stepLogger.verification('"Edit Risk" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(RiskItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+        await this.verifyPage(stepLogger);
 
         stepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -99,4 +95,13 @@ export class RiskItemPageHelper {
             .toBe(true,
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     }
+
+    static async verifyPage(stepLogger: StepLogger) {
+        stepLogger.verification('"Edit Risk" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(RiskItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+    }
+
 }

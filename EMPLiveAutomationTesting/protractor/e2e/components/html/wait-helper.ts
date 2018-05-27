@@ -73,7 +73,7 @@ export class WaitHelper {
     async waitForElementToBeHidden(targetElement: ElementFinder,
                                    timeout = PageHelper.DEFAULT_TIMEOUT,
                                    message = 'Element should not be visible') {
-        return browser.wait(this.EC.invisibilityOf(targetElement),
+        return browser.wait(async () => !(await targetElement.isPresent() && await targetElement.isDisplayed()),
             timeout,
             targetElement.locator().toString() + message);
     }

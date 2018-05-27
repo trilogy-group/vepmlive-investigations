@@ -82,5 +82,5 @@ export class MyTimeOffPageHelper {
     static getElementByType(type: string) {
         const xpath = `[type="${type}"]`;
         return element(By.css(xpath));
-   }
+    }
 }

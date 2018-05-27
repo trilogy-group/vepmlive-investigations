@@ -1,14 +1,14 @@
 import {MyWorkPageConstants} from './my-work-page.constants';
-import {element, By} from 'protractor';
+import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class MyWorkPage {
 
     static get newItem() {
-        return element(By.xpath(`//*[contains(@id,'${MyWorkPageConstants.title.newItem}')]//span[@class='ms-cui-ctl-largelabel']`));
+        return element(By.xpath(`//*[contains(@id,'${MyWorkPageConstants.title.newItem}')]
+        //span[contains(@class,'ms-cui-ctl-largelabel')]`));
     }
 
     static get newItemMenu() {
@@ -20,14 +20,6 @@ export class MyWorkPage {
             timeOffItem: this.menuItem(labels.timeOff),
             toDoItem: this.menuItem(labels.toDo),
         };
-    }
-
-    static menuItem (option: string) {
-        return element(By.xpath(`//*[contains(@id,'${option}')]`));
-    }
-
-    static dialogWindowTitle (title: string) {
-        return CommonPageHelper.getElementByTitle(`${title}`);
     }
 
     static get widowTitleName() {
@@ -54,15 +46,7 @@ export class MyWorkPage {
         };
     }
 
-    static getInputByTitle (text: string) {
-        return element(By.xpath(`//input[@title='${text}']`));
-    }
-
-    static selectValueFromSuggestions (text: string) {
-        return element(By.xpath(`//div[.='${text}']`));
-    }
-
-     static get dropdownAll() {
+    static get dropdownAll() {
         const dropdownLabel = CommonPageConstants.dropdownShowAllButton;
         return {
             project: element(By.id(dropdownLabel.project)),
@@ -71,11 +55,23 @@ export class MyWorkPage {
         };
     }
 
-    static selectDropdownOption(option: string) {
-        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    static menuItem(option: string) {
+        return element(By.css(`[id*='${option}']`));
     }
 
-    static get lastButton() {
-        return AnchorHelper.getAnchorByText(MyWorkPageConstants.last);
+    static dialogWindowTitle(title: string) {
+        return CommonPageHelper.getElementByTitle(`${title}`);
+    }
+
+    static getInputByTitle(text: string) {
+        return element(By.css(`input[title*='${text}']`));
+    }
+
+    static selectValueFromSuggestions(text: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static selectDropdownOption(option: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
     }
 }

@@ -9,19 +9,13 @@ import { CommonPageHelper } from '../../common/common-page.helper';
 import { WaitHelper } from '../../../../components/html/wait-helper';
 import { MyWorkplacePage } from '../my-workplace.po';
 import { CommonPageConstants } from '../../common/common-page.constants';
+import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 
 export class DiscussionsPageHelper {
 
-    static async fillNewDiscussionFormAndVerify(subject: string, body: string, stepLogger: StepLogger) {
+    static async fillNewDiscussionFormAndVerify(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
 
-        stepLogger.step(`Subject *: New Discussion 1`);
-        await TextboxHelper.sendKeys(DiscussionsPage.subjectTextField, subject);
-
-        stepLogger.step(`Body: Enter some text [Ex: Description for New Discussion 1]`);
-        await TextboxHelper.sendKeys(DiscussionsPage.bodyTextBox, body);
-
-        stepLogger.verification('Mark check "Question" checkbox');
-        await PageHelper.click(DiscussionsPage.questionCheckbox);
+        await this.enterSubjectAndBody(subject, body, isQuestion, stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on save');
@@ -32,6 +26,7 @@ export class DiscussionsPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
     }
+  
     static async addDiscussion(stepLogger: StepLogger) {
         stepLogger.step('PRECONDITION: navigate to Discussions page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.discussions, 
@@ -51,4 +46,15 @@ export class DiscussionsPageHelper {
         const body = `${labels.body} ${uniqueId}`;
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
     }    
+
+    static async enterSubjectAndBody(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
+        stepLogger.step(`Subject *: New Discussion 1`);
+        await TextboxHelper.sendKeys(DiscussionsPage.subjectTextField, subject);
+
+        stepLogger.step(`Body: Enter some text [Ex: Description for New Discussion 1]`);
+        await TextboxHelper.sendKeys(DiscussionsPage.bodyTextBox, body);
+
+        stepLogger.verification('Mark check "Question" checkbox');
+        await CheckboxHelper.markCheckbox(DiscussionsPage.questionCheckbox, isQuestion);
+    }
 }

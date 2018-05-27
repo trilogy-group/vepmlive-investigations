@@ -180,6 +180,8 @@ export class PageHelper {
     }
 
     static async switchToFrame(frameEle: WebElement) {
+        // Wait for frame to exist first
+        await browser.sleep(PageHelper.timeout.s);
         return browser.driver.switchTo().frame(frameEle);
     }
 
