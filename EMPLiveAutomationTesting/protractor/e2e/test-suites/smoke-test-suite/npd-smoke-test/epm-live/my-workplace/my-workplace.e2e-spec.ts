@@ -23,6 +23,7 @@ import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import { SharedDocumentsPageConstants } from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
