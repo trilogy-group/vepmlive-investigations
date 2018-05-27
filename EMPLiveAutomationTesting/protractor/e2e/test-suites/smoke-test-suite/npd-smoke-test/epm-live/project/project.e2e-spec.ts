@@ -11,9 +11,9 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {SettingsPageHelper} from '../../../../../page-objects/pages/settings/settings-page.helper';
-import {SettingsPageConstants} from '../../../../../page-objects/pages/settings/settings-page.constants';
-import {SettingsPage} from '../../../../../page-objects/pages/settings/settings.po';
+import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/settings/settings-page.helper';
+import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/settings/settings-page.constants';
+import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/settings/settings.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
@@ -120,11 +120,11 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger.step('Additional step - Click on setting button');
             await PageHelper.click(CommonPage.settingButton);
             stepLogger.step('Additional step - Click on manaage editable field');
-            await PageHelper.click(SettingsPage.generalSettings.manageEditableFields);
+            await PageHelper.click(ItemSettingsPage.generalSettings.manageEditableFields);
             stepLogger.step('Additional step - Make project name editable');
-            await SettingsPageHelper.configureEditableField(SettingsPageConstants.editableMenuTitles.projectName,
-                SettingsPageConstants.editableMenuOptions.onEditItemEditable,
-                SettingsPageConstants.editableMenuConfigurationOptions.always);
+            await ItemSettingsPageHelper.configureEditableField(ItemSettingsPageConstants.editableMenuTitles.projectName,
+                ItemSettingsPageConstants.editableMenuOptions.onEditItemEditable,
+                ItemSettingsPageConstants.editableMenuConfigurationOptions.always);
 
             await CommonPageHelper.navigateToItemPageUnderNavigation(
                 HomePage.navigation.projects.projects,

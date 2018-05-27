@@ -1,12 +1,12 @@
 import {By, element} from 'protractor';
-import {SettingsPage} from './settings.po';
-import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {PageHelper} from '../../../components/html/page-helper';
-import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
-import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
-import {CommonPage} from '../common/common.po';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
+import {PageHelper} from '../../../../components/html/page-helper';
+import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
+import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
+import {CommonPage} from '../../common/common.po';
+import {ItemSettingsPage} from './item-settings.po';
 
-export class SettingsPageHelper {
+export class ItemSettingsPageHelper {
 
     static getConfigureEditableFieldXPath(sectionHeader: string,
                                           subHeader: string,
@@ -34,9 +34,9 @@ export class SettingsPageHelper {
         const checkbox = element(By.xpath(selector));
 
         while (!(await checkbox.isPresent())
-        && (await SettingsPage.pagination.next.isPresent())
-        && (await SettingsPage.pagination.next.isEnabled())) {
-            await PageHelper.click(SettingsPage.pagination.next);
+        && (await ItemSettingsPage.pagination.next.isPresent())
+        && (await ItemSettingsPage.pagination.next.isEnabled())) {
+            await PageHelper.click(ItemSettingsPage.pagination.next);
         }
 
         await expect(await checkbox.isPresent())
@@ -44,9 +44,9 @@ export class SettingsPageHelper {
         await PageHelper.sendKeysToInputField(checkbox, value);
 
         while (!(await CommonPage.formButtons.ok.isPresent())
-        && (await SettingsPage.pagination.next.isPresent())
-        && (await SettingsPage.pagination.next.isEnabled())) {
-            await PageHelper.click(SettingsPage.pagination.next);
+        && (await ItemSettingsPage.pagination.next.isPresent())
+        && (await ItemSettingsPage.pagination.next.isEnabled())) {
+            await PageHelper.click(ItemSettingsPage.pagination.next);
         }
         await PageHelper.click(CommonPage.formButtons.okOutsideTable.get(2));
 
