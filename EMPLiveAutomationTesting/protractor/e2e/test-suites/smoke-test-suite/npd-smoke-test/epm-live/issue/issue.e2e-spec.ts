@@ -125,7 +125,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
 
         stepLogger.verification('"Edit Issue" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.titles.first());
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,

@@ -11,13 +11,16 @@ import {ElementHelper} from '../../../components/html/element-helper';
 import {ProjectItemPage} from '../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {LoginPage} from '../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('View the options on "Resource Capacity Heat map" report page" - [743179]', async () => {

@@ -10,13 +10,16 @@ import {ProjectItemPageConstants} from '../../../../page-objects/pages/items-pag
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
+    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        await homePage.goTo();
+        loginPage = new LoginPage();
+        await loginPage.goToAndLogin();
     });
 
     it('Launch "Assignment Planner" - [743177]', async () => {
@@ -95,7 +98,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Assignment Planner" window is closed');
-        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed.
+        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.get(1)))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));

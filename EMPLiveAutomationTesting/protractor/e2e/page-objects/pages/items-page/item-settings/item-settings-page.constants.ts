@@ -1,4 +1,4 @@
-export class ItemItemSettingsPageConstants {
+export class ItemSettingsPageConstants {
     static readonly epmLive = `(EPM Live)`;
 
     static get pagination() {

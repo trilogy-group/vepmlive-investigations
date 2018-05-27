@@ -20,6 +20,7 @@ export class CommonPage extends BasePage {
             myWorkplace: element(By.id(`${idPrefix}workplace`)),
             favorites: element(By.id(`${idPrefix}favorites`)),
             mostRecent: element(By.id(`${idPrefix}recent`)),
+            settings: element(By.id(`${idPrefix}settings`)),
             workspaces: element(By.id(`${idPrefix}workspaces`))
         };
     }
@@ -120,22 +121,17 @@ export class CommonPage extends BasePage {
         };
     }
 
-    static get titles() {
-        return element.all(By.id(this.titleId));
-    }
-
     static get title() {
         // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
-        return element(By.xpath(`(//*[@id='${this.titleId}'])[1]`));
+        return element(By.css(`h1#${this.titleId}`));
     }
 
     static get dialogTitles() {
-        return element.all(By.id(this.dialogTitleId));
+        return element.all(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get dialogTitle() {
-        // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
-        return element(By.xpath(`(//*[@id='${this.dialogTitleId}'])[1]`));
+        return element(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get contentFrame() {

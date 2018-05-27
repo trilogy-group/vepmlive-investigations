@@ -1,16 +1,16 @@
-import {ItemItemSettingsPageConstants} from './item-settings-page.constants';
+import {ItemSettingsPageConstants} from './item-settings-page.constants';
 import {By, element} from 'protractor';
 
 export class ItemSettingsPage {
     static get pagination() {
         return {
-            next: element(By.linkText(ItemItemSettingsPageConstants.pagination.next)),
-            previous: element(By.linkText(ItemItemSettingsPageConstants.pagination.next))
+            next: element(By.linkText(ItemSettingsPageConstants.pagination.next)),
+            previous: element(By.linkText(ItemSettingsPageConstants.pagination.next))
         };
     }
 
     static get permissionsAndManagement() {
-        const labels = ItemItemSettingsPageConstants.permissionsAndManagement;
+        const labels = ItemSettingsPageConstants.permissionsAndManagement;
         return {
             deleteThisList: element(By.linkText(labels.deleteThisList)),
             saveListAsTemplate: element(By.linkText(labels.saveListAsTemplate)),
@@ -21,14 +21,14 @@ export class ItemSettingsPage {
     }
 
     static get communications() {
-        const communications = ItemItemSettingsPageConstants.communications;
+        const communications = ItemSettingsPageConstants.communications;
         return {
             rssSettings: element(By.linkText(communications.rssSettings))
         };
     }
 
     static get generalSettings() {
-        const generalSettings = ItemItemSettingsPageConstants.generalSettings;
+        const generalSettings = ItemSettingsPageConstants.generalSettings;
         return {
             listName: element(By.linkText(generalSettings.listName)),
             versionSettings: element(By.linkText(generalSettings.versionSettings)),

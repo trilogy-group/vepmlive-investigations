@@ -11,11 +11,11 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/settings/settings-page.helper';
-import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/settings/settings-page.constants';
-import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/settings/settings.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.helper';
+import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/item-settings/item-settings.po';
+import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;

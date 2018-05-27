@@ -88,7 +88,7 @@ export class MyWorkPageHelper {
         stepLogger.verification('"Navigate to My Time Off page');
         await PageHelper.click(MyWorkplacePage.navigation.myTimeOff);
         stepLogger.verification('"Click on last button');
-        await PageHelper.click(MyWorkPage.lastButton);
+        await PageHelper.click(CommonPage.lastButton);
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));

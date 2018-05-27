@@ -172,14 +172,14 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
 
         stepLogger.stepId(6);
-        stepLogger.step('Select that \'To Do\' item from grid and click on \'View Item\' from its contextual menu');
+        stepLogger.step('Select that "To Do" item from grid and click on "View Item" from its contextual menu');
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
             CommonPage.contextMenuOptions.viewItem,
             stepLogger);
 
         stepLogger.stepId(7);
-        stepLogger.step('Check that the attached file get display under \'Attachments\' section');
-        stepLogger.step('The attached file should be displayed under \'Attachments\' section');
+        stepLogger.step('Check that the attached file get display under "Attachments" section');
+        stepLogger.step('The attached file should be displayed under "Attachments" section');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
@@ -188,7 +188,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Close" button');
         await PageHelper.click(CommonPage.formButtons.close);
 
-        stepLogger.verification('View item page should be displayed and user should be in \'To Do\' list page');
+        stepLogger.verification('View item page should be displayed and user should be in "To Do" list page');
         await expect(await PageHelper.isElementDisplayed(item))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
