@@ -51,8 +51,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
@@ -122,8 +121,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
@@ -187,8 +185,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(4);
         stepLogger.step('Check status of "Save & Close" button');
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         await expect(await PageHelper.isElementDisplayed(CommonPage.disabledribbonItems.saveAndClose))
             .toBe(true,
@@ -248,8 +245,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());

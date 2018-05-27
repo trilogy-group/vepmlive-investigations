@@ -237,32 +237,25 @@ describe(SuiteNames.smokeTestSuite, () => {
         const item = CommonPage.recordWithoutGreenTicket;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
 
+        stepLogger.stepId(1);
         stepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
         const selectedTitle = await CommonPage.selectedTitle.getText();
-        stepLogger.step('Click on "Manage" tab');
-        await PageHelper.click(CommonPage.ribbonTitles.manage);
-        stepLogger.step('Click on "Edit Item" button');
-        await PageHelper.click(CommonPage.ribbonItems.editItem);
+        stepLogger.step('Click on "ITEMS" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.verification('Edit work item pop-up should load successfully');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
+        stepLogger.verification('contents of the ITEMS tan should be displayed');
+        await expect(await CommonPage.ribbonItems.attachFile.isDisplayed())
             .toBe(true,
-                ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
+                ValidationsHelper.getItemsUnderTabShouldBeDisplayed(CommonPageConstants.ribbonMenuTitles.items));
 
-        stepLogger.verification('Selected item details displayed in editable mode in the pop up window');
-
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        // Avoiding - Element is not clickable at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.s);
-
-        stepLogger.stepId(4);
+        stepLogger.stepId(2);
         stepLogger.step('Click on "Attach File" button from button menu of popup');
         await PageHelper.click(CommonPage.ribbonItems.attachFile);
 
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+
+        stepLogger.stepId(4);
         stepLogger.verification('A popup displayed to attach file');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.fileUploadControl))
             .toBe(true,
@@ -318,8 +311,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.viewItem));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,

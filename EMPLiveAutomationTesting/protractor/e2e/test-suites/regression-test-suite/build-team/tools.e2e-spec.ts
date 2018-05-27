@@ -47,8 +47,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
@@ -147,8 +146,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(3);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
@@ -241,8 +239,8 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+
 
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
@@ -346,8 +344,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
@@ -436,8 +433,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');

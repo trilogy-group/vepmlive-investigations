@@ -49,8 +49,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
@@ -107,9 +106,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
+        await CommonPageHelper.switchToContentFrame(stepLogger);
         stepLogger.stepId(6);
         stepLogger.step('Click "Close" button in "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
@@ -159,8 +156,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))

@@ -430,4 +430,13 @@ export class CommonPageHelper {
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
+
+    static async switchToContentFrame(stepLogger: StepLogger) {
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        // Avoiding - Element is not clickable at point (-9553, -9859)
+        await browser.sleep(PageHelper.timeout.s);
+    }
+
 }

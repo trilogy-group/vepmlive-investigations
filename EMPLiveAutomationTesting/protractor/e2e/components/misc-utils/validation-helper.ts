@@ -111,4 +111,8 @@ export class ValidationsHelper {
     static getButtonEnabledValidation(name: string) {
         return `${this.types.button} ${this.getEnabledValidation(name)}`;
     }
+
+    static getItemsUnderTabShouldBeDisplayed(name: string) {
+        return `Contents of the ${this.getDisplayedValidation(name + 'tab ')}`;
+    }
 }

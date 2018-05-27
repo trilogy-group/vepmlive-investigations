@@ -53,8 +53,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.step('Select check-box for any of the resources displayed in "Resource Pool" (Right side)');
         await PageHelper.click(ProjectItemPage.teamRecords.resourcePool.first());
@@ -121,8 +120,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Observe that the newly added "Resource" is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
