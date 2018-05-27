@@ -18,9 +18,13 @@ import {PicturePageConstants} from '../../../../../page-objects/pages/my-workpla
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
+import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
+import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -294,6 +298,45 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Newly created Time off item details displayed in read only mode');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
+    });
+
+    it('Create a NewEvent from Workspace Functionality - [1124296]', async () => {
+        const stepLogger = new StepLogger(1124296);
+
+        // Step #1 and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.events,
+            CommonPage.pageHeaders.myWorkplace.events,
+            EventsPageConstants.pagePrefix,
+            stepLogger);
+
+        stepLogger.verification('"Events" Page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(EventsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pagePrefix));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Mouse over on the date for which event to be created');
+        await ElementHelper.actionMouseMove(EventsPage.calenderTomorrow);
+        stepLogger.step('Click on "+ Add" link displayed on the date square box');
+        await ElementHelper.clickUsingJs(EventsPage.addNewEvent(EventsPageConstants.addEvent));
+
+        stepLogger.verification('"Events - New Item" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await expect(await CommonPage.dialogTitles.first().getText())
+            .toBe(EventsPageConstants.pageName,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
+
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToFirstContentFrame();
+
+        // Step #4 and #5 Inside this function
+        const labels = EventsPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const title = `${labels.title} ${uniqueId}`;
+        await EventsPageHelper.fillNewEventsFormAndVerifyEventCreated(title, stepLogger);
+
     });
 
     it('Create new Shared Document from Workplace - [1175269]', async () => {
