@@ -208,6 +208,13 @@ export class CommonPageConstants {
         };
     }
 
+    static get paginationTitle() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
+        };
+    }
+
     static get dropdownShowAllButton() {
         return {
             project: 'Project_ddlShowAll',

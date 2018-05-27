@@ -5,7 +5,6 @@ import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
-import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 export class CommonPage extends BasePage {
 
@@ -264,6 +263,17 @@ export class CommonPage extends BasePage {
 
     static get browseButton() {
         return element(By.css('.ms-fileinput'));
+    }
+
+    static get paging() {
+        return element(By.css('.ms-paging'));
+    }
+   static get paginationControlsByTitle() {
+
+        return {
+            next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
+            previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
+        };
     }
 
     static get paging() {

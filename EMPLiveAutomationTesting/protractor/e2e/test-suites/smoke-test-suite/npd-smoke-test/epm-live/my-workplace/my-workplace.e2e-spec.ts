@@ -20,6 +20,9 @@ import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workp
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
 import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
+import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
+import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
+import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplace/events/events-page.constants';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
@@ -303,24 +306,26 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Create a NewEvent from Workspace Functionality - [1124296]', async () => {
         const stepLogger = new StepLogger(1124296);
 
-        // Step #1 and #2 Inside this function
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-            MyWorkplacePage.navigation.events,
-            CommonPage.pageHeaders.myWorkplace.events,
-            EventsPageConstants.pagePrefix,
-            stepLogger);
-
-        stepLogger.verification('"Events" Page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(EventsPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pagePrefix));
+        stepLogger.step('PRECONDITION: Create a New Event using steps in test case C1124296');
+        const title = await EventsPageHelper.createNewEvent();
 
         stepLogger.stepId(3);
-        stepLogger.step('Mouse over on the date for which event to be created');
-        await ElementHelper.actionMouseMove(EventsPage.calenderTomorrow);
-        stepLogger.step('Click on "+ Add" link displayed on the date square box');
-        await ElementHelper.clickUsingJs(EventsPage.addNewEvent(EventsPageConstants.addEvent));
+        stepLogger.step('Click on Event Name link displayed in Events Page for the event created as per pre requisites');
+        const eventTitleElement = EventsPage.eventPageByTitle(title);
+        await PageHelper.click(eventTitleElement);
+        stepLogger.verification('Event Details Quick View Page is shown and all event details displayed in Read Only mode');
+        const eventTitleDetails = CommonPageHelper.getElementUsingText(title, true);
+        await expect(await PageHelper.isElementPresent(eventTitleDetails))
+            .toBe(true, eventTitleDetails);
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
+        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        stepLogger.verification('"Edit Event" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
+        await expect(await CommonPage.title.getText())
+            .toBe(EventsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
 
         stepLogger.verification('"Events - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
@@ -355,5 +360,50 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.sharedDocuments,
             stepLogger,
             CommonPageHelper.uniqueDocumentFilePath);
+    });
+
+
+    it('Edit Event from Workplace - [1175266]', async () => {
+        const stepLogger = new StepLogger(1175266);
+
+        stepLogger.step('PRECONDITION: Create a New Event using steps in test case C1124296');
+        const title = await EventsPageHelper.createNewEvent();
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Event Name link displayed in Events Page for the event created as per pre requisites');
+        const eventTitleElement = EventsPage.eventPageByTitle(title);
+        await PageHelper.click(eventTitleElement);
+        stepLogger.verification('Event Details Quick View Page is shown and all event details displayed in Read Only mode');
+        const eventTitleDetails = CommonPageHelper.getElementUsingText(title, true);
+        await expect(await PageHelper.isElementPresent(eventTitleDetails))
+            .toBe(true, eventTitleDetails);
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
+        await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
+        stepLogger.verification('"Edit Event" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
+        await expect(await CommonPage.title.getText())
+            .toBe(EventsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
+
+        // steps 5,6 are verified here
+        const labels = EventsPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const newTitle = `${labels.title} ${uniqueId}`;
+        await EventsPageHelper.fillNewEventForm(newTitle, stepLogger);
+
+        stepLogger.stepId(7);
+        stepLogger.step('Click "Close" button in Event Details Quick View Page');
+        await PageHelper.click(EventsPage.closeEventButton);
+        stepLogger.verification('"Events" Page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.events))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.events));
+
+        stepLogger.verification('Updated event is highlighted on the calendar for the date and time with blue background');
+        const newEventTitle = CommonPageHelper.getElementUsingText(newTitle, true);
+        await expect(await PageHelper.isElementPresent(newEventTitle))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
 });
