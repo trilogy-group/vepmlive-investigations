@@ -2,6 +2,7 @@ import {browser, by, By, element, ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from './wait-helper';
 import {PageHelper} from './page-helper';
 import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
+import {HtmlHelper} from '../misc-utils/html-helper';
 
 export class ElementHelper {
     private static readonly EC = protractor.ExpectedConditions;
@@ -106,6 +107,10 @@ export class ElementHelper {
         return classes && classes.split(' ').indexOf(klass) !== -1;
     }
 
+    static async getValue(locator: ElementFinder) {
+        return PageHelper.getAttributeValue(locator, HtmlHelper.attributes.value);
+    }
+
     static async hasClassRegex(locator: ElementFinder, klass: string) {
         const classAttribute = await locator.getAttribute('class');
         const pattern = new RegExp('(^|\\s)' + klass + '(\\s|$)');
@@ -138,8 +143,8 @@ export class ElementHelper {
                                            kClass: string,
                                            timeout = PageHelper.DEFAULT_TIMEOUT,
                                            message = '') {
-       return WaitHelper.getInstance().waitForElementToResolve(
-           () => this.hasClass(targetElement, kClass),
+        return WaitHelper.getInstance().waitForElementToResolve(
+            () => this.hasClass(targetElement, kClass),
             (result: any) => result, timeout, message);
     }
 
@@ -168,7 +173,7 @@ export class ElementHelper {
         return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
     }
 
-    static getElementByText(text: string) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 }

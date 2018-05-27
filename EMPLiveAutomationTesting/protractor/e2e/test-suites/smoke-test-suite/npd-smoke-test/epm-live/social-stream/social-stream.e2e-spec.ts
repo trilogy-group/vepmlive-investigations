@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(743927);
 
         stepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
-        await PageHelper.click(HomePage.newButton);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -43,8 +43,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.verification('Verify Choose File option is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.browseButton);
-        await expect(await PageHelper.isElementDisplayed(HomePage.browseButton))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.browseButton);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.browseButton))
             .toBe(true,
                 ValidationsHelper.getButtonDisplayedValidation(HomePageConstants.addADocumentWindow.chooseFiles));
 
@@ -64,7 +64,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
-        await PageHelper.click(HomePage.newButton);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -78,7 +78,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
         stepLogger.step('Upload file');
-        await PageHelper.uploadFile(HomePage.browseButton, newFile.fullFilePath);
+        await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         stepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.ok);
@@ -87,7 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
