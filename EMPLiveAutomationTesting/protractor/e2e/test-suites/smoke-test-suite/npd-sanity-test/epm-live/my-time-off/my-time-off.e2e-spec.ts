@@ -35,10 +35,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(785495);
         stepLogger.step('PRECONDITION: navigate to Time Off page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-                MyWorkplacePage.navigation.myTimeOff,
-                CommonPage.pageHeaders.myWorkplace.timeOff,
-                CommonPageConstants.pageHeaders.myWorkplace.timeOff,
-                stepLogger);
+            MyWorkplacePage.navigation.myTimeOff,
+            CommonPage.pageHeaders.myWorkplace.timeOff,
+            CommonPageConstants.pageHeaders.myWorkplace.timeOff,
+            stepLogger);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on "+ new link" link displayed on top of "Time Off" page');
@@ -77,8 +77,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#2 is inside this function
         const timeOffTitle = await CommonPage.recordWithoutGreenTicket.getText();
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
-                                                            CommonPage.contextMenuOptions.viewItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
+            CommonPage.contextMenuOptions.viewItem, stepLogger);
         stepLogger.verification('"View TimeOff" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))

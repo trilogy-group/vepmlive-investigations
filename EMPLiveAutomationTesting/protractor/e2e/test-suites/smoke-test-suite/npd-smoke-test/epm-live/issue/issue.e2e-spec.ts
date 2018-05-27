@@ -43,9 +43,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        await expect(await CommonPage.dialogTitles.first().getText())
+        await expect(await CommonPage.dialogTitle.getText())
             .toBe(IssueItemPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(IssueItemPageConstants.pageName));
 
@@ -67,7 +67,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
 
-        await PageHelper.click(IssueItemPage.projectShowAllButton);
+        await PageHelper.click(CommonPage.projectShowAllButton);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(IssueItemPage.inputs.project);
         const projectName = await IssueItemPage.inputs.project.getText();
         await PageHelper.click(IssueItemPage.inputs.project);
@@ -122,10 +122,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.issues,
             stepLogger);
 
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
 
         stepLogger.verification('"Edit Issue" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.titles.first());
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(IssueItemPageConstants.pagePrefix,
