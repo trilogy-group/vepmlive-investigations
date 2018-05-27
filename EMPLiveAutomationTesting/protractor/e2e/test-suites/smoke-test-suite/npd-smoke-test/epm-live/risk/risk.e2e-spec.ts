@@ -199,20 +199,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(titleValue,
                 ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
-    it('Select Columns in Risk - [1176336]', async () => {
-        const stepLogger = new StepLogger(1176336);
-        stepLogger.stepId(1);
-
-        // Step #1 and #2 Inside this function
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.risks,
-            CommonPage.pageHeaders.projects.risks,
-            CommonPageConstants.pageHeaders.projects.risks,
-            stepLogger);
-
-        // Common functionality to edit any item
-        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
-    });
 
     it('Add attachment in Risk - [1176340]', async () => {
         const stepLogger = new StepLogger(1176340);
