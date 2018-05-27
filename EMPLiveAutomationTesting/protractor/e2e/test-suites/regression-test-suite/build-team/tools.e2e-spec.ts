@@ -241,7 +241,6 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
-
         stepLogger.stepId(3);
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));

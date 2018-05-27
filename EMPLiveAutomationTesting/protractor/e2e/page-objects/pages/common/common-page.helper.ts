@@ -343,7 +343,7 @@ export class CommonPageHelper {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
     }
 
-    static async actionTakenViaContextMenu(stepLogger: StepLogger, item: ElementFinder, actionItem: ElementFinder) {
+    static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
@@ -407,8 +407,8 @@ export class CommonPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.stepId(4);
-        stepLogger.step('Click on "Choose Files" button in "Add a picture" pop up');
-        stepLogger.step('Browse and select the file that need to be added as a picture');
+        stepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
+        stepLogger.step(`Browse and select the file that need to be added as a ${pageName}`);
         await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         stepLogger.step('Click "OK" button');
@@ -435,7 +435,7 @@ export class CommonPageHelper {
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
-        // Avoiding - Element is not clickable at point (-9553, -9859)
+        // Avoiding - Element is not able to click at point (-9553, -9859)
         await browser.sleep(PageHelper.timeout.s);
     }
 

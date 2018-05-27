@@ -77,8 +77,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#2 is inside this function
         const timeOffTitle = await CommonPage.recordWithoutGreenTicket.getText();
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
-            CommonPage.contextMenuOptions.viewItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
+            CommonPage.contextMenuOptions.viewItem, stepLogger);
         stepLogger.verification('"View TimeOff" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))

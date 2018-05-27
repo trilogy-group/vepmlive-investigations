@@ -101,7 +101,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #3
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
 
         stepLogger.verification('"Edit Change" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);

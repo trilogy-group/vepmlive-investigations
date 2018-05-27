@@ -81,6 +81,7 @@ export class CommonPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
+            close: 'Close',
             ok: 'OK',
             okWithSmallK: 'Ok',
             add: '< Add',

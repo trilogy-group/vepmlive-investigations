@@ -241,8 +241,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
         const selectedTitle = await CommonPage.selectedTitle.getText();
-        stepLogger.step('Click on "ITEMS" tab');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
+        stepLogger.step('Click on "MANAGE" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.manage);
 
         stepLogger.verification('contents of the ITEMS tan should be displayed');
         await expect(await CommonPage.ribbonItems.attachFile.isDisplayed())
@@ -257,20 +257,20 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.verification('A popup displayed to attach file');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.fileUploadControl))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.fileUploadControl))
             .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(MyWorkPageConstants.fileUpload));
+                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.fileUpload));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
         console.log(fullFilePath);
-        await PageHelper.uploadFile(MyWorkPage.fileUploadControl, fullFilePath);
+        await PageHelper.uploadFile(CommonPage.fileUploadControl, fullFilePath);
 
         stepLogger.verification('Selected file name should be displayed in popup');
-        await expect(await ElementHelper.getValue(MyWorkPage.fileUploadControl))
+        await expect(await ElementHelper.getValue(CommonPage.fileUploadControl))
             .toContain(newFileName,
-                ValidationsHelper.getFieldShouldHaveValueValidation(MyWorkPageConstants.fileUpload, newFileName));
+                ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.fileUpload, newFileName));
 
         stepLogger.stepId(6);
         stepLogger.step('Click on "OK" button');
@@ -286,7 +286,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.save);
         await PageHelper.switchToDefaultContent();
 
-        // Nothing else is working to have it invisible
+        // Nothing else is working to have it frame invisible
         await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.verification('Popup window is closed');
@@ -297,7 +297,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(8);
         stepLogger.step('Click on the row of item to which attachment is added [Ex: New Issue 1]');
-        await TextboxHelper.sendKeys(MyWorkPage.searchTextBox, selectedTitle, true);
+        await TextboxHelper.sendKeys(CommonPage.searchTextBox, selectedTitle, true);
         await PageHelper.click(item);
 
         stepLogger.step('Click on "Manage" tab');

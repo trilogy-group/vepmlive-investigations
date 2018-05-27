@@ -111,6 +111,7 @@ export class CommonPage extends BasePage {
         return {
             save: ButtonHelper.getInputButtonByTextUnderTable(labels.save),
             ok: ButtonHelper.getInputButtonByTextUnderTable(labels.ok),
+            close: ButtonHelper.getInputButtonsByText(labels.close).first(),
             okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
             okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
             cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel),
@@ -245,7 +246,7 @@ export class CommonPage extends BasePage {
     }
 
     static get fileUploadControl() {
-        return element(By.id('onetidIOFile'));
+        return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
     }
 
     static get lastButton() {
@@ -257,11 +258,12 @@ export class CommonPage extends BasePage {
     }
 
     static get selectedTitle() {
-        return element(By.css('.GMClassSelected .EPMLiveMyWorkTitle div'));
+        const selectedClass = '.GMClassSelected ';
+        return element(By.css(`${selectedClass} .EPMLiveMyWorkTitle div,${selectedClass} .GMHtml.HideCol0Title`));
     }
 
     static get uploadButton() {
-        return element(By.css('.js-listview-qcbUploadButton'));
+        return element(By.css('.js-listview-qcbUploadButton,.js-listview-qcbNewButton'));
     }
 
     static get browseButton() {

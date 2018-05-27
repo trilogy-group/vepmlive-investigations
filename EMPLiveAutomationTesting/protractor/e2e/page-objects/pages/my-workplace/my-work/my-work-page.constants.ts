@@ -5,7 +5,6 @@ export class MyWorkPageConstants {
     static readonly pagePrefix = 'My Work';
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
 
-
     static get pageName() {
         return {
             changes: `Changes${CommonPageConstants.pagePostFix.newItem}`,

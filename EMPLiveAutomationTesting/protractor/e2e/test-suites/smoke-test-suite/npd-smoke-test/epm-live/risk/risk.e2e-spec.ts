@@ -121,7 +121,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Common functionality to edit any item
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
 
         // Common functionality to edit risk
         await RiskItemPageHelper.editRisk(stepLogger);
@@ -211,7 +211,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Common functionality to edit any item
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.record, CommonPage.contextMenuOptions.editItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
     });
 
     it('Add attachment in Risk - [1176340]', async () => {
@@ -229,7 +229,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.viewOptionViaRibbon(stepLogger);
 
         // Common functionality to attach file
-        const newFile = await CommonPageHelper.attachFile(RiskItemPage.attachmentButton, RiskItemPage.browseButton, stepLogger);
+        const newFile = await CommonPageHelper.attachFile(RiskItemPage.attachmentButton, CommonPage.fileUploadControl, stepLogger);
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
