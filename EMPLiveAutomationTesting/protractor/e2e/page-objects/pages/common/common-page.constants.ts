@@ -226,10 +226,4 @@ export class CommonPageConstants {
         };
     }
 
-    static get paginationTitle() {
-        return {
-            next: 'Next',
-            previous: 'Previous'
-        };
-    }
 }
