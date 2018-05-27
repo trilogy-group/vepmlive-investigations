@@ -39,11 +39,19 @@ export class EventsPage {
         return element(By.css(`td[date='${tomorrow}']`));
     }
 
+    static get closeEventButton() {
+        return element(By.css('[value = "Close"]'));
+    }
+
     static addNewEvent(title:string) {
         return element(By.css(`a[title='${title}']`));
     }
+
     static getElementByLinkText(text:string) {
         return element(By.linkText(text));
     }
-
+    
+    static eventPageByTitle(title:string) {
+        return CommonPageHelper.getElementUsingTextContent(title,true);
+    }
 }
