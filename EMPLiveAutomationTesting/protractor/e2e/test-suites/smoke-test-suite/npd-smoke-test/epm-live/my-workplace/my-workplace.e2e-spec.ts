@@ -182,7 +182,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await LinkPageHelper.verifyNewLinkAdded(stepLogger, details);
     });
 
-    fit('Create new Pictures from Workplace - [1175271]', async () => {
+    it('Create new Pictures from Workplace - [1175271]', async () => {
         const stepLogger = new StepLogger(1175271);
         stepLogger.stepId(1);
 
