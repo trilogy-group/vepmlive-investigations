@@ -264,7 +264,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
-        console.log(fullFilePath);
         await PageHelper.uploadFile(CommonPage.fileUploadControl, fullFilePath);
 
         stepLogger.verification('Selected file name should be displayed in popup');
