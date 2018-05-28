@@ -426,7 +426,7 @@ export class CommonPageHelper {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName.split('.')[0], true)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }

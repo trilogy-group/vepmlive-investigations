@@ -255,6 +255,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.pictures,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,
             stepLogger);
+
         await CommonPageHelper.uploadDocument(CommonPage.pageHeaders.myWorkplace.pictures,
             PicturePageConstants.addAPicture,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,
