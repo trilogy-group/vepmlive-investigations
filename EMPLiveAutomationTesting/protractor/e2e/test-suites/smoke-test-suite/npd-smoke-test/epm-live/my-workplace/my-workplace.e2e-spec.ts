@@ -7,13 +7,11 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.constants';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {LinkPage} from '../../../../../page-objects/pages/my-workplace/link/link.po';
-import {browser, By, element} from 'protractor';
 import {PicturePageConstants} from '../../../../../page-objects/pages/my-workplace/picture/picture-page.constants';
 import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
@@ -25,6 +23,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 // tslint:disable-next-line:max-line-length
 import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -177,63 +176,10 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(LinkPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
 
-        stepLogger.stepId(4);
-        stepLogger.step(`Enter/Select below details in 'New Link' page`);
-        const uniqueId = PageHelper.getUniqueId();
-        const labels = LinkPageConstants.inputLabels;
-        const url = `https://url_${uniqueId}.com`;
-        const description = `${LinkPageConstants.inputLabels.url} ${uniqueId}`;
-        const notes = `${LinkPageConstants.inputLabels.notes} ${uniqueId}`;
+        // Step #4 and #5 Inside this function
+        const details = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
 
-        stepLogger.step(`Url *: http://url_randomstring.com`);
-        await TextboxHelper.sendKeys(LinkPage.inputs.title.get(0), url);
-
-        stepLogger.step(`Description *: Random description`);
-        await TextboxHelper.sendKeys(LinkPage.inputs.title.get(1), description);
-
-        stepLogger.step(`Notes: Random notes`);
-        await TextboxHelper.sendKeys(LinkPage.inputs.notes, notes);
-
-        stepLogger.verification('Required values Entered/Selected in "Edit To Do" Page');
-        stepLogger.verification('Verify - URL');
-        await expect(await TextboxHelper.hasValue(LinkPage.inputs.title.get(0), url))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.url, url));
-
-        stepLogger.verification('Verify - Description');
-        await expect(await TextboxHelper.hasValue(LinkPage.inputs.title.get(1), description))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.url, description));
-
-        stepLogger.verification('Verify - Description: Random value');
-        await expect(await TextboxHelper.hasValue(LinkPage.inputs.notes, notes))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.notes, notes));
-
-        stepLogger.stepId(5);
-        stepLogger.step('Click on save');
-        await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"New Link" page is closed');
-        await expect(await CommonPage.formButtons.save.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
-
-        stepLogger.verification('Newly created Link item [Ex: New Link 1] details displayed in read only mode');
-        const item = element(By.linkText(description));
-        let pagingText = await CommonPage.paging.getText();
-        while (!(await item.isPresent()) && await CommonPage.paginationControlsByTitle.next.isPresent()) {
-            await PageHelper.click(CommonPage.paginationControlsByTitle.next);
-
-            // Wait if page is not the next one, Ajax operation
-            await browser.wait(async () => pagingText !== await CommonPage.paging.getText());
-            pagingText = await CommonPage.paging.getText();
-        }
-
-        // Always Description appears whereas we want url to assert
-        await expect(await PageHelper.isElementDisplayed(item))
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(url));
+        await LinkPageHelper.verifyNewLinkAdded(stepLogger, details);
     });
 
     it('Create new Pictures from Workplace - [1175271]', async () => {
@@ -246,6 +192,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.pictures,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,
             stepLogger);
+
         await CommonPageHelper.uploadDocument(CommonPage.pageHeaders.myWorkplace.pictures,
             PicturePageConstants.addAPicture,
             CommonPageConstants.pageHeaders.myWorkplace.pictures,

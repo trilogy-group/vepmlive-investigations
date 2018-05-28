@@ -91,7 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
 
         stepLogger.verification(`Log - 'View Log' link displayed`);
-        await expect(await ReportManagerPage.formControls.viewLog.isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ReportManagerPage.formControls.viewLog))
             .toBe(true, ReportManagerPageValidation.logValidation);
 
         stepLogger.verification('Last Run - the date and time stamp display the date and the time the report is run');
