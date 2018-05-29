@@ -397,7 +397,6 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EPKRequest.ashx.cs">
       <DependentUpon>EPKRequest.ashx</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\GenerateTicketResponse.cs" />
     <Compile Include="Layouts\ppm\gotopage.aspx.cs">
       <DependentUpon>gotopage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

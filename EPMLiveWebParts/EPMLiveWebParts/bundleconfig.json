@@ -1,9 +1,0 @@
-[
-  {
-    "outputFileName": "Layouts/epmlive/javascripts/GanttGrid.min.js",
-    "inputFiles": [
-      "Layouts/epmlive/javascripts/GanttGrid.js"
-    ],
-    "sourceMap": true
-  }
-]

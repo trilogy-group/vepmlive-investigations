@@ -812,9 +812,6 @@ namespace EPMLiveWebParts
                             }
                             catch { }
                             break;
-                        case "errormessage":
-                            data = Request["message"];
-                            break;
                         default:
                             data = "Unknown Action";
                             break;
@@ -852,16 +849,9 @@ namespace EPMLiveWebParts
                 }
                 try
                 {
-                    // EPML-5263, EPML-5224 - Code Change: Rather then using Equals, at some of the places, it returns value for isDlg as isDlg=1,1. Hence, used first value which worked in all the cases.
-                    var isDialog = Request["isDlg"];
-                    if (!string.IsNullOrWhiteSpace(isDialog) && isDialog.Contains(",")) isDialog = isDialog.Split(',')[0];
-                    if (Request["action"].ToLower() != "workspace" && isDialog != null)
-                    {
-                        if (isDialog == "1" || isDialog == "0")
-                        {
-                            url += "&IsDlg=" + isDialog;
-                        }
-                    }
+                    //EPML-5263, EPML-5224 - Code Change: Rather then using Equals, at some of the places, it returns value for isDlg as isDlg=1,1. Hence, used Contains which worked in all the cases.
+                    if (Request["action"].ToLower() != "workspace" && (Request["isDlg"] != null && Convert.ToString(Request["isDlg"]).Contains("1") || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1")))
+                        url += "&IsDlg=1";
                 }
                 catch { }
                 Response.Redirect(url);
