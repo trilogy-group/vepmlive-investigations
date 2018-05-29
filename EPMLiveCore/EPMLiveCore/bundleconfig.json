@@ -1,9 +1,0 @@
-[
-  {
-    "outputFileName": "Layouts/epmlive/javascripts/EPMLive.Navigation.min.js",
-    "inputFiles": [
-      "Layouts/epmlive/javascripts/EPMLive.Navigation.js"
-    ],
-    "sourceMap": true
-  }
-]
