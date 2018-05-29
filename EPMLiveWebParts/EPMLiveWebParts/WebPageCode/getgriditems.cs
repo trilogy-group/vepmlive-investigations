@@ -5010,6 +5010,9 @@ namespace EPMLiveWebParts
             foreach (string field in aViewFields)
             {
 
+                if(string.IsNullOrEmpty(field))
+                    continue;
+
                 tooltips += ",true";
                 SPField f = getRealField(list.Fields.GetFieldByInternalName(field));
                 string FieldTitle = f.Title;
