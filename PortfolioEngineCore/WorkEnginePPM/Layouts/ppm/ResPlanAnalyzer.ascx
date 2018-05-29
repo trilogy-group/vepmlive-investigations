@@ -44,7 +44,6 @@
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ResPlanAnalyzer.ascx.css" />
-<script src="/_layouts/ppm/AnalyzerHelper.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/ResPlanAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
