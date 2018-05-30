@@ -17,12 +17,12 @@ export class workspacesPage extends BasePage {
         return CommonPageHelper.getAllElementsByType(HtmlHelper.tags.textBox).last();
     }  
 
-    static get createWSButton(){
+    static get createWorkSpaceButton(){
         return element(By.xpath(`//button[${ComponentHelpers.getXPathFunctionForText(WorkspacesConstants.windowTitle)}]`));
 
     }  
 
-    static get newWSButton(){
+    static get newWorkSpaceButton(){
         return ElementHelper.getElementByText(WorkspacesConstants.newWorkspace);
     } 
     

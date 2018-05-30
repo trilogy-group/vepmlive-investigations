@@ -17,7 +17,7 @@ static async createWorkspace(stepLogger: StepLogger) {
     await PageHelper.click(CommonPage.sidebarMenus.workspaces);
     stepLogger.stepId(2);
     stepLogger.step(`Click on the 'New Workspace' button`);
-    await ElementHelper.click(workspacesPage.newWSButton);
+    await ElementHelper.click(workspacesPage.newWorkSpaceButton);
     stepLogger.step('Waiting for page to open');
     await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
     stepLogger.verification(`'Create Workspace' pop-up displayed with the following details`);
@@ -42,7 +42,7 @@ static async createWorkspace(stepLogger: StepLogger) {
     await ElementHelper.click(workspacesPage.projectTemplate);
     stepLogger.stepId(4);
     stepLogger.step(`Click 'Create Workspace' button in 'Create Workspace' pop-up`);
-    await ElementHelper.click(workspacesPage.createWSButton);
+    await ElementHelper.click(workspacesPage.createWorkSpaceButton);
     stepLogger.verification(`'Create Workspace' pop-up is closed`);
     await expect(await CommonPage.dialogTitle.isPresent())
         .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(WorkspacesConstants.windowTitle));
