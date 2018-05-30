@@ -4804,6 +4804,10 @@ namespace EPMLiveWebParts
                     }
                     foreach (string f in aViewFields)
                     {
+                        //EPMLCID-6880 : to fix empty field issue
+                        if (string.IsNullOrEmpty(f))
+                            continue;
+                         
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
                         //EPML-5172 : to fix grouping issue on PM Approval page.
                         if ((!arrAggregationDef.Contains(field.InternalName) && field.InternalName.Equals("Title")) || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
