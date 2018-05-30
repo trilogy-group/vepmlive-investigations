@@ -20,7 +20,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WorkspacePageHelper.createWorkspace(stepLogger);
     });
 
-    fit('To Verify User is able to view notification after Creating Workspace Using a Project Template - [1175091]', async () => {
+    it('To Verify User is able to view notification after Creating Workspace Using a Project Template - [1175091]', async () => {
         const stepLogger = new StepLogger(1175091);
         const title = await WorkspacePageHelper.createWorkspace(stepLogger);
 
