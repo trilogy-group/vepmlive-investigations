@@ -440,4 +440,11 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
     }
 
+    static getNewPublicViewSelected(titleNewView: string) {
+        return element(By.xpath(`//a[contains(@class,"dropdown-toggle")]//span[normalize-space(.)="${titleNewView}"]`));
+    }
+
+    static getNewPublicViewTitleHeader(columnTitle: ElementFinder) {
+        return element(By.xpath(`//td[normalize-space(.)="${columnTitle}"]`));
+    }
 }

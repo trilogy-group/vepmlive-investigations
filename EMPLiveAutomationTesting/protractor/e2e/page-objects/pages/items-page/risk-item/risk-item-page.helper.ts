@@ -104,4 +104,46 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
     }
 
+    static async verifyRiskViewAdd(stepLogger: StepLogger, titleNewView: string) {
+        stepLogger.verification('Newly created Public risk view is selected in \'View\' drop down');
+
+        try {
+            // tslint:disable-next-line:no-shadowed-variable
+            const viewSelector = await CommonPageHelper.getNewPublicViewSelected(titleNewView);
+            await WaitHelper.getInstance().waitForElementToBeClickable(viewSelector);
+            await expect(await viewSelector.isPresent())
+                    .toBe(true,
+                        ValidationsHelper.getNewViewSelectedValidation(titleNewView));
+
+        } catch (error) {
+            stepLogger.step(`Try block to verify Newly created Public risk view name failed with error: ${error}`);
+        }
+
+        const viewSelector = await CommonPageHelper.getNewPublicViewSelected(titleNewView);
+        await WaitHelper.getInstance().waitForElementToBeClickable(viewSelector);
+        await expect(await viewSelector.isPresent())
+            .toBe(true,
+                ValidationsHelper.getNewViewSelectedValidation(titleNewView));
+
+        try {
+        const columnView = [RiskItemPage.inputs.title, RiskItemPage.inputs.assignedTo,
+             RiskItemPage.inputs.status, RiskItemPage.inputs.dueDate];
+
+        columnView.forEach(async (cloumnElement) => {
+                try {
+                    stepLogger.verification(`${cloumnElement} columns selected to display in the view should be displayed`);
+
+                    const columnSelector = await CommonPageHelper.getNewPublicViewTitleHeader(cloumnElement);
+                    await WaitHelper.getInstance().waitForElementToBeClickable(columnSelector);
+                    await expect(await columnSelector.isPresent())
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumn(cloumnElement));
+                } catch (error) {
+                    stepLogger.step(`Try block from aync block send error to catch and it is: ${error}`);
+                }
+            });
+        } catch (error) {
+            stepLogger.step(`Main try block send error to catch and it is: ${error}`);
+        }
+    }
 }

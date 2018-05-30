@@ -1,3 +1,5 @@
+import { ElementFinder } from "protractor";
+
 export class ValidationsHelper {
     static get types() {
         return {
@@ -114,5 +116,13 @@ export class ValidationsHelper {
 
     static getItemsUnderTabShouldBeDisplayed(name: string) {
         return `Contents of the ${this.getDisplayedValidation(name + 'tab ')}`;
+    }
+
+    static getNewViewSelectedValidation(titleNewView: string) {
+        return `Newly created public view ${titleNewView} should be selected`;
+    }
+
+    static getNewViewCloumn(columnName: ElementFinder) {
+        return `Newly created public view ${columnName} should be selected`;
     }
 }
