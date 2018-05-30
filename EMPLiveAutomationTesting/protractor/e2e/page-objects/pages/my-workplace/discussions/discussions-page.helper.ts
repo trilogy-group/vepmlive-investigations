@@ -29,8 +29,12 @@ export class DiscussionsPageHelper {
   
     static async addDiscussion(stepLogger: StepLogger) {
         stepLogger.step('PRECONDITION: navigate to Discussions page');
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.discussions, 
-            CommonPage.pageHeaders.myWorkplace.discussions, CommonPageConstants.pageHeaders.myWorkplace.discussions, stepLogger);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.discussions,
+            CommonPage.pageHeaders.myWorkplace.discussions,
+            CommonPageConstants.pageHeaders.myWorkplace.discussions,
+            stepLogger
+        );
         stepLogger.stepId(1);
         stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
         await PageHelper.click(DiscussionsPage.newDiscussionLink);

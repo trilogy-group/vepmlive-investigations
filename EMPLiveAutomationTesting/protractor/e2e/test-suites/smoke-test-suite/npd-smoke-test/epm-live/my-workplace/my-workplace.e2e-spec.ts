@@ -422,7 +422,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(DiscussionsPage.openDiscussionLink);
         
         stepLogger.verification('the Discussion should get selected');
-        await expect(await DiscussionsPage.Discussiontitle.getText())
+        await expect(await DiscussionsPage.discussionTitle.getText())
             .toBe(title, ValidationsHelper.getPageDisplayedValidation(title));
             
         stepLogger.stepId(4);
@@ -430,7 +430,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
         const labels = DiscussionsPageConstants.inputLabels;
         const replyMsg = `${labels.reply} ${uniqueId}`;
-        await TextboxHelper.sendKeys(DiscussionsPage.replyMsg,replyMsg);
+        await TextboxHelper.sendKeys(DiscussionsPage.replyMsg, replyMsg);
         await PageHelper.click(DiscussionsPage.replyButton);
 
         stepLogger.verification('Reply should be displayed below the discussion');
