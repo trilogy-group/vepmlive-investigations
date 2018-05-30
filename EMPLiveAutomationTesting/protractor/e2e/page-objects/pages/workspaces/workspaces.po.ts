@@ -1,6 +1,4 @@
 import {BasePage} from '../base-page';
-import { CommonPageHelper } from '../common/common-page.helper';
-import { HtmlHelper } from '../../../components/misc-utils/html-helper';
 import { WorkspacesConstants } from './workspaces.constants';
 import { element, By } from 'protractor';
 import { ElementHelper } from '../../../components/html/element-helper';
@@ -10,11 +8,11 @@ import { ComponentHelpers } from '../../../components/devfactory/component-helpe
 export class workspacesPage extends BasePage {
 
     static get titleInputField(){
-        return CommonPageHelper.getAllElementsByType(HtmlHelper.tags.textBox).first();
+        return element(By.id('tbWsName'));
     }  
 
     static get descInputField(){
-        return CommonPageHelper.getAllElementsByType(HtmlHelper.tags.textBox).last();
+        return element(By.id('tbWsDescription'));
     }  
 
     static get createWorkSpaceButton(){
@@ -31,6 +29,7 @@ export class workspacesPage extends BasePage {
     } 
     
     static get projectTemplate(){
-        return element.all(By.className('template-meta')).last();
+        return element(By.xpath(`//div/span[text() = '${WorkspacesConstants.projectTemplate}']`));
+
     } 
 }
