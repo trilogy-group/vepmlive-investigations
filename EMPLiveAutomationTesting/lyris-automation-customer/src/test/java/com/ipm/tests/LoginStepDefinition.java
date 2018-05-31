@@ -1,5 +1,6 @@
 package com.ipm.tests;
 
+import com.ipm.pageobjects.LoginPageObject;
 import org.openqa.selenium.WebDriver;
 
 import java.io.InputStream;
@@ -20,10 +21,24 @@ public class LoginStepDefinition {
     public static void login(WebDriver driver) {
         LoginStepDefinition lg = new LoginStepDefinition(driver);
         driver.get(lg.getUrl());
+        LoginPageObject loginPageObject = null;
+        try {
+            loginPageObject = new LoginPageObject(driver);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        loginPageObject.enterTheLoginCredentials(lg.getUsername(),lg.getPassword());
+        loginPageObject.clickOnLoginButton();
     }
 
     public String getUrl() {
         return getPropValue("url");
+    }
+    public String getUsername() {
+        return getPropValue("username");
+    }
+    public String getPassword() {
+        return getPropValue("userpassword");
     }
 
     public String getPropValue(String key) {

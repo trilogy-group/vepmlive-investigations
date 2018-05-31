@@ -185,8 +185,8 @@ setx TS_REPO_ID '233'
 
 #Add quality hosts entries
 RUN $hostsFile = Join-Path $env:windir "System32\drivers\etc\hosts" ; \
-'10.18.2.31 WIN-6J09GF4NBP8.epmldev.com' | Add-Content -PassThru $hostsFile ; \
-'10.18.2.31 qaepmlive6' | Add-Content -PassThru $hostsFile
+'10.25.1.89 WIN-6J09GF4NBP8.epmldev.com' | Add-Content -PassThru $hostsFile ; \
+'10.25.1.89 qaepmlive6' | Add-Content -PassThru $hostsFile
 
 #CMD while ($true) { Start-Sleep -Seconds 3600 }
 

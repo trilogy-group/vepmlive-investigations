@@ -435,11 +435,10 @@ namespace WorkEnginePPM
                             catch { }
                             foreach(string sTeam in sTeams)
                             {
-                                DataRow[] drRes = dtRes.Select("EXTID='" + sTeam + "'");
-
-                                SPUser u = web.AllUsers.GetByID(int.Parse(drRes[0]["SPID"].ToString()));
                                 try
                                 {
+                                    DataRow[] drRes = dtRes.Select("EXTID='" + sTeam + "'");
+                                    SPUser u = web.AllUsers.GetByID(int.Parse(drRes[0]["SPID"].ToString()));
                                     SPFieldUserValue uv = new SPFieldUserValue(web, u.ID, u.Name);
                                     if (!uvc.Any(l => l.LookupId == uv.LookupId))
                                     {
