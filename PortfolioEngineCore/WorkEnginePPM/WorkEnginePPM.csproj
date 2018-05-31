@@ -164,6 +164,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx.designer.cs">
       <DependentUpon>InstallDataSyncEvents.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\AutoAdjustPeriods.cs" />
     <Compile Include="Layouts\ppm\calendarform.aspx.cs">
       <DependentUpon>calendarform.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1244,6 +1245,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Optimizer.ascx.js" />
     <Content Include="Layouts\ppm\optimizer.aspx" />
     <Content Include="Layouts\ppm\Optimizer.js" />
+    <Content Include="Layouts\ppm\AutoAdjustPeriods.js" />
     <Content Include="Layouts\ppm\PFEFileImport.aspx" />
     <Content Include="Layouts\ppm\PFEFileImportStatus.aspx" />
     <Content Include="Layouts\ppm\Postcostoptions.aspx" />

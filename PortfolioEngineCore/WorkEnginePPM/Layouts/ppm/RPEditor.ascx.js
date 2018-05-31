@@ -206,10 +206,15 @@
                 case "GetMetaData":
                     this.NegotiationMode = (result.NegotiationMode != 0);
                     this.costCategoryRoles = result.CostCategoryRoles;
-                    var views = result.Views;
-                    this.Views = JSON_GetArray(views, "View");
-                    var periods = result.Periods;
-                    this.allPeriods = JSON_GetArray(periods, "Period");
+                    this.Views = JSON_GetArray(result.Views, "View");
+                    this.allPeriods = JSON_GetArray(result.Periods, "Period");
+                    for (var periodIndex = 0; periodIndex < this.allPeriods.length; periodIndex++) {
+                        var period = this.allPeriods[periodIndex];
+                        if (period.Current === "true") {
+                            this.currentPeriod = parseInt(period.PeriodID);
+                            break;
+                        }
+                    }
                     this.InitializeLayout();
                     break;
                 case "SaveResourcePlanView":
@@ -241,7 +246,9 @@
                             }
                         }
                     }
+                    this.viewTab.refreshSelect("idViewTab_SelView");
                     this.externalEvent('SaveView_Cancel');
+                    this.externalEvent("ViewTab_SelView_Changed");
                     break;
                 case "PostCostValues":
                     break;
@@ -900,12 +907,19 @@
                     this.ResourcesSelectMode = resourcesSelectMode;
                     this.resourcesTab.selectByValue("idResourcesTab_Select", this.ResourcesSelectMode);
                 }
-                if (view.Settings.UseCurrentPeriod != null) {
-                    var UseCurrentPeriod = parseInt(view.Settings.UseCurrentPeriod);
-                    if (UseCurrentPeriod == 1 & this.reloaded == false) {
-                        this.startPeriod = this.currentPeriod;
-                        var from = document.getElementById('idViewTab_FromPeriod');
-                        from.options.selectedIndex = 0;
+
+                if (this.reloaded === false) {
+                    this.autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(view.Settings);
+                    if (this.autoAdjustPeriods.enabled) {
+                        this.ExecuteAutoAdjustPeriods(true);
+                    }
+                    else if (view.Settings.UseCurrentPeriod != null) {
+                        var useCurrentPeriod = parseInt(view.Settings.UseCurrentPeriod);
+                        if (useCurrentPeriod === 1) {
+                            this.startPeriod = this.currentPeriod;
+                            var from = document.getElementById('idViewTab_FromPeriod');
+                            from.options.selectedIndex = 0;
+                        }
                     }
                 }
             }
@@ -917,6 +931,25 @@
         }
         this.bInColResize = false;
     };
+
+    RPEditor.prototype.GetAutoAdjustPeriods = function (config) {
+        return config.GetAutoAdjustPeriods(this.currentPeriod, this.allPeriods, 0);
+    };
+
+    RPEditor.prototype.ExecuteAutoAdjustPeriods = function (updateViewTab) {
+        var calculated = this.GetAutoAdjustPeriods(this.autoAdjustPeriods);
+
+        this.startPeriod = calculated.startPeriod;
+        this.finishPeriod = calculated.finishPeriod;
+
+        if (updateViewTab) {
+            this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
+            this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
+            this.viewTab.refreshSelect("idViewTab_FromPeriod");
+            this.viewTab.refreshSelect("idViewTab_ToPeriod");
+        }
+    };
+
     RPEditor.prototype.HandleException = function (name, e) {
         alert("Exception thrown in function " + name + "\n\n" + e.toString());
     };
@@ -1348,10 +1381,19 @@
             if (grid == null) {
                 if (!this.reloaded) {
                     for (var i = 0; i < this.Views.length; i++) {
-                        if (this.Views[i].Default == true) {
-                            var selPeriods = this.Views[i].g_RPE.RightCols.split(",");
-                            this.viewStartPeriod = selPeriods[0].split(":")[0].replace("Q", "");
-                            this.viewFinishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                        var view = this.Views[i];
+                        if (view.Default === "1") {
+                            this.autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(view.Settings);
+                            if (this.autoAdjustPeriods.enabled) {
+                                var periods = this.GetAutoAdjustPeriods(this.autoAdjustPeriods);
+                                this.viewStartPeriod = periods.startPeriod;
+                                this.viewFinishPeriod = periods.finishPeriod;
+                            }
+                            else {
+                                var selPeriods = this.Views[i].g_RPE.RightCols.split(",");
+                                this.viewStartPeriod = selPeriods[0].split(":")[0].replace("Q", "");
+                                this.viewFinishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                            }
                             break;
                         }
                     }
@@ -3142,21 +3184,12 @@
                         var fp = fpVal.split(":")[0].replace("Q", "");
                         this.startPeriod = sp;
                         this.finishPeriod = fp;
+                        this.autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(selectedView.Settings);
+                        if (this.autoAdjustPeriods.enabled) {
+                            this.ExecuteAutoAdjustPeriods(false);
+                        }
                         this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
                         this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
-                        //this.ApplyGridView("g_RPE", selectedView, true);
-                        //this.ApplyGridView("g_Res", selectedView, true);
-                        //this.ShowSelectedResourceGroup();
-                        ////this.UpdatePlanCalculatedValues();
-                        //this.RefreshPlanPeriods(false);
-                        //var grid = Grids["g_RPE"];
-                        //this.RefreshGrid(grid);
-                        //this.InitialiseResourceGrid();
-                        //this.RefreshResourcePeriodsPaged(false, null);
-                        //this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
-                        //this.ShowHidePeriods(this.plangrid, false, true);
-                        //this.ShowHidePeriods(this.resgrid, false, false);
-                        //this.UpdateButtonsAsync();
                         this.viewTab.refreshSelect("idViewTab_FromPeriod");
                         this.viewTab.refreshSelect("idViewTab_ToPeriod");
                         this.AsyncReload(this.startPeriod, this.finishPeriod);
@@ -3238,6 +3271,9 @@
                     break;
                 case "SaveView_Cancel":
                     this.dhxWins_CloseDialog("winViewDlg");
+                    break;
+                case "AutoAdjustPeriodsCheckBoxOnClick":
+                    AutoAdjustPeriods.DocumentAutoAdjustPeriodsCheckBoxOnClick(document);
                     break;
                 case "DeleteView_OK":
                     var selectView = document.getElementById("idViewTab_SelView");
@@ -3686,13 +3722,33 @@
         HideUnusedGroupRows(grid, row, 0);
     };
     RPEditor.prototype.DisplaySaveViewDialog = function (title, action) {
+        var isRenameAction = action === "rename";
         document.getElementById("id_SaveView_Name").value = "New View";
         document.getElementById("id_SaveView_Guid").value = "";
         document.getElementById("id_SaveView_Action").value = action;
-        var objDefault = document.getElementById("id_SaveView_Default");
-        objDefault.checked = false;
-        if (action == "rename") objDefault.disabled = true; else objDefault.disabled = false;
         document.getElementById("id_SaveView_Personal").checked = false;
+        
+        var autoAdjustPeriodsCheckBox = document.getElementById("autoAdjustPeriodsCheckBox");
+        var startPeriodDeltaInput = document.getElementById("startPeriodDeltaInput");
+        var finishPeriodDeltaInput = document.getElementById("finishPeriodDeltaInput");
+        var viewIsDefaultCheckBox = document.getElementById("id_SaveView_Default");
+
+        var autoAdjustPeriodsConfig = AutoAdjustPeriods.EnsureValidInstance(this.autoAdjustPeriods);
+
+        viewIsDefaultCheckBox.checked = false;
+        autoAdjustPeriodsCheckBox.checked = autoAdjustPeriodsConfig.enabled;
+        startPeriodDeltaInput.value = autoAdjustPeriodsConfig.startPeriodDelta;
+        finishPeriodDeltaInput.value = autoAdjustPeriodsConfig.finishPeriodDelta;
+
+        viewIsDefaultCheckBox.disabled = isRenameAction;
+        autoAdjustPeriodsCheckBox.disabled = isRenameAction;
+        startPeriodDeltaInput.disabled = isRenameAction;
+        finishPeriodDeltaInput.disabled = isRenameAction;
+
+        if (!isRenameAction) {
+            AutoAdjustPeriods.DocumentAutoAdjustPeriodsCheckBoxOnClick(document);
+        }
+
         var selectView = document.getElementById("idViewTab_SelView");
         if (selectView != null && selectView.selectedIndex >= 0) {
             var view = this.GetSelectedView();
@@ -3703,22 +3759,27 @@
                 var bDefault = false;
                 if (view.Default != 0) {
                     bDefault = true;
-                    objDefault.disabled = true;
+                    viewIsDefaultCheckBox.disabled = true;
                 }
-                objDefault.checked = bDefault;
+                viewIsDefaultCheckBox.checked = bDefault;
                 var bPersonal = false;
                 if (view.Personal != 0)
                     bPersonal = true;
                 document.getElementById("id_SaveView_Personal").checked = bPersonal;
             }
         }
-        this.DisplayDialog(20, 30, 280, 165, title, "winViewDlg", "idSaveViewDlg", true, false);
+        this.DisplayDialog(20, 30, 350, 260, title, "winViewDlg", "idSaveViewDlg", true, false);
     };
     RPEditor.prototype.DisplaySaveViewDialogOK = function () {
         var bDefault = document.getElementById("id_SaveView_Default").checked;
         var bPersonal = document.getElementById("id_SaveView_Personal").checked;
         var saveViewName = document.getElementById("id_SaveView_Name").value;
 
+        var autoAdjustPeriodsConfig = AutoAdjustPeriods.CreateFromDocument(document);
+        if (autoAdjustPeriodsConfig === null) {
+            return;
+        }
+        
         // To check entered value is blank or with only space.
         var val = saveViewName.replace(/^\s+|\s+$/, '');
         if (val.length == 0) {
@@ -3762,10 +3823,12 @@
         if (guid.isGuid() != true)
             guid.newGuid();
 
-        var s = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal);
+        this.autoAdjustPeriods = autoAdjustPeriodsConfig;
+        
+        var viewXml = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal);
         var sbd = new StringBuilder();
         sbd.append('<Execute Function="SaveResourcePlanView">');
-        sbd.append(s);
+        sbd.append(viewXml);
         sbd.append('</Execute>');
 
         this.ExecuteJSON(sbd.toString());
@@ -4352,11 +4415,25 @@
         sb.append(" displayMode='" + this.displayMode.toString() + "'");
         sb.append(" ResourceDisplayMode='" + this.ResourceDisplayMode + "'");
         sb.append(" ResourcesSelectMode='" + this.ResourcesSelectMode.toString() + "'");
-        var from = document.getElementById('idViewTab_FromPeriod');
-        if (from.options.selectedIndex == 0)
-            sb.append(" UseCurrentPeriod='1'");
+
+        var autoAdjustPeriodsConfig = AutoAdjustPeriods.EnsureValidInstance(this.autoAdjustPeriods);
+
+        if (autoAdjustPeriodsConfig.enabled === true) {
+            sb.append(' AutoAdjustPeriods="1"');
+            sb.append(' StartPeriodDelta="' + autoAdjustPeriodsConfig.startPeriodDelta + '"');
+            sb.append(' FinishPeriodDelta="' + autoAdjustPeriodsConfig.finishPeriodDelta + '"');
+        }
+        else {
+            sb.append(' AutoAdjustPeriods="0"');
+            var from = document.getElementById('idViewTab_FromPeriod');
+            if (from.options.selectedIndex === 0) {
+                sb.append(" UseCurrentPeriod='1'");
+            }
+        }
+
         sb.append(" >");
         sb.append("</Settings>");
+
         return sb.toString();
     };
     RPEditor.prototype.BuildGridInf = function (gridId, showFilter, showGrouping) {
@@ -4829,24 +4906,20 @@
                 var periodid = parseInt(this.allPeriods[i].PeriodID);
                 from.options[from.options.length] = new Option(sPeriod, periodid);
                 to.options[to.options.length] = new Option(sPeriod, periodid);
-                if (this.allPeriods[i].Current == 'true') {
-                    this.currentPeriod = periodid;
-                }
             }
 
             var selectedView = this.GetSelectedView();
             if (selectedView != null) {
-                var selPeriods = selectedView.g_RPE.RightCols.split(",");
-                this.startPeriod = selPeriods[0].split(":")[0].replace("Q", "");
-                this.finishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                this.autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromConfig(selectedView.Settings);
+                if (this.autoAdjustPeriods.enabled) {
+                    this.ExecuteAutoAdjustPeriods(false);
+                }
+                else {
+                    var selPeriods = selectedView.g_RPE.RightCols.split(",");
+                    this.startPeriod = selPeriods[0].split(":")[0].replace("Q", "");
+                    this.finishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                }
             }
-            if (this.currentPeriod != null) {
-                this.viewTab.selectByValue("idViewTab_FromPeriod", this.currentPeriod);
-            } else {
-                this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
-            }
-        } else {
-            this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
         }
 
         this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);

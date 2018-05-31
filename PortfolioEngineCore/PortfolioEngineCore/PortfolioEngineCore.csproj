@@ -97,6 +97,8 @@
     <Compile Include="Base\DBAccess\QueueManager.cs" />
     <Compile Include="Base\DBAccess\Rates.cs" />
     <Compile Include="Base\DBAccess\ResourcePlanning.cs" />
+    <Compile Include="Base\DBAccess\ViewData.cs" />
+    <Compile Include="Base\DBAccess\ViewDataContext.cs" />
     <Compile Include="Base\DBCommon.cs" />
     <Compile Include="Base\Debugger.cs" />
     <Compile Include="Base\Encrypt.cs" />

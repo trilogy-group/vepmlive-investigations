@@ -5,6 +5,9 @@ using System.Web.Services;
 using System.Xml;
 using PortfolioEngineCore;
 using System.Globalization;
+using System.Linq;
+using PortfolioEngineCore.Base.DBAccess;
+using WorkEnginePPM.Layouts.ppm;
 
 namespace WorkEnginePPM
 {
@@ -398,7 +401,11 @@ Exit_Function:
                 int nLastPeriod;
                 if (dbaEditCosts.SelectViewCalendarInfo(dba, nViewUID, out nCalendarID, out nFirstPeriod, out nLastPeriod) != StatusEnum.rsSuccess) goto Status_Error;
 
+                var viewDataXml = ViewData.GetViewXmlByName(dba, ViewDataContext.CostEditor, Viewuid).FirstOrDefault();
+                var autoAdjustPeriods = AutoAdjustPeriods.TryCreateFromXml(viewDataXml);
+
                 List<InternalPeriod> periods = new List<InternalPeriod>();
+                InternalPeriod currentPeriod = null;
                 if (nCalendarID >= 0)
                 {
                     DataTable dt;
@@ -417,9 +424,12 @@ Exit_Function:
 
                         if (nFirstPeriod == Int32.MinValue)
                             nFirstPeriod = period.Id;
-                        // NB: Using old Status period flag for current period marker
+                        
                         if (period.StartDate <= dtNow && period.FinishDate >= dtNow)
-                            period.IsStatusPeriod = true;
+                        {
+                            period.IsCurrent = true;
+                            currentPeriod = period;
+                        }
 
                         if (period.Id >= nFirstPeriod && period.Id <= nLastPeriod)
                         {
@@ -453,6 +463,20 @@ Exit_Function:
                 ConvertDateToPeriod(periods, dtStart, out lStartPeriod);
                 ConvertDateToPeriod(periods, dtFinish, out lFinishPeriod);
 
+                if (autoAdjustPeriods.Enabled && periods.Count > 0)
+                {
+                    var sortedPeriods = periods.OrderBy(x => x.StartDate).ToList();
+                    var currentPeriodIndex = sortedPeriods.IndexOf(currentPeriod);
+                    var startPeriodIndex = currentPeriodIndex > autoAdjustPeriods.StartPeriodDelta 
+                        ? currentPeriodIndex - autoAdjustPeriods.StartPeriodDelta 
+                        : 0;
+                    var finishPeriodIndex = currentPeriodIndex + autoAdjustPeriods.FinishPeriodDelta < sortedPeriods.Count
+                        ? currentPeriodIndex + autoAdjustPeriods.FinishPeriodDelta
+                        : sortedPeriods.Count - 1;
+
+                    lStartPeriod = sortedPeriods[startPeriodIndex].Id;
+                    lFinishPeriod = sortedPeriods[finishPeriodIndex].Id;
+                }
 
                 string sCheckedoutDetails = "";
 
@@ -478,10 +502,10 @@ Exit_Function:
                             bool bCheckedOut;
                             if (CheckOutPI(dba, Projectid, Wepid, out bCheckedOut, out sCheckedoutDetails) != StatusEnum.rsSuccess) goto Status_Error;
                         }
-                        oGrid.InitializeGridLayout(costType.Id, Ftemode, bEditable, sCheckedoutDetails, lStartPeriod, lFinishPeriod);
+                        oGrid.InitializeGridLayout(costType.Id, Ftemode, bEditable, sCheckedoutDetails, lStartPeriod, lFinishPeriod, autoAdjustPeriods.Enabled);
                         break;
                     case 101:     // non-editable with details
-                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, sCheckedoutDetails, lStartPeriod, lFinishPeriod);
+                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, sCheckedoutDetails, lStartPeriod, lFinishPeriod, autoAdjustPeriods.Enabled);
                         break;
                     case 3:     // calculated
                     case 30:    // cumulative calculated
@@ -497,10 +521,10 @@ Exit_Function:
                         }
 
                         if (GetCostType(dba, costTypeOperations[0].Id, out costType) != StatusEnum.rsSuccess) goto Status_Error;
-                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, "", lStartPeriod, lFinishPeriod);
+                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, "", lStartPeriod, lFinishPeriod, autoAdjustPeriods.Enabled);
                         break;
                     default:
-                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, "", lStartPeriod, lFinishPeriod);
+                        oGrid.InitializeGridLayout(costType.Id, Ftemode, false, "", lStartPeriod, lFinishPeriod, autoAdjustPeriods.Enabled);
                         break;
                 }
                 if (BuildLayout(dba, oGrid, costType, periods) != StatusEnum.rsSuccess) goto Status_Error;
@@ -802,6 +826,7 @@ Status_Error:
                 int nFirstPeriod;
                 int nLastPeriod;
                 if (dbaEditCosts.SelectViewCalendarInfo(dba, nViewUID, out nCalendarID, out nFirstPeriod, out nLastPeriod) != StatusEnum.rsSuccess) goto Status_Error;
+                // TODO: ADD READ VIEW XML
 
                 //Cost Types and variations	                          Edit Mode	 Editable	Calculate Cost	Comes From
                 // Display Only	                                        0	        No	        No	        COST_VALUES
@@ -1981,7 +2006,7 @@ Exit_Function:
             public string Name;
             public DateTime StartDate;
             public DateTime FinishDate;
-            public bool IsStatusPeriod = false;
+            public bool IsCurrent = false;
         }
 
         internal class CostCustomField
@@ -2016,7 +2041,7 @@ Exit_Function:
             //private bool m_bFirstPeriod;
             private int m_nFTEMode = 0;
 
-            public bool InitializeGridLayout(int CostTypeId, int FTEMode, bool bEditable, string sCheckedoutDetails, int lStartPeriod, int lFinishPeriod)
+            public bool InitializeGridLayout(int CostTypeId, int FTEMode, bool bEditable, string sCheckedoutDetails, int lStartPeriod, int lFinishPeriod, bool floatingPeriods)
             {
                 m_nFTEMode = FTEMode;
                 xGrid = new CStruct();
@@ -2039,6 +2064,7 @@ Exit_Function:
                 }
                 xCfg.CreateIntAttr("StartPeriod", lStartPeriod);
                 xCfg.CreateIntAttr("FinishPeriod", lFinishPeriod);
+                xCfg.CreateIntAttr("FloatingPeriods", floatingPeriods ? 1 : 0);
 
                 //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
                 xCfg.CreateStringAttr("MainCol", "Category");
@@ -2219,10 +2245,11 @@ Exit_Function:
                 //xC.CreateIntAttr("CanResize", 0);
                 xC.CreateIntAttr("MinWidth", 25);
                 xC.CreateIntAttr("Width", 40);
-                //if (period.IsStatusPeriod)
-                //    xC.CreateBooleanAttr("IsStatusPeriod", true);
-                if (period.IsStatusPeriod)
+                
+                if (period.IsCurrent)
+                {
                     xC.CreateBooleanAttr("Current", true);
+                }
 
                 xC = m_xPeriodCols.CreateSubStruct("C");
                 xC.CreateStringAttr("Name", "F" + sId);

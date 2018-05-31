@@ -45,6 +45,7 @@
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
+<script src="/_layouts/ppm/AutoAdjustPeriods.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/AnalyzerHelper.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/CostAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
@@ -107,7 +108,7 @@
 			View Name:
 		</div>
 		<div>
-			<input id="id_SaveView_Name" type="text" value="view 1" style="width:10em; text-align:left;margin-bottom:13px;" />
+			<input id="id_SaveView_Name" type="text" value="view 1" style="width:10em; text-align:left;margin-bottom:7px;" />
 		</div>
 		<div>
 			<input id="id_SaveView_Default" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Default View</font>
@@ -115,6 +116,15 @@
 		<div>
 			<input id="id_SaveView_Personal" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal View</font>
 		</div>
+	    <div>
+	        <input id="autoAdjustPeriodsCheckBox" type="checkbox" onclick="javascript: dialogEvent('AutoAdjustPeriodsCheckBoxOnClick');" />&nbsp;&nbsp;<font style="vertical-align:middle">Automatically adjust periods</font>
+	    </div>
+	    <div style="margin-top: 5px; padding-left: 4px;">
+	        <span>From Period: Current period minus </span><input id="startPeriodDeltaInput" type="number" value="6" min="0" style="width:40px; text-align:left;margin-bottom:3px;" disabled="disabled" /><span> period(s)</span>
+	    </div>
+	    <div style="margin-top: 2px; padding-left: 4px;">
+	        <span>To Period: Current period plus </span><input id="finishPeriodDeltaInput" type="number" value="6" min="0" style="width:40px; text-align:left;margin-bottom:3px;" disabled="disabled" /><span> period(s)</span>
+	    </div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
                      <input type="button" onclick="javascript: dialogEvent('SaveView_OK');" class="epmliveButton" value="OK"/>
