@@ -826,8 +826,7 @@ Status_Error:
                 int nFirstPeriod;
                 int nLastPeriod;
                 if (dbaEditCosts.SelectViewCalendarInfo(dba, nViewUID, out nCalendarID, out nFirstPeriod, out nLastPeriod) != StatusEnum.rsSuccess) goto Status_Error;
-                // TODO: ADD READ VIEW XML
-
+                
                 //Cost Types and variations	                          Edit Mode	 Editable	Calculate Cost	Comes From
                 // Display Only	                                        0	        No	        No	        COST_VALUES
                 // Editable – Input Calendar or No Input Calendar    	1	        Yes	        Yes	        COST_DETAILS
