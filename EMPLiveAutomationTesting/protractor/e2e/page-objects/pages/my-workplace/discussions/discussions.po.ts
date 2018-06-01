@@ -5,6 +5,7 @@ import { element, by } from 'protractor';
 import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
 import { By } from 'selenium-webdriver';
 import { ElementHelper } from '../../../../components/html/element-helper';
+import { ButtonHelper } from '../../../../components/html/button-helper';
 
 export class DiscussionsPage {
 
@@ -32,10 +33,9 @@ export class DiscussionsPage {
         return element(By.className('ms-accentText'));
     }
 
-    static get replyButton() {
-        const xpath = `//button[${ComponentHelpers.getXPathFunctionForText(DiscussionsPageConstants.reply)}]`;
-        return element(By.xpath(xpath));
-    }  
+    static get createWorkSpaceButton() {
+        return ButtonHelper.getButtonByText(WorkspacesConstants.windowTitle);
+    } 
 
     static get replyBody() {
         return element(By.className('ms-comm-postReplyBody'));

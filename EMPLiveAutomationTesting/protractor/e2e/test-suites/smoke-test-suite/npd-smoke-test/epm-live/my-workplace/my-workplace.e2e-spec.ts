@@ -373,7 +373,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const labels = DiscussionsPageConstants.inputLabels;
         const replyMsg = `${labels.reply} ${uniqueId}`;
         await TextboxHelper.sendKeys(DiscussionsPage.replyMsg, replyMsg);
-        await PageHelper.click(DiscussionsPage.replyButton);
+        await PageHelper.click(DiscussionsPage.createWorkSpaceButton);
 
         stepLogger.verification('Reply should be displayed below the discussion');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(DiscussionsPage.replyBody);
