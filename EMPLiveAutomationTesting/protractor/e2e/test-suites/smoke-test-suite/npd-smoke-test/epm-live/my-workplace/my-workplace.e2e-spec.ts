@@ -351,7 +351,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
   
-      fit('Reply to a Discussion - [785614]', async () => {
+      it('Reply to a Discussion - [785614]', async () => {
         const stepLogger = new StepLogger(785614);
         
         // steps 1,2,3 are inside this function
