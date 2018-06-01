@@ -3,7 +3,7 @@ import {DiscussionsPageConstants} from './discussions-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import { element} from 'protractor';
 import { By } from 'selenium-webdriver';
-import { ButtonHelperFactory } from '@aurea/protractor-automation-helper';
+import { ButtonHelper } from '../../../../components/html/button-helper';
 
 export class DiscussionsPage {
 
@@ -32,8 +32,7 @@ export class DiscussionsPage {
     }
 
     static get replyButton() {
-        console.log(ButtonHelperFactory.getButtonByExactTextXPath(DiscussionsPageConstants.reply));
-        return element(By.xpath(ButtonHelperFactory.getButtonByExactTextXPath(DiscussionsPageConstants.reply)));
+        return ButtonHelper.getButtonByText(DiscussionsPageConstants.reply);
     } 
 
     static get replyBody() {
