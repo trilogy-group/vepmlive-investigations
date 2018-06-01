@@ -1,8 +1,7 @@
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
-import { element, by } from 'protractor';
-import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
+import { element} from 'protractor';
 import { By } from 'selenium-webdriver';
 import { ElementHelper } from '../../../../components/html/element-helper';
 import { ButtonHelper } from '../../../../components/html/button-helper';
@@ -33,8 +32,8 @@ export class DiscussionsPage {
         return element(By.className('ms-accentText'));
     }
 
-    static get createWorkSpaceButton() {
-        return ButtonHelper.getButtonByText(WorkspacesConstants.windowTitle);
+    static get replyButton() {
+        return ButtonHelper.getButtonByText(DiscussionsPageConstants.reply);
     } 
 
     static get replyBody() {
