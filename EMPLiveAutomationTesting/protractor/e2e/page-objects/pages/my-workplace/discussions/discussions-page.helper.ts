@@ -48,7 +48,7 @@ export class DiscussionsPageHelper {
         const uniqueId = PageHelper.getUniqueId();
         const subject = `${labels.subject} ${uniqueId}`;
         const body = `${labels.body} ${uniqueId}`;
-        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
+        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, false, stepLogger);
     }    
 
     static async enterSubjectAndBody(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {

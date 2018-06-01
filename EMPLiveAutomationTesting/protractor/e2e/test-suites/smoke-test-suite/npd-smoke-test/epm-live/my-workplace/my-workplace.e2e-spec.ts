@@ -351,7 +351,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
   
-      it('Reply to a Discussion - [785614]', async () => {
+      fit('Reply to a Discussion - [785614]', async () => {
         const stepLogger = new StepLogger(785614);
         
         // steps 1,2,3 are inside this function
@@ -371,13 +371,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step(`Click on 'Reply' Enter a response Click 'Reply' button`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = DiscussionsPageConstants.inputLabels;
-        const replyMsg = `${labels.reply} ${uniqueId}`;
-        await TextboxHelper.sendKeys(DiscussionsPage.replyMsg, replyMsg);
+        const message = `${labels.reply} ${uniqueId}`;
+        await TextboxHelper.sendKeys(DiscussionsPage.replyMsg, message);
         await PageHelper.click(DiscussionsPage.replyButton);
 
         stepLogger.verification('Reply should be displayed below the discussion');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(DiscussionsPage.replyBody);
         await expect(await DiscussionsPage.replyBody.getText())
-            .toBe(replyMsg, ValidationsHelper.getLabelDisplayedValidation(replyMsg));
+            .toBe(message, ValidationsHelper.getLabelDisplayedValidation(message));
     });
 });

@@ -8,7 +8,6 @@ export class DiscussionsPageConstants {
     static readonly subjectInputTitle= 'Subject Required Field';
     static readonly question= 'Question';
     static readonly reply = 'Reply';
-    static readonly placeHolder = 'Add a reply'
 
     static get inputLabels() {
         return {

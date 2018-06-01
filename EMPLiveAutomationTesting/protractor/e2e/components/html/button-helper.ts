@@ -21,8 +21,4 @@ export class ButtonHelper extends ButtonHelperFactory {
             isContains
         )}]`;
     }
-
-    static getButtonByText(text: string, isContains = false) {
-        return element(By.xpath(`//button[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`));
-    }
 }
