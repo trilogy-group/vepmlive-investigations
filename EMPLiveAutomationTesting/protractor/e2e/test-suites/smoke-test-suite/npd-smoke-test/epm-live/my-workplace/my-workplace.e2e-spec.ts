@@ -367,7 +367,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await DiscussionsPage.discussionTitle.getText())
             .toBe(title, ValidationsHelper.getPageDisplayedValidation(title));
             
-        stepLogger.stepId(4);
+        stepLogger.stepId(5);
         stepLogger.step(`Click on 'Reply' Enter a response Click 'Reply' button`);
         const uniqueId = PageHelper.getUniqueId();
         const labels = DiscussionsPageConstants.inputLabels;
