@@ -277,4 +277,35 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         await RiskItemPageHelper.verifyRiskViewAdd(stepLogger, titleNewView);
     });
+
+    it('Select Columns in Risk - [1176336]', async () => {
+        const stepLogger = new StepLogger(1176336);
+        stepLogger.stepId(1);
+        stepLogger.stepId(2);
+        // Step #1 and #2 Inside this function
+        stepLogger.step('Select "Navigation" icon  from left side menu and click on Risks');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger);
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on any column header e.g; Status');
+        await PageHelper.click(CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status));
+
+        stepLogger.verification('The up arrow will appear against Status' +
+            ' and the data in table appears sort by Status ascending from a-z');
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingStatus.ascendingOrder)).
+        toBeTruthy(RiskItemPageConstants.sortingName.ascending);
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on same column again');
+        await PageHelper.click(CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status));
+
+        stepLogger.verification('The down arrow will appear against Status' +
+            ' and the data in table appears sort by Status ascending from z-a');
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingStatus.descendingOrder)).
+        toBeTruthy(RiskItemPageConstants.sortingName.descending);
+    });
 });

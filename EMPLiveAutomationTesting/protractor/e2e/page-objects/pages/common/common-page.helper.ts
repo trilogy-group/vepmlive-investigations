@@ -492,4 +492,20 @@ export class CommonPageHelper {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
          CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
+    static getAnchorByText(text: string) {
+        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getDivByText(text: string) {
+        return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static async switchToDefaultContent() {
+        await browser.switchTo().defaultContent();
+    }
+
+    static async switchToFrameCostPlan() {
+        await this.switchToDefaultContent();
+        await PageHelper.switchToiFrame(CommonPage.iFrameCostPlanSelector);
+    }
 }

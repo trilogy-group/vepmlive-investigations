@@ -42,4 +42,11 @@ export class RiskItemPage extends BasePage {
     static get attachmentButton() {
         return element(By.css('.upload-attach'));
     }
+
+    static get columnSortingStatus() {
+        return {
+            ascendingOrder: element(By.className('GMSort1Right GMImage')),
+            descendingOrder: element(By.className('GMSort4Right GMImage'))
+        };
+    }
 }

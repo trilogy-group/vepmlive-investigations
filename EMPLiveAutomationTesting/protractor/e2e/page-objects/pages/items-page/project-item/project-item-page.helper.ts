@@ -275,4 +275,9 @@ export class ProjectItemPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);
     }
+
+    static async createProject(uniqueId: string, stepLogger: StepLogger) {
+        stepLogger.step('Create a new project');
+        await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+    }
 }

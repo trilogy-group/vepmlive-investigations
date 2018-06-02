@@ -12,14 +12,17 @@ import { WaitHelper } from '../../../../components/html/wait-helper';
 import { MyWorkplacePage } from '../my-workplace.po';
 import { CommonPageConstants } from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
+import {MyWorkplacePage} from '../my-workplace.po';
+import {WaitHelper} from '../../../../components/html/wait-helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class DiscussionsPageHelper {
 
     static async fillNewDiscussionFormAndVerify(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
-
+        stepLogger.step('Enter the subject and body');
         await this.enterSubjectAndBody(subject, body, isQuestion, stepLogger);
 
-        stepLogger.stepId(3);
         stepLogger.step('Click on save');
         await PageHelper.click(CommonPage.formButtons.save);
 
@@ -73,5 +76,40 @@ export class DiscussionsPageHelper {
 
         stepLogger.verification('Mark check "Question" checkbox');
         await CheckboxHelper.markCheckbox(DiscussionsPage.questionCheckbox, isQuestion);
+    }
+
+    static async createNewDiscussion(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
+        stepLogger.step('Navigate to Discussions page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.discussions,
+            CommonPage.pageHeaders.myWorkplace.discussions,
+            CommonPageConstants.pageHeaders.myWorkplace.discussions,
+            stepLogger);
+
+        stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
+        await PageHelper.click(DiscussionsPage.newDiscussionLink);
+        stepLogger.verification('"Discussion - New Item" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(DiscussionsPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
+
+        stepLogger.step(`Enter/Select below details in 'New Discussion' page`);
+        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, isQuestion, stepLogger);
+    }
+
+    static async fillNewDiscussionForm(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
+        stepLogger.step('Enter subject and body');
+        await this.enterSubjectAndBody(subject, body, isQuestion, stepLogger);
+    }
+
+    static async saveDiscussionForm(stepLogger: StepLogger) {
+        stepLogger.step('Click on save');
+        await PageHelper.click(CommonPage.formButtons.save);
+
+        stepLogger.verification('"New Discussion" page is closed');
+        await expect(await CommonPage.formButtons.save.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
     }
 }

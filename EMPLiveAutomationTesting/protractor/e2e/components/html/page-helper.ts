@@ -201,7 +201,7 @@ export class PageHelper {
 
     static async isElementPresent(targetElement: ElementFinder, toWait = true) {
         if (toWait) {
-            return await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
+            return await WaitHelper.getInstance().waitForElementToBePresent(targetElement);
         }
         return targetElement.isPresent();
     }
@@ -215,5 +215,12 @@ export class PageHelper {
         browser.setFileDetector(new remote.FileDetector());
         await WaitHelper.getInstance().waitForElementToBePresent(item);
         await item.sendKeys(filePath);
+    }
+
+    static async switchToiFrame(iFrameElement: ElementFinder, timeout: number = PageHelper.timeout.xs) {
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(iFrameElement);
+        await browser.driver.switchTo().frame(iFrameElement.getWebElement());
+        // Wait is needed to load the iframe properly
+        await browser.sleep(timeout);
     }
 }
