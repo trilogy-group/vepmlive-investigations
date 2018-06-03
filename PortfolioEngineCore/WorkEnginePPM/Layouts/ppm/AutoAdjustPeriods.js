@@ -73,13 +73,14 @@ function AutoAdjustPeriods(enabled, start, finish) {
 
         var lastIndex = allPeriods.length - 1;
         if (lastIndex < firstIndex) {
-            // cannot calculate
+            // cannot calculate because specified first index does not exist in allPeriods array, returns empty result
             return {};
         }
 
         var currentIndex = -1;
         var currentPeriodId = parseInt(currentPeriod);
 
+        // find the current period index in allPeriods array
         for (var i = 0; i < allPeriods.length; i++) {
             var periodId = parseInt(allPeriods[i].PeriodID);
             
@@ -90,7 +91,9 @@ function AutoAdjustPeriods(enabled, start, finish) {
         }
 
         if (currentIndex === -1) {
-            // cannot calculate
+            // cannot calculate because specified current period not found in allPeriods array, 
+            // returns result when start period is first element and finish period is last element in periods array 
+            // with respect to specified first and last index value.
             return {
                 startPeriodIndex: firstIndex,
                 finishPeriodIndex: lastIndex,

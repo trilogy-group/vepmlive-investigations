@@ -20,57 +20,70 @@ namespace PortfolioEngineCore.Base.DBAccess
 
         public static bool DeleteViewByName(PortfolioEngineCore.DBAccess dba, ViewDataContext context, string viewName)
         {
-            var sqlCommandText = DeleteViewByNameDataQuery;
-            var sqlCommand = new SqlCommand(sqlCommandText, dba.Connection, dba.Transaction);
-            sqlCommand.Parameters.AddWithValue(ContextParameter, context);
-            sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
-            sqlCommand.ExecuteNonQuery();
+            using (var sqlCommand = new SqlCommand(DeleteViewByNameDataQuery, dba.Connection, dba.Transaction))
+            {
+                sqlCommand.Parameters.AddWithValue(ContextParameter, context);
+                sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
+                sqlCommand.ExecuteNonQuery();
+            }
+
             return true;
         }
 
         public static string[] GetViewXmlByName(PortfolioEngineCore.DBAccess dba, ViewDataContext context, string viewName)
         {
             var results = new List<string>();
-            var sqlCommandText = SelectViewByNameDataQuery;
-
-            var sqlCommand = new SqlCommand(sqlCommandText, dba.Connection, dba.Transaction);
-            sqlCommand.Parameters.AddWithValue(ContextParameter, context);
-            sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
-            var reader = sqlCommand.ExecuteReader();
-
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand(SelectViewByNameDataQuery, dba.Connection, dba.Transaction))
             {
-                string viewDataXml = SqlDb.ReadStringValue(reader[ViewDataColumn]);
-                if (!string.IsNullOrWhiteSpace(viewDataXml))
+                sqlCommand.Parameters.AddWithValue(ContextParameter, context);
+                sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    results.Add(viewDataXml);
+                    try
+                    {
+                        while (reader.Read())
+                        {
+                            var viewDataXml = SqlDb.ReadStringValue(reader[ViewDataColumn]);
+                            if (!string.IsNullOrWhiteSpace(viewDataXml))
+                            {
+                                results.Add(viewDataXml);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        reader.Close();
+                    }
                 }
             }
 
-            reader.Close();
             return results.ToArray();
         }
 
         public static bool SaveViewXmlByName(PortfolioEngineCore.DBAccess dba, ViewDataContext context, string viewName, string viewData)
         {
-            var sqlCommandText = UpdateViewByNameDataQuery;
-            var sqlCommand = new SqlCommand(sqlCommandText, dba.Connection, dba.Transaction);
-            sqlCommand.Parameters.AddWithValue(DataParameter, viewData);
-            sqlCommand.Parameters.AddWithValue(ContextParameter, context);
-            sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
-            int nRowsAffected = sqlCommand.ExecuteNonQuery();
-
-            if (nRowsAffected == 0)
+            using (var sqlCommandUpdate = new SqlCommand(UpdateViewByNameDataQuery, dba.Connection, dba.Transaction))
             {
-                sqlCommandText = InsertViewDataQuery;
-                sqlCommand = new SqlCommand(sqlCommandText, dba.Connection, dba.Transaction);
-                sqlCommand.Parameters.AddWithValue(ViewIdParameter, Guid.NewGuid());
-                sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
-                sqlCommand.Parameters.AddWithValue(ViewResourceParameter, 0);
-                sqlCommand.Parameters.AddWithValue(ViewIsDefaultParameter, 0);
-                sqlCommand.Parameters.AddWithValue(DataParameter, viewData);
-                sqlCommand.Parameters.AddWithValue(ContextParameter, context);
-                sqlCommand.ExecuteNonQuery();
+                sqlCommandUpdate.Parameters.AddWithValue(DataParameter, viewData);
+                sqlCommandUpdate.Parameters.AddWithValue(ContextParameter, context);
+                sqlCommandUpdate.Parameters.AddWithValue(NameParameter, viewName);
+                var rowsAffected = sqlCommandUpdate.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                using (var sqlCommandInsert = new SqlCommand(InsertViewDataQuery, dba.Connection, dba.Transaction))
+                {
+                    sqlCommandInsert.Parameters.AddWithValue(ViewIdParameter, Guid.NewGuid());
+                    sqlCommandInsert.Parameters.AddWithValue(NameParameter, viewName);
+                    sqlCommandInsert.Parameters.AddWithValue(ViewResourceParameter, 0);
+                    sqlCommandInsert.Parameters.AddWithValue(ViewIsDefaultParameter, 0);
+                    sqlCommandInsert.Parameters.AddWithValue(DataParameter, viewData);
+                    sqlCommandInsert.Parameters.AddWithValue(ContextParameter, context);
+                    sqlCommandInsert.ExecuteNonQuery();
+                }
             }
 
             return true;
