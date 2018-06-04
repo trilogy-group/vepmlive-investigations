@@ -37,23 +37,21 @@ namespace PortfolioEngineCore.Base.DBAccess
             {
                 sqlCommand.Parameters.AddWithValue(ContextParameter, context);
                 sqlCommand.Parameters.AddWithValue(NameParameter, viewName);
-                using (var reader = sqlCommand.ExecuteReader())
+                var reader = sqlCommand.ExecuteReader();
+                try
                 {
-                    try
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        var viewDataXml = SqlDb.ReadStringValue(reader[ViewDataColumn]);
+                        if (!string.IsNullOrWhiteSpace(viewDataXml))
                         {
-                            var viewDataXml = SqlDb.ReadStringValue(reader[ViewDataColumn]);
-                            if (!string.IsNullOrWhiteSpace(viewDataXml))
-                            {
-                                results.Add(viewDataXml);
-                            }
+                            results.Add(viewDataXml);
                         }
                     }
-                    finally
-                    {
-                        reader.Close();
-                    }
+                }
+                finally
+                {
+                    reader.Close();
                 }
             }
 
