@@ -10,6 +10,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
 
 export class RiskItemPageHelper {
 
@@ -96,6 +97,26 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     }
 
+    static async unCheckColumns(stepLogger: StepLogger) {
+        stepLogger.step('Deselect non required and default selected column "Schedule Status"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox, true))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
+
+        stepLogger.step('Deselect non required and default selected column "Exposure"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox, true))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
+
+        stepLogger.step('Deselect non required and default selected column Schedule "Due"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox, true))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
+    }
+
     static async verifyPage(stepLogger: StepLogger) {
         stepLogger.verification('"Edit Risk" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -105,45 +126,31 @@ export class RiskItemPageHelper {
     }
 
     static async verifyRiskViewAdd(stepLogger: StepLogger, titleNewView: string) {
-        stepLogger.verification('Newly created Public risk view is selected in \'View\' drop down');
-
-        try {
-            // tslint:disable-next-line:no-shadowed-variable
-            const viewSelector = await CommonPageHelper.getNewPublicViewSelected(titleNewView);
-            await WaitHelper.getInstance().waitForElementToBeClickable(viewSelector);
-            await expect(await viewSelector.isPresent())
+        stepLogger.verification('Newly created Public risk view is selected in "View" drop down');
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText(titleNewView), true))
                     .toBe(true,
-                        ValidationsHelper.getNewViewSelectedValidation(titleNewView));
+                ValidationsHelper.getDisplayedValidation(titleNewView));
 
-        } catch (error) {
-            stepLogger.step(`Try block to verify Newly created Public risk view name failed with error: ${error}`);
-        }
-
-        const viewSelector = await CommonPageHelper.getNewPublicViewSelected(titleNewView);
-        await WaitHelper.getInstance().waitForElementToBeClickable(viewSelector);
-        await expect(await viewSelector.isPresent())
-            .toBe(true,
-                ValidationsHelper.getNewViewSelectedValidation(titleNewView));
-
-        try {
-        const columnView = [RiskItemPage.inputs.title, RiskItemPage.inputs.assignedTo,
-             RiskItemPage.inputs.status, RiskItemPage.inputs.dueDate];
-
-        columnView.forEach(async (cloumnElement) => {
-                try {
-                    stepLogger.verification(`${cloumnElement} columns selected to display in the view should be displayed`);
-
-                    const columnSelector = await CommonPageHelper.getNewPublicViewTitleHeader(cloumnElement);
-                    await WaitHelper.getInstance().waitForElementToBeClickable(columnSelector);
-                    await expect(await columnSelector.isPresent())
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.title} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getColumnByName(RiskItemPageConstants.columnNames.title), true))
                         .toBe(true,
-                            ValidationsHelper.getNewViewCloumn(cloumnElement));
-                } catch (error) {
-                    stepLogger.step(`Try block from aync block send error to catch and it is: ${error}`);
-                }
-            });
-        } catch (error) {
-            stepLogger.step(`Main try block send error to catch and it is: ${error}`);
-        }
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.title));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.assignedTo} columns
+        selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper
+            .getColumnByName(RiskItemPageConstants.columnNames.assignedTo), true))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.assignedTo));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.status} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getColumnByName(RiskItemPageConstants.columnNames.status), true))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.status));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.dueDate} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getColumnByName(RiskItemPageConstants.columnNames.dueDate), true))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
     }
 }

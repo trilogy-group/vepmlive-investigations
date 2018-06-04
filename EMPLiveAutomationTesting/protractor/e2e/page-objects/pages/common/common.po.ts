@@ -270,4 +270,29 @@ export class CommonPage extends BasePage {
         return element(By.css('.ms-paging'));
     }
 
+    static get viewDropDownActions() {
+        const publicViewLabels = CommonPageConstants.viewDropDownLabels;
+        return {
+            createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView)
+        };
+    }
+
+    static get viewNewPageActions() {
+        const createLabels = CommonPageConstants.newPublicViewformLabels;
+        return {
+            fillCreatePublicViewPageTitle: element(By.name(`${createLabels.title}`)),
+
+            publicViewRadioButton: element(By.css(`[${HtmlHelper.tags.id}$='${CommonPageConstants.newPublicViewformLabels.publicView}']`)),
+
+            scheduledStatusCheckBox: element(By.css
+                (`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.scheduleStatus}']`)),
+
+            exposureCheckBox: element(By.css(`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.exposure}']`)),
+
+            dueCheckBox: element(By.css(`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.due}']`)),
+
+            submitCreatePublicViewPage: element(By.css
+                (`${HtmlHelper.tags.input}[${HtmlHelper.tags.id}='${CommonPageConstants.formLabels.topSave}']`))
+        };
+    }
 }

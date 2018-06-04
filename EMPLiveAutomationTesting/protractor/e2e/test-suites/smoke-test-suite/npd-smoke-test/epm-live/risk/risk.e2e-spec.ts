@@ -16,7 +16,6 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -225,7 +224,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
-    it('Add new Public view in Risk - [1176327]', async () => {
+    fit('Add new Public view in Risk - [1176327]', async () => {
         const stepLogger = new StepLogger(1176327);
         stepLogger.stepId(1);
 
@@ -238,34 +237,43 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on public view drop down');
-        await PageHelper.click(RiskItemPage.dropDownViewRisks);
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText
+            (RiskItemPageConstants.defaultViewName), true))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
+        await PageHelper.click(CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName));
 
         stepLogger.stepId(3);
         stepLogger.step('Click on create public view');
-        await PageHelper.click(RiskItemPage.openCreatePublicViewPage);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewDropDownActions.createNewPublicView, true))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
+        await PageHelper.click(CommonPage.viewDropDownActions.createNewPublicView);
 
         stepLogger.stepId(4);
         stepLogger.step('Fill view name');
-
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, true))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.title));
         const uniqueId = PageHelper.getUniqueId();
         const titleNewView = `NewAutomatedPublicView${uniqueId}`;
-        await PageHelper.sendKeysToInputField(RiskItemPage.fillCreatePublicViewPageTitle, titleNewView);
+        await PageHelper.sendKeysToInputField(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, titleNewView);
 
-        stepLogger.step('Click \'Create a Public View\ radio button');
-        await PageHelper.click(RiskItemPage.publicViewRadioButton);
+        stepLogger.step('Click "Create a Public View" radio button');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.publicViewRadioButton, true))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.publicView));
+        await PageHelper.click(CommonPage.viewNewPageActions.publicViewRadioButton);
 
-        stepLogger.step('Deselect non required and default selected column \'Schedule Status\'');
-        CheckboxHelper.markCheckbox(RiskItemPage.scheduledStatusCheckBox, false);
-
-        stepLogger.step('Deselect non required and default selected column \'Exposure\'');
-        CheckboxHelper.markCheckbox(RiskItemPage.exposureCheckBox, false);
-
-        stepLogger.step('Deselect non required and default selected column Schedule \'Due\'');
-        CheckboxHelper.markCheckbox(RiskItemPage.dueCheckBox, false);
+        stepLogger.step('Deselect non required columns');
+        await RiskItemPageHelper.unCheckColumns(stepLogger);
 
         stepLogger.stepId(5);
-        stepLogger.step('Submit new view by clicking ok');
-        await PageHelper.click(RiskItemPage.submitCreatePublicViewPage);
+        stepLogger.step('Submit new view by clicking ok available at top');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.submitCreatePublicViewPage, true))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.formLabels.topSave));
+        await PageHelper.click(CommonPage.viewNewPageActions.submitCreatePublicViewPage);
 
         stepLogger.stepId(6);
         await RiskItemPageHelper.verifyRiskViewAdd(stepLogger, titleNewView);

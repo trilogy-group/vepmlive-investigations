@@ -42,36 +42,4 @@ export class RiskItemPage extends BasePage {
     static get attachmentButton() {
         return element(By.css('.upload-attach'));
     }
-
-    static get dropDownViewRisks(){
-        return element(By.xpath('//a[contains(@class,"dropdown-toggle")]//span[normalize-space(.)="All My Risks"]'));
-    }
-
-    static get openCreatePublicViewPage(){
-        return element(By.xpath('//li//span[normalize-space(.)="Create View"]'));
-    }
-
-    static get fillCreatePublicViewPageTitle(){
-        return element(By.xpath('//tr//td//table//tbody//tr//td//input[contains(@name,"NewViewName")]'));
-    }
-
-    static get submitCreatePublicViewPage(){
-        return element(By.xpath('//td//input[contains(@value,"OK")]'));
-    }
-
-    static get publicViewRadioButton(){
-        return element(By.xpath('//td//input[contains(@id,"PersonalView1")]'));
-    }
-
-    static get scheduledStatusCheckBox(){
-        return element(By.xpath('//td//input[contains(@name,"ShouldDisplayScheduleStatus")]'));
-    }
-
-    static get exposureCheckBox(){
-        return element(By.xpath('//td//input[contains(@name,"ShouldDisplayExposure")]'));
-    }
-
-    static get dueCheckBox(){
-        return element(By.xpath('//td//input[contains(@name,"ShouldDisplayDue")]'));
-    }
 }

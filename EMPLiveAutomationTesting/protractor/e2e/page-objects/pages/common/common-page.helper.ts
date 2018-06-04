@@ -440,11 +440,21 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
     }
 
-    static getNewPublicViewSelected(titleNewView: string) {
-        return element(By.xpath(`//a[contains(@class,"dropdown-toggle")]//span[normalize-space(.)="${titleNewView}"]`));
+    static getDropDownViewByText(titleView: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag
+            // tslint:disable-next-line:max-line-length
+            (HtmlHelper.tags.a, `@${HtmlHelper.tags.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 
-    static getNewPublicViewTitleHeader(columnTitle: ElementFinder) {
-        return element(By.xpath(`//td[normalize-space(.)="${columnTitle}"]`));
+    static getPublicView(text: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)}`));
+    }
+
+    static getColumnByName(columnTitle: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnTitle, false)}`));
+    }
+
+    static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)}`));
     }
 }
