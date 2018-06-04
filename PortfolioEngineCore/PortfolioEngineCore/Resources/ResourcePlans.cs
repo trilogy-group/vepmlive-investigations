@@ -2838,7 +2838,6 @@ namespace PortfolioEngineCore
             CStruct xRPE = new CStruct();
             xRPE.Initialize("Views");
 
-            //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
             string sCommand = "SELECT VIEW_DEFAULT,VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + _userWResID.ToString("0") + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
@@ -2895,45 +2894,6 @@ namespace PortfolioEngineCore
             //        Exit_Function:
             return (_dba.Status == StatusEnum.rsSuccess);
         }
-
-        //public bool SaveResourcePlanViewXML(Guid guidView, string sName, bool bPersonal, bool bDefault, string sData)
-        //{
-        //    //SqlCommand cmd = new SqlCommand("DELETE FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND VIEW_UID=@", _dba.Connection, _dba.Transaction);
-        //    //cmd.Parameters.AddWithValue("VIEW_UID", nViewUID);
-        //    //int lRowsAffected = cmd.ExecuteNonQuery();
-        //    string sCommand;
-        //    sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@,WRES_ID=@,VIEW_DEFAULT=@,VIEW_DATA=@,VIEW_CONTEXT=30000 WHERE VIEW_GUID=@";
-        //    SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //    cmd.Parameters.AddWithValue("VIEW_NAME", sName);
-        //    cmd.Parameters.AddWithValue("WRES_ID", bPersonal @ this._userWResID : 0);
-        //    cmd.Parameters.AddWithValue("VIEW_DEFAULT", bDefault);
-        //    cmd.Parameters.AddWithValue("VIEW_DATA", sData);
-        //    cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //    int nRowsAffected = cmd.ExecuteNonQuery();
-
-        //    if (nRowsAffected == 0)
-        //    {
-        //        sCommand = "INSERT INTO EPG_VIEWS (VIEW_GUID,VIEW_NAME,WRES_ID,VIEW_DEFAULT,VIEW_DATA,VIEW_CONTEXT) VALUES(@,@,@,@,@,30000)";
-        //        cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //        cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //        cmd.Parameters.AddWithValue("VIEW_NAME", sName);
-        //        cmd.Parameters.AddWithValue("WRES_ID", bPersonal @ this._userWResID : 0);
-        //        cmd.Parameters.AddWithValue("VIEW_DEFAULT", bDefault);
-        //        cmd.Parameters.AddWithValue("VIEW_DATA", sData);
-        //        nRowsAffected = cmd.ExecuteNonQuery();
-        //    }
-
-        //    return (_dba.Status == StatusEnum.rsSuccess);
-        //}
-
-        //public bool DeleteResourcePlanViewXML(Guid guidView)
-        //{
-        //    string sCommand = "DELETE FROM EPG_VIEWS WHERE VIEW_GUID=@";
-        //    SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
-        //    cmd.Parameters.AddWithValue("VIEW_GUID", guidView);
-        //    int nRowsAffected = cmd.ExecuteNonQuery();
-        //    return (_dba.Status == StatusEnum.rsSuccess);
-        //}
 
         private static StatusEnum GetPeriods(DBAccess dba, int iCal, out List<CPeriod> clnPeriods)
         {

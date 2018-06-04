@@ -1023,11 +1023,14 @@
                     var col = g.ColNames[1][c];
                     var sType = col.substring(0, 1);
                     var periodId = parseInt(col.substring(1));
-                    if (grid.GetAttribute(null, col, "Current") == true) {
+
+                    if (grid.GetAttribute(null, col, "Current")) {
                         this.currentPeriod = periodId;
-                        if (this.startPeriod <= this.currentPeriod) {
-                            this.startPeriod = this.currentPeriod;
-                            this.editorTab.selectByValue("idViewTab_FromPeriod", 0);
+                        if (!grid.FloatingPeriods) {
+                            if (this.startPeriod <= this.currentPeriod) {
+                                this.startPeriod = this.currentPeriod;
+                                this.editorTab.selectByValue("idViewTab_FromPeriod", 0);
+                            }
                         }
                         break;
                     }

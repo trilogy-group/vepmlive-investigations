@@ -287,7 +287,6 @@ namespace PortfolioEngineCore
             CStruct xRPE = new CStruct();
             xRPE.Initialize("Views");
 
-            //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
             string sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32100 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand, _sqlConnection);
@@ -357,9 +356,6 @@ namespace PortfolioEngineCore
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
 
-            //SqlCommand cmd = new SqlCommand("DELETE FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND VIEW_UID=?",  _sqlConnection);
-            //cmd.Parameters.AddWithValue("VIEW_UID", nViewUID);
-            //int lRowsAffected = cmd.ExecuteNonQuery();
             string sCommand;
             sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@vname,WRES_ID=@wres,VIEW_DEFAULT=@vdef,VIEW_DATA=@vdata,VIEW_CONTEXT=32100 WHERE VIEW_GUID=@guid";
             SqlCommand cmd = new SqlCommand(sCommand, _sqlConnection);
