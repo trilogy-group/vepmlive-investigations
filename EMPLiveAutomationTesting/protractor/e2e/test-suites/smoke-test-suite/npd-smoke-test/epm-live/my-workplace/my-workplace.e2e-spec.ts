@@ -20,9 +20,8 @@ import {EventsPageConstants} from '../../../../../page-objects/pages/my-workplac
 import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/events.po';
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-// tslint:disable-next-line:max-line-length
-import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import { SharedDocumentsPageConstants } from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {

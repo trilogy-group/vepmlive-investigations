@@ -270,4 +270,13 @@ export class CommonPage extends BasePage {
         return element(By.css('.ms-paging'));
     }
 
+    static get personIcon(){
+        return element(By.id('EPMLiveNotificationCounterProfilePic'));
+    }
+
+    static get latestNotification(){
+        return element(By.className('EPMLiveNotificationTitle'));
+    }
+    
+
 }
