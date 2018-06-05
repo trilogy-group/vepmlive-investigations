@@ -1,9 +1,8 @@
-const moment = require('moment');
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {EventsPageConstants} from './events-page.constants';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {By, element} from 'protractor';
+import {element, By} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class EventsPage {
@@ -16,12 +15,20 @@ export class EventsPage {
         return CommonPageHelper.getElementContainsId(EventsPageConstants.newEventItem);
     }
 
+    static get currentView() {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.DisplayView"]'));
+    }
+
     static get titleTextField() {
          return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.title);
     }
 
     static get categoryField() {
         return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.category);
+    }
+
+    static get defaultCheckbox() {
+        return element(By.id('onetidIOCheckDefaultView'));
     }
 
     static get categoryOption() {
@@ -32,26 +39,31 @@ export class EventsPage {
         return CommonPageHelper.getElementContainsTitle(CommonPageConstants.title);
     }
 
-    static get calenderTomorrow() {
-        const currentDate = Date.now();
-        let tomorrow = moment(currentDate).add(1, 'days');
-        tomorrow = moment(tomorrow).format('M/DD/YYYY');
-        return element(By.css(`td[date='${tomorrow}']`));
+    static get calenderTab() {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar-title"]'));
     }
 
-    static get closeEventButton() {
-        return element(By.css('[value = "Close"]'));
+    static getelement(val: string) {
+        return element(By.xpath('.//*[text()="' + val + '"]'));
     }
 
-    static addNewEvent(title: string) {
-        return element(By.css(`a[title='${title}']`));
+    static get rollOver() {
+        return element(By.css('#WPQ2_ListTitleViewSelectorMenu_Container_overflow'));
     }
 
-    static getElementByLinkText(text: string) {
-        return element(By.linkText(text));
+    static get standardViewType () {
+        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
     }
 
-    static eventPageByTitle(title: string) {
-        return CommonPageHelper.getElementUsingTextContent(title, true);
+    static get viewName () {
+        return element(By.css('#ViewName'));
+    }
+
+    static get okButton () {
+        return element(By.css('#onetidSaveItemtop'));
+    }
+
+    static get createView () {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.CreateView-Medium"]'));
     }
 }

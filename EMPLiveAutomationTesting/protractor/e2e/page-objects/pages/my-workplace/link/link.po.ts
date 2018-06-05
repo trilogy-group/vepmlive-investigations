@@ -14,5 +14,4 @@ export class LinkPage {
     static get newLink() {
         return element(By.id('idHomePageNewLink'));
     }
-
 }

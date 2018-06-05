@@ -24,7 +24,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Navigate to Resources page - [910192]', async () => {
         const stepLogger = new StepLogger(910192);
         stepLogger.stepId(1);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
+        await CommonPageHelper.navigateToItemPageUnderNavigation (
             HomePage.navigation.projects.resources,
             CommonPage.pageHeaders.projects.resources,
             CommonPageConstants.pageHeaders.projects.resources,
@@ -34,7 +34,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Add Generic resource - [910195]', async () => {
         const stepLogger = new StepLogger(910195);
         stepLogger.step('PRECONDITION: Navigate to Resources page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
+        await CommonPageHelper.navigateToItemPageUnderNavigation (
             HomePage.navigation.projects.resources,
             CommonPage.pageHeaders.projects.resources,
             CommonPageConstants.pageHeaders.projects.resources,

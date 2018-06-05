@@ -1,25 +1,22 @@
-import {StepLogger} from '../../../../../core/logger/step-logger';
-import {PageHelper} from '../../../../components/html/page-helper';
-import {CommonPageHelper} from '../../../../page-objects/pages/common/common-page.helper';
-import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
-import {SuiteNames} from '../../../helpers/suite-names';
-import {CommonPage} from '../../../../page-objects/pages/common/common.po';
-import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {ProjectItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
-import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ElementHelper} from '../../../../components/html/element-helper';
-import {LoginPage} from '../../../../page-objects/pages/login/login.po';
+import { StepLogger } from '../../../../../core/logger/step-logger';
+import { PageHelper } from '../../../../components/html/page-helper';
+import { CommonPageHelper } from '../../../../page-objects/pages/common/common-page.helper';
+import { HomePage } from '../../../../page-objects/pages/homepage/home.po';
+import { SuiteNames } from '../../../helpers/suite-names';
+import { CommonPage } from '../../../../page-objects/pages/common/common.po';
+import { CommonPageConstants } from '../../../../page-objects/pages/common/common-page.constants';
+import { WaitHelper } from '../../../../components/html/wait-helper';
+import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
+import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
+import { ElementHelper } from '../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
-    let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
         homePage = new HomePage();
-        loginPage = new LoginPage();
-        await loginPage.goToAndLogin();
+        await homePage.goTo();
     });
 
     it('Launch "Assignment Planner" - [743177]', async () => {
@@ -52,7 +49,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
@@ -98,7 +96,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Assignment Planner" window is closed');
-        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed
+        // It needs 2nd element from list of webElements else it always picking up Edit team as title and assertion is getting failed.
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitles.get(1)))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
@@ -109,7 +107,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
         stepLogger.stepId(6);
         stepLogger.step('Click "Close" button in "Edit Team" window');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
@@ -159,7 +159,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
@@ -213,7 +214,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.actionClick(CommonPage.ribbonItems.viewReports);
 
         // view Reports dropdown takes 2-3 seconds time to close and after that only close button is accessible else it thows exception
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        WaitHelper.getInstance().staticWait(3000);
 
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);

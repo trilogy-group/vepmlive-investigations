@@ -10,8 +10,6 @@ import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
-import * as path from 'path';
-import {HomePageConstants} from '../homepage/home-page.constants';
 
 const fs = require('fs');
 
@@ -21,53 +19,24 @@ export class CommonPageHelper {
         const imageFile = CommonPageConstants.imageFile;
         const newFileName = `${imageFile.jpegFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
         const dir = CommonPageConstants.filesDirectoryName;
-        const fullFilePath = path.join(__dirname, dir, newFileName + imageFile.fileType);
+        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${imageFile.fileType}`;
 
         fs.createReadStream(imageFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName: newFileName + imageFile.fileType};
+        return {fullFilePath, newFileName};
     }
 
     static get uniqueDocumentFilePath() {
         const documentFile = CommonPageConstants.documentFile;
         const newFileName = `${documentFile.documentFileName}_${PageHelper.getUniqueId()}`.toLowerCase();
         const dir = CommonPageConstants.filesDirectoryName;
-        const fullFilePath = path.join(__dirname, dir, newFileName + documentFile.fileType);
+        const fullFilePath = `${__dirname}\\${dir}\\${newFileName}${documentFile.fileType}`;
 
         fs.createReadStream(documentFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName: newFileName + documentFile.fileType};
-    }
-
-    public static get getCurrentDate() {
-        return new Date().getDate();
-    }
-
-    public static get getPreviousDate() {
-        const date = this.getCurrentDate;
-        const yesterday = date - 1;
-        return yesterday;
-    }
-
-    public static get getCurrentMonth() {
-        const month = new Date().getMonth();
-        return month + 1; // January is 0!
-    }
-
-    public static get getCurrentYear() {
-        return new Date().getFullYear();
-    }
-
-    public static get getTodayInMMDDYYYY() {
-        const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
-        return currentDate;
-    }
-
-    public static get getYesterdayInMMDDYYYY() {
-        const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
-        return tomorrowDate;
+        return {fullFilePath, newFileName};
     }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
@@ -96,12 +65,16 @@ export class CommonPageHelper {
     }
 
     static getRibbonButtonByText(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
-         and (${ComponentHelpers.getXPathFunctionForDot(title)})]`));
+        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel') and (${ComponentHelpers.
+        getXPathFunctionForDot(title)} or ${ComponentHelpers.getXPathFunctionForText(title)})]`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
         return element(By.xpath(`//*[contains(@class,"ms-cui-disabled")][@aria-disabled="true"][contains(@id,'${id}')]`));
+    }
+
+    static getRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@id,'${id}')]`));
     }
 
     static getRibbonSmallButtonByTitle(title: string) {
@@ -170,7 +143,7 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
-    static getPageHeaderByTitle(title: string, isContains = false) {
+    static getPageHeaderByTitle(title: string, isContains= false) {
         const xpath = `//*[@id='${CommonPage.titleId}']//*[${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`;
         return element(By.xpath(xpath));
     }
@@ -278,8 +251,8 @@ export class CommonPageHelper {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
 
-    static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
+    static async editOptionViaRibbon(stepLogger: StepLogger) {
+        await this.selectRecordFromGrid(stepLogger);
 
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
@@ -298,11 +271,11 @@ export class CommonPageHelper {
         return element.all(By.xpath(xpath)).first();
     }
 
-    static async selectRecordFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
+    static async selectRecordFromGrid(stepLogger: StepLogger) {
         stepLogger.stepId(2);
-        stepLogger.step('Select the check box for record');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
-        await PageHelper.click(item);
+        stepLogger.step('Select the check box for project created');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
+        await PageHelper.click(CommonPage.record);
 
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -343,101 +316,45 @@ export class CommonPageHelper {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
     }
 
-    static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
+    public static get getCurrentDate() {
+        return new Date().getDate();
+    }
+
+    public static get getPreviousDate() {
+        const date = this.getCurrentDate;
+        const yesterday = date - 1;
+        return yesterday;
+    }
+
+    public static get getCurrentMonth() {
+        const month = new Date().getMonth();
+        return month + 1; // January is 0!
+    }
+
+    public static get getCurrentYear() {
+        return new Date().getFullYear();
+    }
+
+    public static get getTodayInMMDDYYYY(){
+        const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
+        return currentDate;
+    }
+
+    public static get getYesterdayInMMDDYYYY(){
+        const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
+        return tomorrowDate;
+    }
+
+    static async actionTakenViaContextMenu(stepLogger: StepLogger, item: ElementFinder, actionItem: ElementFinder) {
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
         await ElementHelper.actionHoverOver(item);
 
         stepLogger.step('Click on the Ellipses button (...)');
-        await PageHelper.click(CommonPage.ellipse);
+        // await PageHelper.click(CommonPage.ellipse);
 
         stepLogger.step('Select "View Item" from the options displayed');
         await PageHelper.click(actionItem);
     }
-
-    static async attachFile(attachmentFileButton: ElementFinder,
-                            browseFileControl: ElementFinder,
-                            stepLogger: StepLogger) {
-        stepLogger.stepId(6);
-        stepLogger.step('Click on button to attach files');
-        await PageHelper.click(attachmentFileButton);
-
-        stepLogger.verification('The popup appears with Choose Files option');
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(CommonPageConstants.attachFilePopupTitle,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
-
-        stepLogger.stepId(7);
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-        const newFile = CommonPageHelper.uniqueDocumentFilePath;
-        stepLogger.step('Click on "Choose Files" and select the file that needs to be attached');
-        await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
-
-        stepLogger.verification('The File name appears under "Choose Files"');
-        await expect(await ElementHelper.getValue(browseFileControl))
-            .toContain(newFile.newFileName,
-                ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.attachFilePopupTitle, newFile.newFileName));
-
-        stepLogger.step('Click on OK');
-        await PageHelper.click(CommonPage.formButtons.okWithSmallK);
-
-        await PageHelper.switchToDefaultContent();
-
-        return newFile;
-    }
-
-    static async uploadDocument(page: ElementFinder,
-                                addWindowTitle: string,
-                                pageName: string,
-                                stepLogger: StepLogger,
-                                newFile = CommonPageHelper.uniqueImageFilePath) {
-        stepLogger.stepId(3);
-        stepLogger.step(`Click on the "+ New" button link displayed on top of "${pageName}" page`);
-        await PageHelper.click(CommonPage.uploadButton);
-
-        stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(addWindowTitle,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
-
-        stepLogger.step('Switch to frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        stepLogger.stepId(4);
-        stepLogger.step(`Click on "Choose Files" button in "${addWindowTitle}" pop up`);
-        stepLogger.step(`Browse and select the file that need to be added as a ${pageName}`);
-        await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
-
-        stepLogger.step('Click "OK" button');
-        await PageHelper.click(CommonPage.formButtons.ok);
-
-        await PageHelper.switchToDefaultContent();
-
-        stepLogger.verification(`"${addWindowTitle}" window is closed`);
-        await expect(await CommonPage.dialogTitle.isDisplayed())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(addWindowTitle));
-
-        stepLogger.verification(`${pageName} page is displayed`);
-        await expect(await PageHelper.isElementDisplayed(page))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(pageName));
-
-        const fileNameWithoutExtension = newFile.newFileName.split('.')[0];
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(fileNameWithoutExtension, true)))
-            .toBe(true,
-                ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
-    }
-
-    static async switchToContentFrame(stepLogger: StepLogger) {
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
-
-        // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.s);
-    }
-
 }

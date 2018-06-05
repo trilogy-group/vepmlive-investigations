@@ -1,6 +1,7 @@
 import {BasePage} from '../../base-page';
 import {IssueItemPageConstants} from './issue-item-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
+import {By, element} from 'protractor';
 
 export class IssueItemPage extends BasePage {
     static get inputs() {
@@ -21,4 +22,7 @@ export class IssueItemPage extends BasePage {
         };
     }
 
+    static get projectShowAllButton() {
+        return element(By.id('Project_ddlShowAll'));
+    }
 }

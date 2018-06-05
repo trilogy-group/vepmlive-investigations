@@ -46,8 +46,24 @@ export class HomePage extends BasePage {
         };
     }
 
+    static get browseButton() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get newButton() {
+        return element(By.css('.js-listview-qcbNewButton'));
+    }
+
     static get whatAreYouWorkingOnTextBox() {
         return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
+    }
+
+    static get navigateToHome() {
+        return element(By.css('.epm-nav-home a'));
+    }
+
+    static get navigateMenu() {
+        return element(By.css('#epm-nav-top-ql'));
     }
 
     static get commentField() {

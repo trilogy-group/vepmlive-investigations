@@ -1,12 +1,13 @@
-import {browser, By, element} from 'protractor';
+import {By, element, browser} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {ProjectItemPageHelper} from './project-item-page.helper';
-import {CommonPageConstants} from '../../common/common-page.constants';
+import { ProjectItemPageHelper } from './project-item-page.helper';
+import { CommonPageConstants } from '../../common/common-page.constants';
 
 export class ProjectItemPage extends BasePage {
+
     static get inputs() {
         const labels = ProjectItemPageConstants.inputLabels;
         return {
@@ -50,6 +51,12 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
+    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
+        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
+        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
+        return element(By.xpath(xpathForUser));
+    }
+
     static get buildTeamContainers() {
         const buildTeamSection = ProjectItemPageConstants.buildTeamContentIDs;
         return {
@@ -80,12 +87,32 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
-    static get assignmentPlannerFrame() {
+    static get assignmentPlannerFrame () {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
     static get newTask() {
         return element(By.id('txtNewTask'));
+    }
+
+    static get newTaskName() {
+        return element(By.xpath('.//*[contains(@class,"GSText GSCell GSNoLeft G")]'));
+    }
+
+    static get clickonprojectName() {
+        return element(By.xpath('.//*[@class=" GSClassReadOnly SummaryTask GSText GSCell GSNoLeft HideCol6Title"]'));
+    }
+
+    static get workFeild() {
+        return element(By.xpath('.//*[contains(@class," GSClassEdit GSAlignRight GSFloat GSCell HideCol6Work")]'));
+    }
+
+    static get savebtn() {
+            return element(By.xpath('.//*[contains(@id,"SaveButton")]'));
+    }
+
+    static get closebtn() {
+        return element(By.xpath('.//*[contains(@id,"CloseButton")]'));
     }
 
     static get selectPlanner() {
@@ -96,7 +123,6 @@ export class ProjectItemPage extends BasePage {
 
         };
     }
-
     static get reportParameters() {
         const label = ProjectItemPageConstants.reportParameter;
         return {
@@ -130,13 +156,15 @@ export class ProjectItemPage extends BasePage {
         return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
     }
 
-    static get applyParameterButton() {
-        return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
+    static get getTaskName() {
+        return element(By.xpath('.//*[contains(@class,"GSClassEdit GSText GSCell GSNoLeft")]'));
     }
 
-    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
-        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
-        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
-        return element(By.xpath(xpathForUser));
+    static get deleteTask() {
+        return element(By.xpath('.//*[@id="Ribbon.WorkPlanner.InsertGroup.DeleteTask-Medium"]'));
+    }
+
+    static get applyParameterButton() {
+        return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
 }

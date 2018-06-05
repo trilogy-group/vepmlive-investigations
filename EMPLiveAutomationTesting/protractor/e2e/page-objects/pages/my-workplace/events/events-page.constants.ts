@@ -7,7 +7,6 @@ export class EventsPageConstants {
     static readonly pageName = `${EventsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly newEventItem= 'Events.New.NewListItem';
     static readonly editPageName = `${EventsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
-    static readonly addEvent= 'Add';
 
     static get inputLabels() {
         return {

@@ -9,7 +9,7 @@ export class Constants extends ConstantsFactory {
         return {
             comma: ',',
             semiColon: ';',
-            apostrophe: '"',
+            apostrophe: '\'',
             pipe: '|'
         };
     }

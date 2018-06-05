@@ -5,7 +5,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, By, element, ElementFinder} from 'protractor';
+import {browser, element, By, ElementFinder} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -13,7 +13,7 @@ import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
+import { ComponentHelpers } from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -249,8 +249,8 @@ export class ProjectItemPageHelper {
             ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
             if (text === resourceName) {
-                resourceFound = true;
-            }
+                    resourceFound = true;
+                }
         }
         return resourceFound;
     }
@@ -262,7 +262,6 @@ export class ProjectItemPageHelper {
             await PageHelper.switchToDefaultContent();
         }
     }
-
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }

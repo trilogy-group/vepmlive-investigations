@@ -1,4 +1,4 @@
-import {browser, ElementFinder, protractor} from 'protractor';
+import {browser,  ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from './wait-helper';
 import {PageHelper} from './page-helper';
 import {HtmlHelper} from '../misc-utils/html-helper';
@@ -33,6 +33,18 @@ export class TextboxHelper {
 
         // On IE, text is sometimes not well sent, this is a workaround
         await locator.sendKeys(value);
+        if (sendEnter) {
+            await locator.sendKeys(protractor.Key.ENTER);
+        }
+    }
+
+    static async sendKeysByJs(locator: ElementFinder,
+                              data: string,
+                              sendEnter = false) {
+        await browser.sleep(PageHelper.timeout.s);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(locator);
+        // browser.executeScript('arguments[0].value = "";', locator);
+        browser.executeScript('arguments[0].setAttribute("value", "' + data + '")', locator);
         if (sendEnter) {
             await locator.sendKeys(protractor.Key.ENTER);
         }
