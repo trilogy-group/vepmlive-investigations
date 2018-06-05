@@ -76,9 +76,6 @@ export class MyTimeOffPageHelper {
 
         stepLogger.step(`click on Close button`);
         await PageHelper.click(MyTimeOffPage.closeButton);
-
-        /* stepLogger.verification('"Click on last button');
-        await PageHelper.click(MyWorkPage.lastButton); */
     }
 
     static getXpathForInputByLabel(type: string, title: string) {
