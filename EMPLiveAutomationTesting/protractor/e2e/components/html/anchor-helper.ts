@@ -4,10 +4,11 @@ import {ComponentHelpers} from '../devfactory/component-helpers/component-helper
 export class AnchorHelper {
 
     static getElementsByTextXPathInsideGrid(text: string, isContains = false) {
-        return `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
+        const xpath = `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
             text,
             isContains
         )}]`;
+        return xpath;
     }
 
     static getElementByTextInsideGrid(text: string, isContains = false) {

@@ -1,10 +1,10 @@
 {
-  "name": "epm-live-automation",
+  "name": "common-automation-framework-protractor",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "postinstall": "webdriver-manager update",
-    "lint": "tslint \"e2e/**/*.ts\"",
+    "lint": "ng lint",
     "clean": "rm -rf allure-reporter *.log",
     "test": "protractor protractor.conf.js",
     "e2e": "protractor protractor.conf.js",
@@ -49,7 +49,6 @@
     "codelyzer": "~3.2.0",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "^4.1.1",
-    "moment": "^2.22.1",
     "protractor": "~5.1.2",
     "should": "^13.2.1",
     "ts-node": "~3.2.0",

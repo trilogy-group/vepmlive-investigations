@@ -86,11 +86,11 @@ export class MyWorkPageHelper {
 
         stepLogger.stepId(6);
         stepLogger.verification('"Navigate to My Time Off page');
-        await PageHelper.click(MyWorkplacePage.navigation.myTimeOff);
+        await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
         stepLogger.verification('"Click on last button');
-        await PageHelper.click(CommonPage.lastButton);
+        await PageHelper.click(MyWorkPage.lastButton);
         stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My Time Off" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+                    .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
 }

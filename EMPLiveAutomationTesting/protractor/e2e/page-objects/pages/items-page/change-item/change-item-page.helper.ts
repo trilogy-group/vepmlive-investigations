@@ -21,7 +21,7 @@ export class ChangeItemPageHelper {
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
 
         stepLogger.step('Click on projectShowAllButton');
-        await PageHelper.click(CommonPage.projectShowAllButton);
+        await PageHelper.click(ChangeItemPage.projectShowAllButton);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ChangeItemPage.inputs.project);
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         const projectName = await ChangeItemPage.inputs.project.getText();

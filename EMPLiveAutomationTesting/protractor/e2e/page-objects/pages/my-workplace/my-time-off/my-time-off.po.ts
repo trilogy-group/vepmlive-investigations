@@ -20,6 +20,12 @@ export class MyTimeOffPage {
         return element(By.id('TimeOffType_ddlShowAll'));
     }
 
+    static get dateEditBox() {
+        return element(By.xpath('//*[@id="Grid6FocusCursors"]/div[1]/div/input'));
+    }
+    static get dateFeild() {
+        return element(By.xpath('//*[@id="WorkPlannerGrid"]/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[4]'));
+    }
     static getInputByLabel(title: string) {
         return element(By.xpath(MyTimeOffPageHelper.getXpathForInputByLabel(HtmlHelper.tags.input, title)));
     }

@@ -172,7 +172,7 @@ export class ProjectItemPageConstants {
         };
     }
 
-    static get reportHeaders() {
+    static get reportHeaders(){
         return {
             refresh: 'Refresh',
             firstPage: 'First Page',
@@ -183,11 +183,10 @@ export class ProjectItemPageConstants {
             findNext: 'Find Next'
         };
     }
-
     static get plannerLabels() {
         return {
             microsoftProject: 'Microsoft Project',
             projectPlanner: 'Project Planner'
-        };
+      };
     }
 }

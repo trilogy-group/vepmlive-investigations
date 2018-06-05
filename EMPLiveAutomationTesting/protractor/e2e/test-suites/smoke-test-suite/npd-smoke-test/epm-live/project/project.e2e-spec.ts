@@ -9,13 +9,11 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.helper';
-import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/item-settings/item-settings.po';
-import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -113,27 +111,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         const overallHealthOffTrack = CommonPageConstants.overallHealth.offTrack;
         const projectUpdateManual = CommonPageConstants.projectUpdate.scheduleDriven;
 
-        const projectNameEditable = await ProjectItemPage.inputs.projectName.isPresent();
-        if (!projectNameEditable) {
-            stepLogger.step('Additional step - Click on cancel button to go back to setting page which is available via list page');
-            await PageHelper.click(CommonPage.formButtons.cancel);
-            stepLogger.step('Additional step - Click on setting button');
-            await PageHelper.click(CommonPage.settingButton);
-            stepLogger.step('Additional step - Click on manaage editable field');
-            await PageHelper.click(ItemSettingsPage.generalSettings.manageEditableFields);
-            stepLogger.step('Additional step - Make project name editable');
-            await ItemSettingsPageHelper.configureEditableField(ItemSettingsPageConstants.editableMenuTitles.projectName,
-                ItemSettingsPageConstants.editableMenuOptions.onEditItemEditable,
-                ItemSettingsPageConstants.editableMenuConfigurationOptions.always);
-
-            await CommonPageHelper.navigateToItemPageUnderNavigation(
-                HomePage.navigation.projects.projects,
-                CommonPage.pageHeaders.projects.projectsCenter,
-                CommonPageConstants.pageHeaders.projects.projectCenter,
-                stepLogger);
-
-            await CommonPageHelper.editOptionViaRibbon(stepLogger);
-        }
+        await expect(await ProjectItemPage.inputs.projectName.isPresent())
+            .toBe(true,
+                ProjectItemPageValidations.projectNameShouldBeEditable);
 
         await ProjectItemPageHelper.fillForm(
             projectNameValue,

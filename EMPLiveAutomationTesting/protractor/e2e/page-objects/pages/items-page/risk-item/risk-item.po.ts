@@ -5,7 +5,6 @@ import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class RiskItemPage extends BasePage {
-
     static get inputs() {
         const labels = RiskItemPageConstants.inputLabels;
         return {
@@ -39,7 +38,7 @@ export class RiskItemPage extends BasePage {
             .getElementByTextInsideGrid(RiskItemPageConstants.inputLabels.title, true);
     }
 
-    static get attachmentButton() {
-        return element(By.css('.upload-attach'));
+    static get projectShowAllButton() {
+        return element(By.id('Project_ddlShowAll'));
     }
 }
