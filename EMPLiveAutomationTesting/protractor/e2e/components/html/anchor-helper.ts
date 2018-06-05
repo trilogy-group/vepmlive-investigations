@@ -4,11 +4,10 @@ import {ComponentHelpers} from '../devfactory/component-helpers/component-helper
 export class AnchorHelper {
 
     static getElementsByTextXPathInsideGrid(text: string, isContains = false) {
-        const xpath = `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
+        return `//td[contains(@class,'GMClassReadOnly') and ${ComponentHelpers.getXPathFunctionForDot(
             text,
             isContains
         )}]`;
-        return xpath;
     }
 
     static getElementByTextInsideGrid(text: string, isContains = false) {
@@ -21,7 +20,13 @@ export class AnchorHelper {
         return element.all(By.xpath(xpath));
     }
 
-    static getAnchorByText(text: string) {
-        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    static getAnchorInsideGridByClass(text: string) {
+        return element(By.xpath(`//td[${ComponentHelpers.getXPathFunctionForClass(text, true)}]//a`));
+    }
+
+    static getAnchorByTextInsideGridByClass(classAttribute: string, text: string) {
+        const xpath = `//td[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]/a[
+            ${ComponentHelpers.getXPathFunctionForDot(text)}]`;
+        return element(By.xpath(xpath));
     }
 }

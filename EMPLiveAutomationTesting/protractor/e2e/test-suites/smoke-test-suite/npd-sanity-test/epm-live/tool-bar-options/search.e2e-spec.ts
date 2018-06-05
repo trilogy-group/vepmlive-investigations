@@ -7,7 +7,6 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -31,12 +30,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#3, step#4 are inside this function
         stepLogger.verification('Search item by Project Name');
-        const projectValue = ProjectItemPageConstants.inputLabels.searchProjectName;
-        await CommonPageHelper.searchItemByTitle(projectValue, ProjectItemPageConstants.columnNames.title, stepLogger, true);
+        const firstProjectName = await CommonPage.itemsListing.getText();
+        await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, stepLogger, true);
 
         stepLogger.verification('searched projects should get displayed');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectValue, true)))
-                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectValue));
+        await expect(await PageHelper.isElementPresent(CommonPage.searchedItemList(firstProjectName)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(firstProjectName));
 
         stepLogger.stepId(5);
         stepLogger.step('Select column name as State');

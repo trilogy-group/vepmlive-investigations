@@ -33,7 +33,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Add a New Discussion - [785611]', async () => {
         const stepLogger = new StepLogger(785611);
         stepLogger.step('PRECONDITION: navigate to Discussions page');
-        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             MyWorkplacePage.navigation.discussions,
             CommonPage.pageHeaders.myWorkplace.discussions,
             CommonPageConstants.pageHeaders.myWorkplace.discussions,
@@ -54,7 +54,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const uniqueId = PageHelper.getUniqueId();
         const subject = `${labels.subject} ${uniqueId}`;
         const body = `${labels.body} ${uniqueId}`;
-        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, stepLogger);
+        const isQuestion = true;
+        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, isQuestion, stepLogger);
 
         stepLogger.stepId(3);
         const label = DiscussionsPage.allDiscussionItems;

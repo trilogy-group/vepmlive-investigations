@@ -14,6 +14,9 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
+import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
+import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -28,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(743927);
 
         stepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
-        await PageHelper.click(HomePage.newButton);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -40,8 +43,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.verification('Verify Choose File option is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.browseButton);
-        await expect(await PageHelper.isElementDisplayed(HomePage.browseButton))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.browseButton);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.browseButton))
             .toBe(true,
                 ValidationsHelper.getButtonDisplayedValidation(HomePageConstants.addADocumentWindow.chooseFiles));
 
@@ -61,7 +64,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');
-        await PageHelper.click(HomePage.newButton);
+        await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -75,7 +78,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
         stepLogger.step('Upload file');
-        await PageHelper.uploadFile(HomePage.browseButton, newFile.fullFilePath);
+        await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
 
         stepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.ok);
@@ -84,7 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(ElementHelper.getElementByText(newFile.newFileName).isDisplayed())
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
@@ -172,4 +175,40 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
+
+    it('Add an item from Social Stream - [1124294]', async () => {
+        const stepLogger = new StepLogger(1124294);
+
+        // // Step #1 and #2 and #3 Inside this function
+        stepLogger.stepId(3);
+        stepLogger.step(`Click on the LINK icon  displayed in 'CREATE' options in social stream`);
+        await ElementHelper.click(HomePage.toolBarMenuItems.link);
+
+        stepLogger.verification(`Links - New Item' window is displayed`);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await expect(await CommonPage.dialogTitles.first().getText())
+            .toBe(LinkPageConstants.pageName,
+                ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
+
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToFirstContentFrame();
+        const details = await LinkPageHelper.fillNewLinkFormAndVerification(stepLogger);
+
+        stepLogger.stepId(6);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.links,
+            CommonPage.pageHeaders.myWorkplace.links,
+            CommonPageConstants.pageHeaders.myWorkplace.links,
+            stepLogger);
+
+        stepLogger.verification(`'Links' page is displayed`);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(LinkPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pagePrefix));
+
+        await LinkPageHelper.verifyNewLinkAdded(stepLogger, details);
+
+    });
+
 });

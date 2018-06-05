@@ -5,6 +5,7 @@ import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 export class CommonPage extends BasePage {
 
@@ -19,12 +20,13 @@ export class CommonPage extends BasePage {
             myWorkplace: element(By.id(`${idPrefix}workplace`)),
             favorites: element(By.id(`${idPrefix}favorites`)),
             mostRecent: element(By.id(`${idPrefix}recent`)),
+            settings: element(By.id(`${idPrefix}settings`)),
             workspaces: element(By.id(`${idPrefix}workspaces`))
         };
     }
 
     static get addNewLink() {
-        return element(By.css('[title="New Item"] a'));
+        return element(By.css(`[title="${CommonPageConstants.newItem}"] a`));
     }
 
     static get contentTitleInViewMode() {
@@ -71,6 +73,7 @@ export class CommonPage extends BasePage {
         return {
             hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
             items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
+            manage: CommonPageHelper.getMenuItemFromRibbonContainer(titles.manage),
             list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
         };
     }
@@ -79,6 +82,7 @@ export class CommonPage extends BasePage {
         const labels = CommonPageConstants.ribbonLabels;
         return {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
+            attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
@@ -106,28 +110,28 @@ export class CommonPage extends BasePage {
     static get formButtons() {
         const labels = CommonPageConstants.formLabels;
         return {
-            save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
-            ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel),
-            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
-            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
+            save: ButtonHelper.getInputButtonByTextUnderTable(labels.save),
+            ok: ButtonHelper.getInputButtonByTextUnderTable(labels.ok),
+            close: ButtonHelper.getInputButtonsByText(labels.close).first(),
+            okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
+            okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
+            cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel),
+            add: ButtonHelper.getInputButtonByTextUnderTable(labels.add),
+            remove: ButtonHelper.getInputButtonByTextUnderTable(labels.remove)
         };
     }
 
-    static get titles() {
-        return element.all(By.id(this.titleId));
-    }
-
     static get title() {
-        return element(By.id(this.titleId));
+        // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
+        return element(By.css(`h1#${this.titleId}`));
     }
 
     static get dialogTitles() {
-        return element.all(By.id(this.dialogTitleId));
+        return element.all(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get dialogTitle() {
-        return element(By.id(this.dialogTitleId));
+        return element(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get contentFrame() {
@@ -178,7 +182,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecordsWithGreenTick() {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
+        return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -215,6 +219,14 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get settingButton() {
+        return element(By.css('[data-original-title="settings"]'));
+    }
+
+    static get projectShowAllButton() {
+        return element(By.id('Project_ddlShowAll'));
+    }
+
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
    }
@@ -233,5 +245,49 @@ export class CommonPage extends BasePage {
 
     static get noDataFound() {
         return CommonPageHelper.getMessageNoDataFound(HtmlHelper.attributeValue.gmNoDataRow, CommonPageConstants.messages.noDataFound);
+    }
+
+    static get viewAll() {
+        return element(By.linkText(CommonPageConstants.viewAll));
+    }
+
+    static get paginationControlsByTitle() {
+        return {
+            next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
+            previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
+        };
+    }
+
+    static get fileUploadControl() {
+        return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
+    }
+
+    static get searchTextBox() {
+        return element(By.id('MWG_Search'));
+    }
+
+    static get selectedTitle() {
+        const selectedClass = '.GMClassSelected ';
+        return element(By.css(`${selectedClass} .EPMLiveMyWorkTitle div,${selectedClass} .GMHtml.HideCol0Title`));
+    }
+
+    static get uploadButton() {
+        return element(By.css('.js-listview-qcbUploadButton,.js-listview-qcbNewButton'));
+    }
+
+    static get browseButton() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get paging() {
+        return element(By.css('.ms-paging'));
+    }
+
+    static get itemsListing() {
+        return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
+    }
+
+    static searchedItemList(text: string) {
+        return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
     }
 }

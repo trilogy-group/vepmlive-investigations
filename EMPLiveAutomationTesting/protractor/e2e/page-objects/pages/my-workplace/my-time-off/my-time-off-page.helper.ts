@@ -8,7 +8,6 @@ import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
-import {MyWorkPage} from '../my-work/my-work.po';
 
 export class MyTimeOffPageHelper {
 
@@ -78,8 +77,8 @@ export class MyTimeOffPageHelper {
         stepLogger.step(`click on Close button`);
         await PageHelper.click(MyTimeOffPage.closeButton);
 
-        stepLogger.verification('"Click on last button');
-        await PageHelper.click(MyWorkPage.lastButton);
+        /* stepLogger.verification('"Click on last button');
+        await PageHelper.click(MyWorkPage.lastButton); */
     }
 
     static getXpathForInputByLabel(type: string, title: string) {
@@ -89,5 +88,5 @@ export class MyTimeOffPageHelper {
     static getElementByType(type: string) {
         const xpath = `[type="${type}"]`;
         return element(By.css(xpath));
-   }
+    }
 }

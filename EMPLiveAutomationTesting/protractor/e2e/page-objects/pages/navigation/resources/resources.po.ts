@@ -1,7 +1,7 @@
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ResourcesPageConstants} from './resources-page.constants';
-import {element, By} from 'protractor';
+import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
 
@@ -33,5 +33,13 @@ export class ResourcesPage extends BasePage {
 
     static getDropdownValue(id: string) {
         return element(By.id(`${id}`));
+    }
+
+    static get searchIcon() {
+        return element(By.className('icon-search-3'));
+    }
+
+    static get searchTextbox() {
+        return element(By.id('toolBarResGridSelector'));
     }
 }

@@ -36,10 +36,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(785495);
         stepLogger.step('PRECONDITION: navigate to Time Off page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
-                MyWorkplacePage.navigation.myTimeOff,
-                CommonPage.pageHeaders.myWorkplace.timeOff,
-                CommonPageConstants.pageHeaders.myWorkplace.timeOff,
-                stepLogger);
+            MyWorkplacePage.navigation.myTimeOff,
+            CommonPage.pageHeaders.myWorkplace.timeOff,
+            CommonPageConstants.pageHeaders.myWorkplace.timeOff,
+            stepLogger);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on "+ new link" link displayed on top of "Time Off" page');
@@ -61,9 +61,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
 
         stepLogger.stepId(5);
-        const label = AnchorHelper.getElementsByTextInsideGrid(labels.title, true);
-        stepLogger.step(`Newly created TimeOff [Ex: Title 1] displayed in "My TimeOff" page`);
-        await CommonPageHelper.checkItemCreated(title, label);
+        stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My TimeOff" page');
+        await CommonPageHelper.searchItemByTitle(title, MyTimeOffPageConstants.columnNames.title, stepLogger, true);
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
     it('View Time Off - [785496]', async () => {
@@ -78,13 +79,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // step#2 is inside this function
         const timeOffTitle = await CommonPage.recordWithoutGreenTicket.getText();
-        await CommonPageHelper.actionTakenViaContextMenu(stepLogger, CommonPage.recordWithoutGreenTicket,
-                                                            CommonPage.contextMenuOptions.viewItem);
+        await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
+            CommonPage.contextMenuOptions.viewItem, stepLogger);
         stepLogger.verification('"View TimeOff" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.timeOff));
-        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(timeOffTitle.trim(), true);
+        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(timeOffTitle.trim());
     });
 });

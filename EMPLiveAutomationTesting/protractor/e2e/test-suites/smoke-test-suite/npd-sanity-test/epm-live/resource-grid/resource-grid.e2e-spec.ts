@@ -13,6 +13,7 @@ import {ResourcesPageHelper} from '../../../../../page-objects/pages/navigation/
 import {browser} from 'protractor';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -25,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Navigate to Resources page - [910192]', async () => {
         const stepLogger = new StepLogger(910192);
         stepLogger.stepId(1);
-        await CommonPageHelper.navigateToItemPageUnderNavigation (
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,
             CommonPage.pageHeaders.projects.resources,
             CommonPageConstants.pageHeaders.projects.resources,
@@ -35,7 +36,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Add Generic resource - [910195]', async () => {
         const stepLogger = new StepLogger(910195);
         stepLogger.step('PRECONDITION: Navigate to Resources page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation (
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,
             CommonPage.pageHeaders.projects.resources,
             CommonPageConstants.pageHeaders.projects.resources,
@@ -63,8 +64,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourcesPageHelper.fillFormAndSave(displayName, stepLogger);
 
         stepLogger.stepId(4);
-        const label = AnchorHelper.getElementsByTextInsideGrid(ResourcesPageConstants.inputLabels.displayName, true);
-        stepLogger.step(`Newly created Resource [Ex: Display 1] displayed in "Resources" page`);
-        await CommonPageHelper.checkItemCreated(displayName, label);
+        stepLogger.step('Click on search');
+        await PageHelper.click(ResourcesPage.searchIcon);
+        stepLogger.step('Enter newly created resource name');
+        await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
+        stepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
     });
 });

@@ -8,6 +8,11 @@ export class CommonPageConstants {
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
     static readonly title = 'Title';
+    static readonly viewAll = 'View All';
+    static readonly newItem = 'New Item';
+    static readonly attachFilePopupTitle = 'Attach File';
+    static readonly last = 'Last';
+    static readonly fileUpload = 'fileUpload';
 
     static get imageFile() {
         return {
@@ -52,6 +57,7 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',
+            attachFile: 'AttachFile',
             editTeam: 'Edit Team',
             close: 'Close',
             saveAndClose: 'Save &Close',
@@ -75,8 +81,10 @@ export class CommonPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
+            close: 'Close',
             ok: 'OK',
-            add:  '< Add',
+            okWithSmallK: 'Ok',
+            add: '< Add',
             remove: 'Remove >'
         };
     }
@@ -84,6 +92,7 @@ export class CommonPageConstants {
     static get ribbonMenuTitles() {
         return {
             hide: `Hide`,
+            manage: `Manage`,
             items: `Items`,
             list: `List`
         };
@@ -196,6 +205,13 @@ export class CommonPageConstants {
         return {
             currentTeam: 'TeamGrid',
             resourcePool: 'ResourceGrid'
+        };
+    }
+
+    static get paginationTitle() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
         };
     }
 

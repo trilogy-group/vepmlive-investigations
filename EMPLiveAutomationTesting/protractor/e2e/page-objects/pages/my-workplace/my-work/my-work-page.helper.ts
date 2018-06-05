@@ -11,8 +11,10 @@ import {LoginPageHelper} from '../../login/login-page.helper';
 
 export class MyWorkPageHelper {
 
-    static async fillFormAndSave(titleValue: string, stepLogger: StepLogger) {
+    static async fillFormAndSave(stepLogger: StepLogger) {
         const inputLabels = MyWorkPageConstants.inputLabels;
+        const uniqueId = PageHelper.getUniqueId();
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
 
         stepLogger.step(`Title *: New Item`);
         await TextboxHelper.sendKeys(MyWorkPage.inputs.title, titleValue);

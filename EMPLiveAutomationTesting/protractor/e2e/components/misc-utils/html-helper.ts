@@ -134,6 +134,7 @@ export class HtmlHelper extends HtmlHelperFactory {
         return {
             gmNoDataRow: 'GMNoDataRow',
             postMainContainer: 'postMainContainer',
+            gmClassReadOnly: 'GMClassReadOnly',
         };
     }
 }

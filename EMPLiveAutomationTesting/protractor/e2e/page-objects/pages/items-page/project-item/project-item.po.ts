@@ -1,10 +1,10 @@
-import {By, element, browser} from 'protractor';
+import {browser, By, element} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import { ProjectItemPageHelper } from './project-item-page.helper';
-import { CommonPageConstants } from '../../common/common-page.constants';
+import {ProjectItemPageHelper} from './project-item-page.helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -50,12 +50,6 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
-    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
-        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
-        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
-        return element(By.xpath(xpathForUser));
-    }
-
     static get buildTeamContainers() {
         const buildTeamSection = ProjectItemPageConstants.buildTeamContentIDs;
         return {
@@ -86,7 +80,7 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
-    static get assignmentPlannerFrame () {
+    static get assignmentPlannerFrame() {
         return browser.driver.findElement(By.xpath('//iframe[contains(@id,"DlgFrame")][contains(@src,"AssignmentPlanner")]'));
     }
 
@@ -102,6 +96,7 @@ export class ProjectItemPage extends BasePage {
 
         };
     }
+
     static get reportParameters() {
         const label = ProjectItemPageConstants.reportParameter;
         return {
@@ -137,5 +132,11 @@ export class ProjectItemPage extends BasePage {
 
     static get applyParameterButton() {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
+    }
+
+    static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
+        const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
+        //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
+        return element(By.xpath(xpathForUser));
     }
 }

@@ -10,9 +10,9 @@ export class ResourcesPageConstants {
     static get inputLabels() {
         return {
             role: 'Role *',
-            holidaySchedule : 'Holiday Schedule *',
-            workHours : 'Work Hours *',
-            availableFrom : 'Available From *',
+            holidaySchedule: 'Holiday Schedule *',
+            workHours: 'Work Hours *',
+            availableFrom: 'Available From *',
             availableTo: 'Available To',
             department: 'Department',
             standardRate: 'Standard Rate',
