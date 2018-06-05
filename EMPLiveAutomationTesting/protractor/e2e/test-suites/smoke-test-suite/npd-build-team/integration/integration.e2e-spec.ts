@@ -1,18 +1,18 @@
-import { SuiteNames } from '../../../helpers/suite-names';
-import { HomePage } from '../../../../page-objects/pages/homepage/home.po';
-import { PageHelper } from '../../../../components/html/page-helper';
-import { StepLogger } from '../../../../../core/logger/step-logger';
-import { CommonPageHelper } from '../../../../page-objects/pages/common/common-page.helper';
-import { CommonPage } from '../../../../page-objects/pages/common/common.po';
-import { CommonPageConstants } from '../../../../page-objects/pages/common/common-page.constants';
-import { WaitHelper } from '../../../../components/html/wait-helper';
-import { ValidationsHelper } from '../../../../components/misc-utils/validation-helper';
-import { ProjectItemPage } from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import { ProjectItemPageConstants } from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import { ProjectItemPageHelper } from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import { ElementHelper } from '../../../../components/html/element-helper';
-import { TextboxHelper } from '../../../../components/html/textbox-helper';
-import { ProjectItemPageValidations } from '../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
+import {SuiteNames} from '../../../helpers/suite-names';
+import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
+import {PageHelper} from '../../../../components/html/page-helper';
+import {StepLogger} from '../../../../../core/logger/step-logger';
+import {CommonPageHelper} from '../../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
+import {WaitHelper} from '../../../../components/html/wait-helper';
+import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
+import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ProjectItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
+import {TextboxHelper} from '../../../../components/html/textbox-helper';
+import {ProjectItemPageValidations} from '../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -53,8 +53,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.step('Select check-box for any of the resources displayed in "Resource Pool" (Right side)');
         await PageHelper.click(ProjectItemPage.teamRecords.resourcePool.first());
@@ -65,8 +64,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
@@ -106,8 +105,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Observe that the "Project Planner" is displayed');
         stepLogger.verification('"Project Planner" window is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
-        .toBe(true,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.stepId(6);
         stepLogger.step('Enter New Task in the "Add a Task"');
@@ -121,13 +120,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
-        stepLogger.step('Switch to content frame');
-        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Observe that the newly added "Resource" is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
-        .toBe(true,
-            ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true,
+                ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 });

@@ -15,13 +15,10 @@ export class HomePageConstants {
                 issues: 'Issues',
                 changes: 'Changes',
                 documents: 'Documents',
-                projectNodeCollapsed: 'Project Node Collapsed',
                 resources: 'Resources',
                 reports: 'Reports',
                 reporting: 'Reporting',
-                projectPlanner: 'Project Planner',
-                workHours: 'Work Hours'
-
+                projectPlanner: 'Project Planner'
             }
         };
     }
@@ -31,7 +28,6 @@ export class HomePageConstants {
             addADocumentTitle: 'Add a document',
             chooseFiles: 'Choose Files',
             overwriteExistingFilesLabel: 'Overwrite existing files',
-            addADocumentPropertyTitle: 'Add A Document Property Title',
         };
     }
 }

@@ -20,10 +20,6 @@ export class StepLogger {
         this.logger.debug(message);
     }
 
-    precondition(precondition: string) {
-        this.commonLogger('Precondition', precondition);
-    }
-
     step(stepName: string) {
         this.commonLogger('Step', stepName);
     }

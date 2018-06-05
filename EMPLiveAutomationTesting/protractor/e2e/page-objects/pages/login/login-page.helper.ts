@@ -3,9 +3,33 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from './login.po';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
-import {By, element, browser} from 'protractor';
+import {browser, By, element} from 'protractor';
 
 export class LoginPageHelper {
+    static get adminEmailId(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
+        return browser.params.login.admin.user;
+    }
+
+    static get adminPassword(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
+        return browser.params.login.admin.password;
+    }
+
+    static get teamMemberEmailId(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
+        return browser.params.login.teamMember.user;
+    }
+
+    static get teamMemberPassword(): string {
+        // Reason: not a typed object
+        // noinspection Annotator
+        return browser.params.login.teamMember.password;
+    }
+
     static async verifyLoginPageDisplayed() {
         await expect(await PageHelper.isElementDisplayed(LoginPage.loginButton, true))
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(
@@ -16,30 +40,6 @@ export class LoginPageHelper {
         await TextboxHelper.sendKeys(LoginPage.usernameTextBox, username);
         await TextboxHelper.sendKeys(LoginPage.passwordTextBox, password);
         await PageHelper.click(LoginPage.loginButton);
-    }
-
-    static get adminEmailId(): string {
-        return browser.params.login.admin.user;
-    }
-
-    static get adminPassword(): string {
-        return browser.params.login.admin.password;
-    }
-
-    static get teamMemberEmailId(): string {
-        return browser.params.login.teamMember.user;
-    }
-
-    static get teamMemberPassword(): string {
-        return browser.params.login.teamMember.password;
-    }
-
-    static get projectManagerPassword(): string {
-        return browser.params.login.projectManager.password;
-    }
-
-    static get projectManagerEmailId(): string {
-        return browser.params.login.projectManager.user;
     }
 
     static getFormControlById(partialId: string) {
