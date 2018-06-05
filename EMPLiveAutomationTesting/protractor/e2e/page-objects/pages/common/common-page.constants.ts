@@ -269,4 +269,13 @@ export class CommonPageConstants {
             edit: 'Edit'
         };
     }
+
+    static get classNames() {
+        return {
+            headerButtonClass: 'GMHeaderButton',
+            headerTextClass: 'GMHeaderText',
+            ascendingClass: 'GMSort4Right',
+            descendingClass: 'GMSort1Right'
+        };
+    }
 }

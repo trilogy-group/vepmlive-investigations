@@ -224,7 +224,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
-    fit('Add new Public view in Risk - [1176327]', async () => {
+    it('Add new Public view in Risk - [1176327]', async () => {
         const stepLogger = new StepLogger(1176327);
         stepLogger.stepId(1);
 
@@ -292,20 +292,20 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Click on any column header e.g; Status');
-        await PageHelper.click(CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status));
+        await PageHelper.click(RiskItemPage.columnHeaderSelector.status);
 
         stepLogger.verification('The up arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from a-z');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingStatus.ascendingOrder)).
-        toBeTruthy(RiskItemPageConstants.sortingName.ascending);
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.descending)).
+        toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.descending));
 
         stepLogger.stepId(4);
-        stepLogger.step('Click on same column again');
-        await PageHelper.click(CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status));
+        stepLogger.step('Click on same column header again');
+        await PageHelper.click(RiskItemPage.columnHeaderSelector.status);
 
         stepLogger.verification('The down arrow will appear against Status' +
             ' and the data in table appears sort by Status ascending from z-a');
-        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingStatus.descendingOrder)).
-        toBeTruthy(RiskItemPageConstants.sortingName.descending);
+        await expect(await PageHelper.isElementDisplayed(RiskItemPage.columnSortingItems.status.ascending)).
+        toBe(true, ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.sortingOrder.ascending));
     });
 });

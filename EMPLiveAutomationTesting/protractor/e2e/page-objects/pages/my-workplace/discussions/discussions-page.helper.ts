@@ -12,10 +12,7 @@ import { WaitHelper } from '../../../../components/html/wait-helper';
 import { MyWorkplacePage } from '../my-workplace.po';
 import { CommonPageConstants } from '../../common/common-page.constants';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
-import {CommonPageHelper} from '../../common/common-page.helper';
-import {MyWorkplacePage} from '../my-workplace.po';
-import {WaitHelper} from '../../../../components/html/wait-helper';
-import {CommonPageConstants} from '../../common/common-page.constants';
+import {LabelHelper} from '../../../../components/html/label-helper';
 
 export class DiscussionsPageHelper {
 
@@ -86,8 +83,9 @@ export class DiscussionsPageHelper {
             CommonPageConstants.pageHeaders.myWorkplace.discussions,
             stepLogger);
 
-        stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
+        stepLogger.step('Click on "New discussion" link displayed on top of "Discussions" page');
         await PageHelper.click(DiscussionsPage.newDiscussionLink);
+
         stepLogger.verification('"Discussion - New Item" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
@@ -95,7 +93,7 @@ export class DiscussionsPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
 
         stepLogger.step(`Enter/Select below details in 'New Discussion' page`);
-        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, isQuestion, stepLogger);
+        await this.fillNewDiscussionFormAndVerify(subject, body, isQuestion, stepLogger);
     }
 
     static async fillNewDiscussionForm(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
@@ -111,5 +109,11 @@ export class DiscussionsPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
+    }
+
+    static getDiscussionField(textValue: string) {
+        return LabelHelper.getSpanByTextInsideListByClassXpath(
+            DiscussionsPageConstants.classLabel.postListItemClass,
+            textValue);
     }
 }

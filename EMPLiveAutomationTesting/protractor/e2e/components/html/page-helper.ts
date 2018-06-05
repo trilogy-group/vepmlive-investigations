@@ -216,11 +216,4 @@ export class PageHelper {
         await WaitHelper.getInstance().waitForElementToBePresent(item);
         await item.sendKeys(filePath);
     }
-
-    static async switchToiFrame(iFrameElement: ElementFinder, timeout: number = PageHelper.timeout.xs) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(iFrameElement);
-        await browser.driver.switchTo().frame(iFrameElement.getWebElement());
-        // Wait is needed to load the iframe properly
-        await browser.sleep(timeout);
-    }
 }

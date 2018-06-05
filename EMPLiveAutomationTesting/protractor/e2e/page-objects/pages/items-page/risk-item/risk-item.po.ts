@@ -3,6 +3,8 @@ import {RiskItemPageConstants} from './risk-item-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
+import {RiskItemPageHelper} from './risk-item-page.helper';
 
 export class RiskItemPage extends BasePage {
 
@@ -43,10 +45,19 @@ export class RiskItemPage extends BasePage {
         return element(By.css('.upload-attach'));
     }
 
-    static get columnSortingStatus() {
+    static get columnHeaderSelector() {
         return {
-            ascendingOrder: element(By.className('GMSort1Right GMImage')),
-            descendingOrder: element(By.className('GMSort4Right GMImage'))
+            status: CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status)
+        };
+    }
+
+    static get columnSortingItems() {
+        const columnHeader = CommonPageConstants.columnHeader;
+        return {
+            status: {
+                ascending: RiskItemPageHelper.getAscendingColumnSelector(columnHeader.status),
+                descending: RiskItemPageHelper.getDescendingColumnSelector(columnHeader.status)
+            },
         };
     }
 }

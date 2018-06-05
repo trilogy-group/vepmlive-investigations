@@ -142,8 +142,8 @@ export class ProjectItemPage extends BasePage {
 
     static get itemOptions() {
         return {
-            resourceAnalyzer: element(By.id('Ribbon.ListItem.Manage.EPKResourceAnalyzer-Large')),
-            editCourse: element(By.id('Ribbon.ListItem.Manage.EPKCosts-Large'))
+            resourceAnalyzer: element(By.css('[id*="Ribbon.ListItem.Manage.EPKResourceAnalyzer"]')),
+            editCourse: element(By.css('[id*="Ribbon.ListItem.Manage.EPKCosts"]'))
         };
     }
 
@@ -166,8 +166,8 @@ export class ProjectItemPage extends BasePage {
 
     static get periodButtons() {
         return {
-            fromPeriod: element(By.id('idViewTab_FromPeriod_button')),
-            toPeriod: element(By.id('idViewTab_ToPeriod_button'))
+            fromPeriod: element(By.css('[id*="FromPeriod_button"]')),
+            toPeriod: element(By.css('[id*="ToPeriod_button"]'))
         };
     }
 }

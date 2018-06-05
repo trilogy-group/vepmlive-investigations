@@ -5,9 +5,6 @@ import {DiscussionsPageHelper} from './discussions-page.helper';
 import {element} from 'protractor';
 import {By} from 'selenium-webdriver';
 import {ButtonHelper} from '../../../../components/html/button-helper';
-import { element} from 'protractor';
-import { By } from 'selenium-webdriver';
-import { ButtonHelper } from '../../../../components/html/button-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
@@ -52,10 +49,6 @@ export class DiscussionsPage {
 
     static get replyMsg() {
         return element(By.id('forum0-Footer-RichTextArea'));
-    }
-
-    static getDiscussionField(text: string) {
-        return CommonPageHelper.getSpanByText(text);
     }
 
     static get buttonSelector() {

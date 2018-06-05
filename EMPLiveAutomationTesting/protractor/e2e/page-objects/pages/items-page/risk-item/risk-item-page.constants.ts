@@ -53,7 +53,7 @@ export class RiskItemPageConstants {
         };
     }
 
-    static get sortingName() {
+    static get sortingOrder() {
         return {
             ascending: 'Ascending from a-z',
             descending: 'Descending from z-a'

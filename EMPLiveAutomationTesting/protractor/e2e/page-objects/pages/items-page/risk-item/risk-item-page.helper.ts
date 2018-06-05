@@ -11,6 +11,7 @@ import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
+import {By, element} from 'protractor';
 
 export class RiskItemPageHelper {
 
@@ -151,5 +152,19 @@ export class RiskItemPageHelper {
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.dueDateViewColumn))
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
+    }
+
+    static getDescendingColumnSelector(columnStatus: string) {
+        return element(By.xpath(`//td[contains(@class, '${CommonPageConstants.classNames.headerTextClass}')` +
+            ` and normalize-space(.)='${columnStatus}']` +
+            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
+            `//u[contains(@class,'${CommonPageConstants.classNames.descendingClass}')]`));
+    }
+
+    static getAscendingColumnSelector(columnStatus: string) {
+        return element(By.xpath(`//td[contains(@class, '${CommonPageConstants.classNames.headerTextClass}')` +
+            ` and normalize-space(.)='${columnStatus}']` +
+            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
+            `//u[contains(@class,'${CommonPageConstants.classNames.ascendingClass}')]`));
     }
 }

@@ -7,6 +7,9 @@ import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -36,9 +39,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step(`Precondition: Create new discussion`);
         const labels = DiscussionsPageConstants.inputLabels;
-        let uniqueId = PageHelper.getUniqueId();
-        let subject = `${labels.subject} ${uniqueId}`;
-        let body = `${labels.body} ${uniqueId}`;
+        const uniqueId = PageHelper.getUniqueId();
+        const subject = `${labels.subject} ${uniqueId}`;
+        const body = `${labels.body} ${uniqueId}`;
         let isQuestion = true;
         await DiscussionsPageHelper.createNewDiscussion(subject, body, isQuestion, stepLogger);
 
@@ -51,33 +54,32 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.myWorkplace.discussions,
             CommonPageConstants.pageHeaders.myWorkplace.discussions,
             stepLogger);
-        stepLogger.step('Select "Navigation" icon  from left side menu and click on Risks');
 
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the Discussion created as per pre requisites that need to be ' +
             'edited Click on the Ellipses button (...) and select Edit Item from the options displayed');
-        await PageHelper.click(DiscussionsPage.getDiscussionField(subject));
+        await PageHelper.click(DiscussionsPageHelper.getDiscussionField(subject));
         await PageHelper.click(DiscussionsPage.buttonSelector.edit);
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select below details in Edit Discussion page Subject *: Updated New Discussion 1 Body: Update ' +
             'the text [Ex: Updated new Discussion used for Smoke Test Case creation] Question: Leave the check box unchecked/un selected');
-        uniqueId = PageHelper.getUniqueId();
-        subject = `${labels.subject} ${uniqueId}`;
-        body = `${labels.body} ${uniqueId}`;
+        const newUniqueId = PageHelper.getUniqueId();
+        const newSubject = `${labels.subject} ${newUniqueId}`;
+        const newBody = `${labels.body} ${newUniqueId}`;
         isQuestion = false;
-        await DiscussionsPageHelper.fillNewDiscussionForm(subject, body, isQuestion, stepLogger);
+        await DiscussionsPageHelper.fillNewDiscussionForm(newSubject, newBody, isQuestion, stepLogger);
 
         stepLogger.stepId(5);
         stepLogger.step('Click save button');
         await DiscussionsPageHelper.saveDiscussionForm(stepLogger);
 
         stepLogger.verification('Updated Discussion item details subject displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(subject).subject))
-            .toBeTruthy(ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.inputLabels.subject));
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(newSubject).subject))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.subject));
 
         stepLogger.verification('Updated Discussion item details body displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(body).body))
-            .toBeTruthy(ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.inputLabels.body));
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(newBody).body))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.body));
     });
 });
