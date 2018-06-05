@@ -81,6 +81,9 @@ export class ValidationsHelper {
         return `${this.types.window} ${this.getNotDisplayedValidation(name)}`;
     }
 
+    static getWindowShouldBeDisplayedValidation(name: string) {
+        return `${this.types.window} ${this.getDisplayedValidation(name)}`;
+    }
     static getNotificationDisplayedValidation(name: string) {
         return `${this.types.notification} ${this.getDisplayedValidation(name)}`;
     }
@@ -107,5 +110,9 @@ export class ValidationsHelper {
 
     static getButtonEnabledValidation(name: string) {
         return `${this.types.button} ${this.getEnabledValidation(name)}`;
+    }
+
+    static getItemsUnderTabShouldBeDisplayed(name: string) {
+        return `Contents of the ${this.getDisplayedValidation(name + 'tab ')}`;
     }
 }

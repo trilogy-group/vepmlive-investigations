@@ -18,17 +18,12 @@ export class LoginPage extends BasePage {
     }
 
     async goToAndLogin(username = LoginPageHelper.adminEmailId, password = LoginPageHelper.adminPassword) {
-        this.goTo();
+        await this.goTo();
         await LoginPageHelper.login(username, password);
     }
 
     async goToAndLoginAsTeamMember(username = LoginPageHelper.teamMemberEmailId, password = LoginPageHelper.teamMemberPassword) {
-        this.goTo();
-        await LoginPageHelper.login(username, password);
-    }
-
-    async goToAndLoginAsProjectManager(username = LoginPageHelper.projectManagerEmailId, password = LoginPageHelper.projectManagerPassword) {
-        this.goTo();
+        await this.goTo();
         await LoginPageHelper.login(username, password);
     }
 }

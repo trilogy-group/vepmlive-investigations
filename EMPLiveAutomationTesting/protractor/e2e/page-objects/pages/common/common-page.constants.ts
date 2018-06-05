@@ -8,11 +8,11 @@ export class CommonPageConstants {
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
     static readonly title = 'Title';
-    static readonly calendarContent = 'Calendar Content';
-    static readonly viewType = 'View Type';
-    static readonly createView = 'create View';
-    static readonly createdView = 'created View'
-    static readonly calendar = 'Calendar'
+    static readonly viewAll = 'View All';
+    static readonly newItem = 'New Item';
+    static readonly attachFilePopupTitle = 'Attach File';
+    static readonly last = 'Last';
+    static readonly fileUpload = 'fileUpload';
 
     static get imageFile() {
         return {
@@ -57,10 +57,8 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',
+            attachFile: 'AttachFile',
             editTeam: 'Edit Team',
-            editCost: 'EPKCosts',
-            editPlan: 'EPMLive.Planner-Large',
-            addTask: 'AddTask-Large',
             close: 'Close',
             saveAndClose: 'Save &Close',
             assignmentPlanner: 'Assignment Planner',
@@ -83,8 +81,10 @@ export class CommonPageConstants {
         return {
             save: 'Save',
             cancel: 'Cancel',
+            close: 'Close',
             ok: 'OK',
-            add:  '< Add',
+            okWithSmallK: 'Ok',
+            add: '< Add',
             remove: 'Remove >'
         };
     }
@@ -92,6 +92,7 @@ export class CommonPageConstants {
     static get ribbonMenuTitles() {
         return {
             hide: `Hide`,
+            manage: `Manage`,
             items: `Items`,
             list: `List`
         };
@@ -114,14 +115,6 @@ export class CommonPageConstants {
             selectColumns: 'select columns',
             view: 'View: ',
             settings: 'settings'
-        };
-    }
-
-    static get costData() {
-        return {
-            firstData: '120.00',
-            secondData: '130.00',
-            thirdData: '140.00',
         };
     }
 
@@ -193,13 +186,6 @@ export class CommonPageConstants {
         };
     }
 
-    static get versionComment() {
-        return {
-            first: 'New Version of previously updated file',
-            second: '0.2'
-        };
-    }
-
     static get projectUpdate() {
         return {
             manual: 'Manual',
@@ -222,6 +208,13 @@ export class CommonPageConstants {
         };
     }
 
+    static get paginationTitle() {
+        return {
+            next: 'Next',
+            previous: 'Previous'
+        };
+    }
+
     static get dropdownShowAllButton() {
         return {
             project: 'Project_ddlShowAll',
@@ -232,4 +225,5 @@ export class CommonPageConstants {
             portfolio: 'Portfolio_ddlShowAll',
         };
     }
+
 }

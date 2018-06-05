@@ -1,6 +1,5 @@
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {By, element} from 'protractor';
 import {ChangeItemPageConstants} from './change-item-page.constants';
 
 export class ChangeItemPage extends BasePage {
@@ -25,7 +24,4 @@ export class ChangeItemPage extends BasePage {
         };
     }
 
-    static get projectShowAllButton() {
-        return element(By.id('Project_ddlShowAll'));
-    }
 }

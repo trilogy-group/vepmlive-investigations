@@ -1,7 +1,7 @@
 /**
  * Page helper for general utility
  */
-import {browser, By, element, ElementFinder, protractor, WebElement} from 'protractor';
+import {browser, ElementFinder, WebElement} from 'protractor';
 import {WaitHelper} from './wait-helper';
 
 const remote = require('selenium-webdriver/remote');
@@ -41,24 +41,8 @@ export class PageHelper {
         browser.waitForAngular();
     }
 
-    static async actionSendKeys( locator: ElementFinder,
-                                 data: string,
-                                 sendEnter = false) {
-        await locator.click();
-        await browser.actions().sendKeys(data).perform();
-        await browser.sleep(PageHelper.timeout.s);
-        if (sendEnter) {
-            await browser.actions().sendKeys(protractor.Key.ENTER).perform();
-        }
-    }
-
-    static actionClick(path: string) {
-        const elem = element(By.xpath(path));
-        browser.actions().mouseMove(elem).click().perform();
-    }
-
-    static async actionDoubleClick(elem: ElementFinder) {
-        await browser.actions().doubleClick(elem).perform();
+    static actionSendKeys(key: string) {
+        return browser.actions().sendKeys(key).perform();
     }
 
     static sendKeysToInputField(elem: ElementFinder, key: string) {
@@ -172,18 +156,6 @@ export class PageHelper {
         return targetElement.click();
     }
 
-    static async clickWithWaitl(targetElement: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
-        await browser.sleep(PageHelper.timeout.l);
-        return targetElement.click();
-    }
-
-    static async clickWithWaitxs(targetElement: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
-        await browser.sleep(PageHelper.timeout.xs);
-        return targetElement.click();
-    }
-
     /**
      * Click on the element and wait for it to get hidden
      * @param {ElementFinder} targetElement
@@ -208,6 +180,7 @@ export class PageHelper {
     }
 
     static async switchToFrame(frameEle: WebElement) {
+        // Wait for frame to exist first
         await browser.sleep(PageHelper.timeout.s);
         return browser.driver.switchTo().frame(frameEle);
     }

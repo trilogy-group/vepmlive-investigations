@@ -5,13 +5,11 @@ import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 export class CommonPage extends BasePage {
 
     static readonly dialogTitleId = 'dialogTitleSpan';
-    static readonly plannerClass = 'GMEditCellInput';
-    static readonly saveBtn = 'SaveBtn';
-    static readonly closeBtn = 'CloseBtn';
     static readonly titleId = 'pageTitle';
 
     static get sidebarMenus() {
@@ -22,12 +20,13 @@ export class CommonPage extends BasePage {
             myWorkplace: element(By.id(`${idPrefix}workplace`)),
             favorites: element(By.id(`${idPrefix}favorites`)),
             mostRecent: element(By.id(`${idPrefix}recent`)),
+            settings: element(By.id(`${idPrefix}settings`)),
             workspaces: element(By.id(`${idPrefix}workspaces`))
         };
     }
 
     static get addNewLink() {
-        return element(By.css('[title="New Item"] a'));
+        return element(By.css(`[title="${CommonPageConstants.newItem}"] a`));
     }
 
     static get contentTitleInViewMode() {
@@ -74,6 +73,7 @@ export class CommonPage extends BasePage {
         return {
             hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
             items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
+            manage: CommonPageHelper.getMenuItemFromRibbonContainer(titles.manage),
             list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
         };
     }
@@ -82,11 +82,9 @@ export class CommonPage extends BasePage {
         const labels = CommonPageConstants.ribbonLabels;
         return {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
+            attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
-            editCost: CommonPageHelper.getRibbonButtonById(labels.editCost),
-            editPlan: CommonPageHelper.getRibbonButtonById(labels.editPlan),
-            addTask: CommonPageHelper.getRibbonButtonById(labels.addTask),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
@@ -112,113 +110,33 @@ export class CommonPage extends BasePage {
     static get formButtons() {
         const labels = CommonPageConstants.formLabels;
         return {
-            save: ButtonHelper.getInputButtonByExactTextXPath(labels.save),
-            ok: ButtonHelper.getInputButtonByExactTextXPath(labels.ok),
-            cancel: ButtonHelper.getInputButtonByExactTextXPath(labels.cancel),
-            add: ButtonHelper.getInputButtonByExactTextXPath(labels.add),
-            remove: ButtonHelper.getInputButtonByExactTextXPath(labels.remove)
+            save: ButtonHelper.getInputButtonByTextUnderTable(labels.save),
+            ok: ButtonHelper.getInputButtonByTextUnderTable(labels.ok),
+            close: ButtonHelper.getInputButtonsByText(labels.close).first(),
+            okWithSmallK: ButtonHelper.getInputButtonByTextUnderTable(labels.okWithSmallK),
+            okOutsideTable: ButtonHelper.getInputButtonsByText(labels.ok),
+            cancel: ButtonHelper.getInputButtonByTextUnderTable(labels.cancel),
+            add: ButtonHelper.getInputButtonByTextUnderTable(labels.add),
+            remove: ButtonHelper.getInputButtonByTextUnderTable(labels.remove)
         };
     }
 
-    static get ellipse() {
-        return element(By.css('td .icon-ellipsis-horizontal'));
-    }
-
-    static get titles() {
-        return element.all(By.id(this.titleId));
-    }
-
     static get title() {
-        return element(By.id(this.titleId));
-    }
-
-    static get eventDialogbox() {
-        return element(By.xpath('.//*[@class="ms-dlgTitle"]'));
+        // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
+        return element(By.xpath(`(//*[@id='${this.titleId}'])[1]`));
     }
 
     static get dialogTitles() {
-        return element(By.xpath('//div[contains(@class,\'grouping-apply\')]//a[normalize-space(.)=\'Apply\']'));
-    }
-
-    static get cellTextBox1() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C1")][1]'));
-    }
-
-    static get cellTextBox2() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C2")][1]'));
-    }
-
-    static get cellTextBox3() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C3")][1]'));
-    }
-
-    static get budgetTab() {
-        return element(By.xpath('.//*[contains(@style,\'rgb(255, 255, 255)\')]/span[text()=\'Budget\']'));
-    }
-
-    static get actualCostTab() {
-        return element(By.xpath('.//*[@tab_id=\'tab_9\' and @class]'));
-    }
-
-    static get benefitsCostTab() {
-        return element(By.xpath('.//*[@tab_id=\'tab_10\' and @class]'));
-    }
-
-    static get clickONCostPlanner() {
-        return element(By.id(this.plannerClass));
-    }
-
-    static get clickOnCloseButton() {
-        return element(By.id(this.closeBtn));
-    }
-
-    static get clickOnSaveButton() {
-        return element(By.id(this.saveBtn));
-    }
-
-    static get budgetEntervalue() {
-        return element(By.xpath('.//*[contains(@onmousemove,\'I24\')]/*[contains(@class,\'HideCol0C1\')][1]'));
-    }
-
-    static get singleSearchTextBox() {
-        return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
+        return element.all(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get dialogTitle() {
-        return element(By.id(this.dialogTitleId));
-    }
-
-    static get fileVersion() {
-        return element(By.xpath('.//a[text()="pdf-file_rjskzm-em"]//ancestor::div[1]//ancestor::tr[1]//td[7]'));
-    }
-
-    static get documentTitle() {
-        return element(By.css('#WPQ2_ListTitleViewSelectorMenu_Container_surfaceopt0'));
-    }
-
-    static get projectCollapse() {
-        return element(By.xpath('.//*[@class="ms-commentexpand-iconouter"]'));
-    }
-
-    static get versionCommentField() {
-        return element(By.css('#ctl00_PlaceHolderMain_VersionCommentSection_ctl01_CheckInComment'));
-    }
-
-    static get homePageTitle() {
-        return element(By.css('#MSOImageWebPart_WebPartWPQ3'));
-    }
-
-    static get contentUpdateFrame() {
-        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
+        return element(By.xpath(`(//*[@id='${this.dialogTitleId}'])[1]`));
     }
 
     static get contentFrame() {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
-    }
-
-    static get newVersionCheckbox() {
-            return element(By.css('#ctl00_PlaceHolderMain_ctl02_ctl04_OverwriteSingle'));
     }
 
     static get actionMenuIcons() {
@@ -250,13 +168,6 @@ export class CommonPage extends BasePage {
         };
     }
 
-    static get project() {
-        return element(By.xpath(`(${this.selectorForProject})[1]`));
-    }
-    static get demoproject() {
-        return element(By.xpath(`//*[@id="GanttGrid0Main"]/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[4]/a[1]`));
-    }
-
     static get record() {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
     }
@@ -270,11 +181,7 @@ export class CommonPage extends BasePage {
     }
 
     static get selectorForRecordsWithGreenTick() {
-        return '//*[contains(@class,"GMDataRow")]//img[contains(@src,"green")]';
-    }
-
-    static get selectorForProject() {
-        return '//*[contains(@class,"GMDataRow")]//a[contains(@href,"javascript")]';
+        return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -285,8 +192,12 @@ export class CommonPage extends BasePage {
         return element(By.xpath('//*[contains(@id,"msColumns") and contains(@id,"_ul_menu")'));
     }
 
-    static get calendearView() {
-        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar"]'));
+    static get ellipse() {
+        return element(By.css('td .icon-ellipsis-horizontal'));
+    }
+
+    static get singleSearchTextBox() {
+        return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
     static get closeButton() {
@@ -307,7 +218,65 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get settingButton() {
+        return element(By.css('[data-original-title="settings"]'));
+    }
+
+    static get projectShowAllButton() {
+        return element(By.id('Project_ddlShowAll'));
+    }
+
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-   }
+    }
+
+    static get viewAll() {
+        return element(By.linkText(CommonPageConstants.viewAll));
+    }
+
+    static get paginationControlsByTitle() {
+        return {
+            next: element(By.css(`[title='${CommonPageConstants.paginationTitle.next}']`)),
+            previous: element(By.css(`[title='${CommonPageConstants.paginationTitle.previous}']`))
+        };
+    }
+
+    static get fileUploadControl() {
+        return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
+    }
+
+    static get lastButton() {
+        return AnchorHelper.getAnchorByText(CommonPageConstants.last);
+    }
+
+    static get searchTextBox() {
+        return element(By.id('MWG_Search'));
+    }
+
+    static get selectedTitle() {
+        const selectedClass = '.GMClassSelected ';
+        return element(By.css(`${selectedClass} .EPMLiveMyWorkTitle div,${selectedClass} .GMHtml.HideCol0Title`));
+    }
+
+    static get uploadButton() {
+        return element(By.css('.js-listview-qcbUploadButton,.js-listview-qcbNewButton'));
+    }
+
+    static get browseButton() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get paging() {
+        return element(By.css('.ms-paging'));
+    }
+
+    static get personIcon(){
+        return element(By.id('EPMLiveNotificationCounterProfilePic'));
+    }
+
+    static get latestNotification(){
+        return element(By.className('EPMLiveNotificationTitle'));
+    }
+    
+
 }
