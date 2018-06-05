@@ -5,10 +5,6 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
-import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageHelper} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 
@@ -32,34 +28,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Add a New Discussion - [785611]', async () => {
         const stepLogger = new StepLogger(785611);
-        stepLogger.step('PRECONDITION: navigate to Discussions page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            MyWorkplacePage.navigation.discussions,
-            CommonPage.pageHeaders.myWorkplace.discussions,
-            CommonPageConstants.pageHeaders.myWorkplace.discussions,
-            stepLogger);
-
-        stepLogger.stepId(1);
-        stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
-        await PageHelper.click(DiscussionsPage.newDiscussionLink);
-        stepLogger.verification('"Discussion - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(DiscussionsPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
-
-        stepLogger.stepId(2);
-        stepLogger.step(`Enter/Select below details in 'New Discussion' page`);
-        const labels = DiscussionsPageConstants.inputLabels;
-        const uniqueId = PageHelper.getUniqueId();
-        const subject = `${labels.subject} ${uniqueId}`;
-        const body = `${labels.body} ${uniqueId}`;
-        const isQuestion = true;
-        await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, isQuestion, stepLogger);
-
-        stepLogger.stepId(3);
-        const label = DiscussionsPage.allDiscussionItems;
-        stepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
-        await CommonPageHelper.checkItemCreated(subject, label);
+        await DiscussionsPageHelper.addDiscussion(stepLogger);
     });
 });

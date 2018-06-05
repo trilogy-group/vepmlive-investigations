@@ -232,7 +232,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     });
 
     it('Edit Item - Attach File - [855672]', async () => {
-        const stepLogger = new StepLogger(1176340);
+        const stepLogger = new StepLogger(855672);
         stepLogger.stepId(1);
 
         // Step #1 and #2 Inside this function
@@ -246,25 +246,34 @@ describe(SuiteNames.smokeTestSuite, () => {
         const item = CommonPage.recordWithoutGreenTicket;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
 
-        stepLogger.stepId(1);
+        stepLogger.stepId(3);
         stepLogger.step('Click on the row of item created as per pre requisites');
         await PageHelper.click(item);
         const selectedTitle = await CommonPage.selectedTitle.getText();
         stepLogger.step('Click on "MANAGE" tab');
         await PageHelper.click(CommonPage.ribbonTitles.manage);
 
-        stepLogger.verification('contents of the ITEMS tan should be displayed');
-        await expect(await CommonPage.ribbonItems.attachFile.isDisplayed())
-            .toBe(true,
-                ValidationsHelper.getItemsUnderTabShouldBeDisplayed(CommonPageConstants.ribbonMenuTitles.items));
+        stepLogger.step('Click on "Edit Item" button');
+        await PageHelper.click(CommonPage.ribbonItems.editItem);
 
-        stepLogger.stepId(2);
+        stepLogger.verification('Edit work item pop-up should load successfully');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
+            .toBe(true,
+                ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
+
+        stepLogger.verification('Selected item details displayed in editable mode in the pop up window');
+
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        // Avoiding - Element is not clickable at point (-9553, -9859)
+        await browser.sleep(PageHelper.timeout.s);
+
+        stepLogger.stepId(4);
         stepLogger.step('Click on "Attach File" button from button menu of popup');
         await PageHelper.click(CommonPage.ribbonItems.attachFile);
 
-        await CommonPageHelper.switchToContentFrame(stepLogger);
-
-        stepLogger.stepId(4);
         stepLogger.verification('A popup displayed to attach file');
         await expect(await PageHelper.isElementDisplayed(CommonPage.fileUploadControl))
             .toBe(true,
@@ -273,7 +282,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         stepLogger.step('Click on "Choose File" button in the pop up window Search and select the file to attach');
         const {fullFilePath, newFileName} = CommonPageHelper.uniqueDocumentFilePath;
-        console.log(fullFilePath);
         await PageHelper.uploadFile(CommonPage.fileUploadControl, fullFilePath);
 
         stepLogger.verification('Selected file name should be displayed in popup');
@@ -322,8 +330,20 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
+        stepLogger.verification('Verify that image is attached');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
+
+        stepLogger.stepId(9);
+        stepLogger.step('Click on "Close" button');
+        await PageHelper.click(CommonPage.formButtons.close);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger.verification('View item page should be displayed and user should be in "My Work" list page');
+        await expect(await CommonPage.dialogTitle.isPresent())
+            .toBe(false,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.myWork));
     });
 });

@@ -123,7 +123,7 @@ export class CommonPage extends BasePage {
 
     static get title() {
         // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
-        return element(By.css(`h1#${this.titleId}`));
+        return element(By.xpath(`(//*[@id='${this.titleId}'])[1]`));
     }
 
     static get dialogTitles() {
@@ -131,7 +131,7 @@ export class CommonPage extends BasePage {
     }
 
     static get dialogTitle() {
-        return element(By.css(`h1#${this.dialogTitleId}`));
+        return element(By.xpath(`(//*[@id='${this.dialogTitleId}'])[1]`));
     }
 
     static get contentFrame() {
@@ -289,5 +289,13 @@ export class CommonPage extends BasePage {
 
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static get personIcon(){
+        return element(By.id('EPMLiveNotificationCounterProfilePic'));
+    }
+
+    static get latestNotification(){
+        return element(By.className('EPMLiveNotificationTitle'));
     }
 }
