@@ -440,18 +440,8 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
     }
 
-    static getDropDownViewByText(titleView: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag
-            // tslint:disable-next-line:max-line-length
-            (HtmlHelper.tags.a, `@${HtmlHelper.tags.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
-    }
-
     static getPublicView(text: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)}`));
-    }
-
-    static getColumnByName(columnTitle: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnTitle, false)}`));
     }
 
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {

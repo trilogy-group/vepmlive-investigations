@@ -237,30 +237,30 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on public view drop down');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText
-            (RiskItemPageConstants.defaultViewName), true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.getDropDownViewByText
+            (RiskItemPageConstants.defaultViewName)))
                     .toBe(true,
                         ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
-        await PageHelper.click(CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName));
+        await PageHelper.click(CommonPage.getDropDownViewByText(RiskItemPageConstants.defaultViewName));
 
         stepLogger.stepId(3);
         stepLogger.step('Click on create public view');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewDropDownActions.createNewPublicView, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewDropDownActions.createNewPublicView))
                     .toBe(true,
                         ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
         await PageHelper.click(CommonPage.viewDropDownActions.createNewPublicView);
 
         stepLogger.stepId(4);
         stepLogger.step('Fill view name');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle))
                     .toBe(true,
                         ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.title));
         const uniqueId = PageHelper.getUniqueId();
         const titleNewView = `NewAutomatedPublicView${uniqueId}`;
-        await PageHelper.sendKeysToInputField(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, titleNewView);
+        await TextboxHelper.sendKeys(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, titleNewView);
 
         stepLogger.step('Click "Create a Public View" radio button');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.publicViewRadioButton, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.publicViewRadioButton))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.publicView));
         await PageHelper.click(CommonPage.viewNewPageActions.publicViewRadioButton);
@@ -270,7 +270,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Submit new view by clicking ok available at top');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.submitCreatePublicViewPage, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.submitCreatePublicViewPage))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.formLabels.topSave));
         await PageHelper.click(CommonPage.viewNewPageActions.submitCreatePublicViewPage);

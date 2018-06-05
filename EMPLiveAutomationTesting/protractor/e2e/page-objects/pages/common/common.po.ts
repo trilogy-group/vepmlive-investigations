@@ -6,6 +6,7 @@ import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import { ComponentHelpers } from '../../../components/devfactory/component-helpers/component-helpers';
 
 export class CommonPage extends BasePage {
 
@@ -277,22 +278,33 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static getViewColumnByName(columnTitle: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnTitle, false)}`));
+    }
+
+    static getDropDownViewByText(titleView: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag
+            // tslint:disable-next-line:max-line-length
+            (HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
+    }
+
     static get viewNewPageActions() {
         const createLabels = CommonPageConstants.newPublicViewformLabels;
         return {
             fillCreatePublicViewPageTitle: element(By.name(`${createLabels.title}`)),
 
-            publicViewRadioButton: element(By.css(`[${HtmlHelper.tags.id}$='${CommonPageConstants.newPublicViewformLabels.publicView}']`)),
+            publicViewRadioButton: element(By
+                .css(`[${HtmlHelper.attributes.id}$='${CommonPageConstants.newPublicViewformLabels.publicView}']`)),
 
             scheduledStatusCheckBox: element(By.css
-                (`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.scheduleStatus}']`)),
+                (`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.scheduleStatus}']`)),
 
-            exposureCheckBox: element(By.css(`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.exposure}']`)),
+            exposureCheckBox: element(By.css(`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.exposure}']`)),
 
-            dueCheckBox: element(By.css(`[${HtmlHelper.tags.name}$='${CommonPageConstants.newPublicViewformLabels.due}']`)),
+            dueCheckBox: element(By.css(`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.due}']`)),
 
             submitCreatePublicViewPage: element(By.css
-                (`${HtmlHelper.tags.input}[${HtmlHelper.tags.id}='${CommonPageConstants.formLabels.topSave}']`))
+                (`${HtmlHelper.tags.input}[${HtmlHelper.attributes.id}='${CommonPageConstants.formLabels.topSave}']`))
         };
     }
 }
