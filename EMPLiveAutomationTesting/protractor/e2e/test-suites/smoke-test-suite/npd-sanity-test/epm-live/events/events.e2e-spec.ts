@@ -26,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
     });
 
-    it('Add an Event- [786942]', async () => {
+    fit('Add an Event- [786942]', async () => {
         await EventsPageHelper.createNewEvent();
     });
 });

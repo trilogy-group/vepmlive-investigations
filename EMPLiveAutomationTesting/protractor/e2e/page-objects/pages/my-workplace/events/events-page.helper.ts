@@ -23,21 +23,20 @@ export class EventsPageHelper {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on save');
-        await PageHelper.click(CommonPage.formButtons.save);
-
+        await PageHelper.click(CommonPage.saveNewEvent);
     }
 
-    static async verifyNewEventCreated(stepLogger: StepLogger) {
+    static async verifyNewEventCreated(stepLogger: StepLogger, titleNewEvent: string) {
 
         await PageHelper.switchToDefaultContent();
         stepLogger.verification('"New Event" page is closed');
-        await expect(await CommonPage.formButtons.save.isPresent())
+        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent, true))
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
 
-        stepLogger.verification('verify "New Event" get created');
-        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock, true))
-            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
+        stepLogger.verification(`verify "New Event" get created which is: ${titleNewEvent}`);
+        await expect(await PageHelper.isElementDisplayed(EventsPage.getNewEventAdded(titleNewEvent), true))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(titleNewEvent));
     }
 
     static async fillNewEventsFormAndVerifyEventCreated(title: string, stepLogger: StepLogger) {
@@ -76,7 +75,7 @@ export class EventsPageHelper {
         stepLogger.step('Click on "Events" tab displayed on top of "Events" page');
         await PageHelper.click(EventsPage.eventsTab);
         stepLogger.verification('Tab Panel of the Events should get displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.tabPanel));
 
         stepLogger.stepId(2);
@@ -95,7 +94,7 @@ export class EventsPageHelper {
         const uniqueId = PageHelper.getUniqueId();
         const title = `${labels.title} ${uniqueId}`;
         await EventsPageHelper.fillNewEventForm(title, stepLogger);
-        await EventsPageHelper.verifyNewEventCreated(stepLogger);
+        await EventsPageHelper.verifyNewEventCreated(stepLogger, title);
         return title;
     }
 }
