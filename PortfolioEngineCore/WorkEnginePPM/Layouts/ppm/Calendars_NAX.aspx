@@ -512,8 +512,6 @@ input[type="radio"] {
             tgrid1.SetCellValue(newRow, "PRD_ID", period.id);
             tgrid1.SetCellValue(newRow, "PRD_NAME", period.name);
         }
-        
-        return;
     }
 
     function UpdatePeriodAutomationControlStates(options) {

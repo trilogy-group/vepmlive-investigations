@@ -146,8 +146,12 @@
         var periods = [];
         var start = values.startDate;
         var finish = values.endDate;
-        var initialWeeklyCut = values.cutWeekly ? DateHelper.addDays(DateHelper.getNextDayOfWeek(start, values.cutWeeklyDay), (values.cutWeeklyPeriodicity - 1) * 7) : finish;
-        var initialMonthlyCut = values.cutMonthly ? DateHelper.addMonths(start, values.cutMonthlyPeriodicity - 1, values.cutMonthlyDay) : finish;
+        var initialWeeklyCut = values.cutWeekly
+            ? DateHelper.addDays(DateHelper.getNextDayOfWeek(start, values.cutWeeklyDay), (values.cutWeeklyPeriodicity - 1) * 7)
+            : finish;
+        var initialMonthlyCut = values.cutMonthly
+            ? DateHelper.addMonths(start, values.cutMonthlyPeriodicity - 1, values.cutMonthlyDay)
+            : finish;
         var currentCut;
         var weeklyIndex = 0;
         var monthlyIndex = 0;
@@ -285,13 +289,13 @@
         var cutMonthlyEndOfDay = document.getElementById(cutPeriodsMonthlyEndOfDayCheckBoxId).checked;
 
         if (scope === undefined || scope === "enabled") {
-            document.getElementById(cutPeriodsWeeklyRadioYesId).disabled = !enabled ? true : false;
-            document.getElementById(cutPeriodsMonthlyRadioYesId).disabled = !enabled ? true : false;
-            document.getElementById(cutPeriodsWeeklyRadioNoId).disabled = !enabled ? true : false;
-            document.getElementById(cutPeriodsMonthlyRadioNoId).disabled = !enabled ? true : false;
-            document.getElementById(cutPeriodsStartDateInputId).disabled = !enabled ? true : false;
-            document.getElementById(cutPeriodsEndDateInputId).disabled = !enabled ? true : false;
-            document.getElementById(createPeriodsButtonId).disabled = !enabled ? true : false;
+            document.getElementById(cutPeriodsWeeklyRadioYesId).disabled = !enabled;
+            document.getElementById(cutPeriodsMonthlyRadioYesId).disabled = !enabled;
+            document.getElementById(cutPeriodsWeeklyRadioNoId).disabled = !enabled;
+            document.getElementById(cutPeriodsMonthlyRadioNoId).disabled = !enabled;
+            document.getElementById(cutPeriodsStartDateInputId).disabled = !enabled;
+            document.getElementById(cutPeriodsEndDateInputId).disabled = !enabled;
+            document.getElementById(createPeriodsButtonId).disabled = !enabled;
 
             document.getElementById(cutPeriodsWeeklyRowId).style.display = !enabled ? "none" : "table-row";
             document.getElementById(cutPeriodsWeeklyPeriodicityRowId).style.display = !enabled ? "none" : "table-row";
@@ -309,18 +313,17 @@
         }
 
         if (scope === undefined || scope === "cutWeekly") {
-            document.getElementById(cutPeriodsWeeklyPeriodicityInputId).disabled = !cutWeekly ? true : false;
-            document.getElementById(cutPeriodsWeeklyDayInputId).disabled = !cutWeekly ? true : false;
+            document.getElementById(cutPeriodsWeeklyPeriodicityInputId).disabled = !cutWeekly;
+            document.getElementById(cutPeriodsWeeklyDayInputId).disabled = !cutWeekly;
         }
 
         if (scope === undefined || scope === "cutMonthly") {
-            document.getElementById(cutPeriodsMonthlyPeriodicityInputId).disabled = !cutMonthly ? true : false;
-            document.getElementById(cutPeriodsMonthlyEndOfDayCheckBoxId).disabled = !cutMonthly ? true : false;
+            document.getElementById(cutPeriodsMonthlyPeriodicityInputId).disabled = !cutMonthly;
+            document.getElementById(cutPeriodsMonthlyEndOfDayCheckBoxId).disabled = !cutMonthly;
         }
 
         if (scope === undefined || scope === "cutMonthly" || scope === "cutMonthlyEndOfDay") {
-            document.getElementById(cutPeriodsMonthlyDayInputId).disabled =
-                (!cutMonthly || cutMonthlyEndOfDay) ? true : false;
+            document.getElementById(cutPeriodsMonthlyDayInputId).disabled = !cutMonthly || cutMonthlyEndOfDay;
         }
 
         if (onStateChangeEvent !== null) {

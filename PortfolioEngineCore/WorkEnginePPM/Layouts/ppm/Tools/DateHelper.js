@@ -15,8 +15,13 @@
         if (format === 'short') {
             year = year.toString().substr(2);
         } else {
-            if (month.toString().length < 2) month = "0" + month;
-            if (day.toString().length < 2) day = "0" + day;
+            if (month.toString().length < 2) {
+                month = "0" + month;
+            }
+
+            if (day.toString().length < 2) {
+                day = "0" + day;
+            }
         }
 
         if (format === "utc") {
