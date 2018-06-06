@@ -1246,6 +1246,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\optimizer.aspx" />
     <Content Include="Layouts\ppm\Optimizer.js" />
     <Content Include="Layouts\ppm\AutoAdjustPeriods.js" />
+    <Content Include="Layouts\ppm\PeriodAutomation.js" />
     <Content Include="Layouts\ppm\PFEFileImport.aspx" />
     <Content Include="Layouts\ppm\PFEFileImportStatus.aspx" />
     <Content Include="Layouts\ppm\Postcostoptions.aspx" />
@@ -1303,6 +1304,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\TestSingleSite.aspx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.ascx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.css" />
+    <Content Include="Layouts\ppm\Tools\DateHelper.js" />
     <Content Include="Layouts\ppm\Tools\DGrid.ascx" />
     <Content Include="Layouts\ppm\Tools\DGrid.ascx.js" />
     <Content Include="Layouts\ppm\Tools\jsfunctions.js" />
