@@ -1,6 +1,7 @@
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import * as path from 'path';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
