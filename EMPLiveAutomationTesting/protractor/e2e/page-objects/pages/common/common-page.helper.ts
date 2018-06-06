@@ -441,11 +441,11 @@ export class CommonPageHelper {
     }
 
     static getPublicView(text: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)}`));
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)}`));
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
 
     static getCssSelector(attribute: string, attValue: string) {
