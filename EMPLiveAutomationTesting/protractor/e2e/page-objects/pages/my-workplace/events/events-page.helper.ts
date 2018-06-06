@@ -44,7 +44,7 @@ export class EventsPageHelper {
 
         await PageHelper.switchToDefaultContent();
         stepLogger.verification('"Verificaion: New Event" page is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent))
+        await expect(await CommonPage.saveNewEvent.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
 

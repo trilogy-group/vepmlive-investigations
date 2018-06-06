@@ -228,8 +228,7 @@ export class CommonPageConstants {
 
     static get specificIds() {
         return {
-            // tslint:disable-next-line:max-line-length
-            saveEventId: 'ctl00_ctl36_g_6bf34b4b_58c0_4134_bd0d_aa7ed25da6fc_ctl00_toolBarTbltop_RightRptControls_ctl01_ctl00_diidIOSaveItem'
+            saveEventId: 'idIOSaveItem'
         };
     }
 }

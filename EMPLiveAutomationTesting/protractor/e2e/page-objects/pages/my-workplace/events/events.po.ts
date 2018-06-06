@@ -32,8 +32,8 @@ export class EventsPage {
         return CommonPageHelper.getElementContainsTitle(CommonPageConstants.title);
     }
 
-    static getNewEventAdded(titleNewEvent: string) {
-        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(titleNewEvent)}]`));
+    static getNewEventAdded(titleNewEvent: string, isContains= false) {
+        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(titleNewEvent, isContains)}]`));
     }
 
     static get calenderTomorrow() {
