@@ -8,6 +8,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {MyWorkPage} from './my-work.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class MyWorkPageHelper {
 
@@ -45,6 +46,10 @@ export class MyWorkPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
         await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+
+        stepLogger.verification('Newly created Item [Ex: Title 1] displayed in "My Work" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     }
 
     static async fillTimeOffFormAndSave(titleValue: string, stepLogger: StepLogger) {
