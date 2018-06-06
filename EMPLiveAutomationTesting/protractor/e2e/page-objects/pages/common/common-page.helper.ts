@@ -12,6 +12,7 @@ import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 const fs = require('fs');
 
@@ -469,5 +470,9 @@ export class CommonPageHelper {
 
         // Avoiding - Element is not able to click at point (-9553, -9859)
         await browser.sleep(PageHelper.timeout.s);
+    }
+
+    static searchedItemList(text: string) {
+        return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
     }
 }

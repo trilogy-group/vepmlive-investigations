@@ -25,7 +25,7 @@ export class DiscussionsPage {
     }
 
     static get allDiscussionItems() {
-        return DiscussionsPageHelper.getAllDiscussionsItem(HtmlHelper.attributeValue.postMainContainer,
+        return DiscussionsPageHelper.discussionsItems(HtmlHelper.attributeValue.postMainContainer,
             DiscussionsPageConstants.inputLabels.subject);
     }
 

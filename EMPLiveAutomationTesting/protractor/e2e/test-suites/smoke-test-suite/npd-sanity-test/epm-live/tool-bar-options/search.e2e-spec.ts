@@ -34,7 +34,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.searchItemByTitle(firstProjectName, ProjectItemPageConstants.columnNames.title, stepLogger, true);
 
         stepLogger.verification('searched projects should get displayed');
-        await expect(await PageHelper.isElementPresent(CommonPage.searchedItemList(firstProjectName)))
+        await expect(await PageHelper.isElementPresent(CommonPageHelper.searchedItemList(firstProjectName)))
                 .toBe(true, ValidationsHelper.getLabelDisplayedValidation(firstProjectName));
 
         stepLogger.stepId(5);

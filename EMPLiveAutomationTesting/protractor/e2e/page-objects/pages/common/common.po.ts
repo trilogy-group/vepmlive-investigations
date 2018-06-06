@@ -287,10 +287,6 @@ export class CommonPage extends BasePage {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
     }
 
-    static searchedItemList(text: string) {
-        return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
-    }
-
     static get personIcon(){
         return element(By.id('EPMLiveNotificationCounterProfilePic'));
     }

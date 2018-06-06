@@ -57,7 +57,7 @@ export class DiscussionsPageHelper {
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, false, stepLogger);
     }
 
-    static getAllDiscussionsItem(classAttribute: string, text: string) {
+    static discussionsItems(classAttribute: string, text: string) {
         const xpath = element.all(By.xpath
             (`//div[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]//span[
                 ${ComponentHelpers.getXPathFunctionForDot(text, true)}]`));
