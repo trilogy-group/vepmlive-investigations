@@ -224,7 +224,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
-    fit('Add new Public view in Risk - [1176327]', async () => {
+    it('Add new Public view in Risk - [1176327]', async () => {
         const stepLogger = new StepLogger(1176327);
         stepLogger.stepId(1);
 
@@ -237,18 +237,17 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on public view drop down');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getDropDownViewByText
-            (RiskItemPageConstants.defaultViewName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.defaultDropDownViewByText))
                     .toBe(true,
                         ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
-        await PageHelper.click(CommonPage.getDropDownViewByText(RiskItemPageConstants.defaultViewName));
+        await PageHelper.click(CommonPage.viewPageActions.defaultDropDownViewByText);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on create public view');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewDropDownActions.createNewPublicView))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.createNewPublicView))
                     .toBe(true,
                         ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
-        await PageHelper.click(CommonPage.viewDropDownActions.createNewPublicView);
+        await PageHelper.click(CommonPage.viewPageActions.createNewPublicView);
 
         stepLogger.stepId(4);
         stepLogger.step('Fill view name');

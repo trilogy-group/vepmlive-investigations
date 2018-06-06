@@ -132,23 +132,23 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getDisplayedValidation(titleNewView));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.title} columns selected to display in the view should be displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getViewColumnByName(RiskItemPageConstants.columnNames.title)))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.titleViewColumn))
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.title));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.assignedTo} columns
         selected to display in the view should be displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getViewColumnByName(RiskItemPageConstants.columnNames.assignedTo)))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.assignedToViewColumn))
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.assignedTo));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.status} columns selected to display in the view should be displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getViewColumnByName(RiskItemPageConstants.columnNames.status)))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.statusViewColumn))
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.status));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.dueDate} columns selected to display in the view should be displayed`);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getViewColumnByName(RiskItemPageConstants.columnNames.dueDate)))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.dueDateViewColumn))
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
     }

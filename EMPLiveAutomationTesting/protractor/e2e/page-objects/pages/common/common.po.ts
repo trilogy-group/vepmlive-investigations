@@ -7,6 +7,7 @@ import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import { ComponentHelpers } from '../../../components/devfactory/component-helpers/component-helpers';
+import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.constants';
 
 export class CommonPage extends BasePage {
 
@@ -271,21 +272,30 @@ export class CommonPage extends BasePage {
         return element(By.css('.ms-paging'));
     }
 
-    static get viewDropDownActions() {
+    static get viewPageActions() {
         const publicViewLabels = CommonPageConstants.viewDropDownLabels;
+        const riskColumns = RiskItemPageConstants.columnNames;
         return {
-            createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView)
+            createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
+
+            defaultDropDownViewByText: element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a,
+                 `@${HtmlHelper.attributes.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers
+                    .getElementByTagXpath(HtmlHelper.tags.span, RiskItemPageConstants.defaultViewName, false)}`)),
+
+            titleViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.title, false)}`)),
+
+            assignedToViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td,
+                riskColumns.assignedTo, false)}`)),
+
+            statusViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.status, false)}`)),
+
+            dueDateViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.dueDate, false)}`))
         };
     }
 
-    static getViewColumnByName(columnTitle: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnTitle, false)}`));
-    }
-
     static getDropDownViewByText(titleView: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag
-            // tslint:disable-next-line:max-line-length
-            (HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
+         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 
     static get viewNewPageActions() {
