@@ -278,19 +278,20 @@ export class CommonPage extends BasePage {
         return {
             createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
 
-            defaultDropDownViewByText: element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a,
-                 `@${HtmlHelper.attributes.class}`, CommonPageConstants.dropDown, true)}${ComponentHelpers
-                    .getElementByTagXpath(HtmlHelper.tags.span, RiskItemPageConstants.defaultViewName, false)}`)),
+            defaultDropDownViewByText: this.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
 
-            titleViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.title, false)}`)),
+            titleViewColumn: this.getColumnElement(riskColumns.title),
 
-            assignedToViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td,
-                riskColumns.assignedTo, false)}`)),
+            assignedToViewColumn: this.getColumnElement(riskColumns.assignedTo),
 
-            statusViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.status, false)}`)),
+            statusViewColumn: this.getColumnElement(riskColumns.status),
 
-            dueDateViewColumn: element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, riskColumns.dueDate, false)}`))
+            dueDateViewColumn: this.getColumnElement(riskColumns.dueDate)
         };
+    }
+
+    static getColumnElement(columnName: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
     }
 
     static getDropDownViewByText(titleView: string) {
@@ -303,18 +304,15 @@ export class CommonPage extends BasePage {
         return {
             fillCreatePublicViewPageTitle: element(By.name(`${createLabels.title}`)),
 
-            publicViewRadioButton: element(By
-                .css(`[${HtmlHelper.attributes.id}$='${CommonPageConstants.newPublicViewformLabels.publicView}']`)),
+            publicViewRadioButton: element(By.id(CommonPageConstants.newPublicViewformLabels.publicView)),
 
-            scheduledStatusCheckBox: element(By.css
-                (`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.scheduleStatus}']`)),
+            scheduledStatusCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.scheduleStatus)),
 
-            exposureCheckBox: element(By.css(`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.exposure}']`)),
+            exposureCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.exposure)),
 
-            dueCheckBox: element(By.css(`[${HtmlHelper.attributes.name}$='${CommonPageConstants.newPublicViewformLabels.due}']`)),
+            dueCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.due)),
 
-            submitCreatePublicViewPage: element(By.css
-                (`${HtmlHelper.tags.input}[${HtmlHelper.attributes.id}='${CommonPageConstants.formLabels.topSave}']`))
+            submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
         };
     }
 }

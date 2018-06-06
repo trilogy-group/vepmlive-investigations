@@ -447,4 +447,8 @@ export class CommonPageHelper {
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)}`));
     }
+
+    static getCssSelector(attribute: string, attValue: string) {
+        return element(By.css(`[${attribute}$='${attValue}']`));
+    }
 }
