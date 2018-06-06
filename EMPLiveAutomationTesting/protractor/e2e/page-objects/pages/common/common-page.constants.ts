@@ -29,7 +29,7 @@ export class CommonPageConstants {
             fileType: '.pdf',
             documentFileName: 'pdf-file',
             filePath: () => {
-                return path.join(this.currentDir, this.filesDirectoryName, this.imageFile.documentFileName + this.documentFile.fileType);
+                return path.join(this.currentDir, this.filesDirectoryName, this.documentFile.documentFileName + this.documentFile.fileType);
             }
         };
     }
