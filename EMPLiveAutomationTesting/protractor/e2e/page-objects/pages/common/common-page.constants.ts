@@ -19,7 +19,7 @@ export class CommonPageConstants {
             fileType: '.jpg',
             jpegFileName: 'jpeg-image',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.imageFile.jpegFileName}${this.imageFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.imageFile.jpegFileName + this.imageFile.fileType);
             }
         };
     }
@@ -29,7 +29,7 @@ export class CommonPageConstants {
             fileType: '.pdf',
             documentFileName: 'pdf-file',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.documentFile.documentFileName}${this.documentFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.documentFile.documentFileName + this.documentFile.fileType);
             }
         };
     }
