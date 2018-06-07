@@ -12,6 +12,8 @@ export class HomePageConstants {
                 projectCenter: 'Project Center',
                 tasks: 'Tasks',
                 risks: 'Risks',
+                workHours: 'Work Hours',
+                projectNodeCollapsed: 'Project Node Collapsed',
                 issues: 'Issues',
                 changes: 'Changes',
                 documents: 'Documents',
@@ -28,6 +30,7 @@ export class HomePageConstants {
             addADocumentTitle: 'Add a document',
             chooseFiles: 'Choose Files',
             overwriteExistingFilesLabel: 'Overwrite existing files',
+            addADocumentPropertyTitle: 'Add A Document Property Title',
         };
     }
 }

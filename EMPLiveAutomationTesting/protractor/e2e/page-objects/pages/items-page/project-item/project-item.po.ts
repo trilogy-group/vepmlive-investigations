@@ -88,6 +88,26 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
+    static get clickonprojectName() {
+        return element(By.xpath('.//*[contains(@class,"SummaryTask GSText GSCell GSNoLeft HideCol6Title")]'));
+    }
+
+    static get workFeild() {
+        return element(By.xpath('.//*[contains(@class," GSClassEdit GSAlignRight GSFloat GSCell HideCol6Work")]'));
+    }
+
+    static get savebtn() {
+        return element(By.xpath('.//*[contains(@id,"SaveButton")]'));
+    }
+
+    static get getTaskName() {
+        return element(By.xpath('.//*[contains(@class,"GSClassEdit GSText GSCell GSNoLeft")]'));
+    }
+
+    static get closebtn() {
+        return element(By.xpath('.//*[contains(@id,"CloseButton")]'));
+    }
+
     static get selectPlanner() {
         const label = ProjectItemPageConstants.plannerLabels;
         return {
@@ -128,6 +148,10 @@ export class ProjectItemPage extends BasePage {
 
     static get actionsdropdown() {
         return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
+    }
+
+    static get deleteTask() {
+        return element(By.xpath('.//*[@id="Ribbon.WorkPlanner.InsertGroup.DeleteTask-Medium"]'));
     }
 
     static get applyParameterButton() {

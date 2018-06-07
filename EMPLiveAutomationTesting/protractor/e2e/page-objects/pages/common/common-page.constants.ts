@@ -8,12 +8,21 @@ export class CommonPageConstants {
     static filesDirectoryName = 'files';
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
+    static readonly calendarContent = 'Calendar Content';
+    static readonly createView = 'create View';
     static readonly title = 'Title';
+    static readonly columnDescription = 'Column Desciption';
+    static readonly viewType = 'View Type';
+    static readonly createdView = 'created View';
     static readonly viewAll = 'View All';
+    static readonly columnType = 'Column Type';
+    static readonly columnName = 'Column Name';
     static readonly newItem = 'New Item';
+    static readonly calendar = 'Calendar';
     static readonly attachFilePopupTitle = 'Attach File';
     static readonly last = 'Last';
     static readonly fileUpload = 'fileUpload';
+    static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
 
     static get viewDropDownLabels() {
@@ -62,9 +71,12 @@ export class CommonPageConstants {
     static get ribbonLabels() {
         return {
             save: 'Save',
+            editPlan: 'EPMLive.Planner-Large',
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',
+            editCost: 'EPKCosts',
+            addTask: 'AddTask-Large',
             attachFile: 'AttachFile',
             editTeam: 'Edit Team',
             close: 'Close',
@@ -117,6 +129,14 @@ export class CommonPageConstants {
         };
     }
 
+    static get costData() {
+        return {
+            firstData: '120.00',
+            secondData: '130.00',
+            thirdData: '140.00',
+        };
+    }
+
     static get pageHeaders() {
         return {
             projects: HomePageConstants.navigationLabels.projects,
@@ -155,6 +175,13 @@ export class CommonPageConstants {
             navigation: 'EPMLiveNav',
             createNew: 'epm-nav-sub-new',
             myWorkplace: 'epm-nav-sub-workplace-static-links'
+        };
+    }
+
+    static get versionComment() {
+        return {
+            first: 'New Version of previously updated file',
+            second: '0.2'
         };
     }
 

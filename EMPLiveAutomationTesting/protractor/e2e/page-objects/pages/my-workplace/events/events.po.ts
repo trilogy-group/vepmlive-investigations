@@ -20,6 +20,14 @@ export class EventsPage {
          return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.title);
     }
 
+    static get standardViewType () {
+        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
+    }
+
+    static get okButton1 () {
+        return element(By.css('#onetidSaveItem'));
+    }
+
     static get categoryField() {
         return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.category);
     }
@@ -39,12 +47,20 @@ export class EventsPage {
         return element(By.css(`td[date='${tomorrow}']`));
     }
 
+    static get calenderTab() {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar-title"]'));
+    }
+
     static get closeEventButton() {
         return element(By.css('[value = "Close"]'));
     }
 
     static addNewEvent(title: string) {
         return element(By.css(`a[title='${title}']`));
+    }
+
+    static get createView () {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.CreateView-Medium"]'));
     }
 
     static getElementByLinkText(text: string) {
@@ -54,4 +70,45 @@ export class EventsPage {
     static eventPageByTitle(title: string) {
         return CommonPageHelper.getElementUsingTextContent(title, true);
     }
+
+    static get currentView() {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.DisplayView"]'));
+    }
+
+    static get defaultCheckbox() {
+        return element(By.id('onetidIOCheckDefaultView'));
+    }
+
+    static getelement(val: string) {
+        return element(By.xpath('.//*[text()="' + val + '"]'));
+    }
+
+    static get rollOver() {
+        return element(By.css('#WPQ2_ListTitleViewSelectorMenu_Container_overflow'));
+    }
+
+    static get viewName () {
+        return element(By.css('#ViewName'));
+    }
+
+    static get okButton () {
+        return element(By.css('#onetidSaveItemtop'));
+    }
+
+    static get choiceCheckbox() {
+        return element(By.id('onetidTypeChoice'));
+    }
+
+    static get descriptionFeild () {
+        return element(By.id('idDesc'));
+    }
+
+    static get columnNameFeild () {
+        return element(By.id('idColName'));
+    }
+
+    static get createColumn () {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.CreateColumn-Medium"]'));
+    }
+
 }

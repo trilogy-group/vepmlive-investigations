@@ -11,6 +11,9 @@ import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.co
 export class CommonPage extends BasePage {
 
     static readonly dialogTitleId = 'dialogTitleSpan';
+    static readonly plannerClass = 'GMEditCellInput';
+    static readonly saveBtn = 'SaveBtn';
+    static readonly closeBtn = 'CloseBtn';
     static readonly titleId = 'pageTitle';
 
     static get sidebarMenus() {
@@ -83,10 +86,13 @@ export class CommonPage extends BasePage {
         const labels = CommonPageConstants.ribbonLabels;
         return {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
+            editPlan: CommonPageHelper.getRibbonButtonById(labels.editPlan),
             attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
+            editCost: CommonPageHelper.getRibbonButtonById(labels.editCost),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
+            addTask: CommonPageHelper.getRibbonButtonById(labels.addTask),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
@@ -196,6 +202,79 @@ export class CommonPage extends BasePage {
 
     static get ellipse() {
         return element(By.css('td .icon-ellipsis-horizontal'));
+    }
+
+    static get demoproject() {
+        return element(By.xpath(`//*[@id="GanttGrid0Main"]/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/
+        td/table/tbody/tr[2]/td[4]/a[1]`));
+    }
+
+    static get actualCostTab() {
+        return element(By.xpath('.//*[@tab_id=\'tab_9\' and @class]'));
+    }
+
+    static get clickOnCloseButton() {
+        return element(By.id(this.closeBtn));
+    }
+
+    static  fileVersion(text: string) {
+        return element(By.xpath('.//*[text()="' + text + '"]//ancestor::div[1]//ancestor::tr[1]//td[7]'));
+    }
+
+    static get clickOnSaveButton() {
+        return element(By.id(this.saveBtn));
+    }
+
+    static get versionCommentField() {
+        return element(By.css('#ctl00_PlaceHolderMain_VersionCommentSection_ctl01_CheckInComment'));
+    }
+
+    static get newVersionCheckbox() {
+        return element(By.css('#ctl00_PlaceHolderMain_ctl02_ctl04_OverwriteSingle'));
+    }
+
+    static get documentTitle() {
+        return element(By.css('#WPQ2_ListTitleViewSelectorMenu_Container_surfaceopt0'));
+    }
+
+    static get projectCollapse() {
+        return element(By.xpath('.//*[@class="ms-commentexpand-iconouter"]'));
+    }
+
+    static get contentUpdateFrame() {
+        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
+    }
+
+    static get homePageTitle() {
+        return element(By.css('#MSOImageWebPart_WebPartWPQ3'));
+    }
+
+    static get cellTextBox1() {
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C1")][1]'));
+    }
+
+    static get cellTextBox2() {
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C2")][1]'));
+    }
+
+    static get cellTextBox3() {
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C3")][1]'));
+    }
+
+    static get budgetTab() {
+        return element(By.xpath('.//*[contains(@style,\'rgb(255, 255, 255)\')]/span[text()=\'Budget\']'));
+    }
+
+    static get benefitsCostTab() {
+        return element(By.xpath('.//*[@tab_id=\'tab_10\' and @class]'));
+    }
+
+    static get calendearView() {
+        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar"]'));
+    }
+
+    static get eventDialogbox() {
+        return element(By.xpath('.//*[@class="ms-dlgTitle"]'));
     }
 
     static get singleSearchTextBox() {

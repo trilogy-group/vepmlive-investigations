@@ -1,7 +1,7 @@
 /**
  * Page helper for general utility
  */
-import {browser, ElementFinder, WebElement} from 'protractor';
+import {browser, ElementFinder, WebElement, protractor} from 'protractor';
 import {WaitHelper} from './wait-helper';
 
 const remote = require('selenium-webdriver/remote');
@@ -156,6 +156,12 @@ export class PageHelper {
         return targetElement.click();
     }
 
+    static async clickWithWaitxs(targetElement: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
+        await browser.sleep(PageHelper.timeout.xs);
+        return targetElement.click();
+    }
+
     /**
      * Click on the element and wait for it to get hidden
      * @param {ElementFinder} targetElement
@@ -206,9 +212,26 @@ export class PageHelper {
         return targetElement.isPresent();
     }
 
+    static async clickWithWaitl(targetElement: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
+        await browser.sleep(PageHelper.timeout.l);
+        return targetElement.click();
+    }
+
     static getUniqueId(): string {
         const shortId = require('shortid');
         return shortId.generate();
+    }
+
+    static async actionSendKeysWithEnter( locator: ElementFinder,
+                                          data: string,
+                                          sendEnter = false) {
+        await locator.click();
+        await browser.actions().sendKeys(data).perform();
+        await browser.sleep(PageHelper.timeout.s);
+        if (sendEnter) {
+            await browser.actions().sendKeys(protractor.Key.ENTER).perform();
+        }
     }
 
     static async uploadFile(item: ElementFinder, filePath: string) {

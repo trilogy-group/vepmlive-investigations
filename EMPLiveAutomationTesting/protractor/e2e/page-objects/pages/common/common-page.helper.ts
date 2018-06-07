@@ -39,7 +39,7 @@ export class CommonPageHelper {
         fs.createReadStream(documentFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName: newFileName + documentFile.fileType};
+        return {fullFilePath, newFileName: newFileName + documentFile.fileType, file: newFileName};
     }
 
     public static get getCurrentDate() {
@@ -59,6 +59,10 @@ export class CommonPageHelper {
 
     public static get getCurrentYear() {
         return new Date().getFullYear();
+    }
+
+    static getRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@id,'${id}')]`));
     }
 
     public static get getTodayInMMDDYYYY() {

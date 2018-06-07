@@ -22,6 +22,10 @@ export class ElementHelper {
         return browser.actions().mouseDown(item).perform();
     }
 
+    static  getElementByTextWithTextParameter(text: string) {
+        return element(By.xpath('.//*[text()="' + text + '"]'));
+    }
+
     static async actionDragAndDrop(source: ElementFinder, destination: ElementFinder) {
         return browser.actions().dragAndDrop(source, destination).perform();
     }
