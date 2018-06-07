@@ -16,6 +16,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {LoginPageHelper} from '../../../../../page-objects/pages/login/login-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {browser} from 'protractor';
+import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -64,9 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Changes - New Item" window');
-        // step#5 is inside this function
         await MyWorkPageHelper.fillFormAndSave(stepLogger);
-
     });
 
     it('Create New Issue - [855547]', async () => {
@@ -90,7 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.issues, true))
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.issues))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.issues));
 
         stepLogger.step('Switch to frame');
@@ -98,7 +97,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Issues - New Item" window');
-        // step#5 is inside this function
         await MyWorkPageHelper.fillFormAndSave(stepLogger);
     });
 
@@ -123,7 +121,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.risks, true))
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.risks))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.risks));
 
         stepLogger.step('Switch to frame');
@@ -131,7 +129,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Risks - New Item" window');
-        // step#5 is inside this function
         await MyWorkPageHelper.fillFormAndSave(stepLogger);
     });
 
@@ -156,7 +153,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.timeOff, true))
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.timeOff))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.timeOff));
 
         stepLogger.step('Switch to frame');
@@ -164,8 +161,22 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Time Off - New Item" window');
-        // step#5 and step#6 are inside this function
-        await MyWorkPageHelper.fillTimeOffFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const inputLabels = MyWorkPageConstants.inputLabels;
+        const titleValue = `${inputLabels.title} ${uniqueId}`;
+        // step#5 is inside this function
+        await MyWorkPageHelper.fillTimeOffFormAndSave(titleValue, stepLogger);
+
+        stepLogger.stepId(6);
+        stepLogger.verification('"Navigate to My Time Off page');
+        await PageHelper.click( MyWorkplacePage.navigation.myTimeOff);
+
+        stepLogger.verification('search for newly created projects');
+        await CommonPageHelper.searchItemByTitle(titleValue, MyTimeOffPageConstants.columnNames.title, stepLogger, true);
+
+        stepLogger.verification('searched projects should get displayed');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
     });
 
     it('Create New To Do item - [855560]', async () => {
@@ -189,7 +200,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"To Do - New Item" window is displayed');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.toDo, true))
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.toDo))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.toDo));
 
         stepLogger.step('Switch to frame');
@@ -216,10 +227,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
-
-        stepLogger.verification('Newly created ToDo Item [Ex: Title 1] displayed in "My Work" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
     });
 
     it('Edit Item - Attach File - [855672]', async () => {

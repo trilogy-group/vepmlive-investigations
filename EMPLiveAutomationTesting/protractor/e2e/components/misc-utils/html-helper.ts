@@ -129,4 +129,12 @@ export class HtmlHelper extends HtmlHelperFactory {
             wbr: 'wbr',
         };
     }
+
+    static get attributeValue() {
+        return {
+            gmNoDataRow: 'GMNoDataRow',
+            postMainContainer: 'postMainContainer',
+            gmClassReadOnly: 'GMClassReadOnly',
+        };
+    }
 }

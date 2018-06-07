@@ -20,7 +20,13 @@ export class AnchorHelper {
         return element.all(By.xpath(xpath));
     }
 
-    static getAnchorByText(text: string) {
-        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+    static getAnchorInsideGridByClass(text: string) {
+        return element(By.xpath(`//td[${ComponentHelpers.getXPathFunctionForClass(text, true)}]//a`));
+    }
+
+    static getAnchorByTextInsideGridByClass(classAttribute: string, text: string) {
+        const xpath = `//td[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]/a[
+            ${ComponentHelpers.getXPathFunctionForDot(text)}]`;
+        return element(By.xpath(xpath));
     }
 }

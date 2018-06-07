@@ -5,6 +5,8 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
+import {element, By} from 'protractor';
+import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import { CommonPageHelper } from '../../common/common-page.helper';
 import { WaitHelper } from '../../../../components/html/wait-helper';
 import { MyWorkplacePage } from '../my-workplace.po';
@@ -25,8 +27,12 @@ export class DiscussionsPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(DiscussionsPageConstants.editPageName));
+
+        const label = DiscussionsPage.allDiscussionItems;
+        stepLogger.step(`Newly created Discussion [Ex: Discussion 1] displayed in "Discussions" page`);
+        await CommonPageHelper.checkItemCreated(subject, label);
     }
-  
+
     static async addDiscussion(stepLogger: StepLogger) {
         stepLogger.step('PRECONDITION: navigate to Discussions page');
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -49,7 +55,14 @@ export class DiscussionsPageHelper {
         const subject = `${labels.subject} ${uniqueId}`;
         const body = `${labels.body} ${uniqueId}`;
         await DiscussionsPageHelper.fillNewDiscussionFormAndVerify(subject, body, false, stepLogger);
-    }    
+    }
+
+    static discussionsItems(classAttribute: string, text: string) {
+        const xpath = element.all(By.xpath
+            (`//div[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]//span[
+                ${ComponentHelpers.getXPathFunctionForDot(text, true)}]`));
+        return xpath;
+    }
 
     static async enterSubjectAndBody(subject: string, body: string, isQuestion: boolean, stepLogger: StepLogger) {
         stepLogger.step(`Subject *: New Discussion 1`);

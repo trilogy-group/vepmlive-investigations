@@ -34,4 +34,12 @@ export class ResourcesPage extends BasePage {
     static getDropdownValue(id: string) {
         return element(By.id(`${id}`));
     }
+
+    static get searchIcon() {
+        return element(By.className('icon-search-3'));
+    }
+
+    static get searchTextbox() {
+        return element(By.id('toolBarResGridSelector'));
+    }
 }
