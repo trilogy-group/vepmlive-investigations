@@ -43,7 +43,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Select any project from project center');
-        await PageHelper.click(CommonPage.demoproject);
+        await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click ITEMS tab select Edit Costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editPlan);

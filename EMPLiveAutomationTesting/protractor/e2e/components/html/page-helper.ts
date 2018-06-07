@@ -45,8 +45,9 @@ export class PageHelper {
         return browser.actions().sendKeys(key).perform();
     }
 
-    static sendKeysToInputField(elem: ElementFinder, key: string) {
-        elem.sendKeys(key);
+    static async sendKeysToInputField(elem: ElementFinder, key: string) {
+        await elem.click();
+        await browser.actions().sendKeys(key).perform();
     }
 
     static actionKeyUp(key: string) {

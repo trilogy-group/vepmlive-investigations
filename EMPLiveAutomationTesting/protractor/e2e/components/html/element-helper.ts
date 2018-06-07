@@ -143,6 +143,12 @@ export class ElementHelper {
         return browser.executeScript('arguments[0].click();', targetElement);
     }
 
+    static async SendKeysUsingJsNoWait(targetElement: ElementFinder, value: String) {
+        browser.sleep(PageHelper.timeout.s);
+        console.log(value);
+        return browser.executeScript('document."' + value + '";', targetElement);
+    }
+
     static async waitForElementToHaveClass(targetElement: ElementFinder,
                                            kClass: string,
                                            timeout = PageHelper.DEFAULT_TIMEOUT,

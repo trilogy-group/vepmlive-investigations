@@ -34,7 +34,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Select any project from project center');
-        await PageHelper.click(CommonPage.demoproject);
+        await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click ITEMS tab select Edit Costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editCost);
@@ -53,11 +53,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox1);
-        await PageHelper.actionSendKeysWithEnter(CommonPage.cellTextBox1, CommonPageConstants.costData.firstData, true);
+        await PageHelper.sendKeysToInputField(CommonPage.cellTextBox1, CommonPageConstants.costData.budgetData);
 
         stepLogger.verification('Costs entered in Budget tab');
         await expect(await CommonPage.cellTextBox1.getText())
-            .toBe(CommonPageConstants.costData.firstData);
+            .toBe(CommonPageConstants.costData.budgetData);
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Actual Costs tab');
@@ -65,11 +65,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox2);
-        await PageHelper.actionSendKeysWithEnter(CommonPage.cellTextBox2, CommonPageConstants.costData.secondData, true);
+        await PageHelper.sendKeysToInputField(CommonPage.cellTextBox2, CommonPageConstants.costData.actualCostData);
 
         stepLogger.verification('Costs entered in Actual Costs tab');
         await expect(await CommonPage.cellTextBox2.getText())
-            .toBe(CommonPageConstants.costData.secondData);
+            .toBe(CommonPageConstants.costData.actualCostData);
 
         stepLogger.stepId(6);
         stepLogger.step('Click on Benefits tab');
@@ -77,11 +77,11 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox3);
-        await PageHelper.actionSendKeysWithEnter(CommonPage.cellTextBox3, CommonPageConstants.costData.secondData, true);
+        await PageHelper.sendKeysToInputField(CommonPage.cellTextBox3, CommonPageConstants.costData.benefitsData);
 
         stepLogger.verification('Costs entered in Benefits tab');
         await expect(await CommonPage.cellTextBox3.getText())
-            .toBe(CommonPageConstants.costData.secondData);
+            .toBe(CommonPageConstants.costData.benefitsData);
 
         stepLogger.stepId(7);
         stepLogger.step('Click on Save button');
@@ -102,15 +102,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
 
         stepLogger.verification('Cost details displayed in Budget tab are same as values entered in Step# 4');
-        await expect(await CommonPage.cellTextBox1.getText()).toBe(CommonPageConstants.costData.firstData);
+        await expect(await CommonPage.cellTextBox1.getText()).toBe(CommonPageConstants.costData.budgetData);
 
         stepLogger.verification('Cost details displayed in Actual Costs tab are same as values entered in Step# 5');
         await PageHelper.click(CommonPage.actualCostTab);
-        await expect(await CommonPage.cellTextBox2.getText()).toBe(CommonPageConstants.costData.secondData);
+        await expect(await CommonPage.cellTextBox2.getText()).toBe(CommonPageConstants.costData.actualCostData);
 
         stepLogger.verification('Click on Benefits tabs');
         await PageHelper.click(CommonPage.benefitsCostTab);
-        await expect(await CommonPage.cellTextBox3.getText()).toBe(CommonPageConstants.costData.secondData);
+        await expect(await CommonPage.cellTextBox3.getText()).toBe(CommonPageConstants.costData.benefitsData);
 
     });
 });

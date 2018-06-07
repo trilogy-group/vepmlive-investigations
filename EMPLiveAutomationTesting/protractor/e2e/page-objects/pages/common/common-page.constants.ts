@@ -132,8 +132,9 @@ export class CommonPageConstants {
     static get costData() {
         return {
             firstData: '120.00',
-            secondData: '130.00',
-            thirdData: '140.00',
+            budgetData: '120',
+            actualCostData: '130',
+            benefitsData: '140',
         };
     }
 

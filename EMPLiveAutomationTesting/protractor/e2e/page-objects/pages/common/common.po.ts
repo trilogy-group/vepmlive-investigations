@@ -204,9 +204,8 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
-    static get demoproject() {
-        return element(By.xpath(`//*[@id="GanttGrid0Main"]/tbody/tr[2]/td[1]/div/div[2]/table/tbody/tr[3]/
-        td/table/tbody/tr[2]/td[4]/a[1]`));
+    static get project() {
+        return element(By.xpath(`.//*[contains(@onclick,"GanttGrid0Main','1'")]`));
     }
 
     static get actualCostTab() {
@@ -250,15 +249,15 @@ export class CommonPage extends BasePage {
     }
 
     static get cellTextBox1() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C1")][1]'));
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C10")]'));
     }
 
     static get cellTextBox2() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C2")][1]'));
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C12")]'));
     }
 
     static get cellTextBox3() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/*[contains(@class,"HideCol0C3")][1]'));
+        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C13")]'));
     }
 
     static get budgetTab() {
