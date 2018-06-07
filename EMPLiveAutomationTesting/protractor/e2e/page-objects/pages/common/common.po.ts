@@ -6,7 +6,6 @@ import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
-import { ComponentHelpers } from '../../../components/devfactory/component-helpers/component-helpers';
 import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.constants';
 
 export class CommonPage extends BasePage {
@@ -291,31 +290,22 @@ export class CommonPage extends BasePage {
         return {
             createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
 
-            defaultDropDownViewByText: this.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
+            defaultDropDownViewByText: CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
 
-            titleViewColumn: this.getColumnElement(riskColumns.title),
+            titleViewColumn: CommonPageHelper.getColumnElement(riskColumns.title),
 
-            assignedToViewColumn: this.getColumnElement(riskColumns.assignedTo),
+            assignedToViewColumn: CommonPageHelper.getColumnElement(riskColumns.assignedTo),
 
-            statusViewColumn: this.getColumnElement(riskColumns.status),
+            statusViewColumn: CommonPageHelper.getColumnElement(riskColumns.status),
 
-            dueDateViewColumn: this.getColumnElement(riskColumns.dueDate)
+            dueDateViewColumn: CommonPageHelper.getColumnElement(riskColumns.dueDate)
         };
-    }
-
-    static getColumnElement(columnName: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
-    }
-
-    static getDropDownViewByText(titleView: string) {
-        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
-         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 
     static get viewNewPageActions() {
         const createLabels = CommonPageConstants.newPublicViewformLabels;
         return {
-            fillCreatePublicViewPageTitle: element(By.name(`${createLabels.title}`)),
+            fillCreatePublicViewPageTitle: element(By.name(createLabels.title)),
 
             publicViewRadioButton: element(By.id(CommonPageConstants.newPublicViewformLabels.publicView)),
 
@@ -327,6 +317,7 @@ export class CommonPage extends BasePage {
 
             submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
         };
+    }
 
     static get itemsListing() {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);

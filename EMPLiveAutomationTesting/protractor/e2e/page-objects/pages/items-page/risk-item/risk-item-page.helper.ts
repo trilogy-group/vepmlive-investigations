@@ -111,7 +111,7 @@ export class RiskItemPageHelper {
         CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column Schedule "Due"');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox, ))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
         CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
@@ -127,7 +127,7 @@ export class RiskItemPageHelper {
 
     static async verifyRiskViewAdd(stepLogger: StepLogger, titleNewView: string) {
         stepLogger.verification('Newly created Public risk view is selected in "View" drop down');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.getDropDownViewByText(titleNewView)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText(titleNewView)))
                     .toBe(true,
                 ValidationsHelper.getDisplayedValidation(titleNewView));
 

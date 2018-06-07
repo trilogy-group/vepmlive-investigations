@@ -480,10 +480,16 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
 
-    static getCssSelector(attribute: string, attValue: string) {
-        return element(By.css(`[${attribute}$='${attValue}']`));
-
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getColumnElement(columnName: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
+    }
+
+    static getDropDownViewByText(titleView: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
+         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 }
