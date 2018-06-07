@@ -1,6 +1,7 @@
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import * as path from 'path';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
@@ -26,7 +27,7 @@ export class CommonPageConstants {
             fileType: '.jpg',
             jpegFileName: 'jpeg-image',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.imageFile.jpegFileName}${this.imageFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.imageFile.jpegFileName + this.imageFile.fileType);
             }
         };
     }
@@ -36,7 +37,7 @@ export class CommonPageConstants {
             fileType: '.pdf',
             documentFileName: 'pdf-file',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.documentFile.documentFileName}${this.documentFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.documentFile.documentFileName + this.documentFile.fileType);
             }
         };
     }
@@ -244,4 +245,17 @@ export class CommonPageConstants {
         };
     }
 
+    static get searchControl() {
+        return {
+           searchComponentDropdown : 'Component dropdown',
+           searchOperatorDropdown: 'Search Operator dropdown',
+           searchField : 'Search Field',
+        };
+    }
+
+    static get messages() {
+        return {
+           noDataFound : 'No data found',
+        };
+    }
 }

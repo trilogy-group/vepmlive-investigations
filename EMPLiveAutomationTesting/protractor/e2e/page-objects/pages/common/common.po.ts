@@ -166,7 +166,8 @@ export class CommonPage extends BasePage {
         return {
             text: element(By.css('#searchtext0Main,#searchtext2Main')),
             type: element(By.css('#searchtype0Main,#searchtype2Main')),
-            column: element(By.css('#search0Main,#search2Main'))
+            column: element(By.css('#search0Main,#search2Main')),
+            textChoice: element(By.css('#searchchoice0Main'))
         };
     }
 
@@ -230,6 +231,22 @@ export class CommonPage extends BasePage {
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+   }
+
+    static get searchChoiceOption(){
+        return {
+           proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
+           active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
+           closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+        };
+    }
+
+    static get searchIcon(){
+        return element(By.css(`[src*='find_icon']`));
+    }
+
+    static get noDataFound() {
+        return CommonPageHelper.getMessageNoDataFound(HtmlHelper.attributeValue.gmNoDataRow, CommonPageConstants.messages.noDataFound);
     }
 
     static get viewAll() {
@@ -245,10 +262,6 @@ export class CommonPage extends BasePage {
 
     static get fileUploadControl() {
         return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
-    }
-
-    static get lastButton() {
-        return AnchorHelper.getAnchorByText(CommonPageConstants.last);
     }
 
     static get searchTextBox() {
@@ -314,5 +327,16 @@ export class CommonPage extends BasePage {
 
             submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
         };
+
+    static get itemsListing() {
+        return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
+    }
+
+    static get personIcon(){
+        return element(By.id('EPMLiveNotificationCounterProfilePic'));
+    }
+
+    static get latestNotification(){
+        return element(By.className('EPMLiveNotificationTitle'));
     }
 }

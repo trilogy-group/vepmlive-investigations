@@ -73,6 +73,9 @@ export class MyTimeOffPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyTimeOffPageConstants.editPageName));
+
+        stepLogger.step(`click on Close button`);
+        await PageHelper.click(MyTimeOffPage.closeButton);
     }
 
     static getXpathForInputByLabel(type: string, title: string) {

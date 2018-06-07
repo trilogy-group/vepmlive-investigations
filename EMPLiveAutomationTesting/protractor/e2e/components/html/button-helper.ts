@@ -21,4 +21,8 @@ export class ButtonHelper extends ButtonHelperFactory {
             isContains
         )}]`;
     }
+
+    static getButtonByText(text: string, isContains = false) {
+        return element(By.xpath(ButtonHelper.getButtonByExactTextXPath(text,isContains)));
+      }
 }
