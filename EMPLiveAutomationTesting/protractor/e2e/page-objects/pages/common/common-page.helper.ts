@@ -472,7 +472,24 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
     }
 
+    static getPublicView(text: string) {
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
+    }
+
+    static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
+    }
+
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getColumnElement(columnName: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
+    }
+
+    static getDropDownViewByText(titleView: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
+         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
     }
 }

@@ -11,6 +11,10 @@ export class ComponentHelpers extends ComponentHelpersFactory {
         return `//${tag}[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
     }
 
+    static getElementByTagXpathWithTag(tag: string, internalTag: string, text: string, isContains = false) {
+        return `//${tag}[${ComponentHelpers.getXPathFunctionForStringComparison(text, internalTag, isContains)}]`;
+    }
+
     public static getXPathFunctionForClass(attributeValue: string, isContains = false) {
         return ComponentHelpers.getXPathFunctionForStringComparison(
             attributeValue,

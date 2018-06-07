@@ -6,6 +6,7 @@ import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.constants';
 
 export class CommonPage extends BasePage {
 
@@ -281,6 +282,41 @@ export class CommonPage extends BasePage {
 
     static get paging() {
         return element(By.css('.ms-paging'));
+    }
+
+    static get viewPageActions() {
+        const publicViewLabels = CommonPageConstants.viewDropDownLabels;
+        const riskColumns = RiskItemPageConstants.columnNames;
+        return {
+            createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
+
+            defaultDropDownViewByText: CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
+
+            titleViewColumn: CommonPageHelper.getColumnElement(riskColumns.title),
+
+            assignedToViewColumn: CommonPageHelper.getColumnElement(riskColumns.assignedTo),
+
+            statusViewColumn: CommonPageHelper.getColumnElement(riskColumns.status),
+
+            dueDateViewColumn: CommonPageHelper.getColumnElement(riskColumns.dueDate)
+        };
+    }
+
+    static get viewNewPageActions() {
+        const createLabels = CommonPageConstants.newPublicViewformLabels;
+        return {
+            fillCreatePublicViewPageTitle: element(By.name(createLabels.title)),
+
+            publicViewRadioButton: element(By.id(CommonPageConstants.newPublicViewformLabels.publicView)),
+
+            scheduledStatusCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.scheduleStatus)),
+
+            exposureCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.exposure)),
+
+            dueCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.due)),
+
+            submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
+        };
     }
 
     static get itemsListing() {

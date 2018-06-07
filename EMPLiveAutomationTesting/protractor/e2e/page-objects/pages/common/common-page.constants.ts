@@ -14,6 +14,13 @@ export class CommonPageConstants {
     static readonly attachFilePopupTitle = 'Attach File';
     static readonly last = 'Last';
     static readonly fileUpload = 'fileUpload';
+    static readonly dropDown: string = 'dropdown-toggle';
+
+    static get viewDropDownLabels() {
+        return {
+            createPublicView: 'Create View'
+        };
+    }
 
     static get imageFile() {
         return {
@@ -86,7 +93,18 @@ export class CommonPageConstants {
             ok: 'OK',
             okWithSmallK: 'Ok',
             add: '< Add',
-            remove: 'Remove >'
+            remove: 'Remove >',
+            topSave: 'onetidSaveItemtop'
+        };
+    }
+
+    static get newPublicViewformLabels() {
+        return {
+            title: 'NewViewName',
+            publicView: 'PersonalView1',
+            scheduleStatus: 'ShouldDisplayScheduleStatus',
+            exposure: 'ShouldDisplayExposure',
+            due: 'ShouldDisplayDue'
         };
     }
 
