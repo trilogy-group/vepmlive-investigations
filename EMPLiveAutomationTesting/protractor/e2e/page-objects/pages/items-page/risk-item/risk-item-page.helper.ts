@@ -155,16 +155,17 @@ export class RiskItemPageHelper {
     }
 
     static getDescendingColumnSelector(columnStatus: string) {
-        return element(By.xpath(`//td[contains(@class, '${CommonPageConstants.classNames.headerTextClass}')` +
-            ` and normalize-space(.)='${columnStatus}']` +
-            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
-            `//u[contains(@class,'${CommonPageConstants.classNames.descendingClass}')]`));
+        return this.getColumnSelector(columnStatus,,CommonPageConstants.classNames.descendingClass);
     }
 
     static getAscendingColumnSelector(columnStatus: string) {
+        return this.getColumnSelector(columnStatus,,CommonPageConstants.classNames.ascendingClass);
+    }
+    
+    static getColumnSelector(columnName: string,sortingClass: string) {
         return element(By.xpath(`//td[contains(@class, '${CommonPageConstants.classNames.headerTextClass}')` +
-            ` and normalize-space(.)='${columnStatus}']` +
-            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
-            `//u[contains(@class,'${CommonPageConstants.classNames.ascendingClass}')]`));
+            ` and normalize-space(.)='${columnName}']` +
+            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]`+
+            `//u[contains(@class,'${sortingClass}')]`));
     }
 }
