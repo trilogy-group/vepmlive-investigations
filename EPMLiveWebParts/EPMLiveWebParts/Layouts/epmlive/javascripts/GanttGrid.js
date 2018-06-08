@@ -239,8 +239,62 @@ function GridOnLoaded(grid) {
     grid.Lang.Format.GroupSeparator = eval("mygrid" + gridid + ".GroupSeparator");
 }
 
-function GridOnReady(grid) {
+var GridColumnWidthNamespace = 'GridColumnWidth';
+function GridColumnWidthSet() {
+    var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
+        return Grids[0].Cols[key];
+    }).filter(x => x.Sec == 1 && x.Visible == 1);
+    var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name + '=' + x.Width);
+    var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
 
+    $.ajax({
+        type: 'POST',
+        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthSet',
+        data: "{ siteUrl: 'http://win-6j09gf4nbp8', columnWidthPairs: '" + columnKeysPlain + "' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+        },
+        error: function (response) {
+            //onError(response);
+        }
+    });
+}
+
+function GridColumnWidthGet() {
+    var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
+        return Grids[0].Cols[key];
+    }).filter(x => x.Sec == 1 && x.Visible == 1);
+    var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name);
+    var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
+
+    $.ajax({
+        type: 'POST',
+        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthGet',
+        data: "{ siteUrl: 'http://win-6j09gf4nbp8', columnWidthPairs: '" + columnKeysPlain + "' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            var widths = response.d.split('>')[1].split('<')[0].split(',');
+
+            for (var i = 0; i < widths.length; i++) {
+                var width = widths[i];
+                var index = columns[i].Index;
+                Grids[0].SetWidth(index, width - Grids[0].Cols[index].Width);
+            }
+
+            Grids.OnColResize = function (tgrid, col) {
+                GridColumnWidthSet();
+            };
+        },
+        error: function (response) {
+            //onError(response);
+        }
+    });
+}
+
+
+function GridOnReady(grid) {
     TGSetEvent("OnRenderFinish", grid.id, GridOnRenderFinish);
     TGSetEvent("OnGetHtmlValue", grid.id, GridOnGetHtmlValue);
     TGSetEvent("OnClick", grid.id, GridClick);
@@ -251,6 +305,8 @@ function GridOnReady(grid) {
     TGSetEvent("OnSelect", grid.id, GridOnSelect);
     TGSetEvent("OnFocus", grid.id, GridOnFocus);
     TGSetEvent("OnDblClick", grid.id, GridOnDblClick);
+
+    GridColumnWidthGet();
 
     var gridid = GetGridId(grid);
 
@@ -263,6 +319,7 @@ function GridOnReady(grid) {
             eval("mygrid" + gridid + ".LinkType='view'");
     }
 }
+
 
 
 function GridOnRenderFinish(grid) {

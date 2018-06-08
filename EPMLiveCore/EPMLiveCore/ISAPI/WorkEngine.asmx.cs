@@ -2,11 +2,15 @@
 using EPMLiveCore.API.ResourceManagement;
 using EPMLiveCore.API.SPAdmin;
 using EPMLiveCore.Infrastructure;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -294,6 +298,86 @@ namespace EPMLiveCore
                 return Response.Failure(1000, string.Format("Error executing function: {0}", ex.Message));
             }
         }
+
+        /// <summary>
+        /// Set website level key-value store.
+        /// </summary>
+        [WebMethod]
+        public string ColumnWidthSet(string siteUrl, string columnWidthPairs)
+        {
+            try
+            {
+                var parameters = columnWidthPairs.Split(',').Select(x => x.Split('=')).ToDictionary(x => x[0], x => (object)x[1]);
+                string data = null;
+                SPWeb web = SPContext.Current.Web;
+                {
+                    foreach (var p in parameters)
+                    {
+                        var queryCheck = string.Format(@"SELECT * FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
+                          p.Key,
+                          web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                        if (dtCheck != null && dtCheck.Rows.Count != 0)
+                        {
+                            var query = string.Format(@"UPDATE [dbo].[PERSONALIZATIONS] SET [Value] = '{0}' WHERE [Key] = '{1}' AND [UserId] = '{2}'",
+                                p.Value,
+                                p.Key,
+                                web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                            var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+                        }
+                        else
+                        {
+                            var query = string.Format(@"INSERT INTO [dbo].[PERSONALIZATIONS] ([Key],[Value], [UserId]) VALUES ('{0}','{1}','{2}')",
+                                p.Key,
+                                p.Value,
+                                web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                            var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+
+                        }
+                    }
+                }
+                return Response.Success(data);
+            }
+            catch (Exception ex)
+            {
+                var api = new APIException(5028, ex.Message);
+                return Response.Failure(api.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Set website level key-value store.
+        /// </summary>
+        [WebMethod]
+        public string ColumnWidthGet(string siteUrl, string columnWidthPairs)
+        {
+            try
+            {
+                var parameters = columnWidthPairs.Split(',');
+                var values = new List<string>();
+                SPWeb web = SPContext.Current.Web;
+                {
+                    foreach (var p in parameters)
+                    {
+                        var queryCheck = string.Format(@"SELECT [Value] FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
+                          p,
+                          web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                        foreach (System.Data.DataRow r in dtCheck.Rows)
+                        {
+                            values.Add(r[0].ToString());
+                        }
+                    }
+                }
+                return Response.Success(String.Join(",", values));
+            }
+            catch (Exception ex)
+            {
+                var api = new APIException(5028, ex.Message);
+                return Response.Failure(api.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
 
         public static string testFunction(string data, SPWeb oWeb)
         {
