@@ -245,6 +245,12 @@ export class CommonPageConstants {
         };
     }
 
+    static get specificIds() {
+        return {
+            saveEventId: 'idIOSaveItem'
+        };
+    }
+  
     static get searchControl() {
         return {
            searchComponentDropdown : 'Component dropdown',
