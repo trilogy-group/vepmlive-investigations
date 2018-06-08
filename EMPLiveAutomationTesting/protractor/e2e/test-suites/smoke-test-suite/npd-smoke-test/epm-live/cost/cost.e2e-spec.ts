@@ -37,7 +37,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click ITEMS tab select Edit Costs');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editCost);
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
         stepLogger.verification('Cost Planner window is displayed');
@@ -52,7 +51,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(CommonPage.budgetTab)).toBe(true);
 
         stepLogger.step('Enter some costs');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox1);
         await PageHelper.sendKeysToInputField(CommonPage.cellTextBox1, CommonPageConstants.costData.budgetData);
 
         stepLogger.verification('Costs entered in Budget tab');
@@ -62,7 +60,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
         stepLogger.step('Click on Actual Costs tab');
         await PageHelper.click(CommonPage.actualCostTab);
-
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox2);
         await PageHelper.sendKeysToInputField(CommonPage.cellTextBox2, CommonPageConstants.costData.actualCostData);
@@ -85,15 +82,14 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(7);
         stepLogger.step('Click on Save button');
-        await ElementHelper.clickUsingJs(await CommonPage.clickOnSaveButton);
+        await ElementHelper.clickUsingJs(await CommonPage.ribbonItems.save);
 
         stepLogger.stepId(8);
         stepLogger.step('Click on Close button');
-        await ElementHelper.clickUsingJs(await CommonPage.clickOnCloseButton);
+        await ElementHelper.clickUsingJs(await CommonPage.ribbonItems.close);
 
         stepLogger.stepId(9);
         stepLogger.step('Reopen the "Cost Planner" [Click on Edit Costs in ITEMS menu]');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editCost);
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
         stepLogger.step('Check the details displayed in Budget, Actual Costs, Benefits tabs');

@@ -45,46 +45,47 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Select any project from project center');
         await PageHelper.click(CommonPage.project);
 
-        stepLogger.step('Click ITEMS tab select Edit Costs');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editPlan);
-        await PageHelper.click(CommonPage.ribbonItems.editPlan);
+        stepLogger.step('Click ITEMS tab select Edit Plan');
+        await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Task" button');
-        await PageHelper.clickWithWaitl(CommonPage.ribbonItems.addTask);
+        await browser.sleep(PageHelper.timeout.m);
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(MyTimeOffPage.dateFeild);
         await ElementHelper.actionDoubleClick(MyTimeOffPage.dateFeild);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
-        await PageHelper.click(ProjectItemPage.workFeild);
+        await PageHelper.click(ProjectItemPage.workField);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
-        await PageHelper.click(ProjectItemPage.clickonprojectName);
+        await PageHelper.click(ProjectItemPage.pagetitle);
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Save button from ribbon panel');
-        await ElementHelper.clickUsingJs(ProjectItemPage.savebtn);
-        await browser.sleep(PageHelper.timeout.s);
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
 
         stepLogger.verification('Changes done in Project Planner page are saved');
-        await WaitHelper.getInstance().waitForElementToBeClickable(ProjectItemPage.getTaskName);
-        await expect(ProjectItemPage.getTaskName.getText()).toBe(uniqueId,
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.TaskName);
+        await expect(ProjectItemPage.TaskName.getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(ProjectItemPage.workFeild.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
-        await ElementHelper.clickUsingJs(ProjectItemPage.closebtn);
+        await browser.sleep(PageHelper.timeout.s);
+        await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
@@ -92,6 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
@@ -101,31 +103,30 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan\n' +
             'Click on Project Planner in the list of planners displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editPlan);
-        await PageHelper.click(CommonPage.ribbonItems.editPlan);
+        await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Changes saved in step# 5 (Task added and details entered for task)' +
             ' are displayed in the Project Planner');
-        await browser.sleep(PageHelper.timeout.s);
-        await expect(ProjectItemPage.getTaskName.getText()).toBe(uniqueId,
+        await browser.sleep(PageHelper.timeout.m);
+        await PageHelper.click(ProjectItemPage.selectTaskName);
+        await expect(ProjectItemPage.TaskName.getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(ProjectItemPage.workFeild.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
         // Delete created task
-        await PageHelper.click(ProjectItemPage.getTaskName);
+        await PageHelper.click(ProjectItemPage.TaskName);
         await PageHelper.click(ProjectItemPage.deleteTask);
         await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ProjectItemPage.savebtn);
-        await browser.sleep(PageHelper.timeout.s);
-
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
     });
 });

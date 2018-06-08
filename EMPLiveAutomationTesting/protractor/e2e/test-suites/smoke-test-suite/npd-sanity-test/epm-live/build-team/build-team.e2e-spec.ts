@@ -1,10 +1,10 @@
-import {PageHelper} from './../../../../../components/html/page-helper';
-import {ProjectItemPageConstants} from './../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {ProjectItemPage} from './../../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ValidationsHelper} from './../../../../../components/misc-utils/validation-helper';
-import {CommonPageConstants} from './../../../../../page-objects/pages/common/common-page.constants';
-import {CommonPage} from './../../../../../page-objects/pages/common/common.po';
-import {CommonPageHelper} from './../../../../../page-objects/pages/common/common-page.helper';
+import {PageHelper} from '../../../../../components/html/page-helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -12,6 +12,7 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -274,5 +275,50 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+    });
+
+    it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
+        const stepLogger = new StepLogger(778315);
+        const uniqueId = PageHelper.getUniqueId();
+        stepLogger.stepId(1);
+        stepLogger.step('Select "Navigation" icon  from left side menu');
+        stepLogger.step('Select Projects -> Projects from the options displayed');
+        // Step #1 and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        stepLogger.stepId(3);
+        stepLogger.step('Select check-box for any Project');
+        await PageHelper.click(CommonPage.record);
+
+        stepLogger.step('Click on "Items" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+
+        stepLogger.step('Click ITEMS tab select Edit Costs');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.editPlan);
+        await PageHelper.click(CommonPage.editPlan);
+
+        stepLogger.step('click on Project Planner');
+        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
+
+        stepLogger.verification('"Project Planner" window is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on "Task" button');
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+
+        stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
+        await PageHelper.actionSendKeys( uniqueId);
+        await PageHelper.click(ProjectItemPage.workField);
+        await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
+        await PageHelper.click(ProjectItemPage.assigToDropDown);
+        await PageHelper.click(ProjectItemPage.selectAssignTo);
     });
 });

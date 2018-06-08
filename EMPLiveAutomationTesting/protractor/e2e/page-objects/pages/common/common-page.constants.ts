@@ -71,7 +71,6 @@ export class CommonPageConstants {
     static get ribbonLabels() {
         return {
             save: 'Save',
-            editPlan: 'EPMLive.Planner-Large',
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',

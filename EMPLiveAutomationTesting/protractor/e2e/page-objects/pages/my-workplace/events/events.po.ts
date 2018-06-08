@@ -24,10 +24,6 @@ export class EventsPage {
         return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
     }
 
-    static get okButton1 () {
-        return element(By.css('#onetidSaveItem'));
-    }
-
     static get categoryField() {
         return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.category);
     }
@@ -48,7 +44,7 @@ export class EventsPage {
     }
 
     static get calenderTab() {
-        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar-title"]'));
+        return element(By.css('[id*="Calendar-title"]'));
     }
 
     static get closeEventButton() {
@@ -60,7 +56,7 @@ export class EventsPage {
     }
 
     static get createView () {
-        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.CreateView-Medium"]'));
+        return element(By.css(`[id*="CustomViews.CreateView"]`));
     }
 
     static getElementByLinkText(text: string) {
@@ -72,27 +68,19 @@ export class EventsPage {
     }
 
     static get currentView() {
-        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.DisplayView"]'));
+        return element(By.css('a[id*="DisplayView"]'));
     }
 
     static get defaultCheckbox() {
         return element(By.id('onetidIOCheckDefaultView'));
     }
 
-    static getelement(val: string) {
-        return element(By.xpath('.//*[text()="' + val + '"]'));
-    }
-
-    static get rollOver() {
-        return element(By.css('#WPQ2_ListTitleViewSelectorMenu_Container_overflow'));
+    static get rollOverEventList() {
+        return element(By.css(`[id*="overflow"]`));
     }
 
     static get viewName () {
-        return element(By.css('#ViewName'));
-    }
-
-    static get okButton () {
-        return element(By.css('#onetidSaveItemtop'));
+        return element(By.id('ViewName'));
     }
 
     static get choiceCheckbox() {
@@ -108,7 +96,7 @@ export class EventsPage {
     }
 
     static get createColumn () {
-        return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar.CustomViews.CreateColumn-Medium"]'));
+        return element(By.css(`[id*="CustomViews.CreateColumn"]`));
     }
 
 }

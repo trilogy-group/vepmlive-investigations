@@ -88,24 +88,32 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
-    static get clickonprojectName() {
-        return element(By.xpath('.//*[contains(@class,"SummaryTask GSText GSCell GSNoLeft HideCol6Title")]'));
+    static get pagetitle() {
+        return element(By.id('pageTitle'));
     }
 
-    static get workFeild() {
-        return element(By.xpath('.//*[contains(@class," GSClassEdit GSAlignRight GSFloat GSCell HideCol6Work")]'));
+    static get workField() {
+        return element(By.xpath('.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"Work")]'));
     }
 
-    static get savebtn() {
-        return element(By.xpath('.//*[contains(@id,"SaveButton")]'));
+    static get close() {
+        return element(By.css('[id*="CloseButton"]'));
     }
 
-    static get getTaskName() {
-        return element(By.xpath('.//*[contains(@class,"GSClassEdit GSText GSCell GSNoLeft")]'));
+    static get selectAssignTo() {
+        return element(By.xpath('.//*[@id="GM0_9"]'));
     }
 
-    static get closebtn() {
-        return element(By.xpath('.//*[contains(@id,"CloseButton")]'));
+    static get assigToDropDown() {
+        return element(By.xpath('.//*[@class="GSEnumHeaderRight"]'));
+    }
+
+    static get selectTaskName() {
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
+    }
+
+    static get TaskName() {
+        return element(By.xpath('.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"Title")]'));
     }
 
     static get selectPlanner() {
@@ -151,7 +159,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get deleteTask() {
-        return element(By.xpath('.//*[@id="Ribbon.WorkPlanner.InsertGroup.DeleteTask-Medium"]'));
+        return element(By.xpath('.//*[contains(@id,"InsertGroup.DeleteTask")]'));
     }
 
     static get applyParameterButton() {

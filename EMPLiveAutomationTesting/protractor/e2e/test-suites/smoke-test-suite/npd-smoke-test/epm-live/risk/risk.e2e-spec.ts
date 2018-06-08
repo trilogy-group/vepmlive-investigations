@@ -224,7 +224,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
-    fit('Add new Public view in Risk - [1176327]', async () => {
+    it('Add new Public view in Risk - [1176327]', async () => {
         const stepLogger = new StepLogger(1176327);
         stepLogger.stepId(1);
 

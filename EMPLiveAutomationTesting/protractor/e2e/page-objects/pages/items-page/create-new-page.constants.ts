@@ -19,7 +19,7 @@ export class CreateNewPageConstants {
             },
             libraryApps: {
                 pictures: 'Pictures',
-                projectDocument: 'ProjectDocument',
+                projectDocument: 'Project Document',
                 sharedDocument: 'SharedDocument',
                 sitePages: 'SitePages'
             }

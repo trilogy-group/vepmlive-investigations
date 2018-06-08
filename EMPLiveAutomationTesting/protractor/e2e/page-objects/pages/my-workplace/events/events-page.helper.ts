@@ -36,7 +36,7 @@ export class EventsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
 
         stepLogger.verification('verify "New Event" get created');
-        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock, true))
+        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
     }
 
@@ -59,7 +59,7 @@ export class EventsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
 
         stepLogger.verification('verify "New Event" get created');
-        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock, true))
+        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
     }
 
@@ -76,7 +76,7 @@ export class EventsPageHelper {
         stepLogger.step('Click on "Events" tab displayed on top of "Events" page');
         await PageHelper.click(EventsPage.eventsTab);
         stepLogger.verification('Tab Panel of the Events should get displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel, true))
+        await expect(await PageHelper.isElementDisplayed(CommonPage.tabPanel))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.tabPanel));
 
         stepLogger.stepId(2);

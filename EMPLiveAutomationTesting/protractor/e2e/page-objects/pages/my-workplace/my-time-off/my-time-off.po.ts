@@ -17,10 +17,10 @@ export class MyTimeOffPage {
     }
 
     static get dateEditBox() {
-        return element(By.xpath('//*[@id="Grid6FocusCursors"]/div[1]/div/input'));
+        return element(By.xpath('//*[contains(@class,"GSEditInput")]'));
     }
     static get dateFeild() {
-        return element(By.xpath('//*[@id="WorkPlannerGrid"]/tbody/tr[3]/td[2]/div/div[2]/table/tbody/tr[3]/td/table/tbody/tr[2]/td[4]'));
+        return element(By.xpath('//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"GSDate ")][2]'));
     }
     static get timeOffTypeShowAllButton() {
         return element(By.id('TimeOffType_ddlShowAll'));

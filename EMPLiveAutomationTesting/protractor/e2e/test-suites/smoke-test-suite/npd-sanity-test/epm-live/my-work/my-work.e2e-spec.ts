@@ -57,7 +57,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
-        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.changes, true))
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.changes))
             .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.title.changes));
 
         stepLogger.step('Switch to frame');
@@ -294,7 +294,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Attached file is displayed at bottom of popup page');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName, true)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 

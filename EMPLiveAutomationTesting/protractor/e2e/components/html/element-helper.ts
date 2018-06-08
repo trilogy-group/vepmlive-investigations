@@ -22,10 +22,6 @@ export class ElementHelper {
         return browser.actions().mouseDown(item).perform();
     }
 
-    static  getElementByTextWithTextParameter(text: string) {
-        return element(By.xpath('.//*[text()="' + text + '"]'));
-    }
-
     static async actionDragAndDrop(source: ElementFinder, destination: ElementFinder) {
         return browser.actions().dragAndDrop(source, destination).perform();
     }
@@ -141,12 +137,6 @@ export class ElementHelper {
 
     static async clickUsingJsNoWait(targetElement: ElementFinder) {
         return browser.executeScript('arguments[0].click();', targetElement);
-    }
-
-    static async SendKeysUsingJsNoWait(targetElement: ElementFinder, value: String) {
-        browser.sleep(PageHelper.timeout.s);
-        console.log(value);
-        return browser.executeScript('document."' + value + '";', targetElement);
     }
 
     static async waitForElementToHaveClass(targetElement: ElementFinder,

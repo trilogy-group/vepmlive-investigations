@@ -12,6 +12,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {browser} from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -32,23 +33,18 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigateToHome);
 
         stepLogger.verification('Logged in users Home Page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.homePageTitle);
-        await expect(await CommonPage.homePageTitle.isPresent())
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+        await expect(await browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on + More button displayed in CREATE options in social stream');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.toolBarMenuItems.more);
         await ElementHelper.click(HomePage.toolBarMenuItems.more);
 
         stepLogger.step('Click on Project Document link from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.toolBarMenuItems.projectDocument);
         await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
                 ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.stepId(3);
@@ -61,28 +57,24 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Add a document pop up is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(HomePage.browseButton);
         await expect(await HomePage.browseButton.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
-        await expect(await CommonPage.contentUpdateFrame.isDisplayed())
+        await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.stepId(4);
         stepLogger.step('Click Save button in Add a document window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.formButtons.save);
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('Add a document window to update the properties of the document is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.contentUpdateFrame);
-        await expect(await CommonPage.contentUpdateFrame.isPresent()).toBe(false,
+        await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.verification('Home Page is displayed');
-        await expect(await CommonPage.homePageTitle.isPresent())
-            .toBe(true,
-                ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+        await expect(await browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
 
         // Notification is not visible after save.
 
@@ -94,21 +86,20 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigation.projects.documents);
 
         stepLogger.verification('Project Documents page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.documentTitle);
-        await expect(CommonPage.documentTitle.isDisplayed()).toBe(true,
+        await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
                 ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
-        await expect(CommonPage.projectCollapse.isDisplayed()).toBe(true,
+        await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
                 ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
         stepLogger.step('Click on the Project node to expand it');
-        await PageHelper.click(CommonPage.projectCollapse);
+        await PageHelper.click(CommonPage.projectsList);
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByTextWithTextParameter(newFile.file));
-        await expect(ElementHelper.getElementByTextWithTextParameter(newFile.file).isDisplayed())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
+        await expect(ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 
@@ -122,23 +113,19 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigateToHome);
 
         stepLogger.verification('Logged in users Home Page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.homePageTitle);
-        await expect(await CommonPage.homePageTitle.isPresent())
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+        await expect(await browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on + More button displayed in CREATE options in social stream');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.toolBarMenuItems.more);
         await ElementHelper.click(HomePage.toolBarMenuItems.more);
 
         stepLogger.step('Click on Project Document link from the options displayed');
         await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.stepId(3);
         stepLogger.step('Click on Choose File button in Add a document pop up Browse and select the same ' +
@@ -161,22 +148,20 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
-        await expect(await CommonPage.contentUpdateFrame.isDisplayed())
+        await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.stepId(4);
         stepLogger.step('Click Save button in Add a document window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.formButtons.save);
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('Add a document window to update the properties of the document is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.contentUpdateFrame);
-        await expect(await CommonPage.contentUpdateFrame.isPresent()).toBe(false,
+        await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.verification('Home Page is displayed');
-        await expect(await CommonPage.homePageTitle.isPresent())
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+        await expect(await browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
 
         // Notification is not visible after save.
 
@@ -188,25 +173,23 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigation.projects.documents);
 
         stepLogger.verification('Project Documents page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.documentTitle);
         await expect(CommonPage.documentTitle.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
-        await expect(CommonPage.projectCollapse.isDisplayed()).toBe(true,
+        await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
         stepLogger.step('Click on the Project node to expand it');
-        await PageHelper.click(CommonPage.projectCollapse);
+        await PageHelper.click(CommonPage.projectsList);
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByTextWithTextParameter(newFile.file));
-        await expect(ElementHelper.getElementByTextWithTextParameter(newFile.file).isDisplayed())
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
+        await expect(ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByTextWithTextParameter(newFile.file));
-        await expect(CommonPage.fileVersion(newFile.file).getText())
+        await expect(CommonPage.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 
