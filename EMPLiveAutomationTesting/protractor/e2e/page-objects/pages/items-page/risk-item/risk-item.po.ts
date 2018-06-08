@@ -4,7 +4,6 @@ import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {RiskItemPageHelper} from './risk-item-page.helper';
 
 export class RiskItemPage extends BasePage {
 
@@ -55,8 +54,8 @@ export class RiskItemPage extends BasePage {
         const columnHeader = CommonPageConstants.columnHeader;
         return {
             status: {
-                ascending: RiskItemPageHelper.getAscendingColumnSelector(columnHeader.status),
-                descending: RiskItemPageHelper.getDescendingColumnSelector(columnHeader.status)
+                ascending: CommonPageHelper.getAscendingColumnSelector(columnHeader.status),
+                descending: CommonPageHelper.getDescendingColumnSelector(columnHeader.status)
             },
         };
     }

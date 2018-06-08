@@ -496,4 +496,19 @@ export class CommonPageHelper {
     static getDivByText(text: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
+
+    static getDescendingColumnSelector(columnName: string) {
+        return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
+    }
+
+    static getAscendingColumnSelector(columnName: string) {
+        return this.getColumnSelector(columnName, CommonPageConstants.classNames.ascendingClass);
+    }
+
+    static getColumnSelector(columnName: string, sortingClass: string) {
+        return element(By.xpath(`//td[contains(@class, '${CommonPageConstants.classNames.headerTextClass}')` +
+            ` and normalize-space(.)='${columnName}']` +
+            `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
+            `//u[contains(@class,'${sortingClass}')]`));
+    }
 }
