@@ -223,4 +223,58 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
+
+    fit('Add new Public view in Risk - [1176327]', async () => {
+        const stepLogger = new StepLogger(1176327);
+        stepLogger.stepId(1);
+
+        // Step #1 and #2 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger);
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on public view drop down');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.defaultDropDownViewByText))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(RiskItemPageConstants.defaultViewName));
+        await PageHelper.click(CommonPage.viewPageActions.defaultDropDownViewByText);
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on create public view');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.createNewPublicView))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewDropDownLabels.createPublicView));
+        await PageHelper.click(CommonPage.viewPageActions.createNewPublicView);
+
+        stepLogger.stepId(4);
+        stepLogger.step('Fill view name');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle))
+                    .toBe(true,
+                        ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.title));
+        const uniqueId = PageHelper.getUniqueId();
+        const titleNewView = `NewAutomatedPublicView${uniqueId}`;
+        await TextboxHelper.sendKeys(CommonPage.viewNewPageActions.fillCreatePublicViewPageTitle, titleNewView);
+
+        stepLogger.step('Click "Create a Public View" radio button');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.publicViewRadioButton))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.publicView));
+        await PageHelper.click(CommonPage.viewNewPageActions.publicViewRadioButton);
+
+        stepLogger.step('Deselect non required columns');
+        await RiskItemPageHelper.unCheckColumns(stepLogger);
+
+        stepLogger.stepId(5);
+        stepLogger.step('Submit new view by clicking ok available at top');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.submitCreatePublicViewPage))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.formLabels.topSave));
+        await PageHelper.click(CommonPage.viewNewPageActions.submitCreatePublicViewPage);
+
+        stepLogger.stepId(6);
+        await RiskItemPageHelper.verifyRiskViewAdd(stepLogger, titleNewView);
+    });
 });

@@ -7,11 +7,13 @@ export class DiscussionsPageConstants {
     static readonly editPageName = `${DiscussionsPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly subjectInputTitle= 'Subject Required Field';
     static readonly question= 'Question';
+    static readonly reply = 'Reply';
 
     static get inputLabels() {
         return {
             subject: 'Subject *',
             body: 'Description for New Discussion*',
+            reply: 'reply *',
         };
     }
 }

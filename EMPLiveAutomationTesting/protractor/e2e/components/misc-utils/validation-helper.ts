@@ -115,4 +115,8 @@ export class ValidationsHelper {
     static getItemsUnderTabShouldBeDisplayed(name: string) {
         return `Contents of the ${this.getDisplayedValidation(name + 'tab ')}`;
     }
+
+    static getNewViewCloumnShouldDisplayed(columnName: string) {
+        return `Newly created public view ${columnName} should be selected`;
+    }
 }

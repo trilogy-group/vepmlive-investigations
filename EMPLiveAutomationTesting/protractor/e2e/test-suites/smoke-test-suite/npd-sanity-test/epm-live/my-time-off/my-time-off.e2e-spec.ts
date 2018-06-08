@@ -11,6 +11,7 @@ import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplac
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {MyTimeOffPage} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -60,9 +61,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await MyTimeOffPageHelper.fillFormAndVerify(title, timeOffType, requestor, startDate, finishDate, stepLogger);
 
         stepLogger.stepId(5);
-        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(title, true);
-        stepLogger.step(`click on Close button`);
-        await PageHelper.click(MyTimeOffPage.closeButton);
+        stepLogger.verification('Newly created TimeOff [Ex: Title 1] displayed in "My TimeOff" page');
+        await CommonPageHelper.searchItemByTitle(title, MyTimeOffPageConstants.columnNames.title, stepLogger, true);
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(title)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 
     it('View Time Off - [785496]', async () => {
@@ -84,6 +86,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.timeOff));
-        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(timeOffTitle.trim(), true);
+        await expect(await MyTimeOffPage.timeOffTitleInViewWindow.getText()).toBe(timeOffTitle.trim());
     });
 });

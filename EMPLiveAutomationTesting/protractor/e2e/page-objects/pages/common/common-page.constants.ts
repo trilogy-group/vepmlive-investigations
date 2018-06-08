@@ -1,6 +1,7 @@
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {MyWorkplaceConstants} from '../my-workplace/my-workplace.constants';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import * as path from 'path';
 
 export class CommonPageConstants {
     static readonly pageName = 'Create New';
@@ -13,13 +14,20 @@ export class CommonPageConstants {
     static readonly attachFilePopupTitle = 'Attach File';
     static readonly last = 'Last';
     static readonly fileUpload = 'fileUpload';
+    static readonly dropDown: string = 'dropdown-toggle';
+
+    static get viewDropDownLabels() {
+        return {
+            createPublicView: 'Create View'
+        };
+    }
 
     static get imageFile() {
         return {
             fileType: '.jpg',
             jpegFileName: 'jpeg-image',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.imageFile.jpegFileName}${this.imageFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.imageFile.jpegFileName + this.imageFile.fileType);
             }
         };
     }
@@ -29,7 +37,7 @@ export class CommonPageConstants {
             fileType: '.pdf',
             documentFileName: 'pdf-file',
             filePath: () => {
-                return `${this.currentDir}\\${this.filesDirectoryName}\\${this.documentFile.documentFileName}${this.documentFile.fileType}`;
+                return path.join(this.currentDir, this.filesDirectoryName, this.documentFile.documentFileName + this.documentFile.fileType);
             }
         };
     }
@@ -85,7 +93,18 @@ export class CommonPageConstants {
             ok: 'OK',
             okWithSmallK: 'Ok',
             add: '< Add',
-            remove: 'Remove >'
+            remove: 'Remove >',
+            topSave: 'onetidSaveItemtop'
+        };
+    }
+
+    static get newPublicViewformLabels() {
+        return {
+            title: 'NewViewName',
+            publicView: 'PersonalView1',
+            scheduleStatus: 'ShouldDisplayScheduleStatus',
+            exposure: 'ShouldDisplayExposure',
+            due: 'ShouldDisplayDue'
         };
     }
 
@@ -229,6 +248,20 @@ export class CommonPageConstants {
     static get specificIds() {
         return {
             saveEventId: 'idIOSaveItem'
+        };
+    }
+  
+    static get searchControl() {
+        return {
+           searchComponentDropdown : 'Component dropdown',
+           searchOperatorDropdown: 'Search Operator dropdown',
+           searchField : 'Search Field',
+        };
+    }
+
+    static get messages() {
+        return {
+           noDataFound : 'No data found',
         };
     }
 }

@@ -1,4 +1,4 @@
-import {browser, By, element, ElementFinder} from 'protractor';
+import {browser, By, element, ElementFinder, ElementArrayFinder} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {PageHelper} from '../../../components/html/page-helper';
@@ -12,6 +12,7 @@ import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
+import {AnchorHelper} from '../../../components/html/anchor-helper';
 
 const fs = require('fs');
 
@@ -228,7 +229,7 @@ export class CommonPageHelper {
         return element(By.xpath(`//td[contains(@class,'GMHeaderText') and ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
     }
 
-    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger) {
+    static async searchItemByTitle(titleValue: string, columnName: string, stepLogger: StepLogger, verifySearchControl = false) {
 
         // Give it sometime to create, Created Item is not reflecting immediately. requires time in processing
         // and search option also requires some time to settle down
@@ -237,6 +238,17 @@ export class CommonPageHelper {
         stepLogger.step('Click on search');
         await PageHelper.click(CommonPage.actionMenuIcons.search);
 
+        if (verifySearchControl === true) {
+            stepLogger.verification('Search Component dropdown is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.column))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchComponentDropdown));
+            stepLogger.verification('Search Operator dropdown is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.type))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchOperatorDropdown));
+            stepLogger.verification('Search field is available');
+            await expect(await PageHelper.isElementDisplayed(CommonPage.searchControls.text))
+                .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.searchControl.searchField));
+        }
         stepLogger.step('Select column name as Title');
         await PageHelper.sendKeysToInputField(CommonPage.searchControls.column, columnName);
 
@@ -432,6 +444,26 @@ export class CommonPageHelper {
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
 
+    static getMessageNoDataFound(classAttribute: string, text: string) {
+        const xpath = element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)} and
+            ${ComponentHelpers.getXPathFunctionForDot(text)}]`));
+        return xpath;
+    }
+
+    static async checkItemCreated(titleValue: string, label: ElementArrayFinder) {
+        let itemFound = false, text;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        const size = await label.count();
+        for (let index = 0; index < size && !itemFound; index++) {
+            await ElementHelper.scrollToElement(label.get(index));
+            text = await label.get(index).getText();
+            if (text === titleValue) {
+                    itemFound = true;
+                }
+        }
+        return itemFound;
+    }
+
     static async switchToContentFrame(stepLogger: StepLogger) {
         stepLogger.step('Switch to content frame');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -440,4 +472,24 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
     }
 
+    static getPublicView(text: string) {
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
+    }
+
+    static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
+        return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
+    }
+
+    static searchedItemList(text: string) {
+        return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getColumnElement(columnName: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
+    }
+
+    static getDropDownViewByText(titleView: string) {
+        return element(By.xpath(`${ComponentHelpers.getElementByTagXpathWithTag(HtmlHelper.tags.a, `@${HtmlHelper.attributes.class}`,
+         CommonPageConstants.dropDown, true)}${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.span, titleView, false)}`));
+    }
 }

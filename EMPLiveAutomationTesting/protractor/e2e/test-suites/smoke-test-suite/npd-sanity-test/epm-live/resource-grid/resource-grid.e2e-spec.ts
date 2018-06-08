@@ -12,6 +12,8 @@ import {ResourcesPageConstants} from '../../../../../page-objects/pages/navigati
 import {ResourcesPageHelper} from '../../../../../page-objects/pages/navigation/resources/resources-page.helper';
 import {browser} from 'protractor';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -57,7 +59,17 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Provide values in required fields');
-        // steps#4 is inside this function
-        await ResourcesPageHelper.fillFormAndSave(stepLogger);
+        const uniqueId = PageHelper.getUniqueId();
+        const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
+        await ResourcesPageHelper.fillFormAndSave(displayName, stepLogger);
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on search');
+        await PageHelper.click(ResourcesPage.searchIcon);
+        stepLogger.step('Enter newly created resource name');
+        await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
+        stepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName)))
+                .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
     });
 });

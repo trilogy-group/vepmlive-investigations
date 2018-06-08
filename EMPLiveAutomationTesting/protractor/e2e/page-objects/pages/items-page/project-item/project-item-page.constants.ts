@@ -31,7 +31,7 @@ export class ProjectItemPageConstants {
             costReduction: 'Cost Reduction',
             employeeSatisfaction: 'Employee Satisfaction',
             risk: 'Risk',
-            projectUpdate: 'Project Update *'
+            projectUpdate: 'Project Update *',
         };
     }
 

@@ -10,6 +10,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
 
 export class RiskItemPageHelper {
 
@@ -96,6 +97,26 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getRecordContainsMessage(secondTableColumns.join(CommonPageConstants.and)));
     }
 
+    static async unCheckColumns(stepLogger: StepLogger) {
+        stepLogger.step('Deselect non required and default selected column "Schedule Status"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
+
+        stepLogger.step('Deselect non required and default selected column "Exposure"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
+
+        stepLogger.step('Deselect non required and default selected column Schedule "Due"');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))
+        .toBe(true,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
+        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
+    }
+
     static async verifyPage(stepLogger: StepLogger) {
         stepLogger.verification('"Edit Risk" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
@@ -104,4 +125,31 @@ export class RiskItemPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
     }
 
+    static async verifyRiskViewAdd(stepLogger: StepLogger, titleNewView: string) {
+        stepLogger.verification('Newly created Public risk view is selected in "View" drop down');
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText(titleNewView)))
+                    .toBe(true,
+                ValidationsHelper.getDisplayedValidation(titleNewView));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.title} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.titleViewColumn))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.title));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.assignedTo} columns
+        selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.assignedToViewColumn))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.assignedTo));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.status} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.statusViewColumn))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.status));
+
+        stepLogger.verification(`${RiskItemPageConstants.columnNames.dueDate} columns selected to display in the view should be displayed`);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.dueDateViewColumn))
+                        .toBe(true,
+                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
+    }
 }
