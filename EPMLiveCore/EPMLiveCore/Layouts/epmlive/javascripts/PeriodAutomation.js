@@ -36,7 +36,7 @@
         cutMonthlyDay: 15
     }
 
-    var readValues = function() {
+    var readValues = function () {
         var enabled = document.getElementById(automateNewPeriodCreationRadioYesId).checked;
         var cutWeekly = enabled && document.getElementById(cutPeriodsWeeklyRadioYesId).checked;
         var cutMonthly = enabled && document.getElementById(cutPeriodsMonthlyRadioYesId).checked;
@@ -122,7 +122,7 @@
                     years +
                     "y), please use smaller date range";
             } else if (minStartDate !== null && values.startDate.getTime() < minStartDate.getTime()) {
-                errorMessage = "'Start On' is less than or equal to the latest existing period end (" +
+                errorMessage = "'Start On' is less than or equal to the latest existing period end (expected period start is " +
                     DateHelper.formatUtcDate(minStartDate) +
                     "), please check the dates";
             }
@@ -136,7 +136,7 @@
         return true;
     }
 
-    var getPeriods = function() {
+    var getPeriods = function () {
         var values = readValues();
 
         if (!validateForm(values) || !values.enabled) {
@@ -144,6 +144,7 @@
         }
 
         var periods = [];
+        var names = [];
         var start = values.startDate;
         var finish = values.endDate;
         var initialWeeklyCut = values.cutWeekly
@@ -190,7 +191,9 @@
             }
 
             var periodName = DateHelper.formatUtcDate(start, "short") + "-" + DateHelper.formatUtcDate(currentCut, "short");
+            var periodLongName = DateHelper.formatUtcDate(start) + " - " + DateHelper.formatUtcDate(currentCut);
             periods.push({ id: id, name: periodName, start: start, finish: currentCut });
+            names.push(periodLongName);
             start = DateHelper.addDays(currentCut, 1);
             id++;
         }
@@ -204,12 +207,15 @@
         if (values.cutMonthly) {
             summary += ("Cut monthly every " + values.cutMonthlyPeriodicity + " month(s) on " + (values.cutMonthlyEndOfDay
                 ? "the last day of month"
-                : ("day " + values.cutMonthlyDay) + "<br/>"));
+                : ("day " + values.cutMonthlyDay)) + "<br/>");
         }
+
+        summary += "Total " + periods.length + " new period(s) will be added" + "<br/>";
 
         return {
             periods: periods,
-            summary: summary
+            summary: summary,
+            names: names
         }
     }
 
@@ -223,9 +229,21 @@
             jQuery("#" + cutPeriodsEndDateInputId).datepicker({ dateFormat: 'mm/dd/yy' });
         }
     }
-    
-    var setMinDate = function(value) {
+
+    var resetDateRangeToDefaults = function () {
+        var today = DateHelper.convertToUtcDate(new Date());
+        var start = minStartDate !== null
+            ? minStartDate
+            : today;
+        var end = (today.getTime() > start.getTime()) ? today : start;
+
+        document.getElementById(cutPeriodsStartDateInputId).value = DateHelper.formatUtcDate(start);
+        document.getElementById(cutPeriodsEndDateInputId).value = DateHelper.formatUtcDate(end);
+    }
+
+    var setMinDate = function (value) {
         minStartDate = value;
+        resetDateRangeToDefaults();
     }
 
     var updateFormValues = function (automatePeriods, cutWeekly, cutMonthly, isSummaryMode, resetOptionsToDefaults) {
@@ -245,14 +263,7 @@
             document.getElementById(cutPeriodsMonthlyDayInputId).value = "";
             document.getElementById(cutPeriodsMonthlyEndOfDayCheckBoxId).checked = true;
 
-            var today = DateHelper.convertToUtcDate(new Date());
-            var start = minStartDate !== null
-                ? minStartDate
-                : today;
-            var end = (today.getTime() > start.getTime()) ? today : start;
-
-            document.getElementById(cutPeriodsStartDateInputId).value = DateHelper.formatUtcDate(start);
-            document.getElementById(cutPeriodsEndDateInputId).value = DateHelper.formatUtcDate(end);
+            resetDateRangeToDefaults();
         }
 
         PeriodAutomation.stateOnChange();
@@ -262,27 +273,27 @@
         PeriodAutomation.stateOnChange("enabled");
     }
 
-    var cutPeriodsWeeklyRadioOnClick = function() {
+    var cutPeriodsWeeklyRadioOnClick = function () {
         PeriodAutomation.stateOnChange("cutWeekly");
     }
 
-    var cutPeriodsMonthlyRadioOnClick = function() {
+    var cutPeriodsMonthlyRadioOnClick = function () {
         PeriodAutomation.stateOnChange("cutMonthly");
     }
 
-    var cutPeriodsMonthlyEndOfDayCheckBoxOnClick = function() {
+    var cutPeriodsMonthlyEndOfDayCheckBoxOnClick = function () {
         PeriodAutomation.stateOnChange("cutMonthlyEndOfDay");
         var checked = document.getElementById(cutPeriodsMonthlyEndOfDayCheckBoxId).checked;
         document.getElementById(cutPeriodsMonthlyDayInputId).value = checked ? "" : defaults.cutMonthlyDay;
     }
 
-    var displaySummary = function(summary) {
+    var displaySummary = function (summary) {
         summaryMode = true;
         document.getElementById(cutPeriodsSummaryTextId).innerHTML = summary;
         PeriodAutomation.stateOnChange();
     }
 
-    var stateOnChange = function(scope) {
+    var stateOnChange = function (scope) {
         var enabled = document.getElementById(automateNewPeriodCreationRadioYesId).checked && !summaryMode;
         var cutWeekly = document.getElementById(cutPeriodsWeeklyRadioYesId).checked;
         var cutMonthly = document.getElementById(cutPeriodsMonthlyRadioYesId).checked;

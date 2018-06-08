@@ -1,4 +1,10 @@
-﻿DateHelper = function() {
+﻿/* 
+    This DateHelper class operates with date values only (hours discarded) and use UTC timezone
+    Locally created Date objects must be converted using convertToUtcDate function
+    Do not change this behavior as it is expected for PeriodAutomation feature
+*/
+
+DateHelper = function () {
     function isLeapYear(year) {
         return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
     };
@@ -31,7 +37,7 @@
         }
     }
 
-    var addMonths = function(date, value, day) {
+    var addMonths = function (date, value, day) {
         var result = new Date(date);
         var n = day === undefined ? result.getUTCDate() : day;
         result.setUTCDate(1);
@@ -40,13 +46,13 @@
         return result;
     };
 
-    var addDays = function(date, value) {
+    var addDays = function (date, value) {
         var result = new Date(date);
         result.setUTCDate(result.getUTCDate() + value);
         return result;
     };
 
-    var addWeeks = function(date, value) {
+    var addWeeks = function (date, value) {
         var result = new Date(date);
         result.setUTCDate(result.getUTCDate() + value * 7);
         return result;
@@ -66,7 +72,7 @@
         return resultDate;
     }
 
-    var formatLocalDate = function(date, format) {
+    var formatLocalDate = function (date, format) {
         var d = new Date(date);
         var month = (d.getMonth() + 1);
         var day = d.getDate();

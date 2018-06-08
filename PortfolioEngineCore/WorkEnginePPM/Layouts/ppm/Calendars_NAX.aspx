@@ -18,8 +18,8 @@
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
-<script src="/_layouts/ppm/Tools/DateHelper.js?ver=<%=FileVersion%>" type="text/javascript"></script>
-<script src="/_layouts/ppm/PeriodAutomation.js?ver=<%=FileVersion%>" type="text/javascript"></script>
+<script src="/_layouts/epmlive/javascripts/DateHelper.js?ver=<%=FileVersion%>" type="text/javascript"></script>
+<script src="/_layouts/epmlive/javascripts/PeriodAutomation.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/epmlive/javascripts/libraries/jquery-ui.min.js" type="text/javascript"></script>
 
 <style type="text/css">
