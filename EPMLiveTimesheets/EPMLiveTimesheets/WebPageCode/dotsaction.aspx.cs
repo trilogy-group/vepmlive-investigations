@@ -1,21 +1,20 @@
-
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
-using System.Xml;
-using System.Data.SqlClient;
 using System.Collections;
-using System.Text.RegularExpressions;
-using System.Net.Mail;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
+using System.Web.Security;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.WebControls;
+using System.Web.UI;
+using System.Web;
+using System.Xml;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint;
 using Newtonsoft.Json;
 
 namespace TimeSheets
@@ -400,7 +399,7 @@ namespace TimeSheets
             }
         }
 
-        private static string[] CreatePeriods(SqlConnection cn, List<Dictionary<string, string>> periods)
+        private static string[] CreatePeriods(SqlConnection connection, List<Dictionary<string, string>> periods)
         {
             var periodIds = new List<string>();
             if (periods != null && periods.Count > 0)
@@ -408,7 +407,7 @@ namespace TimeSheets
                 var siteId = SPContext.Current.Site.ID;
                 var periodId = 1;
 
-                using (var sqlCommand = new SqlCommand("select top 1 period_id from tsperiod where site_id=@siteid order by period_id desc", cn))
+                using (var sqlCommand = new SqlCommand("select top 1 period_id from tsperiod where site_id=@siteid order by period_id desc", connection))
                 {
                     sqlCommand.Parameters.AddWithValue("@siteid", siteId);
                     var reader = sqlCommand.ExecuteReader();
@@ -425,7 +424,7 @@ namespace TimeSheets
                     }
                 }
 
-                using (var sqlCommand = new SqlCommand("insert into tsperiod (period_start,period_end,period_id,site_id) values (@periodstart,@periodend,@period_id,@siteid)", cn))
+                using (var sqlCommand = new SqlCommand("insert into tsperiod (period_start,period_end,period_id,site_id) values (@periodstart,@periodend,@period_id,@siteid)", connection))
                 {
                     sqlCommand.Parameters.AddWithValue("@periodstart", string.Empty);
                     sqlCommand.Parameters.AddWithValue("@periodend", string.Empty);

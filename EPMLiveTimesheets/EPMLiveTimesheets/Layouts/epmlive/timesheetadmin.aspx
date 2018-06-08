@@ -827,7 +827,7 @@
 
 	        mygrid.init();
 	        mygrid.loadXML("gettsperiods.aspx", function() {
-	            if (mygrid.getRowsNum() == 0) {
+	            if (mygrid.getRowsNum() === 0) {
 	                return;
 	            }
 
