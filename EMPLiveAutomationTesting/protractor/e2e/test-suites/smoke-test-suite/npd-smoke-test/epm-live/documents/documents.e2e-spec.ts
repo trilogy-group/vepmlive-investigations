@@ -173,11 +173,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigation.projects.documents);
 
         stepLogger.verification('Project Documents page is displayed');
-        await expect(CommonPage.documentTitle.isDisplayed())
+        await expect(await CommonPage.documentTitle.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
-        await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
+        await expect(await CommonPage.projectsList.isDisplayed()).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
         stepLogger.step('Click on the Project node to expand it');
@@ -186,10 +186,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
-        await expect(ElementHelper.getElementByText(newFile.file).isDisplayed())
+        await expect(await ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
-        await expect(CommonPage.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
+        await expect(await CommonPage.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 

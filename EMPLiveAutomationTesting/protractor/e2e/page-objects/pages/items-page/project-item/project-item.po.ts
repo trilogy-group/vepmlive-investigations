@@ -109,7 +109,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get selectTaskName() {
-        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
+            return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
     }
 
     static get TaskName() {

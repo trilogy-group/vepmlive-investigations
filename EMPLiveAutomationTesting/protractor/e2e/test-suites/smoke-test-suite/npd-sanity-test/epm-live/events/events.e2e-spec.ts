@@ -155,6 +155,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' any the Standard View which was created from the Current View drop-down');
         await PageHelper.click(ElementHelper.getElementByText(CommonPageConstants.calendar));
         await PageHelper.click(EventsPage.calenderTab);
+
         stepLogger.step('Expand Current View drop down');
         await PageHelper.click(EventsPage.currentView);
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
@@ -206,9 +207,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('the respective details should get populated');
         await CheckboxHelper.markCheckbox(EventsPage.choiceCheckbox, true);
-        await expect(EventsPage.columnNameFeild.getAttribute('value')).toBe(uniqueId,
+        await expect(await EventsPage.columnNameFeild.getAttribute('value')).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnName));
-        await expect(EventsPage.descriptionFeild.getAttribute('value')).toBe(CommonPageConstants.menuContainerIds.navigation,
+        await expect(await EventsPage.descriptionFeild.getAttribute('value')).toBe(CommonPageConstants.menuContainerIds.navigation,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnDescription));
 
         stepLogger.stepId(5);

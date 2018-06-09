@@ -207,11 +207,11 @@ export class CommonPage extends BasePage {
     }
 
     static get project() {
-        return element(By.xpath(`.//*[contains(@onmousemove,'"1"')]/td[4]/a[1]`));
+        return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
     }
 
     static get actualCostTab() {
-        return element(By.xpath('.//table[@dir="ltr"]/tbody/tr[3]//*[text()="Actual Costs"]'));
+        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Actual Costs"]'));
     }
 
     static getVersionNumberByRowText(searchCellText: string, targetCellText: string, isContainsSearchCell = false) {
@@ -261,7 +261,7 @@ export class CommonPage extends BasePage {
     }
 
     static get benefitsCostTab() {
-        return element(By.xpath('.//table[@dir="ltr"]/tbody/tr[3]//*[text()="Benefits"]'));
+        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Benefits"]'));
     }
 
     static get calendearView() {

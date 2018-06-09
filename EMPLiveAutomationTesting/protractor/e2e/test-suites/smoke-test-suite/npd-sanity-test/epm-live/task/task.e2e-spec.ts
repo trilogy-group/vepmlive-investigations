@@ -77,9 +77,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Changes done in Project Planner page are saved');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.TaskName);
-        await expect(ProjectItemPage.TaskName.getText()).toBe(uniqueId,
+        await expect(await ProjectItemPage.TaskName.getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
         stepLogger.stepId(6);
@@ -118,9 +118,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' are displayed in the Project Planner');
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(ProjectItemPage.selectTaskName);
-        await expect(ProjectItemPage.TaskName.getText()).toBe(uniqueId,
+        await expect(await ProjectItemPage.TaskName.getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
         // Delete created task

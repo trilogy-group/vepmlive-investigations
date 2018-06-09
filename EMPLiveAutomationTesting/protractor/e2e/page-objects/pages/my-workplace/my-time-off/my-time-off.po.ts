@@ -20,7 +20,7 @@ export class MyTimeOffPage {
         return element(By.xpath('//*[contains(@class,"GSEditInput")]'));
     }
     static get dateFeild() {
-        return element(By.xpath('//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"GSDate ")][2]'));
+        return element(By.xpath('//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"DueDate")][1]'));
     }
     static get timeOffTypeShowAllButton() {
         return element(By.id('TimeOffType_ddlShowAll'));
