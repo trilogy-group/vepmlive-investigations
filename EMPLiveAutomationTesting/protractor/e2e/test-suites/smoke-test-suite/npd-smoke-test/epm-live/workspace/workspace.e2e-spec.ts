@@ -29,9 +29,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step(`Click on 'Person' button displayed on left side of user name on top right side of page`);
         await PageHelper.click(CommonPage.personIcon);
 
-        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!' displayed in the pop down`)
-         await expect(await CommonPage.latestNotification.getText())
-        .toContain(title.replace('* ',''), ValidationsHelper.getLabelDisplayedValidation(title));
+        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
+        displayed in the pop down`);
+        await expect(await CommonPage.latestNotification.getText())
+        .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
 
     });
 

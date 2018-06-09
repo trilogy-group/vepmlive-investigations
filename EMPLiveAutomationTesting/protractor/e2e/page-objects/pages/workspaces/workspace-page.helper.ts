@@ -1,5 +1,5 @@
 import { ElementHelper } from '../../../components/html/element-helper';
-import { workspacesPage } from './workspaces.po';
+import {WorkSpacesPage} from './workspaces.po';
 import { WaitHelper } from '../../../components/html/wait-helper';
 import { WorkspacesConstants } from './workspaces.constants';
 import { CommonPageHelper } from '../common/common-page.helper';
@@ -17,7 +17,7 @@ static async createWorkspace(stepLogger: StepLogger) {
     await PageHelper.click(CommonPage.sidebarMenus.workspaces);
     stepLogger.stepId(2);
     stepLogger.step(`Click on the 'New Workspace' button`);
-    await ElementHelper.click(workspacesPage.newWorkSpaceButton);
+    await ElementHelper.click(WorkSpacesPage.newWorkSpaceButton);
     stepLogger.step('Waiting for page to open');
     await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
     stepLogger.verification(`'Create Workspace' pop-up displayed with the following details`);
@@ -31,23 +31,24 @@ static async createWorkspace(stepLogger: StepLogger) {
     const uniqueId = PageHelper.getUniqueId();
     const labels = WorkspacesConstants.inputLabels;
     const title = `${labels.title} ${uniqueId}`;
-    await TextboxHelper.sendKeys(workspacesPage.titleInputField, title);
+    await TextboxHelper.sendKeys(WorkSpacesPage.titleInputField, title);
     stepLogger.step(`Enter a Description for work space`);
     const description = `${labels.description} ${uniqueId}`;
-    await TextboxHelper.sendKeys(workspacesPage.descInputField, description);
+    await TextboxHelper.sendKeys(WorkSpacesPage.descInputField, description);
     stepLogger.step(`Select the radio button 'Open - Accessible and open to anyone who has permission to the parent site'`);
-    await ElementHelper.click(workspacesPage.openPermission);
-    await WaitHelper.getInstance().waitForElementToBeDisplayed(workspacesPage.projectTemplate);
+    await ElementHelper.click(WorkSpacesPage.openPermission);
+    await WaitHelper.getInstance().waitForElementToBeDisplayed(WorkSpacesPage.projectTemplate);
     stepLogger.step(`Select 'Project' as the 'Online' template`);
-    await ElementHelper.click(workspacesPage.projectTemplate);
+    await ElementHelper.click(WorkSpacesPage.projectTemplate);
     stepLogger.stepId(4);
     stepLogger.step(`Click 'Create Workspace' button in 'Create Workspace' pop-up`);
-    await ElementHelper.click(workspacesPage.createWorkSpaceButton);
+    await ElementHelper.click(WorkSpacesPage.createWorkSpaceButton);
     stepLogger.verification(`'Create Workspace' pop-up is closed`);
     await expect(await CommonPage.dialogTitle.isPresent())
         .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(WorkspacesConstants.windowTitle));
     await PageHelper.switchToDefaultContent();
-    stepLogger.verification(`Blue notification displayed briefly on the right top corner stating 'Your workspace is being created - we will notify you once it is ready'`);
+    stepLogger.verification(`Blue notification displayed briefly on the right top corner stating
+     'Your workspace is being created - we will notify you once it is ready'`);
     await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementUsingText(WorkspacesConstants.notification, true)))
         .toBe(true, ValidationsHelper.getNotificationDisplayedValidation(WorkspacesConstants.notification));
     return title;
