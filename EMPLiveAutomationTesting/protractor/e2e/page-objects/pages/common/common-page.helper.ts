@@ -342,6 +342,12 @@ export class CommonPageHelper {
         return element(By.css(xpath));
     }
 
+    static getVersionNumberByRowText(searchCellText: string, targetCellText: string, isContainsSearchCell = false) {
+        const item = element(By.xpath(`//tr[td[${ComponentHelpers.getXPathFunctionForDot
+        (searchCellText, isContainsSearchCell)}]]//td[normalize-space(.)= '${targetCellText}']`));
+        return item;
+    }
+
     static getElementContainsTitle(title: string) {
         return element(By.css(`[title*="${title}"]`));
     }

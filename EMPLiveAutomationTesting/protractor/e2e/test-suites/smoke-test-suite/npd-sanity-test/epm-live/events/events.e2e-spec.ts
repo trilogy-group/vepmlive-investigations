@@ -217,6 +217,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         ElementHelper.scrollToElement(CommonPage.okButton);
         await PageHelper.click(CommonPage.okButton);
 
+        // Its required no other option we have.
         stepLogger.verification('Newly added column should be displayed in events page while user select ' +
             'standard view from current view drop down ');
         await browser.sleep(PageHelper.timeout.l);

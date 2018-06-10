@@ -173,8 +173,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigation.projects.documents);
 
         stepLogger.verification('Project Documents page is displayed');
-        await expect(await CommonPage.documentTitle.isDisplayed())
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
+        await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
         await expect(await CommonPage.projectsList.isDisplayed()).toBe(true,
@@ -189,7 +189,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
-        await expect(await CommonPage.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
+        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 

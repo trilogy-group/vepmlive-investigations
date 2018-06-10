@@ -57,6 +57,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
+        // Its required no other option we have.
         stepLogger.stepId(4);
         stepLogger.step('Click on "Task" button');
         await browser.sleep(PageHelper.timeout.m);
@@ -64,12 +65,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
-        await PageHelper.click(MyTimeOffPage.dateFeild);
-        await ElementHelper.actionDoubleClick(MyTimeOffPage.dateFeild);
+        await PageHelper.click(MyTimeOffPage.dateField);
+        await ElementHelper.actionDoubleClick(MyTimeOffPage.dateField);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
         await PageHelper.click(ProjectItemPage.workField);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
-        await PageHelper.click(ProjectItemPage.pagetitle);
+        await PageHelper.click(CommonPage.pageTitle);
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Save button from ribbon panel');
@@ -82,6 +83,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
+        // page helper click doesnt work.
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
         await browser.sleep(PageHelper.timeout.s);
@@ -114,6 +116,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
+        // Its required no other option we have.
         stepLogger.verification('Changes saved in step# 5 (Task added and details entered for task)' +
             ' are displayed in the Project Planner');
         await browser.sleep(PageHelper.timeout.m);

@@ -88,10 +88,7 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
-    static get pagetitle() {
-        return element(By.id('pageTitle'));
-    }
-
+    // its good as it is
     static get workField() {
         return element(By.xpath('.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"Work")]'));
     }
@@ -100,14 +97,11 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('[id*="CloseButton"]'));
     }
 
-    static get selectAssignTo() {
-        return element(By.xpath('.//*[@id="GM0_9"]'));
+    static get assignToDropDown() {
+        return element(By.css('.GSEnumHeaderRight'));
     }
 
-    static get assigToDropDown() {
-        return element(By.xpath('.//*[@class="GSEnumHeaderRight"]'));
-    }
-
+    // because xpath get change when tab selected this is best i can do.
     static get selectTaskName() {
             return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
     }
@@ -159,7 +153,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get deleteTask() {
-        return element(By.xpath('.//*[contains(@id,"InsertGroup.DeleteTask")]'));
+        return element(By.css('[id* = "InsertGroup.DeleteTask"]'));
     }
 
     static get applyParameterButton() {

@@ -7,7 +7,6 @@ import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
-import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 
 export class CommonPage extends BasePage {
 
@@ -202,34 +201,30 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
-    static get editPlan() {
-        return element(By.xpath('.//*[contains(@id,"EPMLive.Planner")]'));
+    static get pageTitle() {
+        return element(By.id('pageTitle'));
     }
 
+    static get editPlan() {
+        return element(By.css('[id*="EPMLive.Planner"]'));
+    }
+
+ // This xpath is best we have.
     static get project() {
         return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
     }
 
+    // no it will not work.
     static get actualCostTab() {
         return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Actual Costs"]'));
     }
 
-    static getVersionNumberByRowText(searchCellText: string, targetCellText: string, isContainsSearchCell = false) {
-        const item = element(By.xpath(`//tr[td[${ComponentHelpers.getXPathFunctionForDot
-        (searchCellText, isContainsSearchCell)}]]//td[normalize-space(.)= '${targetCellText}']`));
-        return item;
-    }
-
     static get versionCommentField() {
-        return element(By.xpath('.//*[contains(@id,"CheckInComment")]'));
+        return element(By.css('[id*="CheckInComment"]'));
     }
 
     static get newVersionCheckbox() {
-        return element(By.xpath('.//*[contains(@id,"OverwriteSingle")]'));
-    }
-
-    static get documentTitle() {
-        return element(By.xpath('.//*[contains(@id,"surfaceopt")]'));
+        return element(By.css('[id*="OverwriteSingle"]'));
     }
 
     static get projectsList() {
@@ -240,6 +235,7 @@ export class CommonPage extends BasePage {
         return element(By.xpath('.//*[contains(text(),"update the properties")]'));
     }
 
+    // everything is required.
     static get cellTextBox1() {
         return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C10")]'));
     }
@@ -257,15 +253,16 @@ export class CommonPage extends BasePage {
     }
 
     static get okButton () {
-        return element(By.css('[id="onetidSaveItem"]'));
+        return element(By.css('#onetidSaveItem'));
     }
 
+    // its required
     static get benefitsCostTab() {
         return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Benefits"]'));
     }
 
     static get calendearView() {
-            return element(By.xpath('.//*[@id="Ribbon.Calendar.Calendar"]'));
+            return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
     }
 
     static get singleSearchTextBox() {

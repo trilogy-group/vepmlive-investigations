@@ -297,7 +297,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('Click ITEMS tab select Edit Costs');
+        stepLogger.step('Click ITEMS tab select Edit Plan');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.editPlan);
         await PageHelper.click(CommonPage.editPlan);
 
@@ -318,7 +318,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.workField);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
-        await PageHelper.click(ProjectItemPage.assigToDropDown);
-        await PageHelper.click(ProjectItemPage.selectAssignTo);
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
     });
 });

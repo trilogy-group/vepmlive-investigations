@@ -63,7 +63,7 @@ export class HomePage extends BasePage {
     }
 
     static get navigateMenu() {
-        return element(By.css('#epm-nav-top-ql'));
+        return element(By.css('[data-id*="ql"]'));
     }
 
     static get commentField() {
