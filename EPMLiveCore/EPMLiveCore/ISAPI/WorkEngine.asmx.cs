@@ -325,30 +325,28 @@ namespace EPMLiveCore
                     .ToDictionary(x => x[0], x => (object)x[1]);
                 string data = null;
                 SPWeb web = SPContext.Current.Web;
+                foreach (var parameter in parameters)
                 {
-                    foreach (var parameter in parameters)
+                    var queryCheck = string.Format(@"SELECT * FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
+                        parameter.Key,
+                        web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                    var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                    if (dtCheck != null && dtCheck.Rows.Count != 0)
                     {
-                        var queryCheck = string.Format(@"SELECT * FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
-                          parameter.Key,
-                          web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                        var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
-                        if (dtCheck != null && dtCheck.Rows.Count != 0)
-                        {
-                            var query = string.Format(@"UPDATE [dbo].[PERSONALIZATIONS] SET [Value] = '{0}' WHERE [Key] = '{1}' AND [UserId] = '{2}'",
-                                parameter.Value,
-                                parameter.Key,
-                                web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                            var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
-                        }
-                        else
-                        {
-                            var query = string.Format(@"INSERT INTO [dbo].[PERSONALIZATIONS] ([Key],[Value], [UserId]) VALUES ('{0}','{1}','{2}')",
-                                parameter.Key,
-                                parameter.Value,
-                                web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                            var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+                        var query = string.Format(@"UPDATE [dbo].[PERSONALIZATIONS] SET [Value] = '{0}' WHERE [Key] = '{1}' AND [UserId] = '{2}'",
+                            parameter.Value,
+                            parameter.Key,
+                            web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+                    }
+                    else
+                    {
+                        var query = string.Format(@"INSERT INTO [dbo].[PERSONALIZATIONS] ([Key],[Value], [UserId]) VALUES ('{0}','{1}','{2}')",
+                            parameter.Key,
+                            parameter.Value,
+                            web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
 
-                        }
                     }
                 }
                 return Response.Success(data);
@@ -380,17 +378,15 @@ namespace EPMLiveCore
                 var parameters = columnWidthPairs.Split(',');
                 var values = new List<string>();
                 SPWeb web = SPContext.Current.Web;
+                foreach (var parameter in parameters)
                 {
-                    foreach (var parameter in parameters)
+                    var queryCheck = string.Format(@"SELECT [Value] FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
+                        parameter,
+                        web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                    var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                    foreach (System.Data.DataRow r in dtCheck.Rows)
                     {
-                        var queryCheck = string.Format(@"SELECT [Value] FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
-                          parameter,
-                          web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                        var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
-                        foreach (System.Data.DataRow r in dtCheck.Rows)
-                        {
-                            values.Add(r[0].ToString());
-                        }
+                        values.Add(r[0].ToString());
                     }
                 }
                 return Response.Success(String.Join(",", values));

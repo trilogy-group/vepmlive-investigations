@@ -246,11 +246,13 @@ function GridColumnWidthSet() {
     }).filter(x => x.Sec === 1 && x.Visible === 1);
     var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name + '=' + x.Width);
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthSet',
-        data: "{ siteUrl: 'http://win-6j09gf4nbp8', columnWidthPairs: '" + columnKeysPlain + "' }",
+        data: "{ siteUrl: '" + baseUrl + "', columnWidthPairs: '" + columnKeysPlain + "' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {
@@ -268,11 +270,13 @@ function GridColumnWidthGet() {
     }).filter(x => x.Sec === 1 && x.Visible === 1);
     var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name);
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthGet',
-        data: "{ siteUrl: 'http://win-6j09gf4nbp8', columnWidthPairs: '" + columnKeysPlain + "' }",
+        data: "{ siteUrl: '" + baseUrl + "', columnWidthPairs: '" + columnKeysPlain + "' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {
