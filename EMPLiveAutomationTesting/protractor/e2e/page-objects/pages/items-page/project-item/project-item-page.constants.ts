@@ -190,4 +190,11 @@ export class ProjectItemPageConstants {
             projectPlanner: 'Project Planner'
         };
     }
+
+    static get newTaskFields() {
+        return {
+            title: 'Title',
+            work: 'Work'
+        };
+    }
 }

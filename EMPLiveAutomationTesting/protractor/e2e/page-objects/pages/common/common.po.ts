@@ -209,7 +209,7 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="EPMLive.Planner"]'));
     }
 
- // This xpath is best we have.
+     // This xpath is best we have. Onmouse click is required
     static get project() {
         return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
     }
@@ -228,19 +228,6 @@ export class CommonPage extends BasePage {
 
     static get UpdatePropertyDocument() {
         return element(By.xpath('.//*[contains(text(),"update the properties")]'));
-    }
-
-    // everything is required.
-    static get cellTextBox1() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C10")]'));
-    }
-
-    static get cellTextBox2() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C12")]'));
-    }
-
-    static get cellTextBox3() {
-        return element(By.xpath('.//*[contains(@onmousemove,"I24")]/td[contains(@class,"HideCol0C13")]'));
     }
 
     static get budgetTab() {

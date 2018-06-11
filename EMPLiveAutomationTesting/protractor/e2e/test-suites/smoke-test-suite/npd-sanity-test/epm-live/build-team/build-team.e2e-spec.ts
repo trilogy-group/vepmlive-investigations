@@ -298,7 +298,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click ITEMS tab select Edit Plan');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.editPlan);
         await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.step('click on Project Planner');
@@ -315,7 +314,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
-        await PageHelper.click(ProjectItemPage.workField);
+        await PageHelper.click(ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.work));
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
         await PageHelper.click(ProjectItemPage.assignToDropDown);

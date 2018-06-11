@@ -88,11 +88,6 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
-    // its good as it is
-    static get workField() {
-        return element(By.xpath('.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"Work")]'));
-    }
-
     static get close() {
         return element(By.css('[id*="CloseButton"]'));
     }
@@ -101,13 +96,9 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('.GSEnumHeaderRight'));
     }
 
-    // because xpath get change when tab selected this is best i can do.
+    // because xpath get change when tab selected this is best i can do,
     static get selectTaskName() {
             return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
-    }
-
-    static get TaskName() {
-        return element(By.xpath('.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"Title")]'));
     }
 
     static get selectPlanner() {

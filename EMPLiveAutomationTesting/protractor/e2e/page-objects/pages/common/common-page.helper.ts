@@ -486,7 +486,7 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
-    // its required
+    // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
     static getEditCostTab(Value: string) {
         return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="' + Value + '"]'));
     }
@@ -497,6 +497,10 @@ export class CommonPageHelper {
 
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getcellText(column: string) {
+        return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
     }
 
     static getColumnElement(columnName: string) {

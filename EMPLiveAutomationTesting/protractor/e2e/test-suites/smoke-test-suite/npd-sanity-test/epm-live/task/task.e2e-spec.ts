@@ -15,6 +15,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {MyTimeOffPage} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off.po';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -88,7 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyTimeOffPage.dateField);
         await ElementHelper.actionDoubleClick(MyTimeOffPage.dateField);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
-        await PageHelper.click(ProjectItemPage.workField);
+        await PageHelper.click(ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.work));
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await PageHelper.click(CommonPage.pageTitle);
 
@@ -97,13 +98,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
 
         stepLogger.verification('Changes done in Project Planner page are saved');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.TaskName);
-        await expect(await ProjectItemPage.TaskName.getText()).toBe(uniqueId,
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.getField
+        (ProjectItemPageConstants.newTaskFields.title));
+        await expect(await ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.title).getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(await ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.work).getText()).
+        toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
-        // page helper click doesnt work.
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
         await browser.sleep(PageHelper.timeout.xm);
@@ -141,13 +143,14 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' are displayed in the Project Planner');
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(ProjectItemPage.selectTaskName);
-        await expect(await ProjectItemPage.TaskName.getText()).toBe(uniqueId,
+        await expect(await  ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.title).getText()).toBe(uniqueId,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(await ProjectItemPage.workField.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.work).getText()).
+        toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
         // Delete created task
-        await PageHelper.click(ProjectItemPage.TaskName);
+        await PageHelper.click( ProjectItemPageHelper.getField(ProjectItemPageConstants.newTaskFields.title));
         await PageHelper.click(ProjectItemPage.deleteTask);
         await browser.switchTo().alert().accept();
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));

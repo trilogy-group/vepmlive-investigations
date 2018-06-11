@@ -137,6 +137,14 @@ export class CommonPageConstants {
         };
     }
 
+    static get cell() {
+        return {
+            cell1: 'HideCol0C10',
+            cell2: 'HideCol0C11',
+            cell3: 'HideCol0C13',
+        };
+    }
+
     static get pageHeaders() {
         return {
             projects: HomePageConstants.navigationLabels.projects,

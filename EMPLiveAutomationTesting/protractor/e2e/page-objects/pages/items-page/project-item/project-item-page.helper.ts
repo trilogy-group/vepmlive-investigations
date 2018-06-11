@@ -271,6 +271,10 @@ export class ProjectItemPageHelper {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
 
+    static getField(tab: string) {
+        return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
+    }
+
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);
