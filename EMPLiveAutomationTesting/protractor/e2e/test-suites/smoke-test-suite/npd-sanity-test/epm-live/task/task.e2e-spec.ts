@@ -41,12 +41,23 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.stepId(3);
+        stepLogger.verification('Project Center page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+
+        stepLogger.stepId(2);
         stepLogger.step('Select any project from project center');
         await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
+
+        stepLogger.verification('Select Planner pop-up displays with different planner options to select');
+        await expect(await CommonPage.dialogTitle.isDisplayed())
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
@@ -57,11 +68,20 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
+        stepLogger.verification('NO Tasks displayed in Project Planner');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.selectTaskName))
+            .toBe(false,
+                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
+
         // Its required no other option we have.
         stepLogger.stepId(4);
         stepLogger.step('Click on "Task" button');
-        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonItems.addTask);
+
+        stepLogger.verification('A new task is created and required details entered [Ex: Task One]');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.selectTaskName))
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
@@ -86,13 +106,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         // page helper click doesnt work.
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
-        await browser.sleep(PageHelper.timeout.s);
+        await browser.sleep(PageHelper.timeout.xm);
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(false,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);

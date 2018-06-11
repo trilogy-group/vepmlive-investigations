@@ -153,7 +153,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get deleteTask() {
-        return element(By.css('[id* = "InsertGroup.DeleteTask"]'));
+        return element(By.css('[id*= "DeleteTask"]'));
     }
 
     static get applyParameterButton() {

@@ -9,6 +9,8 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {browser} from 'protractor';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -41,44 +43,50 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Cost Planner window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await PageHelper.isElementPresent(CommonPage.dialogTitle)).toBe(true);
+        await expect(await PageHelper.isElementPresent(CommonPage.dialogTitle)).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.contextMenuOptions.costPlan));
 
         stepLogger.stepId(4);
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.step('Ensure that Budget tab is selected');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
-        await expect(await PageHelper.isElementPresent(CommonPage.budgetTab)).toBe(true);
+        await expect(await PageHelper.isElementPresent(CommonPage.budgetTab)).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(ProjectItemPageConstants.inputLabels.budget));
 
         stepLogger.step('Enter some costs');
         await PageHelper.sendKeysToInputField(CommonPage.cellTextBox1, CommonPageConstants.costData.budgetData);
 
         stepLogger.verification('Costs entered in Budget tab');
-        await expect(await CommonPage.cellTextBox1.getText())
-            .toBe(CommonPageConstants.costData.budgetData);
+        await expect(await CommonPage.cellTextBox1.getText()).toBe(CommonPageConstants.costData.budgetData,
+                ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.inputLabels.budget,
+                    CommonPageConstants.costData.budgetData ));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Actual Costs tab');
-        await PageHelper.click(CommonPage.actualCostTab);
+        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost);
+
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox2);
         await PageHelper.sendKeysToInputField(CommonPage.cellTextBox2, CommonPageConstants.costData.actualCostData);
 
         stepLogger.verification('Costs entered in Actual Costs tab');
-        await expect(await CommonPage.cellTextBox2.getText())
-            .toBe(CommonPageConstants.costData.actualCostData);
+        await expect(await CommonPage.cellTextBox2.getText()).toBe(CommonPageConstants.costData.actualCostData,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.actualCost,
+                CommonPageConstants.costData.actualCostData ));
 
         stepLogger.stepId(6);
         stepLogger.step('Click on Benefits tab');
-        await PageHelper.click(CommonPage.benefitsCostTab);
+        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits);
 
         stepLogger.step('Enter some costs');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.cellTextBox3);
         await PageHelper.sendKeysToInputField(CommonPage.cellTextBox3, CommonPageConstants.costData.benefitsData);
 
         stepLogger.verification('Costs entered in Benefits tab');
-        await expect(await CommonPage.cellTextBox3.getText())
-            .toBe(CommonPageConstants.costData.benefitsData);
+        await expect(await CommonPage.cellTextBox3.getText()).toBe(CommonPageConstants.costData.benefitsData,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.benefits,
+                CommonPageConstants.costData.benefitsData ));
 
         stepLogger.stepId(7);
         stepLogger.step('Click on Save button');
@@ -98,15 +106,20 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
 
         stepLogger.verification('Cost details displayed in Budget tab are same as values entered in Step# 4');
-        await expect(await CommonPage.cellTextBox1.getText()).toBe(CommonPageConstants.costData.budgetData);
+        await expect(await CommonPage.cellTextBox1.getText()).toBe(CommonPageConstants.costData.budgetData,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.inputLabels.budget,
+                CommonPageConstants.costData.budgetData ));
 
         stepLogger.verification('Cost details displayed in Actual Costs tab are same as values entered in Step# 5');
-        await PageHelper.click(CommonPage.actualCostTab);
-        await expect(await CommonPage.cellTextBox2.getText()).toBe(CommonPageConstants.costData.actualCostData);
+        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost);
+        await expect(await CommonPage.cellTextBox2.getText()).toBe(CommonPageConstants.costData.actualCostData,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.actualCost,
+                CommonPageConstants.costData.actualCostData ));
 
         stepLogger.verification('Click on Benefits tabs');
-        await PageHelper.click(CommonPage.benefitsCostTab);
-        await expect(await CommonPage.cellTextBox3.getText()).toBe(CommonPageConstants.costData.benefitsData);
-
+        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits);
+        await expect(await CommonPage.cellTextBox3.getText()).toBe(CommonPageConstants.costData.benefitsData,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.benefits,
+                CommonPageConstants.costData.benefitsData ));
     });
 });

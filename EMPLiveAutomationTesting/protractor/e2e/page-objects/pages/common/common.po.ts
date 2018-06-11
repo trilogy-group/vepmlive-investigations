@@ -214,11 +214,6 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
     }
 
-    // no it will not work.
-    static get actualCostTab() {
-        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Actual Costs"]'));
-    }
-
     static get versionCommentField() {
         return element(By.css('[id*="CheckInComment"]'));
     }
@@ -254,11 +249,6 @@ export class CommonPage extends BasePage {
 
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
-    }
-
-    // its required
-    static get benefitsCostTab() {
-        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="Benefits"]'));
     }
 
     static get calendearView() {

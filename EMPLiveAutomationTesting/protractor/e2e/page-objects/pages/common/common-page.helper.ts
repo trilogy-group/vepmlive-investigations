@@ -486,6 +486,11 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
+    // its required
+    static getEditCostTab(Value: string) {
+        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="' + Value + '"]'));
+    }
+
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }

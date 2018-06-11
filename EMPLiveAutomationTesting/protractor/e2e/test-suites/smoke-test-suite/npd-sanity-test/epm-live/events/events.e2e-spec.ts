@@ -207,10 +207,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('the respective details should get populated');
         await CheckboxHelper.markCheckbox(EventsPage.choiceCheckbox, true);
-        await expect(await EventsPage.columnNameFeild.getAttribute('value')).toBe(uniqueId,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnName));
-        await expect(await EventsPage.descriptionFeild.getAttribute('value')).toBe(CommonPageConstants.menuContainerIds.navigation,
-            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnDescription));
+        await expect(await TextboxHelper.hasValue(EventsPage.columnNameFeild, uniqueId))
+            .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnName));
+        await expect(await TextboxHelper.hasValue(EventsPage.descriptionFeild, CommonPageConstants.menuContainerIds.navigation))
+            .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnDescription));
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok button');
@@ -220,7 +220,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Its required no other option we have.
         stepLogger.verification('Newly added column should be displayed in events page while user select ' +
             'standard view from current view drop down ');
-        await browser.sleep(PageHelper.timeout.l);
+        await browser.sleep(PageHelper.timeout.m);
         await ElementHelper.clickUsingJs(EventsPage.createView);
         await PageHelper.click(EventsPage.standardViewType);
         ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));

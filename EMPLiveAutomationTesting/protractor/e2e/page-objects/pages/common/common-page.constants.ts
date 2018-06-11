@@ -166,6 +166,7 @@ export class CommonPageConstants {
             deleteItem: 'Delete Item',
             comments: 'Comments',
             editTeam: 'Edit Team',
+            costPlan: 'Cost Plan',
             editPlan: 'Edit Plan'
         };
     }

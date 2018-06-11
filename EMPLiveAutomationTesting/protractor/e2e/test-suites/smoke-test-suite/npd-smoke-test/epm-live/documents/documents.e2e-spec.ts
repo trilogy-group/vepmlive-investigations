@@ -93,6 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
                 ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
+        stepLogger.stepId(6);
         stepLogger.step('Click on the Project node to expand it');
         await PageHelper.click(CommonPage.projectsList);
 
@@ -148,8 +149,8 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
-        await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
+        await expect(await CommonPage.UpdatePropertyDocument.isDisplayed()).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.stepId(4);
         stepLogger.step('Click Save button in Add a document window');
@@ -189,6 +190,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
+        stepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
+            'successfully of the already existing document]');
         await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
