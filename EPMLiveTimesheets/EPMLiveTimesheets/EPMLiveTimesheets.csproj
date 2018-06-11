@@ -64,6 +64,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -141,6 +145,7 @@
     </Compile>
     <Compile Include="TimesheetApprovals\TimesheetApprovals.cs" />
     <Compile Include="TimesheetReports\TimesheetReports.cs" />
+    <Compile Include="TimesheetsAssemblyInfo.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
@@ -210,6 +215,7 @@
     <None Include="MyTimesheet\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{d3db6bce-74de-4a61-9e67-c9ffdd21e1d6}</SharePointProjectItemId>
     </None>
+    <None Include="packages.config" />
     <None Include="Package\Package.package">
       <PackageId>{155a4887-be9b-4623-81a7-17e574003e71}</PackageId>
     </None>

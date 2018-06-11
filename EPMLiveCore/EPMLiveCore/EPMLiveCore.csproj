@@ -3672,6 +3672,7 @@
     <Content Include="Layouts\epmlive\Integration\Proxy.aspx" />
     <Content Include="Layouts\epmlive\javascripts\AddFavorite.js" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
+    <Content Include="Layouts\epmlive\javascripts\DateHelper.js" />
     <Content Include="Layouts\epmlive\javascripts\EPM.js" />
     <Content Include="Layouts\epmlive\javascripts\EPM.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.js" />
@@ -3722,6 +3723,7 @@
     <Content Include="Layouts\epmlive\javascripts\masterpages\webfont.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\PeriodAutomation.js" />
     <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />

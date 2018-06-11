@@ -82,6 +82,14 @@ namespace TimeSheets
 
         protected TextBox txtPortManagerColumn;
 
+        public string FileVersion
+        {
+            get
+            {
+                return TimesheetsAssemblyInfo.FileVersion();
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             EPMLiveCore.Act act = new EPMLiveCore.Act(Web);
