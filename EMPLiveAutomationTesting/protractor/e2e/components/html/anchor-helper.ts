@@ -1,5 +1,6 @@
 import {By, element} from 'protractor';
 import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
+import {AnchorComponentSelectors} from '../component-types/anchor-component/anchor-component-selectors';
 
 export class AnchorHelper {
 
@@ -28,5 +29,21 @@ export class AnchorHelper {
         const xpath = `//td[${ComponentHelpers.getXPathFunctionForClass(classAttribute, true)}]/a[
             ${ComponentHelpers.getXPathFunctionForDot(text)}]`;
         return element(By.xpath(xpath));
+    }
+
+    static getAllAnchorsForText(
+        text: string,
+        isContains = false) {
+        return element.all(By.xpath(AnchorComponentSelectors.getAnchorForTextXpath(
+            text,
+            isContains)));
+    }
+
+    static getAnchorByText(text: string) {
+        return this.getAllAnchorsForText(text, false).first();
+    }
+
+    static getAnchorContainsText(text: string) {
+        return this.getAllAnchorsForText(text, true).first();
     }
 }

@@ -9,8 +9,9 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {ProjectItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
-import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
+import {ProjectItemPageHelper} from '../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -56,18 +57,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         // If we able to access Close button under Build Team tab that means Build tab is selected
         stepLogger.verification('"Build Team" tab is selected by default');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.close))
-            .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
 
         stepLogger.verification('"Current Team" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
-            .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
-            .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.stepId(4);
         stepLogger.step('Click "Close" button in "Edit Team" window');
@@ -78,18 +76,15 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+            .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
 
     it('Launch Build Team from Project Center - Ellipsis icon - [743140]', async () => {
@@ -99,11 +94,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Select Projects -> Projects from the options displayed');
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
+                stepLogger);
         stepLogger.stepId(3);
         stepLogger.step('Mouse over on any Project created as per pre requisites');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
@@ -111,7 +105,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Click on the Ellipses button (...)');
         await PageHelper.click(CommonPage.ellipse);
-
         stepLogger.step('select "Edit Team" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
 
@@ -119,7 +112,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
-            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+        .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.step('Switch to content frame');
@@ -129,17 +122,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Build Team" tab is selected by default');
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.close))
             .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
+                    ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
 
         stepLogger.verification('"Current Team" Section is displayed');
-        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
-            .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam));
 
         stepLogger.verification('"Resource Pool" Section is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
             .toBe(true,
-                ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
+                    ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.stepId(4);
         stepLogger.step('Click "Close" button in "Edit Team" window');
@@ -151,16 +142,71 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('"Edit Team" window is closed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+                    ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
         stepLogger.verification('"Project Center" page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+                    ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.verification('All previously created Projects are displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
             .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+                    ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+        });
+
+    it('Navigate to Edit Costs page - [966345]', async () => {
+        const stepLogger = new StepLogger(966345);
+        const uniqueId = PageHelper.getUniqueId();
+        const toolButtons = ProjectItemPage.toolButtons;
+        const periodButtons = ProjectItemPage.periodButtons;
+
+        stepLogger.step('Create a new project and navigate to Item page');
+        await ProjectItemPageHelper.createProject(uniqueId, stepLogger);
+
+        stepLogger.verification('Verify Resource Pool is displayed');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.itemOptions.editCourse))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.editCourse));
+
+        stepLogger.stepId(1);
+        stepLogger.step('Click on Edit Costs icon from the button menu');
+        await PageHelper.click(ProjectItemPage.itemOptions.editCourse);
+
+        stepLogger.stepId(2);
+        stepLogger.step('Switch to frame');
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Plan Actions - Close button');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.planActionButtons.close))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.planActionButtons.close));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Plan Actions - Save button');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.planActionButtons.save))
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.planActionButtons.save));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Tools - categories button');
+        await expect(await PageHelper.isElementDisplayed(toolButtons.categories))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.toolButtons.categories));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Tools - delete button');
+        await expect(await PageHelper.isElementDisplayed(toolButtons.delete))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.toolButtons.delete));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Tools - details button');
+        await expect(await PageHelper.isElementDisplayed(toolButtons.detail))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.toolButtons.detail));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Tools - show reference button');
+        await expect(await PageHelper.isElementDisplayed(toolButtons.showReference))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.toolButtons.showReference));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Periods - from period button');
+        await expect(await PageHelper.isElementDisplayed(periodButtons.fromPeriod))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.periodfields.fromPeriod));
+
+        stepLogger.verification('Check options displayed in Cost Planner window in Periods - to period button');
+        await expect(await PageHelper.isElementDisplayed(periodButtons.toPeriod))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.periodfields.toPeriod));
     });
 });

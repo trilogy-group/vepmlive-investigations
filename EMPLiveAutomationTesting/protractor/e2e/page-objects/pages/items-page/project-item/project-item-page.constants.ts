@@ -190,4 +190,35 @@ export class ProjectItemPageConstants {
             projectPlanner: 'Project Planner'
         };
     }
+
+    static get itemOptions() {
+        return {
+            resourceAnalyzer: 'Resource Analyzer',
+            editCourse: 'Edit Course'
+        };
+    }
+
+    static get planActionButtons() {
+        return {
+            save: 'Save Button',
+            close: 'Close Button'
+        };
+    }
+
+    static get toolButtons() {
+        return {
+            categories: 'Categories',
+            detail: 'Detail',
+            delete: 'Delete button',
+            tools: 'Tools button',
+            showReference: 'Show Reference'
+        };
+    }
+
+    static get periodfields() {
+        return {
+            fromPeriod: 'From Period',
+            toPeriod: 'To Period'
+        };
+    }
 }

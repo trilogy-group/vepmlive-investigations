@@ -267,6 +267,10 @@ export class CommonPage extends BasePage {
         return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
     }
 
+    static get lastButton() {
+        return AnchorHelper.getAnchorByText(CommonPageConstants.last);
+    }
+
     static get searchTextBox() {
         return element(By.id('MWG_Search'));
     }

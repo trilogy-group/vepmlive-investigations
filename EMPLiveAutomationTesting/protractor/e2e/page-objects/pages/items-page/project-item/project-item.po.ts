@@ -139,4 +139,35 @@ export class ProjectItemPage extends BasePage {
         //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
         return element(By.xpath(xpathForUser));
     }
+
+    static get itemOptions() {
+        return {
+            resourceAnalyzer: element(By.css('[id*="Ribbon.ListItem.Manage.EPKResourceAnalyzer"]')),
+            editCourse: element(By.css('[id*="Ribbon.ListItem.Manage.EPKCosts"]'))
+        };
+    }
+
+    static get planActionButtons() {
+        return {
+            save: element(By.id('SaveBtn')),
+            close: element(By.id('CloseBtn'))
+        };
+    }
+
+    static get toolButtons() {
+        return {
+            categories: element(By.id('CategoriesBtn')),
+            detail: element(By.id('DetailBtn')),
+            delete: element(By.id('RemoveBtn')),
+            tools: element(By.id('ToolsBtn')),
+            showReference: element(By.id('ShowRefBtn'))
+        };
+    }
+
+    static get periodButtons() {
+        return {
+            fromPeriod: element(By.css('[id*="FromPeriod_button"]')),
+            toPeriod: element(By.css('[id*="ToPeriod_button"]'))
+        };
+    }
 }

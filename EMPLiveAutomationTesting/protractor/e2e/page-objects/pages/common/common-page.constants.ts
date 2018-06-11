@@ -264,4 +264,24 @@ export class CommonPageConstants {
            noDataFound : 'No data found',
         };
     }
+    static get columnHeader() {
+        return {
+            status: 'Status'
+        };
+    }
+
+    static get buttonName() {
+        return {
+            edit: 'Edit'
+        };
+    }
+
+    static get classNames() {
+        return {
+            headerButtonClass: 'GMHeaderButton',
+            headerTextClass: 'GMHeaderText',
+            ascendingClass: 'GMSort4Right',
+            descendingClass: 'GMSort1Right'
+        };
+    }
 }
