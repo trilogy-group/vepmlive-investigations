@@ -1,10 +1,4 @@
-﻿using EPMLiveCore.API;
-using EPMLiveCore.API.ResourceManagement;
-using EPMLiveCore.API.SPAdmin;
-using EPMLiveCore.Infrastructure;
-using EPMLiveCore.ReportingProxy;
-using Microsoft.SharePoint;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,158 +10,167 @@ using System.Web.Script.Services;
 using System.Web.Services;
 using System.Xml;
 using System.Xml.Linq;
+
+using EPMLiveCore.API;
+using EPMLiveCore.API.ResourceManagement;
+using EPMLiveCore.API.SPAdmin;
+using EPMLiveCore.Infrastructure;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
+
 using FieldInfo = EPMLiveCore.API.FieldInfo;
 
 namespace EPMLiveCore
 {
 
-    #region Error Codes
+    public enum ErrorCodes
+    {
 
-    /*
-     * Error Code Usage:
-     * =====================
-     * CORE FUNCTIONS
-     * =====================
-     * 1000 - Execute
-     * 1010 - GetConfigWebId
-     * 
-     * =====================
-     * MY WORK FUNCTIONS
-     * =====================
-     * 2000 - GetMyWork
-     * 2020 - GetMyGridData
-     * 2030 - RenameMyWorkGridView
-     * 2035 - DeleteMyWorkGridView
-     * 2040 - GetMyGridLayout
-     * 2045 - CheckMyWorkListEditPermission
-     * 2050 - UpdateMyWorkItem
-     * 2060 - GetMyWorkGridColType
-     * 2070 - GetMyWorkGridEnum
-     * 2080 - GetMyWorkGridViews
-     * 2090 - SaveMyWorkGridView
-     * 
-     * ===============================
-     * Build Team
-     * ===============================
-     * 3000 - Get Team
-     * 3010 - Save Team
-     * 
-     * ===============================
-     * Publishing Items
-     * ===============================
-     * 4000 - General Errors
-     * 4010 - Publish
-     * 4020 - GetUpdates
-     * 4020 - ProcessUpdates
-     * 
-     * ===============================
-     * PERSONALIZATION FUNCTIONS
-     * ===============================
-     * 5030 - Personalization_Get
-     * 5040 - Personalization_Set
-     * 
-     * ===============================
-     * FIELD INFO FUNCTIONS
-     * ===============================
-     * 6000 - IsFieldEditable
-     * 
-     * ===============================
-     * TEMPLATE INFO FUNCTIONS
-     * ===============================
-     * 7000 - GetAllTempGalTemps
-     * 7001 - GetAllSolGalTemps
-     * 
-     * 10600 - GetTemplateInformation
-     * 
-     * ===============================
-     * CREATE WORKSPACE/PROJECT/TEMPLATE FUNCTIONS
-     * ===============================
-     * 8000 - CreateWorkspace
-     * 
-     * ===============================
-     * COMMENTS CRUD FUNCTIONS
-     * ===============================
-     * 9000 - CreateComment
-     * 9001 - ReadComment
-     * 9002 - UpdateComment
-     * 9003 - DeleteComment
-     * 
-     * ===============================
-     * LIST ITEM FUNCTIONS
-     * ===============================
-     * 6050 - UpdateListItem
-     * 6060 - GetListItem
-     * 6070 - IsModerationEnabled
-     * 
-     * ===============================
-     * NOTIFICATION FUNCTIONS
-     * =============================== 
-     * 10000 - GetNotifications
-     * 10500 - SetNotificationFlags
-     * 
-     * ===============================
-     * RESOURCE POOL FUNCTIONS
-     * =============================== 
-     * 15xxx
-     * 
-     * ===============================
-     * RESOURCE MANAGEMENT FUNCTIONS
-     * ===============================
-     * 16xxx
-     * 
-     * ===============================
-     * REPORTING FUNCTIONS
-     * ===============================
-     * 17000 - Reporting_GetMyWorkData
-     * 17100 - Reporting_GetMyWorkFields
-     * 17600 - Reporting_RefreshAll
-     *
-     * ===============================
-     * ASSIGNMENT PLANNER
-     * ===============================
-     * 18000 - AssignmentPlanner_GetGridData
-     * 18100 - AssignmentPlanner_GetGridLayout
-     * 18200 - AssignmentPlanner_Publish
-     * 18300 - 399 - AssignmentPlanner_LoadViews, SaveViews, UpdateViews, DeleteViews
-     * 
-     * ===============================
-     * TAG MANAGER
-     * ===============================
-     * 19xxx
-     * 
-     * ===============================
-     * NAVIGATION SERVICE
-     * ===============================
-     * 20xxx
-     * 
-     * ===============================
-     * EPMLIVE FAVORITES SERVICE
-     * ===============================
-     * 21xxx 
-     * 
-     * ===============================
-     * SOCIAL ENGINE
-     * ===============================
-     * 66xxx
-     * 
-     * ===============================
-     * SHAREPOINT ADMIN FUNCTIONS
-     * ===============================
-     * 9001xx - EventReceiverManager
-     * 9002xx - AddRemoveFeatureEvents
-     * 
-     * ===============================
-     * INFRASTRUCTURE ERRORS
-     * ===============================
-     * 9991xx - Grid View Manager related errors
-     * 9992xx - Resource Manager
-     * 9993xx - SPListObjectManager
-     * 
-     * ===============================
-     * 9999 - TestFunction
-    */
+        /*
+         * Error Code Usage:
+         * =====================
+         * CORE FUNCTIONS
+         * =====================
+         * 1000 - Execute
+         * 1010 - GetConfigWebId
+         * 
+         * =====================
+         * MY WORK FUNCTIONS
+         * =====================
+         * 2000 - GetMyWork
+         * 2020 - GetMyGridData
+         * 2030 - RenameMyWorkGridView
+         * 2035 - DeleteMyWorkGridView
+         * 2040 - GetMyGridLayout
+         * 2045 - CheckMyWorkListEditPermission
+         * 2050 - UpdateMyWorkItem
+         * 2060 - GetMyWorkGridColType
+         * 2070 - GetMyWorkGridEnum
+         * 2080 - GetMyWorkGridViews
+         * 2090 - SaveMyWorkGridView
+         * 
+         * ===============================
+         * Build Team
+         * ===============================
+         * 3000 - Get Team
+         * 3010 - Save Team
+         * 
+         * ===============================
+         * Publishing Items
+         * ===============================
+         * 4000 - General Errors
+         * 4010 - Publish
+         * 4020 - GetUpdates
+         * 4020 - ProcessUpdates
+         * 
+         * ===============================
+         * PERSONALIZATION FUNCTIONS
+         * =============================== */
+        PersonalizationGet = 5030,
+        PersonalizationSet = 5040,
 
-    #endregion
+        /* ===============================
+        * FIELD INFO FUNCTIONS
+        * ===============================
+        * 6000 - IsFieldEditable
+        * 
+        * ===============================
+        * TEMPLATE INFO FUNCTIONS
+        * ===============================
+        * 7000 - GetAllTempGalTemps
+        * 7001 - GetAllSolGalTemps
+        * 
+        * 10600 - GetTemplateInformation
+        * 
+        * ===============================
+        * CREATE WORKSPACE/PROJECT/TEMPLATE FUNCTIONS
+        * ===============================
+        * 8000 - CreateWorkspace
+        * 
+        * ===============================
+        * COMMENTS CRUD FUNCTIONS
+        * ===============================
+        * 9000 - CreateComment
+        * 9001 - ReadComment
+        * 9002 - UpdateComment
+        * 9003 - DeleteComment
+        * 
+        * ===============================
+        * LIST ITEM FUNCTIONS
+        * ===============================
+        * 6050 - UpdateListItem
+        * 6060 - GetListItem
+        * 6070 - IsModerationEnabled
+        * 
+        * ===============================
+        * NOTIFICATION FUNCTIONS
+        * =============================== 
+        * 10000 - GetNotifications
+        * 10500 - SetNotificationFlags
+        * 
+        * ===============================
+        * RESOURCE POOL FUNCTIONS
+        * =============================== 
+        * 15xxx
+        * 
+        * ===============================
+        * RESOURCE MANAGEMENT FUNCTIONS
+        * ===============================
+        * 16xxx
+        * 
+        * ===============================
+        * REPORTING FUNCTIONS
+        * ===============================
+        * 17000 - Reporting_GetMyWorkData
+        * 17100 - Reporting_GetMyWorkFields
+        * 17600 - Reporting_RefreshAll
+        *
+        * ===============================
+        * ASSIGNMENT PLANNER
+        * ===============================
+        * 18000 - AssignmentPlanner_GetGridData
+        * 18100 - AssignmentPlanner_GetGridLayout
+        * 18200 - AssignmentPlanner_Publish
+        * 18300 - 399 - AssignmentPlanner_LoadViews, SaveViews, UpdateViews, DeleteViews
+        * 
+        * ===============================
+        * TAG MANAGER
+        * ===============================
+        * 19xxx
+        * 
+        * ===============================
+        * NAVIGATION SERVICE
+        * ===============================
+        * 20xxx
+        * 
+        * ===============================
+        * EPMLIVE FAVORITES SERVICE
+        * ===============================
+        * 21xxx 
+        * 
+        * ===============================
+        * SOCIAL ENGINE
+        * ===============================
+        * 66xxx
+        * 
+        * ===============================
+        * SHAREPOINT ADMIN FUNCTIONS
+        * ===============================
+        * 9001xx - EventReceiverManager
+        * 9002xx - AddRemoveFeatureEvents
+        * 
+        * ===============================
+        * INFRASTRUCTURE ERRORS
+        * ===============================
+        * 9991xx - Grid View Manager related errors
+        * 9992xx - Resource Manager
+        * 9993xx - SPListObjectManager
+        * 
+        * ===============================
+        * 9999 - TestFunction
+       */
+
+    }
 
     /// <summary>
     /// WorkEngine Data API
@@ -307,29 +310,41 @@ namespace EPMLiveCore
         {
             try
             {
-                var parameters = columnWidthPairs.Split(',').Select(x => x.Split('=')).ToDictionary(x => x[0], x => (object)x[1]);
+                if (string.IsNullOrWhiteSpace(columnWidthPairs))
+                {
+                    throw new ArgumentNullException("columnWidthPairs");
+                }
+                if (string.IsNullOrWhiteSpace(siteUrl))
+                {
+                    throw new ArgumentNullException("siteUrl");
+                }
+
+                var parameters = columnWidthPairs
+                    .Split(',')
+                    .Select(x => x.Split('='))
+                    .ToDictionary(x => x[0], x => (object)x[1]);
                 string data = null;
                 SPWeb web = SPContext.Current.Web;
                 {
-                    foreach (var p in parameters)
+                    foreach (var parameter in parameters)
                     {
                         var queryCheck = string.Format(@"SELECT * FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
-                          p.Key,
+                          parameter.Key,
                           web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
                         var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
                         if (dtCheck != null && dtCheck.Rows.Count != 0)
                         {
                             var query = string.Format(@"UPDATE [dbo].[PERSONALIZATIONS] SET [Value] = '{0}' WHERE [Key] = '{1}' AND [UserId] = '{2}'",
-                                p.Value,
-                                p.Key,
+                                parameter.Value,
+                                parameter.Key,
                                 web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
                             var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
                         }
                         else
                         {
                             var query = string.Format(@"INSERT INTO [dbo].[PERSONALIZATIONS] ([Key],[Value], [UserId]) VALUES ('{0}','{1}','{2}')",
-                                p.Key,
-                                p.Value,
+                                parameter.Key,
+                                parameter.Value,
                                 web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
                             var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
 
@@ -340,7 +355,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
-                var api = new APIException(5028, ex.Message);
+                var api = new APIException((int)ErrorCodes.PersonalizationSet, ex.Message);
                 return Response.Failure(api.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
@@ -353,14 +368,23 @@ namespace EPMLiveCore
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(columnWidthPairs))
+                {
+                    throw new ArgumentNullException("columnWidthPairs");
+                }
+                if (string.IsNullOrWhiteSpace(siteUrl))
+                {
+                    throw new ArgumentNullException("siteUrl");
+                }
+
                 var parameters = columnWidthPairs.Split(',');
                 var values = new List<string>();
                 SPWeb web = SPContext.Current.Web;
                 {
-                    foreach (var p in parameters)
+                    foreach (var parameter in parameters)
                     {
                         var queryCheck = string.Format(@"SELECT [Value] FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
-                          p,
+                          parameter,
                           web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
                         var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
                         foreach (System.Data.DataRow r in dtCheck.Rows)
@@ -373,7 +397,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
-                var api = new APIException(5028, ex.Message);
+                var api = new APIException((int) ErrorCodes.PersonalizationGet, ex.Message);
                 return Response.Failure(api.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }

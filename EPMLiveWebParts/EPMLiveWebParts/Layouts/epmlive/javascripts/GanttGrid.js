@@ -243,7 +243,7 @@ var GridColumnWidthNamespace = 'GridColumnWidth';
 function GridColumnWidthSet() {
     var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
         return Grids[0].Cols[key];
-    }).filter(x => x.Sec == 1 && x.Visible == 1);
+    }).filter(x => x.Sec === 1 && x.Visible === 1);
     var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name + '=' + x.Width);
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
 
@@ -255,8 +255,9 @@ function GridColumnWidthSet() {
         dataType: 'json',
         success: function (response) {
         },
-        error: function (response) {
-            //onError(response);
+        error: function (xhr, status, error) {
+            var err = eval("(" + xhr.responseText + ")");
+            alert(err.Message);
         }
     });
 }
@@ -264,7 +265,7 @@ function GridColumnWidthSet() {
 function GridColumnWidthGet() {
     var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
         return Grids[0].Cols[key];
-    }).filter(x => x.Sec == 1 && x.Visible == 1);
+    }).filter(x => x.Sec === 1 && x.Visible === 1);
     var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name);
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
 
@@ -287,8 +288,9 @@ function GridColumnWidthGet() {
                 GridColumnWidthSet();
             };
         },
-        error: function (response) {
-            //onError(response);
+        error: function (xhr, status, error) {
+            var err = eval("(" + xhr.responseText + ")");
+            alert(err.Message);
         }
     });
 }
