@@ -46,7 +46,7 @@ export class HomePage extends BasePage {
         };
     }
 
-    static get browseButton() {
+    static get chooseAfile() {
         return element(By.css('.ms-fileinput'));
     }
 

@@ -37,4 +37,15 @@ export class CheckboxHelper {
         }
         return;
     }
+
+    static async checkboxstatus(elementt: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBeClickable(elementt);
+        // Retry mark checkbox if previous try fails.  This is
+        // useful on slow environments like on remote executions.
+        const isSelected = await elementt.isSelected();
+        if (isSelected !== true) {
+            return false;
+        }
+        return true;
+    }
 }

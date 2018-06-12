@@ -143,6 +143,11 @@ export class CommonPage extends BasePage {
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
     }
 
+    static get userInfoFrame() {
+        // element(By.css('.ms-dlgFrame')) never works in case of iframe
+        return browser.driver.findElement(By.css('[src*="listform"]'));
+    }
+
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
@@ -183,6 +188,10 @@ export class CommonPage extends BasePage {
 
     static get records() {
         return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
+    }
+
+    static get timeZone() {
+        return element(By.css('[name*="TimeZone"][disabled]'));
     }
 
     static get selectorForRecordsWithGreenTick() {
@@ -288,6 +297,10 @@ export class CommonPage extends BasePage {
         return element(By.css(`[src*='find_icon']`));
     }
 
+    static get regionCheckBox(){
+        return element(By.css(`[id*="WebRegional"]`));
+    }
+
     static get noDataFound() {
         return CommonPageHelper.getMessageNoDataFound(HtmlHelper.attributeValue.gmNoDataRow, CommonPageConstants.messages.noDataFound);
     }
@@ -333,15 +346,10 @@ export class CommonPage extends BasePage {
         const riskColumns = RiskItemPageConstants.columnNames;
         return {
             createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
-
             defaultDropDownViewByText: CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
-
             titleViewColumn: CommonPageHelper.getColumnElement(riskColumns.title),
-
             assignedToViewColumn: CommonPageHelper.getColumnElement(riskColumns.assignedTo),
-
             statusViewColumn: CommonPageHelper.getColumnElement(riskColumns.status),
-
             dueDateViewColumn: CommonPageHelper.getColumnElement(riskColumns.dueDate)
         };
     }
@@ -350,15 +358,10 @@ export class CommonPage extends BasePage {
         const createLabels = CommonPageConstants.newPublicViewformLabels;
         return {
             fillCreatePublicViewPageTitle: element(By.name(createLabels.title)),
-
             publicViewRadioButton: element(By.id(CommonPageConstants.newPublicViewformLabels.publicView)),
-
             scheduledStatusCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.scheduleStatus)),
-
             exposureCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.exposure)),
-
             dueCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.due)),
-
             submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
         };
     }

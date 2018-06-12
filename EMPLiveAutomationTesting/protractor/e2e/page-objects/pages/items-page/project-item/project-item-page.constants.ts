@@ -5,7 +5,9 @@ export class ProjectItemPageConstants {
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly languageAndRegion = 'Language and Region';
     static readonly nonAdminUser = 'Non Admin User';
+    static readonly region  = 'Region';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
 
@@ -31,6 +33,7 @@ export class ProjectItemPageConstants {
             costReduction: 'Cost Reduction',
             employeeSatisfaction: 'Employee Satisfaction',
             risk: 'Risk',
+            ok: 'OK',
             projectUpdate: 'Project Update *',
         };
     }
@@ -150,6 +153,14 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get userInformation() {
+        return {
+            myLanguageAndRegion: 'My Language And Region',
+            editItem: 'Edit Item',
+            myAlerts: 'My Alerts'
+        };
+    }
+
     static get teamChangeButtons() {
         return {
             add: '< Add',
@@ -191,10 +202,18 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get users() {
+        return {
+            adminUser: 'Admin User'
+        };
+    }
+
     static get newTaskFields() {
         return {
             title: 'Title',
-            work: 'Work'
+            finishDate: 'Finish Date',
+            work: 'Work',
+            duration: 'Duration'
         };
     }
 }

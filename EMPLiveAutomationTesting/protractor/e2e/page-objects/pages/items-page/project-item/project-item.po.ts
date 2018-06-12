@@ -93,12 +93,16 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get assignToDropDown() {
-        return element(By.css('.GSEnumHeaderRight'));
+        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
+    }
+
+    static selectAssign(index: number) {
+        return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
 
     // because xpath get change when tab selected this is best i can do,
     static get selectTaskName() {
-            return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Work")]'));
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
     }
 
     static get selectPlanner() {

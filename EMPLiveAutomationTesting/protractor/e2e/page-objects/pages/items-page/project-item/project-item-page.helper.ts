@@ -14,6 +14,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
+import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
 
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
@@ -172,6 +173,30 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
+    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
+
+        await browser.sleep(PageHelper.timeout.m);
+        stepLogger.step('Click on Add Task');
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        stepLogger.step('Enter Task name');
+        await PageHelper.actionSendKeys( uniqueId);
+        stepLogger.step('Enter finish date');
+        await PageHelper.click(MyTimeOffPage.dateField);
+        await ElementHelper.actionDoubleClick(MyTimeOffPage.dateField);
+        await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
+        stepLogger.step('Enter duration');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours1);
+        stepLogger.step('Enter effort hours');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
+        stepLogger.step('Select assignee');
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
+        await PageHelper.click(ProjectItemPage.selectAssign(1));
+        stepLogger.step('Click OK');
+        await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok));
+    }
+
     static async createProjectAndNavigateToBuildTeamPage(uniqueId: string, stepLogger: StepLogger) {
         stepLogger.step('Create a new project');
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
@@ -273,6 +298,16 @@ export class ProjectItemPageHelper {
 
     static getField(tab: string) {
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
+    }
+
+    static get newTasksFields(){
+        const fields = ProjectItemPageConstants.newTaskFields;
+        return {
+            title: ProjectItemPageHelper.getField(fields.title),
+            work: ProjectItemPageHelper.getField(fields.work),
+            duration: ProjectItemPageHelper.getField(fields.duration)
+    };
+
     }
 
     static async clickOnViewReports() {

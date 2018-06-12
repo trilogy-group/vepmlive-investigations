@@ -9,6 +9,7 @@ export class HomePageConstants {
             projects: {
                 requests: 'Requests',
                 portfolios: 'Portfolios',
+                durations: 'Duration',
                 projectPortfolios: 'Project Portfolios',
                 projects: 'Projects',
                 projectCenter: 'Project Center',

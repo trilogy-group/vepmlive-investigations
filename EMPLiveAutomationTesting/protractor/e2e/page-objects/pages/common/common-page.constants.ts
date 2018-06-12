@@ -8,6 +8,7 @@ export class CommonPageConstants {
     static filesDirectoryName = 'files';
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
+    static readonly timeZone = 'Time Zone and Region';
     static readonly calendarContent = 'Calendar Content';
     static readonly createView = 'create View';
     static readonly title = 'Title';
@@ -292,6 +293,15 @@ export class CommonPageConstants {
     static get messages() {
         return {
            noDataFound : 'No data found',
+        };
+    }
+
+    static get hours() {
+        return {
+            durationHours1 : '5.00',
+            effortHours: '80',
+            durationHours2 : '10.00',
+            updatedEffortHours : '160.00'
         };
     }
 }

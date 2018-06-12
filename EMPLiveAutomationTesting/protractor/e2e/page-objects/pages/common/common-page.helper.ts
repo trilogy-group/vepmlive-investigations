@@ -499,10 +499,18 @@ export class CommonPageHelper {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
     }
 
-    static getcellText(column: string) {
+    static getCellText(column: string) {
         return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
     }
 
+    static get getcell() {
+        const cells = CommonPageConstants.cell;
+        return {
+            cell1: CommonPageHelper.getCellText(cells.cell1),
+            cell2: CommonPageHelper.getCellText(cells.cell2),
+            cell3: CommonPageHelper.getCellText(cells.cell3)
+        };
+    }
     static getColumnElement(columnName: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
     }

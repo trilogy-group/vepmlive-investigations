@@ -54,11 +54,10 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getMenuDisplayedValidation(ProjectItemPageConstants.inputLabels.budget));
 
         stepLogger.step('Enter some costs');
-        await PageHelper.sendKeysToInputField(CommonPageHelper.getcellText(CommonPageConstants.cell.cell1),
-            CommonPageConstants.costData.budgetData);
+        await PageHelper.sendKeysToInputField(CommonPageHelper.getcell.cell1, CommonPageConstants.costData.budgetData);
 
         stepLogger.verification('Costs entered in Budget tab');
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell1).getText()).toBe
+        await expect(CommonPageHelper.getcell.cell1.getText()).toBe
         (CommonPageConstants.costData.budgetData, ValidationsHelper.getFieldShouldHaveValueValidation
         (ProjectItemPageConstants.inputLabels.budget, CommonPageConstants.costData.budgetData ));
 
@@ -67,12 +66,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost);
 
         stepLogger.step('Enter some costs');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getcellText(CommonPageConstants.cell.cell2));
-        await PageHelper.sendKeysToInputField(CommonPageHelper.getcellText(CommonPageConstants.cell.cell2),
-            CommonPageConstants.costData.actualCostData);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getcell.cell2);
+        await PageHelper.sendKeysToInputField(CommonPageHelper.getcell.cell2, CommonPageConstants.costData.actualCostData);
 
         stepLogger.verification('Costs entered in Actual Costs tab');
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell2).getText()).toBe
+        await expect(CommonPageHelper.getcell.cell2.getText()).toBe
         (CommonPageConstants.costData.actualCostData, ValidationsHelper.getFieldShouldHaveValueValidation
         (ProjectItemPageConstants.columnNames.actualCost, CommonPageConstants.costData.actualCostData ));
 
@@ -81,21 +79,21 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits);
 
         stepLogger.step('Enter some costs');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getcellText(CommonPageConstants.cell.cell3));
-        await PageHelper.sendKeysToInputField(CommonPageHelper.getcellText('HideCol0C13'), CommonPageConstants.costData.benefitsData);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getcell.cell3);
+        await PageHelper.sendKeysToInputField(CommonPageHelper.getcell.cell3, CommonPageConstants.costData.benefitsData);
 
         stepLogger.verification('Costs entered in Benefits tab');
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell3).getText()).toBe
+        await expect(CommonPageHelper.getcell.cell3.getText()).toBe
         (CommonPageConstants.costData.benefitsData, ValidationsHelper.getFieldShouldHaveValueValidation
-        (ProjectItemPageConstants.columnNames.benefits, CommonPageConstants.costData.benefitsData ));
+        (ProjectItemPageConstants.columnNames.benefits, CommonPageConstants.costData.benefitsData));
 
         stepLogger.stepId(7);
         stepLogger.step('Click on Save button');
-        await ElementHelper.clickUsingJs(await CommonPage.ribbonItems.save);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.save);
 
         stepLogger.stepId(8);
         stepLogger.step('Click on Close button');
-        await ElementHelper.clickUsingJs(await CommonPage.ribbonItems.close);
+        await ElementHelper.clickUsingJs(CommonPage.ribbonItems.close);
 
         stepLogger.stepId(9);
         stepLogger.step('Reopen the "Cost Planner" [Click on Edit Costs in ITEMS menu]');
@@ -106,19 +104,19 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
 
         stepLogger.verification('Cost details displayed in Budget tab are same as values entered in Step# 4');
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell1).getText()).toBe
+        await expect(CommonPageHelper.getcell.cell1.getText()).toBe
         (CommonPageConstants.costData.budgetData, ValidationsHelper.getFieldShouldHaveValueValidation
         (ProjectItemPageConstants.inputLabels.budget, CommonPageConstants.costData.budgetData ));
 
         stepLogger.verification('Cost details displayed in Actual Costs tab are same as values entered in Step# 5');
         await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost);
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell2)).toBe(CommonPageConstants.costData.actualCostData,
+        await expect(CommonPageHelper.getcell.cell2).toBe(CommonPageConstants.costData.actualCostData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.actualCost,
                 CommonPageConstants.costData.actualCostData ));
 
         stepLogger.verification('Click on Benefits tabs');
         await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits);
-        await expect(await CommonPageHelper.getcellText(CommonPageConstants.cell.cell3)).toBe(CommonPageConstants.costData.benefitsData,
+        await expect(CommonPageHelper.getcell.cell3).toBe(CommonPageConstants.costData.benefitsData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.benefits,
                 CommonPageConstants.costData.benefitsData ));
     });

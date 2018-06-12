@@ -176,4 +176,8 @@ export class ElementHelper {
     static getElementByText(text: string, isContains = false) {
         return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
+
+    static getBrowserRefresh() {
+        browser.refresh();
+    }
 }

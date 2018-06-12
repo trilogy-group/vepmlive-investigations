@@ -87,11 +87,11 @@ export class EventsPage {
         return element(By.id('onetidTypeChoice'));
     }
 
-    static get descriptionFeild () {
+    static get descriptionField () {
         return element(By.id('idDesc'));
     }
 
-    static get columnNameFeild () {
+    static get columnNameField () {
         return element(By.id('idColName'));
     }
 
