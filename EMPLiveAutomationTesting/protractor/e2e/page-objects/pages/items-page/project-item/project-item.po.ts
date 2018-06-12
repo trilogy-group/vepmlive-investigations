@@ -127,7 +127,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get actionsdropdown() {
-        return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
+        return element(By.xpath(`(//a[contains(@id,"RSActionMenu") and @title="Open Menu"])[last()]`));
     }
 
     static get applyParameterButton() {
