@@ -20,6 +20,10 @@ export class PlannerSettingsPageHelper {
                 editPLanner: element(By.id(menuTitles.plannerAdministration.editPLanner)),
                 backToSetting: ElementHelper.getElementByText(menuTitles.plannerAdministration.backToSetting),
 
+            },
+            buttonLabel: {
+                planner: ElementHelper.getElementByText(PlannerSettingsPageConstants.leftMenus.planners),
+
             }
         };
     }

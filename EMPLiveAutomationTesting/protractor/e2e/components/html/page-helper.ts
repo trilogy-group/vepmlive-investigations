@@ -47,6 +47,7 @@ export class PageHelper {
     }
 
     static async sendKeysToInputField(elem: ElementFinder, key: string) {
+        // send keys in not working in perticular fields, Its required actions classes.
         await elem.click();
         await browser.actions().sendKeys(key).perform();
     }

@@ -44,7 +44,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PlannerSettingsPageHelper.expandPlannerSettingsNode();
 
         stepLogger.step('Click on "Planners" sub node');
-        await PageHelper.click(ElementHelper.getElementByText(PlannerSettingsPageConstants.leftMenus.planners));
+        await PageHelper.click(PlannerSettingsPageHelper.menu.buttonLabel.planner);
 
         stepLogger.verification('Various Settings Options displayed');
         await expect(await PageHelper.isElementDisplayed(PlannerSettingsPageHelper.menu.menuTitles.planName))
@@ -129,21 +129,21 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(CommonPage.dialogTitle.isDisplayed()).toBe(true,
+        await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        await expect(PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation(uniqueId));
         await PageHelper.switchToDefaultContent();
 
         stepLogger.stepId(8);
         stepLogger.step('Select the newly added planner [Ex: Smoke Test Planner 1] in Select Planner pop up');
-        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ElementHelper.getElementByText
-        (uniqueId));
+        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ElementHelper.getElementByText(uniqueId));
 
         stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
+        // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(browser.getTitle()).toContain(projectName,
@@ -161,7 +161,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
-        await expect(CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
+        await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');

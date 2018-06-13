@@ -46,24 +46,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.events,
             stepLogger);
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on CALENDAR tab');
-        await PageHelper.click(EventsPage.calenderTab);
-
-        stepLogger.verification('Contents of the CALENDAR tab should be displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.calendarContent));
-
         // Step #2 and #7 Inside this function
         await EventsPageHelper.createView(stepLogger, uniqueId , false);
 
-        stepLogger.verification('Created view should be displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
-
     });
 
-    it('Create Default View - [855387]', async () => {
+    fit('Create Default View - [855387]', async () => {
         const stepLogger = new StepLogger(855387);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.precondition('User is in Event page ');
@@ -73,20 +61,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.events,
             stepLogger);
 
-        stepLogger.stepId(1);
-        stepLogger.step('Click on CALENDAR tab');
-        await PageHelper.click(EventsPage.calenderTab);
-
-        stepLogger.verification('Contents of the CALENDAR tab should be displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.calendarContent));
-
-        // Step #2 and #6 Inside this function
+        // Step #1 and #6 Inside this function
         await EventsPageHelper.createView(stepLogger, uniqueId , true);
-
-        stepLogger.verification('Newly added default view should be displayed in event page ');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
     });
 
     it('Create Column - [855530]', async () => {

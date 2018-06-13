@@ -92,6 +92,10 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('[id*="CloseButton"]'));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
     static get assignToDropDown() {
         return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
     }

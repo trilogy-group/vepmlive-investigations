@@ -34,11 +34,11 @@ export class DocumentPage {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Add a document pop up is closed');
-        await expect(HomePage.chooseAfile.isPresent()).toBe(false,
+        await expect(await HomePage.chooseAfile.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
-        await expect(CommonPage.UpdatePropertyDocument.isDisplayed())
+        await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.stepId(4);
@@ -46,7 +46,7 @@ export class DocumentPage {
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('Add a document window to update the properties of the document is closed');
-        await expect(CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
+        await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.verification('Home Page is displayed');
@@ -76,7 +76,7 @@ export class DocumentPage {
         await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await expect(CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
     }
@@ -95,7 +95,7 @@ export class DocumentPage {
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
-        await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
+        await expect(await CommonPage.projectsList.isDisplayed()).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
         stepLogger.stepId(6);

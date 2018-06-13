@@ -34,12 +34,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Notification is not visible after save.
 
         // Step #5 and #6 Inside this function
-        await DocumentPage.navigateTOAddADocumentPage(stepLogger);
+        await DocumentPage.verifyCreatedDocument(stepLogger);
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
-        await expect(ElementHelper.getElementByText(newFile.file).isDisplayed())
+        await expect(await ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 
@@ -53,7 +53,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
         await ElementHelper.click(HomePage.toolBarMenuItems.more);
         await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
-        await expect(CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
         await DocumentPage.uploadDocument(newFile.fullFilePath, stepLogger, true);
 
@@ -66,17 +66,17 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Notification is not visible after save.
 
         // Step #5 and #6 Inside this function
-        await DocumentPage.navigateTOAddADocumentPage(stepLogger);
+        await DocumentPage.verifyCreatedDocument(stepLogger);
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.file));
-        await expect(ElementHelper.getElementByText(newFile.file).isDisplayed())
+        await expect(await ElementHelper.getElementByText(newFile.file).isDisplayed())
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
         stepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
             'successfully of the already existing document]');
-        await expect(CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
+        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 

@@ -287,6 +287,14 @@ export class ProjectItemPageHelper {
         }
     }
 
+    static get getlink() {
+        return {
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+        };
+    }
+
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }
@@ -296,10 +304,12 @@ export class ProjectItemPageHelper {
     }
 
     static dateField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
     }
 
     static getField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
     }
 

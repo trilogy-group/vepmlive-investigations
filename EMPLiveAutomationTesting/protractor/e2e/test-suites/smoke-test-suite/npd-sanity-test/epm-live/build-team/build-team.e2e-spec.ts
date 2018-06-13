@@ -280,7 +280,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         return selectedResourcePoolResourceName;
     });
 
-    fit('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
+    it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         const stepLogger = new StepLogger(778315);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.stepId(1);
@@ -313,6 +313,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Task" button');
+        // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
@@ -320,8 +321,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
-        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
-        await browser.sleep(PageHelper.timeout.s);
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
+        // After save It need static wait(5 sec) and no element found which get change after save.
+        await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.verification('A new task is created and required details entered [Ex: New Task 1]');
         await expect(ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
@@ -329,24 +331,25 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
 
+        stepLogger.stepId(5);
         stepLogger.step('Click in the Assigned To column');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.verification('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1)
-            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam))));
+        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1)))
+            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.verification('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1)
-            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam))));
+        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1))).toBe
+        (true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         // Deleting created task
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.deleteTask);
         await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
-        await WaitHelper.getInstance().waitForElementToBeHidden(ProjectItemPage.selectTaskName);
-
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
+        // After save It need static wait(5 sec) and no element found which get change after save.
+        await browser.sleep(PageHelper.timeout.m);
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
@@ -378,8 +381,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
-        // If we able to access Close button under Build Team tab that means Build tab is selected
         stepLogger.verification('"Build Team" tab is selected by default');
+        // If we able to access Close button under Build Team tab that means Build tab is selected
         await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.close))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.ribbonLabels.close));
 
@@ -394,8 +397,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(4);
         stepLogger.step('Click on the "Title" link for the user name who is logged into application from the Current Team' +
             ' grid displayed on left side');
-        await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser));
-
+        await PageHelper.click(ProjectItemPageHelper.getlink.adminUser);
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('User Information pop-up is displayed');
@@ -403,7 +405,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "My Language And Region" link displayed on top of "User Information" pop-up');
-        await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion));
+        await PageHelper.click(ProjectItemPageHelper.getlink.myLanguageAndRegion);
         await PageHelper.switchToNewTabIfAvailable(1);
 
         stepLogger.verification('New tab is opened and "Language and Region" page is displayed');
@@ -412,7 +414,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(6);
         stepLogger.step('Scroll down till the section "Region" is visible');
-        await ElementHelper.scrollToElement(ElementHelper.getElementByText(ProjectItemPageConstants.region));
+        await ElementHelper.scrollToElement(ProjectItemPageHelper.getlink.region);
 
         stepLogger.step('Un check the check box Always follow web settings displayed in Follow Web Settings row');
         await CheckboxHelper.markCheckbox(CommonPage.regionCheckBox, false);

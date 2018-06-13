@@ -104,6 +104,14 @@ export class EventsPageHelper {
 
     static async createView(stepLogger: StepLogger, uniqueId: string, defaultView: boolean) {
 
+        stepLogger.stepId(1);
+        stepLogger.step('Click on CALENDAR tab');
+        await PageHelper.click(EventsPage.calenderTab);
+
+        stepLogger.verification('Contents of the CALENDAR tab should be displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.calendarContent));
+
         stepLogger.stepId(2);
         stepLogger.step('Click on Create View');
         await ElementHelper.clickUsingJs(EventsPage.createView);
@@ -140,11 +148,16 @@ export class EventsPageHelper {
         stepLogger.stepId(6);
         stepLogger.step('Navigate to any other page and come back to Event page and from the CALENDAR tab, select' +
             ' any the Standard View which was created from the Current View drop-down');
-        await PageHelper.click(ElementHelper.getElementByText(CommonPageConstants.calendar));
+        await PageHelper.click(CommonPageHelper.getbuttons.calender);
         await PageHelper.click(EventsPage.calenderTab);
 
         stepLogger.step('Expand Current View drop down');
         await PageHelper.click(EventsPage.currentView);
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
+
+        stepLogger.verification('Created view should be displayed in the list');
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
+
     }
 }

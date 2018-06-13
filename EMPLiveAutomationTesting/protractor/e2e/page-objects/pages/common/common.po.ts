@@ -239,14 +239,15 @@ export class CommonPage extends BasePage {
         return element(By.xpath('.//*[contains(text(),"update the properties")]'));
     }
 
-    static getbutton(tab: string) {
+    static getButton(tab: string) {
+        // it is a part of a object "costButton", object created below
         return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 
     static get costButton(){
         const fields = CommonPageConstants.costButtonLabel;
         return {
-            budget: CommonPage.getbutton(fields.budget),
+            budget: CommonPage.getButton(fields.budget),
         };
 
     }

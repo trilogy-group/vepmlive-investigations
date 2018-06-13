@@ -56,7 +56,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
-        await expect(CommonPage.dialogTitle.isDisplayed()).toBe(true,
+        await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         stepLogger.step('click on Project Planner');
@@ -69,6 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('NO Tasks displayed in Project Planner');
+        // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
                 ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
@@ -83,8 +84,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
-        await PageHelper.click(MyTimeOffPage.dateField);
-        await ElementHelper.actionDoubleClick(MyTimeOffPage.dateField);
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
+        await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
@@ -92,24 +93,25 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Save button from ribbon panel');
-        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
         stepLogger.verification('Changes done in Project Planner page are saved');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
-        await expect(ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
-        await expect(ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.pageHeaders.projects.workHours));
 
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
+        // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.m);
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
-        await expect(CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
+        await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
                 ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
@@ -133,15 +135,15 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        // Sleep required wait helper is not working.
         stepLogger.verification('Changes saved in step# 5 (Task added and details entered for task)' +
             ' are displayed in the Project Planner');
+        // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.xm);
         await PageHelper.click(ProjectItemPage.selectTaskName);
-        await expect(ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title,
                 CommonPageConstants.pageHeaders.projects.tasks));
-        await expect(ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
+        await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.pageHeaders.projects.workHours));
 
@@ -149,7 +151,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.deleteTask);
         await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(CommonPageConstants.formLabels.save));
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
+        // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
     });
 });

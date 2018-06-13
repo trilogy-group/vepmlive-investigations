@@ -500,10 +500,11 @@ export class CommonPageHelper {
     }
 
     static getCellText(column: string) {
+        // it is a part of a object "getCell", object created below
         return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
     }
 
-    static get getcell() {
+    static get getCell() {
         const cells = CommonPageConstants.cell;
         return {
             cell1: CommonPageHelper.getCellText(cells.cell1),
@@ -511,6 +512,13 @@ export class CommonPageHelper {
             cell3: CommonPageHelper.getCellText(cells.cell3)
         };
     }
+
+    static get getbuttons() {
+        return {
+            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
+        };
+    }
+
     static getColumnElement(columnName: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
     }
