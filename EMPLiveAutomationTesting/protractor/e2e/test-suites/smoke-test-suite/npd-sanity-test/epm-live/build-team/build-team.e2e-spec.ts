@@ -391,6 +391,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.resourcePool))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
+        stepLogger.stepId(4);
         stepLogger.step('Click on the "Title" link for the user name who is logged into application from the Current Team' +
             ' grid displayed on left side');
         await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser));
@@ -400,6 +401,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('User Information pop-up is displayed');
         await PageHelper.switchToFrame(CommonPage.userInfoFrame);
 
+        stepLogger.stepId(5);
         stepLogger.step('Click on "My Language And Region" link displayed on top of "User Information" pop-up');
         await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion));
         await PageHelper.switchToNewTabIfAvailable(1);
@@ -408,6 +410,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
             ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.languageAndRegion));
 
+        stepLogger.stepId(6);
         stepLogger.step('Scroll down till the section "Region" is visible');
         await ElementHelper.scrollToElement(ElementHelper.getElementByText(ProjectItemPageConstants.region));
 
@@ -416,7 +419,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Always follow web settings check box is unchecked');
         await expect(CheckboxHelper.checkboxstatus(CommonPage.regionCheckBox)).toBe(false,
-            ValidationsHelper.getCheckBoxNotDisplayedValidation());
+            ValidationsHelper.getCheckBoxNotSelectedValidation());
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');
         await expect(await PageHelper.isElementDisplayed(CommonPage.timeZone)).toBe(false,

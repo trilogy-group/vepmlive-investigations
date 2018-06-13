@@ -255,6 +255,10 @@ export class CommonPage extends BasePage {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
+    static get plannerbox() {
+        return element(By.css('[id*="mbox"][style*="block"]'));
+    }
+
     static get closeButton() {
         return element(By.css('.ms-dlgCloseBtn'));
     }

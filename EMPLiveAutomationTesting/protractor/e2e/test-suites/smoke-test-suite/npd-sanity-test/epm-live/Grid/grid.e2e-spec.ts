@@ -127,7 +127,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(6 );
         stepLogger.step('Check the task details displayed');
-        await browser.sleep(PageHelper.timeout.xm);
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.selectTaskName))
             .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 

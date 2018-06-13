@@ -159,6 +159,10 @@ export class ElementHelper {
         browser.executeScript('arguments[0].scrollIntoView();', elementt);
     }
 
+    static async scrollToBottomOfPage() {
+        browser.executeScript('window.scrollTo(0, document.body.scrollHeight)');
+    }
+
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
         const value = await elem.getAttribute(attribute);
         return value.trim();

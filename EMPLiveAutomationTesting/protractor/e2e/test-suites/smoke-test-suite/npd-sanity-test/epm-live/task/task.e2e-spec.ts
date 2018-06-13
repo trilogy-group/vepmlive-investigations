@@ -108,7 +108,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
-        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
         await expect(CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
                 ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
@@ -122,7 +122,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan\n' +
             'Click on Project Planner in the list of planners displayed');
-        await PageHelper.click(CommonPage.editPlan);
+        await ElementHelper.clickUsingJs(CommonPage.editPlan);
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
@@ -133,7 +133,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        // Sleep reuired wait helper is not working.
+        // Sleep required wait helper is not working.
         stepLogger.verification('Changes saved in step# 5 (Task added and details entered for task)' +
             ' are displayed in the Project Planner');
         await browser.sleep(PageHelper.timeout.xm);

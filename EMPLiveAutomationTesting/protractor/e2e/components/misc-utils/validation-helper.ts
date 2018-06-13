@@ -34,8 +34,12 @@ export class ValidationsHelper {
         return `${this.types.page} ${this.getDisplayedValidation(name)}`;
     }
 
-    static getCheckBoxNotDisplayedValidation() {
+    static getCheckBoxNotSelectedValidation() {
         return this.getCheckBoxStatusValidation('not');
+    }
+
+    static getCheckBoxSelectedValidation() {
+        return this.getCheckBoxStatusValidation('');
     }
 
     static getFieldDisplayedValidation(name: string) {
