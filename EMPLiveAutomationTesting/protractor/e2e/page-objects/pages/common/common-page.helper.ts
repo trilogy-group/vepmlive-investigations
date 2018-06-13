@@ -486,9 +486,9 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
-    // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
     static getEditCostTab(Value: string) {
-        return element(By.xpath('//div[not(contains(@tab_id,"ref"))]/*[text()="' + Value + '"]'));
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return element(By.xpath(`//div[not(contains(@tab_id,"ref"))]/*[text()="${Value}"]`));
     }
 
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {

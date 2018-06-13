@@ -218,8 +218,8 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="EPMLive.Planner"]'));
     }
 
-     // This xpath is best we have. Onmouse click is required
     static get project() {
+        // This xpath is best we have. Onmouse click is required
         return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
     }
 
@@ -239,8 +239,16 @@ export class CommonPage extends BasePage {
         return element(By.xpath('.//*[contains(text(),"update the properties")]'));
     }
 
-    static get budgetTab() {
-        return element(By.xpath('.//*[contains(@class,"element_active")]/*[text()=\'Budget\']'));
+    static getbutton(tab: string) {
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
+    }
+
+    static get costButton(){
+        const fields = CommonPageConstants.costButtonLabel;
+        return {
+            budget: CommonPage.getbutton(fields.budget),
+        };
+
     }
 
     static get okButton () {

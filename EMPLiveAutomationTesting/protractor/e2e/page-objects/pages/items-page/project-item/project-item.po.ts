@@ -100,8 +100,8 @@ export class ProjectItemPage extends BasePage {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
 
-    // because xpath get change when tab selected this is best i can do,
     static get selectTaskName() {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
         return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
     }
 

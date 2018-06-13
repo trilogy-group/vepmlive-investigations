@@ -63,6 +63,7 @@ export class HomePage extends BasePage {
     }
 
     static get navigateMenu() {
+        // ql locator is alone on that page.
         return element(By.css('[data-id*="ql"]'));
     }
 

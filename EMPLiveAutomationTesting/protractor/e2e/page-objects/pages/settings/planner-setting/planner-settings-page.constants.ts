@@ -39,10 +39,4 @@ export class PlannerSettingsPageConstants {
             discription: 'New Planner created as part of smoke test',
         };
     }
-
-    static get buttonLabbles() {
-        return {
-           //
-        };
-    }
 }

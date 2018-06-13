@@ -5,8 +5,8 @@ import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class PlannerSettingsPageHelper {
     static async expandPlannerSettingsNode() {
-        if (element(By.css('[id*="planner-settings"] [class*="collapsed"]')).isDisplayed()) {
-            await PageHelper.click(element(By.css('[id*="planner-settings"] [class*="collapsed"]')));
+        if (this.collapsedMode.isDisplayed()) {
+            await PageHelper.click(this.collapsedMode);
         }
     }
 
@@ -26,6 +26,10 @@ export class PlannerSettingsPageHelper {
 
     static get planNameField() {
         return element(By.css('[id*="PlannerName"]'));
+    }
+
+    static get collapsedMode() {
+        return element(By.css('[id*="planner-settings"] [class*="collapsed"]'));
     }
 
     static get planDiscriptionField() {

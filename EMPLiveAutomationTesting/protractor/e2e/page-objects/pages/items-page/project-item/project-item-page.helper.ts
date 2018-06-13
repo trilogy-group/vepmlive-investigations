@@ -15,7 +15,6 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
-
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -181,8 +180,8 @@ export class ProjectItemPageHelper {
         stepLogger.step('Enter Task name');
         await PageHelper.actionSendKeys( uniqueId);
         stepLogger.step('Enter finish date');
-        await PageHelper.click(MyTimeOffPage.dateField);
-        await ElementHelper.actionDoubleClick(MyTimeOffPage.dateField);
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
+        await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
         stepLogger.step('Enter duration');
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
@@ -194,7 +193,7 @@ export class ProjectItemPageHelper {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPage.selectAssign(1));
         stepLogger.step('Click OK');
-        await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok));
+        await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
 
     static async createProjectAndNavigateToBuildTeamPage(uniqueId: string, stepLogger: StepLogger) {
@@ -296,8 +295,18 @@ export class ProjectItemPageHelper {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
 
+    static dateField(tab: string) {
+        return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
+    }
+
     static getField(tab: string) {
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
+    }
+
+    static get button() {
+        return {
+                ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+        };
     }
 
     static get newTasksFields(){
@@ -305,7 +314,8 @@ export class ProjectItemPageHelper {
         return {
             title: ProjectItemPageHelper.getField(fields.title),
             work: ProjectItemPageHelper.getField(fields.work),
-            duration: ProjectItemPageHelper.getField(fields.duration)
+            duration: ProjectItemPageHelper.getField(fields.duration),
+            date: ProjectItemPageHelper.dateField(fields.date),
     };
 
     }

@@ -12,7 +12,6 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {browser} from 'protractor';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {MyTimeOffPage} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off.po';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 
@@ -24,7 +23,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Add Duration. - [778315]', async () => {
+    it('Add Duration. - [970519]', async () => {
         const stepLogger = new StepLogger(970519);
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
@@ -62,7 +61,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.hours.effortHours));
 
-        await expect( MyTimeOffPage.dateField.getText()).not.toBe(finishDate,
+        await expect( ProjectItemPageHelper.newTasksFields.date.getText()).not.toBe(finishDate,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.finishDate, finishDate));
 
         stepLogger.stepId(2);
@@ -73,7 +72,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.selectAssign(2));
 
         stepLogger.step('Click OK button');
-        await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok));
+        await PageHelper.click(ProjectItemPageHelper.button.ok);
 
         stepLogger.verification('Work column updated according to the number of assigned resources. (Billing hours ' +
             'of the resource multiplied with the duration and the result displayed in Work column) [In this case 2 X 8 X 10 = 160]');
@@ -113,7 +112,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Select the project in which task details updated in step# 2 [Ex: Smoke Test Project 2]' +
         'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
         'Click on Project Planner in the list of planners displayed');
-        await ElementHelper.getBrowserRefresh;
+        await ElementHelper.browserRefresh;
         await PageHelper.click(CommonPage.record);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await PageHelper.click(CommonPage.editPlan);

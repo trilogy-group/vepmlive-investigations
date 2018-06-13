@@ -257,6 +257,12 @@ export class CommonPageConstants {
         };
     }
 
+    static get costButtonLabel() {
+        return {
+            budget: 'Budget',
+        };
+    }
+
     static get teamId() {
         return {
             currentTeam: 'TeamGrid',

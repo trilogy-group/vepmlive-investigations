@@ -19,9 +19,7 @@ export class MyTimeOffPage {
     static get dateEditBox() {
         return element(By.css('[class*= "GSEditInput" ]'));
     }
-    static get dateField() {
-        return element(By.xpath('//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"DueDate")][1]'));
-    }
+
     static get timeOffTypeShowAllButton() {
         return element(By.id('TimeOffType_ddlShowAll'));
     }

@@ -21,6 +21,7 @@ export class EventsPage {
     }
 
     static get standardViewType () {
+        // Only id will not work
         return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
     }
 

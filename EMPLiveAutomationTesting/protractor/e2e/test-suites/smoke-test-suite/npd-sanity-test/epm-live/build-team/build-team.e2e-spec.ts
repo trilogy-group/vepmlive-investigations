@@ -101,7 +101,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('"Edit Team" window is closed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
+        await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
@@ -280,7 +280,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         return selectedResourcePoolResourceName;
     });
 
-    it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
+    fit('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         const stepLogger = new StepLogger(778315);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.stepId(1);
@@ -407,7 +407,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToNewTabIfAvailable(1);
 
         stepLogger.verification('New tab is opened and "Language and Region" page is displayed');
-        await expect(await browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
+        await expect(browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
             ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.languageAndRegion));
 
         stepLogger.stepId(6);
@@ -422,7 +422,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getCheckBoxNotSelectedValidation());
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.timeZone)).toBe(false,
+        await expect(await CommonPage.timeZone.isPresent()).toBe(false,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
 });

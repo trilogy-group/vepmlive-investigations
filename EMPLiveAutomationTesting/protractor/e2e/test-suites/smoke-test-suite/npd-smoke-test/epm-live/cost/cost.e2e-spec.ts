@@ -49,8 +49,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.step('Ensure that Budget tab is selected');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
-        await expect(await PageHelper.isElementPresent(CommonPage.budgetTab)).toBe(true,
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.costButton.budget);
+        await expect(await PageHelper.isElementPresent(CommonPage.costButton.budget)).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(ProjectItemPageConstants.inputLabels.budget));
 
         stepLogger.step('Enter some costs');
@@ -101,7 +101,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Check the details displayed in Budget, Actual Costs, Benefits tabs');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.budgetTab);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.costButton.budget);
 
         stepLogger.verification('Cost details displayed in Budget tab are same as values entered in Step# 4');
         await expect(CommonPageHelper.getcell.cell1.getText()).toBe

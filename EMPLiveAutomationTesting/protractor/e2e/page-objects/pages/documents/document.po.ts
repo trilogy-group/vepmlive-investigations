@@ -8,6 +8,7 @@ import {browser} from 'protractor';
 import {CommonPageConstants} from '../common/common-page.constants';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class DocumentPage {
 
@@ -54,4 +55,53 @@ export class DocumentPage {
 
     }
 
+    static async navigateTOAddADocumentPage(stepLogger: StepLogger) {
+
+        stepLogger.stepId(1);
+        stepLogger.step('Select Navigation icon  from left side menu');
+        await PageHelper.click(HomePage.navigateMenu);
+
+        stepLogger.step('Click on Home link');
+        await PageHelper.click(HomePage.navigateToHome);
+
+        stepLogger.verification('Logged in users Home Page is displayed');
+        await expect(browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        await ElementHelper.click(HomePage.toolBarMenuItems.more);
+
+        stepLogger.step('Click on Project Document link from the options displayed');
+        await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
+
+        stepLogger.verification('Add a document pop up displayed');
+        await expect(CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+    }
+
+    static async verifyCreatedDocument(stepLogger: StepLogger) {
+
+        stepLogger.stepId(5);
+        stepLogger.step('Select Navigation icon  from left side menu');
+        await PageHelper.click(HomePage.navigateMenu);
+
+        stepLogger.step('Select Projects -> Documents from the options displayed');
+        await PageHelper.click(HomePage.navigation.projects.documents);
+
+        stepLogger.verification('Project Documents page is displayed');
+        await expect(browser.getTitle()).toBe(HomePageConstants.documentPage,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
+
+        stepLogger.verification('Project node is displayed in collapsed state');
+        await expect(CommonPage.projectsList.isDisplayed()).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
+
+        stepLogger.stepId(6);
+        stepLogger.step('Click on the Project node to expand it');
+        await PageHelper.click(CommonPage.projectsList);
+
+
+    }
 }

@@ -213,7 +213,8 @@ export class ProjectItemPageConstants {
             title: 'Title',
             finishDate: 'Finish Date',
             work: 'Work',
-            duration: 'Duration'
+            duration: 'Duration',
+            date: 'DueDate'
         };
     }
 }
