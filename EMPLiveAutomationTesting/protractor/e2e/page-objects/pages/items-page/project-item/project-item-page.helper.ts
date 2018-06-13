@@ -271,6 +271,11 @@ export class ProjectItemPageHelper {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
 
+    static getDisabledReportPagingHeaderByTitle(title: string) {
+        return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
+    }
+
+
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);

@@ -117,17 +117,17 @@ export class ProjectItemPage extends BasePage {
         const label = ProjectItemPageConstants.reportHeaders;
         return {
             refresh: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.refresh),
-            firstPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.firstPage),
-            previousPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.previousPage),
-            nextPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.nextPage),
-            lastPage: ProjectItemPageHelper.getReportPagingHeaderByTitle(label.lastPage),
+            firstPage: ProjectItemPageHelper.getDisabledReportPagingHeaderByTitle(label.firstPage),
+            previousPage: ProjectItemPageHelper.getDisabledReportPagingHeaderByTitle(label.previousPage),
+            nextPage: ProjectItemPageHelper.getDisabledReportPagingHeaderByTitle(label.nextPage),
+            lastPage: ProjectItemPageHelper.getDisabledReportPagingHeaderByTitle(label.lastPage),
             findTextInReport: CommonPageHelper.getElementByTitle(label.findTextInReport),
             findNext: CommonPageHelper.getElementByTitle(label.findNext)
         };
     }
 
     static get actionsdropdown() {
-        return element(By.css(`a[id*="RSActionMenu"][title="Open Menu"]`));
+        return element(By.xpath(`(//a[contains(@id,"RSActionMenu") and @title="Open Menu"])[last()]`));
     }
 
     static get applyParameterButton() {
