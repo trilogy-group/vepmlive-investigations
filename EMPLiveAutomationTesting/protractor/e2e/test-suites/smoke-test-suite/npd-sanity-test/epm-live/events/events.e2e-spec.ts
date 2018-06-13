@@ -138,7 +138,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok button');
-        ElementHelper.scrollToElement(CommonPage.okButton);
+        await ElementHelper.scrollToElement(CommonPage.okButton);
         await PageHelper.click(CommonPage.okButton);
 
         stepLogger.verification('Newly added column should be displayed in events page while user select ' +
@@ -146,7 +146,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await ElementHelper.clickUsingJs(EventsPage.createView);
         await PageHelper.click(EventsPage.standardViewType);
-        ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));
+        await ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));
 
