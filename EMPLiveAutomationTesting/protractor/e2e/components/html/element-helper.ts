@@ -58,6 +58,12 @@ export class ElementHelper {
         return select.element(by.xpath(`./option[${ComponentHelpers.getXPathFunctionForDot(option)}]`)).isSelected();
     }
 
+    static async ctrlClick(select: ElementFinder) {
+        browser.actions().mouseMove(select).perform();
+        browser.actions().keyDown(protractor.Key.CONTROL).click().perform();
+        // select.sendKeys(protractor.Key.RIGHT)
+    }
+
     static async getFocusedElement() {
         return browser
             .driver

@@ -11,6 +11,7 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
+import { browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -162,5 +163,27 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.record))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
+    });
+
+    fit('Validate right click for Projects > Project name." - [14119624]', async () => {
+        const stepLogger = new StepLogger(14119624);
+        stepLogger.stepId(1);
+        stepLogger.step('Under Navigations, click on Projects');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        stepLogger.stepId(2);
+        stepLogger.step('Select the project that has to be opened and right click on the hyperlink.');
+        await PageHelper.isElementDisplayed(CommonPage.record);
+        ElementHelper.ctrlClick(CommonPage.record);
+        await browser.sleep(2000);
+        await PageHelper.switchToNewTabIfAvailable(1);
+        
+        stepLogger.stepId(3);
+        stepLogger.step('Verify The project gets opened in a new tab as shown.');
+        await PageHelper.isElementDisplayed(ProjectItemPage.inputs.projectName);
     });
 });
