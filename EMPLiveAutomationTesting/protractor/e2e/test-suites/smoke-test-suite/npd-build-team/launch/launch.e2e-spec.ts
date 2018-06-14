@@ -11,7 +11,6 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
-import { browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -178,8 +177,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(2);
         stepLogger.step('Select the project that has to be opened and right click on the hyperlink.');
         await PageHelper.isElementDisplayed(CommonPage.record);
-        ElementHelper.ctrlClick(CommonPage.record);
-        await browser.sleep(2000);
+        await ElementHelper.actionHoverOver(CommonPage.record);
+        await ElementHelper.rightClickAndSelectNewTab();
         await PageHelper.switchToNewTabIfAvailable(1);
         
         stepLogger.stepId(3);
