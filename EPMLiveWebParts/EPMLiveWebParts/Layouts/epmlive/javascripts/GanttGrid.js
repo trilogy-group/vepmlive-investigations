@@ -251,8 +251,8 @@ function GridColumnWidthSet() {
 
     $.ajax({
         type: 'POST',
-        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthSet',
-        data: "{ siteUrl: '" + baseUrl + "', columnWidthPairs: '" + columnKeysPlain + "' }",
+        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+        data: "{ Function: 'keyvaluestore_ColumnWidthSet', Dataxml: '<Data SiteUrl=\"" + baseUrl + "\">" + columnKeysPlain + "</Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {
@@ -275,8 +275,8 @@ function GridColumnWidthGet() {
 
     $.ajax({
         type: 'POST',
-        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/ColumnWidthGet',
-        data: "{ siteUrl: '" + baseUrl + "', columnWidthPairs: '" + columnKeysPlain + "' }",
+        url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+        data: "{ Function: 'keyvaluestore_ColumnWidthGet', Dataxml: '<Data SiteUrl=\"" + baseUrl + "\">" + columnKeysPlain + "</Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {

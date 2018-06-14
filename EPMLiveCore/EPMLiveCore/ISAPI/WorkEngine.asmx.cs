@@ -253,6 +253,12 @@ namespace EPMLiveCore
                         m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
                         apiClass = Activator.CreateInstance(thisClass);
                         break;
+                    case "keyvaluestore":
+                        assemblyInstance = Assembly.GetExecutingAssembly();
+                        thisClass = this.GetType();
+                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.NonPublic | BindingFlags.Instance);
+                        apiClass = this;
+                        break;
                     default:
                         assemblyInstance = Assembly.GetExecutingAssembly();
                         thisClass = assemblyInstance.GetType("EPMLiveCore.WorkEngineAPI", true, true);
@@ -305,47 +311,50 @@ namespace EPMLiveCore
         /// <summary>
         /// Set website level key-value store.
         /// </summary>
-        [WebMethod]
-        public string ColumnWidthSet(string siteUrl, string columnWidthPairs)
+        private string ColumnWidthSet(string data, SPWeb oWeb)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(columnWidthPairs))
-                {
-                    throw new ArgumentNullException("columnWidthPairs");
-                }
-                if (string.IsNullOrWhiteSpace(siteUrl))
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(data);
+
+                if (doc.FirstChild.Attributes.Count == 0 || string.IsNullOrWhiteSpace(doc.FirstChild.Attributes.Item(0).Value))
                 {
                     throw new ArgumentNullException("siteUrl");
+                }
+                var siteUrl = doc.FirstChild.Attributes.Item(0).Value;
+
+                var columnWidthPairs = doc.FirstChild.InnerText;
+                if (string.IsNullOrWhiteSpace(siteUrl))
+                {
+                    throw new ArgumentNullException("columnWidthPairs");
                 }
 
                 var parameters = columnWidthPairs
                     .Split(',')
                     .Select(x => x.Split('='))
                     .ToDictionary(x => x[0], x => (object)x[1]);
-                string data = null;
-                SPWeb web = SPContext.Current.Web;
                 foreach (var parameter in parameters)
                 {
                     var queryCheck = string.Format(@"SELECT * FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
                         parameter.Key,
-                        web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                    var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                        oWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                    var dtCheck = new QueryExecutor(oWeb).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
                     if (dtCheck != null && dtCheck.Rows.Count != 0)
                     {
                         var query = string.Format(@"UPDATE [dbo].[PERSONALIZATIONS] SET [Value] = '{0}' WHERE [Key] = '{1}' AND [UserId] = '{2}'",
                             parameter.Value,
                             parameter.Key,
-                            web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                        var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+                            oWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dt = new QueryExecutor(oWeb).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
                     }
                     else
                     {
                         var query = string.Format(@"INSERT INTO [dbo].[PERSONALIZATIONS] ([Key],[Value], [UserId]) VALUES ('{0}','{1}','{2}')",
                             parameter.Key,
                             parameter.Value,
-                            web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                        var dt = new QueryExecutor(web).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
+                            oWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                        var dt = new QueryExecutor(oWeb).ExecuteEpmLiveQuery(query, new Dictionary<string, object>());
 
                     }
                 }
@@ -361,29 +370,33 @@ namespace EPMLiveCore
         /// <summary>
         /// Set website level key-value store.
         /// </summary>
-        [WebMethod]
-        public string ColumnWidthGet(string siteUrl, string columnWidthPairs)
+        private string ColumnWidthGet(string data, SPWeb oWeb)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(columnWidthPairs))
-                {
-                    throw new ArgumentNullException("columnWidthPairs");
-                }
-                if (string.IsNullOrWhiteSpace(siteUrl))
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(data);
+
+                if (doc.FirstChild.Attributes.Count == 0 || string.IsNullOrWhiteSpace(doc.FirstChild.Attributes.Item(0).Value))
                 {
                     throw new ArgumentNullException("siteUrl");
+                }
+                var siteUrl = doc.FirstChild.Attributes.Item(0).Value;
+
+                var columnWidthPairs = doc.FirstChild.InnerText;
+                if (string.IsNullOrWhiteSpace(siteUrl))
+                {
+                    throw new ArgumentNullException("columnWidthPairs");
                 }
 
                 var parameters = columnWidthPairs.Split(',');
                 var values = new List<string>();
-                SPWeb web = SPContext.Current.Web;
                 foreach (var parameter in parameters)
                 {
                     var queryCheck = string.Format(@"SELECT [Value] FROM [dbo].[PERSONALIZATIONS] WHERE [Key] = '{0}' AND UserId = {1}",
                         parameter,
-                        web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
-                    var dtCheck = new QueryExecutor(web).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
+                        oWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture));
+                    var dtCheck = new QueryExecutor(oWeb).ExecuteEpmLiveQuery(queryCheck, new Dictionary<string, object>());
                     foreach (System.Data.DataRow r in dtCheck.Rows)
                     {
                         values.Add(r[0].ToString());
