@@ -182,8 +182,16 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
     }
 
+    static get projectCheckbox() {
+        return element(By.xpath(`(${this.projectFirstRow})/*[contains(@class,'GMCellPanel GMEmpty ')]`));
+    }
+
     static get recordWithoutGreenTicket() {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
+    }
+
+    static get projectFirstRow() {
+        return `.//*[contains(@onmousemove,'Rows["1"]')]`;
     }
 
     static get records() {
@@ -215,12 +223,12 @@ export class CommonPage extends BasePage {
     }
 
     static get editPlan() {
-        return element(By.css('[id*="EPMLive.Planner"]'));
+        return element(By.xpath(' .//*[contains(@id,"EPMLive.Planner") and not(contains(@class,"disabled"))]'));
     }
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.xpath(`.//*[contains(@onmousemove,'Rows["1"]')]//*[contains(@href,'Lists/Project')]`));
+        return element(By.xpath(`(${this.projectFirstRow})//*[contains(@href,'Lists/Project')]`));
     }
 
     static get versionCommentField() {

@@ -283,6 +283,27 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         const stepLogger = new StepLogger(778315);
         const uniqueId = PageHelper.getUniqueId();
+
+        stepLogger.precondition('Execute test case C778301 and add a resource to Project [Ex: Smoke Test Project 2 /' +
+            ' Generic Resource 1]');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter, stepLogger);
+        await PageHelper.click(CommonPage.projectCheckbox);
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        await PageHelper.click(ProjectItemPage.teamRecords.resourcePool.first());
+        const selectedResourcePoolResourceName = await ProjectItemPage.teamRecordsName.resourcePool.first().getText();
+        await PageHelper.click(ProjectItemPage.teamChangeButtons.add);
+        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
+        await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
+        // 5 Sec wait required to let it save
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.switchToDefaultContent();
+
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -295,7 +316,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project');
-        await PageHelper.click(CommonPage.record);
+        await ElementHelper.browserRefresh();
+        await browser.sleep(PageHelper.timeout.m);
+        await PageHelper.click(CommonPage.projectCheckbox);
 
         stepLogger.step('Click on "Items" tab');
         await PageHelper.click(CommonPage.ribbonTitles.items);
@@ -315,6 +338,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Task" button');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
@@ -330,26 +354,29 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
         await expect(ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
-
+        await console.log(selectedResourcePoolResourceName);
         stepLogger.stepId(5);
         stepLogger.step('Click in the Assigned To column');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
-        stepLogger.verification('Check the users displayed in the drop down');
+        stepLogger.step('Check the users displayed in the drop down');
         await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1)))
-            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
+            (ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
-        stepLogger.verification('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1))).toBe
-        (true, ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
+        stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
+            ' drop down');
+        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
+            .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
+            (ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
-        // Deleting created task
+        // Delete created task
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await PageHelper.click(ProjectItemPage.deleteTask);
         await browser.switchTo().alert().accept();
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
         // After save It need static wait(5 sec) and no element found which get change after save.
-        await browser.sleep(PageHelper.timeout.m);
+        await browser.sleep(PageHelper.timeout.s);
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {

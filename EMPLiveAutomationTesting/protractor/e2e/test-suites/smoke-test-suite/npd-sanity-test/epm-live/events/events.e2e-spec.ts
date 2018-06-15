@@ -51,7 +51,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    fit('Create Default View - [855387]', async () => {
+    it('Create Default View - [855387]', async () => {
         const stepLogger = new StepLogger(855387);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.precondition('User is in Event page ');

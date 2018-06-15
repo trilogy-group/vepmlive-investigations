@@ -72,6 +72,6 @@ export class HomePage extends BasePage {
     }
 
     static get moreButton() {
-        return element(By.css('.epm-se-show-more'));
+        return element.all(By.css('.epm-se-show-more')).first();
     }
 }

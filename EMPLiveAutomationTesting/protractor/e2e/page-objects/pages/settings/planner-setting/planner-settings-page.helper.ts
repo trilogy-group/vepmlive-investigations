@@ -5,7 +5,7 @@ import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class PlannerSettingsPageHelper {
     static async expandPlannerSettingsNode() {
-        if (this.collapsedMode.isDisplayed()) {
+        if (await this.collapsedMode.isPresent()) {
             await PageHelper.click(this.collapsedMode);
         }
     }

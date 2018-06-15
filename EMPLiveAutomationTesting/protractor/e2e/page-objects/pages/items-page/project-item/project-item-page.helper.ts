@@ -175,6 +175,7 @@ export class ProjectItemPageHelper {
     static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
 
         await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
         stepLogger.step('Enter Task name');

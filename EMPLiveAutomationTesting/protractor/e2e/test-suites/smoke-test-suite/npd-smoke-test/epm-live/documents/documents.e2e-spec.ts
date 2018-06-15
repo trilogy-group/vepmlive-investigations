@@ -51,8 +51,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigateToHome);
         await expect(browser.getTitle())
             .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
-        await ElementHelper.click(HomePage.toolBarMenuItems.more);
-        await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
+        await PageHelper.click(HomePage.toolBarMenuItems.more);
+        await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
         await DocumentPage.uploadDocument(newFile.fullFilePath, stepLogger, true);

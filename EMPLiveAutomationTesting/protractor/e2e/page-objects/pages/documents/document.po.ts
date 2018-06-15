@@ -8,9 +8,35 @@ import {browser} from 'protractor';
 import {CommonPageConstants} from '../common/common-page.constants';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
-import {ElementHelper} from '../../../components/html/element-helper';
 
 export class DocumentPage {
+
+    static async navigateTOAddADocumentPage(stepLogger: StepLogger) {
+
+        stepLogger.stepId(1);
+        stepLogger.step('Select Navigation icon  from left side menu');
+        await PageHelper.click(HomePage.navigateMenu);
+
+        stepLogger.step('Click on Home link');
+        await PageHelper.click(HomePage.navigateToHome);
+
+        stepLogger.verification('Logged in users Home Page is displayed');
+        await expect(browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.click(HomePage.toolBarMenuItems.more);
+
+        stepLogger.step('Click on Project Document link from the options displayed');
+        await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
+
+        stepLogger.verification('Add a document pop up displayed');
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+    }
 
     static async uploadDocument(filePath: string, stepLogger: StepLogger, newVersionFile: boolean) {
 
@@ -41,7 +67,6 @@ export class DocumentPage {
         await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
-        stepLogger.stepId(4);
         stepLogger.step('Click Save button in Add a document window');
         await PageHelper.click(CommonPage.formButtons.save);
 
@@ -52,32 +77,6 @@ export class DocumentPage {
         stepLogger.verification('Home Page is displayed');
         await expect(browser.getTitle())
             .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
-
-    }
-
-    static async navigateTOAddADocumentPage(stepLogger: StepLogger) {
-
-        stepLogger.stepId(1);
-        stepLogger.step('Select Navigation icon  from left side menu');
-        await PageHelper.click(HomePage.navigateMenu);
-
-        stepLogger.step('Click on Home link');
-        await PageHelper.click(HomePage.navigateToHome);
-
-        stepLogger.verification('Logged in users Home Page is displayed');
-        await expect(browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
-
-        stepLogger.stepId(2);
-        stepLogger.step('Click on + More button displayed in CREATE options in social stream');
-        await ElementHelper.click(HomePage.toolBarMenuItems.more);
-
-        stepLogger.step('Click on Project Document link from the options displayed');
-        await ElementHelper.click(HomePage.toolBarMenuItems.projectDocument);
-
-        stepLogger.verification('Add a document pop up displayed');
-        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
     }
 
@@ -101,7 +100,6 @@ export class DocumentPage {
         stepLogger.stepId(6);
         stepLogger.step('Click on the Project node to expand it');
         await PageHelper.click(CommonPage.projectsList);
-
 
     }
 }

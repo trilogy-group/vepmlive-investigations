@@ -71,6 +71,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('NO Tasks displayed in Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
                 ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
@@ -106,7 +107,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step('Click on "Close" button from ribbon panel');
         // After save It need static wait(5 sec) and no element found which get change after save.
-        await browser.sleep(PageHelper.timeout.m);
+        await browser.sleep(PageHelper.timeout.s);
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
@@ -124,6 +125,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan\n' +
             'Click on Project Planner in the list of planners displayed');
+        await browser.sleep(PageHelper.timeout.s);
         await ElementHelper.clickUsingJs(CommonPage.editPlan);
 
         stepLogger.step('click on Project Planner');
@@ -138,7 +140,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Changes saved in step# 5 (Task added and details entered for task)' +
             ' are displayed in the Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
-        await browser.sleep(PageHelper.timeout.xm);
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title,

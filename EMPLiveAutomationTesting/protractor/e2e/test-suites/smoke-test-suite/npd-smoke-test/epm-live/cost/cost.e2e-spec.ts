@@ -10,6 +10,8 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
+import {browser} from 'protractor';
+import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -93,31 +95,45 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(8);
         stepLogger.step('Click on Close button');
+        // No helper works it required wait
+        await browser.sleep(PageHelper.timeout.s);
         await ElementHelper.clickUsingJs(CommonPage.ribbonItems.close);
 
         stepLogger.stepId(9);
         stepLogger.step('Reopen the "Cost Planner" [Click on Edit Costs in ITEMS menu]');
+        // No helper works it required wait
+        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
         stepLogger.step('Check the details displayed in Budget, Actual Costs, Benefits tabs');
+        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.costButton.budget);
 
         stepLogger.verification('Cost details displayed in Budget tab are same as values entered in Step# 4');
+
         await expect(await CommonPageHelper.getCell.cell1.getText()).toBe
         (CommonPageConstants.costData.budgetData, ValidationsHelper.getFieldShouldHaveValueValidation
         (ProjectItemPageConstants.inputLabels.budget, CommonPageConstants.costData.budgetData ));
 
         stepLogger.verification('Cost details displayed in Actual Costs tab are same as values entered in Step# 5');
-        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost);
+        await PageHelper.click(CommonPageHelper.getEditCostTab(ProjectItemPageConstants.columnNames.actualCost));
         await expect(CommonPageHelper.getCell.cell2).toBe(CommonPageConstants.costData.actualCostData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.actualCost,
                 CommonPageConstants.costData.actualCostData ));
 
         stepLogger.verification('Click on Benefits tabs');
-        await CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits);
+        await PageHelper.click(CommonPageHelper.getEditCostTab(ProjectItemPageConstants.inputLabels.benefits));
         await expect(CommonPageHelper.getCell.cell3).toBe(CommonPageConstants.costData.benefitsData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.columnNames.benefits,
                 CommonPageConstants.costData.benefitsData ));
+
+        // Delete created task
+        await PageHelper.click(ProjectItemPage.selectTaskName);
+        await PageHelper.click(ProjectItemPage.deleteTask);
+        await browser.switchTo().alert().accept();
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
+        // After save It need static wait(5 sec) and no element found which get change after save.
+        await browser.sleep(PageHelper.timeout.s);
     });
 });
