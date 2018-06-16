@@ -231,7 +231,6 @@ export class ProjectItemPageConstants {
             projectPlanner: 'Project Planner'
         };
     }
-
     static get users() {
         return {
             adminUser: 'Admin User'
@@ -247,4 +246,5 @@ export class ProjectItemPageConstants {
             date: 'DueDate'
         };
     }
+
 }

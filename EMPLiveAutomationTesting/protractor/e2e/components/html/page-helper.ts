@@ -204,7 +204,7 @@ export class PageHelper {
 
     static async isElementPresent(targetElement: ElementFinder, toWait = true) {
         if (toWait) {
-            return await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
+            return await WaitHelper.getInstance().waitForElementToBePresent(targetElement);
         }
         return targetElement.isPresent();
     }

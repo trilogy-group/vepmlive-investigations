@@ -25,21 +25,21 @@ export class EventsPageHelper {
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);
 
         stepLogger.step(`Select Category *: New Event 1`);
-        await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField))
-            .toBe(true,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.inputLabels.category));
+        await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField)).toBe(true,
+            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.inputLabels.category));
         await PageHelper.click(EventsPage.categoryField);
 
         await expect(await PageHelper.isElementDisplayed(EventsPage.categoryOption))
-            .toBe(true,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
+        .toBe(true,
+            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
+
         await PageHelper.click(EventsPage.categoryOption);
 
         stepLogger.stepId(4);
         stepLogger.step('Click on save');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent))
-            .toBe(true,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.formLabels.save));
+        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent)).toBe(true,
+            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.formLabels.save));
+
         await PageHelper.click(CommonPage.saveNewEvent);
     }
 
@@ -101,7 +101,7 @@ export class EventsPageHelper {
         stepLogger.stepId(2);
         stepLogger.step('Click on "New Event" option from Events tab panel');
         await expect(await PageHelper.isElementDisplayed(EventsPage.newEvent))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(EventsPageConstants.newEvent));
+          .toBe(true, ValidationsHelper.getMenuDisplayedValidation(EventsPageConstants.newEvent));
         await PageHelper.click(EventsPage.newEvent);
 
         stepLogger.verification('"Events - New Item" window is displayed');

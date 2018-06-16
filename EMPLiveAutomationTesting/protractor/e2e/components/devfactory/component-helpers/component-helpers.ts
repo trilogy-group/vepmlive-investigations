@@ -22,4 +22,11 @@ export class ComponentHelpers extends ComponentHelpersFactory {
             isContains
         );
     }
+
+    static getElementByClassXpath(tag: string, text: string, isContains = false) {
+        return `//${tag}[${ComponentHelpers.getXPathFunctionForStringComparison(
+            text,
+            '@' + HtmlHelper.attributes.class,
+            isContains)}]`;
+    }
 }
