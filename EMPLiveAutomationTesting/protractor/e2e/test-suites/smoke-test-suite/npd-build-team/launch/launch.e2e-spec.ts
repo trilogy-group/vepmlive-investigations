@@ -164,7 +164,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.inputLabels.projectName));
     });
 
-    fit('Validate right click for Projects > Project name." - [14119624]', async () => {
+    it('Validate right click for Projects > Project name." - [14119624]', async () => {
         const stepLogger = new StepLogger(14119624);
         stepLogger.stepId(1);
         stepLogger.step('Under Navigations, click on Projects');
