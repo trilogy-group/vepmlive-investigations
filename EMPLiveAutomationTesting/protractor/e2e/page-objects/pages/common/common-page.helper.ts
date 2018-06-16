@@ -302,6 +302,21 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
+    static async clickOnEditPlan() {
+        await browser.sleep(PageHelper.timeout.s);
+        if (await CommonPage.editPlan.isPresent() !== true) {
+            await ElementHelper.browserRefresh();
+            await PageHelper.click(CommonPage.projectCheckbox);
+            await browser.sleep(PageHelper.timeout.m);
+            await PageHelper.click(CommonPage.ribbonTitles.items);
+            await browser.sleep(PageHelper.timeout.s);
+            if (await  CommonPage.editPlan.isPresent() !== true) {
+                await this.clickOnEditPlan();
+            }
+        }
+        await PageHelper.click(CommonPage.editPlan);
+    }
+
     static async deleteTask() {
         if (await ProjectItemPage.selectTaskName.isPresent() === true) {
             await PageHelper.click(ProjectItemPage.selectTaskName);

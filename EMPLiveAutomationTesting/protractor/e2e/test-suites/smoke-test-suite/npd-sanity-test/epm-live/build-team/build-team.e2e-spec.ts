@@ -317,14 +317,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project');
         await ElementHelper.browserRefresh();
-        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.projectCheckbox);
 
         stepLogger.step('Click on "Items" tab');
+        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click ITEMS tab select Edit Plan');
-        await PageHelper.click(CommonPage.editPlan);
+        await CommonPageHelper.clickOnEditPlan();
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);

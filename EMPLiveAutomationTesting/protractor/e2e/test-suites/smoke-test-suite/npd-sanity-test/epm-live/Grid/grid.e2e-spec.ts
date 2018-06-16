@@ -113,12 +113,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Select the project in which task details updated in step# 2 [Ex: Smoke Test Project 2]' +
         'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
         'Click on Project Planner in the list of planners displayed');
-        await ElementHelper.browserRefresh();
-        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         // 5 second wait required Wait helper is not working.
-        await PageHelper.click(CommonPage.editPlan);
+        await CommonPageHelper.clickOnEditPlan();
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
