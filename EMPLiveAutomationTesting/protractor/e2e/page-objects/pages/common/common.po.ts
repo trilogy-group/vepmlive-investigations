@@ -239,6 +239,10 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="OverwriteSingle"]'));
     }
 
+    static get saveNewEvent() {
+        return element(By.css(`input[id$="${CommonPageConstants.specificIds.saveEventId}"]`));
+    }
+
     static get projectsList() {
         return element(By.css('.ms-commentexpand-iconouter'));
     }

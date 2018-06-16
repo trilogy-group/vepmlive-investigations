@@ -310,4 +310,30 @@ export class CommonPageConstants {
             updatedEffortHours : '160.00'
         };
     }
+    static get columnHeader() {
+        return {
+            status: 'Status'
+        };
+    }
+
+    static get specificIds() {
+        return {
+            saveEventId: 'idIOSaveItem'
+        };
+    }
+
+    static get buttonName() {
+        return {
+            edit: 'Edit'
+        };
+    }
+
+    static get classNames() {
+        return {
+            headerButtonClass: 'GMHeaderButton',
+            headerTextClass: 'GMHeaderText',
+            ascendingClass: 'GMSort4Right',
+            descendingClass: 'GMSort1Right'
+        };
+    }
 }

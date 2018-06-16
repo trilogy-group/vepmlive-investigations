@@ -315,6 +315,10 @@ export class ProjectItemPageHelper {
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
     }
 
+    static getDisabledReportPagingHeaderByTitle(title: string) {
+        return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
+    }
+
     static get button() {
         return {
                 ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
