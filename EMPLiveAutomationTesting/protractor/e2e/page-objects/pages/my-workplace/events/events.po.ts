@@ -20,10 +20,6 @@ export class EventsPage {
          return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.title);
     }
 
-    static getNewEventAdded(titleNewEvent: string, isContains= false) {
-        return element(By.xpath(`//a[${ComponentHelpers.getXPathFunctionForDot(titleNewEvent, isContains)}]`));
-    }
-
     static get standardViewType () {
         // Only id will not work
         return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
