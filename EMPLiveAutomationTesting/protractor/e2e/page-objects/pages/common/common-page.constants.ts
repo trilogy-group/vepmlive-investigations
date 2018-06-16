@@ -290,15 +290,15 @@ export class CommonPageConstants {
 
     static get searchControl() {
         return {
-           searchComponentDropdown : 'Component dropdown',
-           searchOperatorDropdown: 'Search Operator dropdown',
-           searchField : 'Search Field',
+            searchComponentDropdown : 'Component dropdown',
+            searchOperatorDropdown: 'Search Operator dropdown',
+            searchField : 'Search Field',
         };
     }
 
     static get messages() {
         return {
-           noDataFound : 'No data found',
+            noDataFound : 'No data found',
         };
     }
 
@@ -310,6 +310,7 @@ export class CommonPageConstants {
             updatedEffortHours : '160.00'
         };
     }
+
     static get columnHeader() {
         return {
             status: 'Status'

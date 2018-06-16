@@ -304,7 +304,6 @@ export class ProjectItemPageHelper {
     static getReportPagingHeaderByTitle(title: string) {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
-
     static dateField(tab: string) {
         // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
@@ -314,14 +313,12 @@ export class ProjectItemPageHelper {
         // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
     }
-
     static getDisabledReportPagingHeaderByTitle(title: string) {
         return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
     }
-
     static get button() {
         return {
-                ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 
@@ -332,12 +329,17 @@ export class ProjectItemPageHelper {
             work: ProjectItemPageHelper.getField(fields.work),
             duration: ProjectItemPageHelper.getField(fields.duration),
             date: ProjectItemPageHelper.dateField(fields.date),
-    };
+        };
 
     }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);
+    }
+
+    static async createProject(uniqueId: string, stepLogger: StepLogger) {
+        stepLogger.step('Create a new project');
+        await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
 }
