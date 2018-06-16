@@ -13,7 +13,8 @@ export class CommonPage extends BasePage {
     static readonly dialogTitleId = 'dialogTitleSpan';
     static readonly plannerClass = 'GMEditCellInput';
     static readonly titleId = 'pageTitle';
-
+    
+    static get sidebarMenus() {
         const idPrefix = 'epm-nav-top-';
         return {
             navigation: element(By.id(`${idPrefix}ql`)),
