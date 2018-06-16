@@ -2,12 +2,12 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {browser} from 'protractor';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
-import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
-import { ProjectItemPage } from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
+import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
-import { ProjectItemPageHelper } from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import { TextboxHelper } from '../../../../../components/html/textbox-helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../../../helpers/suite-names';
@@ -25,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Save the changes by Save button - [965680]', async () => {
+    fit('Save the changes by Save button - [965680]', async () => {
         const stepLogger = new StepLogger(965680);
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
@@ -57,7 +57,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
         await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
@@ -73,7 +73,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
-                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
+            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Task" button');
@@ -84,7 +84,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
-        await PageHelper.actionSendKeys( uniqueId);
+        await PageHelper.actionSendKeys(uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
         await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
         await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
@@ -113,12 +113,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Project Planner page is closed');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
         await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
-                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
+            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(7);
         stepLogger.step('Select the project in which task is added [Ex: SmokeTestProject1]\n' +

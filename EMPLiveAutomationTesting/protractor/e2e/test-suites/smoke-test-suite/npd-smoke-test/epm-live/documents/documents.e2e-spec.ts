@@ -21,7 +21,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Add Documents Functionality-Project Document - [1124284]', async () => {
+    fit('Add Documents Functionality-Project Document - [1124284]', async () => {
         const stepLogger = new StepLogger(1124284);
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 
@@ -43,7 +43,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 
-    it('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
+    fit('Add Project Documents Functionality-New version of existing document-[1175281]', async () => {
         const stepLogger = new StepLogger(1175281);
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
         stepLogger.precondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');

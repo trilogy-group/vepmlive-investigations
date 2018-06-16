@@ -36,7 +36,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EventsPageHelper.createNewEvent();
     });
 
-    it('Create View- [855383]', async () => {
+    fit('Create View- [855383]', async () => {
         const stepLogger = new StepLogger(855383);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.precondition('User is in Event page ');
@@ -51,7 +51,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    it('Create Default View - [855387]', async () => {
+    fit('Create Default View - [855387]', async () => {
         const stepLogger = new StepLogger(855387);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.precondition('User is in Event page ');
@@ -65,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EventsPageHelper.createView(stepLogger, uniqueId , true);
     });
 
-    it('Create Column - [855530]', async () => {
+    fit('Create Column - [855530]', async () => {
         const stepLogger = new StepLogger(855530);
         stepLogger.precondition('User is in Event page ');
         const uniqueId = PageHelper.getUniqueId();
