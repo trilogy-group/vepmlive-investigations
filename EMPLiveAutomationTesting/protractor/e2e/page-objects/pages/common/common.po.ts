@@ -14,7 +14,6 @@ export class CommonPage extends BasePage {
     static readonly plannerClass = 'GMEditCellInput';
     static readonly titleId = 'pageTitle';
 
-    static get sidebarMenus() {
         const idPrefix = 'epm-nav-top-';
         return {
             navigation: element(By.id(`${idPrefix}ql`)),
@@ -241,10 +240,6 @@ export class CommonPage extends BasePage {
 
     static get newVersionCheckbox() {
         return element(By.css('[id*="OverwriteSingle"]'));
-    }
-
-    static get saveNewEvent() {
-        return element(By.css(`input[id$="${CommonPageConstants.specificIds.saveEventId}"]`));
     }
 
     static get projectsList() {
