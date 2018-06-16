@@ -125,6 +125,10 @@ export class CommonPage extends BasePage {
         };
     }
 
+    static get saveNewEvent() {
+        return element(By.css(`input[id$="${CommonPageConstants.specificIds.saveEventId}"]`));
+    }
+
     static get title() {
         // Css doesn't allow to limit the no of elements and we need to keep it like that otherwise its getting >1 item
         return element(By.xpath(`(//*[@id='${this.titleId}'])[1]`));
@@ -239,10 +243,6 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="OverwriteSingle"]'));
     }
 
-    static get saveNewEvent() {
-        return element(By.css(`input[id$="${CommonPageConstants.specificIds.saveEventId}"]`));
-    }
-
     static get projectsList() {
         return element(By.css('.ms-commentexpand-iconouter'));
     }
@@ -343,6 +343,10 @@ export class CommonPage extends BasePage {
 
     static get fileUploadControl() {
         return element(By.css('#onetidIOFile,[id*="fileUploadControl"]'));
+    }
+
+    static get lastButton() {
+        return AnchorHelper.getAnchorByText(CommonPageConstants.last);
     }
 
     static get searchTextBox() {

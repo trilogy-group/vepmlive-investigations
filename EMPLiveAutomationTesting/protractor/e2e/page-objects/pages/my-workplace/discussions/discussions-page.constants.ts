@@ -16,4 +16,10 @@ export class DiscussionsPageConstants {
             reply: 'reply *',
         };
     }
+
+    static get classLabel() {
+        return {
+            postListItemClass: 'postListItem'
+        };
+    }
 }

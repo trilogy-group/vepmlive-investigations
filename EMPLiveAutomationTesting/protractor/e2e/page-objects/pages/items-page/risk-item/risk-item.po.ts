@@ -3,6 +3,7 @@ import {RiskItemPageConstants} from './risk-item-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class RiskItemPage extends BasePage {
 
@@ -41,5 +42,21 @@ export class RiskItemPage extends BasePage {
 
     static get attachmentButton() {
         return element(By.css('.upload-attach'));
+    }
+
+    static get columnHeaderSelector() {
+        return {
+            status: CommonPageHelper.getColumnHeaderByText(CommonPageConstants.columnHeader.status)
+        };
+    }
+
+    static get columnSortingItems() {
+        const columnHeader = CommonPageConstants.columnHeader;
+        return {
+            status: {
+                ascending: CommonPageHelper.getAscendingColumnSelector(columnHeader.status),
+                descending: CommonPageHelper.getDescendingColumnSelector(columnHeader.status)
+            },
+        };
     }
 }
