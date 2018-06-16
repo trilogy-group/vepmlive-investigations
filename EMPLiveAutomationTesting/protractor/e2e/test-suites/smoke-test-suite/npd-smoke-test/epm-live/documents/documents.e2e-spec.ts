@@ -51,6 +51,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigateToHome);
         await expect(browser.getTitle())
             .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+        // Need to add sleep because of bug.
+        await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,

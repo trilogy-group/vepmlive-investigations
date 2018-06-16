@@ -72,6 +72,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
@@ -149,13 +150,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.work,
                 CommonPageConstants.pageHeaders.projects.workHours));
-
-        // Delete created task
-        await PageHelper.click(ProjectItemPage.selectTaskName);
-        await PageHelper.click(ProjectItemPage.deleteTask);
-        await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ProjectItemPage.save);
-        // After save It need static wait(5 sec) and no element found which get change after save.
-        await browser.sleep(PageHelper.timeout.s);
     });
 });

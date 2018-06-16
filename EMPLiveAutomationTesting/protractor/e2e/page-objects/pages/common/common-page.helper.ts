@@ -13,6 +13,7 @@ import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import {ProjectItemPage} from '../items-page/project-item/project-item.po';
 
 const fs = require('fs');
 
@@ -301,6 +302,20 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
+    static async deleteTask() {
+        if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTaskName);
+            await PageHelper.click(ProjectItemPage.deleteTask);
+            await browser.switchTo().alert().accept();
+            await ElementHelper.clickUsingJs(ProjectItemPage.save);
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.s);
+
+            if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+                await this.deleteTask();
+            }
+        }
+    }
     static async viewOptionViaRibbon(stepLogger: StepLogger) {
         await this.selectRecordFromGrid(stepLogger);
 

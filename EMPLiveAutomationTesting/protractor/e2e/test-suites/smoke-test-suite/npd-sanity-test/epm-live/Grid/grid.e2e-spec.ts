@@ -146,12 +146,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration,
                 CommonPageConstants.hours.durationHours2));
 
-        // Deleting created task
-        await PageHelper.click(ProjectItemPage.deleteTask);
-        await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ProjectItemPage.save);
-        // After save It need static wait(5 sec) and no element found which get change after save.
-        await browser.sleep(PageHelper.timeout.s);
-
     });
 });

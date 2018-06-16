@@ -71,6 +71,8 @@ export class DocumentPage {
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('Add a document window to update the properties of the document is closed');
+        // Sleep required to let it save
+        await browser.sleep(PageHelper.timeout.s);
         await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 

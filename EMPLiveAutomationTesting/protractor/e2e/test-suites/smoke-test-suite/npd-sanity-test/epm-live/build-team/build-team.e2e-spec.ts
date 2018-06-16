@@ -339,6 +339,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
@@ -369,14 +370,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
-
-        // Delete created task
-        await PageHelper.click(ProjectItemPage.selectTaskName);
-        await PageHelper.click(ProjectItemPage.deleteTask);
-        await browser.switchTo().alert().accept();
-        await ElementHelper.clickUsingJs(ProjectItemPage.save);
-        // After save It need static wait(5 sec) and no element found which get change after save.
-        await browser.sleep(PageHelper.timeout.s);
     });
 
     fit('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
