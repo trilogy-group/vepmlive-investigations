@@ -152,7 +152,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(9);
         stepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
-        await ElementHelper.clickUsingJs(ProjectItemPage.close);
+        await PageHelper.click(ProjectItemPage.close);
 
         stepLogger.stepId(10);
         stepLogger.step('Click on Leave button in the confirmation dialog');

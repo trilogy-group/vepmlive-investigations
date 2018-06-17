@@ -9,7 +9,6 @@ import {CommonPageConstants} from '../common/common-page.constants';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../components/html/wait-helper';
-import {ElementHelper} from '../../../components/html/element-helper';
 
 export class DocumentPage {
 
@@ -35,7 +34,7 @@ export class DocumentPage {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        ElementHelper.waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
+        await WaitHelper.waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
@@ -68,7 +67,7 @@ export class DocumentPage {
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
-        WaitHelper.getInstance().waitForElementToBePresent(CommonPage.UpdatePropertyDocument);
+        await WaitHelper.getInstance().waitForElementToBePresent(CommonPage.UpdatePropertyDocument);
         await expect(await CommonPage.UpdatePropertyDocument.isDisplayed())
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
@@ -78,7 +77,7 @@ export class DocumentPage {
         stepLogger.verification('Add a document window to update the properties of the document is closed');
         // Sleep required to let it save
         await browser.sleep(PageHelper.timeout.s);
-        WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.UpdatePropertyDocument);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.UpdatePropertyDocument);
         await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
