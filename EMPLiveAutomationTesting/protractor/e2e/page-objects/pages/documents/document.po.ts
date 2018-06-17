@@ -34,7 +34,8 @@ export class DocumentPage {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await WaitHelper.waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
+        await WaitHelper.getInstance()
+            .waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
