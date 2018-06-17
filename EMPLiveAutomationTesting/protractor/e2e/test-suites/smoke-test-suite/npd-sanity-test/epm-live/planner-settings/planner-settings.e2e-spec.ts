@@ -125,7 +125,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan');
-        await PageHelper.click(CommonPage.editPlan);
+        await ElementHelper.clickUsingJs(CommonPage.editPlan);
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -152,7 +152,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(9);
         stepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
-        await PageHelper.click(ProjectItemPage.close);
+        await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.stepId(10);
         stepLogger.step('Click on Leave button in the confirmation dialog');

@@ -9,6 +9,7 @@ import {CommonPageConstants} from '../common/common-page.constants';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {WaitHelper} from '../../../components/html/wait-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class DocumentPage {
 
@@ -34,7 +35,7 @@ export class DocumentPage {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        WaitHelper.getInstance().waitForElementToBePresent(CommonPage.dialogTitle);
+        ElementHelper.waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 

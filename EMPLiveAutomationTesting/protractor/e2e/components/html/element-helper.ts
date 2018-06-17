@@ -184,4 +184,10 @@ export class ElementHelper {
     static browserRefresh() {
         browser.refresh();
     }
+
+    // Waits for the element till the expected condition meet.
+    public static waitForTextToBePresent(targetElement: ElementFinder, value: string) {
+        const EC = protractor.ExpectedConditions;
+        browser.wait(EC.textToBePresentInElementValue(targetElement, value), 25000);
+    }
 }

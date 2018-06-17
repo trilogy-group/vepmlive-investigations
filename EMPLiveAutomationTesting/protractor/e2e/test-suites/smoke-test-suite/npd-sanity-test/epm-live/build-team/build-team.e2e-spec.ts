@@ -355,7 +355,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
         await expect(ProjectItemPageHelper.newTasksFields.work.getText()).toBe(CommonPageConstants.costData.firstData,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.workHours));
-        await console.log(selectedResourcePoolResourceName);
+
         stepLogger.stepId(5);
         stepLogger.step('Click in the Assigned To column');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
