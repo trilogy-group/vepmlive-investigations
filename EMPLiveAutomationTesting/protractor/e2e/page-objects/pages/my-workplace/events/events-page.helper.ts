@@ -175,6 +175,7 @@ export class EventsPageHelper {
         await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
 
         stepLogger.verification('Created view should be displayed in the list');
+        WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(uniqueId));
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
 

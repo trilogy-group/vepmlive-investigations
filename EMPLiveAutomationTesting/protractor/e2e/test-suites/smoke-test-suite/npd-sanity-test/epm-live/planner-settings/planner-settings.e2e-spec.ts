@@ -144,8 +144,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
         // After select project Planner wait required, not element found which can use with waitHelper.
-        await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await browser.sleep(PageHelper.timeout.xm);
         await expect(browser.getTitle()).toContain(projectName,
             ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.project));
         await expect(browser.getTitle()).toContain(uniqueId,

@@ -85,6 +85,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on Create Column from ribbon panel');
+        await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(EventsPage.createColumn);
 
         stepLogger.verification('Create Column popup should be displayed');
