@@ -3,7 +3,6 @@ import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
@@ -48,8 +47,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.precondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigateToHome);
-        await expect(browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
         // Need to add sleep because of bug.
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(HomePage.toolBarMenuItems.more);

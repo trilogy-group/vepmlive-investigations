@@ -27,6 +27,7 @@ export class DocumentPage {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        // wait required because of bug.
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
 

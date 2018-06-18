@@ -13,6 +13,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {WaitHelper} from '../../../../../components/html/wait-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -46,8 +47,31 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.events,
             stepLogger);
 
-        // Step #2 and #7 Inside this function
+        // Step #1 to #5 Inside this function
         await EventsPageHelper.createView(stepLogger, uniqueId, false);
+
+        stepLogger.verification('User should be navigated to event page and created view should be displayed');
+        await PageHelper.click(EventsPage.rollOverEventList);
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
+
+        stepLogger.stepId(6);
+        stepLogger.step('Click on CALENDAR tab');
+        await PageHelper.click(CommonPageHelper.getbuttons.calender);
+        await PageHelper.click(EventsPage.calenderTab);
+
+        stepLogger.verification('Contents of the CALENDAR tab should be displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.calendarContent));
+
+        stepLogger.stepId(7);
+        stepLogger.step('Expand Current View drop down');
+        await PageHelper.click(EventsPage.currentView);
+
+        stepLogger.verification('Created view should be displayed in the list');
+        WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(uniqueId));
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
 
     });
 
@@ -61,8 +85,26 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.myWorkplace.events,
             stepLogger);
 
-        // Step #1 and #6 Inside this function
+        // Step #1 and #5 Inside this function
         await EventsPageHelper.createView(stepLogger, uniqueId, true);
+
+        stepLogger.verification('View should be created and user should be navigated to event page');
+        await PageHelper.click(EventsPage.rollOverEventList);
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
+
+        stepLogger.stepId(6);
+        stepLogger.step('Navigate to any other page and come back to Event page and from the CALENDAR tab, select' +
+            ' any the Standard View which was created from the Current View drop-down');
+        await PageHelper.click(CommonPageHelper.getbuttons.calender);
+        await PageHelper.click(EventsPage.calenderTab);
+        await PageHelper.click(EventsPage.currentView);
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
+
+        stepLogger.verification('Created view should be displayed in the list');
+        WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(uniqueId));
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
     });
 
     fit('Create Column - [855530]', async () => {

@@ -59,10 +59,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
+        stepLogger.stepId(3);
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
-        stepLogger.verification('"Project Planner" window is displayed');
+        stepLogger.verification('The Project Planner page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,

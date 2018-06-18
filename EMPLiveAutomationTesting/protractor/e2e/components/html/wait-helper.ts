@@ -104,6 +104,10 @@ export class WaitHelper {
     }
 
     // Waits for the element till the expected condition meet.
+    // public static async waitForTextToBePresent(targetElement: ElementFinder, value: string) {
+    //     const EC = protractor.ExpectedConditions;
+    //     await browser.wait(EC.textToBePresentInElementValue(targetElement, value), 25000);
+    // }
 
     async waitForTextToBePresent(targetElement: ElementFinder, value: string) {
         const EC = protractor.ExpectedConditions;
