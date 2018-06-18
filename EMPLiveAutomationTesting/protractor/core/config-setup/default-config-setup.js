@@ -3,14 +3,36 @@ const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
+const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
+    '--disable-web-security'];
+/*  ABOUT --disable-dev-shm-usage:
+    By default, Docker runs a container with a /dev/shm shared memory space 64MB.
+    This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
+    To fix, run the container with docker run --shm-size=1gb to increase the size of /dev/shm.
+    Since Chrome 65, this is no longer necessary. Instead, launch the browser with the --disable-dev-shm-usage flag
+
+    sources:
+        - https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
+        - https://developers.google.com/web/tools/puppeteer/troubleshooting
+*/
+const chromeOptions = {
+    args: useHeadlessBrowser ? chromeHeadlessArgs : [],
+    // Set download path and avoid prompting for download even though
+    // this is already the default on Chrome but for completeness
+    prefs: {
+        'download': {
+            'prompt_for_download': false,
+            'directory_upgrade': true,
+            'default_directory': 'Downloads'
+        }
+    }
+};
 const configSetup = {
     restartBrowserBetweenTests: true,
     SELENIUM_PROMISE_MANAGER: false,
     multiCapabilities: [{
         browserName: 'chrome',
-        'chromeOptions': {
-            args: ['--disable-blink-features=BlockCredentialedSubresources'],
-        },
+        'chromeOptions': chromeOptions,
         shardTestFiles: 'true',
         maxInstances: maxBrowserInstances
     }],
@@ -23,9 +45,7 @@ const configSetup = {
     },
     capabilities: {
         "browserName": "chrome",
-        'chromeOptions': {
-            args: ['--disable-blink-features=BlockCredentialedSubresources'],
-        }
+        'chromeOptions': chromeOptions
     },
     bsMultiCapabilities: [{
         name: `${browserStackBrowser.os} ${browserStackBrowser.os_version}-${browserStackBrowser.browserName} v ${browserStackBrowser.browser_version || 'Latest'}`,
@@ -94,11 +114,11 @@ const configSetup = {
                 user: "report.writer",
                 password: "Pass@word1"
             },
-            resourceManager : {
+            resourceManager: {
                 user: "resource.manager",
                 password: "Pass@word1"
             },
-            executiveUser : {
+            executiveUser: {
                 user: "executive.user",
                 password: "Pass@word1"
             }
