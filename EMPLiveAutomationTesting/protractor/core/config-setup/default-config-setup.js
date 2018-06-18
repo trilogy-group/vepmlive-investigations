@@ -3,14 +3,24 @@ const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
+const chromeOptions = {
+    args: ['--disable-blink-features=BlockCredentialedSubresources', '--disable-dev-shm-usage'],
+    // Set download path and avoid prompting for download even though
+    // this is already the default on Chrome but for completeness
+    prefs: {
+        'download': {
+            'prompt_for_download': false,
+            'directory_upgrade': true,
+            'default_directory': 'Downloads'
+        }
+    }
+};
 const configSetup = {
     restartBrowserBetweenTests: true,
     SELENIUM_PROMISE_MANAGER: false,
     multiCapabilities: [{
         browserName: 'chrome',
-        'chromeOptions': {
-            args: ['--disable-blink-features=BlockCredentialedSubresources'],
-        },
+        'chromeOptions': chromeOptions,
         shardTestFiles: 'true',
         maxInstances: maxBrowserInstances
     }],
@@ -23,9 +33,7 @@ const configSetup = {
     },
     capabilities: {
         "browserName": "chrome",
-        'chromeOptions': {
-            args: ['--disable-blink-features=BlockCredentialedSubresources'],
-        }
+        'chromeOptions': chromeOptions
     },
     bsMultiCapabilities: [{
         name: `${browserStackBrowser.os} ${browserStackBrowser.os_version}-${browserStackBrowser.browserName} v ${browserStackBrowser.browser_version || 'Latest'}`,
