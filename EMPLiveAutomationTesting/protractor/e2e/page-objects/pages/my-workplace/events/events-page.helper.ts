@@ -158,26 +158,5 @@ export class EventsPageHelper {
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok button');
         await PageHelper.click(CommonPage.okButton);
-
-        stepLogger.verification('View should be created and user should be navigated to event page');
-        await PageHelper.click(EventsPage.rollOverEventList);
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
-
-        stepLogger.stepId(6);
-        stepLogger.step('Navigate to any other page and come back to Event page and from the CALENDAR tab, select' +
-            ' any the Standard View which was created from the Current View drop-down');
-        await PageHelper.click(CommonPageHelper.getbuttons.calender);
-        await PageHelper.click(EventsPage.calenderTab);
-
-        stepLogger.step('Expand Current View drop down');
-        await PageHelper.click(EventsPage.currentView);
-        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
-
-        stepLogger.verification('Created view should be displayed in the list');
-        WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(uniqueId));
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
-
     }
 }

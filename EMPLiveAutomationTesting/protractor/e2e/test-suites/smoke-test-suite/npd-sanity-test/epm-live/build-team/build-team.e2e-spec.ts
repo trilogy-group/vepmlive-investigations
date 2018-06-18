@@ -314,19 +314,30 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.stepId(3);
-        stepLogger.step('Select check-box for any Project');
+        stepLogger.verification('"Project Center" page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+
+        stepLogger.stepId(2);
+        stepLogger.step('Select on any of the project created as per pre requisites [Ex: Smoke Test Project 2]');
         await ElementHelper.browserRefresh();
         await PageHelper.click(CommonPage.projectCheckbox);
 
-        stepLogger.step('Click on "Items" tab');
+        stepLogger.step('Click on the ITEMS tab above the grid');
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('Click ITEMS tab select Edit Plan');
+        stepLogger.step('From the ITEMS ribbon menu, click on Edit Plan');
         await CommonPageHelper.clickOnEditPlan();
 
-        stepLogger.step('click on Project Planner');
+        stepLogger.verification('Select Planner pop-up displays with different planner options to select');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Project Planner in the list of planners displayed');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
@@ -334,15 +345,21 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Task" button');
+        stepLogger.verification('NO Tasks displayed in Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
+        await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
+            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
+
+        stepLogger.stepId(4);
+        stepLogger.step('Click on "Task" button');
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
-        stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
+        stepLogger.step('Enter details for Task (Name, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
@@ -383,6 +400,11 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
+
+        stepLogger.verification('"Project Center" page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project [Ex: Smoke Test Project 2]');

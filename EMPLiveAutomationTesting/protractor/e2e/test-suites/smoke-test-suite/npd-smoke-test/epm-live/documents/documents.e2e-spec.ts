@@ -3,7 +3,6 @@ import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
-import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
@@ -11,7 +10,6 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {browser} from 'protractor';
 import {DocumentPage} from '../../../../../page-objects/pages/documents/document.po';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -49,14 +47,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.precondition('Execute test case C1124284 and add a Project Document [Ex: testfile.txt]');
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigateToHome);
-        await expect(browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
         // Need to add sleep because of bug.
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
-        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
         await DocumentPage.uploadDocument(newFile.fullFilePath, stepLogger, true);
 
         // Step #1 and #2 Inside this function
