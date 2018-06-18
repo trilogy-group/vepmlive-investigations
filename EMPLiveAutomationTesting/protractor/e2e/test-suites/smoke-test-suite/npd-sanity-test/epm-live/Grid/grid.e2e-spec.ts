@@ -23,7 +23,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Add Duration. - [970519]', async () => {
+    it('Add Duration. - [970519]', async () => {
         const stepLogger = new StepLogger(970519);
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;

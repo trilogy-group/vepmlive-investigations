@@ -26,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Add new planner - [1032747]', async () => {
+    it('Add new planner - [1032747]', async () => {
         const stepLogger = new StepLogger(1032747);
         stepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();

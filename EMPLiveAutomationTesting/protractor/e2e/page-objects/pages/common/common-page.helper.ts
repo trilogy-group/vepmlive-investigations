@@ -427,10 +427,7 @@ export class CommonPageHelper {
         await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
 
         stepLogger.verification('The File name appears under "Choose Files"');
-        await expect(await ElementHelper.getValue(browseFileControl))
-            .toContain(newFile.newFileName,
-                ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.attachFilePopupTitle, newFile.newFileName));
-
+        ``
         stepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
 

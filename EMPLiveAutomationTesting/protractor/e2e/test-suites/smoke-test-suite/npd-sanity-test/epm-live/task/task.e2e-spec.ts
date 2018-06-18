@@ -25,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Save the changes by Save button - [965680]', async () => {
+    it('Save the changes by Save button - [965680]', async () => {
         const stepLogger = new StepLogger(965680);
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;

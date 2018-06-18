@@ -280,7 +280,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         return selectedResourcePoolResourceName;
     });
 
-    fit('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
+    it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         const stepLogger = new StepLogger(778315);
         const uniqueId = PageHelper.getUniqueId();
 
@@ -389,7 +389,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
-    fit('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
+    it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
         const stepLogger = new StepLogger(778281);
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
