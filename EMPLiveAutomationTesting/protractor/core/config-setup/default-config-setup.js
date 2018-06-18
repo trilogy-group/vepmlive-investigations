@@ -3,6 +3,7 @@ const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
+const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(false, "--params.headlessBrowser", false));
 const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
     '--disable-web-security'];
 /*  ABOUT --disable-dev-shm-usage:
