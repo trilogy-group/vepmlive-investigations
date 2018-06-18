@@ -34,8 +34,8 @@ export class DocumentPage {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await WaitHelper.getInstance()
-            .waitForTextToBePresent(CommonPage.dialogTitle, HomePageConstants.addADocumentWindow.addADocumentTitle);
+        // Wait helper is not working on this point.
+        await browser.sleep(PageHelper.timeout.s);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
@@ -63,7 +63,8 @@ export class DocumentPage {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Add a document pop up is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(HomePage.chooseAfile);
+        // Wait required to let popup close.
+        await browser.sleep(PageHelper.timeout.s);
         await expect(await HomePage.chooseAfile.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 

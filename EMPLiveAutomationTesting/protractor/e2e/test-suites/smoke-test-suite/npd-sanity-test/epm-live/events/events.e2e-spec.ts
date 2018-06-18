@@ -47,7 +47,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #2 and #7 Inside this function
-        await EventsPageHelper.createView(stepLogger, uniqueId , false);
+        await EventsPageHelper.createView(stepLogger, uniqueId, false);
 
     });
 
@@ -62,7 +62,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         // Step #1 and #6 Inside this function
-        await EventsPageHelper.createView(stepLogger, uniqueId , true);
+        await EventsPageHelper.createView(stepLogger, uniqueId, true);
     });
 
     fit('Create Column - [855530]', async () => {
@@ -98,15 +98,17 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(EventsPage.choiceCheckbox, true);
 
         stepLogger.verification('the respective column type should get selected');
+        await browser.sleep(PageHelper.timeout.s);
         await expect(EventsPage.choiceCheckbox.isEnabled()).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.columnType));
 
         stepLogger.stepId(4);
         stepLogger.step('Provide column name and other required details');
-        await TextboxHelper.sendKeys(EventsPage.columnNameField, uniqueId);
+        await TextboxHelper.sendKeys(EventsPage.columnNameField, uniqueId, true);
         await TextboxHelper.sendKeys(EventsPage.descriptionField, CommonPageConstants.menuContainerIds.navigation);
 
         stepLogger.verification('the respective details should get populated');
+
         await CheckboxHelper.markCheckbox(EventsPage.choiceCheckbox, true);
         await expect(await TextboxHelper.hasValue(EventsPage.columnNameField, uniqueId))
             .toBe(true, ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.columnName));
@@ -127,5 +129,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));
 
-    }) ;
+    });
 });

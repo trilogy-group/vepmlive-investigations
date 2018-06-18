@@ -11,7 +11,6 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {browser} from 'protractor';
 import {DocumentPage} from '../../../../../page-objects/pages/documents/document.po';
-import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -55,8 +54,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
-        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
         await DocumentPage.uploadDocument(newFile.fullFilePath, stepLogger, true);
 
         // Step #1 and #2 Inside this function
@@ -78,7 +75,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Version column displays value "0.2" [A new version should be created successfully' +
             ' of the already existing document]');
-        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second ).getText())
+        await expect(await CommonPageHelper.getVersionNumberByRowText(newFile.file, CommonPageConstants.versionComment.second).getText())
             .toBe(CommonPageConstants.versionComment.second, ValidationsHelper.getDisplayedValidation
             (CommonPageConstants.versionComment.second));
 

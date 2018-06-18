@@ -251,12 +251,7 @@ export class CommonPage extends BasePage {
         return element(By.xpath('.//*[contains(text(),"update the properties")]'));
     }
 
-    static getButton(tab: string) {
-        // it is a part of a object "costButton", object created below
-        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
-    }
-
-    static get costButton(){
+    static get costButton() {
         const fields = CommonPageConstants.costButtonLabel;
         return {
             budget: CommonPage.getButton(fields.budget),
@@ -264,12 +259,12 @@ export class CommonPage extends BasePage {
 
     }
 
-    static get okButton () {
+    static get okButton() {
         return element(By.css('#onetidSaveItem'));
     }
 
     static get calendearView() {
-            return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
+        return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
     }
 
     static get singleSearchTextBox() {
@@ -308,21 +303,21 @@ export class CommonPage extends BasePage {
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-   }
+    }
 
-    static get searchChoiceOption(){
+    static get searchChoiceOption() {
         return {
-           proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
-           active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
-           closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+            proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
+            active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
+            closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
         };
     }
 
-    static get searchIcon(){
+    static get searchIcon() {
         return element(By.css(`[src*='find_icon']`));
     }
 
-    static get regionCheckBox(){
+    static get regionCheckBox() {
         return element(By.css(`[id*="WebRegional"]`));
     }
 
@@ -399,11 +394,16 @@ export class CommonPage extends BasePage {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
     }
 
-    static get personIcon(){
+    static get personIcon() {
         return element(By.id('EPMLiveNotificationCounterProfilePic'));
     }
 
-    static get latestNotification(){
+    static get latestNotification() {
         return element(By.className('EPMLiveNotificationTitle'));
+    }
+
+    static getButton(tab: string) {
+        // it is a part of a object "costButton", object created below
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 }

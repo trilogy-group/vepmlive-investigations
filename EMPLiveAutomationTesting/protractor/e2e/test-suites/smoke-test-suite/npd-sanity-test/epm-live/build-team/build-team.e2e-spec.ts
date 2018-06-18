@@ -343,7 +343,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
-        await PageHelper.actionSendKeys( uniqueId);
+        await PageHelper.actionSendKeys(uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
@@ -445,6 +445,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
-                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
+            ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
 });
