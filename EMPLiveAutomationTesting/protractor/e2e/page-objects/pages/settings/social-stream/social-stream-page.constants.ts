@@ -18,6 +18,7 @@ export class SocialStreamPageConstants {
             page: 'Page',
             delete: 'Delete',
             epmLive: 'EPM Live',
+            gridGantt: 'Grid/Gantt',
             socialStream: 'Social Stream',
         };
     }

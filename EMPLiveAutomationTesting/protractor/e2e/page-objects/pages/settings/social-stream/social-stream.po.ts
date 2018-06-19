@@ -92,6 +92,7 @@ export class SocialStreamPage {
             page: ElementHelper.getElementByText(menuTitlesAndIds.page),
             epmLive:  this.title(menuTitlesAndIds.epmLive),
             socialStream:  this.title(menuTitlesAndIds.socialStream),
+            gridGantt:  this.title(menuTitlesAndIds.gridGantt),
             delete: ElementHelper.getElementByText(menuTitlesAndIds.delete),
         };
     }

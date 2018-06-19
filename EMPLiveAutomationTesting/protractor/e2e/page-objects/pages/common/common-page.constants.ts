@@ -65,7 +65,8 @@ export class CommonPageConstants {
     static get pagePostFix() {
         return {
             newItem: ' - New Item',
-            editItem: ' - Edit Item'
+            editItem: ' - Edit Item',
+            subject: ' - Subject'
         };
     }
 

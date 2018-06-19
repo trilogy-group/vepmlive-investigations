@@ -22,7 +22,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(856165);
         stepLogger.stepId(1);
         stepLogger.step('Go to left panel and click on Settings  (Main Gear) icon');
-        await PageHelper.click(CommonPage.sidebarMenus.settings);
+            await PageHelper.click(CommonPage.sidebarMenus.settings);
 
         stepLogger.verification('settings menu should be displayed in the left navigation');
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,

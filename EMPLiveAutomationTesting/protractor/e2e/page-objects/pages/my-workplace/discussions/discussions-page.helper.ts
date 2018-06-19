@@ -5,7 +5,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
-import {element, By} from 'protractor';
+import {element, By, browser} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import { CommonPageHelper } from '../../common/common-page.helper';
 import { WaitHelper } from '../../../../components/html/wait-helper';
@@ -115,5 +115,36 @@ export class DiscussionsPageHelper {
         return LabelHelper.getSpanByTextInsideListByClassXpath(
             DiscussionsPageConstants.classLabel.postListItemClass,
             textValue);
+    }
+
+    static get menueLink() {
+        return element.all(By.xpath(`${this.gridTab}//*[contains(@class,'menuLink')]`));
+    }
+
+    static get gridTab() {
+        return `//span[contains(@title,'Un') or contains(@title,'grid')]//parent::div`;
+    }
+
+    static get delete() {
+        return element(By.css('[title= "Delete"]'));
+    }
+
+    static get gridGantt() {
+        return element(By.id('GanttGrid0Main'));
+    }
+
+    static async deleteGridGantt() {
+        await browser.sleep(PageHelper.timeout.m);
+        if (await this.menueLink.first().isPresent() === true) {
+            await PageHelper.click(this.menueLink.first());
+            await PageHelper.click(this.delete);
+            await browser.switchTo().alert().accept();
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.m);
+
+            if (await this.menueLink.first().isPresent() === true) {
+                await this.deleteGridGantt();
+            }
+        }
     }
 }
