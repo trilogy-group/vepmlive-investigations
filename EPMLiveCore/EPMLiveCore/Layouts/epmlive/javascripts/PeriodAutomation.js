@@ -168,7 +168,7 @@
             nextMonthlyCut = DateHelper.addMonths(initialMonthlyCut, monthlyIndex * values.cutMonthlyPeriodicity, values.cutMonthlyDay);
         }
 
-        while (start < finish) {
+        while (start <= finish) {
             if (nextWeeklyCut <= nextMonthlyCut && nextWeeklyCut < finish) {
                 // next weekly cut is valid and enabled, use weekly cut
                 currentCut = nextWeeklyCut;
