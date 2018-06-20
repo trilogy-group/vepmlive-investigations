@@ -244,7 +244,7 @@ function GridColumnWidthSet() {
     var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
         return Grids[0].Cols[key];
     }).filter(x => x.Sec === 1 && x.Visible === 1);
-    var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name + '=' + x.Width);
+    var columnKeys = columns.map(x => x.Name + '=' + x.Width);
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host;
@@ -252,15 +252,10 @@ function GridColumnWidthSet() {
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        data: "{ Function: 'keyvaluestore_ColumnWidthSet', Dataxml: '<Data SiteUrl=\"" + baseUrl + "\">" + columnKeysPlain + "</Data>' }",
+        data: "{ Function: 'personalization_Set', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain + "</Value></Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        success: function (response) {
-        },
-        error: function (xhr, status, error) {
-            var err = eval("(" + xhr.responseText + ")");
-            alert(err.Message);
-        }
+        success: function () { }, error: function (xhr, status, error) { alert(xhr.responseText); }
     });
 }
 
@@ -276,15 +271,15 @@ function GridColumnWidthGet() {
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        data: "{ Function: 'keyvaluestore_ColumnWidthGet', Dataxml: '<Data SiteUrl=\"" + baseUrl + "\">" + columnKeysPlain + "</Data>' }",
+        data: "{ Function: 'personalization_Get', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain + "</Value></Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {
-            var widths = response.d.split('>')[1].split('<')[0].split(',');
+            var widths = response.d.split('[CDATA[')[1].split(']]>')[0].split(',');
 
             for (var i = 0; i < widths.length; i++) {
-                var width = widths[i];
-                var index = columns[i].Index;
+                var width = +(widths[i].split('=')[1]);
+                var index = widths[i].split('=')[0];
                 Grids[0].SetWidth(index, width - Grids[0].Cols[index].Width);
             }
 
@@ -293,8 +288,7 @@ function GridColumnWidthGet() {
             };
         },
         error: function (xhr, status, error) {
-            var err = eval("(" + xhr.responseText + ")");
-            alert(err.Message);
+            alert(xhr.responseText);
         }
     });
 }
