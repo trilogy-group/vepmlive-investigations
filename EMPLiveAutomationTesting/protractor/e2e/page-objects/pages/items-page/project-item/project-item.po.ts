@@ -2,7 +2,6 @@ import {browser, By, element} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {ElementHelper} from '../../../../components/html/element-helper';
 import {ProjectItemPageHelper} from './project-item-page.helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 
@@ -53,8 +52,8 @@ export class ProjectItemPage extends BasePage {
     static get buildTeamContainers() {
         const buildTeamSection = ProjectItemPageConstants.buildTeamContentIDs;
         return {
-            currentTeam: ElementHelper.getElementByStartsWithId(buildTeamSection.currentTeam, buildTeamSection.currentTeam),
-            resourcePool: ElementHelper.getElementByStartsWithId(buildTeamSection.resourcePool, buildTeamSection.resourcePool),
+            currentTeam: CommonPageHelper.getElementByStartsWithId(buildTeamSection.currentTeam, buildTeamSection.currentTeam),
+            resourcePool: CommonPageHelper.getElementByStartsWithId(buildTeamSection.resourcePool, buildTeamSection.resourcePool),
         };
     }
 
@@ -86,27 +85,6 @@ export class ProjectItemPage extends BasePage {
 
     static get newTask() {
         return element(By.id('txtNewTask'));
-    }
-
-    static get close() {
-        return element(By.css('[id*="CloseButton"]'));
-    }
-
-    static get save() {
-        return element(By.css('[id*="SaveButton"]'));
-    }
-
-    static get assignToDropDown() {
-        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
-    }
-
-    static selectAssign(index: number) {
-        return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
-    }
-
-    static get selectTaskName() {
-        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
-        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
     }
 
     static get selectPlanner() {

@@ -160,6 +160,11 @@ export class ProjectItemPageHelper {
         return projectNameValue;
     }
 
+    static get selectTaskName() {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
+    }
+
     static async waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger: StepLogger) {
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -175,7 +180,7 @@ export class ProjectItemPageHelper {
     static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
 
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
         await CommonPageHelper.deleteTask();
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
@@ -192,8 +197,8 @@ export class ProjectItemPageHelper {
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
         stepLogger.step('Select assignee');
-        await PageHelper.click(ProjectItemPage.assignToDropDown);
-        await PageHelper.click(ProjectItemPage.selectAssign(1));
+        await PageHelper.click(ProjectItemPageHelper.assignToDropDown);
+        await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
         stepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
@@ -236,8 +241,8 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(projectNameValue));
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(projectNameValue));
+        await expect(await PageHelper.isElementPresent(CommonPageHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -291,9 +296,9 @@ export class ProjectItemPageHelper {
 
     static get getlink() {
         return {
-            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+            myLanguageAndRegion: CommonPageHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: CommonPageHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: CommonPageHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
 
@@ -318,7 +323,7 @@ export class ProjectItemPageHelper {
     }
     static get button() {
         return {
-            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: CommonPageHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 
@@ -342,4 +347,21 @@ export class ProjectItemPageHelper {
         stepLogger.step('Create a new project');
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
+
+    static get close() {
+        return element(By.css('[id*="CloseButton"]'));
+    }
+
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
+    static get assignToDropDown() {
+        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
+    }
+
+    static selectAssign(index: number) {
+        return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
+    }
+
 }

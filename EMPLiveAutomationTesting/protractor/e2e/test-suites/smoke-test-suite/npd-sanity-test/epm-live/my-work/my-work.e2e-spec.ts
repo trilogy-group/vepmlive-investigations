@@ -294,7 +294,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Attached file is displayed at bottom of popup page');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 
@@ -331,7 +331,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Verify that image is attached');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 

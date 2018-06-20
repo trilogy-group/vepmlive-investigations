@@ -4,7 +4,13 @@ export class PlannerSettingsPageConstants {
 
     static get leftMenus() {
         return {
-            planners: 'Planners'
+            planners: 'Planners',
+        };
+    }
+
+    static get labels() {
+        return {
+            projectRequest: 'Project Requests',
         };
     }
 
@@ -14,6 +20,8 @@ export class PlannerSettingsPageConstants {
             settings: 'Settings',
             planName: 'Plan Name',
             sourceList: 'Source List',
+            editPlanner: 'Edit Planner',
+            deletePlanner: 'Delete Planner',
             checkBox: 'CheckBox',
             taskList: 'Task List',
             addANewPlanner: '+ Add New Planner',
@@ -26,8 +34,10 @@ export class PlannerSettingsPageConstants {
             plannerAdministration: {
                 planName: 'Plan Name',
                 sourceList: 'Source List',
+                editPlanner: 'Edit Planner',
+                deletePlanner: 'Delete Planner',
                 taskList: 'Task List',
-                editPLanner: 'idHomePageNewItem',
+                newPlanner: 'idHomePageNewItem',
                 backToSetting: 'Back To Settings',
             },
         };
@@ -35,8 +45,10 @@ export class PlannerSettingsPageConstants {
 
     static get newPlannerDetails() {
         return {
-            name: 'Smoke Test Planner 1',
-            discription: 'New Planner created as part of smoke test',
+            name: 'Smoke Test Planner ',
+            updatedName: 'Updated Smoke Test Planner ',
+            description: 'New Planner created as part of smoke test ',
+            updatedDescription: 'Updated New Planner created as part of smoke test ',
         };
     }
 }

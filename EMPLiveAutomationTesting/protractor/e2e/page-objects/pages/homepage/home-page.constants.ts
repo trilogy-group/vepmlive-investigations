@@ -1,5 +1,6 @@
 export class HomePageConstants {
     static readonly pageName = 'Home page';
+    static readonly navigation = 'Navigation';
     static readonly homePage = 'Home';
     static readonly documentPage = 'Project Documents - My Documents';
     static readonly comment = 'This is a test comment';

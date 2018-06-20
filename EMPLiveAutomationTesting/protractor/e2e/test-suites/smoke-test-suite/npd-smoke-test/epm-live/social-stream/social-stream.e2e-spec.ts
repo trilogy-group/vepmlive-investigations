@@ -18,6 +18,7 @@ import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {HomePageHelper} from '../../../../../page-objects/pages/homepage/home-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -86,8 +87,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(newFile.newFileName));
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
@@ -100,7 +101,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TextboxHelper.sendKeys(HomePage.whatAreYouWorkingOnTextBox, HomePageConstants.comment);
 
         stepLogger.verification('Verify Comment entered and posted is displayed in Activity Stream of user Home Page');
-        await expect(await PageHelper.isElementDisplayed(HomePage.commentField))
+        await expect(await PageHelper.isElementDisplayed(HomePageHelper.commentField))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(HomePageConstants.comment));
 
         stepLogger.step('Click on "Project" Link on the top menu bar');
@@ -134,8 +135,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Project displayed in "Project" page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(projectNameValue));
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(projectNameValue));
+        await expect(await PageHelper.isElementPresent(CommonPageHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
     });
@@ -171,8 +172,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(title));
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(title)))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(title));
+        await expect(await PageHelper.isElementPresent(CommonPageHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 

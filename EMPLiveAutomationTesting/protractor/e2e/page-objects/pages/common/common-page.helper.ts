@@ -14,6 +14,7 @@ import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
+import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 
 const fs = require('fs');
 
@@ -53,9 +54,17 @@ export class CommonPageHelper {
         return yesterday;
     }
 
+    static get UpdatePropertyDocument() {
+        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
+    }
+
     public static get getCurrentMonth() {
         const month = new Date().getMonth();
         return month + 1; // January is 0!
+    }
+
+    static get projectsList() {
+        return element(By.css('.ms-commentexpand-iconouter'));
     }
 
     public static get getCurrentYear() {
@@ -291,6 +300,14 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'pageNumber') and contains(@title,"${title}")]`));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
+    static get plannerbox() {
+        return element(By.css('[id*="mbox"][style*="block"]'));
+    }
+
     static getMenuItemFromRibbonContainer(title: string) {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
@@ -306,7 +323,7 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
         if (await CommonPage.editPlan.isPresent() !== true) {
             await ElementHelper.browserRefresh();
-            await PageHelper.click(CommonPage.projectCheckbox);
+            await PageHelper.click(this.projectCheckbox);
             await browser.sleep(PageHelper.timeout.m);
             await PageHelper.click(CommonPage.ribbonTitles.items);
             await browser.sleep(PageHelper.timeout.s);
@@ -322,7 +339,7 @@ export class CommonPageHelper {
             await PageHelper.click(ProjectItemPage.selectTaskName);
             await PageHelper.click(ProjectItemPage.deleteTask);
             await browser.switchTo().alert().accept();
-            await ElementHelper.clickUsingJs(ProjectItemPage.save);
+            await ElementHelper.clickUsingJs(ProjectItemPageHelper.save);
             // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.s);
 
@@ -427,7 +444,10 @@ export class CommonPageHelper {
         await PageHelper.uploadFile(browseFileControl, newFile.fullFilePath);
 
         stepLogger.verification('The File name appears under "Choose Files"');
-        ``
+        await expect(await ElementHelper.getValue(browseFileControl))
+            .toContain(newFile.newFileName,
+                ValidationsHelper.getFieldShouldHaveValueValidation(CommonPageConstants.attachFilePopupTitle, newFile.newFileName));
+
         stepLogger.step('Click on OK');
         await PageHelper.click(CommonPage.formButtons.okWithSmallK);
 
@@ -476,7 +496,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 
         const fileNameWithoutExtension = newFile.newFileName.split('.')[0];
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(fileNameWithoutExtension, true)))
+        await expect(await PageHelper.isElementDisplayed(this.getElementByText(fileNameWithoutExtension, true)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
@@ -531,21 +551,6 @@ export class CommonPageHelper {
         return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
     }
 
-    static get getCell() {
-        const cells = CommonPageConstants.cell;
-        return {
-            cell1: CommonPageHelper.getCellText(cells.cell1),
-            cell2: CommonPageHelper.getCellText(cells.cell2),
-            cell3: CommonPageHelper.getCellText(cells.cell3)
-        };
-    }
-
-    static get getbuttons() {
-        return {
-            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
-        };
-    }
-
     static getColumnElement(columnName: string) {
         return element(By.xpath(`${ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.td, columnName, false)}`));
     }
@@ -557,6 +562,35 @@ export class CommonPageHelper {
 
     static getDivByText(text: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
+    }
+
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
+    }
+
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
+
+    static get projectCheckbox() {
+        return element(By.xpath(`(${this.projectFirstRow})/*[contains(@class,'GMCellPanel GMEmpty ')]`));
+    }
+
+    static get project() {
+        // This xpath is best we have. Onmouse click is required
+        return element(By.xpath(`${this.projectFirstRow}//*[contains(@href,'Lists/Project')]`));
+    }
+
+    static get projectFirstRow() {
+        return `.//*[contains(@onmousemove,'Rows["1"]')]`;
+    }
+
+    static get okButton () {
+        return element(By.css('#onetidSaveItem'));
+    }
+
+    static getElementAllByText(text: string, isContains = false) {
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
 
     static getDescendingColumnSelector(columnName: string) {

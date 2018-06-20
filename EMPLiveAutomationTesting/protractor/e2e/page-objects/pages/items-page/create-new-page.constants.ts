@@ -21,7 +21,8 @@ export class CreateNewPageConstants {
                 pictures: 'Pictures',
                 projectDocument: 'Project Document',
                 sharedDocument: 'SharedDocument',
-                sitePages: 'SitePages'
+                sitePages: 'SitePages',
+                socialStream: 'Social Stream'
             }
         };
     }

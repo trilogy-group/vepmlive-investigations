@@ -1,8 +1,8 @@
 import {BasePage} from '../base-page';
 import { WorkspacesConstants } from './workspaces.constants';
 import { element, By } from 'protractor';
-import { ElementHelper } from '../../../components/html/element-helper';
 import { ComponentHelpers } from '../../../components/devfactory/component-helpers/component-helpers';
+import {CommonPageHelper} from '../common/common-page.helper';
 
 export class WorkSpacesPage extends BasePage {
 
@@ -19,7 +19,7 @@ export class WorkSpacesPage extends BasePage {
     }
 
     static get newWorkSpaceButton(){
-        return ElementHelper.getElementByText(WorkspacesConstants.newWorkspace);
+        return CommonPageHelper.getElementByText(WorkspacesConstants.newWorkspace);
     }
 
     static get openPermission(){

@@ -15,7 +15,6 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -218,8 +217,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         const newFile = await CommonPageHelper.attachFile(RiskItemPage.attachmentButton, CommonPage.fileUploadControl, stepLogger);
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(newFile.newFileName));
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });

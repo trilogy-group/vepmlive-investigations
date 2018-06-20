@@ -139,11 +139,16 @@ export class CommonPageConstants {
         };
     }
 
+    static get documentUploadText() {
+        return  'The document was uploaded successfully. Use this form to update the properties of the document.';
+    }
+
     static get cell() {
         return {
             cell1: 'HideCol0C10',
             cell2: 'HideCol0C11',
             cell3: 'HideCol0C13',
+            cell4:  'HideCol0C15'
         };
     }
 
@@ -261,6 +266,8 @@ export class CommonPageConstants {
     static get costButtonLabel() {
         return {
             budget: 'Budget',
+            actualCost: 'Actual Costs',
+            benefits:   'Benefits'
         };
     }
 

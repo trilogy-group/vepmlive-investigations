@@ -16,6 +16,7 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
+import {SocialStreamPageHelper} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -118,6 +119,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('To Do - Attach File - [852049]', async () => {
         const stepLogger = new StepLogger(1176340);
         stepLogger.stepId(1);
+
         // Step #1 and #2 Inside this function
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
             MyWorkplacePage.navigation.toDo,
@@ -187,7 +189,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.step('Check that the attached file get display under "Attachments" section');
         stepLogger.step('The attached file should be displayed under "Attachments" section');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 
@@ -232,7 +234,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
         stepLogger.verification('the Settings menu should be displayed in the left navigation');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.settingMenu)).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(SocialStreamPageConstants.validations.settingMenu));
 
         stepLogger.stepId(3);
@@ -240,22 +242,22 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
 
         stepLogger.verification('the page should be opened in Edit mode');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
         stepLogger.stepId(4);
         stepLogger.step(`Click on 'Add a Web Part' link`);
-        await PageHelper.click(SocialStreamPage.addAWebpart);
+        await PageHelper.click(SocialStreamPageHelper.addAWebpart);
 
         stepLogger.verification('the respective section to add a web part should be opened and displayed');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
         stepLogger.stepId(5);
         stepLogger.step('Select Categories EPM Live and Part as Grid/ Gantt Click on Add');
         await PageHelper.click(SocialStreamPage.settingItems.epmLive);
         await PageHelper.click(SocialStreamPage.settingItems.gridGantt);
-        await PageHelper.click(SocialStreamPage.addButton);
+        await PageHelper.click(SocialStreamPageHelper.addButton);
 
         stepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPageHelper.gridGantt);
@@ -265,7 +267,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step(`Click on Page tab >> 'Stop Editing'`);
         await PageHelper.click(SocialStreamPage.settingItems.page);
-        await PageHelper.click(SocialStreamPage.stopEditing);
+        await PageHelper.click(SocialStreamPageHelper.stopEditing);
 
         stepLogger.verification('User should be on To Do list page and all item should be displayed in grid.');
         await browser.sleep(PageHelper.timeout.m);

@@ -15,6 +15,7 @@ import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {browser} from 'protractor';
+import {SocialStreamPageHelper} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -117,7 +118,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
         stepLogger.verification('Settings should be displayed');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.settingMenu)).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(SocialStreamPageConstants.validations.settingMenu));
 
         stepLogger.stepId(3);
@@ -125,22 +126,22 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.settingItems.editPage);
 
         stepLogger.verification('the Discussions page should be displayed in Edit Mode');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
         stepLogger.stepId(4);
         stepLogger.step(`Click on 'Add a Web Part'`);
-        await PageHelper.click(SocialStreamPage.addAWebpart);
+        await PageHelper.click(SocialStreamPageHelper.addAWebpart);
 
         stepLogger.verification('the respective details should be displayed');
-        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPageHelper.webPartAdderUpdatePanel)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
 
         stepLogger.stepId(5);
         stepLogger.step('Select Categories as EPM Live and Part as Grid/ Gantt and Click on Add button');
         await PageHelper.click(SocialStreamPage.settingItems.epmLive);
         await PageHelper.click(SocialStreamPage.settingItems.gridGantt);
-        await PageHelper.click(SocialStreamPage.addButton);
+        await PageHelper.click(SocialStreamPageHelper.addButton);
 
         stepLogger.verification('Grid/ Gantt web part should be applied in Discussions page');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPageHelper.gridGantt);
@@ -150,7 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step(`Click on 'Stop Editing' (Page tab >> Stop Editing )`);
         await PageHelper.click(SocialStreamPage.settingItems.page);
-        await PageHelper.click(SocialStreamPage.stopEditing);
+        await PageHelper.click(SocialStreamPageHelper.stopEditing);
 
         stepLogger.verification('User should be on Discussions list page and all discussions should be listed in grid');
         await browser.sleep(PageHelper.timeout.m);
