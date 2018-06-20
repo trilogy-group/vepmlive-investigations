@@ -12,6 +12,8 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
 {
     public partial class ManageAccount : LayoutsPageBase
     {
+        private const int AccountSecondaryOwnerIdFieldIndex = 17;
+
         StringBuilder sbSub = new StringBuilder();
         StringBuilder sbUser = new StringBuilder();
         StringBuilder sbDisk = new StringBuilder();
@@ -138,10 +140,12 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
            
         private void loadAccount(SPSite site, SqlConnection cn)
         {
+            var loggedInUserName = EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName);
+
             SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@siteid", site.ID);
-            cmd.Parameters.AddWithValue("@username", EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName));
+            cmd.Parameters.AddWithValue("@username", loggedInUserName);
 
             DataSet ds = new DataSet();
             SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -153,8 +157,9 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
             }
             catch { }
             string owneruname = "";
+            var secondaryOwnerLogin = string.Empty;
 
-            if(activationtype == 3)
+            if (activationtype == 3)
             {
                 cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -165,9 +170,14 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
                 if(dr2.Read())
                 {
                     owneruname = dr2.GetString(13);
+                    if (dr2.FieldCount >= AccountSecondaryOwnerIdFieldIndex && !dr2.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
+                    {
+                        secondaryOwnerLogin = dr2.GetString(AccountSecondaryOwnerIdFieldIndex);
+                    }
                 }
                 dr2.Close();
-                if(owneruname.ToLower() == EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower())
+
+                if (string.Equals(owneruname, loggedInUserName, StringComparison.OrdinalIgnoreCase) || string.Equals(secondaryOwnerLogin, loggedInUserName, StringComparison.OrdinalIgnoreCase))
                 {
                     isOwner = true;
                 }
@@ -198,6 +208,11 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
 
                 owneruname = dr.GetString(13);
 
+                if (dr.FieldCount >= AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
+                {
+                    secondaryOwnerLogin = dr.GetString(AccountSecondaryOwnerIdFieldIndex);
+                }
+
                 try
                 {
                     lockusers = dr.GetBoolean(16);
@@ -205,7 +220,8 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
                 catch { }
             }
             dr.Close();
-            if(owneruname.ToLower() == EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower())
+
+            if (string.Equals(owneruname, loggedInUserName, StringComparison.OrdinalIgnoreCase) || string.Equals(secondaryOwnerLogin, loggedInUserName, StringComparison.OrdinalIgnoreCase))
             {
                 isOwner = true;
             }

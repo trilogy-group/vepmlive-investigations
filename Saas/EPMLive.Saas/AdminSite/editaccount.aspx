@@ -18,6 +18,31 @@
         #AddLicenseButton {
             width: 100px;
         }
+
+        .form-field-caption {
+            width: 100px;
+            background-color: #c9c9c9;
+            white-space: nowrap;
+        }
+
+        .form-owner-table {
+            width: 100%;
+            border-spacing: 2px;
+            border-collapse: separate;
+            margin: 10px;
+        }
+
+        .form-owners-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .form-owner-left,
+        .form-owner-right {
+            width: 50%;
+            float: left;
+        }
+
     </style>
 
     <script src="dhtmlxtab/dhtmlxcommon.js"></script>
@@ -48,10 +73,10 @@
             }
         }
         function changeowner(key_id) {
-            sm('divresetkey', 400, 100);
+            sm('divresetkey', 400, 180);
             var url = "changeowner.aspx?account_id=<%=Request["account_id"] %>";
         document.getElementById("iframeresetkey").src = url;
-        document.getElementById("iframeresetkey").style.height = 90;
+        document.getElementById("iframeresetkey").style.height = 170;
 
     }
     function closereset() {
@@ -108,7 +133,7 @@
     }
 
     </script>
-    <div id="a_tabbar" class="dhtmlxTabBar" select="a<%=strTab %>" imgpath="dhtmlxtab/imgs/" style="width: 100%; height: 500px;" skincolors="#FCFBFC,#F4F3EE">
+    <div id="a_tabbar" class="dhtmlxTabBar" select="a<%=strTab %>" imgpath="dhtmlxtab/imgs/" style="width: 100%; height: 530px;" skincolors="#FCFBFC,#F4F3EE">
         <div id="a1" name="Account Information" width="140px">
             <asp:Panel ID="pnlEditSuccess" runat="server" Width="100%" Visible="false">
                 <font color="green"><b>User Saved Successfully!</b></font>
@@ -123,55 +148,55 @@
                     <td colspan="2"><b>Account Information</b></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Account #:</td>
+                    <td class="form-field-caption">Account #:</td>
                     <td>
                         <asp:Label ID="lblAccountRef" runat="server"></asp:Label></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Account Description:</td>
+                    <td class="form-field-caption">Account Description:</td>
                     <td>
                         <asp:TextBox ID="txtDesc" runat="server" Width="100"></asp:TextBox></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Months Free:</td>
+                    <td class="form-field-caption">Months Free:</td>
                     <td>
                         <asp:TextBox ID="txtMonthsFree" runat="server" Width="50"></asp:TextBox></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Trial Users:</td>
+                    <td class="form-field-caption">Trial Users:</td>
                     <td>
                         <asp:TextBox ID="txtTrialUsers" runat="server" Width="50"></asp:TextBox></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Linked Partner Id:</td>
+                    <td class="form-field-caption">Linked Partner Id:</td>
                     <td>
                         <asp:TextBox ID="txtPartnerId" runat="server" Width="50"></asp:TextBox>
                         <a href="http://www.workengine.com/partners/Lists/Partners/PartnerIds.aspx" target="_blank">[Find an ID]</a></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Dedicated:</td>
+                    <td class="form-field-caption">Dedicated:</td>
                     <td>
                         <asp:CheckBox ID="chkDedicated" runat="server"></asp:CheckBox>
                         (Check this if users should not receive system upgrade notices due to being on a dedicated system)</td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Expiration Date:</td>
+                    <td class="form-field-caption">Expiration Date:</td>
                     <td>
                         <asp:Label ID="lblExpiration" runat="server"></asp:Label></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Linked CRM Account:</td>
+                    <td class="form-field-caption">Linked CRM Account:</td>
                     <td>
                         <asp:Label ID="lblLink" runat="server"></asp:Label></td>
                 </tr>
                 <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Lock Users:</td>
+                    <td class="form-field-caption">Lock Users:</td>
                     <td>
                         <asp:CheckBox ID="chkLockUsers" runat="server" />
                         Select this option to prevent the owner from purchasing additional users.</td>
                 </tr>
                 <tr style="display: none">
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Billing Type:</td>
+                    <td class="form-field-caption">Billing Type:</td>
                     <td>
                         <asp:DropDownList ID="ddlBillingType" runat="server" Enabled="false">
                             <asp:ListItem Text="--Select--" Value=""></asp:ListItem>
@@ -181,54 +206,102 @@
                         </asp:DropDownList>
                     </td>
                 </tr>
-
-                <tr>
-                    <td colspan="2"><b>User Information</b> <a href="edituser.aspx?uid=<%=strUid %>">[Edit]</a></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Username:</td>
-                    <td>
-                        <asp:Label ID="lblUsername" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>First Name:</td>
-                    <td>
-                        <asp:Label ID="txtEditFirstName" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9">Last Name:</td>
-                    <td>
-                        <asp:Label ID="txtEditLastName" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>E-Mail:</td>
-                    <td>
-                        <asp:Label ID="lblEditEmail" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Company:</td>
-                    <td>
-                        <asp:Label ID="txtEditCompany" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Title:</td>
-                    <td>
-                        <asp:Label ID="txtEditTitle" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Department:</td>
-                    <td>
-                        <asp:Label ID="txtEditDepartment" runat="server"></asp:Label></td>
-                </tr>
-                <tr>
-                    <td width="100" bgcolor="#c9c9c9" nowrap>Phone:</td>
-                    <td>
-                        <asp:Label ID="txtEditPhone" runat="server"></asp:Label></td>
-                </tr>
+                </table>
+                <div class="form-owners-wrapper">
+                        <div class="form-owner-left">
+                            <table class="form-owner-table">
+                                <tr>
+                                    <td colspan="2"><b>Primary Owner</b> <a href="edituser.aspx?uid=<%=strUid %>">[Edit]</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">Username:</td>
+                                    <td>
+                                        <asp:Label ID="lblUsername" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">First Name:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditFirstName" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td width="100" bgcolor="#c9c9c9">Last Name:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditLastName" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">E-Mail:</td>
+                                    <td>
+                                        <asp:Label ID="lblEditEmail" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">Company:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditCompany" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">Title:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditTitle" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">Department:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditDepartment" runat="server"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-field-caption">Phone:</td>
+                                    <td>
+                                        <asp:Label ID="txtEditPhone" runat="server"></asp:Label></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="form-owner-right">
+                            <% if (secondaryOwnerUid != string.Empty) { %>
+                            <table class="form-owner-table">
+                                 <tr>
+                                     <td colspan="2"><b>Secondary Owner</b> <a href="edituser.aspx?uid=<%= secondaryOwnerUid %>">[Edit]</a></td>
+                                 </tr>
+                                 <tr>
+                                     <td class="form-field-caption">Username:</td>
+                                        <td><asp:Label ID="secondaryOwnerUserNameField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">First Name:</td>
+                                        <td><asp:Label ID="secondaryOwnerFirstNameField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">Last Name:</td>
+                                        <td><asp:Label ID="secondaryOwnerLastNameField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">E-Mail:</td>
+                                        <td><asp:Label ID="secondaryOwnerEmailField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">Company:</td>
+                                        <td><asp:Label ID="secondaryOwnerCompanyField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">Title:</td>
+                                        <td><asp:Label ID="secondaryOwnerTitleField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">Department:</td>
+                                        <td><asp:Label ID="secondaryOwnerDepartmentField" runat="server"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="form-field-caption">Phone:</td>
+                                        <td><asp:Label ID="secondaryOwnerPhoneField" runat="server"></asp:Label></td>
+                                    </tr>
+                            </table>
+                            <% } %>
+                        </div>
+                </div>
+            <table border="0" cellpadding="1" cellspacing="2" style="margin: 10px">           
                 <tr>
                     <td colspan="2">
                         <br />
-                        <input type="button" value="Change Owner" class="searchbutton" onclick="changeowner();" style="width: 100px">
+                        <input type="button" value="Change Owners" class="searchbutton" onclick="changeowner();" style="width: 110px">
                         <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" CssClass="searchbutton" />
                         <asp:Button ID="btnCancel" runat="server" Text="Cancel" OnClick="btnCancel_Click" CssClass="searchbutton" />
                     </td>
@@ -419,7 +492,7 @@
 
     </div>
     <div id="divresetkey" class="dialog">
-        <iframe id="iframeresetkey" width="100%" height="100" frameborder="0"></iframe>
+        <iframe id="iframeresetkey" width="100%" height="170" frameborder="0"></iframe>
     </div>
 
     <div id="modalAddLicenseManagement" class="dialog">
