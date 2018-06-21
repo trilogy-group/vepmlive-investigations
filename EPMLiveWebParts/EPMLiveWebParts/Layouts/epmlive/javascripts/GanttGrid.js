@@ -240,12 +240,19 @@ function GridOnLoaded(grid) {
 }
 
 var GridColumnWidthNamespace = 'GridColumnWidth';
-function GridColumnWidthSet() {
-    var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
-        return Grids[0].Cols[key];
-    }).filter(x => x.Name != "Panel" && x.Visible === 1);
-    var columnKeys = columns.map(x => x.Name + '=' + x.Width);
-    var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
+function GridColumnWidthSet(col) {
+    var contains = columnStatus.filter(x => x.Name == col);
+    if (contains.length == 0) {
+        columnStatus.push({ Name: col, Width: Grids[0].Cols[col].Width });
+    } else {
+        for (var i = 0; i < columnStatus.length; i++) {
+            if (columnStatus[i].Name == col)
+                columnStatus[i].Width = Grids[0].Cols[col].Width;
+        }
+    }
+
+    var columnKeys = columnStatus.map(x => x.Name + '=' + x.Width);
+    var columnKeysPlain = columnKeys.join(',');
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
@@ -259,6 +266,8 @@ function GridColumnWidthSet() {
         success: function () { }, error: function (xhr, status, error) { alert(xhr.responseText); }
     });
 }
+
+var columnStatus = [];
 
 function GridColumnWidthGet() {
     var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
@@ -278,27 +287,29 @@ function GridColumnWidthGet() {
         success: function (response) {
             var cdata = response.d.split('[CDATA[');
             Grids.OnColResize = function (tgrid, col) {
-                
+
             };
 
             if (cdata.length != 1) {
-                var widths = cdata[1].split(']]>')[0].split(',');
+                var widthsPart = cdata[1].split(']]>')[0].split(',');
+                var widths = widthsPart.map(x => { return { Name: x.split('=')[0], Width: x.split('=')[1] }; });
                 for (var i = 0; i < widths.length; i++) {
-                    var index = widths[i].split('=')[0];
+                    var index = widths[i].Name;
                     var col = Grids[0].Cols[index];
                     if (typeof col == 'undefined') {
                         continue;
                     }
-                    var width = +(widths[i].split('=')[1]);
+                    var width = +(widths[i].Width);
                     Grids[0].SetWidth(index, width - col.Width);
                 }
+
+                columnStatus = widths;
             }
             Grids.OnColResize = function (tgrid, col) {
                 if (col == 'Title')
                     return;
-                GridColumnWidthSet();
+                GridColumnWidthSet(col);
             };
-
         },
         error: function (xhr, status, error) {
             alert(xhr.responseText);
