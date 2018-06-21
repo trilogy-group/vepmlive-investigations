@@ -278,21 +278,26 @@ function GridColumnWidthGet() {
         success: function (response) {
             var cdata = response.d.split('[CDATA[');
             Grids.OnColResize = function (tgrid, col) {
+                
+            };
+
+            if (cdata.length != 1) {
+                var widths = cdata[1].split(']]>')[0].split(',');
+                for (var i = 0; i < widths.length; i++) {
+                    var index = widths[i].split('=')[0];
+                    var col = Grids[0].Cols[index];
+                    if (typeof col == 'undefined') {
+                        continue;
+                    }
+                    var width = +(widths[i].split('=')[1]);
+                    Grids[0].SetWidth(index, width - col.Width);
+                }
+            }
+            Grids.OnColResize = function (tgrid, col) {
+                if (col == 'Title')
+                    return;
                 GridColumnWidthSet();
             };
-            if (cdata.length == 1)
-                return;
-            var widths = cdata[1].split(']]>')[0].split(',');
-            for (var i = 0; i < widths.length; i++) {
-                var index = widths[i].split('=')[0];
-                var col = Grids[0].Cols[index];
-                if (typeof col == 'undefined') {
-                    continue;
-                }
-                var width = +(widths[i].split('=')[1]);
-                Grids[0].SetWidth(index, width - col.Width);
-            }
-
 
         },
         error: function (xhr, status, error) {
