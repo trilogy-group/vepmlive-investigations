@@ -14,7 +14,6 @@ import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
-import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 
 const fs = require('fs');
 
@@ -54,17 +53,9 @@ export class CommonPageHelper {
         return yesterday;
     }
 
-    static get UpdatePropertyDocument() {
-        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
-    }
-
     public static get getCurrentMonth() {
         const month = new Date().getMonth();
         return month + 1; // January is 0!
-    }
-
-    static get projectsList() {
-        return element(By.css('.ms-commentexpand-iconouter'));
     }
 
     public static get getCurrentYear() {
@@ -304,10 +295,6 @@ export class CommonPageHelper {
         return element(By.css('[id*="SaveButton"]'));
     }
 
-    static get plannerbox() {
-        return element(By.css('[id*="mbox"][style*="block"]'));
-    }
-
     static getMenuItemFromRibbonContainer(title: string) {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
@@ -323,7 +310,7 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.s);
         if (await CommonPage.editPlan.isPresent() !== true) {
             await ElementHelper.browserRefresh();
-            await PageHelper.click(this.projectCheckbox);
+            await PageHelper.click(CommonPage.projectCheckbox);
             await browser.sleep(PageHelper.timeout.m);
             await PageHelper.click(CommonPage.ribbonTitles.items);
             await browser.sleep(PageHelper.timeout.s);
@@ -339,7 +326,7 @@ export class CommonPageHelper {
             await PageHelper.click(ProjectItemPage.selectTaskName);
             await PageHelper.click(ProjectItemPage.deleteTask);
             await browser.switchTo().alert().accept();
-            await ElementHelper.clickUsingJs(ProjectItemPageHelper.save);
+            await ElementHelper.clickUsingJs(ProjectItemPage.save);
             // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.s);
 
@@ -533,11 +520,6 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
-    static getEditCostTab(Value: string) {
-        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
-        return element(By.xpath(`//div[not(contains(@tab_id,"ref"))]/*[text()="${Value}"]`));
-    }
-
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
@@ -572,29 +554,22 @@ export class CommonPageHelper {
         return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
-    static get projectCheckbox() {
-        return element(By.xpath(`(${this.projectFirstRow})/*[contains(@class,'GMCellPanel GMEmpty ')]`));
-    }
-
-    static get project() {
-        // This xpath is best we have. Onmouse click is required
-        return element(By.xpath(`${this.projectFirstRow}//*[contains(@href,'Lists/Project')]`));
-    }
-
-    static get projectFirstRow() {
-        return `.//*[contains(@onmousemove,'Rows["1"]')]`;
-    }
-
-    static get okButton () {
-        return element(By.css('#onetidSaveItem'));
-    }
-
     static getElementAllByText(text: string, isContains = false) {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
 
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
+    }
+
+    static getEditCostTab(value: string) {
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return element(By.xpath(`${CommonPage.costTab}/*[text()="${value}"]`));
+    }
+
+    static getActiveButtonByText(tab: string) {
+        // it is a part of a object "costButton", object created below
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 
     static getAscendingColumnSelector(columnName: string) {

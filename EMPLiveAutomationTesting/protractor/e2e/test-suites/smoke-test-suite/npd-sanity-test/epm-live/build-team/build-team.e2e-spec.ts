@@ -289,7 +289,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects, CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter, stepLogger);
-        await PageHelper.click(CommonPageHelper.projectCheckbox);
+        await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
@@ -317,7 +317,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project');
         await ElementHelper.browserRefresh();
-        await PageHelper.click(CommonPageHelper.projectCheckbox);
+        await PageHelper.click(CommonPage.projectCheckbox);
 
         stepLogger.step('Click on "Items" tab');
         await browser.sleep(PageHelper.timeout.m);
@@ -338,7 +338,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Task" button');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
@@ -346,7 +346,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
-        await ElementHelper.clickUsingJs(ProjectItemPageHelper.save);
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.m);
 
@@ -358,7 +358,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click in the Assigned To column');
-        await PageHelper.click(ProjectItemPageHelper.assignToDropDown);
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.step('Check the users displayed in the drop down');
         await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectAssign(1)))

@@ -6,7 +6,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ToDoPageConstants} from './to-do-page.constants';
 import {PageHelper} from '../../../../components/html/page-helper';
-import {browser, By, element} from 'protractor';
+import {browser} from 'protractor';
 
 export class ToDoPageHelper {
 
@@ -48,32 +48,16 @@ export class ToDoPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
     }
 
-    static get menueLink() {
-        return element.all(By.xpath(`${this.gridTab}//*[contains(@class,'menuLink')]`));
-    }
-
-    static get gridTab() {
-        return `//span[contains(@title,'Un') or contains(@title,'grid')]//parent::div`;
-    }
-
-    static get delete() {
-        return element(By.css('[title= "Delete"]'));
-    }
-
-    static get gridGantt() {
-        return element(By.id('GanttGrid0Main'));
-    }
-
     static async deleteGridGantt() {
         await browser.sleep(PageHelper.timeout.m);
-        if (await this.menueLink.first().isPresent() === true) {
-            await PageHelper.click(this.menueLink.first());
-            await PageHelper.click(this.delete);
+        if (await ToDoPage.menueLink.first().isPresent() === true) {
+            await PageHelper.click(ToDoPage.menueLink.first());
+            await PageHelper.click(ToDoPage.delete);
             await browser.switchTo().alert().accept();
             // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.m);
 
-            if (await this.menueLink.first().isPresent() === true) {
+            if (await ToDoPage.menueLink.first().isPresent() === true) {
                 await this.deleteGridGantt();
             }
         }

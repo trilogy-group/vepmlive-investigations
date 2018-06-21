@@ -189,8 +189,10 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }
 
-    static get uploadSuccessFullyText() {
-        return element(By.xpath(`.//*[normalize-space(text())='${CommonPageConstants.documentUploadText}']`));
+    static get uploadSuccessFullyText(){
+        return{
+        message: CommonPageHelper.getElementByText(CommonPageConstants.documentUploadText),
+     };
     }
     static get records() {
         return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
@@ -204,6 +206,18 @@ export class CommonPage extends BasePage {
         return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
 
+    static get projectsList() {
+        return element(By.css('.ms-commentexpand-iconouter'));
+    }
+
+    static get projectCheckbox() {
+        return element(By.css(`(${this.projectFirstRow}) [class*='GMCellPanel GMEmpty']`));
+    }
+
+    static get projectFirstRow() {
+        return `[onmousemove*='Rows["1"]']`;
+    }
+
     static get selectorForRecordsWithoutGreenTick() {
         return '//*[contains(@class,"GMDataRow")]';
     }
@@ -214,6 +228,14 @@ export class CommonPage extends BasePage {
 
     static get ellipse() {
         return element(By.css('td .icon-ellipsis-horizontal'));
+    }
+
+    static get okButton () {
+        return element(By.css('#onetidSaveItem'));
+    }
+
+    static get UpdatePropertyDocument() {
+        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
     }
 
     static get pageTitle() {
@@ -232,17 +254,17 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="OverwriteSingle"]'));
     }
 
-    static getActiveButtonByText(tab: string) {
-        // it is a part of a object "costButton", object created below
-        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
+    static get project() {
+        // This xpath is best we have. Onmouse click is required
+        return element(By.xpath(`${CommonPage.projectFirstRow}//*[contains(@href,'Lists/Project')]`));
     }
 
     static get costButton(){
         const fields = CommonPageConstants.costButtonLabel;
         return {
-            budget: CommonPage.getActiveButtonByText(fields.budget),
-            actualCost: CommonPage.getActiveButtonByText(fields.actualCost),
-            benefits: CommonPage.getActiveButtonByText(fields.benefits),
+            budget: CommonPageHelper.getActiveButtonByText(fields.budget),
+            actualCost: CommonPageHelper.getActiveButtonByText(fields.actualCost),
+            benefits: CommonPageHelper.getActiveButtonByText(fields.benefits),
         };
 
     }
@@ -250,16 +272,20 @@ export class CommonPage extends BasePage {
     static get editCostButton(){
         const fields = CommonPageConstants.costButtonLabel;
         return {
-            budget: CommonPage.getEditCostTab(fields.budget),
-            actualCost: CommonPage.getEditCostTab(fields.actualCost),
-            benefits: CommonPage.getEditCostTab(fields.benefits),
+            budget: CommonPageHelper.getEditCostTab(fields.budget),
+            actualCost: CommonPageHelper.getEditCostTab(fields.actualCost),
+            benefits: CommonPageHelper.getEditCostTab(fields.benefits),
         };
 
     }
 
-    static getEditCostTab(value: string) {
+    static get  costTab() {
         // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
-        return element(By.xpath(`//div[not(contains(@tab_id,"ref"))]/*[text()="${value}"]`));
+        return `//div[not(contains(@tab_id,"ref"))]`;
+    }
+
+    static get plannerbox() {
+        return element(By.css('[id*="mbox"][style*="block"]'));
     }
 
     static get calendearView() {
@@ -296,7 +322,7 @@ export class CommonPage extends BasePage {
         return element(By.id('Project_ddlShowAll'));
     }
 
-    static get getCell() {
+    static get getCostCell() {
         const cells = CommonPageConstants.cell;
         return {
             cell1: CommonPageHelper.getCellText(cells.cell1),

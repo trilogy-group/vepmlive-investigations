@@ -9,7 +9,7 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
-import {browser, By, element} from 'protractor';
+import {browser} from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import { MyWorkplaceConstants } from '../my-workplace.constants';
@@ -125,7 +125,7 @@ export class EventsPageHelper {
 
         stepLogger.stepId(1);
         stepLogger.step('Click on CALENDAR tab');
-        await PageHelper.click(this.calenderTab);
+        await PageHelper.click(EventsPage.calenderTab);
 
         stepLogger.verification('Contents of the CALENDAR tab should be displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
@@ -133,7 +133,7 @@ export class EventsPageHelper {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on Create View');
-        await ElementHelper.clickUsingJs(this.createViews);
+        await ElementHelper.clickUsingJs(EventsPage.createViews);
 
         stepLogger.verification('View Type page should be displayed');
         await expect(await browser.getTitle()).toEqual(CommonPageConstants.viewDropDownLabels.createPublicView,
@@ -141,7 +141,7 @@ export class EventsPageHelper {
 
         stepLogger.stepId(3);
         stepLogger.step('Select any of the view [Example Standard View]');
-        await PageHelper.click(this.standardViewType);
+        await PageHelper.click(EventsPage.standardViewType);
 
         stepLogger.verification('Create View popup should be displayed');
         await expect(await browser.getTitle()).toEqual(CommonPageConstants.viewDropDownLabels.
@@ -157,10 +157,10 @@ export class EventsPageHelper {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok button');
-        await PageHelper.click(CommonPageHelper.okButton);
+        await PageHelper.click(CommonPage.okButton);
 
         stepLogger.verification('View should be created and user should be navigated to event page');
-        await PageHelper.click(this.rollOverEventList);
+        await PageHelper.click(EventsPage.rollOverEventList);
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
 
@@ -168,34 +168,15 @@ export class EventsPageHelper {
         stepLogger.step('Navigate to any other page and come back to Event page and from the CALENDAR tab, select' +
             ' any the Standard View which was created from the Current View drop-down');
         await PageHelper.click(CommonPage.getbuttons.calender);
-        await PageHelper.click(this.calenderTab);
+        await PageHelper.click(EventsPage.calenderTab);
 
         stepLogger.step('Expand Current View drop down');
-        await PageHelper.click(this.currentView);
+        await PageHelper.click(EventsPage.currentView);
         await ElementHelper.clickUsingJs(CommonPageHelper.getElementByText(uniqueId));
 
         stepLogger.verification('Created view should be displayed in the list');
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.createdView));
 
-    }
-    static get calenderTab() {
-        return element(By.css('[id*="Calendar-title"]'));
-    }
-    static get standardViewType () {
-        // Only id will not work
-        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
-    }
-
-    static get rollOverEventList() {
-        return element(By.css(`[id*="overflow"]`));
-    }
-
-    static get currentView() {
-        return element(By.css('a[id*="DisplayView"]'));
-    }
-
-    static get createViews () {
-        return element(By.css(`[id*="CustomViews.CreateView"]`));
     }
 }

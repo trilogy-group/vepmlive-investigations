@@ -117,34 +117,25 @@ export class DiscussionsPageHelper {
             textValue);
     }
 
-    static get menueLink() {
-        return element.all(By.xpath(`${this.gridTab}//*[contains(@class,'menuLink')]`));
-    }
-
-    static get gridTab() {
-        return `//span[contains(@title,'Un') or contains(@title,'grid')]//parent::div`;
-    }
-
-    static get delete() {
-        return element(By.css('[title= "Delete"]'));
-    }
-
-    static get gridGantt() {
-        return element(By.id('GanttGrid0Main'));
-    }
-
     static async deleteGridGantt() {
         await browser.sleep(PageHelper.timeout.m);
-        if (await this.menueLink.first().isPresent() === true) {
-            await PageHelper.click(this.menueLink.first());
-            await PageHelper.click(this.delete);
+        if (await DiscussionsPage.menueLink.first().isPresent() === true) {
+            await PageHelper.click(DiscussionsPage.menueLink.first());
+            await PageHelper.click(DiscussionsPage.delete);
             await browser.switchTo().alert().accept();
             // After save It need static wait(5 sec) and no element found which get change after save.
             await browser.sleep(PageHelper.timeout.m);
 
-            if (await this.menueLink.first().isPresent() === true) {
+            if (await DiscussionsPage.menueLink.first().isPresent() === true) {
                 await this.deleteGridGantt();
             }
         }
+    }
+
+    static getDiscussionFieldSelector(text: string) {
+        return {
+            subject: CommonPageHelper.getDivByText(text),
+            body: CommonPageHelper.getDivByText(text)
+        };
     }
 }

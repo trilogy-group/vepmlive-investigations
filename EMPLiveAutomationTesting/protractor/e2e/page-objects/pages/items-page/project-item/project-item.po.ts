@@ -129,8 +129,8 @@ export class ProjectItemPage extends BasePage {
         return element(By.xpath(`(//a[contains(@id,"RSActionMenu") and @title="Open Menu"])[last()]`));
     }
 
-    static get deleteTask() {
-        return element(By.css('[id*= "DeleteTask"]'));
+    static get deleteTask(){
+        return  element(By.css('[id*="DeleteTask"]'));
     }
 
     static get applyParameterButton() {
@@ -173,4 +173,22 @@ export class ProjectItemPage extends BasePage {
             toPeriod: element(By.css('[id*="ToPeriod_button"]'))
         };
     }
+
+    static get selectTaskName() {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
+    }
+
+    static get assignToDropDown() {
+        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
+    }
+
+    static get close() {
+        return element(By.css('[id*="CloseButton"]'));
+    }
+
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
 }

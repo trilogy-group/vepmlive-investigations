@@ -77,7 +77,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         stepLogger.step('Click on CALENDAR tab');
-        await PageHelper.click(EventsPageHelper.calenderTab);
+        await PageHelper.click(EventsPage.calenderTab);
 
         stepLogger.verification('Details of the Calendar tab should be displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
@@ -114,14 +114,14 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok button');
-        await ElementHelper.scrollToElement(CommonPageHelper.okButton);
-        await PageHelper.click(CommonPageHelper.okButton);
+        await ElementHelper.scrollToElement(CommonPage.okButton);
+        await PageHelper.click(CommonPage.okButton);
 
         stepLogger.verification('Newly added column should be displayed in events page while user select ' +
             'standard view from current view drop down ');
         await browser.sleep(PageHelper.timeout.m);
-        await ElementHelper.clickUsingJs(EventsPageHelper.createViews);
-        await PageHelper.click(EventsPageHelper.standardViewType);
+        await ElementHelper.clickUsingJs(EventsPage.createViews);
+        await PageHelper.click(EventsPage.standardViewType);
         await ElementHelper.scrollToElement(CommonPageHelper.getElementByText(uniqueId));
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));

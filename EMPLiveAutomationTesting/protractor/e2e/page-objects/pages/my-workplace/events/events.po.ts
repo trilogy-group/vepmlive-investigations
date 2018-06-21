@@ -74,6 +74,26 @@ export class EventsPage {
     static get descriptionField () {
         return element(By.id('idDesc'));
     }
+    static get calenderTab() {
+        return element(By.css('[id*="Calendar-title"]'));
+    }
+
+    static get standardViewType () {
+        // Only id will not work
+        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
+    }
+
+    static get rollOverEventList() {
+        return element(By.css(`[id*="overflow"]`));
+    }
+
+    static get currentView() {
+        return element(By.css('a[id*="DisplayView"]'));
+    }
+
+    static get createViews () {
+        return element(By.css(`[id*="CustomViews.CreateView"]`));
+    }
 
     static get columnNameField () {
         return element(By.id('idColName'));

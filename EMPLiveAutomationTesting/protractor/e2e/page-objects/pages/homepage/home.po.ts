@@ -3,7 +3,6 @@ import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
 import {By, element} from 'protractor';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
-import {HomePageHelper} from './home-page.helper';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -39,7 +38,7 @@ export class HomePage extends BasePage {
             portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
             projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
             socialStream: CommonPageHelper.getElementByText(optionsLibraryApps.socialStream),
-            more: HomePageHelper.moreButton,
+            more: HomePage.moreButton,
             risk: CommonPageHelper.getToolBarItemsByText(options.risk),
             timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
             toDo: CommonPageHelper.getToolBarItemsByText(options.toDo),
@@ -55,4 +54,26 @@ export class HomePage extends BasePage {
     static get whatAreYouWorkingOnTextBox() {
         return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
     }
+
+    static get navigateMenu() {
+        // ql locator is alone on that page.
+        return CommonPageHelper.getElementByTitle(HomePageConstants.navigation);
+    }
+
+    static get navigateToHome() {
+        return element(By.css('.epm-nav-home a'));
+    }
+
+    static get navigationMenu() {
+        return element(By.css('#epm-nav-sub'));
+    }
+
+    static get commentField() {
+        return CommonPageHelper.getElementUsingText(HomePageConstants.comment, false);
+    }
+
+    static get moreButton() {
+        return element.all(By.css('.epm-se-show-more')).first();
+    }
+
 }

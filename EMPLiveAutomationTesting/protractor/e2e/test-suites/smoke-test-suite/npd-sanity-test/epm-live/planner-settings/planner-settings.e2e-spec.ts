@@ -12,6 +12,7 @@ import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {browser} from 'protractor';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {PlannerSettingPage} from '../../../../../page-objects/pages/settings/planner-setting/planner-setting.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -65,17 +66,17 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select below value in Planner Settings page "General Settings"');
         stepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planNameField, plannerName);
+        await TextboxHelper.sendKeys(PlannerSettingPage.planNameField, plannerName);
 
         stepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planDiscriptionField,
+        await TextboxHelper.sendKeys(PlannerSettingPage.planDiscriptionField,
             PlannerSettingsPageConstants.newPlannerDetails.description);
 
         stepLogger.step('Scroll down till the section Additional Settings is displayed');
-        await ElementHelper.scrollToElement(PlannerSettingsPageHelper.startSoonCheckBox);
+        await ElementHelper.scrollToElement(PlannerSettingPage.startSoonCheckBox);
 
         stepLogger.step('Enforce Start as Soon as Possible: Check/Select the check box Enable Start as Soon as Possible');
-        await CheckboxHelper.markCheckbox(PlannerSettingsPageHelper.startSoonCheckBox, true);
+        await CheckboxHelper.markCheckbox(PlannerSettingPage.startSoonCheckBox, true);
 
         // To Verify "Required values Entered/Selected in 'Planner Settings' page" is not posible
         await PlannerSettingsPageHelper.saveAndVerifyCreatePlanner(plannerName, stepLogger, true);
@@ -123,10 +124,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Planner Name: Enter a Name for Planner [Ex: Smoke Test Planner 1]');
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planNameField, plannerUpdatedName);
+        await TextboxHelper.sendKeys(PlannerSettingPage.planNameField, plannerUpdatedName);
 
         stepLogger.step('Planner Description: Enter Description for Planner [Ex: New Planner created as part of smoke test]');
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planDiscriptionField,
+        await TextboxHelper.sendKeys(PlannerSettingPage.planDiscriptionField,
             PlannerSettingsPageConstants.newPlannerDetails.updatedDescription);
 
         // Required changes done in 'Planner Settings' page verify is not posible

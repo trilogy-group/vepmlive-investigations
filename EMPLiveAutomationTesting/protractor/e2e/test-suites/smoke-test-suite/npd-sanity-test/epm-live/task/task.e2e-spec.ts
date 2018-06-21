@@ -50,7 +50,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Select any project from project center');
-        await PageHelper.click(CommonPageHelper.project);
+        await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click ITEMS tab select Edit Plan');
         await PageHelper.click(CommonPage.editPlan);
@@ -71,7 +71,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('NO Tasks displayed in Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
@@ -95,7 +95,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on Save button from ribbon panel');
-        await ElementHelper.clickUsingJs(ProjectItemPageHelper.save);
+        await ElementHelper.clickUsingJs(ProjectItemPage.save);
 
         stepLogger.verification('Changes done in Project Planner page are saved');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
@@ -109,7 +109,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "Close" button from ribbon panel');
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
-        await ElementHelper.clickUsingJs(ProjectItemPageHelper.close);
+        await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner page is closed');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
@@ -142,7 +142,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ' are displayed in the Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await PageHelper.click(ProjectItemPage.selectTaskName);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title,

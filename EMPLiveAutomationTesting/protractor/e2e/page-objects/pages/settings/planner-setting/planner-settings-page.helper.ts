@@ -12,11 +12,13 @@ import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {StepLogger} from '../../../../../core/logger/step-logger';
+import {ProjectItemPage} from '../../items-page/project-item/project-item.po';
+import {PlannerSettingPage} from './planner-setting.po';
 
 export class PlannerSettingsPageHelper {
     static async expandPlannerSettingsNode() {
-        if (await this.collapsedMode.isPresent()) {
-            await PageHelper.click(this.collapsedMode);
+        if (await PlannerSettingPage.collapsedMode.isPresent()) {
+            await PageHelper.click(PlannerSettingPage.collapsedMode);
         }
     }
 
@@ -53,43 +55,19 @@ export class PlannerSettingsPageHelper {
         return element(By.xpath(`.//*[@selected='selected' and text()='${value}']`));
     }
 
-    static get planNameField() {
-        return element(By.css('[id*="PlannerName"]'));
-    }
-
-    static get collapsedMode() {
-        return element(By.css('[id*="planner-settings"] [class*="collapsed"]'));
-    }
-
-    static get planDiscriptionField() {
-        return element(By.css('[id*="txtDescription"]'));
-    }
-
-    static get startSoonCheckBox() {
-        return element(By.css('[id*="StartSoon"]'));
-    }
-
-    static get sourceListDropDown() {
-        return element(By.css('[id*="ProjectCenter"]'));
-    }
-
-    static get saveButton() {
-        return element(By.css('[value*="Save Settings"]'));
-    }
-
     static async createPlanner(name: string) {
 
         await PageHelper.click(CommonPage.sidebarMenus.settings);
         await PlannerSettingsPageHelper.expandPlannerSettingsNode();
         await PageHelper.click(PlannerSettingsPageHelper.menu.buttonLabel.planner);
         await PageHelper.click(PlannerSettingsPageHelper.menu.menuTitles.newPlanner);
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planNameField, name);
-        await TextboxHelper.sendKeys(PlannerSettingsPageHelper.planDiscriptionField,
+        await TextboxHelper.sendKeys(PlannerSettingPage.planNameField, name);
+        await TextboxHelper.sendKeys(PlannerSettingPage.planDiscriptionField,
             PlannerSettingsPageConstants.newPlannerDetails.description);
-        await ElementHelper.scrollToElement(PlannerSettingsPageHelper.startSoonCheckBox);
-        await CheckboxHelper.markCheckbox(PlannerSettingsPageHelper.startSoonCheckBox, true);
+        await ElementHelper.scrollToElement(PlannerSettingPage.startSoonCheckBox);
+        await CheckboxHelper.markCheckbox(PlannerSettingPage.startSoonCheckBox, true);
         await ElementHelper.scrollToBottomOfPage();
-        await PageHelper.click(PlannerSettingsPageHelper.saveButton);
+        await PageHelper.click(PlannerSettingPage.saveButton);
     }
 
     static async saveAndVerifyCreatePlanner(name: string, stepLogger: StepLogger, navigatedTOCreatedPlanner: Boolean ) {
@@ -99,7 +77,7 @@ export class PlannerSettingsPageHelper {
         await ElementHelper.scrollToBottomOfPage();
 
         stepLogger.step('Click on Save Settings button');
-        await PageHelper.click(PlannerSettingsPageHelper.saveButton);
+        await PageHelper.click(PlannerSettingPage.saveButton);
 
         stepLogger.verification('"Planner Settings" page is closed');
         await expect(await browser.getTitle()).not.toBe(PlannerSettingsPageConstants.plannerPage,
@@ -131,9 +109,9 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.stepId(7);
         stepLogger.step('Select the project created as per pre requisites [Ex: Smoke Test Project 2]');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.project);
-        const projectName = await CommonPageHelper.project.getText();
-        await PageHelper.click(CommonPageHelper.project);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.project);
+        const projectName = await CommonPage.project.getText();
+        await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click on the ITEMS tab above the grid\n' +
             'From the ITEMS ribbon menu, click on Edit Plan');
@@ -164,7 +142,7 @@ export class PlannerSettingsPageHelper {
         stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await browser.getTitle()).toContain(projectName,
             ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.project));
         await expect(await browser.getTitle()).toContain(name,
@@ -172,7 +150,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.stepId(9);
         stepLogger.step('Click Close button in Project Planner window [Ex: Smoke Test Planner 1]');
-        await PageHelper.click(ProjectItemPageHelper.close);
+        await PageHelper.click(ProjectItemPage.close);
 
         stepLogger.stepId(10);
         stepLogger.step('Click on Leave button in the confirmation dialog');

@@ -18,7 +18,6 @@ import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {HomePageHelper} from '../../../../../page-objects/pages/homepage/home-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -101,7 +100,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await TextboxHelper.sendKeys(HomePage.whatAreYouWorkingOnTextBox, HomePageConstants.comment);
 
         stepLogger.verification('Verify Comment entered and posted is displayed in Activity Stream of user Home Page');
-        await expect(await PageHelper.isElementDisplayed(HomePageHelper.commentField))
+        await expect(await PageHelper.isElementDisplayed(HomePage.commentField))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(HomePageConstants.comment));
 
         stepLogger.step('Click on "Project" Link on the top menu bar');

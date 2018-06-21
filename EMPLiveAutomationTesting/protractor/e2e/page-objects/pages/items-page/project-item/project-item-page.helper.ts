@@ -160,11 +160,6 @@ export class ProjectItemPageHelper {
         return projectNameValue;
     }
 
-    static get selectTaskName() {
-        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
-        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
-    }
-
     static async waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger: StepLogger) {
         stepLogger.step('Waiting for page to open');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
@@ -180,7 +175,7 @@ export class ProjectItemPageHelper {
     static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
 
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPageHelper.plannerbox);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
@@ -197,7 +192,7 @@ export class ProjectItemPageHelper {
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
         stepLogger.step('Select assignee');
-        await PageHelper.click(ProjectItemPageHelper.assignToDropDown);
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
         await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
         stepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
@@ -346,18 +341,6 @@ export class ProjectItemPageHelper {
     static async createProject(uniqueId: string, stepLogger: StepLogger) {
         stepLogger.step('Create a new project');
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
-    }
-
-    static get close() {
-        return element(By.css('[id*="CloseButton"]'));
-    }
-
-    static get save() {
-        return element(By.css('[id*="SaveButton"]'));
-    }
-
-    static get assignToDropDown() {
-        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
     }
 
     static selectAssign(index: number) {
