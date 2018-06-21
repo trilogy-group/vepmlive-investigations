@@ -208,7 +208,7 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
 
                 owneruname = dr.GetString(13);
 
-                if (dr.FieldCount >= AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
+                if (dr.FieldCount > AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
                 {
                     secondaryOwnerLogin = dr.GetString(AccountSecondaryOwnerIdFieldIndex);
                 }

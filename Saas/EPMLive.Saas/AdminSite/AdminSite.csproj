@@ -416,6 +416,7 @@
     <Compile Include="appfeature.aspx.designer.cs">
       <DependentUpon>appfeature.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ChangeOwnerStatus.cs" />
     <Compile Include="deletelicense.aspx.cs">
       <DependentUpon>deletelicense.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

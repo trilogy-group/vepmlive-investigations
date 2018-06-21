@@ -52,7 +52,7 @@ namespace EPMLiveAccountManagement.Layouts.epmlive
                     maxUsers = dr.GetInt32(0);
                     currentUsers = dr.GetInt32(1);
                     owneruname = dr.GetString(13);
-                    if (dr.FieldCount >= AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
+                    if (dr.FieldCount > AccountSecondaryOwnerIdFieldIndex && !dr.IsDBNull(AccountSecondaryOwnerIdFieldIndex))
                     {
                         secondaryOwnerLogin = dr.GetString(AccountSecondaryOwnerIdFieldIndex);
                     }
