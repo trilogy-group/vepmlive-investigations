@@ -203,7 +203,7 @@ namespace AdminSite
         {
             var sqlCommand = new SqlCommand(UpdateSecondaryAccountQuery, connection);
             sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
-            sqlCommand.Parameters.AddWithValue(NewOwnerParameter, selectedValue);
+            sqlCommand.Parameters.AddWithValue(NewOwnerParameter, selectedValue != Guid.Empty ? (object) selectedValue : DBNull.Value);
 
             var result = sqlCommand.ExecuteNonQuery();
             return result > 0 ? ChangeOwnerStatus.Success : ChangeOwnerStatus.SecondaryOwnerFailedToExecute;

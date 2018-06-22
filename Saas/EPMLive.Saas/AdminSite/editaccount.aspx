@@ -256,7 +256,7 @@
                             </table>
                         </div>
                         <div class="form-owner-right">
-                            <% if (secondaryOwnerUid != string.Empty) { %>
+                            <% if (!string.IsNullOrWhiteSpace(secondaryOwnerUid)) { %>
                             <table class="form-owner-table">
                                  <tr>
                                      <td colspan="2"><b>Secondary Owner</b> <a href="edituser.aspx?uid=<%= secondaryOwnerUid %>">[Edit]</a></td>
