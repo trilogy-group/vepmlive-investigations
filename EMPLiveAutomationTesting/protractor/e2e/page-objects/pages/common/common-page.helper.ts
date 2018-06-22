@@ -13,6 +13,7 @@ import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import {ProjectItemPage} from '../items-page/project-item/project-item.po';
 
 const fs = require('fs');
 
@@ -39,7 +40,7 @@ export class CommonPageHelper {
         fs.createReadStream(documentFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName: newFileName + documentFile.fileType};
+        return {fullFilePath, newFileName: newFileName + documentFile.fileType, file: newFileName};
     }
 
     public static get getCurrentDate() {
@@ -59,6 +60,10 @@ export class CommonPageHelper {
 
     public static get getCurrentYear() {
         return new Date().getFullYear();
+    }
+
+    static getRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@id,'${id}')]`));
     }
 
     public static get getTodayInMMDDYYYY() {
@@ -297,6 +302,35 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
+    static async clickOnEditPlan() {
+        await browser.sleep(PageHelper.timeout.s);
+        if (await CommonPage.editPlan.isPresent() !== true) {
+            await ElementHelper.browserRefresh();
+            await PageHelper.click(CommonPage.projectCheckbox);
+            await browser.sleep(PageHelper.timeout.m);
+            await PageHelper.click(CommonPage.ribbonTitles.items);
+            await browser.sleep(PageHelper.timeout.s);
+            if (await  CommonPage.editPlan.isPresent() !== true) {
+                await this.clickOnEditPlan();
+            }
+        }
+        await PageHelper.click(CommonPage.editPlan);
+    }
+
+    static async deleteTask() {
+        if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTaskName);
+            await PageHelper.click(ProjectItemPage.deleteTask);
+            await browser.switchTo().alert().accept();
+            await ElementHelper.clickUsingJs(ProjectItemPage.save);
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.s);
+
+            if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+                await this.deleteTask();
+            }
+        }
+    }
     static async viewOptionViaRibbon(stepLogger: StepLogger) {
         await this.selectRecordFromGrid(stepLogger);
 
@@ -336,6 +370,12 @@ export class CommonPageHelper {
     static getElementContainsId(id: string) {
         const xpath = `[id*="${id}"]`;
         return element(By.css(xpath));
+    }
+
+    static getVersionNumberByRowText(searchCellText: string, targetCellText: string, isContainsSearchCell = false) {
+        const item = element(By.xpath(`//tr[td[${ComponentHelpers.getXPathFunctionForDot
+        (searchCellText, isContainsSearchCell)}]]//td[normalize-space(.)= '${targetCellText}']`));
+        return item;
     }
 
     static getElementContainsTitle(title: string) {
@@ -476,12 +516,37 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
+    static getEditCostTab(Value: string) {
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return element(By.xpath(`//div[not(contains(@tab_id,"ref"))]/*[text()="${Value}"]`));
+    }
+
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
 
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getCellText(column: string) {
+        // it is a part of a object "getCell", object created below
+        return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
+    }
+
+    static get getCell() {
+        const cells = CommonPageConstants.cell;
+        return {
+            cell1: CommonPageHelper.getCellText(cells.cell1),
+            cell2: CommonPageHelper.getCellText(cells.cell2),
+            cell3: CommonPageHelper.getCellText(cells.cell3)
+        };
+    }
+
+    static get getbuttons() {
+        return {
+            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
+        };
     }
 
     static getColumnElement(columnName: string) {

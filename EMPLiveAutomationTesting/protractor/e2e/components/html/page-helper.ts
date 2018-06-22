@@ -17,6 +17,7 @@ export class PageHelper {
         xs: 2000,
         s: 5000,
         m: 10000,
+        xm: 15000,
         l: 25000,
         xl: 50000,
         xxl: 75000,
@@ -45,8 +46,10 @@ export class PageHelper {
         return browser.actions().sendKeys(key).perform();
     }
 
-    static sendKeysToInputField(elem: ElementFinder, key: string) {
-        elem.sendKeys(key);
+    static async sendKeysToInputField(elem: ElementFinder, key: string) {
+        // send keys in not working in perticular fields, Its required actions classes.
+        await elem.click();
+        await browser.actions().sendKeys(key).perform();
     }
 
     static actionKeyUp(key: string) {

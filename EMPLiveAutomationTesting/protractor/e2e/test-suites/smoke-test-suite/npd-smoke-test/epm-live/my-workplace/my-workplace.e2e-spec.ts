@@ -21,12 +21,13 @@ import {EventsPage} from '../../../../../page-objects/pages/my-workplace/events/
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import { SharedDocumentsPageConstants } from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
+// tslint:disable-next-line:max-line-length
+import {SharedDocumentsPageConstants} from '../../../../../page-objects/pages/my-workplace/shared-documents/shared-documents-page.constants';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
-import { DiscussionsPageHelper } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
-import { DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
-import { DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
-import { TextboxHelper } from '../../../../../components/html/textbox-helper';
+import {DiscussionsPageHelper } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.helper';
+import {DiscussionsPage } from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+import {DiscussionsPageConstants } from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
+import {TextboxHelper } from '../../../../../components/html/textbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -349,23 +350,23 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementPresent(newEventTitle))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(newTitle));
     });
-  
-      it('Reply to a Discussion - [785614]', async () => {
+
+    it('Reply to a Discussion - [785614]', async () => {
         const stepLogger = new StepLogger(785614);
-        
+
         // steps 1,2,3 are inside this function
-        stepLogger.step('PRECONDITION: Create new Discussion');        
+        stepLogger.step('PRECONDITION: Create new Discussion');
         await DiscussionsPageHelper.addDiscussion(stepLogger);
 
         stepLogger.stepId(4);
         stepLogger.step(`Click on 'Discussion' added by Admin User`);
-        const title = await ElementHelper.getText(DiscussionsPage.openDiscussionLink)
+        const title = await ElementHelper.getText(DiscussionsPage.openDiscussionLink);
         await PageHelper.click(DiscussionsPage.openDiscussionLink);
-        
+
         stepLogger.verification('the Discussion should get selected');
         await expect(await DiscussionsPage.discussionTitle.getText())
             .toBe(title, ValidationsHelper.getPageDisplayedValidation(title));
-            
+
         stepLogger.stepId(5);
         stepLogger.step(`Click on 'Reply' Enter a response Click 'Reply' button`);
         const uniqueId = PageHelper.getUniqueId();

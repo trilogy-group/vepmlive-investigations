@@ -46,8 +46,25 @@ export class HomePage extends BasePage {
         };
     }
 
+    static get chooseAfile() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get newButton() {
+        return element(By.css('.js-listview-qcbNewButton'));
+    }
+
     static get whatAreYouWorkingOnTextBox() {
         return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
+    }
+
+    static get navigateToHome() {
+        return element(By.css('.epm-nav-home a'));
+    }
+
+    static get navigateMenu() {
+        // ql locator is alone on that page.
+        return element(By.css('[data-id*="ql"]'));
     }
 
     static get commentField() {
@@ -55,6 +72,6 @@ export class HomePage extends BasePage {
     }
 
     static get moreButton() {
-        return element(By.css('.epm-se-show-more'));
+        return element.all(By.css('.epm-se-show-more')).first();
     }
 }

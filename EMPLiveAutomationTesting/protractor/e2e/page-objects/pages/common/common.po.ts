@@ -6,11 +6,12 @@ import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
-import { RiskItemPageConstants } from '../items-page/risk-item/risk-item-page.constants';
+import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
 
 export class CommonPage extends BasePage {
 
     static readonly dialogTitleId = 'dialogTitleSpan';
+    static readonly plannerClass = 'GMEditCellInput';
     static readonly titleId = 'pageTitle';
 
     static get sidebarMenus() {
@@ -86,7 +87,9 @@ export class CommonPage extends BasePage {
             attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
+            editCost: CommonPageHelper.getRibbonButtonById(labels.editCost),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
+            addTask: CommonPageHelper.getRibbonButtonById(labels.addTask),
             editTeam: CommonPageHelper.getRibbonSmallButtonByTitle(labels.editTeam),
             close: CommonPageHelper.getRibbonButtonByText(labels.close),
             saveAndClose: CommonPageHelper.getRibbonButtonByText(labels.saveAndClose),
@@ -144,6 +147,11 @@ export class CommonPage extends BasePage {
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
     }
 
+    static get userInfoFrame() {
+        // element(By.css('.ms-dlgFrame')) never works in case of iframe
+        return browser.driver.findElement(By.css('[src*="listform"]'));
+    }
+
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
@@ -178,12 +186,24 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
     }
 
+    static get projectCheckbox() {
+        return element(By.xpath(`(${this.projectFirstRow})/*[contains(@class,'GMCellPanel GMEmpty ')]`));
+    }
+
     static get recordWithoutGreenTicket() {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }
 
+    static get projectFirstRow() {
+        return `.//*[contains(@onmousemove,'Rows["1"]')]`;
+    }
+
     static get records() {
         return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
+    }
+
+    static get timeZone() {
+        return element(By.css('[name*="TimeZone"][disabled]'));
     }
 
     static get selectorForRecordsWithGreenTick() {
@@ -202,8 +222,57 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
+    static get pageTitle() {
+        return element(By.id('pageTitle'));
+    }
+
+    static get editPlan() {
+        return element(By.xpath(' .//*[contains(@id,"EPMLive.Planner") and not(contains(@class,"disabled"))]'));
+    }
+
+    static get project() {
+        // This xpath is best we have. Onmouse click is required
+        return element(By.xpath(`(${this.projectFirstRow})//*[contains(@href,'Lists/Project')]`));
+    }
+
+    static get versionCommentField() {
+        return element(By.css('[id*="CheckInComment"]'));
+    }
+
+    static get newVersionCheckbox() {
+        return element(By.css('[id*="OverwriteSingle"]'));
+    }
+
+    static get projectsList() {
+        return element(By.css('.ms-commentexpand-iconouter'));
+    }
+
+    static get UpdatePropertyDocument() {
+        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
+    }
+
+    static get costButton() {
+        const fields = CommonPageConstants.costButtonLabel;
+        return {
+            budget: CommonPage.getButton(fields.budget),
+        };
+
+    }
+
+    static get okButton() {
+        return element(By.css('#onetidSaveItem'));
+    }
+
+    static get calendearView() {
+        return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
+    }
+
     static get singleSearchTextBox() {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
+    }
+
+    static get plannerbox() {
+        return element(By.css('[id*="mbox"][style*="block"]'));
     }
 
     static get closeButton() {
@@ -234,18 +303,22 @@ export class CommonPage extends BasePage {
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-   }
+    }
 
-    static get searchChoiceOption(){
+    static get searchChoiceOption() {
         return {
-           proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
-           active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
-           closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+            proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
+            active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
+            closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
         };
     }
 
-    static get searchIcon(){
+    static get searchIcon() {
         return element(By.css(`[src*='find_icon']`));
+    }
+
+    static get regionCheckBox() {
+        return element(By.css(`[id*="WebRegional"]`));
     }
 
     static get noDataFound() {
@@ -297,15 +370,10 @@ export class CommonPage extends BasePage {
         const riskColumns = RiskItemPageConstants.columnNames;
         return {
             createNewPublicView: CommonPageHelper.getCreateNewPublicViewOfDropDown(publicViewLabels.createPublicView),
-
             defaultDropDownViewByText: CommonPageHelper.getDropDownViewByText(RiskItemPageConstants.defaultViewName),
-
             titleViewColumn: CommonPageHelper.getColumnElement(riskColumns.title),
-
             assignedToViewColumn: CommonPageHelper.getColumnElement(riskColumns.assignedTo),
-
             statusViewColumn: CommonPageHelper.getColumnElement(riskColumns.status),
-
             dueDateViewColumn: CommonPageHelper.getColumnElement(riskColumns.dueDate)
         };
     }
@@ -314,15 +382,10 @@ export class CommonPage extends BasePage {
         const createLabels = CommonPageConstants.newPublicViewformLabels;
         return {
             fillCreatePublicViewPageTitle: element(By.name(createLabels.title)),
-
             publicViewRadioButton: element(By.id(CommonPageConstants.newPublicViewformLabels.publicView)),
-
             scheduledStatusCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.scheduleStatus)),
-
             exposureCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.exposure)),
-
             dueCheckBox: element(By.name(CommonPageConstants.newPublicViewformLabels.due)),
-
             submitCreatePublicViewPage: element(By.id(CommonPageConstants.formLabels.topSave))
         };
     }
@@ -331,11 +394,16 @@ export class CommonPage extends BasePage {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
     }
 
-    static get personIcon(){
+    static get personIcon() {
         return element(By.id('EPMLiveNotificationCounterProfilePic'));
     }
 
-    static get latestNotification(){
+    static get latestNotification() {
         return element(By.className('EPMLiveNotificationTitle'));
+    }
+
+    static getButton(tab: string) {
+        // it is a part of a object "costButton", object created below
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 }

@@ -14,7 +14,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
-
+import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -172,6 +172,32 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
+    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
+
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
+        stepLogger.step('Click on Add Task');
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        stepLogger.step('Enter Task name');
+        await PageHelper.actionSendKeys( uniqueId);
+        stepLogger.step('Enter finish date');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
+        await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
+        await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
+        stepLogger.step('Enter duration');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours1);
+        stepLogger.step('Enter effort hours');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
+        stepLogger.step('Select assignee');
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
+        await PageHelper.click(ProjectItemPage.selectAssign(1));
+        stepLogger.step('Click OK');
+        await PageHelper.click(ProjectItemPageHelper.button.ok);
+    }
+
     static async createProjectAndNavigateToBuildTeamPage(uniqueId: string, stepLogger: StepLogger) {
         stepLogger.step('Create a new project');
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
@@ -263,6 +289,14 @@ export class ProjectItemPageHelper {
         }
     }
 
+    static get getlink() {
+        return {
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+        };
+    }
+
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }
@@ -270,11 +304,34 @@ export class ProjectItemPageHelper {
     static getReportPagingHeaderByTitle(title: string) {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
+    static dateField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
+        return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
+    }
 
+    static getField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
+        return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
+    }
     static getDisabledReportPagingHeaderByTitle(title: string) {
         return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
     }
+    static get button() {
+        return {
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+        };
+    }
 
+    static get newTasksFields(){
+        const fields = ProjectItemPageConstants.newTaskFields;
+        return {
+            title: ProjectItemPageHelper.getField(fields.title),
+            work: ProjectItemPageHelper.getField(fields.work),
+            duration: ProjectItemPageHelper.getField(fields.duration),
+            date: ProjectItemPageHelper.dateField(fields.date),
+        };
+
+    }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);

@@ -89,7 +89,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(ReportManagerPageConstants.noErrorMessage,
                 ReportManagerPageValidation.lastResultValidation);
 
-
         stepLogger.verification(`Log - 'View Log' link displayed`);
         await expect(await PageHelper.isElementDisplayed(ReportManagerPage.formControls.viewLog))
             .toBe(true, ReportManagerPageValidation.logValidation);

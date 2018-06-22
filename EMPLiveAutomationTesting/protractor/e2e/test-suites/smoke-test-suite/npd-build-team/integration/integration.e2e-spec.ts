@@ -128,8 +128,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
-    
-    it('View the options on "Resource Capacity Heat map" report page" - [743179]', async () => {
+
+    xit('View the options on "Resource Capacity Heat map" report page" - 743179 - Disabled Duplication', async () => {
         const stepLogger = new StepLogger(743179);
         stepLogger.stepId(1);
         stepLogger.step('Go to Navigation > Projects > Projects');

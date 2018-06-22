@@ -8,12 +8,22 @@ export class CommonPageConstants {
     static filesDirectoryName = 'files';
     static readonly currentDir = __dirname;
     static readonly tabPanel = 'Tab Panel';
+    static readonly timeZone = 'Time Zone and Region';
+    static readonly calendarContent = 'Calendar Content';
+    static readonly createView = 'create View';
     static readonly title = 'Title';
+    static readonly columnDescription = 'Column Desciption';
+    static readonly viewType = 'View Type';
+    static readonly createdView = 'created View';
     static readonly viewAll = 'View All';
+    static readonly columnType = 'Column Type';
+    static readonly columnName = 'Column Name';
     static readonly newItem = 'New Item';
+    static readonly calendar = 'Calendar';
     static readonly attachFilePopupTitle = 'Attach File';
     static readonly last = 'Last';
     static readonly fileUpload = 'fileUpload';
+    static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
 
     static get viewDropDownLabels() {
@@ -65,6 +75,8 @@ export class CommonPageConstants {
             cancel: 'Cancel',
             viewItem: 'ViewItem',
             editItem: 'EditItem',
+            editCost: 'EPKCosts',
+            addTask: 'AddTask-Large',
             attachFile: 'AttachFile',
             editTeam: 'Edit Team',
             close: 'Close',
@@ -117,6 +129,23 @@ export class CommonPageConstants {
         };
     }
 
+    static get costData() {
+        return {
+            firstData: '120.00',
+            budgetData: '120',
+            actualCostData: '130',
+            benefitsData: '140',
+        };
+    }
+
+    static get cell() {
+        return {
+            cell1: 'HideCol0C10',
+            cell2: 'HideCol0C11',
+            cell3: 'HideCol0C13',
+        };
+    }
+
     static get pageHeaders() {
         return {
             projects: HomePageConstants.navigationLabels.projects,
@@ -146,6 +175,7 @@ export class CommonPageConstants {
             deleteItem: 'Delete Item',
             comments: 'Comments',
             editTeam: 'Edit Team',
+            costPlan: 'Cost Plan',
             editPlan: 'Edit Plan'
         };
     }
@@ -155,6 +185,13 @@ export class CommonPageConstants {
             navigation: 'EPMLiveNav',
             createNew: 'epm-nav-sub-new',
             myWorkplace: 'epm-nav-sub-workplace-static-links'
+        };
+    }
+
+    static get versionComment() {
+        return {
+            first: 'New Version of previously updated file',
+            second: '0.2'
         };
     }
 
@@ -220,6 +257,12 @@ export class CommonPageConstants {
         };
     }
 
+    static get costButtonLabel() {
+        return {
+            budget: 'Budget',
+        };
+    }
+
     static get teamId() {
         return {
             currentTeam: 'TeamGrid',
@@ -245,28 +288,38 @@ export class CommonPageConstants {
         };
     }
 
-    static get specificIds() {
-        return {
-            saveEventId: 'idIOSaveItem'
-        };
-    }
-  
     static get searchControl() {
         return {
-           searchComponentDropdown : 'Component dropdown',
-           searchOperatorDropdown: 'Search Operator dropdown',
-           searchField : 'Search Field',
+            searchComponentDropdown : 'Component dropdown',
+            searchOperatorDropdown: 'Search Operator dropdown',
+            searchField : 'Search Field',
         };
     }
 
     static get messages() {
         return {
-           noDataFound : 'No data found',
+            noDataFound : 'No data found',
         };
     }
+
+    static get hours() {
+        return {
+            durationHours1 : '5.00',
+            effortHours: '80',
+            durationHours2 : '10.00',
+            updatedEffortHours : '160.00'
+        };
+    }
+
     static get columnHeader() {
         return {
             status: 'Status'
+        };
+    }
+
+    static get specificIds() {
+        return {
+            saveEventId: 'idIOSaveItem'
         };
     }
 

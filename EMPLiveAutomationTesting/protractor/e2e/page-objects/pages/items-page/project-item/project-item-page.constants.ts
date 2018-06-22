@@ -5,7 +5,9 @@ export class ProjectItemPageConstants {
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly languageAndRegion = 'Language and Region';
     static readonly nonAdminUser = 'Non Admin User';
+    static readonly region  = 'Region';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
 
@@ -31,6 +33,7 @@ export class ProjectItemPageConstants {
             costReduction: 'Cost Reduction',
             employeeSatisfaction: 'Employee Satisfaction',
             risk: 'Risk',
+            ok: 'OK',
             projectUpdate: 'Project Update *',
         };
     }
@@ -150,6 +153,14 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get userInformation() {
+        return {
+            myLanguageAndRegion: 'My Language And Region',
+            editItem: 'Edit Item',
+            myAlerts: 'My Alerts'
+        };
+    }
+
     static get teamChangeButtons() {
         return {
             add: '< Add',
@@ -171,26 +182,6 @@ export class ProjectItemPageConstants {
             units: 'Units'
         };
     }
-
-    static get reportHeaders() {
-        return {
-            refresh: 'Refresh',
-            firstPage: 'First Page',
-            previousPage: 'Previous Page',
-            nextPage: 'Next Page',
-            lastPage: 'Last Page',
-            findTextInReport: 'Find Text in Report',
-            findNext: 'Find Next'
-        };
-    }
-
-    static get plannerLabels() {
-        return {
-            microsoftProject: 'Microsoft Project',
-            projectPlanner: 'Project Planner'
-        };
-    }
-
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
@@ -221,4 +212,39 @@ export class ProjectItemPageConstants {
             toPeriod: 'To Period'
         };
     }
+
+    static get reportHeaders() {
+        return {
+            refresh: 'Refresh',
+            firstPage: 'First Page',
+            previousPage: 'Previous Page',
+            nextPage: 'Next Page',
+            lastPage: 'Last Page',
+            findTextInReport: 'Find Text in Report',
+            findNext: 'Find Next'
+        };
+    }
+
+    static get plannerLabels() {
+        return {
+            microsoftProject: 'Microsoft Project',
+            projectPlanner: 'Project Planner'
+        };
+    }
+    static get users() {
+        return {
+            adminUser: 'Admin User'
+        };
+    }
+
+    static get newTaskFields() {
+        return {
+            title: 'Title',
+            finishDate: 'Finish Date',
+            work: 'Work',
+            duration: 'Duration',
+            date: 'DueDate'
+        };
+    }
+
 }

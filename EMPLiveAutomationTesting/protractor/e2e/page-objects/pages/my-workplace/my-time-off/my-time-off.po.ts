@@ -16,6 +16,10 @@ export class MyTimeOffPage {
         };
     }
 
+    static get dateEditBox() {
+        return element(By.css('[class*= "GSEditInput" ]'));
+    }
+
     static get timeOffTypeShowAllButton() {
         return element(By.id('TimeOffType_ddlShowAll'));
     }
