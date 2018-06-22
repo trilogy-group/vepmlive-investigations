@@ -11,10 +11,10 @@ import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-wor
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
-import {ToDoPageHelper} from '../../../../../page-objects/pages/my-workplace/to-do/to-do-page.helper';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {browser} from 'protractor';
+import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -88,7 +88,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.body));
     });
 
-    it('Add Grid/Gantt web part - [785832]', async () => {
+    fit('Add Grid/Gantt web part - [785832]', async () => {
         const stepLogger = new StepLogger(785832);
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -143,8 +143,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.addButton);
 
         stepLogger.verification('Grid/ Gantt web part should be applied in Discussions page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPageHelper.gridGantt);
-        await expect(await PageHelper.isElementDisplayed(ToDoPageHelper.gridGantt)).toBe(true,
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPage.gridGantt);
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
         stepLogger.stepId(6);
@@ -154,7 +154,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('User should be on Discussions list page and all discussions should be listed in grid');
         await browser.sleep(PageHelper.timeout.m);
-        await expect(await PageHelper.isElementDisplayed(ToDoPageHelper.gridGantt)).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 });

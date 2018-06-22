@@ -256,7 +256,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.xpath(`${CommonPage.projectFirstRow}//*[contains(@href,'Lists/Project')]`));
+        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
     static get costButton(){

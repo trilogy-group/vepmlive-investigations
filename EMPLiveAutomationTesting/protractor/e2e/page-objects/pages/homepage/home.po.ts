@@ -38,21 +38,13 @@ export class HomePage extends BasePage {
             portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
             projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
             socialStream: CommonPageHelper.getElementByText(optionsLibraryApps.socialStream),
-            more: HomePage.moreButton,
+            more: this.moreButton,
             risk: CommonPageHelper.getToolBarItemsByText(options.risk),
             timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
             toDo: CommonPageHelper.getToolBarItemsByText(options.toDo),
             projectDocument: CommonPageHelper.getToolBarItemsByText(optionsLibraryApps.projectDocument),
             sharedDocument: CommonPageHelper.getToolBarItemsByText(optionsLibraryApps.sharedDocument)
         };
-    }
-
-    static get newButton() {
-        return element(By.css('.js-listview-qcbNewButton'));
-    }
-
-    static get whatAreYouWorkingOnTextBox() {
-        return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
     }
 
     static get navigateMenu() {
@@ -62,6 +54,10 @@ export class HomePage extends BasePage {
 
     static get navigateToHome() {
         return element(By.css('.epm-nav-home a'));
+    }
+
+    static get chooseAfile() {
+        return element(By.css('.ms-fileinput'));
     }
 
     static get navigationMenu() {
@@ -74,6 +70,14 @@ export class HomePage extends BasePage {
 
     static get moreButton() {
         return element.all(By.css('.epm-se-show-more')).first();
+    }
+
+    static get newButton() {
+        return element(By.css('.js-listview-qcbNewButton'));
+    }
+
+    static get whatAreYouWorkingOnTextBox() {
+        return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
     }
 
 }

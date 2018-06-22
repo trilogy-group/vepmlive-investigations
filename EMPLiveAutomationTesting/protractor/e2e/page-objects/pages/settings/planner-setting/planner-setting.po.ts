@@ -7,7 +7,7 @@ export class PlannerSettingPage {
     }
 
     static get collapsedMode() {
-        return element(By.css('[id*="planner-settings"].epm-nav-node-collapsed'));
+        return element(By.css('[id*="planner-settings"] .epm-nav-node-collapsed'));
     }
 
     static get planDiscriptionField() {
