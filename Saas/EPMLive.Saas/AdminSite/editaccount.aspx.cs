@@ -10,9 +10,29 @@ namespace AdminSite
 {
     public partial class editaccount : System.Web.UI.Page
     {
+        private const string AccountIdParameter = "@account_id";
+
+        private const string GetAccountInfoQuery =
+            "SELECT ACCOUNT.secondary_owner_id, ACCOUNT.lockusers, ACCOUNT.maxusers, ACCOUNT.crmaccountuid, ACCOUNT.account_id, ACCOUNT.billingType, ACCOUNT.account_ref, ACCOUNT.monthsfree, " +
+            "ACCOUNT.dtCreated, ACCOUNT.accountDescription, ACCOUNT.partnerid, ACCOUNT.dedicated, PrimaryOwner.uid, PrimaryOwner.dtcreated AS Expr1, PrimaryOwner.username, PrimaryOwner.isBilled, " +
+            "PrimaryOwner.createdBy, PrimaryOwner.tempPassword, PrimaryOwner.firstName, PrimaryOwner.lastName, PrimaryOwner.company, PrimaryOwner.title, PrimaryOwner.department, PrimaryOwner.phone, " +
+            "PrimaryOwner.fax, PrimaryOwner.email, PrimaryOwner.activated, PrimaryOwner.registered, PrimaryOwner.enabled, PrimaryOwner.address1, PrimaryOwner.address2, PrimaryOwner.city, PrimaryOwner.state, " +
+            "PrimaryOwner.zip, PrimaryOwner.country, PrimaryOwner.region, PrimaryOwner.version, PrimaryOwner.donotemail, PrimaryOwner.lastcontactdate, PrimaryOwner.epmliveadmin, PrimaryOwner.notes, " +
+            "PrimaryOwner.publisher, PrimaryOwner.CrmUid, BETA1Survey.project_version, BETA1Survey.sharepoint_version, BETA1Survey.products, BETA1Survey.comments, " +
+            "SecondaryOwner.username AS secondaryOwner_username, SecondaryOwner.firstName AS secondaryOwner_firstName, SecondaryOwner.lastName AS secondaryOwner_lastName, " +
+            "SecondaryOwner.email AS secondaryOwner_email, SecondaryOwner.company AS secondaryOwner_company, SecondaryOwner.title AS secondaryOwner_title, " +
+            "SecondaryOwner.department AS secondaryOwner_department, SecondaryOwner.phone AS secondaryOwner_phone " +
+            "FROM USERS AS PrimaryOwner INNER JOIN " +
+            "ACCOUNT ON PrimaryOwner.uid = ACCOUNT.owner_id LEFT OUTER JOIN " +
+            "USERS AS SecondaryOwner ON ACCOUNT.secondary_owner_id = SecondaryOwner.uid LEFT OUTER JOIN " +
+            "BETA1Survey ON PrimaryOwner.uid = BETA1Survey.uid " +
+            "WHERE (ACCOUNT.account_id = " + AccountIdParameter + ")";
+
         protected string strAccountId;
         protected string strTab;
         protected string strUid;
+
+        protected string secondaryOwnerUid;
 
         protected int TotalTicketUsage;
         protected int TotalTickets;
@@ -60,10 +80,10 @@ namespace AdminSite
             SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ToString());
             cn.Open();
 
-            SqlCommand cmdGetSites = new SqlCommand("SELECT     account.lockusers, maxusers,crmaccountuid,account_id,billingtype, account.account_ref,monthsfree,account.dtcreated,accountdescription,partnerid,account.dedicated, dbo.USERS.*, dbo.BETA1Survey.project_version, dbo.BETA1Survey.sharepoint_version, dbo.BETA1Survey.products, dbo.BETA1Survey.comments FROM         dbo.USERS Left Outer JOIN dbo.BETA1Survey ON dbo.USERS.uid = dbo.BETA1Survey.uid Left Outer JOIN dbo.ACCOUNT ON dbo.USERS.uid = dbo.ACCOUNT.owner_id WHERE account_id like '" + Request["account_id"] + "'", cn);
-            cmdGetSites.CommandType = CommandType.Text;
+            var sqlCommand = new SqlCommand(GetAccountInfoQuery, cn) { CommandType = CommandType.Text };
+            sqlCommand.Parameters.AddWithValue(AccountIdParameter, strAccountId);
 
-            SqlDataAdapter da = new SqlDataAdapter(cmdGetSites);
+            SqlDataAdapter da = new SqlDataAdapter(sqlCommand);
             DataSet ds = new DataSet();
             da.Fill(ds);
 
@@ -77,6 +97,15 @@ namespace AdminSite
             txtEditLastName.Text = dr["lastName"].ToString();
             txtEditPhone.Text = dr["phone"].ToString();
             txtEditTitle.Text = dr["title"].ToString();
+
+            secondaryOwnerUserNameField.Text = dr["secondaryOwner_username"].ToString();
+            secondaryOwnerEmailField.Text = dr["secondaryOwner_email"].ToString();
+            secondaryOwnerCompanyField.Text = dr["secondaryOwner_company"].ToString();
+            secondaryOwnerDepartmentField.Text = dr["secondaryOwner_department"].ToString();
+            secondaryOwnerFirstNameField.Text = dr["secondaryOwner_firstName"].ToString();
+            secondaryOwnerLastNameField.Text = dr["secondaryOwner_lastName"].ToString();
+            secondaryOwnerPhoneField.Text = dr["secondaryOwner_phone"].ToString();
+            secondaryOwnerTitleField.Text = dr["secondaryOwner_title"].ToString();
 
             bool lockusers;
             bool.TryParse(dr["lockusers"].ToString(), out lockusers);
@@ -108,35 +137,35 @@ namespace AdminSite
 
             ddlBillingType.SelectedValue = dr["billingType"].ToString();
 
-            cmdGetSites = new SqlCommand("Select * from CONTRACTLEVEL_TITLES", cn);
-            cmdGetSites.CommandType = CommandType.Text;
+            sqlCommand = new SqlCommand("Select * from CONTRACTLEVEL_TITLES", cn);
+            sqlCommand.CommandType = CommandType.Text;
 
             FillLicensesTab();
 
             //======================================================================
 
 
-            cmdGetSites = new SqlCommand("SELECT * from vwOwnedSites where account_id='" + Request["account_id"] + "'", cn);
-            cmdGetSites.CommandType = CommandType.Text;
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("SELECT * from vwOwnedSites where account_id='" + Request["account_id"] + "'", cn);
+            sqlCommand.CommandType = CommandType.Text;
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
             gvSitesOwn.DataSource = ds;
             gvSitesOwn.DataBind();
 
-            cmdGetSites = new SqlCommand("SELECT sitename,siteurl,timecreated from ACCOUNT_EXTERNAL_SITES where account_id='" + Request["account_id"] + "'", cn);
-            cmdGetSites.CommandType = CommandType.Text;
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("SELECT sitename,siteurl,timecreated from ACCOUNT_EXTERNAL_SITES where account_id='" + Request["account_id"] + "'", cn);
+            sqlCommand.CommandType = CommandType.Text;
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
             gvExternalSites.DataSource = ds;
             gvExternalSites.DataBind();
 
-            cmdGetSites = new SqlCommand("SELECT * from vwSitesIAmIn where uid='" + dr["uid"] + "'", cn);
-            cmdGetSites.CommandType = CommandType.Text;
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("SELECT * from vwSitesIAmIn where uid='" + dr["uid"] + "'", cn);
+            sqlCommand.CommandType = CommandType.Text;
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
@@ -144,9 +173,9 @@ namespace AdminSite
             gvSites.DataBind();
 
 
-            cmdGetSites = new SqlCommand("SELECT * from vwAccountUsers where account_id='" + Request["account_id"] + "' and deleted is null", cn);
-            cmdGetSites.CommandType = CommandType.Text;
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("SELECT * from vwAccountUsers where account_id='" + Request["account_id"] + "' and deleted is null", cn);
+            sqlCommand.CommandType = CommandType.Text;
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
@@ -155,9 +184,9 @@ namespace AdminSite
 
             TotalTicketUsage = ds.Tables[0].Rows.Count;
 
-            cmdGetSites = new SqlCommand("SELECT sum(quantity) from orders where account_ref='" + dr["account_ref"] + "' and version = 6", cn);
-            cmdGetSites.CommandType = CommandType.Text;
-            SqlDataReader drTickets = cmdGetSites.ExecuteReader();
+            sqlCommand = new SqlCommand("SELECT sum(quantity) from orders where account_ref='" + dr["account_ref"] + "' and version = 6", cn);
+            sqlCommand.CommandType = CommandType.Text;
+            SqlDataReader drTickets = sqlCommand.ExecuteReader();
 
             if (drTickets.Read() && !drTickets.IsDBNull(0))
                 TotalTickets = drTickets.GetInt32(0);
@@ -167,19 +196,19 @@ namespace AdminSite
             drTickets.Close();
 
 
-            cmdGetSites = new SqlCommand("select * from enterprise_sites where owner=@owner", cn);
-            cmdGetSites.Parameters.AddWithValue("@owner", dr["uid"].ToString());
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("select * from enterprise_sites where owner=@owner", cn);
+            sqlCommand.Parameters.AddWithValue("@owner", dr["uid"].ToString());
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
             foreach (DataRow drSite in ds.Tables[0].Rows)
             {
 
-                cmdGetSites = new SqlCommand("spGetEnterpriseUsers", cn);
-                cmdGetSites.CommandType = CommandType.StoredProcedure;
-                cmdGetSites.Parameters.AddWithValue("@euid", drSite["uid"].ToString());
-                da = new SqlDataAdapter(cmdGetSites);
+                sqlCommand = new SqlCommand("spGetEnterpriseUsers", cn);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@euid", drSite["uid"].ToString());
+                da = new SqlDataAdapter(sqlCommand);
                 ds = new DataSet();
                 da.Fill(ds);
 
@@ -240,10 +269,10 @@ namespace AdminSite
             ddlBillingType.Enabled = false;
 
 
-            cmdGetSites = new SqlCommand("SP_GetAccountLog", cn);
-            cmdGetSites.CommandType = CommandType.StoredProcedure;
-            cmdGetSites.Parameters.AddWithValue("@accountid", Request["account_id"]);
-            da = new SqlDataAdapter(cmdGetSites);
+            sqlCommand = new SqlCommand("SP_GetAccountLog", cn);
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.Parameters.AddWithValue("@accountid", Request["account_id"]);
+            da = new SqlDataAdapter(sqlCommand);
             ds = new DataSet();
             da.Fill(ds);
 
@@ -252,6 +281,10 @@ namespace AdminSite
 
 
             strUid = dr["uid"].ToString();
+            if (!dr.IsNull("secondary_owner_id"))
+                secondaryOwnerUid = (Guid)dr["secondary_owner_id"] != Guid.Empty
+                    ? dr["secondary_owner_id"].ToString()
+                    : string.Empty;
 
             cn.Close();
         }
