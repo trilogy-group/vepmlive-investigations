@@ -281,10 +281,12 @@ namespace AdminSite
 
 
             strUid = dr["uid"].ToString();
-            if (!dr.IsNull("secondary_owner_id"))
-                secondaryOwnerUid = (Guid)dr["secondary_owner_id"] != Guid.Empty
-                    ? dr["secondary_owner_id"].ToString()
-                    : string.Empty;
+
+            secondaryOwnerUid = string.Empty;
+            if (!dr.IsNull("secondary_owner_id") && (Guid) dr["secondary_owner_id"] != Guid.Empty)
+            {
+                secondaryOwnerUid = dr["secondary_owner_id"].ToString();
+            }
 
             cn.Close();
         }
