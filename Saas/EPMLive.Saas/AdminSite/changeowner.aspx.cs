@@ -30,10 +30,9 @@ namespace AdminSite
             pnlMain.Visible = false;
             pnlMessage.Visible = true;
 
-            var connection = new SqlConnection(GetConnectionString());
-            try
+            var status = ChangeOwnerStatus.NotExecuted;
+            using (var connection = new SqlConnection(GetConnectionString()))
             {
-                var status = ChangeOwnerStatus.NotExecuted;
                 connection.Open();
 
                 // get selected values
@@ -60,18 +59,14 @@ namespace AdminSite
 
                 // if primary owner updated and secondary owner is changed, call update for the secondary owner
                 if ((status == ChangeOwnerStatus.Success
-                     || status == ChangeOwnerStatus.NotExecuted 
+                     || status == ChangeOwnerStatus.NotExecuted
                      || status == ChangeOwnerStatus.PrimaryOwnerNoChange) && owners[1] != secondaryOwnerId)
                 {
                     status = UpdateSecondaryOwner(connection, secondaryOwnerId);
                 }
+            }
 
-                DisplayStatus(status);
-            }
-            finally
-            {
-                connection.Close();
-            }
+            DisplayStatus(status);
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -81,8 +76,7 @@ namespace AdminSite
                 return;
             }
 
-            var connection = new SqlConnection(GetConnectionString());
-            try
+            using (var connection = new SqlConnection(GetConnectionString()))
             {
                 connection.Open();
 
@@ -104,10 +98,6 @@ namespace AdminSite
                     ddlOwner.SelectedValue = owners[0].ToString();
                     secondaryOwner.SelectedValue = owners[1].ToString();
                 }
-            }
-            finally
-            {
-                connection.Close();
             }
         }
 
@@ -153,33 +143,30 @@ namespace AdminSite
         private DataSet GetAccountUsers(SqlConnection connection)
         {
             var result = new DataSet();
-                using (var sqlCommand = new SqlCommand(GetAccountUsersQuery, connection))
-                {
-                    sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
-                    var adapter = new SqlDataAdapter(sqlCommand);
-                    adapter.Fill(result);
-                }
+            using (var sqlCommand = new SqlCommand(GetAccountUsersQuery, connection))
+            {
+                sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
+                var adapter = new SqlDataAdapter(sqlCommand);
+                adapter.Fill(result);
+            }
+
             return result;
         }
 
         private Guid[] GetOwners(SqlConnection connection)
         {
             var result = new List<Guid>();
-            var sqlCommand = new SqlCommand(GetOwnerIdQuery, connection);
-            sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
-            var dr = sqlCommand.ExecuteReader();
-
-            try
+            using (var sqlCommand = new SqlCommand(GetOwnerIdQuery, connection))
             {
-                if (dr.Read())
+                sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    result.Add(dr.GetGuid(0));
-                    result.Add(dr.IsDBNull(1) ? Guid.Empty : dr.GetGuid(1));
+                    if (reader.Read())
+                    {
+                        result.Add(reader.GetGuid(0));
+                        result.Add(reader.IsDBNull(1) ? Guid.Empty : reader.GetGuid(1));
+                    }
                 }
-            }
-            finally
-            {
-                dr.Close();
             }
 
             return result.ToArray();
@@ -195,26 +182,20 @@ namespace AdminSite
 
         private ChangeOwnerStatus UpdatePrimaryOwner(SqlConnection connection, Guid originalValue, Guid selectedValue)
         {
-            var sqlCommand =
-                new SqlCommand(MoveAccountStoredProcedure, connection) {CommandType = CommandType.StoredProcedure};
-            sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
-            sqlCommand.Parameters.AddWithValue(OldOwnerParameter, originalValue);
-            sqlCommand.Parameters.AddWithValue(NewOwnerParameter, selectedValue);
-            var dr = sqlCommand.ExecuteReader();
-            try
+            using (var sqlCommand = new SqlCommand(MoveAccountStoredProcedure, connection) {CommandType = CommandType.StoredProcedure})
             {
-                if (dr.Read())
+                sqlCommand.Parameters.AddWithValue(AccountIdParameter, Request[AccountIdRequestArgument]);
+                sqlCommand.Parameters.AddWithValue(OldOwnerParameter, originalValue);
+                sqlCommand.Parameters.AddWithValue(NewOwnerParameter, selectedValue);
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    return (ChangeOwnerStatus) dr.GetInt32(0);
-                }
-                else
-                {
+                    if (reader.Read())
+                    {
+                        return (ChangeOwnerStatus) reader.GetInt32(0);
+                    }
+
                     return ChangeOwnerStatus.PrimaryOwnerFailedToExecute;
                 }
-            }
-            finally
-            {
-                dr.Close();
             }
         }
 
