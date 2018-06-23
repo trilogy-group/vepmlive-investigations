@@ -9,6 +9,8 @@ import {CommonPageConstants} from '../common/common-page.constants';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../components/html/checkbox-helper';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import {WaitHelper} from '../../../components/html/wait-helper';
+import {DocumentPage} from './document-page.po';
 
 export class DocumentPageHelper {
 
@@ -34,8 +36,7 @@ export class DocumentPageHelper {
         await PageHelper.click(HomePage.toolBarMenuItems.projectDocument);
 
         stepLogger.verification('Add a document pop up displayed');
-        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+        await this.verifyDocumentPopUp();
 
     }
 
@@ -140,12 +141,11 @@ export class DocumentPageHelper {
             await PageHelper.click(HomePage.toolBarMenuItems.sharedDocument);
         }
         stepLogger.verification('Add a document pop up displayed');
-        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+        await this.verifyDocumentPopUp();
 
         stepLogger.stepId(4);
         stepLogger.step('Click in Choose file button displayed in Choose a file row in Add a document popup' +
-        'Search and select the file to upload [Ex: Testwordfile.docx] and click Open button');
+            'Search and select the file to upload [Ex: Testwordfile.docx] and click Open button');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await PageHelper.uploadFile(CommonPage.browseButton, filePath);
 
@@ -156,24 +156,38 @@ export class DocumentPageHelper {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Add a document popup is to select file is closed');
+        await browser.sleep(PageHelper.timeout.s);
         await expect(await CommonPage.browseButton.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
         stepLogger.verification('Project Documents (Add a document) window displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.UpdatePropertyDocument))
-          .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.verification('Text The document was uploaded successfully. Use this form to update the' +
             ' properties of the document. on top of the window');
         await expect(await PageHelper.isElementPresent(CommonPage.uploadSuccessFullyText.message))
-          .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.documentUploadText));
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.documentUploadText));
 
         stepLogger.stepId(6);
         stepLogger.step('Click Save button in Add a document window');
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('Project Documents (Add a document) window is closed');
+        await this.verifyUpdateDocumentPopUp();
+    }
+
+    static async verifyDocumentPopUp() {
+        await WaitHelper.getInstance().waitForElementOptionallyPresent(DocumentPage.documentTitle);
+        await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
+            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+    }
+
+    static async verifyUpdateDocumentPopUp() {
+        await browser.sleep(PageHelper.timeout.s);
         await expect(await CommonPage.UpdatePropertyDocument.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
+
     }
 }
