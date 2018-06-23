@@ -134,7 +134,7 @@ export class CommonPage extends BasePage {
     }
 
     static get dialogTitles() {
-        return element.all(By.css(`h1#${this.dialogTitleId}`));
+        return element.all(By.css(`[id='tdRes'] [data-original-title*='Grouping']`));
     }
 
     static get dialogTitle() {
@@ -149,6 +149,22 @@ export class CommonPage extends BasePage {
     static get userInfoFrame() {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('[src*="listform"]'));
+    }
+
+    static get resourceGrid() {
+        return `[id='tdRes']`;
+    }
+
+    static get resourceGroupingButton() {
+        return element(By.css(`${this.resourceGrid} [data-original-title*='Grouping']`));
+    }
+
+    static get resourceGroupingColumn() {
+        return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
+    }
+
+    static get resourceDepartment() {
+        return element(By.css(`.GMHeaderRow [class*='Department']`));
     }
 
     static get actionMenuIcons() {
@@ -252,6 +268,10 @@ export class CommonPage extends BasePage {
 
     static get newVersionCheckbox() {
         return element(By.css('[id*="OverwriteSingle"]'));
+    }
+
+    static get buildTeam() {
+        return element(By.css('[id*="BuildTeam-title"'));
     }
 
     static get project() {

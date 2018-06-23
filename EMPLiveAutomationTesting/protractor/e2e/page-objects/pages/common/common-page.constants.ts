@@ -80,6 +80,7 @@ export class CommonPageConstants {
             addTask: 'AddTask-Large',
             attachFile: 'AttachFile',
             editTeam: 'Edit Team',
+            buildTeam: 'Build Team',
             close: 'Close',
             saveAndClose: 'Save &Close',
             assignmentPlanner: 'Assignment Planner',
@@ -251,6 +252,13 @@ export class CommonPageConstants {
     static get projectUpdate() {
         return {
             manual: 'Manual',
+            scheduleDriven: 'Schedule Driven'
+        };
+    }
+
+    static get resourceGrid() {
+        return {
+            resourceGridColumn: 'Resource Grid Column',
             scheduleDriven: 'Schedule Driven'
         };
     }
