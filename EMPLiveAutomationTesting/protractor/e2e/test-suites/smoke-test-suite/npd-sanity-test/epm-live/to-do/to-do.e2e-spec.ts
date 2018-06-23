@@ -202,7 +202,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 
-    fit('Add Grid/Gantt web part - [785834]', async () => {
+    it('Add Grid/Gantt web part - [785834]', async () => {
         const stepLogger = new StepLogger(785834);
         // Delete previous created Grid/Gantt
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(

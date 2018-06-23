@@ -48,6 +48,7 @@ export class SocialStreamPage {
     }
 
     static get socialTab() {
+        // move to parent div is not posible in CSS.
         return `.//span[contains(@title,'Social')]//parent::div`;
     }
 
@@ -72,7 +73,7 @@ export class SocialStreamPage {
     }
 
     static get commentBox() {
-        return `.//*[@id='epm-se-threads']/li[1]`;
+        return `[id='epm-se-threads'] > li:first-child`;
     }
 
     static get updateBox() {
@@ -80,11 +81,11 @@ export class SocialStreamPage {
     }
 
     static get commentTextBox() {
-        return element.all(By.xpath(`${this.commentBox}//*[contains(@class,"input")]`));
+        return element.all(By.css(`${this.commentBox} [class*='input']`));
     }
 
     static get commentPost() {
-        return element.all(By.xpath(`${this.commentBox}//*[contains(@id,"post")]`));
+        return element.all(By.css(`${this.commentBox} [id*="post"]`));
     }
 
     static get postButton() {
@@ -100,7 +101,7 @@ export class SocialStreamPage {
     }
 
     static get addButton() {
-        return element(By.xpath(`.//*[contains(@class,'buttonArea')]/button[1]`));
+            return element(By.css(`[class*='buttonArea'] > button:first-child`));
     }
 
     static get stopEditing  () {
