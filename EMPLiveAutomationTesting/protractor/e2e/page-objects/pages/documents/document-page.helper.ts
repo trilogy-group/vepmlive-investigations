@@ -25,10 +25,11 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Logged in users Home Page is displayed');
         await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
 
         stepLogger.stepId(2);
         stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        // Sleep required because of bug of two "More" buttons
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
 
@@ -67,7 +68,7 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Add a document window to update the properties of the document is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.UpdatePropertyDocument))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
+            .toBe(true, ValidationsHelper.getDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.step('Click Save button in Add a document window');
         await PageHelper.click(CommonPage.formButtons.save);
@@ -80,7 +81,7 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Home Page is displayed');
         await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
 
     }
 
@@ -95,11 +96,11 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
+            ValidationsHelper.getPageDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project node is displayed in collapsed state');
         await expect(await PageHelper.isElementDisplayed(CommonPage.projectsList)).toBe(true,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
+            ValidationsHelper.getDisplayedValidation(HomePageConstants.navigationLabels.projects.projectNodeCollapsed));
 
         stepLogger.stepId(6);
         stepLogger.step('Click on the Project node to expand it');
@@ -123,7 +124,7 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Logged in users Home Page is displayed');
         await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
 
         stepLogger.verification('Social Stream web part is shown on the Home Page');
         await expect(await PageHelper.isElementPresent(HomePage.toolBarMenuItems.socialStream))
@@ -131,6 +132,7 @@ export class DocumentPageHelper {
 
         stepLogger.stepId(3);
         stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        // Sleep required because of bug of two "More" buttons
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
         if (document === CreateNewPageConstants.navigationLabels.libraryApps.projectDocument) {
@@ -162,7 +164,7 @@ export class DocumentPageHelper {
 
         stepLogger.verification('Project Documents (Add a document) window displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.UpdatePropertyDocument))
-            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
+            .toBe(true, ValidationsHelper.getDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentPropertyTitle));
 
         stepLogger.verification('Text The document was uploaded successfully. Use this form to update the' +
             ' properties of the document. on top of the window');
@@ -180,7 +182,7 @@ export class DocumentPageHelper {
     static async verifyDocumentPopUp() {
         await WaitHelper.getInstance().waitForElementOptionallyPresent(DocumentPage.documentTitle);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+            ValidationsHelper.getDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 
     }
 

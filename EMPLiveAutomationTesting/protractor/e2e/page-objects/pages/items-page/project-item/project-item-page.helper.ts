@@ -236,8 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(projectNameValue));
-        await expect(await PageHelper.isElementPresent(CommonPageHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -253,7 +252,6 @@ export class ProjectItemPageHelper {
         stepLogger.verification('Verify User is moved under Current team');
         const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
             ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(userCheckBoxForCurrentTeam);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }

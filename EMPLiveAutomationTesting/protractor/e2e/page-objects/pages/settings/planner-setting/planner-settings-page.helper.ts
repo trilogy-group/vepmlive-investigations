@@ -81,7 +81,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.verification('"Planner Settings" page is closed');
         await expect(await browser.getTitle()).not.toBe(PlannerSettingsPageConstants.plannerPage,
-            ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.plannerPage));
+            ValidationsHelper.getNotDisplayedValidation(PlannerSettingsPageConstants.plannerPage));
 
         stepLogger.verification('Planner Administration page is displayed');
         await expect(await browser.getTitle()).toBe(PlannerSettingsPageConstants.administration,
@@ -102,7 +102,6 @@ export class PlannerSettingsPageHelper {
             stepLogger);
 
         stepLogger.verification('Project Center page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
@@ -110,7 +109,7 @@ export class PlannerSettingsPageHelper {
         stepLogger.stepId(7);
         stepLogger.step('Select the project created as per pre requisites [Ex: Smoke Test Project 2]');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.project);
-        const projectName = await CommonPage.project.getText();
+        const projectName = await ElementHelper.getText(CommonPage.project);
         await PageHelper.click(CommonPage.project);
 
         stepLogger.step('Click on the ITEMS tab above the grid\n' +
@@ -118,7 +117,6 @@ export class PlannerSettingsPageHelper {
         await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
