@@ -259,7 +259,7 @@ export class CommonPageConstants {
     static get resourceGrid() {
         return {
             resourceGridColumn: 'Resource Grid Column',
-            scheduleDriven: 'Schedule Driven'
+            resourceAddGridColumn: 'Resource Add Grid Column'
         };
     }
 
@@ -320,9 +320,11 @@ export class CommonPageConstants {
 
     static get hours() {
         return {
-            durationHours1 : '5.00',
+            durationHours1 : '10.00',
             effortHours: '80',
-            durationHours2 : '10.00',
+            durationHours2 : '20.00',
+            durationHours3 : '30.00',
+            durationHours4 : '5.00',
             updatedEffortHours : '160.00'
         };
     }
@@ -341,7 +343,8 @@ export class CommonPageConstants {
 
     static get buttonName() {
         return {
-            edit: 'Edit'
+            edit: 'Edit',
+            addButton: 'Add Link'
         };
     }
 
@@ -351,6 +354,13 @@ export class CommonPageConstants {
             headerTextClass: 'GMHeaderText',
             ascendingClass: 'GMSort4Right',
             descendingClass: 'GMSort1Right'
+        };
+    }
+
+    static get predecessorsData() {
+        return {
+            predecessors1: '1',
+            predecessors2: '2',
         };
     }
 }

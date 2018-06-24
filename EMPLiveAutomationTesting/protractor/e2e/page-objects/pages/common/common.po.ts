@@ -163,8 +163,16 @@ export class CommonPage extends BasePage {
         return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
     }
 
+    static get resourceAddGroupingColumn() {
+        return element(By.css(`.//*[@class='GMHeaderGroup']/*[text()='Department']`));
+    }
+
     static get resourceDepartment() {
         return element(By.css(`.GMHeaderRow [class*='Department']`));
+    }
+
+    static get closeButton() {
+        return element(By.css(`[id*=".CloseButton"]`));
     }
 
     static get actionMenuIcons() {
@@ -246,6 +254,14 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
+    static get addButton() {
+        return element(By.css('#addlinkdiv [value="Add Link"]'));
+    }
+
+    static get projectTab() {
+        return element(By.id('Ribbon.Project-title'));
+    }
+
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
     }
@@ -256,6 +272,10 @@ export class CommonPage extends BasePage {
 
     static get pageTitle() {
         return element(By.id('pageTitle'));
+    }
+
+    static get linkDownbutton() {
+        return element(By.css('[id*="LinkDown"]'));
     }
 
     static get editPlan() {
@@ -271,7 +291,7 @@ export class CommonPage extends BasePage {
     }
 
     static get buildTeam() {
-        return element(By.css('[id*="BuildTeam-title"'));
+        return element(By.css('[id*="BuildTeam-title"]'));
     }
 
     static get project() {
@@ -316,7 +336,7 @@ export class CommonPage extends BasePage {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
-    static get closeButton() {
+    static get resourceCloseButton() {
         return element(By.css('.ms-dlgCloseBtn'));
     }
 

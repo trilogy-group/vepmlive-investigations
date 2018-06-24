@@ -14,6 +14,7 @@ import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
+import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 
 const fs = require('fs');
 
@@ -397,6 +398,13 @@ export class CommonPageHelper {
 
     static getTeamRecordsNameByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    static async enterTaskNameAndData(hours: string, title: string) {
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        await PageHelper.actionSendKeys(title);
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(hours);
     }
 
     static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {

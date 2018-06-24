@@ -243,7 +243,9 @@ export class ProjectItemPageConstants {
             finishDate: 'Finish Date',
             work: 'Work',
             duration: 'Duration',
-            date: 'DueDate'
+            start: 'Start',
+            date: 'DueDate',
+            predecessors: 'Predecessors'
         };
     }
 

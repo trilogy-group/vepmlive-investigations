@@ -5,7 +5,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, By, element, ElementFinder} from 'protractor';
+import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -15,6 +15,7 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
+
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -329,9 +330,36 @@ export class ProjectItemPageHelper {
             work: ProjectItemPageHelper.getField(fields.work),
             duration: ProjectItemPageHelper.getField(fields.duration),
             date: ProjectItemPageHelper.dateField(fields.date),
+            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
         };
 
     }
+
+    static  getselectTask(index: number, column: string) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains
+        (@class,"${column}")]`));
+    }
+
+    static async verifyTitleAndDuration(uniqueId: string, value: string) {
+        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
+        await expect(await ProjectItemPageHelper.newTasksFields.duration.getText()).toBe(value,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
+    }
+
+    static async selectCreatedTask() {
+        const elm1 = this.getselectTask(1, ProjectItemPageConstants.newTaskFields.start);
+        const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);
+        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
+        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
+        await elm1.click();
+        await browser.sleep(PageHelper.timeout.xs);
+        await elm2.click();
+        await browser.sleep(PageHelper.timeout.xs);
+        await elm3.click();
+        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
+        }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);

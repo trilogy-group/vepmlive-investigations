@@ -146,7 +146,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-    fit('Group items via "Show/Hide" grouping. - [743151]', async () => {
+    it('Group items via "Show/Hide" grouping. - [743151]', async () => {
         const stepLogger = new StepLogger(743151);
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -174,12 +174,12 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.dialogTitle.getText()).toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+
         stepLogger.verification('"Build Team" tab is selected by default');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.buildTeam);
         await expect(await PageHelper.isElementDisplayed(CommonPage.buildTeam)).toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.buildTeam));
-
-        await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Two section "Current Team" and "Resource Pool" displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamSection.currentTeam))
@@ -207,9 +207,51 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Grouping applied successfully and data displayed in Resource Pool grid in groups of ' +
         'selected column [Ex: Department]');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.resourceAddGroupingColumn);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.resourceAddGroupingColumn)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.resourceGrid.resourceAddGridColumn));
+
+        stepLogger.stepId(6);
+        stepLogger.step('Move back column header used in grouping section [Ex: Department] by drag and drop');
+        await ElementHelper.actionDragAndDrop(CommonPage.resourceGroupingColumn, CommonPage.resourceDepartment);
+
+        await browser.sleep(9000);
+
+        stepLogger.verification('Grouping applied is REMOVED successfully and data displayed in Resource Pool' +
+        'grid as UN GROUPED');
+        await expect(await CommonPage.resourceAddGroupingColumn.isPresent()).toBe(false,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.resourceGrid.resourceAddGridColumn));
+
+        stepLogger.stepId(7);
+        stepLogger.step('Click on "Show/Hide Grouping" icon  in "Resource Pool" grid displayed on right side');
+        await ElementHelper.actionDragAndDrop(CommonPage.resourceGroupingColumn, CommonPage.resourceDepartment);
+
+        await browser.sleep(9000);
+
+        stepLogger.verification('New Row to drag and drop columns to use for Grouping displayed on top of the ' +
+            '"Resource Pool" grid is Removed');
+        await expect(await CommonPage.resourceGroupingColumn.isPresent()).toBe(false,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.resourceGrid.resourceGridColumn));
+
+        stepLogger.stepId(8);
+        stepLogger.step('Click on "Show/Hide Grouping" icon  in "Resource Pool" grid displayed on right side');
+        await PageHelper.click(CommonPage.resourceCloseButton);
+
+        stepLogger.verification('A New Row to drag and drop columns to use for Grouping is displayed on top of the ' +
+            'Resource Pool grid');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.resourceGroupingColumn);
         await expect(await PageHelper.isElementDisplayed(CommonPage.resourceGroupingColumn)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.resourceGrid.resourceGridColumn));
+
+        stepLogger.verification('"Edit Team" window is closed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+
+        stepLogger.verification('"Project Center" page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
+            .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
     });
 });
