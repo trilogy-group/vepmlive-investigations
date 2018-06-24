@@ -335,7 +335,7 @@ export class ProjectItemPageHelper {
 
     }
 
-    static  getselectTask(index: number, column: string) {
+    static getselectTask(index: number, column: string) {
         // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
         return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains
         (@class,"${column}")]`));
