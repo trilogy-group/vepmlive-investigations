@@ -6,10 +6,6 @@ import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
 import {CommonPageHelper} from '../../../../../../page-objects/pages/common/common-page.helper';
 import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
 import {CommonPageConstants} from '../../../../../../page-objects/pages/common/common-page.constants';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
-import {ProjectItemPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
-import {browser} from 'protractor';
-import {ProjectItemPage} from '../../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {TaskPageHelper} from '../../../../../../page-objects/pages/my-workplace/task/task-page.helper';
 import {TaskPageConstants} from '../../../../../../page-objects/pages/my-workplace/task/task-page.constants';
 
@@ -33,14 +29,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
-        await PageHelper.click(CommonPage.project);
-        await PageHelper.click(CommonPage.editPlan);
-        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
-        await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
-        await CommonPageHelper.deleteTask();
-
+        await TaskPageHelper.navigateToPlannerAndDeleteTask();
         await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, testCase);
     });
 
@@ -56,14 +45,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
-        await PageHelper.click(CommonPage.project);
-        await PageHelper.click(CommonPage.editPlan);
-        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
-        await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
-        await CommonPageHelper.deleteTask();
-
+        await TaskPageHelper.navigateToPlannerAndDeleteTask();
         await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, testCase);
     });
 });

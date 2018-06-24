@@ -338,6 +338,12 @@ export class ProjectItemPageHelper {
         (@class,"${column}")]`));
     }
 
+    static getFinishDate(index: number) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains(@class,
+        "GSNoRight") and contains(@class,"Due")]`));
+    }
+
     static async verifyTitleAndDuration(uniqueId: string, value: string) {
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
@@ -346,14 +352,11 @@ export class ProjectItemPageHelper {
     }
 
     static async selectCreatedTask() {
-        const elm1 = this.getselectTask(1, ProjectItemPageConstants.newTaskFields.start);
+        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
         const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);
         const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
         await browser.actions().keyDown(protractor.Key.CONTROL).perform();
-        await elm1.click();
-        await browser.sleep(PageHelper.timeout.xs);
         await elm2.click();
-        await browser.sleep(PageHelper.timeout.xs);
         await elm3.click();
         await browser.actions().keyUp(protractor.Key.CONTROL).perform();
         }

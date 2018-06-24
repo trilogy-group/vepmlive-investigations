@@ -133,6 +133,14 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get index() {
+        return {
+            one: 1,
+            two: 2,
+            three: 3
+        };
+    }
+
     static get buildTeamContentClass() {
         return {
             saveAndCloseDisabled: 'ms-cui-disabled'

@@ -28,9 +28,9 @@ export class TaskPageHelper {
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
-        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
         await ProjectItemPageHelper.verifyTitleAndDuration(uniqueId, CommonPageConstants.hours.durationHours1);
-        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
         await ProjectItemPageHelper.verifyTitleAndDuration(uniqueId, CommonPageConstants.hours.durationHours2);
         await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).click();
         await ProjectItemPageHelper.verifyTitleAndDuration(uniqueId, CommonPageConstants.hours.durationHours3);
@@ -54,17 +54,16 @@ export class TaskPageHelper {
         await expect(await CommonPage.addButton.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.buttonName.addButton));
 
-        await browser.sleep(PageHelper.timeout.xs);
-
         stepLogger.verification('Selected tasks are linked');
-        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
         await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
             predecessors1, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessors1));
-        await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).click();
-        // await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-        //     predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
-        //     CommonPageConstants.predecessorsData.predecessors2));
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
+            ProjectItemPageConstants.newTaskFields.start).click();
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
+            predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+            CommonPageConstants.predecessorsData.predecessors2));
 
         stepLogger.stepId(4);
         stepLogger.step('Click on Project tab');
@@ -72,39 +71,54 @@ export class TaskPageHelper {
         await PageHelper.click(CommonPage.projectTab);
         // Ensure Respect Links option is enabled (If NOT enable click on it to Enable and Respect Links' option is enabled
         // is not possible by automation.
-        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
-        const startDate = await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).getText();
-        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
-        const startDate1 = await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).getText();
-        const finishDate1 = await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.finishDate).getText();
-        await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).click();
-        const finishDate2 = await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.finishDate).getText();
-        const startDate2 = await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
+        const finishDate = await ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.one).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
+        const startDate1 = await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two,
+            ProjectItemPageConstants.newTaskFields.start).getText();
+        const finishDate1 = await ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.two).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
+            ProjectItemPageConstants.newTaskFields.start).click();
+        const finishDate2 = await ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.three).getText();
+        const startDate2 = await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
+            ProjectItemPageConstants.newTaskFields.start).getText();
 
         stepLogger.stepId(5);
         stepLogger.step(`${testCase} the Duration for task1 from, say, 5 to 3 days`);
-        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(updatedHours);
         stepLogger.step('Click anywhere in the page/tab out of the Duration column');
-        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.click(ProjectItemPage.selectTaskName);
 
-        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
-        const updatedStartDate = ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).getText();
-        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
-        const updatedStartDate1 = ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).getText();
-        const updatedFinishDate1 = ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.finishDate).getText();
-        await ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).click();
-        const updatedFinishDate2 = ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.finishDate).getText();
-        const updatedStartDate2 = ProjectItemPageHelper.getselectTask(3, ProjectItemPageConstants.newTaskFields.start).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
+        const updatedFinishDate = ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.one).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
+        const updatedStartDate1 = ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two,
+            ProjectItemPageConstants.newTaskFields.start).getText();
+        const updatedFinishDate1 = ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.two).getText();
+        await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
+            ProjectItemPageConstants.newTaskFields.start).click();
+        const updatedFinishDate2 = ProjectItemPageHelper.getFinishDate(ProjectItemPageConstants.index.three).getText();
+        const updatedStartDate2 = ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
+            ProjectItemPageConstants.newTaskFields.start).getText();
 
         stepLogger.verification('Task1\'s Finish Date gets shifted forward');
         stepLogger.verification('Start and Finish dates for Task 2 and Task 3 get shifted forward');
-        await expect(await updatedStartDate).not.toBe(startDate, ValidationsHelper.getNotDisplayedValidation(startDate));
+        await expect(await updatedFinishDate).not.toBe(finishDate, ValidationsHelper.getNotDisplayedValidation(finishDate));
         await expect(await updatedStartDate1).not.toBe(startDate1, ValidationsHelper.getNotDisplayedValidation(startDate1));
         await expect(await updatedStartDate2).not.toBe(startDate2, ValidationsHelper.getNotDisplayedValidation(startDate2));
         await expect(await updatedFinishDate1).not.toBe(finishDate1, ValidationsHelper.getNotDisplayedValidation(finishDate1));
         await expect(await updatedFinishDate2).not.toBe(finishDate2, ValidationsHelper.getNotDisplayedValidation(finishDate2));
+    }
+
+    static async navigateToPlannerAndDeleteTask() {
+        await PageHelper.click(CommonPage.project);
+        await PageHelper.click(CommonPage.editPlan);
+        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
     }
 
 }
