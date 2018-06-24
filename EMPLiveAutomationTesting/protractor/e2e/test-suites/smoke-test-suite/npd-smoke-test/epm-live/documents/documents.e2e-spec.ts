@@ -4,7 +4,6 @@ import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
@@ -38,7 +37,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(newFile.file));
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
@@ -50,7 +48,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(HomePage.navigateMenu);
         await PageHelper.click(HomePage.navigateToHome);
         await expect(await browser.getTitle())
-            .toBe(HomePageConstants.homePage, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.pageName));
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
         // Need to add sleep because of bug.
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(HomePage.toolBarMenuItems.more);
@@ -72,7 +70,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(newFile.file));
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
@@ -105,7 +102,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Project Documents page is displayed');
         await expect(await browser.getTitle()).toBe(HomePageConstants.documentPage,
-            ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
+            ValidationsHelper.getPageDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))

@@ -11,7 +11,6 @@ import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-wor
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {browser} from 'protractor';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
@@ -143,7 +142,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.addButton);
 
         stepLogger.verification('Grid/ Gantt web part should be applied in Discussions page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPage.gridGantt);
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
@@ -153,6 +151,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.stopEditing);
 
         stepLogger.verification('User should be on Discussions list page and all discussions should be listed in grid');
+        // wait helper doesn't work sleep required.
         await browser.sleep(PageHelper.timeout.m);
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));

@@ -67,7 +67,6 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.verification('"Current Team" section will list the resources attached to the project');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamRecords.currentTeam.first()))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
@@ -314,7 +313,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.stepId(3);
+        stepLogger.stepId(2);
         stepLogger.step('Select check-box for any Project');
         await ElementHelper.browserRefresh();
         await PageHelper.click(CommonPage.projectCheckbox);
@@ -326,23 +325,36 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click ITEMS tab select Edit Plan');
         await CommonPageHelper.clickOnEditPlan();
 
-        stepLogger.step('click on Project Planner');
+        stepLogger.verification('Select Planner pop-up displays with different planner options to select');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Project Planner in the list of planners displayed');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
-        stepLogger.verification('"Project Planner" window is displayed');
+        stepLogger.verification('The Project Planner page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
+        stepLogger.verification('NO Tasks displayed in Project Planner');
+        // After select project Planner wait required, not element found which can use with waitHelper.
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
+        await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
+            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
+
         stepLogger.stepId(4);
-        stepLogger.step('Click on "Task" button');
+        stepLogger.step('Click on + Task button');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
-        stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
+        stepLogger.step('Enter details for Task (Name, Hours)');
         await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
@@ -367,7 +379,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
             ' drop down');
-        await expect(await PageHelper.isElementPresent(CommonPageHelper.getElementByText(selectedResourcePoolResourceName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });

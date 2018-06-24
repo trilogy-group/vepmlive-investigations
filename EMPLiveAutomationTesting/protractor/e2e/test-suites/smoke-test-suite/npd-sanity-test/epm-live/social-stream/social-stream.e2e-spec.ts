@@ -6,7 +6,6 @@ import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
-import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 
@@ -60,7 +59,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.addButton);
 
         stepLogger.verification('the Social Stream web-part should get added');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(SocialStreamPage.settingItems.socialStream);
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingItems.socialStream)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.socialStream));
 
@@ -77,7 +75,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.stopEditing);
 
         stepLogger.verification('contents of the PAGE tab should be displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(SocialStreamPage.socialStreamPage);
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.socialStreamPage)).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
@@ -89,7 +86,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const status = SocialStreamPageConstants.message.testStatus + uniqueId;
         const comment = SocialStreamPageConstants.message.testComment + uniqueId;
         stepLogger.step('Check that there is a text box in Social Stream called What are you working on');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(SocialStreamPage.updateBox.first());
         await expect(await PageHelper.isElementDisplayed(SocialStreamPage.updateBox.first())).toBe(true,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.socialStreamTextBox));
 
@@ -131,7 +127,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step('Go back to Home page of admin user and check that the comment added by another user get display here');
         await SocialStreamPage.logout();
-        await await loginPage.goToAndLogin();
+        await loginPage.goToAndLogin();
 
         stepLogger.verification('Comment added by another user should be displayed to admin user');
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(comment))).toBe(true,

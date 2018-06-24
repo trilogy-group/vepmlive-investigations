@@ -134,7 +134,7 @@ export class CommonPage extends BasePage {
     }
 
     static get dialogTitles() {
-        return element.all(By.css(`[id='tdRes'] [data-original-title*='Grouping']`));
+        return element.all(By.css(`h1#${this.dialogTitleId}`));
     }
 
     static get dialogTitle() {

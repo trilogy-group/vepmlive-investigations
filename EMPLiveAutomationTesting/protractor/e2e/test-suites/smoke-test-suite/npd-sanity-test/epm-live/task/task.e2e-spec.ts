@@ -43,7 +43,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('Project Center page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
     .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
@@ -63,7 +62,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
@@ -117,7 +115,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
@@ -133,7 +130,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
