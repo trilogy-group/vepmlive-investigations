@@ -259,8 +259,11 @@ function GridColumnWidthSet(col) {
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        data: "{ Function: 'personalization_Set', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain
-            + "</Value><Filters><Filter Key=\"siteId\">" + window.epmLive.currentSiteId + "</Filter><Filter Key=\"listid\">" + window.epmLive.currentListId + "</Filter></Filters></Data>' }",
+        data: "{ Function: 'personalization_Set', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain + "</Value><Filters>"
+        + "<Filter Key=\"siteId\">" + window.epmLive.currentSiteId + "</Filter>"
+        + "<Filter Key=\"listid\">" + window.epmLive.currentListId + "</Filter>"
+        + "<Filter Key=\"webid\">" + window.epmLive.currentWebId + "</Filter>"
+        + "</Filters></Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function () { }, error: function (xhr, status, error) { alert(xhr.responseText); }
@@ -281,7 +284,11 @@ function GridColumnWidthGet() {
     $.ajax({
         type: 'POST',
         url: window.epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        data: "{ Function: 'personalization_Get', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain + "</Value><Filters><Filter Key=\"siteId\">" + window.epmLive.currentSiteId + "</Filter><Filter Key=\"listid\">" + window.epmLive.currentListId + "</Filter></Filters></Data>' }",
+        data: "{ Function: 'personalization_Get', Dataxml: '<Data  Key=\"" + GridColumnWidthNamespace + "\"><Value>" + columnKeysPlain + "</Value><Filters>"
+        + "<Filter Key=\"siteId\">" + window.epmLive.currentSiteId + "</Filter>"
+        + "<Filter Key=\"listid\">" + window.epmLive.currentListId + "</Filter>"
+        + "<Filter Key=\"webid\">" + window.epmLive.currentWebId + "</Filter>"
+        + "</Filters></Data>' }",
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function (response) {
