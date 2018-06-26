@@ -43,7 +43,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         stepLogger.verification('Verify Choose File option is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.browseButton);
         await expect(await PageHelper.isElementDisplayed(CommonPage.browseButton))
             .toBe(true,
                 ValidationsHelper.getButtonDisplayedValidation(HomePageConstants.addADocumentWindow.chooseFiles));
@@ -86,7 +85,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementByText(newFile.newFileName));
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
