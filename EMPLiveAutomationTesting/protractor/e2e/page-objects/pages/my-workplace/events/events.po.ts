@@ -20,11 +20,6 @@ export class EventsPage {
          return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.title);
     }
 
-    static get standardViewType () {
-        // Only id will not work
-        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
-    }
-
     static get categoryField() {
         return CommonPageHelper.getElementByTitle(EventsPageConstants.inputFields.category);
     }
@@ -48,20 +43,12 @@ export class EventsPage {
         return element(By.css(`td[date='${tomorrow}']`));
     }
 
-    static get calenderTab() {
-        return element(By.css('[id*="Calendar-title"]'));
-    }
-
     static get closeEventButton() {
         return element(By.css('[value = "Close"]'));
     }
 
     static addNewEvent(title: string) {
         return element(By.css(`a[title='${title}']`));
-    }
-
-    static get createView () {
-        return element(By.css(`[id*="CustomViews.CreateView"]`));
     }
 
     static getElementByLinkText(text: string) {
@@ -72,16 +59,8 @@ export class EventsPage {
         return CommonPageHelper.getElementUsingTextContent(title, true);
     }
 
-    static get currentView() {
-        return element(By.css('a[id*="DisplayView"]'));
-    }
-
     static get defaultCheckbox() {
         return element(By.id('onetidIOCheckDefaultView'));
-    }
-
-    static get rollOverEventList() {
-        return element(By.css(`[id*="overflow"]`));
     }
 
     static get viewName () {
@@ -94,6 +73,26 @@ export class EventsPage {
 
     static get descriptionField () {
         return element(By.id('idDesc'));
+    }
+    static get calenderTab() {
+        return element(By.css('[id*="Calendar-title"]'));
+    }
+
+    static get standardViewType () {
+        // Only id will not work
+        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
+    }
+
+    static get rollOverEventList() {
+        return element(By.css(`[id*="overflow"]`));
+    }
+
+    static get currentView() {
+        return element(By.css('a[id*="DisplayView"]'));
+    }
+
+    static get createViews () {
+        return element(By.css(`[id*="CustomViews.CreateView"]`));
     }
 
     static get columnNameField () {

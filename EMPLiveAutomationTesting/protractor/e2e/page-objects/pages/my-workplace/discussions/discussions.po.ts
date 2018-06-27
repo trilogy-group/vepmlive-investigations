@@ -7,6 +7,7 @@ import {By} from 'selenium-webdriver';
 import {ButtonHelper} from '../../../../components/html/button-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {SocialStreamPageConstants} from '../../settings/social-stream/social-stream-page.constants';
 
 export class DiscussionsPage {
 
@@ -57,10 +58,20 @@ export class DiscussionsPage {
         };
     }
 
-    static getDiscussionFieldSelector(text: string) {
-        return {
-            subject: CommonPageHelper.getDivByText(text),
-            body: CommonPageHelper.getDivByText(text)
-        };
+    static get menueLink() {
+        return element.all(By.xpath(`${this.gridTab}//*[contains(@class,'menuLink')]`));
     }
+
+    static get gridTab() {
+        return `//span[contains(@title,'Un') or contains(@title,'grid')]//parent::div`;
+    }
+
+    static get delete() {
+        return CommonPageHelper.getElementByTitle(SocialStreamPageConstants.settingItems.delete);
+    }
+
+    static get gridGantt() {
+        return element(By.id('GanttGrid0Main'));
+    }
+
 }

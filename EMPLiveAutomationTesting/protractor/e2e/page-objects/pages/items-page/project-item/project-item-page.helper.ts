@@ -193,7 +193,7 @@ export class ProjectItemPageHelper {
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
         stepLogger.step('Select assignee');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
-        await PageHelper.click(ProjectItemPage.selectAssign(1));
+        await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
         stepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
@@ -236,8 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(projectNameValue));
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -253,7 +252,6 @@ export class ProjectItemPageHelper {
         stepLogger.verification('Verify User is moved under Current team');
         const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
             ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(userCheckBoxForCurrentTeam);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }
@@ -291,9 +289,9 @@ export class ProjectItemPageHelper {
 
     static get getlink() {
         return {
-            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+            myLanguageAndRegion: CommonPageHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: CommonPageHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: CommonPageHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
 
@@ -318,7 +316,7 @@ export class ProjectItemPageHelper {
     }
     static get button() {
         return {
-            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: CommonPageHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 
@@ -342,4 +340,9 @@ export class ProjectItemPageHelper {
         stepLogger.step('Create a new project');
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
+
+    static selectAssign(index: number) {
+        return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
+    }
+
 }

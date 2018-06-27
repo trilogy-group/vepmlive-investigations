@@ -67,7 +67,6 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.resourcePool));
 
         stepLogger.verification('"Current Team" section will list the resources attached to the project');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.teamRecords.currentTeam.first()))
             .toBe(true,
                 ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
@@ -280,7 +279,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         return selectedResourcePoolResourceName;
     });
 
-    fit('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
+    it('View the Build Team-Current team members in Project Planner. - [778315]', async () => {
         const stepLogger = new StepLogger(778315);
         const uniqueId = PageHelper.getUniqueId();
 
@@ -314,33 +313,27 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.verification('"Project Center" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
-
         stepLogger.stepId(2);
-        stepLogger.step('Select on any of the project created as per pre requisites [Ex: Smoke Test Project 2]');
+        stepLogger.step('Select check-box for any Project');
         await ElementHelper.browserRefresh();
         await PageHelper.click(CommonPage.projectCheckbox);
 
-        stepLogger.step('Click on the ITEMS tab above the grid');
+        stepLogger.step('Click on "Items" tab');
         await browser.sleep(PageHelper.timeout.m);
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
-        stepLogger.step('From the ITEMS ribbon menu, click on Edit Plan');
+        stepLogger.step('Click ITEMS tab select Edit Plan');
         await CommonPageHelper.clickOnEditPlan();
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
         stepLogger.stepId(3);
         stepLogger.step('Click on Project Planner in the list of planners displayed');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
-        stepLogger.verification('"Project Planner" window is displayed');
+        stepLogger.verification('The Project Planner page is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
@@ -354,13 +347,15 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
 
         stepLogger.stepId(4);
-        stepLogger.step('Click on "Task" button');
+        stepLogger.step('Click on + Task button');
+        // After select project Planner wait required, not element found which can use with waitHelper.
+        await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
         stepLogger.step('Enter details for Task (Name, Hours)');
-        await PageHelper.actionSendKeys(uniqueId);
+        await PageHelper.actionSendKeys( uniqueId);
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
         await PageHelper.actionSendKeys(CommonPageConstants.costData.firstData);
         await ElementHelper.clickUsingJs(ProjectItemPage.save);
@@ -378,18 +373,18 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.step('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPage.selectAssign(1)))
+        await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectAssign(1)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
             ' drop down');
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
-    fit('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
+    it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {
         const stepLogger = new StepLogger(778281);
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -400,11 +395,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-
-        stepLogger.verification('"Project Center" page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(3);
         stepLogger.step('Select check-box for any Project [Ex: Smoke Test Project 2]');
@@ -451,7 +441,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToNewTabIfAvailable(1);
 
         stepLogger.verification('New tab is opened and "Language and Region" page is displayed');
-        await expect(browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
+        await expect(await browser.getTitle()).toBe(ProjectItemPageConstants.languageAndRegion,
             ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.languageAndRegion));
 
         stepLogger.stepId(6);
@@ -467,6 +457,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
-            ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
+                ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
 });

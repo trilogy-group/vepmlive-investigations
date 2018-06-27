@@ -291,6 +291,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'pageNumber') and contains(@title,"${title}")]`));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
     static getMenuItemFromRibbonContainer(title: string) {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
@@ -479,7 +483,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 
         const fileNameWithoutExtension = newFile.newFileName.split('.')[0];
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(fileNameWithoutExtension, true)))
+        await expect(await PageHelper.isElementDisplayed(this.getElementByText(fileNameWithoutExtension, true)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
@@ -516,11 +520,6 @@ export class CommonPageHelper {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, text, false)));
     }
 
-    static getEditCostTab(Value: string) {
-        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
-        return element(By.xpath(`//div[not(contains(@tab_id,"ref"))]/*[text()="${Value}"]`));
-    }
-
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
@@ -532,21 +531,6 @@ export class CommonPageHelper {
     static getCellText(column: string) {
         // it is a part of a object "getCell", object created below
         return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
-    }
-
-    static get getCell() {
-        const cells = CommonPageConstants.cell;
-        return {
-            cell1: CommonPageHelper.getCellText(cells.cell1),
-            cell2: CommonPageHelper.getCellText(cells.cell2),
-            cell3: CommonPageHelper.getCellText(cells.cell3)
-        };
-    }
-
-    static get getbuttons() {
-        return {
-            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
-        };
     }
 
     static getColumnElement(columnName: string) {
@@ -562,8 +546,30 @@ export class CommonPageHelper {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
+    }
+
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
+
+    static getElementAllByText(text: string, isContains = false) {
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
+    }
+
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
+    }
+
+    static getEditCostTab(value: string) {
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return element(By.xpath(`${CommonPage.costTab}/*[text()="${value}"]`));
+    }
+
+    static getActiveButtonByText(tab: string) {
+        // it is a part of a object "costButton", object created below
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 
     static getAscendingColumnSelector(columnName: string) {

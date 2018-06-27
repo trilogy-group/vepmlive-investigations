@@ -10,6 +10,10 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {DiscussionsPageConstants} from '../../../../../page-objects/pages/my-workplace/discussions/discussions-page.constants';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {DiscussionsPage} from '../../../../../page-objects/pages/my-workplace/discussions/discussions.po';
+import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
+import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
+import {browser} from 'protractor';
+import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -75,11 +79,81 @@ describe(SuiteNames.smokeTestSuite, () => {
         await DiscussionsPageHelper.saveDiscussionForm(stepLogger);
 
         stepLogger.verification('Updated Discussion item details subject displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(newSubject).subject))
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPageHelper.getDiscussionFieldSelector(newSubject).subject))
             .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.subject));
 
         stepLogger.verification('Updated Discussion item details body displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(DiscussionsPage.getDiscussionFieldSelector(newBody).body))
+        await expect(await PageHelper.isElementDisplayed(DiscussionsPageHelper.getDiscussionFieldSelector(newBody).body))
             .toBe(true, ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.inputLabels.body));
+    });
+
+    it('Add Grid/Gantt web part - [785832]', async () => {
+        const stepLogger = new StepLogger(785832);
+        // Delete previous created Grid/Gantt
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.discussions,
+            CommonPage.pageHeaders.myWorkplace.discussions,
+            CommonPageConstants.pageHeaders.myWorkplace.discussions,
+            stepLogger);
+        await PageHelper.click(CommonPage.sidebarMenus.settings);
+        await PageHelper.click(SocialStreamPage.settingItems.editPage);
+        await DiscussionsPageHelper.deleteGridGantt();
+
+        stepLogger.stepId(1);
+        stepLogger.step('User is on Discussions page [Left panel> My Workplace> Discussions]');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.discussions,
+            CommonPage.pageHeaders.myWorkplace.discussions,
+            CommonPageConstants.pageHeaders.myWorkplace.discussions,
+            stepLogger);
+
+        stepLogger.verification('user should be navigated to the "Discussions" page');
+        await expect(await browser.getTitle()).toBe(DiscussionsPageConstants.discussionPage,
+            ValidationsHelper.getDisplayedValidation(DiscussionsPageConstants.discussionPage));
+
+        stepLogger.stepId(2);
+        stepLogger.step(`Click on 'Main Gear Settings' display in left bottom corner`);
+        await PageHelper.click(CommonPage.sidebarMenus.settings);
+
+        stepLogger.verification('Settings should be displayed');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(SocialStreamPageConstants.validations.settingMenu));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Edit Page');
+        await PageHelper.click(SocialStreamPage.settingItems.editPage);
+
+        stepLogger.verification('the Discussions page should be displayed in Edit Mode');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+            ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
+
+        stepLogger.stepId(4);
+        stepLogger.step(`Click on 'Add a Web Part'`);
+        await PageHelper.click(SocialStreamPage.addAWebpart);
+
+        stepLogger.verification('the respective details should be displayed');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+            ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
+
+        stepLogger.stepId(5);
+        stepLogger.step('Select Categories as EPM Live and Part as Grid/ Gantt and Click on Add button');
+        await PageHelper.click(SocialStreamPage.settingItems.epmLive);
+        await PageHelper.click(SocialStreamPage.settingItems.gridGantt);
+        await PageHelper.click(SocialStreamPage.addButton);
+
+        stepLogger.verification('Grid/ Gantt web part should be applied in Discussions page');
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
+
+        stepLogger.stepId(6);
+        stepLogger.step(`Click on 'Stop Editing' (Page tab >> Stop Editing )`);
+        await PageHelper.click(SocialStreamPage.settingItems.page);
+        await PageHelper.click(SocialStreamPage.stopEditing);
+
+        stepLogger.verification('User should be on Discussions list page and all discussions should be listed in grid');
+        // wait helper doesn't work sleep required.
+        await browser.sleep(PageHelper.timeout.m);
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 });

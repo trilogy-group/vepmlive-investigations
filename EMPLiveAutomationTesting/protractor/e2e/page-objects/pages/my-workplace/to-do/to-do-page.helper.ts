@@ -6,6 +6,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ToDoPageConstants} from './to-do-page.constants';
 import {PageHelper} from '../../../../components/html/page-helper';
+import {browser} from 'protractor';
 
 export class ToDoPageHelper {
 
@@ -45,5 +46,20 @@ export class ToDoPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ToDoPageConstants.editPageName));
+    }
+
+    static async deleteGridGantt() {
+        await browser.sleep(PageHelper.timeout.m);
+        if (await ToDoPage.menueLink.first().isPresent() === true) {
+            await PageHelper.click(ToDoPage.menueLink.first());
+            await PageHelper.click(ToDoPage.delete);
+            await browser.switchTo().alert().accept();
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.m);
+
+            if (await ToDoPage.menueLink.first().isPresent() === true) {
+                await this.deleteGridGantt();
+            }
+        }
     }
 }

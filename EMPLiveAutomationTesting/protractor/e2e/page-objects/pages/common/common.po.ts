@@ -1,6 +1,5 @@
 import {BasePage} from '../base-page';
 import {browser, By, element} from 'protractor';
-import {ElementHelper} from '../../../components/html/element-helper';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
@@ -170,7 +169,7 @@ export class CommonPage extends BasePage {
     }
 
     static get ganttGrid() {
-        return ElementHelper.getElementByStartsWithId('GanttGrid');
+        return CommonPageHelper.getElementByStartsWithId('GanttGrid');
     }
 
     static get searchControls() {
@@ -186,18 +185,15 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
     }
 
-    static get projectCheckbox() {
-        return element(By.xpath(`(${this.projectFirstRow})/*[contains(@class,'GMCellPanel GMEmpty ')]`));
-    }
-
     static get recordWithoutGreenTicket() {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }
 
-    static get projectFirstRow() {
-        return `.//*[contains(@onmousemove,'Rows["1"]')]`;
+    static get uploadSuccessFullyText(){
+        return{
+        message: CommonPageHelper.getElementByText(CommonPageConstants.documentUploadText),
+     };
     }
-
     static get records() {
         return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
     }
@@ -208,6 +204,18 @@ export class CommonPage extends BasePage {
 
     static get selectorForRecordsWithGreenTick() {
         return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
+    }
+
+    static get projectsList() {
+        return element(By.css('.ms-commentexpand-iconouter'));
+    }
+
+    static get projectCheckbox() {
+        return element(By.css(`(${this.projectFirstRow}) [class*='GMCellPanel GMEmpty']`));
+    }
+
+    static get projectFirstRow() {
+        return `[onmousemove*='Rows["1"]']`;
     }
 
     static get selectorForRecordsWithoutGreenTick() {
@@ -222,17 +230,20 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
+    static get okButton () {
+        return element(By.css('#onetidSaveItem'));
+    }
+
+    static get UpdatePropertyDocument() {
+        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
+    }
+
     static get pageTitle() {
         return element(By.id('pageTitle'));
     }
 
     static get editPlan() {
         return element(By.xpath(' .//*[contains(@id,"EPMLive.Planner") and not(contains(@class,"disabled"))]'));
-    }
-
-    static get project() {
-        // This xpath is best we have. Onmouse click is required
-        return element(By.xpath(`(${this.projectFirstRow})//*[contains(@href,'Lists/Project')]`));
     }
 
     static get versionCommentField() {
@@ -243,36 +254,46 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="OverwriteSingle"]'));
     }
 
-    static get projectsList() {
-        return element(By.css('.ms-commentexpand-iconouter'));
+    static get project() {
+        // This xpath is best we have. Onmouse click is required
+        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
-    static get UpdatePropertyDocument() {
-        return element(By.xpath('.//*[contains(text(),"update the properties")]'));
-    }
-
-    static get costButton() {
+    static get costButton(){
         const fields = CommonPageConstants.costButtonLabel;
         return {
-            budget: CommonPage.getButton(fields.budget),
+            budget: CommonPageHelper.getActiveButtonByText(fields.budget),
+            actualCost: CommonPageHelper.getActiveButtonByText(fields.actualCost),
+            benefits: CommonPageHelper.getActiveButtonByText(fields.benefits),
         };
 
     }
 
-    static get okButton() {
-        return element(By.css('#onetidSaveItem'));
+    static get editCostButton(){
+        const fields = CommonPageConstants.costButtonLabel;
+        return {
+            budget: CommonPageHelper.getEditCostTab(fields.budget),
+            actualCost: CommonPageHelper.getEditCostTab(fields.actualCost),
+            benefits: CommonPageHelper.getEditCostTab(fields.benefits),
+        };
+
     }
 
-    static get calendearView() {
-        return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
-    }
-
-    static get singleSearchTextBox() {
-        return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
+    static get  costTab() {
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return `//div[not(contains(@tab_id,"ref"))]`;
     }
 
     static get plannerbox() {
         return element(By.css('[id*="mbox"][style*="block"]'));
+    }
+
+    static get calendearView() {
+            return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
+    }
+
+    static get singleSearchTextBox() {
+        return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
     static get closeButton() {
@@ -301,23 +322,39 @@ export class CommonPage extends BasePage {
         return element(By.id('Project_ddlShowAll'));
     }
 
-    static get tabPanel() {
-        return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-    }
-
-    static get searchChoiceOption() {
+    static get getCostCell() {
+        const cells = CommonPageConstants.cell;
         return {
-            proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
-            active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
-            closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+            cell1: CommonPageHelper.getCellText(cells.cell1),
+            cell2: CommonPageHelper.getCellText(cells.cell2),
+            cell3: CommonPageHelper.getCellText(cells.cell3),
+            cell4: CommonPageHelper.getCellText(cells.cell4)
         };
     }
 
-    static get searchIcon() {
+    static get getbuttons() {
+        return {
+            calender: CommonPageHelper.getElementByText(CommonPageConstants.calendar),
+        };
+    }
+
+    static get tabPanel() {
+        return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
+   }
+
+    static get searchChoiceOption(){
+        return {
+           proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
+           active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
+           closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+        };
+    }
+
+    static get searchIcon(){
         return element(By.css(`[src*='find_icon']`));
     }
 
-    static get regionCheckBox() {
+    static get regionCheckBox(){
         return element(By.css(`[id*="WebRegional"]`));
     }
 
@@ -394,16 +431,11 @@ export class CommonPage extends BasePage {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
     }
 
-    static get personIcon() {
+    static get personIcon(){
         return element(By.id('EPMLiveNotificationCounterProfilePic'));
     }
 
-    static get latestNotification() {
+    static get latestNotification(){
         return element(By.className('EPMLiveNotificationTitle'));
-    }
-
-    static getButton(tab: string) {
-        // it is a part of a object "costButton", object created below
-        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 }

@@ -5,7 +5,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
-import {element, By} from 'protractor';
+import {element, By, browser} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import { CommonPageHelper } from '../../common/common-page.helper';
 import { WaitHelper } from '../../../../components/html/wait-helper';
@@ -115,5 +115,27 @@ export class DiscussionsPageHelper {
         return LabelHelper.getSpanByTextInsideListByClassXpath(
             DiscussionsPageConstants.classLabel.postListItemClass,
             textValue);
+    }
+
+    static async deleteGridGantt() {
+        await browser.sleep(PageHelper.timeout.m);
+        if (await DiscussionsPage.menueLink.first().isPresent() === true) {
+            await PageHelper.click(DiscussionsPage.menueLink.first());
+            await PageHelper.click(DiscussionsPage.delete);
+            await browser.switchTo().alert().accept();
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.m);
+
+            if (await DiscussionsPage.menueLink.first().isPresent() === true) {
+                await this.deleteGridGantt();
+            }
+        }
+    }
+
+    static getDiscussionFieldSelector(text: string) {
+        return {
+            subject: CommonPageHelper.getDivByText(text),
+            body: CommonPageHelper.getDivByText(text)
+        };
     }
 }

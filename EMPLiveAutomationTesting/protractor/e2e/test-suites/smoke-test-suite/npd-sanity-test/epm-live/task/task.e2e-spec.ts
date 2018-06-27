@@ -25,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Save the changes by Save button - [965680]', async () => {
+    it('Save the changes by Save button - [965680]', async () => {
         const stepLogger = new StepLogger(965680);
         const uniqueId = PageHelper.getUniqueId();
         const input = MyTimeOffPageConstants.inputValues;
@@ -43,9 +43,8 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('Project Center page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
-            .toBe(true,
+    .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
         stepLogger.stepId(2);
@@ -56,15 +55,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.editPlan);
 
         stepLogger.verification('Select Planner pop-up displays with different planner options to select');
-        await expect(await CommonPage.dialogTitle.isDisplayed()).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.selectPlanner));
 
-        stepLogger.stepId(3);
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
-        stepLogger.verification('The Project Planner page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
+        stepLogger.verification('"Project Planner" window is displayed');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
@@ -118,7 +115,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 
         stepLogger.verification('Project Center page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
 
@@ -134,7 +130,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
 
         stepLogger.verification('"Project Planner" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectPlanner);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
