@@ -158,6 +158,7 @@ namespace EPMLiveCore
 
     public class CoreFunctions
     {
+        private const string SharepointSystemAccountLowercase = "sharepoint\\system";
         static string saltValue = "f53fNDH@";
         static string hashAlgorithm = "SHA1";
         static int passwordIterations = 2;
@@ -620,6 +621,25 @@ namespace EPMLiveCore
                 return s[s.Length - 1];
             }
             catch { return username; }
+        }
+
+        public static string GetCleanUserNameWithDomain(SPWeb web, string username)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+
+            if (username.ToLower() == SharepointSystemAccountLowercase)
+            {
+                username = web.Site.WebApplication.ApplicationPool.Username;
+            }
+            else
+            {
+                username = username.Contains("\\") ? GetJustUsername(username) : GetRealUserName(username, web.Site);
+            }
+
+            return username;
         }
 
         public static string GetCleanUserName(string username)
