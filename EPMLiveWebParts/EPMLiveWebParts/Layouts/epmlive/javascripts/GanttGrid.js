@@ -307,14 +307,15 @@ function GridColumnWidthGet() {
                         continue;
                     }
                     var width = +(widths[i].Width);
+                    if (typeof col != 'undefined') {
+                        delete Grids[0].Cols[index].RelWidth;
+                    }
                     Grids[0].SetWidth(index, width - col.Width);
                 }
 
                 columnStatus = widths;
             }
             Grids.OnColResize = function (tgrid, col) {
-                if (col == 'Title')
-                    return;
                 GridColumnWidthSet(col);
             };
         },
