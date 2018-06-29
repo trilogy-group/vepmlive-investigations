@@ -673,7 +673,7 @@ namespace EPMLiveCore.API
                 {
                     SPList list = oWeb.Lists[listid];
                     SPListItem li = list.GetItemById(itemid);
-                    var isProjectCenter = listid == GetProjectCenterListId(oWeb);
+                    var projectResourceRatesFeatureIsEnabled = listid == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
 
                     SPFieldUserValueCollection uvc = null;
                     try
@@ -717,7 +717,7 @@ namespace EPMLiveCore.API
 
                             setItemPermissions(oWeb, uv.ToString(), nd.Attributes["Permissions"].Value, li);
 
-                            if (isProjectCenter)
+                            if (projectResourceRatesFeatureIsEnabled)
                             {
                                 var resourceId = GetResourceId(oWeb, drRes[0]);
                                 if (resourceId > 0)
@@ -764,7 +764,7 @@ namespace EPMLiveCore.API
                         uvc.Remove(uv);
                     }
 
-                    if (isProjectCenter)
+                    if (projectResourceRatesFeatureIsEnabled)
                     {
                         // remove rates for all resources except whose we saved recently (cleanup for removed team members)
                         DeleteProjectResourceRates(oWeb, itemid, savedRatesUserIds.ToArray());
@@ -1952,7 +1952,7 @@ namespace EPMLiveCore.API
 
                         if (listid != Guid.Empty)
                         {
-                            projectResourceRatesEnabled = listid == GetProjectCenterListId(tWeb);
+                            projectResourceRatesEnabled = listid == GetProjectCenterListId(tWeb) && IsPfeSite(tWeb);
                         }
 
                         XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
@@ -2304,7 +2304,7 @@ namespace EPMLiveCore.API
                             }
                         }
                         
-                        var allowEditRate = GetResourceId(oWeb, dr) > 0;
+                        var allowEditRate = IsPfeSite(oWeb) && GetResourceId(oWeb, dr) > 0;
 
                         // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
                         nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);
@@ -2329,6 +2329,22 @@ namespace EPMLiveCore.API
 
             var queryDocument = new XmlDocument();
             queryDocument.LoadXml(xml);
+
+            // get the list and list item id from the query XML
+            var listItemId = 0;
+            var listId = Guid.Empty;
+            if (queryDocument.FirstChild != null && queryDocument.FirstChild.Attributes != null)
+            {
+                listItemId = queryDocument.FirstChild.Attributes["ItemId"] != null
+                    ? Convert.ToInt32(queryDocument.FirstChild.Attributes["ItemId"].Value)
+                    : 0;
+
+                listId = queryDocument.FirstChild.Attributes["ListId"] != null
+                    ? new Guid(queryDocument.FirstChild.Attributes["ListId"].Value)
+                    : Guid.Empty;
+            }
+
+            var projectResourceRateFeatureIsEnabled = listId == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
 
             XmlDocument docTeam = new XmlDocument();
             docTeam.LoadXml(GetTeam(xml, oWeb));
@@ -2364,25 +2380,11 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                // get the list and list item id from the query XML
-                var listItemId = 0;
-                var listId = Guid.Empty;
-                if (queryDocument.FirstChild != null && queryDocument.FirstChild.Attributes != null)
-                {
-                    listItemId = queryDocument.FirstChild.Attributes["ItemId"] != null
-                        ? Convert.ToInt32(queryDocument.FirstChild.Attributes["ItemId"].Value)
-                        : 0;
-
-                    listId = queryDocument.FirstChild.Attributes["ListId"] != null
-                        ? new Guid(queryDocument.FirstChild.Attributes["ListId"].Value)
-                        : Guid.Empty;
-                }
-
                 // before get project resource rates, validate all inputs: should be project center list item with valid user id
-                bool allowEditRate = false;
+                var allowEditRate = false;
                 if (listItemId > 0 
                     && listId != Guid.Empty 
-                    && listId == GetProjectCenterListId(oWeb))
+                    && projectResourceRateFeatureIsEnabled)
                 {
                     var resourceId = GetResourceId(oWeb, resourceUsername, resourceName);
                     if (resourceId > 0)
@@ -2667,6 +2669,11 @@ namespace EPMLiveCore.API
                 // in case when list does not exist return empty id
                 return Guid.Empty;
             }
+        }
+
+        private static bool IsPfeSite(SPWeb web)
+        {
+            return ConnectionProvider.AllowDatabaseConnections(web);
         }
 
         private const string WEB_GROUPS_QUERY =

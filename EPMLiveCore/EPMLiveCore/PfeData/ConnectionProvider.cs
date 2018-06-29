@@ -7,12 +7,29 @@ namespace EPMLiveCore.PfeData
 {
     public class ConnectionProvider : IConnectionProvider
     {
+        const string FeatureGuid = "158c5682-d839-4248-b780-82b4710ee152";
+
+        public static bool AllowDatabaseConnections(SPWeb web)
+        {
+            return web?.Site.Features[new Guid(FeatureGuid)] != null;
+        }
+
         /// <summary>
         /// Creates connection from config settings stored in SPWeb.
         /// </summary>
         /// <returns>The new SqlConnection instance.</returns>
         public SqlConnection CreateConnection(SPWeb web)
         {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+
+            if (!AllowDatabaseConnections(web))
+            {
+                throw new InvalidOperationException($"PPMFeature is not installed ({web.Site.Url})");
+            }
+
             var basePath = GetBasePath(web);
             var connectionString = Utilities.GetPFEDBConnectionString(basePath);
 
