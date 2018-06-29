@@ -419,6 +419,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\640Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
