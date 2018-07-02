@@ -724,9 +724,14 @@ namespace EPMLiveCore.API
                                 if (resourceId > 0)
                                 {
                                     // update rate for existing resources if rate is not equal to the standard rate, otherwise remove rate
-                                    var rate = Convert.ToDecimal(nd.Attributes[ProjectRateColumn].Value);
-                                    var standardRate = drRes[0][StandardRateColumn] != null ? Convert.ToDecimal(drRes[0][StandardRateColumn]) : 0;
-                                    UpdateProjectResourceRate(oWeb, itemid, resourceId, rate != standardRate ? rate : (decimal?)null);
+                                    var rateString = nd.Attributes[ProjectRateColumn].Value;
+                                    var standardRateString = drRes[0].Table.Columns.Contains(StandardRateColumn) 
+                                        ? drRes[0][StandardRateColumn]?.ToString()
+                                        : null;
+
+                                    var rateValue = !string.IsNullOrWhiteSpace(rateString) ? Convert.ToDecimal(rateString) : (decimal?)null;
+                                    var standardRateValue =  !string.IsNullOrWhiteSpace(standardRateString) ? Convert.ToDecimal(standardRateString) : 0;
+                                    UpdateProjectResourceRate(oWeb, itemid, resourceId, rateValue != standardRateValue ? rateValue : null);
 
                                     // keep resource id for cleanup action
                                     savedRatesUserIds.Add(resourceId);
@@ -958,16 +963,15 @@ namespace EPMLiveCore.API
 
         private static int GetResourceId(SPWeb oWeb, DataRow row)
         {
-            var isGeneric = row.Table.Columns.Contains(StandardRateColumn) &&
-                            row[StandardRateColumn] != DBNull.Value &&
-                            row[GenericColumn].ToString() == GenericColumnYes;
+            var isGeneric = row.Table.Columns.Contains(GenericColumn) &&
+                            row[GenericColumn]?.ToString() == GenericColumnYes;
 
-            var resourceUsername = !isGeneric && row.Table.Columns.Contains(UsernameColumn) && row[UsernameColumn] != DBNull.Value
-                ? row[UsernameColumn].ToString()
-                : string.Empty;
-            var resourceName = row.Table.Columns.Contains(TitleColumn) && row[TitleColumn] != DBNull.Value
-                ? row[TitleColumn].ToString()
-                : string.Empty;
+            var resourceUsername = !isGeneric && row.Table.Columns.Contains(UsernameColumn)
+                ? row[UsernameColumn]?.ToString()
+                : null;
+            var resourceName = row.Table.Columns.Contains(TitleColumn)
+                ? row[TitleColumn]?.ToString()
+                : null;
 
             var resourceId = GetResourceId(oWeb, resourceUsername, resourceName);
             return resourceId;
