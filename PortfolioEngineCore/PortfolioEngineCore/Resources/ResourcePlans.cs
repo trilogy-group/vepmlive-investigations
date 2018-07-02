@@ -1787,7 +1787,7 @@ namespace PortfolioEngineCore
                 xCalendar.CreateIntAttr("CalID", oAdmin.PortfolioCommitmentsCalendarUID);
 
                 // Take into account the status date
-                int lStartPeriodID = clnPeriods[0].PeriodID;
+                int lStartPeriodID = clnPeriods.Count > 0 ? clnPeriods[0].PeriodID : 0;
                 int lFinishPeriodID;
                 xRPE.CreateInt("StartPeriodID", lStartPeriodID);
                 if (clnPeriods.Count > 0)
