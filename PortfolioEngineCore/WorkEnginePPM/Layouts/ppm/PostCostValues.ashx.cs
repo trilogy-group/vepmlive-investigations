@@ -189,7 +189,7 @@ namespace WorkEnginePPM
             request.Initialize("Request");
             var epkSet = request.CreateSubStruct("EPKSet");
             epkSet.CreateString("EPKAuth", "");
-            var  process = epkSet.CreateSubStruct("EPKProcess");
+            var process = epkSet.CreateSubStruct("EPKProcess");
             process.CreateInt("RequestNo", UpdateOnProjectResourceRateChange);
             process.CreateString("PIs", projectId);
 

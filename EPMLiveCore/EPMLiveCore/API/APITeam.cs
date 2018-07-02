@@ -24,6 +24,7 @@ namespace EPMLiveCore.API
     {
         private const string AllowEditProjectRateColumn = "AllowEditProjectRate";
         private const string GenericColumn = "Generic";
+        private const string GenericColumnYes = "Yes";
         private const string ProjectCenterListName = "Project Center";
         private const string ProjectRateColumn = "ProjectRate";
         private const string ProjectRateColumnCaption = "Project Rate";
@@ -959,7 +960,7 @@ namespace EPMLiveCore.API
         {
             var isGeneric = row.Table.Columns.Contains(StandardRateColumn) &&
                             row[StandardRateColumn] != DBNull.Value &&
-                            row[GenericColumn].ToString() == "Yes";
+                            row[GenericColumn].ToString() == GenericColumnYes;
 
             var resourceUsername = !isGeneric && row.Table.Columns.Contains(UsernameColumn) && row[UsernameColumn] != DBNull.Value
                 ? row[UsernameColumn].ToString()
@@ -984,7 +985,9 @@ namespace EPMLiveCore.API
             }
 
             var usersRepository = new ResourceRepository();
-            var accountName = !string.IsNullOrWhiteSpace(username) ? CoreFunctions.GetCleanUserNameWithDomain(web, username) : null;
+            var accountName = !string.IsNullOrWhiteSpace(username) 
+                ? CoreFunctions.GetCleanUserNameWithDomain(web, username) 
+                : null;
             return usersRepository.FindResourceId(web, accountName, name);
         }
 
@@ -2171,7 +2174,6 @@ namespace EPMLiveCore.API
         private static void AddHtmlColumn(XmlDocument xml, XmlNode allColumnsNode, XmlNode headerNode, bool visible, string name, string displayName,
             int? relativeWidth, int? width, string align)
         {
-            // creates the new column
             var columnNode = xml.CreateNode(XmlNodeType.Element, "C", xml.NamespaceURI);
             if (columnNode.Attributes != null)
             {
@@ -2358,7 +2360,7 @@ namespace EPMLiveCore.API
                 ndNew.Attributes.Append(nattr);
                 var id = nd.Attributes["ID"].Value;
                 var standardRate = nd.Attributes[StandardRateColumn] != null ? nd.Attributes[StandardRateColumn].Value : String.Empty;
-                var isGeneric = nd.Attributes[GenericColumn] != null && nd.Attributes[GenericColumn].Value == "Yes";
+                var isGeneric = nd.Attributes[GenericColumn] != null && nd.Attributes[GenericColumn].Value == GenericColumnYes;
                 var resourceUsername = nd.Attributes[UsernameColumn] != null && !isGeneric
                     ? nd.Attributes[UsernameColumn].Value
                     : string.Empty;

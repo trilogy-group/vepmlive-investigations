@@ -22,6 +22,11 @@ namespace PortfolioEngineCore.Base.DBAccess
 
         private static List<ProjectResourceRate> GetRatesInternal(PortfolioEngineCore.DBAccess dba, int projectId, int? resourceId)
         {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+
             try
             {
                 var results = new List<ProjectResourceRate>();

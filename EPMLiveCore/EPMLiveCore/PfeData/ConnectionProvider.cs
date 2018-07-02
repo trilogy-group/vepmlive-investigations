@@ -7,7 +7,7 @@ namespace EPMLiveCore.PfeData
 {
     public class ConnectionProvider : IConnectionProvider
     {
-        const string FeatureGuid = "158c5682-d839-4248-b780-82b4710ee152";
+        private const string FeatureGuid = "158c5682-d839-4248-b780-82b4710ee152";
 
         public static bool AllowDatabaseConnections(SPWeb web)
         {
@@ -51,7 +51,7 @@ namespace EPMLiveCore.PfeData
                 var basePath = CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
                 return basePath;
             }
-            catch { return ""; }
+            catch { return string.Empty; }
         }
     }
 }

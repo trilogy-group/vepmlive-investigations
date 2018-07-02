@@ -67,7 +67,7 @@ namespace EPMLiveCore.PfeData
             return rate;
         }
 
-        public List<ProjectResourceRate> GetRates(SPWeb web, int projectId, int resourceId)
+        public IList<ProjectResourceRate> GetRates(SPWeb web, int projectId, int resourceId)
         {
             return GetRatesInternal(web, projectId, resourceId);
         }

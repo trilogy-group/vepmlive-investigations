@@ -24,7 +24,7 @@ namespace EPMLiveCore.PfeData
         /// <summary>
         /// Gets rates list for project / resource.
         /// </summary>
-        List<ProjectResourceRate> GetRates(SPWeb web, int projectId, int resourceId);
+        IList<ProjectResourceRate> GetRates(SPWeb web, int projectId, int resourceId);
 
         /// <summary>
         /// Saves the project resource rate.
