@@ -95,6 +95,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                     case EPMLiveVersion.V634:
                         version = "6.3.4";
                         break;
+                    case EPMLiveVersion.V640:
+                        version = "6.4.0";
+                        break;
                     case EPMLiveVersion.GENERIC:
                         version = "GENERIC";
                         break;
