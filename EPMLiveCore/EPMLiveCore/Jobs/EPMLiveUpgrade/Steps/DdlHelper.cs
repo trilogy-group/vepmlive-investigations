@@ -24,7 +24,29 @@ ELSE SELECT 0";
             });
         }
 
-        private static T ExecuteReader<T>(SqlConnection sqlConnection, string sql,
+        public static bool TableExist(this SqlConnection sqlConnection, string tableName)
+        {
+            var sql =
+                $@"IF EXISTS(SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_name = N'{tableName}')
+BEGIN
+    SELECT 1
+END
+ELSE BEGIN
+    SELECT 0
+END";
+
+            return ExecuteReader(sqlConnection, sql, reader =>
+            {
+                if (reader.Read())
+                {
+                    return reader.GetInt32(0) == 1;
+                }
+
+                return false;
+            });
+        }
+
+        public static T ExecuteReader<T>(this SqlConnection sqlConnection, string sql,
             Func<SqlDataReader, T> processReaderFunc)
         {
             using (var sqlCommand = new SqlCommand(sql, sqlConnection))

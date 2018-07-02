@@ -419,6 +419,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\640Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
@@ -1291,6 +1292,13 @@
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
+    <Compile Include="PfeData\ConnectionProvider.cs" />
+    <Compile Include="PfeData\IConnectionProvider.cs" />
+    <Compile Include="PfeData\IProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\IResourceRepository.cs" />
+    <Compile Include="PfeData\ResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRate.cs" />
     <Compile Include="PlatformIntegrationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -3552,6 +3560,7 @@
     <Content Include="Layouts\epmlive\images\dragger.png" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.png" />
+    <Content Include="Layouts\epmlive\images\editrate16.gif" />
     <Content Include="Layouts\epmlive\images\epmlive-header.png" />
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\epmlivelogo-white.png" />

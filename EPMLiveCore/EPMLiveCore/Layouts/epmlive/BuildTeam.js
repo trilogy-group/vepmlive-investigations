@@ -1,5 +1,6 @@
 ﻿
 var isDirty = false;
+var updateResourceRateDialogLinkedRow = null;
 
 function Assignments() {
     var sResources = "";
@@ -91,10 +92,16 @@ function AddResource() {
                 perms.push(sDefaultGroup);
         }
 
-
-        if (tGrid.GetValue(oTRow, "Generic") != "1" && tGrid.GetValue(oTRow, "Generic") != "Yes")
+        if (tGrid.GetValue(oTRow, "Generic") !== "1" && tGrid.GetValue(oTRow, "Generic") !== "Yes") {
             tGrid.SetValue(oTRow, "Permissions", perms.join(';'), 1, 0);
+        }
 
+        if (rGrid.GetValue(oSRow, "AllowEditProjectRate") !== "1") {
+            tGrid.SetValue(oTRow, "ProjectRate", rGrid.GetValue(oSRow, "StandardRate"), 1, 0);
+            var imageUrl = SP.Utilities.Utility.getLayoutsPageUrl('epmlive/images/editrate16.gif');
+            tGrid.SetValue(oTRow, "ProjectRateEdit", "<img class=\"projectRateEditButton\" src=\"" + imageUrl + "\" onclick=\"ShowRateDialog('" + oSRow.id + "');return false;\"></input>", 1, 0);
+        }
+        
         tGrid.SetValue(oTRow, "Title", rGrid.GetValue(oSRow, "Title"), 1, 0);
 
         tGrid.RefreshCell(oTRow, "Permissions");
@@ -316,7 +323,7 @@ function SaveAndClose() {
     if (ValidateTeam()) {
         ShowTDialog("Saving Team...");
 
-        var x = Grids.TeamGrid.GetXmlData("Body", "Permissions");
+        var x = Grids.TeamGrid.GetXmlData("Body", "Permissions,ProjectRate");
 
         if (sListId != "")
             dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool + "&ListId=" + sListId + "&ItemId=" + sItemId, SaveTeamCloseClose);
@@ -326,15 +333,46 @@ function SaveAndClose() {
 }
 
 function SaveTeamCloseClose(loader) {
-    HideTDialog();
     if (loader.xmlDoc.responseText != null) {
         var data = loader.xmlDoc.responseText.trim();
-        
-        if (data != "Success") {
+        if (data !== "Success") {
+            HideTDialog();
             alert(data);
+        } else {
+            UpdateCostValues(function (success) {
+                HideTDialog();
+                if (success) {
+                    Close();
+                }
+            });
         }
-        else
-            Close();
+    }
+}
+
+function UpdateCostValues(onCompleted) {
+    var webUrl = SP.Utilities.Utility.getLayoutsPageUrl('ppm/PostCostValues.ashx');
+    var projectRateColumn = Grids.TeamGrid.Cols["ProjectRate"];
+    if (sItemId && projectRateColumn && (projectRateColumn.Visible === 1)) {
+        var requestData =
+            "<request function=\"PostCostValuesRequest\" context=\"PostOnProjectResourceRateChange\"><data ProjectId=\"" +
+                sItemId +
+                "\" Publish=\"1\"/></request>";
+        $.ajax({
+            type: 'POST',
+            url: webUrl,
+            data: requestData,
+            contentType: 'text/xml; charset=utf-8',
+            dataType: 'json',
+            success: function(response) {
+                onCompleted(true);
+            },
+            error: function(response) {
+                onCompleted(false);
+                alert("Error: " + response.responseText);
+            }
+        });
+    } else {
+        onCompleted(true);
     }
 }
 
@@ -352,11 +390,15 @@ function SaveTeam() {
 }
 
 function SaveTeamClose(loader) {
-    HideTDialog();
     if (loader.xmlDoc.responseText != null) {
         var data = loader.xmlDoc.responseText.trim();
-        if (data != "Success") {
+        if (data !== "Success") {
+            HideTDialog();
             alert(data);
+        } else {
+            UpdateCostValues(function () {
+                HideTDialog();
+            });
         }
     }
 }
@@ -382,4 +424,43 @@ function ShowTDialog(text) {
 
 function HideTDialog() {
     hm("dlgNormal");
+}
+
+function ShowRateDialog(id) {
+    var row = Grids.TeamGrid.Rows[id];
+    if (row) {
+        Grids.TeamGrid.Disable();
+        Grids.ResourceGrid.Disable();
+        sm("updateResourceRateDialog", 300, 250);
+
+        document.getElementById("resourceRate").innerText = row.StandardRate;
+        document.getElementById("projectRate").value = row.ProjectRate;
+
+        updateResourceRateDialogLinkedRow = row;
+    }
+}
+
+function SubmitRateDialog() {
+    var row = updateResourceRateDialogLinkedRow;
+    if (row) {
+        var value = parseFloat(document.getElementById("projectRate").value);
+        if (isNaN(value)) {
+            value = row.StandardRate;
+        }
+        isDirty = true;
+        Grids.TeamGrid.SetString(row, "ProjectRate", value.toString(), true);
+    }
+
+    hm("updateResourceRateDialog");
+    Grids.TeamGrid.Enable();
+    Grids.ResourceGrid.Enable();
+    updateResourceRateDialogLinkedRow = null;
+    RefreshCommandUI();
+}
+
+function HideRateDialog() {
+    hm("updateResourceRateDialog");
+    Grids.TeamGrid.Enable();
+    Grids.ResourceGrid.Enable();
+    updateResourceRateDialogLinkedRow = null;
 }

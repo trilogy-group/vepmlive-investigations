@@ -13,6 +13,8 @@ using System.Data.SqlClient;
 using EPMLiveCore.Infrastructure;
 using DataTable = System.Data.DataTable;
 using EPMLiveCore.Infrastructure.Logging;
+using EPMLiveCore.PfeData;
+
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 using Microsoft.SharePoint.Administration;
 
@@ -20,7 +22,16 @@ namespace EPMLiveCore.API
 {
     public class APITeam
     {
-        static bool bIsTeamSecurityEnabled = false;
+        private const string AllowEditProjectRateColumn = "AllowEditProjectRate";
+        private const string GenericColumn = "Generic";
+        private const string GenericColumnYes = "Yes";
+        private const string ProjectCenterListName = "Project Center";
+        private const string ProjectRateColumn = "ProjectRate";
+        private const string ProjectRateColumnCaption = "Project Rate";
+        private const string ProjectRateEditColumn = "ProjectRateEdit";
+        private const string StandardRateColumn = "StandardRate";
+        private const string TitleColumn = "Title";
+        private const string UsernameColumn = "Username";
 
         private static DataTable getResources(SPWeb web, string filterfield, string filtervalue, bool hasPerms, ArrayList arrColumns, SPListItem liItem, XmlNodeList nodeTeam)
         {
@@ -657,13 +668,13 @@ namespace EPMLiveCore.API
                     SPList list = oWeb.Lists[listid];
                     GridGanttSettings gSettings = new GridGanttSettings(list);
                     bUseTeam = gSettings.BuildTeam;
-                    bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                 }
 
                 if (listid != Guid.Empty && bUseTeam)
                 {
                     SPList list = oWeb.Lists[listid];
                     SPListItem li = list.GetItemById(itemid);
+                    var projectResourceRatesFeatureIsEnabled = listid == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
 
                     SPFieldUserValueCollection uvc = null;
                     try
@@ -687,6 +698,7 @@ namespace EPMLiveCore.API
                         arrUsers.Add(uv.LookupId);
                     }
 
+                    var savedRatesUserIds = new List<int>();
                     foreach (XmlNode nd in docTeam.SelectNodes("//Team/Member"))
                     {
                         DataRow[] drRes = dtResourcePool.Select("ID='" + nd.Attributes["ID"].Value + "'");
@@ -700,9 +712,26 @@ namespace EPMLiveCore.API
                             }
 
                             if (uv.User != null)
+                            {
                                 modifiedUsers += "," + uv.User.ID;
+                            }
 
                             setItemPermissions(oWeb, uv.ToString(), nd.Attributes["Permissions"].Value, li);
+
+                            if (projectResourceRatesFeatureIsEnabled)
+                            {
+                                var resourceId = GetResourceId(oWeb, drRes[0]);
+                                if (resourceId > 0)
+                                {
+                                    // update rate for existing resources if rate is not equal to the standard rate, otherwise remove rate
+                                    var rate = Convert.ToDecimal(nd.Attributes[ProjectRateColumn].Value);
+                                    var standardRate = drRes[0][StandardRateColumn] != null ? Convert.ToDecimal(drRes[0][StandardRateColumn]) : 0;
+                                    UpdateProjectResourceRate(oWeb, itemid, resourceId, rate != standardRate ? rate : (decimal?)null);
+
+                                    // keep resource id for cleanup action
+                                    savedRatesUserIds.Add(resourceId);
+                                }
+                            }
 
                             try
                             {
@@ -724,7 +753,9 @@ namespace EPMLiveCore.API
                                 setItemPermissions(oWeb, uv.ToString(), "", li);
 
                                 if (uv.User != null)
+                                {
                                     modifiedUsers += "," + uv.User.ID;
+                                }
                             }
                         }
                     }
@@ -732,6 +763,12 @@ namespace EPMLiveCore.API
                     foreach (SPFieldUserValue uv in arrDelete)
                     {
                         uvc.Remove(uv);
+                    }
+
+                    if (projectResourceRatesFeatureIsEnabled)
+                    {
+                        // remove rates for all resources except whose we saved recently (cleanup for removed team members)
+                        DeleteProjectResourceRates(oWeb, itemid, savedRatesUserIds.ToArray());
                     }
 
                     try
@@ -882,6 +919,76 @@ namespace EPMLiveCore.API
                 throw new APIException(3010, ex.Message);
             }
             return docOut.OuterXml;
+        }
+
+        /// <summary>
+        /// Updates project resource rate (if necessary) or deletes existing rate value if provided rate is null.
+        /// </summary>
+        private static void UpdateProjectResourceRate(SPWeb web, int projectId, int resourceId, decimal? rate)
+        {
+            var repository = new ProjectResourceRateRepository();
+            var currentRate = repository.GetRate(web, DateTime.Today, projectId, resourceId);
+
+            if (rate.HasValue)
+            {
+                // update if rate changed
+                if (currentRate == null || currentRate.Rate != rate.Value)
+                {
+                    repository.SaveRate(web, projectId, resourceId, rate.Value);
+                }
+            }
+            else
+            {
+                // delete if rate exists
+                if (currentRate != null)
+                {
+                    repository.DeleteRates(web, projectId, resourceId);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes all project resource rates except ones provided in exceptResourceIds array.
+        /// </summary>
+        private static void DeleteProjectResourceRates(SPWeb web, int projectId, int[] exceptResourceIds)
+        {
+            var repository = new ProjectResourceRateRepository();
+            repository.DeleteAllRates(web, projectId, exceptResourceIds);
+        }
+
+        private static int GetResourceId(SPWeb oWeb, DataRow row)
+        {
+            var isGeneric = row.Table.Columns.Contains(StandardRateColumn) &&
+                            row[StandardRateColumn] != DBNull.Value &&
+                            row[GenericColumn].ToString() == GenericColumnYes;
+
+            var resourceUsername = !isGeneric && row.Table.Columns.Contains(UsernameColumn) && row[UsernameColumn] != DBNull.Value
+                ? row[UsernameColumn].ToString()
+                : string.Empty;
+            var resourceName = row.Table.Columns.Contains(TitleColumn) && row[TitleColumn] != DBNull.Value
+                ? row[TitleColumn].ToString()
+                : string.Empty;
+
+            var resourceId = GetResourceId(oWeb, resourceUsername, resourceName);
+            return resourceId;
+        }
+
+        /// <summary>
+        /// Gets the PFE resource id based on username or full name (for generic accounts only).
+        /// </summary>
+        /// <returns></returns>
+        private static int GetResourceId(SPWeb web, string username, string name)
+        {
+            if (string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name))
+            {
+                return 0;
+            }
+
+            var usersRepository = new ResourceRepository();
+            var accountName = !string.IsNullOrWhiteSpace(username) 
+                ? CoreFunctions.GetCleanUserNameWithDomain(web, username) 
+                : null;
+            return usersRepository.FindResourceId(web, accountName, name);
         }
 
         private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem li)
@@ -1708,6 +1815,7 @@ namespace EPMLiveCore.API
                                         attr.Value = field.Title;
                                         ndHeader.Attributes.Append(attr);
 
+                                        AddHtmlColumn(docOut, ndCols, ndHeader, false, AllowEditProjectRateColumn, string.Empty, null, 10, null);
                                     }
                                 }
                             }
@@ -1796,6 +1904,7 @@ namespace EPMLiveCore.API
                         GridGanttSettings gSettings = null;
                         SPList oList = null;
                         SPListItem oLi = null;
+                        var projectResourceRatesEnabled = false;
 
                         if (!string.IsNullOrEmpty(xml))
                         {
@@ -1807,7 +1916,6 @@ namespace EPMLiveCore.API
                                 listid = new Guid(InputDoc.FirstChild.Attributes["ListId"].Value);
                                 oList = tWeb.Lists[listid];
                                 gSettings = new GridGanttSettings(oList);
-                                bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                             }
                             catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                             try
@@ -1836,7 +1944,6 @@ namespace EPMLiveCore.API
 
                                         oList = tWeb.Lists[listid];
                                         gSettings = new GridGanttSettings(oList);
-                                        bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                                         oLi = oList.GetItemById(itemid);
                                     }
                                     catch { }
@@ -1845,9 +1952,18 @@ namespace EPMLiveCore.API
                         }
                         catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
 
+
+                        if (listid != Guid.Empty)
+                        {
+                            projectResourceRatesEnabled = listid == GetProjectCenterListId(tWeb) && IsPfeSite(tWeb);
+                        }
+
                         XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
                         XmlNode ndLeftCols = doc.SelectSingleNode("//LeftCols");
                         XmlNode ndHeader = doc.SelectSingleNode("//Header");
+
+                        AddHtmlColumn(doc, ndRightCols, ndHeader, projectResourceRatesEnabled, ProjectRateColumn, ProjectRateColumnCaption, null, 100, "Right");
+                        AddHtmlColumn(doc, ndRightCols, ndHeader, projectResourceRatesEnabled, ProjectRateEditColumn, string.Empty, null, 30, "Left");
 
                         XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
                         XmlAttribute attr = doc.CreateAttribute("Name");
@@ -2055,6 +2171,63 @@ namespace EPMLiveCore.API
             return doc.OuterXml;
         }
 
+        private static void AddHtmlColumn(XmlDocument xml, XmlNode allColumnsNode, XmlNode headerNode, bool visible, string name, string displayName,
+            int? relativeWidth, int? width, string align)
+        {
+            var columnNode = xml.CreateNode(XmlNodeType.Element, "C", xml.NamespaceURI);
+            if (columnNode.Attributes != null)
+            {
+                // add name
+                var attribute = xml.CreateAttribute("Name");
+                attribute.Value = name;
+                columnNode.Attributes.Append(attribute);
+
+                // add type
+                attribute = xml.CreateAttribute("Type");
+                attribute.Value = "Html";
+                columnNode.Attributes.Append(attribute);
+
+                // add relative width (if specified)
+                if (relativeWidth.HasValue)
+                {
+                    attribute = xml.CreateAttribute("RelWidth");
+                    attribute.Value = relativeWidth.Value.ToString();
+                    columnNode.Attributes.Append(attribute);
+                }
+
+                // add width (if specified)
+                if (width.HasValue)
+                {
+                    attribute = xml.CreateAttribute("Width");
+                    attribute.Value = width.Value.ToString();
+                    columnNode.Attributes.Append(attribute);
+                }
+
+                // add cell format (if specified)
+                if (align != null)
+                {
+                    attribute = xml.CreateAttribute("Align");
+                    attribute.Value = align;
+                    columnNode.Attributes.Append(attribute);
+                }
+
+                // add visible status
+                attribute = xml.CreateAttribute("Visible");
+                attribute.Value = visible ? "1" : "0";
+                columnNode.Attributes.Append(attribute);
+
+                // add header info (if display name specified)
+                if (displayName != null && headerNode.Attributes != null)
+                {
+                    attribute = xml.CreateAttribute(name);
+                    attribute.Value = displayName;
+                    headerNode.Attributes.Append(attribute);
+                }
+            }
+
+            allColumnsNode.AppendChild(columnNode);
+        }
+
         public static string GetResourceGridLayout(string xml, SPWeb oWeb)
         {
             XmlDocument doc = GetGenericResourceGrid("ResourceGrid", oWeb);
@@ -2132,6 +2305,13 @@ namespace EPMLiveCore.API
                                 ndNew.Attributes.Append(nattr);
                             }
                         }
+                        
+                        var allowEditRate = IsPfeSite(oWeb) && GetResourceId(oWeb, dr) > 0;
+
+                        // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
+                        nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);
+                        nattr.Value = allowEditRate ? "1" : "0";
+                        ndNew.Attributes.Append(nattr);
                     }
 
                     ndBody.AppendChild(ndNew);
@@ -2149,9 +2329,28 @@ namespace EPMLiveCore.API
 
             XmlNode ndBody = docOut.FirstChild.SelectSingleNode("//B");
 
+            var queryDocument = new XmlDocument();
+            queryDocument.LoadXml(xml);
+
+            // get the list and list item id from the query XML
+            var listItemId = 0;
+            var listId = Guid.Empty;
+            if (queryDocument.FirstChild != null && queryDocument.FirstChild.Attributes != null)
+            {
+                listItemId = queryDocument.FirstChild.Attributes["ItemId"] != null
+                    ? Convert.ToInt32(queryDocument.FirstChild.Attributes["ItemId"].Value)
+                    : 0;
+
+                listId = queryDocument.FirstChild.Attributes["ListId"] != null
+                    ? new Guid(queryDocument.FirstChild.Attributes["ListId"].Value)
+                    : Guid.Empty;
+            }
+
+            var projectResourceRateFeatureIsEnabled = listId == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
+
             XmlDocument docTeam = new XmlDocument();
             docTeam.LoadXml(GetTeam(xml, oWeb));
-
+            var ratesRepository  = new ProjectResourceRateRepository();
             foreach (XmlNode nd in docTeam.FirstChild.ChildNodes)
             {
                 XmlNode ndNew = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
@@ -2159,6 +2358,13 @@ namespace EPMLiveCore.API
                 XmlAttribute nattr = docOut.CreateAttribute("NoColorState");
                 nattr.Value = "1";
                 ndNew.Attributes.Append(nattr);
+                var id = nd.Attributes["ID"].Value;
+                var standardRate = nd.Attributes[StandardRateColumn] != null ? nd.Attributes[StandardRateColumn].Value : String.Empty;
+                var isGeneric = nd.Attributes[GenericColumn] != null && nd.Attributes[GenericColumn].Value == GenericColumnYes;
+                var resourceUsername = nd.Attributes[UsernameColumn] != null && !isGeneric
+                    ? nd.Attributes[UsernameColumn].Value
+                    : string.Empty;
+                var resourceName = nd.Attributes[TitleColumn] != null ? nd.Attributes[TitleColumn].Value : string.Empty;
 
                 foreach (XmlAttribute attr in nd.Attributes)
                 {
@@ -2176,12 +2382,46 @@ namespace EPMLiveCore.API
                     }
                 }
 
+                // before get project resource rates, validate all inputs: should be project center list item with valid user id
+                var allowEditRate = false;
+                if (listItemId > 0 
+                    && listId != Guid.Empty 
+                    && projectResourceRateFeatureIsEnabled)
+                {
+                    var resourceId = GetResourceId(oWeb, resourceUsername, resourceName);
+                    if (resourceId > 0)
+                    {
+                        // get the rate value
+                        var rate = ratesRepository.GetRate(oWeb, DateTime.Today, listItemId, resourceId);
+                        var rateValue = rate != null ? string.Format("{0:0.##}", rate.Rate) : standardRate;
+
+                        // add project rate value
+                        nattr = docOut.CreateAttribute(ProjectRateColumn);
+                        nattr.Value = string.Format("{0:0.##}", rateValue);
+                        ndNew.Attributes.Append(nattr);
+
+                        // add project rate edit hyperlink
+                        nattr = docOut.CreateAttribute(ProjectRateEditColumn);
+                        nattr.Value = string.Format(
+                            "<img class=\"projectRateEditButton\" src=\"images/editrate16.gif\" onclick=\"ShowRateDialog('{0}');return false;\"></input>",
+                            id);
+                        ndNew.Attributes.Append(nattr);
+
+                        allowEditRate = true;
+                    }
+                }
+
+                // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
+                nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);
+                nattr.Value = allowEditRate ? "1" : "0";
+                ndNew.Attributes.Append(nattr);
+
                 ndBody.AppendChild(ndNew);
             }
 
             return docOut.OuterXml;
         }
-
+        
         public static string GetResourcePoolXml(string xml, SPWeb oWeb)
         {
             System.IO.StringWriter writer = new System.IO.StringWriter();
@@ -2418,6 +2658,24 @@ namespace EPMLiveCore.API
                 }
             }
             catch { }
+        }
+
+        private static Guid GetProjectCenterListId(SPWeb web)
+        {
+            try
+            {
+                return web.Lists[ProjectCenterListName].ID;
+            }
+            catch (ArgumentException)
+            {
+                // in case when list does not exist return empty id
+                return Guid.Empty;
+            }
+        }
+
+        private static bool IsPfeSite(SPWeb web)
+        {
+            return ConnectionProvider.AllowDatabaseConnections(web);
         }
 
         private const string WEB_GROUPS_QUERY =

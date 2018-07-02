@@ -5,7 +5,6 @@
 <%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BuildTeam.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.BuildTeam" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
@@ -14,6 +13,9 @@
     <script type="text/javascript" src="DHTML/xgrid/dhtmlxcommon.js"></script>
     <script type="text/javascript" src="dhtml/xlayout/dhtmlxlayout.js"></script>
     <script type="text/javascript" src="dhtml/xlayout/dhtmlxcontainer.js"></script>
+    
+    <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
+    <script type="text/javascript" src="modal/modal.js"></script>
 
     <link rel="stylesheet" type="text/css" href="stylesheets/buildteam.css" />
 
@@ -47,13 +49,47 @@
             color: #555555;
             text-decoration: none;
         }
+
+        .projectRateEditButton {
+            width: 16px;
+            cursor: pointer;
+        }
     </style>
 
     <link rel="stylesheet" href="modal/modal.css" type="text/css" />
     <script type="text/javascript" src="modal/modal.js"></script>
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
+    <div id="updateResourceRateDialog" class="dialog" style="display:none;">
+        <table width="100%" cellspacing="0">
+            <tr>
+                <td style="height:1px;" width="250" class="topcell"></td>
+                <td style="height:1px;" class="topcell"></td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    Standard Rate
+                </td>
+                <td class="controlcell">
+                    <span id="resourceRate"></span>
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                   Rate per Project
+                </td>
+                <td class="controlcell">
+                    <input type="text" id="projectRate" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="button" class="ms-input" value="OK" onclick="SubmitRateDialog();" /> 
+                    <input type="button" class="ms-input" value="Cancel" onclick="HideRateDialog();" />
+                </td>
+            </tr>
+        </table>
+    </div>
     <table style="width: 100%; height: 100%" id="parentId">
         <tr>
             <td width="50%" valign="top" id="tdTeam">

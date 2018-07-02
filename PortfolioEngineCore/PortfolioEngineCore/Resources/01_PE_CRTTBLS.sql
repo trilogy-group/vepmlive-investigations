@@ -5788,3 +5788,21 @@ else
                                 Print 'Updating Table EPG_DATASTASH'
                 end
                                                             
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_PROJECT_RATES')
+                begin
+                                print 'Creating Table EPG_PROJECT_RATES'
+
+CREATE TABLE dbo.EPG_PROJECT_RATES
+ (
+	ID int IDENTITY(1,1) NOT NULL,
+	PROJECT_ID int NOT NULL,
+	WRES_ID int NOT NULL,
+	PR_EFFECTIVE_DATE datetime NULL,
+	PR_RATE decimal(15, 6) NULL
+) 
+
+                end
+else
+                begin
+                                Print 'Updating Table EPG_PROJECT_RATES'
+                end
