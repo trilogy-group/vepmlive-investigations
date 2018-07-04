@@ -6,7 +6,9 @@ language: shell
 
 branches:
   only:
-    - develop
+    - bugfix/*
+    - hotfix/*
+    - feature/*
     
 cache:
   directories:
