@@ -19,6 +19,11 @@ namespace EPMLiveCore.PfeData
 
         public int FindProjectId(SPWeb web, Guid listId, int id)
         {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+
             using (var connection = CreateConnection(web))
             {
                 return FindProjectId(connection, web.ID, listId, id);
