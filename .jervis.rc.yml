@@ -1,0 +1,148 @@
+#######################
+# Versata EPMlive
+#######################
+
+language: shell
+
+jervis_version: master
+#feature/CFOT-303
+
+variables:
+#  - CENTRAL_JERVIS_BRANCH=CFOT-626
+
+cache:
+  directories:
+    - ${HOME}/.m2
+    - ${HOME}/.gradle
+    - ${HOME}/.sdkman
+
+before_install:
+#$contents = "%teamcity.build.branch%"
+#$versionString = [RegEx]::Match($contents,"((?:\d+\.\d+\.\d+(\.\d+)?))")
+#$currentBuild = [RegEx]::Match($versionString,"((\d+\.\d+\.\d+)(?:\.\d+)?)").Groups[2]
+#Write-Host "##teamcity[setParameter name='reformedBuildNumber' value='$currentBuild']"
+#Write-Host "##teamcity[buildNumber '$currentBuild.%build.counter%']"
+#  - echo [assembly:System.Reflection.AssemblyFileVersion("%reformedBuildNumber%.%build.counter%")] > CommonAssemblyInfo.cs
+  - powershell $ver=[RegEx]::Match('%BRANCH_NAME%','((?:\d+\.\d+\.\d+(\.\d+)?))');$ver2= [RegEx]::Match($ver,'((\d+\.\d+\.\d+)(?:\.\d+)?)').Groups[2]; $ver = '[assembly:System.Reflection.AssemblyFileVersion(\"'+$ver2+'.%BUILD_NUMBER%\")]'; $ver3 = ''+$ver2+'.%BUILD_NUMBER%'; $ver = (Get-Content CommonAssemblyInfo.cs).replace('6.1.0.0', $ver3); Set-Content -Value "$ver" -Path CommonAssemblyInfo.cs
+#update version
+
+install:
+  - echo "running build steps powershell etc"
+  - xcopy * c:\workspace /s/h/e/k/c/q
+  - rm -fr EPM* BuildTeamCity InstallShield Libraries PortfolioEngineCore ProjectPublisher2016 PWChanger EPK* Template Utils WiX Izenda CommonAssemblyInfo.cs EMPLiveAutomationTesting Telerik.* UplandIntegrations .nuget Saas
+  - cd "\workspace"
+    
+  - powershell BuildTeamCity/tl_buildInstaller.ps1 -SkipInstallShield
+#BuildTeamCity/tl_buildCode.ps1 -ConfigurationToBuild Debug
+#  - ls -la .
+  - powershell BuildTeamCity/tl_buildCode.ps1 -TestsOnly -CleanBuild $false
+
+script:  
+  - cd "\workspace"
+#  - powershell BuildTeamCity/calcCoverageForJervis.ps1 Debug
+  - cd ".nuget" & NuGet.exe install -OutputDirectory ..\packages OpenCoverToCoberturaConverter & cd ..
+  - powershell BuildTeamCity/calcCoverageCobertura.ps1 Debug
+
+  - echo "running silent installer"
+  - cd BuildTeamCity
+  - powershell ./tl_buildSilentInstaller.ps1
+  - cd ../
+  
+  
+  - echo "uploading to nexus, rename Silent builder, update release number in rcBuildDeployment_real.ps1"
+  - powershell BuildTeamCity/nexuxUploadAndRename.ps1 -branch %BRANCH_NAME% -build %BUILD_NUMBER%
+
+  - echo "RC Build Deployment"
+  - powershell BuildTeamCity/rcBuildDeployment_real.ps1 -branch %BRANCH_NAME% -build %BUILD_NUMBER%
+  
+#  - sleep 3600
+
+  - xcopy BuildTeamCity\epmlive_SI_* %WORKSPACE%
+  - xcopy "InstallShield\Build Dependencies\"PublisherSetup2016* %WORKSPACE%
+#  - xcopy Artifacts\* %WORKSPACE%\Artifacts\
+#  - xcopy CoverageReports\* %WORKSPACE%\CoverageReports\
+  - powershell.exe -NoP -NonI -Command "Expand-Archive '.\cobertura.xml.zip' './'"
+  - xcopy BuildTeamCity\cobertura.xml %WORKSPACE%
+jenkins:
+  os: windows
+  additional_labels:
+    - "epmlive"
+  stash:
+    allowEmpty: true
+    name: 'artifacts'
+  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
+  collect:
+    artifacts:
+      - 'PublisherSetup2016*.zip'
+      - 'epmlive_SI_*.zip'
+      - 'nuget.exe'
+      - 'Artifacts\*'
+      - 'CoverageReports\index.html'
+#    cobertura: 'cobertura.xml'
+    cobertura:
+      path: 'cobertura.xml'
+      autoUpdateHealth: false
+      autoUpdateStability: false
+      failNoReports: false
+      failUnhealthy: false
+      failUnstable: false
+      maxNumberOfBuilds: 0
+      onlyStable: false
+      sourceEncoding: 'ASCII'
+      zoomCoverageChart: true
+      methodCoverageTargets: '1, 0, 0'
+      lineCoverageTargets: '1, 0, 0'
+      conditionalCoverageTargets: '1, 0, 0'
+#      allowEmptyArchive: true
+#    junit: '**/*.xml'
+#- 'InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\WorkEngine*.exe'
+#- 'Artifacts/*.zip'
+#aline:
+#  language: .NET
+#  product: 'EPMLive' # required
+#  product_version: '1.0.0' #  optional
+#  process_tests: false # optional. default is true
+  
+services:
+  ui-tests:
+    health-check:
+      - name: Git clone
+        raw: git clone https://nacxaa:4d7232674318f2de7cf20aa8cf669567d200e54a@github.com/nacxaa/vepmlive-epmlive2013release.git -b {{ lookup('env', 'BRANCH_NAME') }}
+      - name: Prepare script
+        raw: cd vepmlive-epmlive2013release && sh BuildTeamCity/uiTestsPrepare.sh
+      - name: RC Build UI Tests. Will run for ~15m, please be patient..
+        raw: echo 'ok'
+      - name: RC Build UI Tests output
+        raw: cd vepmlive-epmlive2013release/EMPLiveAutomationTesting/lyris-automation-customer && mvn clean install -DskipTests=false  
+        register: test_ui
+#        failed_when: test_ui.rc == 3
+      - debug: var=test_ui.stdout_lines
+#      - name: UI Tests results
+#        raw: cat vepmlive-epmlive2013release/EMPLiveAutomationTesting/lyris-automation-customer/target/surefire-reports/com.ipm.tests.*
+#        register: test_res
+#        failed_when: test_res.rc == 0
+##    regression-test:
+##      - name: RC Build Automated Tests. This test will run for ~3h, please be patient..
+##        raw: echo 'ok'
+##      - name: RC Build Automated Tests output
+##        shell: docker -H dw1.eu.aureacentral.com run --rm registry2.swarm.devfactory.com/aurea/epmlive:TeamCity-Agent-2017-jetbrains powershell 'git clone https://nacxaa:4d7232674318f2de7cf20aa8cf669567d200e54a@github.com/nacxaa/vepmlive-epmlive2013release.git -b {{ lookup('env', 'BRANCH_NAME') }}; .\vepmlive-epmlive2013release\BuildTeamCity\rcBuildAutomatedTests.ps1 -branch {{ lookup('env', 'BRANCH_NAME') }} -build {{ lookup('env', 'BUILD_NUMBER') }}'
+# registry2.swarm.devfactory.com/aurea/epmlive:jenkins-build-agent-sdk10
+##        register: test_reg
+#        async: 15000
+#        poll: 60
+#        failed_when: test_reg.rc == 3
+##      - debug: var=test_reg.stderr
+##      - debug: var=test_reg.stdout_lines
+##  reg-tests:
+##      regression-test:
+##      - name: RC Build Automated Tests. This test will run for ~3h, please be patient..
+##        raw: echo 'ok'
+##      - name: RC Build Automated Tests output
+##        shell: powershell 'git clone https://nacxaa:4d7232674318f2de7cf20aa8cf669567d200e54a@github.com/nacxaa/vepmlive-epmlive2013release.git -b {{ lookup('env', 'BRANCH_NAME') }}; .\vepmlive-epmlive2013release\BuildTeamCity\rcBuildAutomatedTests.ps1 -branch {{ lookup('env', 'BRANCH_NAME') }} -build {{ lookup('env', 'BUILD_NUMBER') }}'
+# registry2.swarm.devfactory.com/aurea/epmlive:jenkins-build-agent-sdk10
+##        register: test_reg
+#        async: 15000
+#        poll: 60
+#        failed_when: test_reg.rc == 3
+##      - debug: var=test_reg.stderr
+##      - debug: var=test_reg.stdout_lines
