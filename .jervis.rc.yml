@@ -10,6 +10,10 @@ jervis_version: master
 variables:
 #  - CENTRAL_JERVIS_BRANCH=CFOT-626
 
+branches:
+  only:
+    - develop
+    
 cache:
   directories:
     - ${HOME}/.m2
@@ -75,7 +79,7 @@ jenkins:
     artifacts:
       - 'PublisherSetup2016*.zip'
       - 'epmlive_SI_*.zip'
-      - 'nuget.exe'
+#      - 'nuget.exe'
       - 'Artifacts\*'
       - 'CoverageReports\index.html'
 #    cobertura: 'cobertura.xml'
@@ -85,7 +89,7 @@ jenkins:
       autoUpdateStability: false
       failNoReports: false
       failUnhealthy: false
-      failUnstable: false
+      failUnstable: true
       maxNumberOfBuilds: 0
       onlyStable: false
       sourceEncoding: 'ASCII'
