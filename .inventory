@@ -1,0 +1,35 @@
+all:
+  vars:
+    company: aurea
+    project: central
+    team: ms.cfot
+    product: epmlive
+    maintainer:
+      skype: nacxaa
+ 
+docker-host:
+  vars:
+    recreate: true
+    pull: yes
+    restart: 'no'
+  children:
+    dlb1.aureacentral.com:
+##    dw1.eu.aureacentral.com:
+ 
+dlb1.aureacentral.com:
+  vars:
+    ansible_host: dlb1.aureacentral.com
+    ansible_user: root
+    memory: 4G
+    cpu_period: 100000
+    cpu_quota: 300000
+    cpu_shares: 2048
+    network_mode: bridge
+  hosts:
+    ui-tests:
+      image: registry2.swarm.devfactory.com/aurea/epmlive:ui-tests
+      services:
+        - name: ui-tests
+      entrypoint:
+        - sleep
+        - 3600
