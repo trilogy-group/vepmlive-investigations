@@ -6,9 +6,9 @@ language: shell
 
 branches:
   only:
-    - bugfix/*
-    - hotfix/*
-    - feature/*
+    - /^bugfix\/.*$/
+    - /^hotfix\/.*$/
+    - /^feature\/.*$/
     
 cache:
   directories:
