@@ -67,6 +67,13 @@ script:
 #  - xcopy CoverageReports\* %WORKSPACE%\CoverageReports\
   - powershell.exe -NoP -NonI -Command "Expand-Archive '.\cobertura.xml.zip' './'"
   - xcopy BuildTeamCity\cobertura.xml %WORKSPACE%
+
+docker-agents:
+  - cloud-name: dw1.eu.aureacentral.com
+    docker-url: dw1.eu.aureacentral.com:2375
+    docker-image: registry2.swarm.devfactory.com/aurea/epmlive:jenkins-build-agent-sdk10
+    labels: epmlive
+    
 jenkins:
   os: windows
   additional_labels:
