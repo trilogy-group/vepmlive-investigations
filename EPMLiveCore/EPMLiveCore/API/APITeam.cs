@@ -674,7 +674,8 @@ namespace EPMLiveCore.API
                 {
                     SPList list = oWeb.Lists[listid];
                     SPListItem li = list.GetItemById(itemid);
-                    var projectResourceRatesFeatureIsEnabled = listid == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
+                    var projectResourceRatesFeatureIsEnabled = IsProjectCenter(oWeb, listid) && IsPfeSite(oWeb);
+                    var projectId = projectResourceRatesFeatureIsEnabled ? GetProjectId(oWeb, listid, itemid) : 0;
 
                     SPFieldUserValueCollection uvc = null;
                     try
@@ -721,7 +722,7 @@ namespace EPMLiveCore.API
                             if (projectResourceRatesFeatureIsEnabled)
                             {
                                 var resourceId = GetResourceId(oWeb, drRes[0]);
-                                if (resourceId > 0)
+                                if (resourceId > 0 && projectId > 0)
                                 {
                                     // update rate for existing resources if rate is not equal to the standard rate, otherwise remove rate
                                     var rateString = nd.Attributes[ProjectRateColumn].Value;
@@ -731,7 +732,7 @@ namespace EPMLiveCore.API
 
                                     var rateValue = !string.IsNullOrWhiteSpace(rateString) ? Convert.ToDecimal(rateString) : (decimal?)null;
                                     var standardRateValue =  !string.IsNullOrWhiteSpace(standardRateString) ? Convert.ToDecimal(standardRateString) : 0;
-                                    UpdateProjectResourceRate(oWeb, itemid, resourceId, rateValue != standardRateValue ? rateValue : null);
+                                    UpdateProjectResourceRate(oWeb, projectId, resourceId, rateValue != standardRateValue ? rateValue : null);
 
                                     // keep resource id for cleanup action
                                     savedRatesUserIds.Add(resourceId);
@@ -770,10 +771,10 @@ namespace EPMLiveCore.API
                         uvc.Remove(uv);
                     }
 
-                    if (projectResourceRatesFeatureIsEnabled)
+                    if (projectResourceRatesFeatureIsEnabled && projectId > 0)
                     {
                         // remove rates for all resources except whose we saved recently (cleanup for removed team members)
-                        DeleteProjectResourceRates(oWeb, itemid, savedRatesUserIds.ToArray());
+                        DeleteProjectResourceRates(oWeb, projectId, savedRatesUserIds.ToArray());
                     }
 
                     try
@@ -980,7 +981,6 @@ namespace EPMLiveCore.API
         /// <summary>
         /// Gets the PFE resource id based on username or full name (for generic accounts only).
         /// </summary>
-        /// <returns></returns>
         private static int GetResourceId(SPWeb web, string username, string name)
         {
             if (string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name))
@@ -993,6 +993,20 @@ namespace EPMLiveCore.API
                 ? CoreFunctions.GetCleanUserNameWithDomain(web, username) 
                 : null;
             return usersRepository.FindResourceId(web, accountName, name);
+        }
+
+        /// <summary>
+        /// Get the PFE unique project id based on list item id.
+        /// </summary>
+        private static int GetProjectId(SPWeb web, Guid listId, int id)
+        {
+            if (id == 0 || listId == Guid.Empty)
+            {
+                return 0;
+            }
+
+            var repository = new ProjectRepository();
+            return repository.FindProjectId(web, listId, id);
         }
 
         private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem li)
@@ -1957,10 +1971,7 @@ namespace EPMLiveCore.API
                         catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
 
 
-                        if (listid != Guid.Empty)
-                        {
-                            projectResourceRatesEnabled = listid == GetProjectCenterListId(tWeb) && IsPfeSite(tWeb);
-                        }
+                        projectResourceRatesEnabled = IsProjectCenter(tWeb, listid) && IsPfeSite(tWeb);
 
                         XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
                         XmlNode ndLeftCols = doc.SelectSingleNode("//LeftCols");
@@ -2350,7 +2361,8 @@ namespace EPMLiveCore.API
                     : Guid.Empty;
             }
 
-            var projectResourceRateFeatureIsEnabled = listId == GetProjectCenterListId(oWeb) && IsPfeSite(oWeb);
+            var projectResourceRateFeatureIsEnabled = IsProjectCenter(oWeb, listId) && IsPfeSite(oWeb);
+            var projectId = projectResourceRateFeatureIsEnabled ? GetProjectId(oWeb, listId, listItemId) : 0;
 
             XmlDocument docTeam = new XmlDocument();
             docTeam.LoadXml(GetTeam(xml, oWeb));
@@ -2388,15 +2400,14 @@ namespace EPMLiveCore.API
 
                 // before get project resource rates, validate all inputs: should be project center list item with valid user id
                 var allowEditRate = false;
-                if (listItemId > 0 
-                    && listId != Guid.Empty 
-                    && projectResourceRateFeatureIsEnabled)
+                if (projectResourceRateFeatureIsEnabled 
+                    && projectId > 0)
                 {
                     var resourceId = GetResourceId(oWeb, resourceUsername, resourceName);
                     if (resourceId > 0)
                     {
                         // get the rate value
-                        var rate = ratesRepository.GetRate(oWeb, DateTime.Today, listItemId, resourceId);
+                        var rate = ratesRepository.GetRate(oWeb, DateTime.Today, projectId, resourceId);
                         var rateValue = rate != null ? string.Format("{0:0.##}", rate.Rate) : standardRate;
 
                         // add project rate value
@@ -2664,16 +2675,21 @@ namespace EPMLiveCore.API
             catch { }
         }
 
-        private static Guid GetProjectCenterListId(SPWeb web)
+        private static bool IsProjectCenter(SPWeb web, Guid listId)
         {
             try
             {
-                return web.Lists[ProjectCenterListName].ID;
+                if (listId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                return web.Lists[ProjectCenterListName].ID == listId;
             }
             catch (ArgumentException)
             {
-                // in case when list does not exist return empty id
-                return Guid.Empty;
+                // in case when list does not exist return false
+                return false;
             }
         }
 

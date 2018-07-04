@@ -146,6 +146,7 @@
         var sDefaultGroup = "<%=sDefaultGroup %>";
         var sListId = "<%=Request["listid"] %>";
         var sItemId = "<%=Request["id"] %>";
+        var projectIdInPfe = "<%=projectIdInPfe%>";
         var scrollTimeout;
 
         function Close()

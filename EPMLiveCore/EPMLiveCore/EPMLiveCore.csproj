@@ -1294,8 +1294,10 @@
     <Compile Include="NotificationEvent.cs" />
     <Compile Include="PfeData\ConnectionProvider.cs" />
     <Compile Include="PfeData\IConnectionProvider.cs" />
+    <Compile Include="PfeData\IProjectRepository.cs" />
     <Compile Include="PfeData\IProjectResourceRateRepository.cs" />
     <Compile Include="PfeData\IResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectRepository.cs" />
     <Compile Include="PfeData\ResourceRepository.cs" />
     <Compile Include="PfeData\ProjectResourceRateRepository.cs" />
     <Compile Include="PfeData\ProjectResourceRate.cs" />
