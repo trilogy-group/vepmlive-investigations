@@ -352,10 +352,10 @@ function SaveTeamCloseClose(loader) {
 function UpdateCostValues(onCompleted) {
     var webUrl = SP.Utilities.Utility.getLayoutsPageUrl('ppm/PostCostValues.ashx');
     var projectRateColumn = Grids.TeamGrid.Cols["ProjectRate"];
-    if (sItemId && projectRateColumn && (projectRateColumn.Visible === 1)) {
+    if (projectIdInPfe && projectRateColumn && (projectRateColumn.Visible === 1)) {
         var requestData =
             "<request function=\"PostCostValuesRequest\" context=\"PostOnProjectResourceRateChange\"><data ProjectId=\"" +
-                sItemId +
+                projectIdInPfe +
                 "\" Publish=\"1\"/></request>";
         $.ajax({
             type: 'POST',
