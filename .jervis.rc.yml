@@ -22,15 +22,12 @@ cache:
     - ${HOME}/.sdkman
 
 before_install:
-  - echo '%RELEASE%'
-  - echo '{%RELEASE%}'
-  - echo '{RELEASE}'
 ##  - powershell $ver=[RegEx]::Match('%BRANCH_NAME%','((?:\d+\.\d+\.\d+(\.\d+)?))');$ver2= [RegEx]::Match($ver,'((\d+\.\d+\.\d+)(?:\.\d+)?)').Groups[2]; $ver = '[assembly:System.Reflection.AssemblyFileVersion(\"'+$ver2+'.%BUILD_NUMBER%\")]'; $ver3 = ''+$ver2+'.%BUILD_NUMBER%'; $ver = (Get-Content CommonAssemblyInfo.cs).replace('6.1.0.0', $ver3); Set-Content -Value "$ver" -Path CommonAssemblyInfo.cs
   - powershell $ver = (Get-Content CommonAssemblyInfo.cs).replace('6.1.0.0', '%RELEASE%'); Set-Content -Value "$ver" -Path CommonAssemblyInfo.cs
 #update version
 
 install:
-  - sleep 3600
+#  - sleep 3600
   - echo "running build steps powershell etc"
   - xcopy * c:\workspace /s/h/e/k/c/q
   - rm -fr EPM* BuildTeamCity InstallShield Libraries PortfolioEngineCore ProjectPublisher2016 PWChanger EPK* Template Utils WiX Izenda CommonAssemblyInfo.cs EMPLiveAutomationTesting Telerik.* UplandIntegrations .nuget Saas
