@@ -6,6 +6,7 @@ import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class CommonPage extends BasePage {
 
@@ -169,7 +170,7 @@ export class CommonPage extends BasePage {
     }
 
     static get editTeamButtonOnTask() {
-        return CommonPageHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
+        return ElementHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
 }
     static get resourceDepartment() {
         return element(By.css(`.GMHeaderRow [class*='Department']`));
@@ -197,7 +198,7 @@ export class CommonPage extends BasePage {
     }
 
     static get ganttGrid() {
-        return CommonPageHelper.getElementByStartsWithId('GanttGrid');
+        return ElementHelper.getElementByStartsWithId('GanttGrid');
     }
 
     static get searchControls() {
@@ -219,7 +220,7 @@ export class CommonPage extends BasePage {
 
     static get uploadSuccessFullyText(){
         return{
-        message: CommonPageHelper.getElementByText(CommonPageConstants.documentUploadText),
+        message: ElementHelper.getElementByText(CommonPageConstants.documentUploadText),
      };
     }
     static get records() {
@@ -378,7 +379,7 @@ export class CommonPage extends BasePage {
 
     static get getbuttons() {
         return {
-            calender: CommonPageHelper.getElementByText(CommonPageConstants.calendar),
+            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
         };
     }
 

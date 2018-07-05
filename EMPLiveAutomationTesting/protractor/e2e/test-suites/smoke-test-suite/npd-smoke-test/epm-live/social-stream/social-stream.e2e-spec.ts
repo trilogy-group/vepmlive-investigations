@@ -85,7 +85,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
@@ -132,7 +132,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Project displayed in "Project" page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
     });
@@ -168,7 +168,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(title)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
 

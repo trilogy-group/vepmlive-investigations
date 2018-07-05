@@ -122,8 +122,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await ElementHelper.clickUsingJs(EventsPage.createViews);
         await PageHelper.click(EventsPage.standardViewType);
-        await ElementHelper.scrollToElement(CommonPageHelper.getElementByText(uniqueId));
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId))).toBe(true,
+        await ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));
 
     }) ;

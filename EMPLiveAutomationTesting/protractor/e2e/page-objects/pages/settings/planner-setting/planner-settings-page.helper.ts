@@ -27,17 +27,17 @@ export class PlannerSettingsPageHelper {
         const leftMenus = PlannerSettingsPageConstants.leftMenus;
         return {
             menuTitles: {
-                planName: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.planName),
-                souceList: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.sourceList),
-                taskList: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.taskList),
-                editPlanner: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.editPlanner),
-                deletePlanner: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.deletePlanner),
+                planName: ElementHelper.getElementByText(menuTitles.plannerAdministration.planName),
+                souceList: ElementHelper.getElementByText(menuTitles.plannerAdministration.sourceList),
+                taskList: ElementHelper.getElementByText(menuTitles.plannerAdministration.taskList),
+                editPlanner: ElementHelper.getElementByText(menuTitles.plannerAdministration.editPlanner),
+                deletePlanner: ElementHelper.getElementByText(menuTitles.plannerAdministration.deletePlanner),
                 newPlanner: element(By.id(menuTitles.plannerAdministration.newPlanner)),
-                backToSetting: CommonPageHelper.getElementByText(menuTitles.plannerAdministration.backToSetting),
+                backToSetting: ElementHelper.getElementByText(menuTitles.plannerAdministration.backToSetting),
 
             },
             buttonLabel: {
-                planner: CommonPageHelper.getElementByText(leftMenus.planners),
+                planner: ElementHelper.getElementByText(leftMenus.planners),
             }
         };
     }
@@ -46,7 +46,7 @@ export class PlannerSettingsPageHelper {
         const labels = PlannerSettingsPageConstants.labels;
         return {
             dropDown: {
-                projectRequest: CommonPageHelper.getElementByText(labels.projectRequest)
+                projectRequest: ElementHelper.getElementByText(labels.projectRequest)
             }
         };
     }
@@ -88,7 +88,7 @@ export class PlannerSettingsPageHelper {
             ValidationsHelper.getPageDisplayedValidation(PlannerSettingsPageConstants.administration));
 
         stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(name)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation(name));
 
         stepLogger.stepId(6);
@@ -122,7 +122,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(name)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation(name));
         await PageHelper.switchToDefaultContent();
 
@@ -135,7 +135,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.stepId(8);
         stepLogger.step('Select the newly added planner [Ex: Smoke Test Planner 1] in Select Planner pop up');
-        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(CommonPageHelper.getElementByText(name));
+        await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ElementHelper.getElementByText(name));
 
         stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
         // After select project Planner wait required, not element found which can use with waitHelper.

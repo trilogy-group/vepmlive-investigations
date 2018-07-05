@@ -236,7 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -289,9 +289,9 @@ export class ProjectItemPageHelper {
 
     static get getlink() {
         return {
-            myLanguageAndRegion: CommonPageHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: CommonPageHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: CommonPageHelper.getElementByText(ProjectItemPageConstants.region),
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
 
@@ -316,7 +316,7 @@ export class ProjectItemPageHelper {
     }
     static get button() {
         return {
-            ok: CommonPageHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 

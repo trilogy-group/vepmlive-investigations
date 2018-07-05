@@ -11,7 +11,6 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {PlannerSettingsPageConstants} from '../../../../../page-objects/pages/settings/planner-setting/planner-settings-page.constants';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {PlannerSettingPage} from '../../../../../page-objects/pages/settings/planner-setting/planner-setting.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -26,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(1032747);
         stepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
-        const plannerName = PlannerSettingsPageConstants.newPlannerDetails.name + uniqueId;
+        const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
         stepLogger.step('Click on "Main Gear Settings" icon  displayed in left bottom corner');
         await PageHelper.click(CommonPage.sidebarMenus.settings);
 
@@ -86,7 +85,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(1032780);
         const uniqueId = PageHelper.getUniqueId();
         stepLogger.precondition('Add new planner');
-        const plannerName = PlannerSettingsPageConstants.newPlannerDetails.name + uniqueId;
+        const plannerName = `${PlannerSettingsPageConstants.newPlannerDetails.name}${uniqueId}`;
         const plannerUpdatedName = PlannerSettingsPageConstants.newPlannerDetails.updatedName + uniqueId;
         await PlannerSettingsPageHelper.createPlanner(plannerName);
 
@@ -106,13 +105,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('All existing Planners are displayed in the list along with the new planner created' +
             ' as per pre requisites [Ex: Smoke Test Planner 1]');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(plannerName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(plannerName)))
             .toBe(true, ValidationsHelper.getRecordCreatedValidation(plannerName));
 
         stepLogger.stepId(2);
         stepLogger.step('Mouse over the name of the newly created planner [Ex: Smoke Test Planner 1]\n' +
             'Click on drop down seen on the right side of the planner name');
-        await PageHelper.click(CommonPageHelper.getElementByText(plannerName));
+        await PageHelper.click(ElementHelper.getElementByText(plannerName));
 
         stepLogger.step('Select Edit Planner from the options displayed');
         await PageHelper.click(PlannerSettingsPageHelper.menu.menuTitles.editPlanner);

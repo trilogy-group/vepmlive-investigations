@@ -3,6 +3,7 @@ import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
 import {By, element} from 'protractor';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -37,7 +38,7 @@ export class HomePage extends BasePage {
             project: CommonPageHelper.getToolBarItemsByText(options.project),
             portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
             projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
-            socialStream: CommonPageHelper.getElementByText(optionsLibraryApps.socialStream),
+            socialStream: ElementHelper.getElementByText(optionsLibraryApps.socialStream),
             more: this.moreButton,
             risk: CommonPageHelper.getToolBarItemsByText(options.risk),
             timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),

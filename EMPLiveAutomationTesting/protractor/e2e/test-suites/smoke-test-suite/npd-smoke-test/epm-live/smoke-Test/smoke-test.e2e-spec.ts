@@ -25,7 +25,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Creating New Task and Assigning Task to resource functionality - [1124259]', async () => {
         const stepLogger = new StepLogger(1124259);
         const uniqueId = PageHelper.getUniqueId();
-        const taskElement = CommonPageHelper.getElementByText(uniqueId);
+        const taskElement = ElementHelper.getElementByText(uniqueId);
 
         stepLogger.stepId(1);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -100,7 +100,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Selected user name is displayed in "Assigned To" column [Ex: User1 User1] in' +
             ' "Project Planner" window');
-        await expect(await CommonPageHelper.getElementByText(user).isPresent()).toBe(true,
+        await expect(await ElementHelper.getElementByText(user).isPresent()).toBe(true,
             ValidationsHelper.getDisplayedValidation(user));
 
         stepLogger.stepId(7);
@@ -113,7 +113,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
         await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
-        await expect(await CommonPageHelper.getElementByText(user).isPresent()).toBe(true,
+        await expect(await ElementHelper.getElementByText(user).isPresent()).toBe(true,
             ValidationsHelper.getDisplayedValidation(user));
 
         stepLogger.stepId(8);

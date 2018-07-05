@@ -173,6 +173,14 @@ export class ElementHelper {
         return text.trim();
     }
 
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
+    }
+
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
+
     static browserRefresh() {
         browser.refresh();
     }

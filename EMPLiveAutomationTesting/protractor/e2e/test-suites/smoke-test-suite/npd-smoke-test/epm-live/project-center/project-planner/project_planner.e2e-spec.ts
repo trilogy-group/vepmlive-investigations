@@ -132,11 +132,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.verification('List of users drop down with a check box on Right side of user name is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(name))).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name))).toBe(true,
             ValidationsHelper.getDisplayedValidation(name));
 
         stepLogger.stepId(7);
-        await PageHelper.click(CommonPageHelper.getElementByText(name));
+        await PageHelper.click(ElementHelper.getElementByText(name));
         await PageHelper.click(ProjectItemPageHelper.button.ok);
 
         stepLogger.stepId(8);

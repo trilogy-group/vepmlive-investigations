@@ -161,7 +161,7 @@ export class EventsPageHelper {
 
         stepLogger.verification('View should be created and user should be navigated to event page');
         await PageHelper.click(EventsPage.rollOverEventList);
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
 
         stepLogger.stepId(6);
@@ -172,10 +172,10 @@ export class EventsPageHelper {
 
         stepLogger.step('Expand Current View drop down');
         await PageHelper.click(EventsPage.currentView);
-        await ElementHelper.clickUsingJs(CommonPageHelper.getElementByText(uniqueId));
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
 
         stepLogger.verification('Created view should be displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
 
     }

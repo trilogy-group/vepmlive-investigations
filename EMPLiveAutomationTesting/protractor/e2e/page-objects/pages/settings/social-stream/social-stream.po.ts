@@ -3,18 +3,19 @@ import {SocialStreamPageConstants} from './social-stream-page.constants';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {SocialStreamPageHelper} from './social-stream-page.helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class SocialStreamPage {
 
     static get settingItems() {
         const menuTitlesAndIds = SocialStreamPageConstants.settingItems;
         return {
-            editPage: CommonPageHelper.getElementByText(menuTitlesAndIds.editPage),
-            page: CommonPageHelper.getElementByText(menuTitlesAndIds.page),
+            editPage: ElementHelper.getElementByText(menuTitlesAndIds.editPage),
+            page: ElementHelper.getElementByText(menuTitlesAndIds.page),
             epmLive:  SocialStreamPageHelper.title(menuTitlesAndIds.epmLive),
             socialStream:  SocialStreamPageHelper.title(menuTitlesAndIds.socialStream),
             gridGantt:  SocialStreamPageHelper.title(menuTitlesAndIds.gridGantt),
-            delete: CommonPageHelper.getElementByText(menuTitlesAndIds.delete),
+            delete: ElementHelper.getElementByText(menuTitlesAndIds.delete),
         };
     }
 

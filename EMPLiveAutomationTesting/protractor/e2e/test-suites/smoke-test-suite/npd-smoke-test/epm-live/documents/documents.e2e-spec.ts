@@ -11,6 +11,7 @@ import {CommonPageConstants} from '../../../../../page-objects/pages/common/comm
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
 import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/document-page.helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -37,7 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 
@@ -70,7 +71,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
 
         stepLogger.verification('Version column displays value "0.2" [A new version should be created ' +
@@ -105,7 +106,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getPageDisplayedValidation(HomePageConstants.navigationLabels.projects.documents));
 
         stepLogger.verification('Project Document uploaded [Ex: Testwordfile.docx] is displayed under the Project Node');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.file)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });
 });

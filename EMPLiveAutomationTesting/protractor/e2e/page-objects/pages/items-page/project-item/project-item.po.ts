@@ -4,6 +4,7 @@ import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ProjectItemPageHelper} from './project-item-page.helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -60,8 +61,8 @@ export class ProjectItemPage extends BasePage {
     static get buildTeamContainers() {
         const buildTeamSection = ProjectItemPageConstants.buildTeamContentIDs;
         return {
-            currentTeam: CommonPageHelper.getElementByStartsWithId(buildTeamSection.currentTeam, buildTeamSection.currentTeam),
-            resourcePool: CommonPageHelper.getElementByStartsWithId(buildTeamSection.resourcePool, buildTeamSection.resourcePool),
+            currentTeam: ElementHelper.getElementByStartsWithId(buildTeamSection.currentTeam, buildTeamSection.currentTeam),
+            resourcePool: ElementHelper.getElementByStartsWithId(buildTeamSection.resourcePool, buildTeamSection.resourcePool),
         };
     }
 
@@ -146,11 +147,11 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get viewsButton() {
-        return CommonPageHelper.getElementByText(ProjectItemPageConstants.views);
+        return ElementHelper.getElementByText(ProjectItemPageConstants.views);
     }
 
     static get showGanttButton() {
-        return CommonPageHelper.getElementByText(ProjectItemPageConstants.viewsItems.showgantt);
+        return ElementHelper.getElementByText(ProjectItemPageConstants.viewsItems.showgantt);
     }
 
     static get title() {
@@ -224,7 +225,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get linkType() {
-        return CommonPageHelper.getElementByText(ProjectItemPageConstants.addLinkPopup.linkType, true);
+        return ElementHelper.getElementByText(ProjectItemPageConstants.addLinkPopup.linkType, true);
     }
 
     static get cancelButton() {

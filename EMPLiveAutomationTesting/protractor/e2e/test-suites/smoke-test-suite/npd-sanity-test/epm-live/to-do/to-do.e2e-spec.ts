@@ -188,7 +188,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.step('Check that the attached file get display under "Attachments" section');
         stepLogger.step('The attached file should be displayed under "Attachments" section');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 

@@ -491,7 +491,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 
         const fileNameWithoutExtension = newFile.newFileName.split('.')[0];
-        await expect(await PageHelper.isElementDisplayed(this.getElementByText(fileNameWithoutExtension, true)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(fileNameWithoutExtension, true)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
@@ -552,14 +552,6 @@ export class CommonPageHelper {
 
     static getDivByText(text: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
-    }
-
-    static getElementByStartsWithId(id: string, endsWith = 'Main') {
-        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
-    }
-
-    static getElementByText(text: string, isContains = false) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
     static getElementAllByText(text: string, isContains = false) {
