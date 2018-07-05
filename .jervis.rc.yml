@@ -9,6 +9,7 @@ jervis_version: master
 
 variables:
 #  - CENTRAL_JERVIS_BRANCH=CFOT-626
+   - RELEASE=6.4.444
 
 branches:
   only:
@@ -21,6 +22,9 @@ cache:
     - ${HOME}/.sdkman
 
 before_install:
+  - echo '%RELEASE%'
+  - echo '{%RELEASE%}'
+  - echo '{RELEASE}'
 #$contents = "%teamcity.build.branch%"
 #$versionString = [RegEx]::Match($contents,"((?:\d+\.\d+\.\d+(\.\d+)?))")
 #$currentBuild = [RegEx]::Match($versionString,"((\d+\.\d+\.\d+)(?:\.\d+)?)").Groups[2]
