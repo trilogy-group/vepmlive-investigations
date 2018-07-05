@@ -64,9 +64,9 @@ script:
   - xcopy BuildTeamCity\epmlive_SI_* %WORKSPACE%
   - xcopy "InstallShield\Build Dependencies\"PublisherSetup2016* %WORKSPACE%
 #  - xcopy Artifacts\* %WORKSPACE%\Artifacts\
-#  - xcopy CoverageReports\* %WORKSPACE%\CoverageReports\
-  - powershell.exe -NoP -NonI -Command "Expand-Archive '.\cobertura.xml.zip' './'"
-  - xcopy BuildTeamCity\cobertura.xml %WORKSPACE%
+  - xcopy CoverageReports\* %WORKSPACE%\CoverageReports\
+#  - powershell.exe -NoP -NonI -Command "Expand-Archive '.\cobertura.xml.zip' './'"
+#  - xcopy BuildTeamCity\cobertura.xml %WORKSPACE%
 
 #docker-agents:
 #  - cloud-name: dw1.eu.aureacentral.com
