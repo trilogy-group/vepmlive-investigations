@@ -5,9 +5,11 @@ export class ProjectItemPageConstants {
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly region  = 'Region';
+    static readonly views  = 'Views';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
 
@@ -35,6 +37,12 @@ export class ProjectItemPageConstants {
             risk: 'Risk',
             ok: 'OK',
             projectUpdate: 'Project Update *',
+        };
+    }
+
+    static get viewsItems() {
+        return {
+            showgantt: 'Show Gantt',
         };
     }
 
@@ -193,14 +201,23 @@ export class ProjectItemPageConstants {
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
-            editCourse: 'Edit Course'
+            editCourse: 'Edit Course',
+            publish: 'Publish Status'
+        };
+    }
+
+    static get addLinkPopup() {
+        return {
+            linkType: 'Link Type',
+            addLink: 'Add Link',
+            cancel: 'Cancel',
         };
     }
 
     static get planActionButtons() {
         return {
             save: 'Save Button',
-            close: 'Close Button'
+            close: 'Close Button',
         };
     }
 
@@ -247,6 +264,7 @@ export class ProjectItemPageConstants {
 
     static get newTaskFields() {
         return {
+            assignedList: 'Assigned List',
             title: 'Title',
             finishDate: 'Finish Date',
             work: 'Work',

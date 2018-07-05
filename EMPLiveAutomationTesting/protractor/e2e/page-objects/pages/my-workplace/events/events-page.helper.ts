@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -9,7 +10,6 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
-import {browser} from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import { MyWorkplaceConstants } from '../my-workplace.constants';

@@ -371,6 +371,14 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
 
+    static async removeAssignedUserIfPresent(stepLogger: StepLogger) {
+        stepLogger.step('Removed assigned user from current team');
+        if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
+            await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
+        }
+    }
+
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }

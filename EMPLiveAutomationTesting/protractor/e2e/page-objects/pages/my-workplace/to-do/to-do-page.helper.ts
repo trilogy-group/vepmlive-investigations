@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {ToDoPage} from './to-do.po';
@@ -6,7 +7,6 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ToDoPageConstants} from './to-do-page.constants';
 import {PageHelper} from '../../../../components/html/page-helper';
-import {browser} from 'protractor';
 
 export class ToDoPageHelper {
 

@@ -521,7 +521,7 @@ export class CommonPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.s);
+        await browser.sleep(PageHelper.timeout.m);
     }
 
     static getPublicView(text: string) {

@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -10,7 +11,6 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {PlannerSettingsPageConstants} from '../../../../../page-objects/pages/settings/planner-setting/planner-settings-page.constants';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-import {browser} from 'protractor';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {PlannerSettingPage} from '../../../../../page-objects/pages/settings/planner-setting/planner-setting.po';
 

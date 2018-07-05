@@ -49,6 +49,14 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
+    static get selectTeamMember() {
+        return element(By.xpath(`.//a[.="${ProjectItemPageConstants.teamMember}"]`));
+    }
+
+    static get selectTeamMemberCheckBox() {
+        return element(By.xpath(`.//td[.="${ProjectItemPageConstants.teamMember}"]//parent::tr//*[contains(@class,'GMCellPanel')]`));
+    }
+
     static get buildTeamContainers() {
         const buildTeamSection = ProjectItemPageConstants.buildTeamContentIDs;
         return {
@@ -137,6 +145,18 @@ export class ProjectItemPage extends BasePage {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
 
+    static get viewsButton() {
+        return CommonPageHelper.getElementByText(ProjectItemPageConstants.views);
+    }
+
+    static get showGanttButton() {
+        return CommonPageHelper.getElementByText(ProjectItemPageConstants.viewsItems.showgantt);
+    }
+
+    static get title() {
+        return element(By.xpath('//*[@id="ResourceGrid"]//*[.="Title"]'));
+    }
+
     static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
         const xpathForUser = `//td[normalize-space(@id)="${teamType}"]//a[normalize-space(text())="${userName}"]
         //parent::td//parent::tr/td[contains(@class,"GMCellPanel")]`;
@@ -189,6 +209,26 @@ export class ProjectItemPage extends BasePage {
 
     static get save() {
         return element(By.css('[id*="SaveButton"]'));
+    }
+
+    static get publishstatus() {
+        return element(By.css('[id*="publish"] a'));
+    }
+
+    static get publishButtton() {
+        return element(By.css('[id*="PublishButton"]'));
+    }
+
+    static get profilePicOfUser() {
+        return element(By.css('[id*="CounterProfile"]'));
+    }
+
+    static get linkType() {
+        return CommonPageHelper.getElementByText(ProjectItemPageConstants.addLinkPopup.linkType, true);
+    }
+
+    static get cancelButton() {
+        return element(By.css('#addlinkdiv [value="Cancel"]'));
     }
 
 }

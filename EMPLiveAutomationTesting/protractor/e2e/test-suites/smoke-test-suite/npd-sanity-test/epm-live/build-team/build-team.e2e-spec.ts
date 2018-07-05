@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
@@ -13,7 +14,6 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {browser} from 'protractor';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {

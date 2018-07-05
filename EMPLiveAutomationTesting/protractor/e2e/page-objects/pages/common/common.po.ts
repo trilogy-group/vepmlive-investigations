@@ -44,6 +44,7 @@ export class CommonPage extends BasePage {
                 projectPortfolios: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPortfolios),
                 projectsCenter: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectCenter),
                 tasks: CommonPageHelper.getPageHeaderByTitle(projectsLabels.tasks),
+                taskCenter: CommonPageHelper.getPageHeaderByTitle(projectsLabels.taskCenter),
                 risks: CommonPageHelper.getPageHeaderByTitle(projectsLabels.risks),
                 issues: CommonPageHelper.getPageHeaderByTitle(projectsLabels.issues),
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
@@ -167,6 +168,9 @@ export class CommonPage extends BasePage {
         return element(By.css(`.//*[@class='GMHeaderGroup']/*[text()='Department']`));
     }
 
+    static get editTeamButtonOnTask() {
+        return CommonPageHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
+}
     static get resourceDepartment() {
         return element(By.css(`.GMHeaderRow [class*='Department']`));
     }
