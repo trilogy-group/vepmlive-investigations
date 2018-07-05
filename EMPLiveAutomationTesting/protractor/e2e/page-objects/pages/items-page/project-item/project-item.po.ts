@@ -138,8 +138,8 @@ export class ProjectItemPage extends BasePage {
         return element(By.xpath(`(//a[contains(@id,"RSActionMenu") and @title="Open Menu"])[last()]`));
     }
 
-    static get deleteTask(){
-        return  element(By.css('[id*="DeleteTask"]'));
+    static get deleteTask() {
+        return element(By.css('[id*="DeleteTask"]'));
     }
 
     static get applyParameterButton() {

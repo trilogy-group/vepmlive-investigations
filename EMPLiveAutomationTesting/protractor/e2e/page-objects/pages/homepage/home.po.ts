@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {BasePage} from '../base-page';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
-import {By, element} from 'protractor';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
 import {ElementHelper} from '../../../components/html/element-helper';
 

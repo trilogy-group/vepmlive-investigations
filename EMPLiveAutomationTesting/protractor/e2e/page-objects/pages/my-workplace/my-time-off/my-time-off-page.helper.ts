@@ -1,3 +1,4 @@
+import {By, element} from 'protractor';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {CommonPage} from '../../common/common.po';
 import {StepLogger} from '../../../../../core/logger/step-logger';
@@ -7,7 +8,6 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyTimeOffPage} from './my-time-off.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {By, element} from 'protractor';
 
 export class MyTimeOffPageHelper {
 

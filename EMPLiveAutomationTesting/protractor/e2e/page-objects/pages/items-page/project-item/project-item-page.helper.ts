@@ -1,3 +1,4 @@
+import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {ProjectItemPage} from './project-item.po';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {StepLogger} from '../../../../../core/logger/step-logger';
@@ -5,7 +6,6 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';

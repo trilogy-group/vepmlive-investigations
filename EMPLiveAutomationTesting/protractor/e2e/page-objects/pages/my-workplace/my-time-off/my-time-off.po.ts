@@ -1,6 +1,6 @@
+import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyTimeOffPageConstants} from './my-time-off-page.constants';
-import {By, element} from 'protractor';
 import {MyTimeOffPageHelper} from './my-time-off-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 

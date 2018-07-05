@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ReportsItemPageConstants} from './reports-item-page.constants';
-import {By, element} from 'protractor';
 
 export class ReportsItemPage extends BasePage {
 

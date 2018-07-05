@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ToDoPageConstants} from './to-do-page.constants';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
-import {By, element} from 'protractor';
 import {SocialStreamPageConstants} from '../../settings/social-stream/social-stream-page.constants';
 
 export class ToDoPage {

@@ -1,5 +1,5 @@
-import {ItemSettingsPageConstants} from './item-settings-page.constants';
 import {By, element} from 'protractor';
+import {ItemSettingsPageConstants} from './item-settings-page.constants';
 
 export class ItemSettingsPage {
     static get pagination() {

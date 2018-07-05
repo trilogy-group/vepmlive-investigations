@@ -1,5 +1,5 @@
-import {BasePage} from '../base-page';
 import {browser, By, element} from 'protractor';
+import {BasePage} from '../base-page';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
