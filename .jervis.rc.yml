@@ -31,6 +31,7 @@ before_install:
 #update version
 
 install:
+  - sleep 3600
   - echo "running build steps powershell etc"
   - xcopy * c:\workspace /s/h/e/k/c/q
   - rm -fr EPM* BuildTeamCity InstallShield Libraries PortfolioEngineCore ProjectPublisher2016 PWChanger EPK* Template Utils WiX Izenda CommonAssemblyInfo.cs EMPLiveAutomationTesting Telerik.* UplandIntegrations .nuget Saas
