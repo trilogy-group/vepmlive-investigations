@@ -253,8 +253,6 @@ function GridColumnWidthSet(col) {
 
     var columnKeys = columnStatus.map(function(x) { return x.Name + '=' + x.Width });
     var columnKeysPlain = columnKeys.join(',');
-    var getUrl = window.location;
-    var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
     $.ajax({
         type: 'POST',
@@ -278,8 +276,6 @@ function GridColumnWidthGet() {
     }).filter(function(x) { return x.Name != "Panel" && x.Visible === 1 });
     var columnKeys = columns.map(function(x) { return GridColumnWidthNamespace + '.' + x.Name });
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
-    var getUrl = window.location;
-    var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
     $.ajax({
         type: 'POST',
@@ -293,9 +289,6 @@ function GridColumnWidthGet() {
         dataType: 'json',
         success: function (response) {
             var cdata = response.d.split('[CDATA[');
-            Grids.OnColResize = function (tgrid, col) {
-
-            };
 
             if (cdata.length != 1) {
                 var widthsPart = cdata[1].split(']]>')[0].split(',');
@@ -315,6 +308,7 @@ function GridColumnWidthGet() {
 
                 columnStatus = widths;
             }
+
             Grids.OnColResize = function (tgrid, col) {
                 GridColumnWidthSet(col);
             };
