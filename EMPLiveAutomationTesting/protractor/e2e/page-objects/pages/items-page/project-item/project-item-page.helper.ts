@@ -193,7 +193,7 @@ export class ProjectItemPageHelper {
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
         stepLogger.step('Select assignee');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
-        await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
+        await PageHelper.click(ProjectItemPageHelper.selectFirstAssign());
         stepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
@@ -377,6 +377,10 @@ export class ProjectItemPageHelper {
             await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
             await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
         }
+    }
+
+    static selectFirstAssign() {
+        return this.selectAssign(1);
     }
 
     static selectAssign(index: number) {

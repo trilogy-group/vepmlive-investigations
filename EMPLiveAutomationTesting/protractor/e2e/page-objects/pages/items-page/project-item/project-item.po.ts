@@ -50,6 +50,12 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
+    static get cancelPopupButton() {
+        return {
+            cancel: ElementHelper.getElementByText(CommonPageConstants.formLabels.cancel)
+        };
+    }
+
     static get selectTeamMember() {
         return element(By.xpath(`.//a[.="${ProjectItemPageConstants.teamMember}"]`));
     }
@@ -185,6 +191,14 @@ export class ProjectItemPage extends BasePage {
             delete: element(By.id('RemoveBtn')),
             tools: element(By.id('ToolsBtn')),
             showReference: element(By.id('ShowRefBtn'))
+        };
+    }
+
+    static get createColumnTabLabel() {
+        return {
+            nameAndType: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.nameAndType, true),
+            additionalColumnSetting: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.additionalColumnSetting),
+            columnValidation: CommonPageHelper.getATagByText(ProjectItemPageConstants.createColumnTabLabel.columnValidation, true),
         };
     }
 

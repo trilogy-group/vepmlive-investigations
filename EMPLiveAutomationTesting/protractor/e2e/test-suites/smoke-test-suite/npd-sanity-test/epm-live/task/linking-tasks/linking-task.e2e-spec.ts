@@ -23,14 +23,14 @@ describe(SuiteNames.smokeTestSuite, () => {
             'created in pre requisite# 3 [Ex: Smoke Test Project 2:: New Task 1, New Task 2]');
         const uniqueId = PageHelper.getUniqueId();
         const hours = CommonPageConstants.hours.durationHours4;
-        const testCase = TaskPageConstants.decrease;
+        const operation = TaskPageConstants.decrease;
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
         await TaskPageHelper.navigateToPlannerAndDeleteTask();
-        await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, testCase);
+        await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, operation);
     });
 
     it('Increase Task1\'s Duration (Respective Links=ON, \'Start ASAP\'=ON - [1035334])', async () => {
@@ -38,7 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.precondition('Execute steps# 1 to 4 in test case C743761 and add 2 tasks in the project ' +
             'created in pre requisite# 3 [Ex: Smoke Test Project 2:: New Task 1, New Task 2]');
         const uniqueId = PageHelper.getUniqueId();
-        const testCase = TaskPageConstants.increase;
+        const operation = TaskPageConstants.increase;
         const hours = CommonPageConstants.hours.durationHours3;
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -46,6 +46,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
         await TaskPageHelper.navigateToPlannerAndDeleteTask();
-        await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, testCase);
+        await TaskPageHelper.increaseAndDecreaseTaskDuration(stepLogger, uniqueId, hours, operation);
     });
 });

@@ -169,6 +169,7 @@ export class ElementHelper {
     }
 
     static async getText(elem: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBePresent(elem);
         const text = await elem.getText();
         return text.trim();
     }

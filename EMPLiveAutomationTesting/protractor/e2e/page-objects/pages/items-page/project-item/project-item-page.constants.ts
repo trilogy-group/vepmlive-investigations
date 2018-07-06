@@ -155,6 +155,15 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get createColumnTabLabel() {
+        return {
+            createColumn: 'Create Column',
+            nameAndType: 'Name and Type',
+            additionalColumnSetting: 'Additional Column Settings',
+            columnValidation: 'Column Validation',
+        };
+    }
+
     static get messageText() {
         return {
             saveAndCloseDisabled: 'Save & Close Button is disabled',

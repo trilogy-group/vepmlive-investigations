@@ -161,6 +161,10 @@ export class CommonPage extends BasePage {
         return element(By.css(`${this.resourceGrid} [data-original-title*='Grouping']`));
     }
 
+    static get createColumnDlgBox() {
+        return element(By.css(`[class*="ColumnsMenuHead"]`));
+    }
+
     static get resourceGroupingColumn() {
         return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
     }
@@ -269,6 +273,10 @@ export class CommonPage extends BasePage {
 
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
+    }
+
+    static get cancelButton () {
+        return element(By.id('onetidCancelItem'));
     }
 
     static get UpdatePropertyDocument() {
