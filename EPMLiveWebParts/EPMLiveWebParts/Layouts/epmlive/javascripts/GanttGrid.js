@@ -241,7 +241,7 @@ function GridOnLoaded(grid) {
 
 var GridColumnWidthNamespace = 'GridColumnWidth';
 function GridColumnWidthSet(col) {
-    var contains = columnStatus.filter(x => x.Name == col);
+    var contains = columnStatus.filter(function(x) { return x.Name == col });
     if (contains.length == 0) {
         columnStatus.push({ Name: col, Width: Grids[0].Cols[col].Width });
     } else {
@@ -251,7 +251,7 @@ function GridColumnWidthSet(col) {
         }
     }
 
-    var columnKeys = columnStatus.map(x => x.Name + '=' + x.Width);
+    var columnKeys = columnStatus.map(function(x) { return x.Name + '=' + x.Width });
     var columnKeysPlain = columnKeys.join(',');
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host;
@@ -275,8 +275,8 @@ var columnStatus = [];
 function GridColumnWidthGet() {
     var columns = Object.keys(Grids[0].Cols).map(function (key, index) {
         return Grids[0].Cols[key];
-    }).filter(x => x.Name != "Panel" && x.Visible === 1);
-    var columnKeys = columns.map(x => GridColumnWidthNamespace + '.' + x.Name);
+    }).filter(function(x) { return x.Name != "Panel" && x.Visible === 1 });
+    var columnKeys = columns.map(function(x) { return GridColumnWidthNamespace + '.' + x.Name });
     var columnKeysPlain = columnKeys.reduce(function (acc, name) { return acc + ',' + name; });
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host;
@@ -299,7 +299,7 @@ function GridColumnWidthGet() {
 
             if (cdata.length != 1) {
                 var widthsPart = cdata[1].split(']]>')[0].split(',');
-                var widths = widthsPart.map(x => { return { Name: x.split('=')[0], Width: x.split('=')[1] }; });
+                var widths = widthsPart.map(function(x) { return { Name: x.split('=')[0], Width: x.split('=')[1] }; });
                 for (var i = 0; i < widths.length; i++) {
                     var index = widths[i].Name;
                     var col = Grids[0].Cols[index];
