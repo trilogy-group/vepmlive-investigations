@@ -12,8 +12,6 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
@@ -86,8 +84,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(newFile.newFileName));
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
@@ -171,6 +168,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
+
 
     it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);
