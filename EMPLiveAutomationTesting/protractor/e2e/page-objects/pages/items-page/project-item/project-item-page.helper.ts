@@ -338,6 +338,11 @@ export class ProjectItemPageHelper {
         (@class,"${column}")]`));
     }
 
+    static async closeResourcePage() {
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.click(CommonPage.resourceCloseButton);
+    }
+
     static getFinishDate(index: number) {
         // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
         return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains(@class,
@@ -376,6 +381,13 @@ export class ProjectItemPageHelper {
         if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
             await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
             await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
+        }
+    }
+
+    static async unCheckedSelectColumnIfChecked() {
+        if (await ProjectItemPage.selectColumnName.isPresent() === false) {
+            await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.actualCost));
+            await PageHelper.click(ProjectItemPage.selectColumnLabel.ok);
         }
     }
 

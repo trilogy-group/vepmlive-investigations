@@ -7,12 +7,17 @@ export class ProjectItemPageConstants {
     static readonly buildTeamPage = 'Build Team';
     static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
+    static readonly associated = 'Associated';
+    static readonly changeWindow = 'Changes - All Changes';
+    static readonly issueWindow = 'Issues - All Issues by Status';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly region  = 'Region';
     static readonly views  = 'Views';
+    static readonly actualCost  = 'Actual Cost';
+    static readonly saveView  = 'Save View';
+    static readonly createColumn  = 'Create Column';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
-
     static get inputLabels() {
         return {
             projectName: 'Project Name *',
@@ -164,6 +169,16 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get associatedItems() {
+        return {
+            lists: 'Lists',
+            changes: 'Changes',
+            issues: 'Issues',
+            risks: 'Risks',
+            documentLibraries: 'Document Libraries',
+        };
+    }
+
     static get messageText() {
         return {
             saveAndCloseDisabled: 'Save & Close Button is disabled',
@@ -212,6 +227,14 @@ export class ProjectItemPageConstants {
             resourceAnalyzer: 'Resource Analyzer',
             editCourse: 'Edit Course',
             publish: 'Publish Status'
+        };
+    }
+
+    static get selectColumnLabel() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
         };
     }
 

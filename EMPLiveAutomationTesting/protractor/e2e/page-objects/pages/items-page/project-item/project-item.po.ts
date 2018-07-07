@@ -102,6 +102,14 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
+    static get changeWindow() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.changeWindow);
+    }
+
+    static get issueWindow() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.issueWindow);
+    }
+
     static get selectPlanner() {
         const label = ProjectItemPageConstants.plannerLabels;
         return {
@@ -152,8 +160,48 @@ export class ProjectItemPage extends BasePage {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
 
+    static get saveViewButton() {
+        return element(By.css(`[id*="SaveView"]`));
+    }
+
+    static get associatedItemsDropDown() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.associated);
+    }
+
+    static get OkButton() {
+        return element(By.css(`[id="viewNameDiv"] [value="OK"]`));
+    }
+
+    static get saveViewNameField() {
+        return element(By.id(`viewname`));
+    }
+
+    static get currentViewDropDown() {
+        return element(By.css(`[id*="WorkViewsGroup"][class*="arrow-button"]`));
+    }
+
     static get viewsButton() {
         return ElementHelper.getElementByText(ProjectItemPageConstants.views);
+    }
+
+    static get actuallCostColumn() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.actualCost);
+    }
+
+    static get selectColumnName() {
+        return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.unCheckedCheckbox}`));
+    }
+
+    static get unCheckedCheckbox() {
+        return '/div[contains(@class,"Unchecked")]';
+    }
+
+    static get checkedSelectColumn() {
+        return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.checkedCheckbox}`));
+    }
+
+    static get checkedCheckbox() {
+        return '/div[contains(@class,"Checked")]';
     }
 
     static get showGanttButton() {
@@ -202,10 +250,32 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get associatedItems() {
+        return {
+            // Below xpath required, element will not be clickable by other xpath css is not possible.
+            lists: ElementHelper.getElementByText(ProjectItemPageConstants.associatedItems.lists),
+            changes: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.changes}"]
+            /following-sibling::span`)),
+            issues: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.issues}"]
+            /following-sibling::span`)),
+            risks: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.risks}"]
+            /following-sibling::span`)),
+            documentLibraries: ElementHelper.getElementByText(ProjectItemPageConstants.associatedItems.documentLibraries),
+        };
+    }
+
     static get periodButtons() {
         return {
             fromPeriod: element(By.css('[id*="FromPeriod_button"]')),
             toPeriod: element(By.css('[id*="ToPeriod_button"]'))
+        };
+    }
+
+    static get selectColumnLabel() {
+        return {
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.ok),
+            hideAll: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.hideAll),
+            cancel: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.cancel),
         };
     }
 
@@ -218,12 +288,16 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
     static get close() {
         return element(By.css('[id*="CloseButton"]'));
     }
 
-    static get save() {
-        return element(By.css('[id*="SaveButton"]'));
+    static get associatedGroup() {
+        return `.//*[contains(@id,"CreateNewItem-Menu")]`;
     }
 
     static get publishstatus() {
