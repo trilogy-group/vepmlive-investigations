@@ -6,6 +6,8 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
+import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
@@ -168,7 +170,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
-
 
     it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);

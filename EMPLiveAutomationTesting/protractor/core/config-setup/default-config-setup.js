@@ -3,10 +3,6 @@ const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
 const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
-<<<<<<< HEAD
-const chromeOptions = {
-    args: ['--disable-blink-features=BlockCredentialedSubresources', '--disable-dev-shm-usage'],
-=======
 const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(false, "--params.headlessBrowser", false));
 const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
     '--disable-web-security'];
@@ -15,14 +11,12 @@ const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x8
     This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
     To fix, run the container with docker run --shm-size=1gb to increase the size of /dev/shm.
     Since Chrome 65, this is no longer necessary. Instead, launch the browser with the --disable-dev-shm-usage flag
-
     sources:
         - https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         - https://developers.google.com/web/tools/puppeteer/troubleshooting
 */
 const chromeOptions = {
     args: useHeadlessBrowser ? chromeHeadlessArgs : [],
->>>>>>> automation/EPMLCID-19254
     // Set download path and avoid prompting for download even though
     // this is already the default on Chrome but for completeness
     prefs: {
