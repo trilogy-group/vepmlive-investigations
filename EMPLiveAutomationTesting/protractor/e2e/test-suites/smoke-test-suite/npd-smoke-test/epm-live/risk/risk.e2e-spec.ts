@@ -218,7 +218,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         const newFile = await CommonPageHelper.attachFile(RiskItemPage.attachmentButton, CommonPage.fileUploadControl, stepLogger);
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(newFile.newFileName));
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));

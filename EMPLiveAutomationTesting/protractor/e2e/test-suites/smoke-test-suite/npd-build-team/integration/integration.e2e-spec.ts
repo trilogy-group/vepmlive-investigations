@@ -128,7 +128,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
-    
+
     it('View the options on "Resource Capacity Heat map" report page" - [743179]', async () => {
         const stepLogger = new StepLogger(743179);
         stepLogger.stepId(1);

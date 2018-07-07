@@ -2,9 +2,9 @@ import {browser, By, element} from 'protractor';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {BasePage} from '../../base-page';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {ElementHelper} from '../../../../components/html/element-helper';
 import {ProjectItemPageHelper} from './project-item-page.helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {ElementHelper} from '../../../../components/html/element-helper';
 
 export class ProjectItemPage extends BasePage {
     static get inputs() {
@@ -48,6 +48,20 @@ export class ProjectItemPage extends BasePage {
 
     static get saveAndClose() {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
+    }
+
+    static get cancelPopupButton() {
+        return {
+            cancel: ElementHelper.getElementByText(CommonPageConstants.formLabels.cancel)
+        };
+    }
+
+    static get selectTeamMember() {
+        return element(By.xpath(`.//a[.="${ProjectItemPageConstants.teamMember}"]`));
+    }
+
+    static get selectTeamMemberCheckBox() {
+        return element(By.xpath(`.//td[.="${ProjectItemPageConstants.teamMember}"]//parent::tr//*[contains(@class,'GMCellPanel')]`));
     }
 
     static get buildTeamContainers() {
@@ -130,8 +144,24 @@ export class ProjectItemPage extends BasePage {
         return element(By.xpath(`(//a[contains(@id,"RSActionMenu") and @title="Open Menu"])[last()]`));
     }
 
+    static get deleteTask() {
+        return element(By.css('[id*="DeleteTask"]'));
+    }
+
     static get applyParameterButton() {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
+    }
+
+    static get viewsButton() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.views);
+    }
+
+    static get showGanttButton() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.viewsItems.showgantt);
+    }
+
+    static get title() {
+        return element(By.xpath('//*[@id="ResourceGrid"]//*[.="Title"]'));
     }
 
     static async getUserCheckBoxForTeamType(teamType: string, userName: string) {
@@ -164,10 +194,56 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get createColumnTabLabel() {
+        return {
+            nameAndType: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.nameAndType, true),
+            additionalColumnSetting: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.additionalColumnSetting),
+            columnValidation: CommonPageHelper.getATagByText(ProjectItemPageConstants.createColumnTabLabel.columnValidation, true),
+        };
+    }
+
     static get periodButtons() {
         return {
             fromPeriod: element(By.css('[id*="FromPeriod_button"]')),
             toPeriod: element(By.css('[id*="ToPeriod_button"]'))
         };
     }
+
+    static get selectTaskName() {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath('.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow ")]//*[contains(@class,"Start")]'));
+    }
+
+    static get assignToDropDown() {
+        return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
+    }
+
+    static get close() {
+        return element(By.css('[id*="CloseButton"]'));
+    }
+
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
+    static get publishstatus() {
+        return element(By.css('[id*="publish"] a'));
+    }
+
+    static get publishButtton() {
+        return element(By.css('[id*="PublishButton"]'));
+    }
+
+    static get profilePicOfUser() {
+        return element(By.css('[id*="CounterProfile"]'));
+    }
+
+    static get linkType() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.addLinkPopup.linkType, true);
+    }
+
+    static get cancelButton() {
+        return element(By.css('#addlinkdiv [value="Cancel"]'));
+    }
+
 }

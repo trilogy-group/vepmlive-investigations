@@ -1,9 +1,9 @@
+import {By, element} from 'protractor';
 const moment = require('moment');
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {EventsPageConstants} from './events-page.constants';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class EventsPage {
@@ -58,4 +58,58 @@ export class EventsPage {
     static eventPageByTitle(title: string) {
         return CommonPageHelper.getElementUsingTextContent(title, true);
     }
+
+    static get defaultCheckbox() {
+        return element(By.id('onetidIOCheckDefaultView'));
+    }
+
+    static get viewName () {
+        return element(By.id('ViewName'));
+    }
+
+    static get choiceCheckbox() {
+        return element(By.id('onetidTypeChoice'));
+    }
+
+    static get numberCheckbox() {
+        return element(By.id('onetidTypeNumber'));
+    }
+
+
+    static get descriptionField () {
+        return element(By.id('idDesc'));
+    }
+    static get calenderTab() {
+        return element(By.css('[id*="Calendar-title"]'));
+    }
+
+    static get standardViewType () {
+        // Only id will not work
+        return element(By.xpath('.//*[contains(@href,"ViewID=1") and @id="onetCategoryHTML"]'));
+    }
+
+    static get rollOverEventList() {
+        return element(By.css(`[id*="overflow"]`));
+    }
+
+    static get currentView() {
+        return element(By.css('a[id*="DisplayView"]'));
+    }
+
+    static get createViews () {
+        return element(By.css(`[id*="CustomViews.CreateView"]`));
+    }
+
+    static get columnNameField () {
+        return element(By.id('idColName'));
+    }
+
+    static get createColumn () {
+        return element(By.css(`[id*="CreateColumn"]`));
+    }
+
+    static get selectColumn () {
+        return element(By.css(`[id*="SelectColumns"]`));
+    }
+
 }

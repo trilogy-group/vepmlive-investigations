@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {ButtonHelperFactory} from '@aurea/protractor-automation-helper';
 import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../misc-utils/html-helper';
-import {By, element} from 'protractor';
 
 export class ButtonHelper extends ButtonHelperFactory {
     static getInputButtonByTextUnderTable(text: string, isContains = false) {
@@ -23,6 +23,6 @@ export class ButtonHelper extends ButtonHelperFactory {
     }
 
     static getButtonByText(text: string, isContains = false) {
-        return element(By.xpath(ButtonHelper.getButtonByExactTextXPath(text,isContains)));
+        return element(By.xpath(ButtonHelper.getButtonByExactTextXPath(text, isContains)));
       }
 }

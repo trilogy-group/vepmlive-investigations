@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -11,9 +12,10 @@ import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {browser} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
+import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -197,6 +199,78 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('View item page should be displayed and user should be in "To Do" list page');
         await expect(await PageHelper.isElementDisplayed(item))
             .toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
+    });
+
+    it('Add Grid/Gantt web part - [785834]', async () => {
+        const stepLogger = new StepLogger(785834);
+        // Delete previous created Grid/Gantt
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.toDo,
+            CommonPage.pageHeaders.myWorkplace.toDo,
+            CommonPageConstants.pageHeaders.myWorkplace.toDo,
+            stepLogger);
+        await PageHelper.click(CommonPage.sidebarMenus.settings);
+        await PageHelper.click(SocialStreamPage.settingItems.editPage);
+        await ToDoPageHelper.deleteGridGantt();
+
+        stepLogger.step('PRECONDITION: navigate to To Do page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.toDo,
+            CommonPage.pageHeaders.myWorkplace.toDo,
+            CommonPageConstants.pageHeaders.myWorkplace.toDo,
+            stepLogger);
+
+        stepLogger.stepId(1);
+        stepLogger.step('Verify that the Grid/ Gantt web part is not added in page and page looks as below:');
+        stepLogger.verification('Grid/ Gantt web part should not have got added in the page');
+        await expect(await ToDoPage.gridGantt.isPresent())
+            .toBe(false,
+                ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
+
+        stepLogger.stepId(2);
+        stepLogger.step(`Click on 'Main Gear Settings' display in left bottom corner`);
+        await PageHelper.click(CommonPage.sidebarMenus.settings);
+
+        stepLogger.verification('the Settings menu should be displayed in the left navigation');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.settingMenu)).toBe(true,
+            ValidationsHelper.getMenuDisplayedValidation(SocialStreamPageConstants.validations.settingMenu));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Edit Page');
+        await PageHelper.click(SocialStreamPage.settingItems.editPage);
+
+        stepLogger.verification('the page should be opened in Edit mode');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+            ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
+
+        stepLogger.stepId(4);
+        stepLogger.step(`Click on 'Add a Web Part' link`);
+        await PageHelper.click(SocialStreamPage.addAWebpart);
+
+        stepLogger.verification('the respective section to add a web part should be opened and displayed');
+        await expect(await PageHelper.isElementDisplayed(SocialStreamPage.webPartAdderUpdatePanel)).toBe(true,
+            ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.validations.homePage));
+
+        stepLogger.stepId(5);
+        stepLogger.step('Select Categories EPM Live and Part as Grid/ Gantt Click on Add');
+        await PageHelper.click(SocialStreamPage.settingItems.epmLive);
+        await PageHelper.click(SocialStreamPage.settingItems.gridGantt);
+        await PageHelper.click(SocialStreamPage.addButton);
+
+        stepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPage.gridGantt);
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
+
+        stepLogger.stepId(6);
+        stepLogger.step(`Click on Page tab >> 'Stop Editing'`);
+        await PageHelper.click(SocialStreamPage.settingItems.page);
+        await PageHelper.click(SocialStreamPage.stopEditing);
+
+        stepLogger.verification('User should be on To Do list page and all item should be displayed in grid.');
+        await browser.sleep(PageHelper.timeout.m);
+        await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.toDo));
     });
 });

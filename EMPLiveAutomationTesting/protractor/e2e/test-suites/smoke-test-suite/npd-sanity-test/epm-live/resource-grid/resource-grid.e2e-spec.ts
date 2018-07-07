@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
@@ -10,7 +11,6 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {ResourcesPage} from '../../../../../page-objects/pages/navigation/resources/resources.po';
 import {ResourcesPageConstants} from '../../../../../page-objects/pages/navigation/resources/resources-page.constants';
 import {ResourcesPageHelper} from '../../../../../page-objects/pages/navigation/resources/resources-page.helper';
-import {browser} from 'protractor';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';

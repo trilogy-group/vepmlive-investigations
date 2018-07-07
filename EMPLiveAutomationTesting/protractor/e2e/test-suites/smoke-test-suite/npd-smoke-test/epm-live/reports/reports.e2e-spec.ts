@@ -35,32 +35,27 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify EPM Live Analytics option is displayed');
         await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingMenu.epmLiveAnalytics))
-            .toBe(true,
-                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.epmLiveAnalytics));
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.epmLiveAnalytics));
 
         stepLogger.verification('Verify Classic Reporting option is displayed');
         await expect(await PageHelper.isElementDisplayed(ReportsItemPage.reportsLandingMenu.classicReporting))
-            .toBe(true,
-                ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.classicReporting));
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(ReportsItemPageConstants.landingPageMenu.classicReporting));
 
         stepLogger.step('Click on Classic Reporting option');
         await PageHelper.click(ReportsItemPage.reportsLandingMenu.classicReporting);
 
         stepLogger.verification(`Classic Reporting page is displayed`);
         await expect(await PageHelper.isElementDisplayed(projectCommonPageConstant.reports))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
+            .toBe(true, ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
 
         stepLogger.step('Click on Projects and expand the list');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(
             await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
-        await PageHelper.click(
-            await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
+        await PageHelper.click(await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
 
         stepLogger.verification(`Project health link is displayed`);
         await expect(await PageHelper.isElementDisplayed(projectReportListElement.projectHealth))
-            .toBe(true,
-                ValidationsHelper.getButtonDisplayedValidation(projectReportListConstant.projectHealth));
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(projectReportListConstant.projectHealth));
 
         stepLogger.step('Click on Projects health option');
         await PageHelper.click(projectReportListElement.projectHealth);
@@ -77,7 +72,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification(`Classic Reporting page is displayed`);
         await expect(await PageHelper.isElementDisplayed(projectCommonPageConstant.reports))
-            .toBe(true,
-                ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
+            .toBe(true, ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
     });
 });

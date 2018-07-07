@@ -163,12 +163,17 @@ export class ElementHelper {
         browser.executeScript('arguments[0].scrollIntoView();', elementt);
     }
 
+    static async scrollToBottomOfPage() {
+        browser.executeScript('window.scrollTo(0, document.body.scrollHeight)');
+    }
+
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
         const value = await elem.getAttribute(attribute);
         return value.trim();
     }
 
     static async getText(elem: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBePresent(elem);
         const text = await elem.getText();
         return text.trim();
     }
@@ -179,5 +184,9 @@ export class ElementHelper {
 
     static getElementByText(text: string, isContains = false) {
         return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
+
+    static browserRefresh() {
+        browser.refresh();
     }
 }

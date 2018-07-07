@@ -1,6 +1,6 @@
+import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyTimeOffPageConstants} from './my-time-off-page.constants';
-import {By, element} from 'protractor';
 import {MyTimeOffPageHelper} from './my-time-off-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 
@@ -14,6 +14,10 @@ export class MyTimeOffPage {
             start: CommonPageHelper.getTextBoxByLabel(labels.start),
             finish: CommonPageHelper.getTextBoxByLabel(labels.finish),
         };
+    }
+
+    static get dateEditBox() {
+        return element(By.css('[class*= "GSEditInput" ]'));
     }
 
     static get timeOffTypeShowAllButton() {

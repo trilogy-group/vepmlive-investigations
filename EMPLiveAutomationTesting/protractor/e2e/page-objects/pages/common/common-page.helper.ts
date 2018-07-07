@@ -13,6 +13,8 @@ import {CommonPage} from './common.po';
 import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import {ProjectItemPage} from '../items-page/project-item/project-item.po';
+import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 
 const fs = require('fs');
 
@@ -39,7 +41,7 @@ export class CommonPageHelper {
         fs.createReadStream(documentFile.filePath())
             .pipe(fs.createWriteStream(fullFilePath));
 
-        return {fullFilePath, newFileName: newFileName + documentFile.fileType};
+        return {fullFilePath, newFileName: newFileName + documentFile.fileType, file: newFileName};
     }
 
     public static get getCurrentDate() {
@@ -59,6 +61,10 @@ export class CommonPageHelper {
 
     public static get getCurrentYear() {
         return new Date().getFullYear();
+    }
+
+    static getRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@id,'${id}')]`));
     }
 
     public static get getTodayInMMDDYYYY() {
@@ -286,6 +292,10 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'pageNumber') and contains(@title,"${title}")]`));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
     static getMenuItemFromRibbonContainer(title: string) {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
@@ -297,6 +307,35 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
 
+    static async clickOnEditPlan() {
+        await browser.sleep(PageHelper.timeout.s);
+        if (await CommonPage.editPlan.isPresent() !== true) {
+            await ElementHelper.browserRefresh();
+            await PageHelper.click(CommonPage.projectCheckbox);
+            await browser.sleep(PageHelper.timeout.m);
+            await PageHelper.click(CommonPage.ribbonTitles.items);
+            await browser.sleep(PageHelper.timeout.s);
+            if (await  CommonPage.editPlan.isPresent() !== true) {
+                await this.clickOnEditPlan();
+            }
+        }
+        await PageHelper.click(CommonPage.editPlan);
+    }
+
+    static async deleteTask() {
+        if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTaskName);
+            await PageHelper.click(ProjectItemPage.deleteTask);
+            await browser.switchTo().alert().accept();
+            await ElementHelper.clickUsingJs(ProjectItemPage.save);
+            // After save It need static wait(5 sec) and no element found which get change after save.
+            await browser.sleep(PageHelper.timeout.s);
+
+            if (await ProjectItemPage.selectTaskName.isPresent() === true) {
+                await this.deleteTask();
+            }
+        }
+    }
     static async viewOptionViaRibbon(stepLogger: StepLogger) {
         await this.selectRecordFromGrid(stepLogger);
 
@@ -324,6 +363,11 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getATagByText(text: string, isContains: boolean) {
+        const xpath = `//a[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
+        return element(By.xpath(xpath));
+    }
+
     static getElementByRole(role: string) {
         const xpath = `[role="${role}"]`;
         return element(By.css(xpath));
@@ -336,6 +380,12 @@ export class CommonPageHelper {
     static getElementContainsId(id: string) {
         const xpath = `[id*="${id}"]`;
         return element(By.css(xpath));
+    }
+
+    static getVersionNumberByRowText(searchCellText: string, targetCellText: string, isContainsSearchCell = false) {
+        const item = element(By.xpath(`//tr[td[${ComponentHelpers.getXPathFunctionForDot
+        (searchCellText, isContainsSearchCell)}]]//td[normalize-space(.)= '${targetCellText}']`));
+        return item;
     }
 
     static getElementContainsTitle(title: string) {
@@ -353,6 +403,13 @@ export class CommonPageHelper {
 
     static getTeamRecordsNameByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    static async enterTaskNameAndData(hours: string, title: string) {
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        await PageHelper.actionSendKeys(title);
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(hours);
     }
 
     static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
@@ -469,7 +526,7 @@ export class CommonPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.s);
+        await browser.sleep(PageHelper.timeout.m);
     }
 
     static getPublicView(text: string) {
@@ -482,6 +539,11 @@ export class CommonPageHelper {
 
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
+    }
+
+    static getCellText(column: string) {
+        // it is a part of a object "getCell", object created below
+        return element(By.xpath(`.//*[contains(@onmousemove,"I24")]/td[contains(@class,"${column}")]`));
     }
 
     static getColumnElement(columnName: string) {
@@ -497,8 +559,22 @@ export class CommonPageHelper {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getElementAllByText(text: string, isContains = false) {
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
+    }
+
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
+    }
+
+    static getEditCostTab(value: string) {
+        // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
+        return element(By.xpath(`${CommonPage.costTab}/*[text()="${value}"]`));
+    }
+
+    static getActiveButtonByText(tab: string) {
+        // it is a part of a object "costButton", object created below
+        return element(By.xpath(`.//*[contains(@class,"element_active")]/*[text()="${tab}"]`));
     }
 
     static getAscendingColumnSelector(columnName: string) {

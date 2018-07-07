@@ -1,8 +1,9 @@
+import {By, element} from 'protractor';
 import {BasePage} from '../base-page';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {HomePageConstants} from './home-page.constants';
-import {By, element} from 'protractor';
 import {CreateNewPageConstants} from '../items-page/create-new-page.constants';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class HomePage extends BasePage {
     url = '/sites/devtestautomation';
@@ -37,6 +38,7 @@ export class HomePage extends BasePage {
             project: CommonPageHelper.getToolBarItemsByText(options.project),
             portfolio: CommonPageHelper.getToolBarItemsByText(options.portfolio),
             projectRequest: CommonPageHelper.getToolBarItemsByText(options.projectRequest),
+            socialStream: ElementHelper.getElementByText(optionsLibraryApps.socialStream),
             more: this.moreButton,
             risk: CommonPageHelper.getToolBarItemsByText(options.risk),
             timeOff: CommonPageHelper.getToolBarItemsByText(options.timeOff),
@@ -46,8 +48,21 @@ export class HomePage extends BasePage {
         };
     }
 
-    static get whatAreYouWorkingOnTextBox() {
-        return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
+    static get navigateMenu() {
+        // ql locator is alone on that page.
+        return CommonPageHelper.getElementByTitle(HomePageConstants.navigation);
+    }
+
+    static get navigateToHome() {
+        return element(By.css('.epm-nav-home a'));
+    }
+
+    static get chooseAfile() {
+        return element(By.css('.ms-fileinput'));
+    }
+
+    static get navigationMenu() {
+        return element(By.css('#epm-nav-sub'));
     }
 
     static get commentField() {
@@ -55,6 +70,15 @@ export class HomePage extends BasePage {
     }
 
     static get moreButton() {
-        return element(By.css('.epm-se-show-more'));
+        return element.all(By.css('.epm-se-show-more')).first();
     }
+
+    static get newButton() {
+        return element(By.css('.js-listview-qcbNewButton'));
+    }
+
+    static get whatAreYouWorkingOnTextBox() {
+        return element(By.css('#epm-se-status-update-box div.epm-se-comment-input'));
+    }
+
 }

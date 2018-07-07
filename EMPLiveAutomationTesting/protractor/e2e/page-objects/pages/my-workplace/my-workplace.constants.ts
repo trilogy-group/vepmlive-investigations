@@ -8,6 +8,7 @@ export class MyWorkplaceConstants {
             myTimeOff: 'My Time Off',
             timeOff: 'Time Off',
             toDo: 'To Do',
+            gridGantt: 'Grid Gantt',
             discussions: 'Discussions',
             events: 'Events',
             wikis: 'Wikis',

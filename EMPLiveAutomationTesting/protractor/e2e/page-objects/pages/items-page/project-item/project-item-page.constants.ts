@@ -5,7 +5,11 @@ export class ProjectItemPageConstants {
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly teamMember = 'Team Member';
+    static readonly languageAndRegion = 'Language and Region';
     static readonly nonAdminUser = 'Non Admin User';
+    static readonly region  = 'Region';
+    static readonly views  = 'Views';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
 
@@ -31,7 +35,14 @@ export class ProjectItemPageConstants {
             costReduction: 'Cost Reduction',
             employeeSatisfaction: 'Employee Satisfaction',
             risk: 'Risk',
+            ok: 'OK',
             projectUpdate: 'Project Update *',
+        };
+    }
+
+    static get viewsItems() {
+        return {
+            showgantt: 'Show Gantt',
         };
     }
 
@@ -130,9 +141,26 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get index() {
+        return {
+            one: 1,
+            two: 2,
+            three: 3
+        };
+    }
+
     static get buildTeamContentClass() {
         return {
             saveAndCloseDisabled: 'ms-cui-disabled'
+        };
+    }
+
+    static get createColumnTabLabel() {
+        return {
+            createColumn: 'Create Column',
+            nameAndType: 'Name and Type',
+            additionalColumnSetting: 'Additional Column Settings',
+            columnValidation: 'Column Validation',
         };
     }
 
@@ -147,6 +175,14 @@ export class ProjectItemPageConstants {
         return {
             currentTeam: 'Current Team',
             resourcePool: 'Resource Pool'
+        };
+    }
+
+    static get userInformation() {
+        return {
+            myLanguageAndRegion: 'My Language And Region',
+            editItem: 'Edit Item',
+            myAlerts: 'My Alerts'
         };
     }
 
@@ -171,37 +207,26 @@ export class ProjectItemPageConstants {
             units: 'Units'
         };
     }
-
-    static get reportHeaders() {
-        return {
-            refresh: 'Refresh',
-            firstPage: 'First Page',
-            previousPage: 'Previous Page',
-            nextPage: 'Next Page',
-            lastPage: 'Last Page',
-            findTextInReport: 'Find Text in Report',
-            findNext: 'Find Next'
-        };
-    }
-
-    static get plannerLabels() {
-        return {
-            microsoftProject: 'Microsoft Project',
-            projectPlanner: 'Project Planner'
-        };
-    }
-
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
-            editCourse: 'Edit Course'
+            editCourse: 'Edit Course',
+            publish: 'Publish Status'
+        };
+    }
+
+    static get addLinkPopup() {
+        return {
+            linkType: 'Link Type',
+            addLink: 'Add Link',
+            cancel: 'Cancel',
         };
     }
 
     static get planActionButtons() {
         return {
             save: 'Save Button',
-            close: 'Close Button'
+            close: 'Close Button',
         };
     }
 
@@ -221,4 +246,42 @@ export class ProjectItemPageConstants {
             toPeriod: 'To Period'
         };
     }
+
+    static get reportHeaders() {
+        return {
+            refresh: 'Refresh',
+            firstPage: 'First Page',
+            previousPage: 'Previous Page',
+            nextPage: 'Next Page',
+            lastPage: 'Last Page',
+            findTextInReport: 'Find Text in Report',
+            findNext: 'Find Next'
+        };
+    }
+
+    static get plannerLabels() {
+        return {
+            microsoftProject: 'Microsoft Project',
+            projectPlanner: 'Project Planner'
+        };
+    }
+    static get users() {
+        return {
+            adminUser: 'Admin User'
+        };
+    }
+
+    static get newTaskFields() {
+        return {
+            assignedList: 'Assigned List',
+            title: 'Title',
+            finishDate: 'Finish Date',
+            work: 'Work',
+            duration: 'Duration',
+            start: 'Start',
+            date: 'DueDate',
+            predecessors: 'Predecessors'
+        };
+    }
+
 }

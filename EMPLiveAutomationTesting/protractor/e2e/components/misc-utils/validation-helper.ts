@@ -10,6 +10,7 @@ export class ValidationsHelper {
             notification: 'Notification',
             grid: 'Grid',
             menu: 'Menu',
+            checkBox: 'CheckBox',
         };
     }
 
@@ -25,8 +26,20 @@ export class ValidationsHelper {
         return `${this.types.field} ${fieldLabel} should ${status} have value as ${value}`;
     }
 
+    static getCheckBoxStatusValidation(status = '') {
+        return `${this.types.checkBox} should ${status} have checked`;
+    }
+
     static getPageDisplayedValidation(name: string) {
         return `${this.types.page} ${this.getDisplayedValidation(name)}`;
+    }
+
+    static getCheckBoxNotSelectedValidation() {
+        return this.getCheckBoxStatusValidation('not');
+    }
+
+    static getCheckBoxSelectedValidation() {
+        return this.getCheckBoxStatusValidation('');
     }
 
     static getFieldDisplayedValidation(name: string) {

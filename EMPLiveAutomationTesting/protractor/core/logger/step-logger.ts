@@ -24,6 +24,10 @@ export class StepLogger {
         this.commonLogger('Step', stepName);
     }
 
+    precondition(precondition: string) {
+        this.commonLogger('Precondition', precondition);
+    }
+
     commonLogger(operation: string, step: string) {
         const message = `${this.stepIdVar} - ${operation} - ${step}`;
         if (this.debug) {

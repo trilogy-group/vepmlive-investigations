@@ -1,10 +1,10 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
 import {SettingsPage} from '../../../../../../page-objects/pages/settings/settings.po';
-import {browser} from 'protractor';
 import {Constants} from '../../../../../../components/misc-utils/constants';
 import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
 import {WaitHelper} from '../../../../../../components/html/wait-helper';
@@ -88,7 +88,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect((await ReportManagerPage.formControls.messages.getText()).trim())
             .toBe(ReportManagerPageConstants.noErrorMessage,
                 ReportManagerPageValidation.lastResultValidation);
-
 
         stepLogger.verification(`Log - 'View Log' link displayed`);
         await expect(await PageHelper.isElementDisplayed(ReportManagerPage.formControls.viewLog))

@@ -1,3 +1,4 @@
+import { browser } from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -5,7 +6,6 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import { WorkspacePageHelper } from '../../../../../page-objects/pages/workspaces/workspace-page.helper';
 import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
 import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
-import { browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -29,9 +29,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step(`Click on 'Person' button displayed on left side of user name on top right side of page`);
         await PageHelper.click(CommonPage.personIcon);
 
-        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!' displayed in the pop down`)
-         await expect(await CommonPage.latestNotification.getText())
-        .toContain(title.replace('* ',''), ValidationsHelper.getLabelDisplayedValidation(title));
+        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
+        displayed in the pop down`);
+        await expect(await CommonPage.latestNotification.getText())
+        .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
 
     });
 

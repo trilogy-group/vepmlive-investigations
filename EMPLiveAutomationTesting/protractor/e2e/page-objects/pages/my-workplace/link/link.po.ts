@@ -1,6 +1,6 @@
+import {By, element} from 'protractor';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {LinkPageConstants} from './link-page.constants';
-import {By, element} from 'protractor';
 
 export class LinkPage {
     static get inputs() {

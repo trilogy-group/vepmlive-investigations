@@ -1,3 +1,4 @@
+import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {ProjectItemPage} from './project-item.po';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {StepLogger} from '../../../../../core/logger/step-logger';
@@ -5,7 +6,6 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, By, element, ElementFinder} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -14,7 +14,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
-
+import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -172,6 +172,32 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
+    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
+
+        await browser.sleep(PageHelper.timeout.m);
+        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await CommonPageHelper.deleteTask();
+        stepLogger.step('Click on Add Task');
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        stepLogger.step('Enter Task name');
+        await PageHelper.actionSendKeys( uniqueId);
+        stepLogger.step('Enter finish date');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
+        await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
+        await TextboxHelper.sendKeys(MyTimeOffPage.dateEditBox, finishDate);
+        stepLogger.step('Enter duration');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.durationHours1);
+        stepLogger.step('Enter effort hours');
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.work);
+        await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
+        stepLogger.step('Select assignee');
+        await PageHelper.click(ProjectItemPage.assignToDropDown);
+        await PageHelper.click(ProjectItemPageHelper.selectFirstAssign());
+        stepLogger.step('Click OK');
+        await PageHelper.click(ProjectItemPageHelper.button.ok);
+    }
+
     static async createProjectAndNavigateToBuildTeamPage(uniqueId: string, stepLogger: StepLogger) {
         stepLogger.step('Create a new project');
         const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
@@ -210,8 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(projectNameValue));
-        await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -227,7 +252,6 @@ export class ProjectItemPageHelper {
         stepLogger.verification('Verify User is moved under Current team');
         const userCheckBoxForCurrentTeam = await ProjectItemPage.getUserCheckBoxForTeamType(
             ProjectItemPageConstants.buildTeamContentIDs.currentTeam, ProjectItemPageConstants.nonAdminUser);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(userCheckBoxForCurrentTeam);
         await expect(await PageHelper.isElementDisplayed(userCheckBoxForCurrentTeam))
             .toBe(true, ValidationsHelper.getGridDisplayedValidation(ProjectItemPageConstants.nonAdminUser));
     }
@@ -263,6 +287,14 @@ export class ProjectItemPageHelper {
         }
     }
 
+    static get getlink() {
+        return {
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+        };
+    }
+
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }
@@ -270,11 +302,64 @@ export class ProjectItemPageHelper {
     static getReportPagingHeaderByTitle(title: string) {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
+    static dateField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
+        return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
+    }
 
+    static getField(tab: string) {
+        // it is a part of a object "newTasksFields", object created below
+        return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
+    }
     static getDisabledReportPagingHeaderByTitle(title: string) {
         return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
     }
+    static get button() {
+        return {
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+        };
+    }
 
+    static get newTasksFields(){
+        const fields = ProjectItemPageConstants.newTaskFields;
+        return {
+            title: ProjectItemPageHelper.getField(fields.title),
+            work: ProjectItemPageHelper.getField(fields.work),
+            duration: ProjectItemPageHelper.getField(fields.duration),
+            date: ProjectItemPageHelper.dateField(fields.date),
+            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
+        };
+
+    }
+
+    static getselectTask(index: number, column: string) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains
+        (@class,"${column}")]`));
+    }
+
+    static getFinishDate(index: number) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains(@class,
+        "GSNoRight") and contains(@class,"Due")]`));
+    }
+
+    static async verifyTitleAndDuration(uniqueId: string, value: string) {
+        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
+        await expect(await ProjectItemPageHelper.newTasksFields.duration.getText()).toBe(value,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
+    }
+
+    static async selectCreatedTask() {
+        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
+        const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);
+        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
+        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
+        await elm2.click();
+        await elm3.click();
+        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
+        }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
@@ -285,4 +370,21 @@ export class ProjectItemPageHelper {
         stepLogger.step('Create a new project');
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
+
+    static async removeAssignedUserIfPresent(stepLogger: StepLogger) {
+        stepLogger.step('Removed assigned user from current team');
+        if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
+            await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
+        }
+    }
+
+    static selectFirstAssign() {
+        return this.selectAssign(1);
+    }
+
+    static selectAssign(index: number) {
+        return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
+    }
+
 }

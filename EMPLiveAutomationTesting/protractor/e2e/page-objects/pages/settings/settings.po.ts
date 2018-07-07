@@ -23,7 +23,8 @@ export class SettingsPage {
                     portfolioLookups: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.portfolioLookups)),
                     portfolioPermissions: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.portfolioPermissions)),
                     setupWizard: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.setupWizard)),
-                    siteLibrariesAndLists: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.siteLibrariesAndLists)),
+                    siteLibrariesAndLists: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.siteLibrariesAndLists)
+                    ),
                     workspaceTemplates: element(By.linkText(menuTitlesAndIds.configurationSettings.childMenuLabels.workspaceTemplates))
                 }
             },

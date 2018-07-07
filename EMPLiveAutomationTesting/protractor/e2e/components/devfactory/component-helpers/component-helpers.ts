@@ -1,5 +1,5 @@
-import {ComponentHelpersFactory} from '@aurea/protractor-automation-helper';
 import {By, element} from 'protractor';
+import {ComponentHelpersFactory} from '@aurea/protractor-automation-helper';
 import {HtmlHelper} from '../../misc-utils/html-helper';
 
 export class ComponentHelpers extends ComponentHelpersFactory {

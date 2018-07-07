@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -9,6 +10,8 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
+import {ElementHelper} from '../../../../components/html/element-helper';
+import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import { MyWorkplaceConstants } from '../my-workplace.constants';
 
 export class EventsPageHelper {
@@ -22,21 +25,21 @@ export class EventsPageHelper {
         await TextboxHelper.sendKeys(EventsPage.titleTextField, title);
 
         stepLogger.step(`Select Category *: New Event 1`);
-        await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField))
-        .toBe(true,
+        await expect(await PageHelper.isElementDisplayed(EventsPage.categoryField)).toBe(true,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.inputLabels.category));
         await PageHelper.click(EventsPage.categoryField);
 
         await expect(await PageHelper.isElementDisplayed(EventsPage.categoryOption))
-        .toBe(true,
-            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
+            .toBe(true,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.categoryOption.meeting));
+
         await PageHelper.click(EventsPage.categoryOption);
 
         stepLogger.stepId(4);
         stepLogger.step('Click on save');
-        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent))
-        .toBe(true,
+        await expect(await PageHelper.isElementDisplayed(CommonPage.saveNewEvent)).toBe(true,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.formLabels.save));
+
         await PageHelper.click(CommonPage.saveNewEvent);
     }
 
@@ -72,7 +75,7 @@ export class EventsPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(EventsPageConstants.editPageName));
 
         stepLogger.verification('verify "New Event" get created');
-        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock, true))
+        await expect(await PageHelper.isElementDisplayed(EventsPage.calenderBlock))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.title));
     }
 
@@ -98,7 +101,7 @@ export class EventsPageHelper {
         stepLogger.stepId(2);
         stepLogger.step('Click on "New Event" option from Events tab panel');
         await expect(await PageHelper.isElementDisplayed(EventsPage.newEvent))
-        .toBe(true, ValidationsHelper.getMenuDisplayedValidation(EventsPageConstants.newEvent));
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(EventsPageConstants.newEvent));
         await PageHelper.click(EventsPage.newEvent);
 
         stepLogger.verification('"Events - New Item" window is displayed');
@@ -116,5 +119,64 @@ export class EventsPageHelper {
         await EventsPageHelper.fillNewEventForm(title, stepLogger);
         await EventsPageHelper.verifyNewEventCreated(stepLogger, title);
         return title;
+    }
+
+    static async createView(stepLogger: StepLogger, uniqueId: string, defaultView: boolean) {
+
+        stepLogger.stepId(1);
+        stepLogger.step('Click on CALENDAR tab');
+        await PageHelper.click(EventsPage.calenderTab);
+
+        stepLogger.verification('Contents of the CALENDAR tab should be displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.calendearView))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.calendarContent));
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on Create View');
+        await ElementHelper.clickUsingJs(EventsPage.createViews);
+
+        stepLogger.verification('View Type page should be displayed');
+        await expect(await browser.getTitle()).toEqual(CommonPageConstants.viewDropDownLabels.createPublicView,
+            ValidationsHelper.getDisplayedValidation(CommonPageConstants.viewType));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Select any of the view [Example Standard View]');
+        await PageHelper.click(EventsPage.standardViewType);
+
+        stepLogger.verification('Create View popup should be displayed');
+        await expect(await browser.getTitle()).toEqual(CommonPageConstants.viewDropDownLabels.
+            createPublicView, ValidationsHelper.getDisplayedValidation(CommonPageConstants.createView));
+
+        stepLogger.stepId(4);
+        stepLogger.step('Provide value in required fields and check Make this the default view');
+
+        if (defaultView === true) {
+            await CheckboxHelper.markCheckbox(EventsPage.defaultCheckbox, true);
+        }
+        await TextboxHelper.sendKeys(EventsPage.viewName, uniqueId);
+
+        stepLogger.stepId(5);
+        stepLogger.step('Click on Ok button');
+        await PageHelper.click(CommonPage.okButton);
+
+        stepLogger.verification('View should be created and user should be navigated to event page');
+        await PageHelper.click(EventsPage.rollOverEventList);
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
+
+        stepLogger.stepId(6);
+        stepLogger.step('Navigate to any other page and come back to Event page and from the CALENDAR tab, select' +
+            ' any the Standard View which was created from the Current View drop-down');
+        await PageHelper.click(CommonPage.getbuttons.calender);
+        await PageHelper.click(EventsPage.calenderTab);
+
+        stepLogger.step('Expand Current View drop down');
+        await PageHelper.click(EventsPage.currentView);
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
+
+        stepLogger.verification('Created view should be displayed in the list');
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
+            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
+
     }
 }
