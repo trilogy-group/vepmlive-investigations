@@ -11,6 +11,11 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
+import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
+import {ResourceplannerPage} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.po';
+import {ResourcePlannerConstants} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.constants';
+import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
+import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -230,5 +235,53 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+    });
+    fit('Generate Resource Capacity Heat Map Report - [743180]', async () => {
+        const stepLogger = new StepLogger(743180);
+        stepLogger.stepId(1);
+        const hours = '10.00' ;
+        // Step #1 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
+        stepLogger.stepId(1);
+        // Add hours for the resource added in the top-grid
+        stepLogger.step('Add hours for the resource added in the top-grid');
+        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        stepLogger.stepId(2);
+        // navigate to Reporter setting page
+        stepLogger.step('navigate to Reporter setting page');
+        await ReportingSettingsPageHelper.navigateTo(stepLogger);
+        stepLogger.stepId(3);
+        // Run Schedule
+        await ReportingSettingsPageHelper.runSchedule(stepLogger);
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.stepId(4);
+        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        await CommonPageHelper.editTeam(stepLogger);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.stepId(5);
+        stepLogger.step('Click On Resource Capacity Heat Map');
+        await EditTeamPageHelper.clickviewReport(stepLogger);
+        await EditTeamPageHelper.clickResourceCapacityHeatMap(stepLogger);
+        stepLogger.stepId(6);
+        stepLogger.step('Getting Value from  Resource Capacity Heat Map');
+        await EditTeamPageHelper.selectParametersAndApply(stepLogger);
+        stepLogger.step('Validate that Added Hours is present ');
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.selectUser))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
     });
 });

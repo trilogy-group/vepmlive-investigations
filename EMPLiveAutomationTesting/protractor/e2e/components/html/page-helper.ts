@@ -188,6 +188,11 @@ export class PageHelper {
         await browser.sleep(PageHelper.timeout.s);
         return browser.driver.switchTo().frame(frameEle);
     }
+    static async acceptAlert() {
+        // Wait for frame to exist first
+        await browser.sleep(PageHelper.timeout.s);
+        return browser.switchTo().alert().accept();;
+    }
 
     /**
      * Verify whether element is displayed on page or not

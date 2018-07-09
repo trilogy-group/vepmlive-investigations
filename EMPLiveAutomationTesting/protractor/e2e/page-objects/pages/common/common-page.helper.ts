@@ -306,7 +306,23 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
-
+    static async resourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+        await PageHelper.click(CommonPageHelper.getElementUsingTextContent(CommonPageConstants.ribbonLabels.editResource, false));
+        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+    }
+    static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+        stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await PageHelper.click(CommonPage.ribbonItems.editTeam);
+        stepLogger.verification('"Edit Team" window is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.getText())
+            .toBe(CommonPageConstants.ribbonLabels.editTeam,
+                ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
+    }
     static async clickOnEditPlan() {
         await browser.sleep(PageHelper.timeout.s);
         if (await CommonPage.editPlan.isPresent() !== true) {

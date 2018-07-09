@@ -12,6 +12,7 @@ export class ProjectItemPageConstants {
     static readonly views  = 'Views';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
+    static readonly resourcePlanner = 'Resource Planner - Project Mode';
 
     static get inputLabels() {
         return {

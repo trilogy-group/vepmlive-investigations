@@ -78,6 +78,7 @@ export class CommonPageConstants {
             editItem: 'EditItem',
             editCost: 'EPKCosts',
             addTask: 'AddTask-Large',
+            add: 'Add',
             attachFile: 'AttachFile',
             editTeam: 'Edit Team',
             buildTeam: 'Build Team',
@@ -89,7 +90,8 @@ export class CommonPageConstants {
             resourceCapacityHeatMap: 'Resource Capacity Heat Map',
             resourceCommitments: 'Resource Commitments',
             resourceRequirements: 'Resource Requirements',
-            resourceWorkVsCapacity: 'Resource Work vs. Capacity'
+            resourceWorkVsCapacity: 'Resource Work vs. Capacity',
+            editResource: 'Edit Resource'
         };
     }
 
@@ -108,6 +110,7 @@ export class CommonPageConstants {
             okWithSmallK: 'Ok',
             add: '< Add',
             remove: 'Remove >',
+            delete: 'Delete',
             topSave: 'onetidSaveItemtop'
         };
     }

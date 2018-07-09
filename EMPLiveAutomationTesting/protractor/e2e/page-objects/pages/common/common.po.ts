@@ -87,6 +87,7 @@ export class CommonPage extends BasePage {
             viewItem: CommonPageHelper.getRibbonButtonByText(labels.viewItem),
             attachFile: CommonPageHelper.getRibbonButtonByText(labels.attachFile),
             save: CommonPageHelper.getRibbonButtonByText(labels.save),
+            add: CommonPageHelper.getRibbonButtonByText(labels.add),
             editItem: CommonPageHelper.getRibbonButtonByText(labels.editItem),
             editCost: CommonPageHelper.getRibbonButtonById(labels.editCost),
             cancel: CommonPageHelper.getRibbonButtonByText(labels.cancel),
@@ -102,6 +103,7 @@ export class CommonPage extends BasePage {
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
             resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
             editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
+            editResource: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editResource),
         };
     }
 
