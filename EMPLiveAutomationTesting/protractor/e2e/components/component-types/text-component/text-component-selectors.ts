@@ -2,6 +2,7 @@ import {TextBoxComponentSelectorsFactory} from '@aurea/protractor-automation-hel
 import {ModelComponentSelectors} from '../modal-component/model-component-selectors';
 import {HtmlHelper} from '../../misc-utils/html-helper';
 import {ComponentHelpers} from '../../devfactory/component-helpers/component-helpers';
+import {element, By} from 'protractor';
 
 export class TextComponentSelectors extends TextBoxComponentSelectorsFactory {
     public static getDivForTextXpath(
@@ -46,4 +47,15 @@ export class TextComponentSelectors extends TextBoxComponentSelectorsFactory {
     static getSpanForTextInsideListForClassXpath(classValue: string, text: string, isContains = false) {
         return `${this.getListForClassXpath(classValue, isContains)}${this.getSpanForTextXpath(text)}`;
     }
+
+    static getItemByText(text: string, isContains = false, tag = '*') {
+        const xpath = `//${tag}[${ComponentHelpers.getXPathFunctionForText(
+          text, isContains)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getListByText(text: string, textIsContains = false) {
+        return this.getItemByText(text, textIsContains, HtmlHelper.tags.li);
+    }
+
 }

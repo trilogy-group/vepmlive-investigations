@@ -4,6 +4,7 @@ export class MyWorkPageConstants {
 
     static readonly pagePrefix = 'My Work';
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly edit = 'Edit.Edit';
 
     static get pageName() {
         return {
@@ -46,6 +47,13 @@ export class MyWorkPageConstants {
             sick: 'Sick',
             vacation: 'Vacation',
             doctorAppointment: 'Doctor Appointment',
+        };
+    }
+
+    static get editPageActions() {
+        return {
+            stopEditing: 'Actions.Stop',
+            editPage: 'Actions.Edit-Menu',
         };
     }
 }
