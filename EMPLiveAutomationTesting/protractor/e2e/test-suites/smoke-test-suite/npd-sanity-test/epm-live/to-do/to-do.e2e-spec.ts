@@ -259,7 +259,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.addButton);
 
         stepLogger.verification('Grid/ Gantt web part should be applied in To Do page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ToDoPage.gridGantt);
         await expect(await PageHelper.isElementDisplayed(ToDoPage.gridGantt)).toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.gridGantt));
 
