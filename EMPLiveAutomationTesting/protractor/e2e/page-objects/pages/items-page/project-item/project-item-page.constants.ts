@@ -222,6 +222,15 @@ export class ProjectItemPageConstants {
             units: 'Units'
         };
     }
+
+    static get fragmentLabels() {
+        return {
+            fragment: 'Fragments ',
+            insert: 'Insert Fragment',
+            save: 'Save Fragment',
+            manage: 'Manage Fragments',
+        };
+    }
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',

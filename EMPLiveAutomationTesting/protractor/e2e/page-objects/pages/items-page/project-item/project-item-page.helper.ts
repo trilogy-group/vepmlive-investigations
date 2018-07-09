@@ -356,6 +356,15 @@ export class ProjectItemPageHelper {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
     }
 
+    static async verifyFragmentDropDownLabel() {
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.insert)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.insert));
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.save)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.save));
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.manage)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.manage));
+    }
+
     static async selectCreatedTask() {
         await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
         const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);

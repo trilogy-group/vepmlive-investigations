@@ -135,6 +135,15 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get fragmentDropDownLabels() {
+        const label = ProjectItemPageConstants.fragmentLabels;
+        return {
+            insert: element(By.xpath(`.//a[.="${label.insert}"]//*[contains(@class,"glass")]`)),
+            save: element(By.xpath(`.//a[.="${label.save}"]//*[contains(@class,"glass")]`)),
+            manage: element(By.xpath(`.//a[.="${label.manage}"]//*[contains(@class,"glass")]`)),
+        };
+    }
+
     static get reportHeaders() {
         const label = ProjectItemPageConstants.reportHeaders;
         return {
@@ -170,6 +179,18 @@ export class ProjectItemPage extends BasePage {
 
     static get OkButton() {
         return element(By.css(`[id="viewNameDiv"] [value="OK"]`));
+    }
+
+    static get fragmentIcon() {
+        return element(By.xpath(`.//a[.="${ProjectItemPageConstants.fragmentLabels.fragment}"]`));
+    }
+
+    static get privateCheckBox() {
+        return element(By.css(`[id*="chkPrivate"]`));
+    }
+
+    static get closeFragmentButton() {
+        return element(By.css('[id*="btnClose"]'));
     }
 
     static get saveViewNameField() {
