@@ -1,11 +1,8 @@
-﻿using EPMLiveCore.Infrastructure.Logging;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore.SPUtilities
@@ -31,6 +28,11 @@ namespace EPMLiveCore.SPUtilities
             string className, 
             Func<SPList, bool> checkIfListMappingRequiredFunc = null)
         {
+            if (spWeb == null)
+            {
+                throw new ArgumentNullException("spWeb");
+            }
+
             var listsToBeMapped = new HashSet<Guid>();
             var listIconsToBeSet = new Dictionary<string, string>();
 

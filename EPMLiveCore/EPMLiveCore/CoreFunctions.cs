@@ -1142,9 +1142,9 @@ namespace EPMLiveCore
             return isInRole;
         }
 
-        public static List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, IList<SPEventReceiverType> types)
+        public static IList<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, IList<SPEventReceiverType> types)
         {
-            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+            var evts = new List<SPEventReceiverDefinition>();
 
             try
             {
@@ -1152,7 +1152,7 @@ namespace EPMLiveCore
                         where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
                               e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
                               types.Contains(e.Type)
-                        select e).ToList<SPEventReceiverDefinition>();
+                        select e).ToList();
             }
             catch
             {
