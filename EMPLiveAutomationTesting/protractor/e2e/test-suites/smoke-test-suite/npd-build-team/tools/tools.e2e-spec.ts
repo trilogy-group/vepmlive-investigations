@@ -236,7 +236,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
-    fit('Generate Resource Capacity Heat Map Report - [743180]', async () => {
+    it('Generate Resource Capacity Heat Map Report - [743180]', async () => {
         const stepLogger = new StepLogger(743180);
         stepLogger.stepId(1);
         const hours = '10.00' ;
