@@ -17,7 +17,12 @@ namespace EPMLiveCore.SPUtilities
 
         public static void MapListsReporting(SPWeb spWeb, Func<SPList, bool> checkIfListMappingRequiredFunc = null)
         {
-            MapLists(spWeb, _epmLiveReportingAssemblyFullName, _epmLiveReportingListEventsClassName);
+            MapLists(
+                spWeb, 
+                _epmLiveReportingAssemblyFullName, 
+                _epmLiveReportingListEventsClassName, 
+                checkIfListMappingRequiredFunc
+            );
         }
 
         public static void MapLists(
