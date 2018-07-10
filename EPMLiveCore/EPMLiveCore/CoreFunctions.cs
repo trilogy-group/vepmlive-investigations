@@ -1152,7 +1152,7 @@ namespace EPMLiveCore
                         where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
                               e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
                               types.Contains(e.Type)
-                        select e).ToList();
+                        select e).ToList<SPEventReceiverDefinition>();
             }
             catch
             {
