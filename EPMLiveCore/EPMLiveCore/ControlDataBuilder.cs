@@ -9,17 +9,22 @@ namespace EPMLiveCore
 {
     public class ControlDataBuilder
     {
-        private IDictionary<string, string> _parameters = new Dictionary<string, string>();
+        public readonly IDictionary<string, string> Parameters = new Dictionary<string, string>();
 
         public ControlDataBuilder AddParameter(string key, object value)
         {
             // TODO: (CC-76591, 2018-07-10) Consider using formatters for non-string types
-            _parameters.Add(key, value.ToString());
+            Parameters.Add(key, value.ToString());
             return this;
         }
 
         public ControlDataBuilder AddParametersForLookupField(SPFieldLookup lookupField)
         {
+            if (lookupField == null)
+            {
+                throw new ArgumentNullException("lookupField"); // (CC-76591, 2018-07-10) nameof not available in C# 5
+            }
+
             return AddParameter("ParentWebID", lookupField.ParentList.ParentWeb.ID)
                   .AddParameter("LookupWebID", lookupField.LookupWebId)
                   .AddParameter("LookupListID", lookupField.LookupList)
@@ -29,8 +34,13 @@ namespace EPMLiveCore
                   .AddParameter("Required", lookupField.Required);
         }
 
-        public ControlDataBuilder AddParmetersForField(SPField field, bool allowMultipleValues)
+        public ControlDataBuilder AddParametersForField(SPField field, bool allowMultipleValues)
         {
+            if (field == null)
+            {
+                throw new ArgumentNullException("field"); // (CC-76591, 2018-07-10) nameof not available in C# 5
+            }
+
             var valueFormatString = string.Join(string.Empty,
                 field.InternalName,
                 "_",
@@ -60,6 +70,11 @@ namespace EPMLiveCore
 
         public ControlDataBuilder AddParametersForLookupData(LookupConfigData lookupData)
         {
+            if (lookupData == null)
+            {
+                throw new ArgumentNullException("lookupData"); // (CC-76591, 2018-07-10) nameof not available in C# 5
+            }
+
             return AddParameter("Field", lookupData.Field)
                    .AddParameter("ControlType", lookupData.Type)
                    .AddParameter("Parent", lookupData.Parent)
@@ -70,7 +85,7 @@ namespace EPMLiveCore
         {
             return string.Format("<Data>{0}</Data>",
                 string.Join(string.Empty,
-                    _parameters.Select(parameter =>
+                    Parameters.Select(parameter =>
                         string.Format("<Param key=\"{0}\">{1}</Param>",
                             System.Security.SecurityElement.Escape(parameter.Key),
                             System.Security.SecurityElement.Escape(parameter.Value)

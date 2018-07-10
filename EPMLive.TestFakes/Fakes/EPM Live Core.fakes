@@ -20,5 +20,7 @@
     <Add FullName="EPMLiveCore.GridGanttSettings!"/>
     <Add FullName="EPMLiveCore.EnhancedLookupConfigValuesHelper!"/>
     <Add FullName="EPMLiveCore.ReportHelper.ReportData!"/>
+    <Add FullName="EPMLiveCore.ControlDataBuilder!"/>
+    <Add FullName="EPMLiveCore.LookupConfigData!"/>
   </ShimGeneration>
 </Fakes>

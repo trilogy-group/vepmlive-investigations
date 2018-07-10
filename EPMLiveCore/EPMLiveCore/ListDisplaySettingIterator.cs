@@ -1589,7 +1589,7 @@ namespace EPMLiveCore
                 .AddParameter("ListID", ListId)
                 .AddParameter("ItemID", ItemId)
                 .AddParametersForLookupField(lookupField)
-                .AddParmetersForField(field, lookupField.AllowMultipleValues)
+                .AddParametersForField(field, lookupField.AllowMultipleValues)
                 .BuildControlData();
 
             cascadingMultiLookupControl.CustomProperty = customValue;
@@ -1608,7 +1608,7 @@ namespace EPMLiveCore
                 .AddParameter("ListID", ListId)
                 .AddParameter("ItemID", ItemId)
                 .AddParametersForLookupField(lookupField)
-                .AddParmetersForField(field, lookupField.AllowMultipleValues)
+                .AddParametersForField(field, lookupField.AllowMultipleValues)
                 .AddParametersForLookupData(lookupData)
                 .BuildControlData();
 
@@ -1629,7 +1629,7 @@ namespace EPMLiveCore
                 .AddParameter("ListID", ListId)
                 .AddParameter("ItemID", ItemId)
                 .AddParametersForLookupField(lookupField)
-                .AddParmetersForField(field, lookupField.AllowMultipleValues)
+                .AddParametersForField(field, lookupField.AllowMultipleValues)
                 .BuildControlData();
 
             SPFieldLookupValueCollection lookupValueCollection = null;
