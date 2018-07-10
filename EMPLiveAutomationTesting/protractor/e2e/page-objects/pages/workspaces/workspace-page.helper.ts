@@ -8,6 +8,7 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {CommonPage} from '../common/common.po';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
+import {CommonPageConstants} from '../common/common-page.constants';
 
 export class WorkspacePageHelper {
 
@@ -72,5 +73,47 @@ export class WorkspacePageHelper {
         const AllWorkspacesDisplayed = await PageHelper.isElementDisplayed(option.allWorkspaces);
         await expect(AllWorkspacesDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             optionName.allWorkspaces));
+    }
+
+    static async verifyWorkpaceListingInMenuPanel(stepLogger: StepLogger) {
+        stepLogger.verification(`verify all available Workspaces are listed`);
+        const workspaceDisplayed = await PageHelper.isElementDisplayed(
+            WorkSpacesPage.allWorkspaceListing);
+        await expect(workspaceDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            WorkspacesConstants.workspaceListing));
+    }
+
+    static async expandEllipsisAndSelectEditTeamOption(stepLogger: StepLogger) {
+        stepLogger.step('Mouse over on first listed workspace');
+        await ElementHelper.actionHoverOver(WorkSpacesPage.allWorkspaceListing);
+        stepLogger.step(`expand ellipsis against any workspace listed `);
+        await PageHelper.click(WorkSpacesPage.workspaceEllipsis);
+        stepLogger.step(`select "Edit Team" option`);
+        await PageHelper.click(WorkSpacesPage.contextMenu.editTeam);
+    }
+
+    static async verifyEditTeamWindowOpened(stepLogger: StepLogger) {
+        stepLogger.step('Switch to default frame');
+        await PageHelper.switchToDefaultContent();
+        stepLogger.verification(`verify "Edit Team" pop-up opened.`);
+        const editTeamDisplayed = await PageHelper.isElementDisplayed(
+            WorkSpacesPage.editTeamPopupHeading);
+        await expect(editTeamDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            WorkspacesConstants.editTeam));
+    }
+
+    static async clickOnCloseButton(stepLogger: StepLogger) {
+        stepLogger.step('Switch to content frame');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        stepLogger.step(`click on Close button`);
+        await PageHelper.click(CommonPage.ribbonItems.close);
+    }
+
+    static async verifyEditTeamWindowClosed(stepLogger: StepLogger) {
+        stepLogger.verification('"Edit Team" window is closed');
+        await expect(await PageHelper.isElementPresent(CommonPage.ribbonItems.close, false))
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(
+                    CommonPageConstants.ribbonLabels.close));
     }
 }
