@@ -31,47 +31,54 @@ namespace ModelDataCache
             return true;
         }
 
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs, bool bUseQTY, bool bUseCost, bool bShowdeccosts)
+        public void AddPeriodColumn(string id, string name, bool showFTEs, bool useQuantity, bool useCost, bool bShowdeccosts)
         {
             CStruct xC = null;
 
-            if (bUseQTY && bUseCost)
+            if (useQuantity)
             {
-                Header1.CreateStringAttr("P" + sId + "VSpan", "2");
-                Header1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else if (bUseQTY)
-            {
-                Header1.CreateStringAttr("P" + sId + "V", sName);
+                if (useCost)
+                {
+                    Header1.CreateStringAttr("P" + id + "VSpan", "2");
+                }
+
+                Header1.CreateStringAttr("P" + id + "V", name);
             }
             else
-                Header1.CreateStringAttr("P" + sId + "C", sName);
-
-            if (bUseQTY)
             {
-                if (ShowFTEs)
-                    Header2.CreateStringAttr("P" + sId + "V", " FTE ");
-                else
-                    Header2.CreateStringAttr("P" + sId + "V", " Qty ");
+                Header1.CreateStringAttr("P" + id + "C", name);
             }
 
-            if (bUseCost)
-                Header2.CreateStringAttr("P" + sId + "C", " Cost ");
+            if (useQuantity)
+            {
+                if (showFTEs)
+                {
+                    Header2.CreateStringAttr("P" + id + "V", " FTE ");
+                }
+                else
+                {
+                    Header2.CreateStringAttr("P" + id + "V", " Qty ");
+                }
+            }
 
-            if (bUseQTY)
+            if (useCost)
+            {
+                Header2.CreateStringAttr("P" + id + "C", " Cost ");
+            }
+
+            if (useQuantity)
             {
                 xC = PeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "V");
+                xC.CreateStringAttr("Name", "P" + id + "V");
                 xC.CreateStringAttr("Type", "Float");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateStringAttr("Format", "#.##");
             }
 
-            if (bUseCost)
+            if (useCost)
             {
-
                 xC = PeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "C");
+                xC.CreateStringAttr("Name", "P" + id + "C");
                 xC.CreateStringAttr("Type", "Float");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateStringAttr("Format", (bShowdeccosts ? ",#.00;-,#.00;0" : ",0"));
