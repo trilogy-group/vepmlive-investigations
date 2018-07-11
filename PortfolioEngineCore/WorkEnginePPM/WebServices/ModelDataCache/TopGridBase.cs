@@ -29,38 +29,51 @@ namespace ModelDataCache
             return result.ToString();
         }
 
-        internal void AddDetailRow(DetailRowData oDet, int rID, bool UsingGrouping, bool ShowFTEs, bool ShowGantt, IList<SortFieldDefn> DetCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowcostdec)
+        internal void AddDetailRow(
+            DetailRowData detailRowData, 
+            int rowId, 
+            bool useGroupping,
+            bool showFTE,
+            bool showGantt,
+            IList<SortFieldDefn> detCol,
+            int minP,
+            int maxP,
+            bool useQuantity,
+            bool useCost,
+            bool roundCost)
         {
-            var xIParent = Levels[oDet.m_lev - 1];
-            var xI = xIParent.CreateSubStruct("I");
+            var parent = Levels[detailRowData.m_lev - 1];
+            var iSubStruct = parent.CreateSubStruct("I");
 
-            bool bCellhtml = false;
+            var wrapCellInHtml = false;
 
-            Levels[oDet.m_lev] = xI;
-            xI.CreateStringAttr("id", rID.ToString());
-            if (oDet.bRealone)
+            Levels[detailRowData.m_lev] = iSubStruct;
+            iSubStruct.CreateStringAttr("id", rowId.ToString());
+            if (detailRowData.bRealone)
             {
-                xI.CreateStringAttr("Color", "255,255,255");
+                iSubStruct.CreateStringAttr("Color", "255,255,255");
             }
 
-            xI.CreateStringAttr("Select", (oDet.bSelected ? "1" : "0"));
-            xI.CreateBooleanAttr("SelectCanEdit", true);
-            xI.CreateBooleanAttr("CanEdit", false);
+            iSubStruct.CreateStringAttr("Select", (detailRowData.bSelected ? "1" : "0"));
+            iSubStruct.CreateBooleanAttr("SelectCanEdit", true);
+            iSubStruct.CreateBooleanAttr("CanEdit", false);
 
-            if (oDet.m_lev != 1)
-                xI.CreateIntAttr("CanFilter", 2);
-
-            if (UsingGrouping)
+            if (detailRowData.m_lev != 1)
             {
-                xI.CreateStringAttr("xGrouping", oDet.sName);
-                if (bCellhtml)
+                iSubStruct.CreateIntAttr("CanFilter", 2);
+            }
+
+            if (useGroupping)
+            {
+                iSubStruct.CreateStringAttr("xGrouping", detailRowData.sName);
+                if (wrapCellInHtml)
                 {
-                    xI.CreateStringAttr("GroupingHtmlPrefix", "<B>");
-                    xI.CreateStringAttr("GroupingHtmlPostfix", "</B>");
+                    iSubStruct.CreateStringAttr("GroupingHtmlPrefix", "<B>");
+                    iSubStruct.CreateStringAttr("GroupingHtmlPostfix", "</B>");
                 }
             }
 
-            foreach (var sortField in DetCol)
+            foreach (var sortField in detCol)
             {
                 var sortFieldName = sortField.name.Replace(" ", "");
 
@@ -68,117 +81,155 @@ namespace ModelDataCache
                 sortFieldName = sortFieldName.Replace("\n", "");
                 sortFieldName = RemoveNastyCharacters(sortFieldName);
 
-                switch (sortField.fid)
+                string value;
+                if (TryGetDataFromDetailRowDataField(detailRowData, sortField.fid, out value))
                 {
-                    case (int)FieldIDs.SD_FID:
-                        if (oDet.Det_Start != DateTime.MinValue)
-                        {
-                            xI.CreateStringAttr(sortFieldName, oDet.Det_Start.ToShortDateString());
-                        }
-                        break;
-                    case (int)FieldIDs.FD_FID:
-                        if (oDet.Det_Finish != DateTime.MinValue)
-                        {
-                            xI.CreateStringAttr(sortFieldName, oDet.Det_Finish.ToShortDateString());
-                        }
-                        break;
-                    case (int)FieldIDs.FTOT_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.m_tot1.ToString());
-                        break;
-                    case (int)FieldIDs.DTOT_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.m_tot2.ToString());
-                        break;
-                    case (int)FieldIDs.PI_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.PI_Name);
-                        break;
-                    case (int)FieldIDs.CT_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.CT_Name);
-                        break;
-                    case (int)FieldIDs.SCEN_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.Scen_Name);
-                        break;
-                    case (int)FieldIDs.BC_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.Cat_Name);
-                        break;
-                    case (int)FieldIDs.FULLC_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.FullCatName);
-                        break;
-                    case (int)FieldIDs.CAT_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.CC_Name);
-                        break;
-                    case (int)FieldIDs.FULLCAT_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.FullCCName);
-                        break;
-                    case (int)FieldIDs.BC_ROLE:
-                        xI.CreateStringAttr(sortFieldName, oDet.Role_Name);
-                        break;
-                    case (int)FieldIDs.MC_FID:
-                        xI.CreateStringAttr(sortFieldName, oDet.MC_Name);
-                        break;
-                    default:
-                        if (sortField.fid >= 11801 && sortField.fid <= 11805)
-                            xI.CreateStringAttr(sortFieldName, oDet.Text_OCVal[sortField.fid - 11800]);
-
-                        else if (sortField.fid >= 11811 && sortField.fid <= 11815)
-                            xI.CreateStringAttr(sortFieldName, oDet.TXVal[sortField.fid - 11810]);
-                        else if (sortField.fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && sortField.fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                        {
-
-                            if (oDet.m_PI_Format_Extra_data != null)
-                                xI.CreateStringAttr(sortFieldName, oDet.m_PI_Format_Extra_data[sortField.fid - (int)FieldIDs.PI_USE_EXTRA]);
-                        }
-                        else
-                            xI.CreateStringAttr(sortFieldName, " ");
-                        break;
+                    iSubStruct.CreateStringAttr(sortFieldName, value);
                 }
             }
 
-            xI.CreateIntAttr("NoColorState", 1);
+            iSubStruct.CreateIntAttr("NoColorState", 1);
 
-            if (ShowGantt)
+            if (showGantt)
             {
-                if (oDet.bGotChildren == false)
+                if (detailRowData.bGotChildren == false)
                 {
-                    xI.CreateStringAttr("GGanttClass", "GanttBlue");
+                    iSubStruct.CreateStringAttr("GGanttClass", "GanttBlue");
                 }
-                return;
             }
-
-            for (var i = minp; i <= maxp; i++)
+            else
             {
-                if (bUseQTY)
+                DisplayValues(detailRowData, showFTE, minP, maxP, useQuantity, useCost, roundCost, iSubStruct);
+            }
+        }
+
+        private static void DisplayValues(DetailRowData detailRowData, bool showFTE, int minP, int maxP, bool useQuantity, bool useCost, bool roundCost, PortfolioEngineCore.CStruct iSubStruct)
+        {
+            for (var i = minP; i <= maxP; i++)
+            {
+                if (useQuantity)
                 {
-                    if (ShowFTEs)
+                    if (showFTE)
                     {
-                        if (oDet.zFTE[i] != double.MinValue)
+                        if (detailRowData.zFTE[i] != double.MinValue)
                         {
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zFTE[i]);
+                            iSubStruct.CreateDoubleAttr("P" + i.ToString() + "V", detailRowData.zFTE[i]);
                         }
                     }
                     else
                     {
-                        if (oDet.zValue[i] != double.MinValue)
+                        if (detailRowData.zValue[i] != double.MinValue)
                         {
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zValue[i]);
+                            iSubStruct.CreateDoubleAttr("P" + i.ToString() + "V", detailRowData.zValue[i]);
                         }
                     }
                 }
 
-                if (bUseCost)
+                if (useCost)
                 {
-                    var dcost = oDet.zCost[i];
+                    var dcost = detailRowData.zCost[i];
 
-                    if (bshowcostdec == false)
+                    if (roundCost == false)
                     {
                         dcost = Math.Floor(dcost);
                     }
 
-                    if (oDet.zCost[i] != double.MinValue)
+                    if (detailRowData.zCost[i] != double.MinValue)
                     {
-                        xI.CreateDoubleAttr("P" + i.ToString() + "C", dcost);
+                        iSubStruct.CreateDoubleAttr("P" + i.ToString() + "C", dcost);
                     }
                 }
             }
+        }
+
+        private bool TryGetDataFromDetailRowDataField(DetailRowData detailRowData, int fid, out string value)
+        {
+            var result = true;
+
+            switch (fid)
+            {
+                case (int)FieldIDs.SD_FID:
+                    if (detailRowData.Det_Start != DateTime.MinValue)
+                    {
+                        value = detailRowData.Det_Start.ToShortDateString();
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case (int)FieldIDs.FD_FID:
+                    if (detailRowData.Det_Finish != DateTime.MinValue)
+                    {
+                        value = detailRowData.Det_Finish.ToShortDateString();
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case (int)FieldIDs.FTOT_FID:
+                    value = detailRowData.m_tot1.ToString();
+                    break;
+                case (int)FieldIDs.DTOT_FID:
+                    value = detailRowData.m_tot2.ToString();
+                    break;
+                case (int)FieldIDs.PI_FID:
+                    value = detailRowData.PI_Name;
+                    break;
+                case (int)FieldIDs.CT_FID:
+                    value = detailRowData.CT_Name;
+                    break;
+                case (int)FieldIDs.SCEN_FID:
+                    value = detailRowData.Scen_Name;
+                    break;
+                case (int)FieldIDs.BC_FID:
+                    value = detailRowData.Cat_Name;
+                    break;
+                case (int)FieldIDs.FULLC_FID:
+                    value = detailRowData.FullCatName;
+                    break;
+                case (int)FieldIDs.CAT_FID:
+                    value = detailRowData.CC_Name;
+                    break;
+                case (int)FieldIDs.FULLCAT_FID:
+                    value = detailRowData.FullCCName;
+                    break;
+                case (int)FieldIDs.BC_ROLE:
+                    value = detailRowData.Role_Name;
+                    break;
+                case (int)FieldIDs.MC_FID:
+                    value = detailRowData.MC_Name;
+                    break;
+                default:
+                    if (fid >= 11801 && fid <= 11805)
+                    {
+                        value = detailRowData.Text_OCVal[fid - 11800];
+                    }
+                    else if (fid >= 11811 && fid <= 11815)
+                    {
+                        value = detailRowData.TXVal[fid - 11810];
+                    }
+                    else if (fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        if (detailRowData.m_PI_Format_Extra_data != null)
+                        {
+                            value = detailRowData.m_PI_Format_Extra_data[fid - (int)FieldIDs.PI_USE_EXTRA];
+                        }
+                        else
+                        {
+                            result = false;
+                        }
+                    }
+                    else
+                    {
+                        value = " ";
+                    }
+                    break;
+            }
+
+            value = null;
+            return result;
         }
     }
 }
