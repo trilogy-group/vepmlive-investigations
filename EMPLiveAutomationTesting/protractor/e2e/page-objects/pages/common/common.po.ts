@@ -271,6 +271,10 @@ export class CommonPage extends BasePage {
         return element(By.css('#addlinkdiv [value="Add Link"]'));
     }
 
+    static get addLinkCancelButton() {
+        return element(By.css('#addlinkdiv [value="Cancel"]'));
+    }
+
     static get projectTab() {
         return element(By.css('[id*="Project-title"]'));
     }

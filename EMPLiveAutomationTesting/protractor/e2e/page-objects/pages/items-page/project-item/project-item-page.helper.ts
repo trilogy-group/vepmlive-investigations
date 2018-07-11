@@ -385,6 +385,14 @@ export class ProjectItemPageHelper {
         await browser.actions().keyUp(protractor.Key.CONTROL).perform();
         }
 
+    static async selectCreatedTaskTwoAndThree() {
+        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
+        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
+        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
+        await elm3.click();
+        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
+    }
+
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
         await browser.sleep(PageHelper.timeout.xs);

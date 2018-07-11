@@ -361,6 +361,7 @@ export class CommonPageConstants {
     static get predecessorsData() {
         return {
             predecessors1: '1',
+            predecessorsNull: ' ',
             predecessors2: '2',
         };
     }

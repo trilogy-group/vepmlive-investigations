@@ -257,6 +257,12 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get linkDropDownValues() {
+        return {
+            finishToStart: 'FS (Finish-to-Start)',
+        };
+    }
+
     static get planActionButtons() {
         return {
             save: 'Save Button',

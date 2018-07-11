@@ -229,6 +229,22 @@ export class ProjectItemPage extends BasePage {
         return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.unCheckedCheckbox}`));
     }
 
+    static get linkTypeDropDownId() {
+        return `slctAddLinkType`;
+    }
+
+    static get linkTypeDropDown() {
+        return element(By.id(`slctAddLinkType`));
+}
+
+    static get lagTimeTextBox() {
+        return element(By.id(`txtAddLinkLag`));
+    }
+
+    static get linkDropDownValue() {
+        return element(By.xpath(`.//*[@id="${this.linkTypeDropDownId}"]/option[1]`));
+    }
+
     static get unCheckedCheckbox() {
         return '/div[contains(@class,"Unchecked")]';
     }
