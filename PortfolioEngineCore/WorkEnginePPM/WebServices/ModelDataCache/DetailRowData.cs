@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 namespace ModelDataCache
 {
+    // (CC-76813, 2018-07-11) Had to make the class public in order to be able to test dependent methods. Test assembly is not strongly signed, therefore can not be used with InternalsVisibleTo attribute
     [Serializable()]
-    class DetailRowData
+    public class DetailRowData
     {
         public int CB_ID;
         public int CT_ID;
@@ -248,7 +249,7 @@ namespace ModelDataCache
                     break;
             }
         }
-        public void CaputureInitialData(Dictionary<int, PeriodData> clnPer)
+        public void CaputureInitialData(IDictionary<int, PeriodData> clnPer)
         {
             bCapture = true;
             oDet_Start = Det_Start;
@@ -284,7 +285,7 @@ namespace ModelDataCache
             CaptureBurnRates(clnPer);
         }
 
-        private void CaptureBurnRates(Dictionary<int, PeriodData> clnPer)
+        private void CaptureBurnRates(IDictionary<int, PeriodData> clnPer)
         {
             int i = 0;
             int lPerSpan = 0;

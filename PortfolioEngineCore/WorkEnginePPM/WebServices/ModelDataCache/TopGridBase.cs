@@ -29,13 +29,13 @@ namespace ModelDataCache
             return result.ToString();
         }
 
-        internal void AddDetailRow(
+        public void AddDetailRow(
             DetailRowData detailRowData, 
             int rowId, 
             bool useGroupping,
             bool showFTE,
             bool showGantt,
-            IList<SortFieldDefn> detCol,
+            IList<SortFieldDefn> sortFields,
             int minP,
             int maxP,
             bool useQuantity,
@@ -73,13 +73,9 @@ namespace ModelDataCache
                 }
             }
 
-            foreach (var sortField in detCol)
+            foreach (var sortField in sortFields)
             {
-                var sortFieldName = sortField.name.Replace(" ", "");
-
-                sortFieldName = sortFieldName.Replace("\r", "");
-                sortFieldName = sortFieldName.Replace("\n", "");
-                sortFieldName = RemoveNastyCharacters(sortFieldName);
+                var sortFieldName = RemoveNastyCharacters(sortField.name);
 
                 string value;
                 if (TryGetDataFromDetailRowDataField(detailRowData, sortField.fid, out value))
