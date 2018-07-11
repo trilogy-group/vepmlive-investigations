@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -9,7 +10,6 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {MyWorkplacePage} from '../my-workplace.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
-import {browser} from 'protractor';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import { MyWorkplaceConstants } from '../my-workplace.constants';
@@ -161,7 +161,7 @@ export class EventsPageHelper {
 
         stepLogger.verification('View should be created and user should be navigated to event page');
         await PageHelper.click(EventsPage.rollOverEventList);
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
 
         stepLogger.stepId(6);
@@ -172,10 +172,10 @@ export class EventsPageHelper {
 
         stepLogger.step('Expand Current View drop down');
         await PageHelper.click(EventsPage.currentView);
-        await ElementHelper.clickUsingJs(CommonPageHelper.getElementByText(uniqueId));
+        await ElementHelper.clickUsingJs(ElementHelper.getElementByText(uniqueId));
 
         stepLogger.verification('Created view should be displayed in the list');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
 
     }

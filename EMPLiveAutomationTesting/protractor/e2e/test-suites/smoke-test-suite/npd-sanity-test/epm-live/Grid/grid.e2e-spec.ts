@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
@@ -10,7 +11,6 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {browser} from 'protractor';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {WaitHelper} from '../../../../../components/html/wait-helper';

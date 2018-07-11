@@ -1,7 +1,7 @@
+import {By, element} from 'protractor';
 import {BasePage} from '../../base-page';
 import {RiskItemPageConstants} from './risk-item-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
-import {By, element} from 'protractor';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 

@@ -16,6 +16,8 @@ import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
+import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
+import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -83,9 +85,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(newFile.newFileName));
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {
@@ -130,7 +131,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Project displayed in "Project" page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
     });
@@ -166,10 +167,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(title)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
-
 
     it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);

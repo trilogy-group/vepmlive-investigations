@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -15,7 +16,6 @@ import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {LoginPageHelper} from '../../../../../page-objects/pages/login/login-page.helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {browser} from 'protractor';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -294,7 +294,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.formButtons.ok);
 
         stepLogger.verification('Attached file is displayed at bottom of popup page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 
@@ -331,7 +331,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Verify that image is attached');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 

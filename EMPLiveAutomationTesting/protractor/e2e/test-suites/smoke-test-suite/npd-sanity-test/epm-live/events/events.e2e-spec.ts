@@ -1,10 +1,10 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
-import {browser} from 'protractor';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {EventsPageHelper} from '../../../../../page-objects/pages/my-workplace/events/events-page.helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
@@ -122,8 +122,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
         await ElementHelper.clickUsingJs(EventsPage.createViews);
         await PageHelper.click(EventsPage.standardViewType);
-        await ElementHelper.scrollToElement(CommonPageHelper.getElementByText(uniqueId));
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(uniqueId))).toBe(true,
+        await ElementHelper.scrollToElement(ElementHelper.getElementByText(uniqueId));
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId))).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.column));
 
     }) ;

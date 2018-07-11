@@ -5,12 +5,19 @@ export class ProjectItemPageConstants {
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly buildTeamPage = 'Build Team';
+    static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
+    static readonly associated = 'Associated';
+    static readonly changeWindow = 'Changes - All Changes';
+    static readonly issueWindow = 'Issues - All Issues by Status';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly region  = 'Region';
+    static readonly views  = 'Views';
+    static readonly actualCost  = 'Actual Cost';
+    static readonly saveView  = 'Save View';
+    static readonly createColumn  = 'Create Column';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
-
     static get inputLabels() {
         return {
             projectName: 'Project Name *',
@@ -35,6 +42,12 @@ export class ProjectItemPageConstants {
             risk: 'Risk',
             ok: 'OK',
             projectUpdate: 'Project Update *',
+        };
+    }
+
+    static get viewsItems() {
+        return {
+            showgantt: 'Show Gantt',
         };
     }
 
@@ -133,9 +146,36 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get index() {
+        return {
+            one: 1,
+            two: 2,
+            three: 3
+        };
+    }
+
     static get buildTeamContentClass() {
         return {
             saveAndCloseDisabled: 'ms-cui-disabled'
+        };
+    }
+
+    static get createColumnTabLabel() {
+        return {
+            createColumn: 'Create Column',
+            nameAndType: 'Name and Type',
+            additionalColumnSetting: 'Additional Column Settings',
+            columnValidation: 'Column Validation',
+        };
+    }
+
+    static get associatedItems() {
+        return {
+            lists: 'Lists',
+            changes: 'Changes',
+            issues: 'Issues',
+            risks: 'Risks',
+            documentLibraries: 'Document Libraries',
         };
     }
 
@@ -182,17 +222,43 @@ export class ProjectItemPageConstants {
             units: 'Units'
         };
     }
+
+    static get fragmentLabels() {
+        return {
+            fragment: 'Fragments ',
+            insert: 'Insert Fragment',
+            save: 'Save Fragment',
+            manage: 'Manage Fragments',
+        };
+    }
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
-            editCourse: 'Edit Course'
+            editCourse: 'Edit Course',
+            publish: 'Publish Status'
+        };
+    }
+
+    static get selectColumnLabel() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
+        };
+    }
+
+    static get addLinkPopup() {
+        return {
+            linkType: 'Link Type',
+            addLink: 'Add Link',
+            cancel: 'Cancel',
         };
     }
 
     static get planActionButtons() {
         return {
             save: 'Save Button',
-            close: 'Close Button'
+            close: 'Close Button',
         };
     }
 
@@ -239,11 +305,14 @@ export class ProjectItemPageConstants {
 
     static get newTaskFields() {
         return {
+            assignedList: 'Assigned List',
             title: 'Title',
             finishDate: 'Finish Date',
             work: 'Work',
             duration: 'Duration',
-            date: 'DueDate'
+            start: 'Start',
+            date: 'DueDate',
+            predecessors: 'Predecessors'
         };
     }
 

@@ -1,11 +1,12 @@
-import {BasePage} from '../base-page';
 import {browser, By, element} from 'protractor';
+import {BasePage} from '../base-page';
 import {CommonPageConstants} from './common-page.constants';
 import {CommonPageHelper} from './common-page.helper';
 import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class CommonPage extends BasePage {
 
@@ -44,6 +45,7 @@ export class CommonPage extends BasePage {
                 projectPortfolios: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPortfolios),
                 projectsCenter: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectCenter),
                 tasks: CommonPageHelper.getPageHeaderByTitle(projectsLabels.tasks),
+                taskCenter: CommonPageHelper.getPageHeaderByTitle(projectsLabels.taskCenter),
                 risks: CommonPageHelper.getPageHeaderByTitle(projectsLabels.risks),
                 issues: CommonPageHelper.getPageHeaderByTitle(projectsLabels.issues),
                 changes: CommonPageHelper.getPageHeaderByTitle(projectsLabels.changes),
@@ -151,6 +153,41 @@ export class CommonPage extends BasePage {
         return browser.driver.findElement(By.css('[src*="listform"]'));
     }
 
+    static get resourceGrid() {
+        return `[id='tdRes']`;
+    }
+
+    static get savePopupBox() {
+        return element(By.css(`[title="Save Fragment"]`));
+    }
+
+    static get resourceGroupingButton() {
+        return element(By.css(`${this.resourceGrid} [data-original-title*='Grouping']`));
+    }
+
+    static get createColumnDlgBox() {
+        return element(By.css(`[class*="ColumnsMenuHead"]`));
+    }
+
+    static get resourceGroupingColumn() {
+        return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
+    }
+
+    static get resourceAddGroupingColumn() {
+        return element(By.css(`.//*[@class='GMHeaderGroup']/*[text()='Department']`));
+    }
+
+    static get editTeamButtonOnTask() {
+        return ElementHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
+}
+    static get resourceDepartment() {
+        return element(By.css(`.GMHeaderRow [class*='Department']`));
+    }
+
+    static get closeButton() {
+        return element(By.css(`[id*=".CloseButton"]`));
+    }
+
     static get actionMenuIcons() {
         const titles = CommonPageConstants.actionMenuIconTitles;
         return {
@@ -169,7 +206,7 @@ export class CommonPage extends BasePage {
     }
 
     static get ganttGrid() {
-        return CommonPageHelper.getElementByStartsWithId('GanttGrid');
+        return ElementHelper.getElementByStartsWithId('GanttGrid');
     }
 
     static get searchControls() {
@@ -191,7 +228,7 @@ export class CommonPage extends BasePage {
 
     static get uploadSuccessFullyText(){
         return{
-        message: CommonPageHelper.getElementByText(CommonPageConstants.documentUploadText),
+        message: ElementHelper.getElementByText(CommonPageConstants.documentUploadText),
      };
     }
     static get records() {
@@ -230,8 +267,20 @@ export class CommonPage extends BasePage {
         return element(By.css('td .icon-ellipsis-horizontal'));
     }
 
+    static get addButton() {
+        return element(By.css('#addlinkdiv [value="Add Link"]'));
+    }
+
+    static get projectTab() {
+        return element(By.css('[id*="Project-title"]'));
+    }
+
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
+    }
+
+    static get cancelButton () {
+        return element(By.id('onetidCancelItem'));
     }
 
     static get UpdatePropertyDocument() {
@@ -240,6 +289,10 @@ export class CommonPage extends BasePage {
 
     static get pageTitle() {
         return element(By.id('pageTitle'));
+    }
+
+    static get linkDownbutton() {
+        return element(By.css('[id*="LinkDown"]'));
     }
 
     static get editPlan() {
@@ -252,6 +305,10 @@ export class CommonPage extends BasePage {
 
     static get newVersionCheckbox() {
         return element(By.css('[id*="OverwriteSingle"]'));
+    }
+
+    static get buildTeam() {
+        return element(By.css('[id*="BuildTeam-title"]'));
     }
 
     static get project() {
@@ -296,7 +353,7 @@ export class CommonPage extends BasePage {
         return CommonPageHelper.getElementByTitle('Type something and hit enter to search this list');
     }
 
-    static get closeButton() {
+    static get resourceCloseButton() {
         return element(By.css('.ms-dlgCloseBtn'));
     }
 
@@ -334,7 +391,7 @@ export class CommonPage extends BasePage {
 
     static get getbuttons() {
         return {
-            calender: CommonPageHelper.getElementByText(CommonPageConstants.calendar),
+            calender: ElementHelper.getElementByText(CommonPageConstants.calendar),
         };
     }
 

@@ -59,7 +59,8 @@ export class ElementHelper {
     }
 
     static async rightClickAndSelectNewTab() {
-        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN).sendKeys(protractor.Key.ENTER).perform();
+        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN)
+            .sendKeys(protractor.Key.ENTER).perform();
     }
 
     static async getFocusedElement() {
@@ -173,8 +174,17 @@ export class ElementHelper {
     }
 
     static async getText(elem: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBePresent(elem);
         const text = await elem.getText();
         return text.trim();
+    }
+
+    static getElementByStartsWithId(id: string, endsWith = 'Main') {
+        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
+    }
+
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
     static browserRefresh() {

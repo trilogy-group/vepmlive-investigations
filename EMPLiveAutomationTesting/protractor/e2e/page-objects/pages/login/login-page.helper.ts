@@ -1,9 +1,9 @@
+import {browser, By, element} from 'protractor';
 import {LoginPageConstants} from './login-page.constants';
 import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from './login.po';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
-import {browser, By, element} from 'protractor';
 
 export class LoginPageHelper {
     static get adminEmailId(): string {

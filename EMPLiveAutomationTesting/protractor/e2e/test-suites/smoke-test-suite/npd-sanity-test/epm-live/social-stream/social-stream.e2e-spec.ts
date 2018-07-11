@@ -7,7 +7,7 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {ElementHelper} from '../../../../../components/html/element-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -99,7 +99,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.postButton.first());
 
         stepLogger.verification('Posted comment should be displayed in Social Stream');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(status))).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(status))).toBe(true,
             ValidationsHelper.getDisplayedValidation(status));
 
         stepLogger.stepId(3);
@@ -108,7 +108,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await await loginPage.goToAndLoginAsTeamMember();
 
         stepLogger.verification('Status added by Admin should display here');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(status))).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(status))).toBe(true,
             ValidationsHelper.getDisplayedValidation(status));
 
         stepLogger.stepId(4);
@@ -121,7 +121,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.commentPost.first());
 
         stepLogger.verification('Comment should be added below the main status (Added by Admin User)');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(comment))).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(comment))).toBe(true,
             ValidationsHelper.getDisplayedValidation(comment));
 
         stepLogger.stepId(6);
@@ -130,7 +130,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
 
         stepLogger.verification('Comment added by another user should be displayed to admin user');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(comment))).toBe(true,
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(comment))).toBe(true,
             ValidationsHelper.getDisplayedValidation(comment));
     });
 });
