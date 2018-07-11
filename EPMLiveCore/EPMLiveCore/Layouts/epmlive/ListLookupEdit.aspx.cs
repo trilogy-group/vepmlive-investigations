@@ -204,12 +204,16 @@ namespace EPMLiveCore.Layouts.epmlive
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                 string className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                     assemblyName,
-                                                                     className,
-                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                     SPEventReceiverType.ItemUpdated,
-                                                                                                     SPEventReceiverType.ItemDeleting});
+                var evts = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new [] {
+                        SPEventReceiverType.ItemAdded,
+                        SPEventReceiverType.ItemUpdated,
+                        SPEventReceiverType.ItemDeleting
+                    });
+
                 foreach(SPEventReceiverDefinition evt in evts)
                 {
                     evt.Delete();
@@ -225,12 +229,15 @@ namespace EPMLiveCore.Layouts.epmlive
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                 string className = "EPMLiveCore.ItemSecurityEventReceiver";
 
-                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
-                                                                        assemblyName,
-                                                                        className,
-                                                                        new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                        SPEventReceiverType.ItemUpdated,
-                                                                                                        SPEventReceiverType.ItemDeleting});
+                var evts = CoreFunctions.GetListEvents(
+                    list,
+                    assemblyName,
+                    className,
+                    new [] {
+                        SPEventReceiverType.ItemAdded,
+                        SPEventReceiverType.ItemUpdated,
+                        SPEventReceiverType.ItemDeleting
+                    });
                 foreach(SPEventReceiverDefinition evt in evts)
                 {
                     evt.Delete();
