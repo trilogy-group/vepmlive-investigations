@@ -157,6 +157,10 @@ export class CommonPage extends BasePage {
         return `[id='tdRes']`;
     }
 
+    static get savePopupBox() {
+        return element(By.css(`[title="Save Fragment"]`));
+    }
+
     static get resourceGroupingButton() {
         return element(By.css(`${this.resourceGrid} [data-original-title*='Grouping']`));
     }
@@ -268,7 +272,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectTab() {
-        return element(By.id('Ribbon.Project-title'));
+        return element(By.css('[id*="Project-title"]'));
     }
 
     static get okButton () {

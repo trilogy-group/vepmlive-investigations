@@ -75,7 +75,6 @@ export class EventsPage {
         return element(By.id('onetidTypeNumber'));
     }
 
-
     static get descriptionField () {
         return element(By.id('idDesc'));
     }

@@ -22,7 +22,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Creating New Task and Assigning Task to resource functionality - [1124259]', async () => {
+    it('Creating New Task and Assigning Task to resource functionality - [1124259]', async () => {
         const stepLogger = new StepLogger(1124259);
         const uniqueId = PageHelper.getUniqueId();
         const taskElement = ElementHelper.getElementByText(uniqueId);

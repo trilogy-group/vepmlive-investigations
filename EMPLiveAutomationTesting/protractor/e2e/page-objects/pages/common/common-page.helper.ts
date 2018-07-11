@@ -363,6 +363,11 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getElementByValue(text: string) {
+        const xpath = `//*[@value="${text}"]`;
+        return element(By.xpath(xpath));
+    }
+
     static getATagByText(text: string, isContains: boolean) {
         const xpath = `//a[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
         return element(By.xpath(xpath));

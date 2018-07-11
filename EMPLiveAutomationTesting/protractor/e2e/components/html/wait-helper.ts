@@ -33,6 +33,15 @@ export class WaitHelper {
             targetElement.locator().toString() + message);
     }
 
+    async waitForPageToStable() {
+        while (true) {
+            const result = browser.executeScript('return document.readyState == \'complete\'');
+            if (result) {
+                return;
+            }
+        }
+    }
+
     /**
      * Wait for an element to display
      * @param {ElementFinder} targetElement

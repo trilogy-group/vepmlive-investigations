@@ -23,7 +23,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Validate project planner and create and assign task to resources - [743933]', async () => {
+    it('Validate project planner and create and assign task to resources - [743933]', async () => {
         const stepLogger = new StepLogger(743933);
         const uniqueId = PageHelper.getUniqueId();
 
