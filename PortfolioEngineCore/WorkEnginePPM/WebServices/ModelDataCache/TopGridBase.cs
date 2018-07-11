@@ -1,31 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ModelDataCache
 {
     public abstract class TopGridBase : GridBase
     {
-        protected string RemoveNastyCharacters(string sn)
+        protected string RemoveNastyCharacters(string input)
         {
-            var result = string.Empty;
-            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
-
-            sn = sn.Replace(" ", string.Empty);
-            sn = sn.Replace("'", string.Empty);
-            sn = sn.Replace("\r", string.Empty);
-            sn = sn.Replace("\n", string.Empty);
-            sn = sn.Replace("\"", string.Empty);
-            sn = sn.Replace("\\", string.Empty);
-
-            for (int i = 0; i < sn.Length; i++)
+            if (input == null)
             {
-                string sx = sn.Substring(i, 1);
-
-                if (sNastyChars.IndexOf(sx) == -1)
-                    result += sx;
+                throw new ArgumentNullException("input");
             }
 
-            return result;
+            const string nastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
+            const string charsToCleanup = nastyChars + " '\r\n\"\\";
+
+            var result = new StringBuilder(input.Length);
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (charsToCleanup.IndexOf(input[i]) < 0)
+                {
+                    result.Append(input[i]);
+                }
+            }
+
+            return result.ToString();
         }
 
         internal void AddDetailRow(DetailRowData oDet, int rID, bool UsingGrouping, bool ShowFTEs, bool ShowGantt, IList<SortFieldDefn> DetCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowcostdec)
