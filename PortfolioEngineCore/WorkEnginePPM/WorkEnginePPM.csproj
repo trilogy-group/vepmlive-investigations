@@ -845,7 +845,47 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>Model.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\ModelCache.cs" />
+    <Compile Include="WebServices\ModelDataCache\BarMoved.cs" />
+    <Compile Include="WebServices\ModelDataCache\BottomGrid.cs" />
+    <Compile Include="WebServices\ModelDataCache\BottomGridCostsData.cs" />
+    <Compile Include="WebServices\ModelDataCache\BottomGridCostsLayout.cs" />
+    <Compile Include="WebServices\ModelDataCache\CatItemData.cs" />
+    <Compile Include="WebServices\ModelDataCache\CSCategoryEntry.cs" />
+    <Compile Include="WebServices\ModelDataCache\CSNamedRate.cs" />
+    <Compile Include="WebServices\ModelDataCache\CSRatesAndCategory.cs" />
+    <Compile Include="WebServices\ModelDataCache\CSTargetData.cs" />
+    <Compile Include="WebServices\ModelDataCache\CustomFieldData.cs" />
+    <Compile Include="WebServices\ModelDataCache\CustomFieldDbTable.cs" />
+    <Compile Include="WebServices\ModelDataCache\CustomFieldsDefn.cs" />
+    <Compile Include="WebServices\ModelDataCache\DataItem.cs" />
+    <Compile Include="WebServices\ModelDataCache\DetailRowData.cs" />
+    <Compile Include="WebServices\ModelDataCache\FieldIDs.cs" />
+    <Compile Include="WebServices\ModelDataCache\FilterGridCostsLayout.cs" />
+    <Compile Include="WebServices\ModelDataCache\FilterGridCostsData.cs" />
+    <Compile Include="WebServices\ModelDataCache\ItemDefn.cs" />
+    <Compile Include="WebServices\ModelDataCache\ListItemData.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelBarsChanged.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelCache.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelErrorHandling.cs" />
+    <Compile Include="WebServices\ModelDataCache\PeriodData.cs" />
+    <Compile Include="WebServices\ModelDataCache\PeriodsAndOptions.cs" />
+    <Compile Include="WebServices\ModelDataCache\PIData.cs" />
+    <Compile Include="WebServices\ModelDataCache\PortFieldData.cs" />
+    <Compile Include="WebServices\ModelDataCache\RateFteCache.cs" />
+    <Compile Include="WebServices\ModelDataCache\RateTable.cs" />
+    <Compile Include="WebServices\ModelDataCache\SecItemData.cs" />
+    <Compile Include="WebServices\ModelDataCache\SortFieldDefn.cs" />
+    <Compile Include="WebServices\ModelDataCache\SortGroupDefn.cs" />
+    <Compile Include="WebServices\ModelDataCache\SortRowDefn.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetColours.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetGridLayout.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetGridsData.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetLegendGridData.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
+    <Compile Include="WebServices\ModelDataCache\TargetRowData.cs" />
+    <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
+    <Compile Include="WebServices\ModelDataCache\TopGridCostsData.cs" />
+    <Compile Include="WebServices\ModelDataCache\TopGridCostsLayout.cs" />
     <Compile Include="WebServices\OptGrids.cs" />
     <Compile Include="WebServices\Optimizer.asmx.cs">
       <DependentUpon>Optimizer.asmx</DependentUpon>
