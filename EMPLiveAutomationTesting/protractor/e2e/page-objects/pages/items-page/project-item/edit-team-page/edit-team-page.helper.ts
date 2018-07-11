@@ -2,8 +2,7 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {EditTeamPage} from './edit-team-page.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {DropDownHelper} from '../../../../../components/html/dropdown-helper';
-import {ElementHelper} from '../../../../../components/html/element-helper';
+import {CommonPage} from '../../../common/common.po';
 
 export class EditTeamPageHelper {
     static async clickviewReport(stepLogger: StepLogger) {
@@ -13,33 +12,31 @@ export class EditTeamPageHelper {
     }
 
     static async clickResourceCapacityHeatMap(stepLogger: StepLogger) {
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.resourceCapacityHeatMap);
-        stepLogger.step('click on view report');
-        await PageHelper.click(EditTeamPage.resourceCapacityHeatMap);
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.viewReportMenus.resourceCapacityHeatMap);
+        stepLogger.step('click on resource Capacity');
+        await PageHelper.click(EditTeamPage.viewReportMenus.resourceCapacityHeatMap);
     }
-    static async selectParametersAndApply(stepLogger: StepLogger) {
-        // this is work around without it not able to work on new tab
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
-        await PageHelper.switchToNewTabIfAvailable(0);
-        await PageHelper.switchToNewTabIfAvailable(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.applyButton);
-        await  PageHelper.click(EditTeamPage.periodStartOption);
-        stepLogger.step('Select Period start Date ');
-        await DropDownHelper.selectOptionByVal(EditTeamPage.periodStartOption, '2' );
-        await  WaitHelper.getInstance().waitForElementToBeClickable(EditTeamPage.applyButton);
-        stepLogger.step('Select Period End Date ');
-        await  PageHelper.click(EditTeamPage.periodEndOption);
-        await PageHelper.click(EditTeamPage.periodEndOptionValue);
-        await  WaitHelper.getInstance().waitForElementToBeClickable(EditTeamPage.applyButton);
-        stepLogger.step('Select Department ');
-        await PageHelper.click(EditTeamPage.department);
-        const department = 'Test department 1';
-        await DropDownHelper.selectOptionByVal(EditTeamPage.department, department );
-        await  WaitHelper.getInstance().waitForElementToBeClickable(EditTeamPage.applyButton);
-        stepLogger.step('Click on Apply Button ');
-        await ElementHelper.actionMouseMove(EditTeamPage.applyButton);
-        await PageHelper.click(EditTeamPage.applyButton);
-        await  WaitHelper.getInstance().waitForElementToBeClickable(EditTeamPage.applyButton);
 
+    static async clickResourceCommitments(stepLogger: StepLogger) {
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.viewReportMenus.resourceCommitments);
+        stepLogger.step('click on resource commitments');
+        await PageHelper.click(EditTeamPage.viewReportMenus.resourceCommitments);
     }
+
+    static async resourceAvailableVsPlannedByDept(stepLogger: StepLogger) {
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.viewReportMenus.resourceAvailableVsPlannedByDept);
+        stepLogger.step('click on resource Capacity');
+        await PageHelper.click(EditTeamPage.viewReportMenus.resourceAvailableVsPlannedByDept);
+    }
+    static async resourceWorkVsCapacity(stepLogger: StepLogger) {
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(EditTeamPage.viewReportMenus.resourceWorkVsCapacity);
+        stepLogger.step('click on resource Capacity');
+        await PageHelper.click(EditTeamPage.viewReportMenus.resourceAvailableVsPlannedByDept);
+    }
+    static async closeEditTeamPopUp(stepLogger: StepLogger) {
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
+        stepLogger.step('click on resource commitments');
+        await PageHelper.click(CommonPage.ribbonItems.close);
+    }
+
 }

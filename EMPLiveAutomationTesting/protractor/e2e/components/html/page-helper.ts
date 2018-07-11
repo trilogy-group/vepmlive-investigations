@@ -137,6 +137,14 @@ export class PageHelper {
         // See http://git.io/v4gXM for details
         return browser.driver.get(url);
     }
+    static async closeTab(windowNumber = 1) {
+        const handles = await browser.getAllWindowHandles();
+        const newWindowHandle = handles[windowNumber]; // this is your new window
+        if (newWindowHandle) {
+            await browser.driver.close();
+            await browser.switchTo().window(handles[0]);
+        }
+        }
 
     /**
      * Gets html attribute value
@@ -191,7 +199,7 @@ export class PageHelper {
     static async acceptAlert() {
         // Wait for frame to exist first
         await browser.sleep(PageHelper.timeout.s);
-        return browser.switchTo().alert().accept();;
+        return browser.switchTo().alert().accept();
     }
 
     /**
@@ -225,4 +233,5 @@ export class PageHelper {
         await WaitHelper.getInstance().waitForElementToBePresent(item);
         await item.sendKeys(filePath);
     }
+
 }

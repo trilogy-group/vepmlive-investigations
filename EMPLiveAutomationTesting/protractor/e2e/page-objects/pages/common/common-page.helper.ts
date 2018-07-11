@@ -309,6 +309,7 @@ export class CommonPageHelper {
     static async resourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editResource);
         await PageHelper.click(CommonPageHelper.getElementUsingTextContent(CommonPageConstants.ribbonLabels.editResource, false));
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }

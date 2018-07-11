@@ -16,7 +16,11 @@ import {ResourceplannerPage} from '../../../../page-objects/pages/resourceplanne
 import {ResourcePlannerConstants} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.constants';
 import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
-
+import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.constansts';
+import {ResourceCapacityHeatMapPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-capacity-heatMap-page/resource-capacity-heatMap-page.helper';
+import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.helper';
+import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
+import {ResourceAvailablePageHelpergeHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
@@ -262,6 +266,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ReportingSettingsPageHelper.navigateTo(stepLogger);
         stepLogger.stepId(3);
         // Run Schedule
+        stepLogger.step('Run Schedule');
         await ReportingSettingsPageHelper.runSchedule(stepLogger);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -279,9 +284,130 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EditTeamPageHelper.clickResourceCapacityHeatMap(stepLogger);
         stepLogger.stepId(6);
         stepLogger.step('Getting Value from  Resource Capacity Heat Map');
-        await EditTeamPageHelper.selectParametersAndApply(stepLogger);
-        stepLogger.step('Validate that Added Hours is present ');
-        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.selectUser))
+        await ResourceCapacityHeatMapPageHelper.selectParametersAndApply(stepLogger);
+        stepLogger.step('Validate that User  is present ');
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
     });
+    it('Generate "Resource Commitments" Report - [743183]', async () => {
+        const stepLogger = new StepLogger(743183);
+        stepLogger.stepId(1);
+        // Step #1 Inside this function
+        await ReportingSettingsPageHelper.navigateTo(stepLogger);
+        stepLogger.stepId(2);
+        // Run Schedule
+        stepLogger.step('Run Schedule');
+        await ReportingSettingsPageHelper.runSchedule(stepLogger);
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.stepId(3);
+        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        await CommonPageHelper.editTeam(stepLogger);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.stepId(4);
+        stepLogger.step('Click On Resource Commitments ');
+        await EditTeamPageHelper.clickviewReport(stepLogger);
+        await EditTeamPageHelper.clickResourceCommitments(stepLogger);
+        stepLogger.stepId(5);
+        await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
+        stepLogger.step('Validate that Resource commitment Message displayed ');
+        await expect(await PageHelper.isElementDisplayed(ResourceCommitments.resourceCommitmentsMessage))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(EditItemPageConstants.resourceCommitmentsMessage));
+        stepLogger.step('Closing the tab');
+        await PageHelper.closeTab();
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.sidebarMenus.navigation);
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.step('Navigate to resource Planner page');
+        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
+        await ResourcePlannerPageHelper.deletingUser(stepLogger);
+        await ReportingSettingsPageHelper.navigateTo(stepLogger);
+        stepLogger.stepId(6);
+        // Run Schedule
+        await ReportingSettingsPageHelper.runSchedule(stepLogger);
+        stepLogger.stepId(6);
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.stepId(7);
+        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        await CommonPageHelper.editTeam(stepLogger);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.stepId(8);
+        stepLogger.step('Click On Resource Commitments ');
+        await EditTeamPageHelper.clickviewReport(stepLogger);
+        await EditTeamPageHelper.clickResourceCommitments(stepLogger);
+        stepLogger.stepId(9);
+        await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
+        stepLogger.step('Validate that Resource commitment Message is not displayed ');
+        await expect(await PageHelper.isElementDisplayed(ResourceCommitments.resourceCommitmentsMessage))
+            .toBe(false, ValidationsHelper.getNotDisplayedValidation(EditItemPageConstants.resourceCommitmentsMessage));
+    });
+
+    it('Generate "Resource Available Vs. Planned by Dept." reports. - [743185]', async () => {
+        const stepLogger = new StepLogger(743185);
+        stepLogger.stepId(1);
+        const hours = '10.00' ;
+        // Step #1 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
+        stepLogger.stepId(2);
+        // Add hours for the resource added in the top-grid
+        stepLogger.step('Add hours for the resource added in the top-grid');
+        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        stepLogger.stepId(3);
+        // navigate to Reporter setting page
+        stepLogger.step('navigate to Reporter setting page');
+        await ReportingSettingsPageHelper.navigateTo(stepLogger);
+        stepLogger.stepId(4);
+        // Run Schedule
+        stepLogger.step('Run Schedule');
+        await ReportingSettingsPageHelper.runSchedule(stepLogger);
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.stepId(5);
+        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        await CommonPageHelper.editTeam(stepLogger);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.stepId(6);
+        stepLogger.step('Click On Resource Available Vs Planned By Dept');
+        await EditTeamPageHelper.clickviewReport(stepLogger);
+        await EditTeamPageHelper.resourceAvailableVsPlannedByDept(stepLogger);
+        stepLogger.stepId(7);
+        stepLogger.step('Getting Value from  Resource Available Vs Planned By Dept');
+        await ResourceAvailablePageHelpergeHelper.selectParametersAndApply(stepLogger);
+        stepLogger.stepId(8);
+        stepLogger.step('Validate that Added user is present ');
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
+    });
+
 });

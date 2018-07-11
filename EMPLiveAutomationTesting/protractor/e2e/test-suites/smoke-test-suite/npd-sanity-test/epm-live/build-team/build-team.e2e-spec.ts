@@ -16,6 +16,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -459,4 +460,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
+
 });
