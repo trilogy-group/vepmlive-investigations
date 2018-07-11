@@ -248,7 +248,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectCheckbox() {
-        return element(By.css(`(${this.projectFirstRow}) [class*='GMCellPanel GMEmpty']`));
+        return element(By.css(`${this.projectFirstRow} [class*='GMCellPanel GMEmpty']`));
     }
 
     static get projectFirstRow() {
@@ -325,7 +325,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+            return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
     static get costButton(){

@@ -422,6 +422,10 @@ export class ProjectItemPageHelper {
         return this.selectAssign(1);
     }
 
+    static selectLastAssign() {
+        return this.selectAssign(3);
+    }
+
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
