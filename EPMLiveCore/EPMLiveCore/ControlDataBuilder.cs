@@ -45,8 +45,7 @@ namespace EPMLiveCore
                 field.InternalName,
                 "_",
                 field.Id.ToString(),
-                "{0}"
-            );
+                "{0}");
 
             if (allowMultipleValues)
             {

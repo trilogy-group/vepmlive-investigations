@@ -18,6 +18,7 @@ using System.Linq;
 using System.Globalization;
 using System.Xml;
 using System.Web.UI.HtmlControls;
+using System.Diagnostics;
 
 namespace EPMLiveCore
 {
@@ -1516,11 +1517,11 @@ namespace EPMLiveCore
                 // this represents a comma separated list of lookup field internal names to modify
                 EnhancedLookupConfigValuesHelper valueHelper = null;
                 string unprocessedModCandidates = string.Empty;
-                GridGanttSettings gSettings = new GridGanttSettings(this.list);
+                var gSettings = new GridGanttSettings(this.list);
 
                 try
                 {
-                    string rawValue = gSettings.Lookups;
+                    var rawValue = gSettings.Lookups;
                     //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
                     valueHelper = new EnhancedLookupConfigValuesHelper(rawValue);
                 }
@@ -1532,8 +1533,8 @@ namespace EPMLiveCore
                 }
 
 
-                bool isEnhanced = valueHelper.ContainsKey(field.InternalName);
-                bool isParent = valueHelper.IsParentField(field.InternalName);
+                var isEnhanced = valueHelper.ContainsKey(field.InternalName);
+                var isParent = valueHelper.IsParentField(field.InternalName);
 
                 if (!isEnhanced && !isParent)
                 {
@@ -1644,7 +1645,14 @@ namespace EPMLiveCore
                 {
                     lookupValueCollection = new SPFieldLookupValueCollection(this.ListItem[lookupField.Id].ToString());
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        EventLog myLog = new EventLog("EPM Live", ".", "ListDisplaySettingIterator");
+                        myLog.WriteEntry("Error in CreateGenericPickerControl(): " + ex.Message + ex.StackTrace, EventLogEntryType.Information, 1000);
+                    });
+                }
             }
 
             if (lookupValueCollection != null && lookupValueCollection.Count > 0)
