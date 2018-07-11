@@ -356,6 +356,16 @@ export class ProjectItemPageHelper {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
     }
 
+    static async verifyGanttChart() {
+        await expect(await ProjectItemPage.ganttChart.isPresent()).toBe(false,
+            ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.ganttChart));
+    }
+
+    static async verifyAlertMessage() {
+        await expect(await browser.switchTo().alert().getText()).toContain(ProjectItemPageConstants.baseLineMessage.clear,
+            ValidationsHelper.getRecordContainsMessage(ProjectItemPageConstants.baseLineMessage.clear));
+    }
+
     static async verifyFragmentDropDownLabel() {
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.insert)).toBe(true,
             ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.insert));

@@ -275,6 +275,14 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="Project-title"]'));
     }
 
+    static get setBaselineTab() {
+        return element(By.css('[id*="SetBaseline"] [class*="img"]'));
+    }
+
+    static get clearBaselineTab() {
+        return element(By.css('[id*="ClearBaseline"] [class*="img"]'));
+    }
+
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
     }

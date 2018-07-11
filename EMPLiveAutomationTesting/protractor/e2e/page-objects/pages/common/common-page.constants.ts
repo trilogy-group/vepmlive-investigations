@@ -82,6 +82,7 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             buildTeam: 'Build Team',
             close: 'Close',
+            insert: 'Insert',
             saveAndClose: 'Save &Close',
             assignmentPlanner: 'Assignment Planner',
             viewReports: 'View Reports',

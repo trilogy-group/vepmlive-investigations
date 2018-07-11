@@ -12,6 +12,7 @@ export class ProjectItemPageConstants {
     static readonly issueWindow = 'Issues - All Issues by Status';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly region  = 'Region';
+    static readonly ganttChart  = 'Gantt Chart';
     static readonly views  = 'Views';
     static readonly actualCost  = 'Actual Cost';
     static readonly saveView  = 'Save View';
@@ -182,7 +183,8 @@ export class ProjectItemPageConstants {
     static get messageText() {
         return {
             saveAndCloseDisabled: 'Save & Close Button is disabled',
-            saveAndCloseEnabled: 'Save & Close Button is enabled'
+            saveAndCloseEnabled: 'Save & Close Button is enabled',
+            uploadSuccessfully: 'imported successfully'
         };
     }
 
@@ -300,6 +302,12 @@ export class ProjectItemPageConstants {
     static get users() {
         return {
             adminUser: 'Admin User'
+        };
+    }
+
+    static get baseLineMessage() {
+        return {
+            clear: 'Would you like to overwrite the baseline saved on: Wed Jul 11 2018'
         };
     }
 

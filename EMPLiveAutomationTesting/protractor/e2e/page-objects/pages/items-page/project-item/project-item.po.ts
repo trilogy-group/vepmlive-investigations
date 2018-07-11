@@ -193,6 +193,22 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('[id*="btnClose"]'));
     }
 
+    static get firstFragment() {
+        return element(By.css('.modal-body tbody tr:nth-child(1)'));
+    }
+
+    static get ganttChart() {
+        return element(By.xpath('.//*[@class="GSHeadRight"]//parent::td[contains(@style,"none")]'));
+    }
+
+    static get fragmentUploadMessage() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.messageText.uploadSuccessfully, true);
+    }
+
+    static get insertFragmentButton() {
+        return element(By.css('[id*="btnImport"]'));
+    }
+
     static get saveViewNameField() {
         return element(By.id(`viewname`));
     }
