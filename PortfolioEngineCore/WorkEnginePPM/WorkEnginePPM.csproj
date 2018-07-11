@@ -862,6 +862,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\FieldIDs.cs" />
     <Compile Include="WebServices\ModelDataCache\FilterGridCostsLayout.cs" />
     <Compile Include="WebServices\ModelDataCache\FilterGridCostsData.cs" />
+    <Compile Include="WebServices\ModelDataCache\GridBase.cs" />
     <Compile Include="WebServices\ModelDataCache\ItemDefn.cs" />
     <Compile Include="WebServices\ModelDataCache\ListItemData.cs" />
     <Compile Include="WebServices\ModelDataCache\ModelBarsChanged.cs" />
@@ -884,6 +885,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetRowData.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
+    <Compile Include="WebServices\ModelDataCache\TopGridBase.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGridCostsData.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGridCostsLayout.cs" />
     <Compile Include="WebServices\OptGrids.cs" />
