@@ -15,6 +15,7 @@ export class HomePageConstants {
                 projects: 'Projects',
                 projectCenter: 'Project Center',
                 tasks: 'Tasks',
+                taskCenter: 'Task Center',
                 selectPlanner: 'Select Planner',
                 risks: 'Risks',
                 workHours: 'Work Hours',

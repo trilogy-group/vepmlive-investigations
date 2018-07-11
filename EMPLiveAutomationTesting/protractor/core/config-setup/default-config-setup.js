@@ -11,7 +11,6 @@ const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x8
     This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
     To fix, run the container with docker run --shm-size=1gb to increase the size of /dev/shm.
     Since Chrome 65, this is no longer necessary. Instead, launch the browser with the --disable-dev-shm-usage flag
-
     sources:
         - https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         - https://developers.google.com/web/tools/puppeteer/troubleshooting

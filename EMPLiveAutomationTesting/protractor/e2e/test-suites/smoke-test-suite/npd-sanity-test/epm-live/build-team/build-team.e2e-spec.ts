@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
@@ -13,7 +14,6 @@ import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-pag
 import {ProjectItemPageValidations} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.validations';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {browser} from 'protractor';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -373,15 +373,15 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.step('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectAssign(1)))
+        await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectFirstAssign()))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
         stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
             ' drop down');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(selectedResourcePoolResourceName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
-            (ProjectItemPageConstants.teamSectionlabels.currentTeam));
+                  (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {

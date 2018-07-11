@@ -6,6 +6,7 @@ import {CommonPageHelper} from '../common/common-page.helper';
 import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class WorkSpacesPage extends BasePage {
 
@@ -22,7 +23,7 @@ export class WorkSpacesPage extends BasePage {
     }
 
     static get newWorkSpaceButton(){
-        return CommonPageHelper.getElementByText(WorkspacesConstants.newWorkspace);
+        return ElementHelper.getElementByText(WorkspacesConstants.newWorkspace);
     }
 
     static get openPermission(){

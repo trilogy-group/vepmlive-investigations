@@ -1,3 +1,4 @@
+import {browser, By, element} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -6,7 +7,6 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {LinkPageConstants} from './link-page.constants';
 import {LinkPage} from './link.po';
 import {WaitHelper} from '../../../../components/html/wait-helper';
-import {browser, By, element} from 'protractor';
 
 export class LinkPageHelper {
 

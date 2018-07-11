@@ -1,9 +1,9 @@
+import {By, element} from 'protractor';
 const moment = require('moment');
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
 import {EventsPageConstants} from './events-page.constants';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {By, element} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 
 export class EventsPage {
@@ -71,6 +71,10 @@ export class EventsPage {
         return element(By.id('onetidTypeChoice'));
     }
 
+    static get numberCheckbox() {
+        return element(By.id('onetidTypeNumber'));
+    }
+
     static get descriptionField () {
         return element(By.id('idDesc'));
     }
@@ -100,7 +104,11 @@ export class EventsPage {
     }
 
     static get createColumn () {
-        return element(By.css(`[id*="CustomViews.CreateColumn"]`));
+        return element(By.css(`[id*="CreateColumn"]`));
+    }
+
+    static get selectColumn () {
+        return element(By.css(`[id*="SelectColumns"]`));
     }
 
 }

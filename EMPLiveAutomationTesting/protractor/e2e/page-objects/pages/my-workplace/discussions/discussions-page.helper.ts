@@ -1,3 +1,4 @@
+import {element, By, browser} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
 import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {DiscussionsPage} from './discussions.po';
@@ -5,7 +6,6 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {CommonPage} from '../../common/common.po';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {DiscussionsPageConstants} from './discussions-page.constants';
-import {element, By, browser} from 'protractor';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import { CommonPageHelper } from '../../common/common-page.helper';
 import { WaitHelper } from '../../../../components/html/wait-helper';

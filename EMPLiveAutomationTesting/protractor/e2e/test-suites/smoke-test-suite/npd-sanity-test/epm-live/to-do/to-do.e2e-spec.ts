@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -11,7 +12,6 @@ import {ToDoPageConstants} from '../../../../../page-objects/pages/my-workplace/
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ToDoPage} from '../../../../../page-objects/pages/my-workplace/to-do/to-do.po';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
-import {browser} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 import {SocialStreamPage} from '../../../../../page-objects/pages/settings/social-stream/social-stream.po';
@@ -188,7 +188,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.step('Check that the attached file get display under "Attachments" section');
         stepLogger.step('The attached file should be displayed under "Attachments" section');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFileName)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFileName)))
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFileName));
 

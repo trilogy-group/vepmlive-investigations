@@ -21,7 +21,8 @@ export class PageHelper {
         l: 25000,
         xl: 50000,
         xxl: 75000,
-        xxxl: 200000
+        xxxl: 200000,
+        xxxxl: 300000
     };
     static DEFAULT_TIMEOUT = PageHelper.timeout.xxl;
 
