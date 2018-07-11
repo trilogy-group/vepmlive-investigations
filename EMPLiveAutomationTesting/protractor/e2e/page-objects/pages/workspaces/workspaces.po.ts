@@ -4,6 +4,7 @@ import {element, By} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageHelper} from '../common/common-page.helper';
 import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';
+import {ElementHelper} from '../../../components/html/element-helper';
 
 export class WorkSpacesPage extends BasePage {
 
@@ -20,7 +21,7 @@ export class WorkSpacesPage extends BasePage {
     }
 
     static get newWorkSpaceButton(){
-        return CommonPageHelper.getElementByText(WorkspacesConstants.newWorkspace);
+        return ElementHelper.getElementByText(WorkspacesConstants.newWorkspace);
     }
 
     static get openPermission(){

@@ -1,3 +1,4 @@
+import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {ProjectItemPage} from './project-item.po';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {StepLogger} from '../../../../../core/logger/step-logger';
@@ -5,7 +6,6 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
-import {browser, By, element, ElementFinder} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -193,7 +193,7 @@ export class ProjectItemPageHelper {
         await PageHelper.actionSendKeys(CommonPageConstants.hours.effortHours);
         stepLogger.step('Select assignee');
         await PageHelper.click(ProjectItemPage.assignToDropDown);
-        await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
+        await PageHelper.click(ProjectItemPageHelper.selectFirstAssign());
         stepLogger.step('Click OK');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
     }
@@ -236,7 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -289,9 +289,9 @@ export class ProjectItemPageHelper {
 
     static get getlink() {
         return {
-            myLanguageAndRegion: CommonPageHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: CommonPageHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: CommonPageHelper.getElementByText(ProjectItemPageConstants.region),
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
 
@@ -316,7 +316,7 @@ export class ProjectItemPageHelper {
     }
     static get button() {
         return {
-            ok: CommonPageHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 
@@ -327,9 +327,53 @@ export class ProjectItemPageHelper {
             work: ProjectItemPageHelper.getField(fields.work),
             duration: ProjectItemPageHelper.getField(fields.duration),
             date: ProjectItemPageHelper.dateField(fields.date),
+            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
         };
 
     }
+
+    static getselectTask(index: number, column: string) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains
+        (@class,"${column}")]`));
+    }
+
+    static async closeResourcePage() {
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.click(CommonPage.resourceCloseButton);
+    }
+
+    static getFinishDate(index: number) {
+        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
+        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains(@class,
+        "GSNoRight") and contains(@class,"Due")]`));
+    }
+
+    static async verifyTitleAndDuration(uniqueId: string, value: string) {
+        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
+        await expect(await ProjectItemPageHelper.newTasksFields.duration.getText()).toBe(value,
+            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
+    }
+
+    static async verifyFragmentDropDownLabel() {
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.insert)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.insert));
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.save)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.save));
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.manage)).toBe(true,
+            ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.manage));
+    }
+
+    static async selectCreatedTask() {
+        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
+        const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);
+        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
+        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
+        await elm2.click();
+        await elm3.click();
+        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
+        }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
@@ -339,6 +383,25 @@ export class ProjectItemPageHelper {
     static async createProject(uniqueId: string, stepLogger: StepLogger) {
         stepLogger.step('Create a new project');
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+    }
+
+    static async removeAssignedUserIfPresent(stepLogger: StepLogger) {
+        stepLogger.step('Removed assigned user from current team');
+        if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
+            await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
+            await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
+        }
+    }
+
+    static async unCheckedSelectColumnIfChecked() {
+        if (await ProjectItemPage.selectColumnName.isPresent() === false) {
+            await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.actualCost));
+            await PageHelper.click(ProjectItemPage.selectColumnLabel.ok);
+        }
+    }
+
+    static selectFirstAssign() {
+        return this.selectAssign(1);
     }
 
     static selectAssign(index: number) {

@@ -1,6 +1,6 @@
+import {browser} from 'protractor';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {browser} from 'protractor';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';

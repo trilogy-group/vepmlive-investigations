@@ -14,6 +14,7 @@ import * as path from 'path';
 import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
+import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 
 const fs = require('fs');
 
@@ -362,6 +363,16 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getElementByValue(text: string) {
+        const xpath = `//*[@value="${text}"]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getATagByText(text: string, isContains: boolean) {
+        const xpath = `//a[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
+        return element(By.xpath(xpath));
+    }
+
     static getElementByRole(role: string) {
         const xpath = `[role="${role}"]`;
         return element(By.css(xpath));
@@ -397,6 +408,13 @@ export class CommonPageHelper {
 
     static getTeamRecordsNameByTeamId(id: string) {
         return element.all(By.xpath(`//*[@id="${id}"]//a`));
+    }
+
+    static async enterTaskNameAndData(hours: string, title: string) {
+        await PageHelper.click(CommonPage.ribbonItems.addTask);
+        await PageHelper.actionSendKeys(title);
+        await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
+        await PageHelper.actionSendKeys(hours);
     }
 
     static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
@@ -483,7 +501,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(pageName));
 
         const fileNameWithoutExtension = newFile.newFileName.split('.')[0];
-        await expect(await PageHelper.isElementDisplayed(this.getElementByText(fileNameWithoutExtension, true)))
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(fileNameWithoutExtension, true)))
             .toBe(true,
                 ValidationsHelper.getImageDisplayedValidation(newFile.newFileName));
     }
@@ -513,7 +531,7 @@ export class CommonPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
         // Avoiding - Element is not able to click at point (-9553, -9859)
-        await browser.sleep(PageHelper.timeout.s);
+        await browser.sleep(PageHelper.timeout.m);
     }
 
     static getPublicView(text: string) {
@@ -544,14 +562,6 @@ export class CommonPageHelper {
 
     static getDivByText(text: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(text)}]`));
-    }
-
-    static getElementByStartsWithId(id: string, endsWith = 'Main') {
-        return element(By.css(`[id^='${id}'][id$='${endsWith}']`));
-    }
-
-    static getElementByText(text: string, isContains = false) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
     static getElementAllByText(text: string, isContains = false) {

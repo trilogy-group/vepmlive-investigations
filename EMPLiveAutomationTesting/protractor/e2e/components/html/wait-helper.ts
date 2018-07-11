@@ -1,5 +1,5 @@
-import {PageHelper} from './page-helper';
 import {browser, ElementFinder, protractor} from 'protractor';
+import {PageHelper} from './page-helper';
 
 export class WaitHelper {
     private static instance: WaitHelper;
@@ -31,6 +31,15 @@ export class WaitHelper {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
+    }
+
+    async waitForPageToStable() {
+        while (true) {
+            const result = browser.executeScript('return document.readyState == \'complete\'');
+            if (result) {
+                return;
+            }
+        }
     }
 
     /**
@@ -101,6 +110,10 @@ export class WaitHelper {
             promiseCall().then((value: any) => (result = resolver(value)));
             return result;
         }, timeout, message);
+    }
+    async waitForTextToBePresent(targetElement: ElementFinder, value: string) {
+        const EC = protractor.ExpectedConditions;
+        await browser.wait(EC.textToBePresentInElement(targetElement, value), 25000);
     }
 
     async waitForElementToHaveText(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT, message = '') {

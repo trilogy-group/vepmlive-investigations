@@ -1,3 +1,4 @@
+import { browser } from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
@@ -5,7 +6,6 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import { WorkspacePageHelper } from '../../../../../page-objects/pages/workspaces/workspace-page.helper';
 import { CommonPage } from '../../../../../page-objects/pages/common/common.po';
 import { ValidationsHelper } from '../../../../../components/misc-utils/validation-helper';
-import { browser } from 'protractor';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;

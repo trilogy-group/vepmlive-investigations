@@ -6,7 +6,7 @@ import {CommonPageHelper} from '../../../../page-objects/pages/common/common-pag
 import {MyWorkplacePage} from '../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-import { MyWorkPageHelper } from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
+import {MyWorkPageHelper} from '../../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -16,7 +16,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Edit page via Edit page option. - [745079]', async () => {
+    it('Edit page via Edit page option. - [745079]', async () => {
         const stepLogger = new StepLogger(745079);
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;

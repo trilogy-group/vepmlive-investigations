@@ -1,5 +1,5 @@
-import {MyWorkPageConstants} from './my-work-page.constants';
 import {By, element} from 'protractor';
+import {MyWorkPageConstants} from './my-work-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';

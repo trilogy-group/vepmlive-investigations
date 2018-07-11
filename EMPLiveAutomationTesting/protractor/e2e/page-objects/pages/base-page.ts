@@ -1,5 +1,5 @@
-import {Page} from '../contracts/page';
 import {browser} from 'protractor';
+import {Page} from '../contracts/page';
 import {PageHelper} from '../../components/html/page-helper';
 
 export class BasePage implements Page {
