@@ -162,7 +162,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual("0", _stringAttributesCreated["id"]);
@@ -180,7 +180,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
@@ -194,7 +194,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual(2, _intAttributesCreated["CanFilter"]);
@@ -209,7 +209,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["xGrouping"]);
@@ -225,7 +225,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual("GanttBlue", _stringAttributesCreated["GGanttClass"]);
@@ -247,7 +247,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             for (var i = _fromPeriodIndexParameter; i <= _fromPeriodIndexParameter; i++)
@@ -272,7 +272,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRows(new[] { _detailRowParameter });
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)

@@ -35,5 +35,27 @@ namespace WorkEnginePPM.Tests.TestDoubles
             Header2 = header2Shim;
             PeriodCols = periodColsShim;
         }
+
+        public new void AddPeriodColumns(IEnumerable<PeriodData> periodsData)
+        {
+            base.AddPeriodColumns(periodsData);
+        }
+
+        protected override void AddDetailRow(DetailRowData detailRowData, int rowId)
+        {
+        }
+
+        protected override void InitializeGridData(RenderingTypes renderingType)
+        {
+        }
+
+        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        {
+        }
+
+        protected override string ResolvePeriodId(PeriodData periodData, int index)
+        {
+            return index.ToString();
+        }
     }
 }

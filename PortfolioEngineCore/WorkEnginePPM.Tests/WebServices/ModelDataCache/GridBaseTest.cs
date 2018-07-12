@@ -111,21 +111,6 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         }
 
         [TestMethod]
-        public void GetString_Always_ReturnsGeneratedConstructorXml()
-        {
-            // Arrange
-            const string expectedResult = "test-xml";
-            ShimCStruct.AllInstances.XML = (instance) => expectedResult;
-            var gridBase = CreateGridBase();
-
-            // Act
-            var result = gridBase.GetString();
-
-            // Assert
-            Assert.AreEqual(expectedResult, result);
-        }
-
-        [TestMethod]
         public void AddPeriodColumn_UseQuantity_Header1AttributesAdded()
         {
             // Arrange
@@ -141,7 +126,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => index.ToString());
+            gridBase.AddPeriodColumns(_periodsParameter);
 
             // Assert
             Assert.AreEqual(_periodsParameter.Count, attributes.Count);
@@ -165,7 +150,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => index.ToString());
+            gridBase.AddPeriodColumns(_periodsParameter);
 
             // Assert
             Assert.AreEqual(_periodsParameter.Count, attributes.Count);
@@ -190,13 +175,13 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => period.PeriodID.ToString());
+            gridBase.AddPeriodColumns(_periodsParameter);
 
             // Assert
             Assert.AreEqual(_periodsParameter.Count, attributes.Count);
             for (var i = 0; i < _periodsParameter.Count; i++)
             {
-                Assert.AreEqual(" Qty ", attributes["P" + _periodsParameter[i].PeriodID + "V"]);
+                Assert.AreEqual(" Qty ", attributes["P" + (i + 1) + "V"]);
             }
         }
 
@@ -214,7 +199,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => period.PeriodID.ToString());
+            gridBase.AddPeriodColumns(_periodsParameter);
 
             // Assert
             Assert.AreEqual(0, attributes.Count);

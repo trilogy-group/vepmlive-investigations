@@ -8,7 +8,7 @@ using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
-    public class TopGridBaseTestDouble : TopGridBase
+    public class TopGridBaseTestDouble : TopGrid
     {
         public TopGridBaseTestDouble(
             bool useGrouping, 
@@ -34,6 +34,11 @@ namespace WorkEnginePPM.Tests.TestDoubles
         public new string RemoveNastyCharacters(string input)
         {
             return base.RemoveNastyCharacters(input);
+        }
+
+        public void AddDetailRow(DetailRowData detailRowData)
+        {
+            base.AddDetailRow(detailRowData, 0);
         }
     }
 }

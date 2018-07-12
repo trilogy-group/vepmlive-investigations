@@ -128,7 +128,7 @@ namespace ModelDataCache
 
         protected abstract string ResolvePeriodId(PeriodData periodData, int index);
 
-        private void AddPeriodColumns(IEnumerable<PeriodData> periods)
+        protected void AddPeriodColumns(IEnumerable<PeriodData> periods)
         {
             var iNatural = 0;
             foreach(var period in periods)
