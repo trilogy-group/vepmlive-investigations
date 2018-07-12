@@ -697,7 +697,7 @@ namespace EPMLiveCore.ReportHelper
         //    return true;
         //}
 
-        public bool MapLists(List<Guid> sListNames, Guid webId)
+        public bool MapLists(ICollection<Guid> sListNames, Guid webId)
         {
             bool blnPassed = false;
             char[] splitter = ",".ToCharArray();
