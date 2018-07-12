@@ -24,7 +24,7 @@ namespace ModelDataCache
         public readonly int DetFreeze;
         public readonly bool UseQuantity;
         public readonly bool UseCost;
-        public readonly bool RoundCost;
+        public readonly bool ShowCostDetailed;
         public readonly int FromPeriodIndex;
         public readonly int ToPeriodIndex;
 
@@ -38,7 +38,7 @@ namespace ModelDataCache
             int detFreeze,
             bool useQuantity,
             bool useCost,
-            bool roundCost,
+            bool showCostDetailed,
             int fromPeriodIndex,
             int toPeriodIndex)
         {
@@ -51,7 +51,7 @@ namespace ModelDataCache
             DetFreeze = detFreeze;
             UseQuantity = useQuantity;
             UseCost = useCost;
-            RoundCost = roundCost;
+            ShowCostDetailed = showCostDetailed;
             FromPeriodIndex = fromPeriodIndex;
             ToPeriodIndex = toPeriodIndex;
 
@@ -128,7 +128,7 @@ namespace ModelDataCache
                 xC.CreateStringAttr("Name", "P" + id + "C");
                 xC.CreateStringAttr("Type", "Float");
                 xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", (RoundCost ? ",#.00;-,#.00;0" : ",0"));
+                xC.CreateStringAttr("Format", (ShowCostDetailed ? ",#.00;-,#.00;0" : ",0"));
             }
         }
 

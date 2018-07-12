@@ -33,7 +33,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         private string _nameParameter;
         private bool _useQuantityParameter;
         private bool _useCostParameter;
-        private bool _roundCostParameter;
+        private bool _showCostDetailed;
         private int _fromPeriodIndexParameter;
         private int _toPeriodIndexParameter;
 
@@ -56,7 +56,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             _nameParameter = "test-name";
             _useQuantityParameter = false;
             _useCostParameter = false;
-            _roundCostParameter = false;
+            _showCostDetailed = false;
             _fromPeriodIndexParameter = 0;
             _toPeriodIndexParameter = int.MaxValue;
 
@@ -98,7 +98,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
                 _detFreezeParameter,
                 _useQuantityParameter,
                 _useCostParameter,
-                _roundCostParameter,
+                _showCostDetailed,
                 _fromPeriodIndexParameter,
                 _toPeriodIndexParameter
             );

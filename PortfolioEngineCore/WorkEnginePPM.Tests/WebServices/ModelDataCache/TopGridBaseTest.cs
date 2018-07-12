@@ -34,7 +34,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         private string _nameParameter;
         private bool _useQuantityParameter;
         private bool _useCostParameter;
-        private bool _roundCostParameter;
+        private bool _showCostDetailedParameter;
         private int _fromPeriodIndexParameter;
         private int _toPeriodIndexParameter;
 
@@ -57,7 +57,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             _nameParameter = "test-name";
             _useQuantityParameter = false;
             _useCostParameter = false;
-            _roundCostParameter = false;
+            _showCostDetailedParameter = false;
             _fromPeriodIndexParameter = 0;
             _toPeriodIndexParameter = 10;
 
@@ -108,7 +108,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
                 _detFreezeParameter,
                 _useQuantityParameter,
                 _useCostParameter,
-                _roundCostParameter,
+                _showCostDetailedParameter,
                 _fromPeriodIndexParameter,
                 _toPeriodIndexParameter
             );
@@ -165,7 +165,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             gridBase.AddDetailRows(new[] { _detailRowParameter });
 
             // Assert
-            Assert.AreEqual(_idParameter.ToString(), _stringAttributesCreated["id"]);
+            Assert.AreEqual("0", _stringAttributesCreated["id"]);
             Assert.AreEqual("1", _stringAttributesCreated["Select"]);
             Assert.AreEqual(true, _booleanAttributesCreated["SelectCanEdit"]);
             Assert.AreEqual(false, _booleanAttributesCreated["CanEdit"]);
@@ -237,6 +237,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             // Arrange
             _showGanttParameter = false;
             _useCostParameter = true;
+            _showCostDetailedParameter = true;
 
             for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
             {
@@ -261,7 +262,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             // Arrange
             _showGanttParameter = false;
             _useCostParameter = true;
-            _roundCostParameter = true;
+            _showCostDetailedParameter = false;
 
             for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
             {

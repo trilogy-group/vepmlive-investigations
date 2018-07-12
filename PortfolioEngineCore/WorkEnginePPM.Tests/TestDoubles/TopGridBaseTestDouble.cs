@@ -20,10 +20,10 @@ namespace WorkEnginePPM.Tests.TestDoubles
             int detFreeze, 
             bool useQuantity, 
             bool useCost, 
-            bool roundCost, 
+            bool showCostDetailed, 
             int fromPeriodIndex, 
             int toPeriodIndex) 
-        : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
+        : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, showCostDetailed, fromPeriodIndex, toPeriodIndex)
         {
             for (var i = 0; i < Levels.Length; i++)
             {

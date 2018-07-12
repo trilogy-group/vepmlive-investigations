@@ -6,8 +6,8 @@ namespace ModelDataCache
 {
     public abstract class TopGridBase : GridBase
     {
-        public TopGridBase(bool useGrouping, bool showFTEs, bool showGantt, DateTime dateStart, DateTime dateEnd, IList<SortFieldDefn> sortFields, int detFreeze, bool useQuantity, bool useCost, bool roundCost, int fromPeriodIndex, int toPeriodIndex) 
-            : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
+        public TopGridBase(bool useGrouping, bool showFTEs, bool showGantt, DateTime dateStart, DateTime dateEnd, IList<SortFieldDefn> sortFields, int detFreeze, bool useQuantity, bool useCost, bool showCostDetailed, int fromPeriodIndex, int toPeriodIndex) 
+            : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, showCostDetailed, fromPeriodIndex, toPeriodIndex)
         {
         }
 
@@ -136,7 +136,7 @@ namespace ModelDataCache
                 {
                     var dcost = detailRowData.zCost[i];
 
-                    if (RoundCost == false)
+                    if (ShowCostDetailed == false)
                     {
                         dcost = Math.Floor(dcost);
                     }
