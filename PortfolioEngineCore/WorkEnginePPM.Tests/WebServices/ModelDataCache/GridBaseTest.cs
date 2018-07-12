@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ModelDataCache;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using WorkEnginePPM.Tests.TestDoubles;
@@ -19,11 +20,61 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         private ShimCStruct _header1Shim;
         private ShimCStruct _header2Shim;
         private ShimCStruct _periodColsShim;
+        
+        private bool _useGroupingParameter;
+        private bool _showFTEsParameter;
+        private bool _showGanttParameter;
+        private DateTime _dateStartParameter;
+        private DateTime _dateEndParameter;
+        private IList<SortFieldDefn> _sortFieldsParameter;
+        private int _detFreezeParameter;
+
+        private string _idParameter;
+        private string _nameParameter;
+        private bool _useQuantityParameter;
+        private bool _useCostParameter;
+        private bool _roundCostParameter;
+        private int _fromPeriodIndexParameter;
+        private int _toPeriodIndexParameter;
+
+        private IList<PeriodData> _periodsParameter;
 
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
+
+            _useGroupingParameter = false;
+            _showFTEsParameter = false;
+            _showGanttParameter = false;
+            _dateStartParameter = DateTime.MinValue;
+            _dateEndParameter = DateTime.MaxValue;
+            _sortFieldsParameter = new SortFieldDefn[] { };
+            _detFreezeParameter = 0;
+
+            _idParameter = "test-id";
+            _nameParameter = "test-name";
+            _useQuantityParameter = false;
+            _useCostParameter = false;
+            _roundCostParameter = false;
+            _fromPeriodIndexParameter = 0;
+            _toPeriodIndexParameter = int.MaxValue;
+
+            _periodsParameter = new PeriodData[]
+            {
+                new PeriodData
+                {
+                    PeriodID = 18,
+                    PeriodName = "test-1"
+                },
+
+                new PeriodData
+                {
+                    PeriodID = 46,
+                    PeriodName = "test-2"
+                }
+            };
+
             _header1Shim = new ShimCStruct();
             _header2Shim = new ShimCStruct();
             _periodColsShim = new ShimCStruct();
@@ -33,7 +84,24 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 
         private GridBaseTestDouble CreateGridBase()
         {
-            return new GridBaseTestDouble(_header1Shim, _header2Shim, _periodColsShim);
+            return new GridBaseTestDouble(
+                _header1Shim, 
+                _header2Shim, 
+                _periodColsShim,
+
+                _useGroupingParameter,
+                _showFTEsParameter,
+                _showGanttParameter,
+                _dateStartParameter,
+                _dateEndParameter,
+                _sortFieldsParameter,
+                _detFreezeParameter,
+                _useQuantityParameter,
+                _useCostParameter,
+                _roundCostParameter,
+                _fromPeriodIndexParameter,
+                _toPeriodIndexParameter
+            );
         }
 
         [TestCleanup]
@@ -61,12 +129,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void AddPeriodColumn_UseQuantity_Header1AttributesAdded()
         {
             // Arrange
-            const string idParameter = "test-id";
-            const string nameParameter = "test-name";
-            const bool showFTEParameter = false;
-            const bool useQuantityParameter = true;
-            const bool useCostParameter = false;
-            const bool showCostsDescendingParameter = false;
+            _useQuantityParameter = true;
 
             var attributes = new Dictionary<string, string>();
 
@@ -78,24 +141,20 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumn(idParameter, nameParameter, showFTEParameter, useQuantityParameter, useCostParameter, showCostsDescendingParameter);
+            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => index.ToString());
 
             // Assert
-            Assert.AreEqual(1, attributes.Count);
-            Assert.AreEqual(nameParameter, attributes["P" + idParameter + "V"]);
+            Assert.AreEqual(_periodsParameter.Count, attributes.Count);
+            for (var i = 0; i < _periodsParameter.Count; i++)
+            {
+                Assert.AreEqual(_periodsParameter[i].PeriodName, attributes["P" + (i + 1) + "V"]);
+            }
         }
 
         [TestMethod]
         public void AddPeriodColumn_NotUseQuantity_Header1AttributesAdded()
         {
             // Arrange
-            const string idParameter = "test-id";
-            const string nameParameter = "test-name";
-            const bool showFTEParameter = false;
-            const bool useQuantityParameter = false;
-            const bool useCostParameter = false;
-            const bool showCostsDescendingParameter = false;
-
             var attributes = new Dictionary<string, string>();
 
             _header1Shim.CreateStringAttrStringString = (name, value) =>
@@ -106,24 +165,21 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumn(idParameter, nameParameter, showFTEParameter, useQuantityParameter, useCostParameter, showCostsDescendingParameter);
+            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => index.ToString());
 
             // Assert
-            Assert.AreEqual(1, attributes.Count);
-            Assert.AreEqual(nameParameter, attributes["P" + idParameter + "C"]);
+            Assert.AreEqual(_periodsParameter.Count, attributes.Count);
+            for (var i = 0; i < _periodsParameter.Count; i++)
+            {
+                Assert.AreEqual(_periodsParameter[i].PeriodName, attributes["P" + (i + 1) + "C"]);
+            }
         }
 
         [TestMethod]
         public void AddPeriodColumn_UseQuantity_Header2AttributesAdded()
         {
             // Arrange
-            const string idParameter = "test-id";
-            const string nameParameter = "test-name";
-            const bool showFTEParameter = false;
-            const bool useQuantityParameter = true;
-            const bool useCostParameter = false;
-            const bool showCostsDescendingParameter = false;
-
+            _useQuantityParameter = true;
             var attributes = new Dictionary<string, string>();
 
             _header2Shim.CreateStringAttrStringString = (name, value) =>
@@ -134,24 +190,20 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumn(idParameter, nameParameter, showFTEParameter, useQuantityParameter, useCostParameter, showCostsDescendingParameter);
+            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => period.PeriodID.ToString());
 
             // Assert
-            Assert.AreEqual(1, attributes.Count);
-            Assert.AreEqual(" Qty ", attributes["P" + idParameter + "V"]);
+            Assert.AreEqual(_periodsParameter.Count, attributes.Count);
+            for (var i = 0; i < _periodsParameter.Count; i++)
+            {
+                Assert.AreEqual(" Qty ", attributes["P" + _periodsParameter[i].PeriodID + "V"]);
+            }
         }
 
         [TestMethod]
         public void AddPeriodColumn_NotUseQuantity_Header2AttributesAdded()
         {
             // Arrange
-            const string idParameter = "test-id";
-            const string nameParameter = "test-name";
-            const bool showFTEParameter = false;
-            const bool useQuantityParameter = false;
-            const bool useCostParameter = false;
-            const bool showCostsDescendingParameter = false;
-
             var attributes = new Dictionary<string, string>();
 
             _header2Shim.CreateStringAttrStringString = (name, value) =>
@@ -162,7 +214,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddPeriodColumn(idParameter, nameParameter, showFTEParameter, useQuantityParameter, useCostParameter, showCostsDescendingParameter);
+            gridBase.AddPeriodColumns(_periodsParameter, (period, index) => period.PeriodID.ToString());
 
             // Assert
             Assert.AreEqual(0, attributes.Count);
