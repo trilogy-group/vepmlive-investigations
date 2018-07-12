@@ -5066,24 +5066,19 @@ namespace ModelDataCache
                 m_display_maxp
             );
 
-            oGrid.InitializeGridLayout();
-
             if (bShowGantt == false)
             {
-                oGrid.AddPeriodColumns(m_Periods.Values);
+                oGrid.AddPeriodsData(m_Periods.Values);
             }
 
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
+            m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            m_tgrid_displayed = oGrid.AddDetailRows(m_tgrid_sorted);
-
-            return oGrid.GetString();
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
         }
         
         public string GetTopGridLayout()
         {
-            var oGrid = new TopGridCostsLayout(
+            var oGrid = new TopGrid(
                 m_Det_grouped,
                 bShowFTEs,
                 bShowGantt,
@@ -5098,21 +5093,17 @@ namespace ModelDataCache
                 m_display_maxp
             );
 
-            oGrid.InitializeGridLayout();
-
             if (bShowGantt == false)
             {
-                oGrid.AddPeriodColumns(m_Periods.Values);
+                oGrid.AddPeriodsData(m_Periods.Values);
             }
 
-            oGrid.FinalizeGridLayout();
-
-            return oGrid.GetString();
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
         }
 
         public string GetTopGridData()
         {
-            var oGrid = new TopGridCostsData(
+            var oGrid = new TopGrid(
                 m_Det_grouped,
                 bShowFTEs,
                 bShowGantt,
@@ -5125,12 +5116,10 @@ namespace ModelDataCache
                 m_show_rhs_dec_costs,
                 m_display_minp,
                 m_display_maxp);
+            
+            m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            oGrid.InitializeGridData();
-
-            m_tgrid_displayed = oGrid.AddDetailRows(m_tgrid_sorted);
-
-            return oGrid.GetString();
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
         }
 
         public String GetBottomGrid()

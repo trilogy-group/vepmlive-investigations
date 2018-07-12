@@ -14,6 +14,9 @@ namespace ModelDataCache
         protected CStruct Header1;
         protected CStruct Header2;
         protected CStruct PeriodCols;
+
+        protected IList<PeriodData> Periods;
+        protected IList<DetailRowData> DetailRows;
         
         public readonly bool UseGrouping;
         public readonly bool ShowFTEs;
@@ -54,9 +57,6 @@ namespace ModelDataCache
             ShowCostDetailed = showCostDetailed;
             FromPeriodIndex = fromPeriodIndex;
             ToPeriodIndex = toPeriodIndex;
-
-            Constructor = new CStruct();
-            Constructor.Initialize("Grid");
         }
 
         protected bool CheckIfDetailRowShouldBeAdded(DetailRowData detailRow)
@@ -64,7 +64,71 @@ namespace ModelDataCache
             return detailRow.bRealone || detailRow.bGotChildren;
         }
 
-        protected void AddPeriodColumns(IEnumerable<PeriodData> periods, Func<PeriodData, int, string> columnIdFunc)
+        public void AddPeriodsData(IEnumerable<PeriodData> periods)
+        {
+            Periods = periods.ToArray();
+        }
+
+        public List<DetailRowData> AddDetailRowsData(IEnumerable<DetailRowData> detailRowsData)
+        {
+            var result = new List<DetailRowData>();
+            foreach (var detailRow in detailRowsData)
+            {
+                if (CheckIfDetailRowShouldBeAdded(detailRow))
+                {
+                    result.Add(detailRow);
+                }
+            }
+
+            DetailRows = result;
+            return result;
+        }
+
+        public string RenderToXml(RenderingTypes renderingType)
+        {
+            Constructor = new CStruct();
+            Constructor.Initialize("Grid");
+
+            if (renderingType.HasFlag(RenderingTypes.Layout))
+            {
+                InitializeGridLayout(renderingType);
+
+                if (Periods != null)
+                {
+                    AddPeriodColumns(Periods);
+                }
+
+                FinalizeGridLayout(renderingType);
+            }
+
+            if (renderingType.HasFlag(RenderingTypes.Data))
+            {
+                InitializeGridData(renderingType);
+
+                if (DetailRows != null)
+                {
+                    for(var i = 0; i < DetailRows.Count; i++)
+                    {
+                        AddDetailRow(DetailRows[i], i);
+                    }
+                }
+            }
+
+            return Constructor.XML();
+        }
+
+        protected abstract void InitializeGridLayout(RenderingTypes renderingType);
+        protected abstract void InitializeGridData(RenderingTypes renderingType);
+        protected virtual void FinalizeGridLayout(RenderingTypes renderingType)
+        {
+
+        }
+
+        protected abstract void AddDetailRow(DetailRowData detailRowData, int rowId);
+
+        protected abstract string ResolvePeriodId(PeriodData periodData, int index);
+
+        private void AddPeriodColumns(IEnumerable<PeriodData> periods)
         {
             var iNatural = 0;
             foreach(var period in periods)
@@ -73,7 +137,7 @@ namespace ModelDataCache
 
                 if (iNatural >= FromPeriodIndex && iNatural <= ToPeriodIndex)
                 {
-                    AddPeriodColumn(columnIdFunc(period, iNatural), period.PeriodName);
+                    AddPeriodColumn(ResolvePeriodId(period, iNatural), period.PeriodName);
                 }
             }
         }
@@ -132,23 +196,13 @@ namespace ModelDataCache
             }
         }
 
-        public string GetString()
-        {
-            return Constructor.XML();
-        }
 
-        public virtual bool InitializeGridLayout()
+        [Flags]
+        public enum RenderingTypes
         {
-            return true;
-        }
-        
-        public virtual void FinalizeGridLayout()
-        {
-        }
-
-        public virtual bool InitializeGridData()
-        {
-            return true;
+            Layout = 1,
+            Data = 2,
+            Combined = Layout | Data
         }
     }
 }
