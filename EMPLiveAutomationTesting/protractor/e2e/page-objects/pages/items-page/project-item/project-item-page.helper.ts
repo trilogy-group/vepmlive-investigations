@@ -358,7 +358,7 @@ export class ProjectItemPageHelper {
 
     static async verifyGanttChart() {
         await expect(await ProjectItemPage.ganttChart.isPresent()).toBe(false,
-            ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.ganttChart));
+            ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
     }
 
     static async verifyAlertMessage() {

@@ -313,7 +313,7 @@ export class ProjectItemPageConstants {
 
     static get baseLineMessage() {
         return {
-            clear: 'Would you like to overwrite the baseline saved on: Wed Jul 11 2018'
+            clear: 'Would you like to overwrite the baseline saved on'
         };
     }
 

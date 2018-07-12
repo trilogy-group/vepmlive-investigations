@@ -229,11 +229,11 @@ export class ProjectItemPage extends BasePage {
         return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.unCheckedCheckbox}`));
     }
 
-    static get linkTypeDropDownId() {
+    static get linkDropDownId() {
         return `slctAddLinkType`;
     }
 
-    static get linkTypeDropDown() {
+    static get linkTypeDropDownId() {
         return element(By.id(`slctAddLinkType`));
 }
 
@@ -242,7 +242,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get linkDropDownValue() {
-        return element(By.xpath(`.//*[@id="${this.linkTypeDropDownId}"]/option[1]`));
+        return element(By.xpath(`.//*[@id="${this.linkDropDownId}"]/option[1]`));
     }
 
     static get unCheckedCheckbox() {

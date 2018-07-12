@@ -102,7 +102,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Select a value in Link Type: [Ex: FS (Finish-to-start)]');
-        await PageHelper.click(ProjectItemPage.linkTypeDropDown);
+        await PageHelper.click(ProjectItemPage.linkTypeDropDownId);
         await ElementHelper.clickUsingJs(ProjectItemPage.linkDropDownValue);
 
         stepLogger.step('Enter a value in Lag Time (Days) text box [Ex: 5]');
