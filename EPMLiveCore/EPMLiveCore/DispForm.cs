@@ -51,7 +51,7 @@ namespace EPMLiveCore
             writer.WriteLine("</script>");
         }
 
-        private void RegisterArchiveRestoreFormButtons(SPWeb web, SPList list, SPListItem item, SPRibbon ribbon)
+        private void RegisterArchiveRestoreFormButtons(SPList list, SPListItem item, SPRibbon ribbon)
         {
             var archiveRestoreFeatureIsEnabled = AllowArchiveRestoreProjectForList(list);
             var archiveProjectButtonVisible = archiveRestoreFeatureIsEnabled
@@ -109,7 +109,7 @@ namespace EPMLiveCore
 
             SPRibbon ribbon = SPRibbon.GetCurrent(this.Page);
 
-            RegisterArchiveRestoreFormButtons(Web, List, ListItem, ribbon);
+            RegisterArchiveRestoreFormButtons(List, ListItem, ribbon);
 
             ribbon.TrimById("Ribbon.ListForm.Display.Manage.EditItem");
 

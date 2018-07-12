@@ -26,6 +26,8 @@ namespace EPMLiveWebParts
         private const string SuccessMessage = "Success";
         private const string ArhiveRestoreListIdRequestParameter = "listid";
         private const string ArchiveRestoreItemIdRequestParameter = "id";
+        private const string ArchiveProjectAction = "archiveproject";
+        private const string RestoreProjectAction = "restoreproject";
 
         protected string data;
         
@@ -816,10 +818,10 @@ namespace EPMLiveWebParts
                             }
                             catch { }
                             break;
-                        case "archiveproject":
+                        case ArchiveProjectAction:
                             data = ArchiveRestoreProject(site, true);
                             break;
-                        case "restoreproject":
+                        case RestoreProjectAction:
                             data = ArchiveRestoreProject(site, false);
                             break;
                         case "errormessage":
