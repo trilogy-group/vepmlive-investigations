@@ -9,7 +9,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyWorkPage} from './my-work.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
-import { CommonPageConstants } from '../../common/common-page.constants';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class MyWorkPageHelper {
 
