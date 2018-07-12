@@ -10,9 +10,22 @@ namespace WorkEnginePPM.Tests.TestDoubles
 {
     public class TopGridBaseTestDouble : TopGridBase
     {
-        public TopGridBaseTestDouble()
+        public TopGridBaseTestDouble(
+            bool useGrouping, 
+            bool showFTEs, 
+            bool showGantt, 
+            DateTime dateStart, 
+            DateTime dateEnd, 
+            IList<SortFieldDefn> sortFields, 
+            int detFreeze, 
+            bool useQuantity, 
+            bool useCost, 
+            bool roundCost, 
+            int fromPeriodIndex, 
+            int toPeriodIndex) 
+        : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
         {
-            for(var i = 0; i < Levels.Length; i++)
+            for (var i = 0; i < Levels.Length; i++)
             {
                 Levels[i] = new ShimCStruct();
             }
