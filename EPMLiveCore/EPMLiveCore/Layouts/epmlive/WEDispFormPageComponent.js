@@ -264,7 +264,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.ListForm.Edit.Actions.ArchiveProject') {
             var action = "archiveproject";
-            var message = "Are you sure you want to restore the project?";
+            var message = "Are you sure you want to archive the project?";
             var waitMessage = "Moving project and all related records to archive. Please wait...";
             this.ArchiveRestoreProject(action, message, waitMessage);
         }
