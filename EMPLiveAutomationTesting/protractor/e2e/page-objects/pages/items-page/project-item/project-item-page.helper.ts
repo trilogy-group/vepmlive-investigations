@@ -15,7 +15,34 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
+
 export class ProjectItemPageHelper {
+    static get getlink() {
+        return {
+            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+        };
+    }
+
+    static get button() {
+        return {
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+        };
+    }
+
+    static get newTasksFields() {
+        const fields = ProjectItemPageConstants.newTaskFields;
+        return {
+            title: ProjectItemPageHelper.getField(fields.title),
+            work: ProjectItemPageHelper.getField(fields.work),
+            duration: ProjectItemPageHelper.getField(fields.duration),
+            date: ProjectItemPageHelper.dateField(fields.date),
+            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
+        };
+
+    }
+
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
                           benefits: string,
@@ -172,7 +199,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToFrame(CommonPage.contentFrame);
     }
 
-    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string  ) {
+    static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string) {
 
         await browser.sleep(PageHelper.timeout.m);
         await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
@@ -180,7 +207,7 @@ export class ProjectItemPageHelper {
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
         stepLogger.step('Enter Task name');
-        await PageHelper.actionSendKeys( uniqueId);
+        await PageHelper.actionSendKeys(uniqueId);
         stepLogger.step('Enter finish date');
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.date);
         await ElementHelper.actionDoubleClick(ProjectItemPageHelper.newTasksFields.date);
@@ -270,7 +297,7 @@ export class ProjectItemPageHelper {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
         size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
-            ElementHelper.scrollToElement(label.get(index));
+            await ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
             if (text === resourceName) {
                 resourceFound = true;
@@ -287,14 +314,6 @@ export class ProjectItemPageHelper {
         }
     }
 
-    static get getlink() {
-        return {
-            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
-        };
-    }
-
     static getReportParametersByTitle(title: string) {
         return element(By.xpath(`//table[contains(@id,"ParameterTable")]//td/span[contains(text(),'${title}')]`));
     }
@@ -302,6 +321,7 @@ export class ProjectItemPageHelper {
     static getReportPagingHeaderByTitle(title: string) {
         return element(By.css(`input.sqlrv-Image[name*="RptControls"][title="${title}"]`));
     }
+
     static dateField(tab: string) {
         // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`//*[contains(@class,"GSClassSelected ")]/*[contains(@class,"${tab}")][1]`));
@@ -311,25 +331,9 @@ export class ProjectItemPageHelper {
         // it is a part of a object "newTasksFields", object created below
         return element(By.xpath(`.//*[contains(@class,"GSClassSelected")]//*[contains(@class,"${tab}")]`));
     }
+
     static getDisabledReportPagingHeaderByTitle(title: string) {
         return element(By.xpath(`(//input[@title="${title}" and @disabled])[1]`));
-    }
-    static get button() {
-        return {
-            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
-        };
-    }
-
-    static get newTasksFields(){
-        const fields = ProjectItemPageConstants.newTaskFields;
-        return {
-            title: ProjectItemPageHelper.getField(fields.title),
-            work: ProjectItemPageHelper.getField(fields.work),
-            duration: ProjectItemPageHelper.getField(fields.duration),
-            date: ProjectItemPageHelper.dateField(fields.date),
-            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
-        };
-
     }
 
     static getselectTask(index: number, column: string) {
@@ -373,7 +377,7 @@ export class ProjectItemPageHelper {
         await elm2.click();
         await elm3.click();
         await browser.actions().keyUp(protractor.Key.CONTROL).perform();
-        }
+    }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);

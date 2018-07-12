@@ -10,7 +10,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
+import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 
 export class RiskItemPageHelper {
 
@@ -102,19 +102,19 @@ export class RiskItemPageHelper {
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
+        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column "Exposure"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
+        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column Schedule "Due"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
+        await CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
     }
 
     static async verifyPage(stepLogger: StepLogger) {
