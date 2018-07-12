@@ -21,7 +21,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Validate the Functionality of Edit Resource plan- [2488591]', async () => {
+    it('Validate the Functionality of Edit Resource plan- [2488591]', async () => {
         const stepLogger = new StepLogger(2488591);
         stepLogger.stepId(1);
         const hours = '10.00';
