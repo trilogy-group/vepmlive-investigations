@@ -885,9 +885,6 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetRowData.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
-    <Compile Include="WebServices\ModelDataCache\TopGridBase.cs" />
-    <Compile Include="WebServices\ModelDataCache\TopGridCostsData.cs" />
-    <Compile Include="WebServices\ModelDataCache\TopGridCostsLayout.cs" />
     <Compile Include="WebServices\OptGrids.cs" />
     <Compile Include="WebServices\Optimizer.asmx.cs">
       <DependentUpon>Optimizer.asmx</DependentUpon>

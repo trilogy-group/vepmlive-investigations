@@ -8,11 +8,24 @@ using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
-    public class TopGridBaseTestDouble : TopGridBase
+    public class TopGridBaseTestDouble : TopGrid
     {
-        public TopGridBaseTestDouble()
+        public TopGridBaseTestDouble(
+            bool useGrouping, 
+            bool showFTEs, 
+            bool showGantt, 
+            DateTime dateStart, 
+            DateTime dateEnd, 
+            IList<SortFieldDefn> sortFields, 
+            int detFreeze, 
+            bool useQuantity, 
+            bool useCost, 
+            bool showCostDetailed, 
+            int fromPeriodIndex, 
+            int toPeriodIndex) 
+        : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, showCostDetailed, fromPeriodIndex, toPeriodIndex)
         {
-            for(var i = 0; i < Levels.Length; i++)
+            for (var i = 0; i < Levels.Length; i++)
             {
                 Levels[i] = new ShimCStruct();
             }
@@ -21,6 +34,11 @@ namespace WorkEnginePPM.Tests.TestDoubles
         public new string RemoveNastyCharacters(string input)
         {
             return base.RemoveNastyCharacters(input);
+        }
+
+        public void AddDetailRow(DetailRowData detailRowData)
+        {
+            base.AddDetailRow(detailRowData, 0);
         }
     }
 }

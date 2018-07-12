@@ -22,22 +22,44 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         private IDictionary<string, int> _intAttributesCreated;
         private IDictionary<string, double> _doubleAttributesCreated;
 
-        private DetailRowData _detailRowDataParameter;
-        private int _rowIdParameter;
         private bool _useGroupingParameter;
-        private bool _showFteParameter;
+        private bool _showFTEsParameter;
         private bool _showGanttParameter;
-        private SortFieldDefn[] _detColParameter;
-        private int _minPParameter;
-        private int _maxPParameter;
+        private DateTime _dateStartParameter;
+        private DateTime _dateEndParameter;
+        private IList<SortFieldDefn> _sortFieldsParameter;
+        private int _detFreezeParameter;
+
+        private string _idParameter;
+        private string _nameParameter;
         private bool _useQuantityParameter;
         private bool _useCostParameter;
-        private bool _roundCostParameter;
+        private bool _showCostDetailedParameter;
+        private int _fromPeriodIndexParameter;
+        private int _toPeriodIndexParameter;
+
+        private DetailRowData _detailRowParameter;
 
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
+            
+            _useGroupingParameter = false;
+            _showFTEsParameter = false;
+            _showGanttParameter = false;
+            _dateStartParameter = DateTime.MinValue;
+            _dateEndParameter = DateTime.MaxValue;
+            _sortFieldsParameter = new SortFieldDefn[] { };
+            _detFreezeParameter = 0;
+
+            _idParameter = "test-id";
+            _nameParameter = "test-name";
+            _useQuantityParameter = false;
+            _useCostParameter = false;
+            _showCostDetailedParameter = false;
+            _fromPeriodIndexParameter = 0;
+            _toPeriodIndexParameter = 10;
 
             _stringAttributesCreated = new Dictionary<string, string>();
             _booleanAttributesCreated = new Dictionary<string, bool>();
@@ -65,26 +87,31 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
                     },
                 };
 
-            _detailRowDataParameter = new DetailRowData(64)
+            _detailRowParameter = new DetailRowData(64)
             {
                 m_lev = 1,
-                bSelected = true
+                bSelected = true,
+                bRealone = true,
+                bGotChildren = true
             };
-            _rowIdParameter = 0;
-            _useGroupingParameter = false;
-            _showFteParameter = false;
-            _showGanttParameter = false;
-            _detColParameter = new SortFieldDefn[] { };
-            _minPParameter = 0;
-            _maxPParameter = 0;
-            _useQuantityParameter = false;
-            _useCostParameter = false;
-            _roundCostParameter = false;
         }
 
         private TopGridBaseTestDouble CreateGridBase()
         {
-            return new TopGridBaseTestDouble();
+            return new TopGridBaseTestDouble(
+                _useGroupingParameter,
+                _showFTEsParameter,
+                _showGanttParameter,
+                _dateStartParameter,
+                _dateEndParameter,
+                _sortFieldsParameter,
+                _detFreezeParameter,
+                _useQuantityParameter,
+                _useCostParameter,
+                _showCostDetailedParameter,
+                _fromPeriodIndexParameter,
+                _toPeriodIndexParameter
+            );
         }
 
         [TestCleanup]
@@ -135,22 +162,10 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            Assert.AreEqual(_rowIdParameter.ToString(), _stringAttributesCreated["id"]);
+            Assert.AreEqual("0", _stringAttributesCreated["id"]);
             Assert.AreEqual("1", _stringAttributesCreated["Select"]);
             Assert.AreEqual(true, _booleanAttributesCreated["SelectCanEdit"]);
             Assert.AreEqual(false, _booleanAttributesCreated["CanEdit"]);
@@ -161,23 +176,11 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void AddDetailRow_Realone_AddsColor()
         {
             // Arrange
-            _detailRowDataParameter.bRealone = true;
+            _detailRowParameter.bRealone = true;
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
@@ -187,23 +190,11 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void AddDetailRow_LevelNotEqualTo1_AddsCanFilterAttribute()
         {
             // Arrange
-            _detailRowDataParameter.m_lev = 2;
+            _detailRowParameter.m_lev = 2;
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual(2, _intAttributesCreated["CanFilter"]);
@@ -214,26 +205,14 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         {
             // Arrange
             _useGroupingParameter = true;
-            _detailRowDataParameter.sName = "test-name";
+            _detailRowParameter.sName = "test-name";
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            Assert.AreEqual(_detailRowDataParameter.sName, _stringAttributesCreated["xGrouping"]);
+            Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["xGrouping"]);
         }
 
         [TestMethod]
@@ -241,24 +220,12 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         {
             // Arrange
             _showGanttParameter = true;
-            _detailRowDataParameter.bGotChildren = false;
+            _detailRowParameter.bGotChildren = false;
 
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
             Assert.AreEqual("GanttBlue", _stringAttributesCreated["GGanttClass"]);
@@ -270,33 +237,22 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             // Arrange
             _showGanttParameter = false;
             _useCostParameter = true;
+            _showCostDetailedParameter = true;
 
-            for (var i = _minPParameter; i <= _maxPParameter; i++)
+            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
             {
-                _detailRowDataParameter.zCost[i] = 1.1 * i;
+                _detailRowParameter.zCost[i] = 1.1 * i;
             }
 
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            for (var i = _minPParameter; i <= _maxPParameter; i++)
+            for (var i = _fromPeriodIndexParameter; i <= _fromPeriodIndexParameter; i++)
             {
-                Assert.AreEqual(_detailRowDataParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
+                Assert.AreEqual(_detailRowParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
             }
         }
 
@@ -306,34 +262,22 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             // Arrange
             _showGanttParameter = false;
             _useCostParameter = true;
-            _roundCostParameter = true;
+            _showCostDetailedParameter = false;
 
-            for (var i = _minPParameter; i <= _maxPParameter; i++)
+            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
             {
-                _detailRowDataParameter.zCost[i] = 1.1 * i;
+                _detailRowParameter.zCost[i] = 1.1 * i;
             }
 
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(
-                _detailRowDataParameter,
-                _rowIdParameter,
-                _useGroupingParameter,
-                _showFteParameter,
-                _showGanttParameter,
-                _detColParameter,
-                _minPParameter,
-                _maxPParameter,
-                _useQuantityParameter,
-                _useCostParameter,
-                _roundCostParameter
-            );
+            gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            for (var i = _minPParameter; i <= _maxPParameter; i++)
+            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
             {
-                Assert.AreEqual((double)(int)_detailRowDataParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
+                Assert.AreEqual((double)(int)_detailRowParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
             }
         }
     }
