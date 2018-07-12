@@ -64,7 +64,7 @@ namespace ModelDataCache
             return detailRow.bRealone || detailRow.bGotChildren;
         }
 
-        public void AddPeriodColumns(IEnumerable<PeriodData> periods, Func<PeriodData, int, string> columnIdFunc)
+        protected void AddPeriodColumns(IEnumerable<PeriodData> periods, Func<PeriodData, int, string> columnIdFunc)
         {
             var iNatural = 0;
             foreach(var period in periods)
@@ -150,6 +150,5 @@ namespace ModelDataCache
         {
             return true;
         }
-
     }
 }

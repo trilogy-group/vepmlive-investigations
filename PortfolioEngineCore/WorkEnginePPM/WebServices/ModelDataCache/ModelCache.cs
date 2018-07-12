@@ -5070,7 +5070,7 @@ namespace ModelDataCache
 
             if (bShowGantt == false)
             {
-                oGrid.AddPeriodColumns(m_Periods.Values, (period, index) => index.ToString());
+                oGrid.AddPeriodColumns(m_Periods.Values);
             }
 
             oGrid.FinalizeGridLayout();
@@ -5083,26 +5083,31 @@ namespace ModelDataCache
         
         public string GetTopGridLayout()
         {
-            TopGridCostsLayout oGrid = new TopGridCostsLayout();
-            oGrid.InitializeGridLayout(m_Det_grouped, bShowFTEs, bShowGantt, m_dtMin, m_dtMax, m_DetColRoot, m_DetFreeze);
+            var oGrid = new TopGridCostsLayout(
+                m_Det_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_DetColRoot,
+                m_DetFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp
+            );
+
+            oGrid.InitializeGridLayout();
 
             if (bShowGantt == false)
             {
-                int i = 0;
-
-                foreach (PeriodData period in m_Periods.Values)
-                {
-                    ++i;
-
-                    if (i >= m_display_minp && i <= m_display_maxp)
-                        oGrid.AddPeriodColumn(i.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
+                oGrid.AddPeriodColumns(m_Periods.Values);
             }
 
             oGrid.FinalizeGridLayout();
 
-            string s = oGrid.GetString();
-            return s;
+            return oGrid.GetString();
         }
 
         public string GetTopGridData()
