@@ -200,6 +200,7 @@ namespace ModelDataCache
         [Flags]
         public enum RenderingTypes
         {
+            None = 0,
             Layout = 1,
             Data = 2,
             Combined = Layout | Data

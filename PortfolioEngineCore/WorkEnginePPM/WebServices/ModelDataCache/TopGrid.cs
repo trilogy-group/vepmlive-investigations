@@ -278,11 +278,6 @@ namespace ModelDataCache
             Levels[Level] = i;
         }
 
-        // (CC-76582, 2018-07-12) Not using enumerator pattern, because rows will only be added if enumeration is fully completed, which is not obvious. 
-        // One might call AddDetailRows without processing the result and the expectation would be that rows are added.
-        // List is returned because the calling code consumes List instead of IList and will not be refactored in scope of the current refactoring
-
-
         protected string RemoveNastyCharacters(string input)
         {
             if (input == null)

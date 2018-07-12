@@ -110,7 +110,7 @@ namespace ModelDataCache
 
         private List<DetailRowData> m_filtersource = null;
         private List<DetailRowData> m_tgrid_sorted = null;
-        private List<DetailRowData> m_tgrid_displayed = null;
+        private IList<DetailRowData> m_tgrid_displayed = null;
         private List<DetailRowData> m_bgrid_sorted = null;
         private List<DetailRowData> m_target_sorted = null;
 
