@@ -265,12 +265,14 @@ WEDispFormPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.ListForm.Edit.Actions.ArchiveProject') {
             var action = "archiveproject";
             var message = "Are you sure you want to restore the project?";
-            this.ArchiveRestoreProject(action, message);
+            var waitMessage = "Moving project and all related records to archive. Please wait...";
+            this.ArchiveRestoreProject(action, message, waitMessage);
         }
         else if (commandId === 'Ribbon.ListForm.Edit.Actions.RestoreProject') {
             var action = "restoreproject";
             var message = "Are you sure you want to restore the project?";
-            this.ArchiveRestoreProject(action, message);
+            var waitMessage = "Restoring project and all related records from archive. Please wait...";
+            this.ArchiveRestoreProject(action, message, waitMessage);
         }
         else {
             return handleCommand(commandId, properties, sequence);
@@ -302,8 +304,9 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
     },
 
-    ArchiveRestoreProject: function (action, message) {
+    ArchiveRestoreProject: function (action, message, waitMessage) {
         var callback = this.ArhiveRestoreProjectPost;
+        var waitDialog = this.ShowWaitActionDialog;
         this.ShowConfirmActionDialog(message,
             function (confirm) {
                 if (confirm) {
@@ -315,12 +318,17 @@ WEDispFormPageComponent.PageComponent.prototype = {
                         WEListId +
                         "&id=" +
                         escape(WEItemId);
+                    waitDialog(waitMessage);
                     jQuery.post(url, callback);
                 }
             });
     },
 
     ArhiveRestoreProjectPost: function (response) {
+        // close wait dialog
+        SP.UI.ModalDialog.commonModalDialogClose(1, 'Done');
+
+        // process response
         if (response) {
             if (response.indexOf("General Error") >= 0) {
                 alert(response);
@@ -352,6 +360,26 @@ WEDispFormPageComponent.PageComponent.prototype = {
             dialogReturnValueCallback: function (diagResult, retVal) {
                 callback(diagResult === 1);
             }
+        };
+
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    },
+
+    ShowWaitActionDialog: function (message) {
+        var viewDiv = document.createElement('div');
+        viewDiv.innerHTML = '<div>' +
+            '<div style="width: 290px; padding: 0px;">' +
+            '<p id="askYesNoText">' + message + '</p>' +
+            '<div style="clear: both; height: 20px;"></div>' +
+            '</div>' +
+            '</div>';
+
+        var options = {
+            html: viewDiv,
+            height: 110,
+            width: 290,
+            showClose: false,
+            title: epmLive.currentItemTitle
         };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
