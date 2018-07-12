@@ -6,30 +6,9 @@ namespace ModelDataCache
 {
     internal class TopGrid : TopGridBase
     {
-        public readonly bool UseGrouping;
-        public readonly bool ShowFTEs;
-        public readonly bool ShowGantt;
-        public readonly DateTime DateStart;
-        public readonly DateTime DateEnd;
-        public readonly IList<SortFieldDefn> DetCol;
-        public readonly int DetFreeze;
-
-        public TopGrid(
-            bool useGrouping, 
-            bool showFTEs, 
-            bool showGantt, 
-            DateTime dateStart, 
-            DateTime dateEnd, 
-            List<SortFieldDefn> detCol, 
-            int detFreeze) 
+        public TopGrid(bool useGrouping, bool showFTEs, bool showGantt, DateTime dateStart, DateTime dateEnd, IList<SortFieldDefn> sortFields, int detFreeze, bool useQuantity, bool useCost, bool roundCost, int fromPeriodIndex, int toPeriodIndex) 
+            : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
         {
-            UseGrouping = useGrouping;
-            ShowFTEs = showFTEs;
-            ShowGantt = showGantt;
-            DateStart = dateStart;
-            DateEnd = dateEnd;
-            DetCol = detCol;
-            DetFreeze = detFreeze;
         }
 
         public override bool InitializeGridLayout()
@@ -141,7 +120,7 @@ namespace ModelDataCache
                 Header2.CreateStringAttr("xGrouping", "Grouping");
             }
 
-            foreach (var sng in DetCol)
+            foreach (var sng in SortFields)
             {
                 string sn = sng.name.Replace(" ", "");
 

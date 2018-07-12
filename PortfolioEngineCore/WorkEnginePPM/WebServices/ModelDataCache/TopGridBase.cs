@@ -6,6 +6,11 @@ namespace ModelDataCache
 {
     public abstract class TopGridBase : GridBase
     {
+        public TopGridBase(bool useGrouping, bool showFTEs, bool showGantt, DateTime dateStart, DateTime dateEnd, IList<SortFieldDefn> sortFields, int detFreeze, bool useQuantity, bool useCost, bool roundCost, int fromPeriodIndex, int toPeriodIndex) 
+            : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
+        {
+        }
+
         protected string RemoveNastyCharacters(string input)
         {
             if (input == null)
@@ -29,18 +34,27 @@ namespace ModelDataCache
             return result.ToString();
         }
 
-        public void AddDetailRow(
-            DetailRowData detailRowData, 
-            int rowId, 
-            bool useGroupping,
-            bool showFTE,
-            bool showGantt,
-            IList<SortFieldDefn> sortFields,
-            int minP,
-            int maxP,
-            bool useQuantity,
-            bool useCost,
-            bool roundCost)
+        // (CC-76582, 2018-07-12) Not using enumerator pattern, because rows will only be added if enumeration is fully completed, which is not obvious. 
+        // One might call AddDetailRows without processing the result and the expectation would be that rows are added.
+        // List is returned because the calling code consumes List instead of IList and will not be refactored in scope of the current refactoring
+        public List<DetailRowData> AddDetailRows(IList<DetailRowData> detailRows)
+        {
+            var i = 0;
+            var result = new List<DetailRowData>();
+
+            foreach(var detailRow in detailRows)
+            {
+                if (CheckIfDetailRowShouldBeAdded(detailRow))
+                {
+                    AddDetailRow(detailRow, i++);
+                    result.Add(detailRow);
+                }
+            }
+
+            return result;
+        }
+
+        private void AddDetailRow(DetailRowData detailRowData, int rowId)
         {
             var parent = Levels[detailRowData.m_lev - 1];
             var iSubStruct = parent.CreateSubStruct("I");
@@ -63,17 +77,14 @@ namespace ModelDataCache
                 iSubStruct.CreateIntAttr("CanFilter", 2);
             }
 
-            if (useGroupping)
+            iSubStruct.CreateStringAttr("xGrouping", detailRowData.sName);
+            if (wrapCellInHtml)
             {
-                iSubStruct.CreateStringAttr("xGrouping", detailRowData.sName);
-                if (wrapCellInHtml)
-                {
-                    iSubStruct.CreateStringAttr("GroupingHtmlPrefix", "<B>");
-                    iSubStruct.CreateStringAttr("GroupingHtmlPostfix", "</B>");
-                }
+                iSubStruct.CreateStringAttr("GroupingHtmlPrefix", "<B>");
+                iSubStruct.CreateStringAttr("GroupingHtmlPostfix", "</B>");
             }
 
-            foreach (var sortField in sortFields)
+            foreach (var sortField in SortFields)
             {
                 var sortFieldName = RemoveNastyCharacters(sortField.name);
 
@@ -86,7 +97,7 @@ namespace ModelDataCache
 
             iSubStruct.CreateIntAttr("NoColorState", 1);
 
-            if (showGantt)
+            if (ShowGantt)
             {
                 if (detailRowData.bGotChildren == false)
                 {
@@ -95,17 +106,17 @@ namespace ModelDataCache
             }
             else
             {
-                DisplayValues(detailRowData, showFTE, minP, maxP, useQuantity, useCost, roundCost, iSubStruct);
+                DisplayValues(detailRowData, iSubStruct);
             }
         }
 
-        private static void DisplayValues(DetailRowData detailRowData, bool showFTE, int minP, int maxP, bool useQuantity, bool useCost, bool roundCost, PortfolioEngineCore.CStruct iSubStruct)
+        private void DisplayValues(DetailRowData detailRowData, PortfolioEngineCore.CStruct iSubStruct)
         {
-            for (var i = minP; i <= maxP; i++)
+            for (var i = FromPeriodIndex; i <= ToPeriodIndex; i++)
             {
-                if (useQuantity)
+                if (UseQuantity)
                 {
-                    if (showFTE)
+                    if (ShowFTEs)
                     {
                         if (detailRowData.zFTE[i] != double.MinValue)
                         {
@@ -121,11 +132,11 @@ namespace ModelDataCache
                     }
                 }
 
-                if (useCost)
+                if (UseCost)
                 {
                     var dcost = detailRowData.zCost[i];
 
-                    if (roundCost == false)
+                    if (RoundCost == false)
                     {
                         dcost = Math.Floor(dcost);
                     }
