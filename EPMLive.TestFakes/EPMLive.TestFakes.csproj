@@ -97,11 +97,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\EPM Live Core.fakes">
-      <SubType>Designer</SubType>
-    </Fakes>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
@@ -145,6 +140,7 @@
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
+    <Fakes Include="Fakes\EPM Live Core.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

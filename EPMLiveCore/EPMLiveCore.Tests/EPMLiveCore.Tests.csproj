@@ -96,6 +96,7 @@
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
     <Compile Include="Shared\AssertException.cs" />
+    <Compile Include="SPUtilities\SPListUtilityTest.cs" />
     <Compile Include="TestCheck.cs" />
   </ItemGroup>
   <ItemGroup>
