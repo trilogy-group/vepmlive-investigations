@@ -3,6 +3,8 @@ import {MyWorkPageConstants} from './my-work-page.constants';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {HtmlHelper} from '../../../../components/misc-utils/html-helper';
+import {AnchorHelper} from '../../../../components/html/anchor-helper';
 
 export class MyWorkPage {
 
@@ -73,5 +75,29 @@ export class MyWorkPage {
 
     static selectDropdownOption(option: string) {
         return element(By.xpath(`//div[${ComponentHelpers.getXPathFunctionForText(option)}]`));
+    }
+
+    static get editPageDropdown() {
+        const idXpath = `//*[contains(@id,'${MyWorkPageConstants.edit}')]`;
+        const anchorXpath = `//a[contains(@class,'${HtmlHelper.attributeValue.dropdown}')]`;
+        const xpath = `${idXpath}${anchorXpath}`;
+        return element(By.xpath(xpath));
+    }
+
+    static get disabledStopEditingOption() {
+        const stopEditingXpath = `//a[contains(@id,'${MyWorkPageConstants.editPageActions.stopEditing}') and @aria-disabled="true"]`;
+        return element(By.xpath(stopEditingXpath));
+    }
+
+    static get editPageMenuOption() {
+        return AnchorHelper.getAnchorById(MyWorkPageConstants.editPageActions.editPage, true);
+    }
+
+    static get editPage() {
+        return element(By.css('#DeltaPlaceHolderMain'));
+    }
+
+    static get selectedPageTab() {
+        return element(By.xpath(`.//*[@aria-selected="true" and @title='${CommonPageConstants.ribbonMenuTitles.page}']`));
     }
 }

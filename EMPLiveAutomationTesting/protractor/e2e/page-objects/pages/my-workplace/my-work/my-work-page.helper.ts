@@ -9,6 +9,7 @@ import {PageHelper} from '../../../../components/html/page-helper';
 import {MyWorkPage} from './my-work.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
+import {CommonPageConstants} from '../../common/common-page.constants';
 
 export class MyWorkPageHelper {
 
@@ -83,5 +84,57 @@ export class MyWorkPageHelper {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
         await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+    }
+
+    static async clickOnPageTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on "Page" tab');
+        await PageHelper.click(CommonPage.ribbonTitles.page);
+    }
+
+    static async verifyMyWorkPageDisplayed(stepLogger: StepLogger) {
+        stepLogger.verification(`verify "My Work"  page is displayed`);
+        const panelHeadingDisplayed = await PageHelper.isElementDisplayed(
+            CommonPage.pageHeaders.myWorkplace.myWork);
+        await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            CommonPageConstants.pageHeaders.myWorkplace.myWork));
+    }
+
+    static async expandEditPageDropdown(stepLogger: StepLogger) {
+        stepLogger.step(`click on "Edit Page" dropdown`);
+        await PageHelper.click(MyWorkPage.editPageDropdown);
+    }
+
+    static async verifyEditPageDropdownOptions(stepLogger: StepLogger) {
+        stepLogger.verification(`verify "Edit Page" option is shown`);
+        const editPageDisplayed = await PageHelper.isElementDisplayed(
+            MyWorkPage.editPageMenuOption);
+        await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            MyWorkPageConstants.editPageActions.editPage));
+
+        stepLogger.verification(`verify "Stop Editing" option is shown as disabled`);
+        const stopEditingDisplayed = await PageHelper.isElementDisplayed(
+            MyWorkPage.disabledStopEditingOption);
+        await expect(stopEditingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            MyWorkPageConstants.editPageActions.stopEditing));
+    }
+
+    static async clickOnEditPageMenuOption(stepLogger: StepLogger) {
+        stepLogger.step(`click on "Edit Page" option from dropdown`);
+        await PageHelper.click(MyWorkPage.editPageMenuOption);
+    }
+
+    static async verifyEditPageOpened(stepLogger: StepLogger) {
+        stepLogger.verification(`verify "Edit Page" opens`);
+        const editPageDisplayed = await PageHelper.isElementDisplayed(
+            MyWorkPage.editPage);
+        await expect(editPageDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            MyWorkPageConstants.editPageActions.editPage));
+    }
+
+    static  async verifyPageTabIsSelected(stepLogger: StepLogger) {
+        stepLogger.verification(`verify "PageTab" is shown as selected`);
+        const tabDisplayed = await PageHelper.isElementDisplayed(MyWorkPage.selectedPageTab);
+        await expect(tabDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            CommonPageConstants.ribbonMenuTitles.page));
     }
 }

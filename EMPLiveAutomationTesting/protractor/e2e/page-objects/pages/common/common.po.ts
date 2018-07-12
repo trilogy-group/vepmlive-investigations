@@ -6,6 +6,7 @@ import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
+import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';
 import {ElementHelper} from '../../../components/html/element-helper';
 
 export class CommonPage extends BasePage {
@@ -24,6 +25,19 @@ export class CommonPage extends BasePage {
             mostRecent: element(By.id(`${idPrefix}recent`)),
             settings: element(By.id(`${idPrefix}settings`)),
             workspaces: element(By.id(`${idPrefix}workspaces`))
+        };
+    }
+
+    static get sidebarMenuPanelHeader() {
+        const label = CommonPageConstants.sidebarMenuPanelHeader;
+        return {
+            workspaces: TextComponentSelectors.getListByText(label.workspaces),
+            createNew: TextComponentSelectors.getListByText(label.createNew),
+            myWorkplace: TextComponentSelectors.getListByText(label.myWorkplace),
+            favorites: TextComponentSelectors.getListByText(label.favorites),
+            mostRecent: TextComponentSelectors.getListByText(label.mostRecent),
+            settings: TextComponentSelectors.getListByText(label.settings),
+            frequentApps: TextComponentSelectors.getListByText(label.frequentApps),
         };
     }
 
@@ -77,7 +91,8 @@ export class CommonPage extends BasePage {
             hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
             items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
             manage: CommonPageHelper.getMenuItemFromRibbonContainer(titles.manage),
-            list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
+            list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list),
+            page: CommonPageHelper.getMenuItemFromRibbonContainer(titles.page)
         };
     }
 

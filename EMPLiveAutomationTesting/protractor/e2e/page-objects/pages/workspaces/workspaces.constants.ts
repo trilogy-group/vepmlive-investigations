@@ -10,4 +10,12 @@ export class WorkspacesConstants {
             description: 'Description *',
         };
     }
+
+    static get workspacesMenuOptions() {
+        return {
+            newWorkspace: 'New Workspace',
+            favoriteWorkspaces: 'Favorite Workspaces',
+            allWorkspaces: 'All Workspaces',
+        };
+    }
 }

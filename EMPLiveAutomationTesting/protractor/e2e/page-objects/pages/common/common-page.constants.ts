@@ -127,7 +127,8 @@ export class CommonPageConstants {
             hide: `Hide`,
             manage: `Manage`,
             items: `Items`,
-            list: `List`
+            list: `List`,
+            page: `Page`,
         };
     }
 
@@ -354,6 +355,18 @@ export class CommonPageConstants {
             headerTextClass: 'GMHeaderText',
             ascendingClass: 'GMSort4Right',
             descendingClass: 'GMSort1Right'
+        };
+    }
+
+    static get sidebarMenuPanelHeader() {
+        return {
+            createNew: 'Create New',
+            myWorkplace: 'My Workplace',
+            favorites: 'Favorites',
+            mostRecent: 'Recent Items',
+            settings: 'Settings',
+            workspaces: 'Workspaces',
+            frequentApps: 'Frequent Apps',
         };
     }
 

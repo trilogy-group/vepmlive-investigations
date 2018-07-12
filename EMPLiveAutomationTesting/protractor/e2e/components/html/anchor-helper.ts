@@ -1,6 +1,7 @@
 import {By, element} from 'protractor';
 import {ComponentHelpers} from '../devfactory/component-helpers/component-helpers';
 import {AnchorComponentSelectors} from '../component-types/anchor-component/anchor-component-selectors';
+import {HtmlHelper} from '../misc-utils/html-helper';
 
 export class AnchorHelper {
 
@@ -45,5 +46,15 @@ export class AnchorHelper {
 
     static getAnchorContainsText(text: string) {
         return this.getAllAnchorsForText(text, true).first();
+    }
+
+    static getItemById(idAttributeValue: string, isContains = false, tag = '*') {
+        const xpath = `//${tag}[${ComponentHelpers.getXPathFunctionForStringComparison(
+            idAttributeValue, `@${HtmlHelper.attributes.id}`, isContains)}]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getAnchorById(id: string, idIsContains = false) {
+        return this.getItemById(id, idIsContains, HtmlHelper.tags.a);
     }
 }

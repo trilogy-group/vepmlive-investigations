@@ -156,7 +156,7 @@ export class PageHelper {
      * @returns {any}
      */
     static async click(targetElement: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
         return targetElement.click();
     }
 
