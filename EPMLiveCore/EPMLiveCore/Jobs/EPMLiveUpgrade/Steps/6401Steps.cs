@@ -16,10 +16,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     PR_EFFECTIVE_DATE datetime NULL,
     PR_RATE decimal(15, 6) NULL
 )";
+
         private const string ProjectRatesCreateIndexQuery = @"CREATE NONCLUSTERED INDEX [IX_EPG_PROJECT_RATES_PROJECT_ID] ON [dbo].[EPG_PROJECT_RATES]
 (
     [PROJECT_ID] ASC
 )";
+
         private const string ProjectRatesGetMaintenanceRecordCountQuery = @"SELECT COUNT(*) FROM [EPGP_COST_VALUES_TOSET] WHERE [TOSET_MAINKEY] = 101";
 
         private const string ProjectRatesPopulateMaintenanceRecordsQuery = @"INSERT INTO [EPGP_COST_VALUES_TOSET](
@@ -49,6 +51,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             catch (Exception e)
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 1);
+                return false;
             }
 
             return true;

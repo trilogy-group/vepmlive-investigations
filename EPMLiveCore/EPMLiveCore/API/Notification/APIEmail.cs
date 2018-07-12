@@ -333,11 +333,25 @@ namespace EPMLiveCore.API
         {
             try
             {
-                using(SPSite site = new SPSite(li.ParentList.ParentWeb.Site.ID))
+                if (li == null)
+                {
+                    throw new ArgumentNullException(nameof(li));
+                }
+
+                var siteId = li.ParentList.ParentWeb.Site.ID;
+                var webId = li.ParentList.ParentWeb.ID;
+                var archiverService = new ProjectArchiverService();
+                if (archiverService.IsArchived(siteId, webId, li.ParentList.ID, li.ID))
+                {
+                    // do not queue new messages for archived items
+                    return;
+                }
+
+                using (var site = new SPSite(siteId))
                 {
                     try
                     {
-                        using(SPWeb web = site.OpenWeb(li.ParentList.ParentWeb.ID))
+                        using (var web = site.OpenWeb(webId))
                         {
                             try
                             {

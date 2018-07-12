@@ -7,7 +7,9 @@ namespace EPMLiveCore.PfeData
     public class ProjectRepository : IProjectRepository
     {
         private const string GetProjectIdByExternalId = "SELECT TOP 1 PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @PROJECT_EXT_UID";
+        private const string UpdateProjectArchivedStatusByExternalId = "UPDATE EPGP_PROJECTS SET PROJECT_ARCHIVED = @PROJECT_ARCHIVED WHERE PROJECT_EXT_UID = @PROJECT_EXT_UID";
         private const string ProjectExternalIdParameter = "@PROJECT_EXT_UID";
+        private const string ProjectArchivedParameter = "PROJECT_ARCHIVED";
         private const string ProjectIdColumn = "PROJECT_ID";
         
         private readonly IConnectionProvider _connectionProvider;
@@ -16,6 +18,20 @@ namespace EPMLiveCore.PfeData
         {
             _connectionProvider = new ConnectionProvider();
         }
+
+        public void UpdateArchivedStatus(SPWeb web, Guid listId, int id, bool value)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException(nameof(web));
+            }
+
+            using (var connection = CreateConnection(web))
+            {
+                UpdateArchivedStatus(connection, web.ID, listId, id, value);
+            }
+        }
+
 
         public int FindProjectId(SPWeb web, Guid listId, int id)
         {
@@ -27,6 +43,17 @@ namespace EPMLiveCore.PfeData
             using (var connection = CreateConnection(web))
             {
                 return FindProjectId(connection, web.ID, listId, id);
+            }
+        }
+
+        private void UpdateArchivedStatus(SqlConnection connection, Guid webId, Guid listId, int id, bool value)
+        {
+            using (var sqlCommand = new SqlCommand(UpdateProjectArchivedStatusByExternalId, connection))
+            {
+                var externalId = $"{webId}.{listId}.{id:0}";
+                sqlCommand.Parameters.AddWithValue(ProjectExternalIdParameter, externalId);
+                sqlCommand.Parameters.AddWithValue(ProjectArchivedParameter, value ? 1 : 0);
+                sqlCommand.ExecuteNonQuery();
             }
         }
 

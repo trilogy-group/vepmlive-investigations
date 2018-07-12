@@ -23,6 +23,10 @@ namespace EPMLiveWebParts
 {
     public partial class gridaction : System.Web.UI.Page
     {
+        private const string SuccessMessage = "Success";
+        private const string ArhiveRestoreListIdRequestParameter = "listid";
+        private const string ArchiveRestoreItemIdRequestParameter = "id";
+
         protected string data;
         
 
@@ -812,6 +816,12 @@ namespace EPMLiveWebParts
                             }
                             catch { }
                             break;
+                        case "archiveproject":
+                            data = ArchiveRestoreProject(site, true);
+                            break;
+                        case "restoreproject":
+                            data = ArchiveRestoreProject(site, false);
+                            break;
                         case "errormessage":
                             data = Request["message"];
                             break;
@@ -870,6 +880,30 @@ namespace EPMLiveWebParts
             {
 
             }
+        }
+
+        private string ArchiveRestoreProject(SPSite site, bool archive)
+        {
+            if (site == null)
+            {
+                throw new ArgumentNullException(nameof(site));
+            }
+
+            var web = GetWeb(site);
+            var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
+            var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
+            var service = new ProjectArchiverService();
+
+            if (archive)
+            {
+                service.ArchiveProject(listItem);
+            }
+            else
+            {
+                service.RestoreProject(listItem);
+            }
+
+            return SuccessMessage;
         }
     }
 }

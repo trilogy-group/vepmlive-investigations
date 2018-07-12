@@ -162,6 +162,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + cItemId;
                 }
 
+                var archived = IsArchived(spSite.ID, S(childWeb["ItemWebId"]), S(childWeb["ItemListId"]), cItemId);
+
                 if (hasAccess.Equals("1"))
                 {
                     try
@@ -189,6 +191,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     SiteId = S(SiteId),
                     WebId = cWebId,
                     Active = hasAccess.Equals("1"),
+                    Archived = archived,
                     Category = S(webId),
                     ItemId = itemId
                 };
@@ -198,6 +201,39 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     yield return navLink;
                 }
             }
+        }
+
+        private bool IsArchived(Guid siteId, string webIdString, string listIdString, string itemIdString)
+        {
+            // return false in all cases when ids are invalid (can be null or empty or "-1")
+            if (string.IsNullOrWhiteSpace(webIdString) || string.IsNullOrWhiteSpace(listIdString) || string.IsNullOrWhiteSpace(itemIdString))
+            {
+                return false;
+            }
+
+            Guid webId;
+            Guid listId;
+            int itemId;
+
+            try
+            {
+                webId = new Guid(webIdString);
+                listId = new Guid(listIdString);
+                itemId = Convert.ToInt32(itemIdString);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (siteId == Guid.Empty || webId == Guid.Empty || listId == Guid.Empty || itemId <= 0)
+            {
+                return false;
+            }
+
+            // done with id validation - check archived status
+            var archiverService = new ProjectArchiverService();
+            return archiverService.IsArchived(siteId, webId, listId, itemId);
         }
 
         private IEnumerable<NavLink> GetFavoriteWorkspaces(List<SPNavLink> allWorkspaces)
@@ -328,9 +364,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, new CacheStoreCategory(Web).Navigation, () =>
             {
-                List<SPNavLink> allWorkspaces = GetAllWorkspaces().ToList();
-                IEnumerable<NavLink> favoriteWorkspaces = GetFavoriteWorkspaces(allWorkspaces);
-
+                var allWorkspaces = GetAllWorkspaces().Where(x => !x.Archived).ToList();
+                var favoriteWorkspaces = GetFavoriteWorkspaces(allWorkspaces).ToList();
                 var navLinks = new List<NavLink>();
 
                 navLinks.AddRange(favoriteWorkspaces);

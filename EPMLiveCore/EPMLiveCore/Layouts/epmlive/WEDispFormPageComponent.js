@@ -64,6 +64,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKRP');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKRPM');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPMINT');
+        Array.add($arr, 'Ribbon.ListForm.Edit.Actions.ArchiveProject');
+        Array.add($arr, 'Ribbon.ListForm.Edit.Actions.RestoreProject');
         return $arr;
     },
     isFocusable: function () {
@@ -94,6 +96,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
             case "Ribbon.ListForm.Display.Manage.EPKRP":
             case "Ribbon.ListForm.Display.Manage.EPKRPM":
             case "Ribbon.ListForm.Display.Manage.EPMINT":
+            case 'Ribbon.ListForm.Edit.Actions.ArchiveProject':
+            case 'Ribbon.ListForm.Edit.Actions.RestoreProject':
                 return true;
             default:
                 return commandEnabled(commandId);
@@ -258,6 +262,16 @@ WEDispFormPageComponent.PageComponent.prototype = {
             OpenIntegrationPage(properties.SourceControlId.replace("EPMINT.", ""), WEListId, WEItemId);
 
         }
+        else if (commandId === 'Ribbon.ListForm.Edit.Actions.ArchiveProject') {
+            var action = "archiveproject";
+            var message = "Are you sure you want to restore the project?";
+            this.ArchiveRestoreProject(action, message);
+        }
+        else if (commandId === 'Ribbon.ListForm.Edit.Actions.RestoreProject') {
+            var action = "restoreproject";
+            var message = "Are you sure you want to restore the project?";
+            this.ArchiveRestoreProject(action, message);
+        }
         else {
             return handleCommand(commandId, properties, sequence);
         }
@@ -287,6 +301,62 @@ WEDispFormPageComponent.PageComponent.prototype = {
             alert(ticket);
         }
     },
+
+    ArchiveRestoreProject: function (action, message) {
+        var callback = this.ArhiveRestoreProjectPost;
+        this.ShowConfirmActionDialog(message,
+            function (confirm) {
+                if (confirm) {
+                    var url = WEWebUrl +
+                        "/_layouts/epmlive/gridaction.aspx?action=" +
+                        action +
+                        "&" +
+                        "listid=" +
+                        WEListId +
+                        "&id=" +
+                        escape(WEItemId);
+                    jQuery.post(url, callback);
+                }
+            });
+    },
+
+    ArhiveRestoreProjectPost: function (response) {
+        if (response) {
+            if (response.indexOf("General Error") >= 0) {
+                alert(response);
+            }
+            window.location.href = window.location.href;
+        } else {
+            alert("No response received");
+        }
+    },
+
+    ShowConfirmActionDialog: function(message, callback) {
+        var viewDiv = document.createElement('div');
+        viewDiv.innerHTML = '<div>' +
+            '<div style="width: 290px; padding: 0px;">' +
+            '<p id="askYesNoText">' + message + '</p>' +
+            '<div style="clear: both; height: 20px;"></div>' +
+            '<div style="margin-left: 85px;">' +
+            '<input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="$(\'#askYesNoText\').blur();SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self">' +
+            '<input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self">' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+
+        var options = {
+            html: viewDiv,
+            height: 110,
+            width: 290,
+            title: epmLive.currentItemTitle,
+            dialogReturnValueCallback: function (diagResult, retVal) {
+                callback(diagResult === 1);
+            }
+        };
+
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    },
+
     epkmulti: function (epkcontrol) {
 
         if (weburl == "/")

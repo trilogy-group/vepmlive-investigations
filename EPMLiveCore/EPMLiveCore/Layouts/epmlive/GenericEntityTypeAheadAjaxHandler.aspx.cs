@@ -6,6 +6,8 @@ using System.Text;
 using System.Data;
 using EPMLiveCore.ReportingProxy;
 using System.Collections.Generic;
+using System.Linq;
+using Telerik.Web.Data.Extensions;
 
 namespace EPMLiveCore
 {
@@ -126,8 +128,7 @@ namespace EPMLiveCore
                 if (items.Count > 0)
                 {
                     DataTable dt = items.GetDataTable();
-                    _sbResult = new StringBuilder();
-
+                    
                     if (!string.IsNullOrEmpty(_selectedChildren))
                     {
                         try
@@ -141,10 +142,7 @@ namespace EPMLiveCore
                         { }
                     }
 
-                    foreach (DataRow r in dt.Rows)
-                    {
-                        _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                    }
+                    ApplyFiltersAndCreateOutput(dt.Select(string.Empty));
                 }
             }
             else
@@ -177,16 +175,8 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(tableName))
                         {
                             isEmptyTableName = false;
-                            DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
-                            _sbResult = new StringBuilder();
-
-                            if (dt != null)
-                            {
-                                foreach (DataRow r in dt.Rows)
-                                {
-                                    _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                                }
-                            }
+                            var dataTable = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
+                            ApplyFiltersAndCreateOutput(dataTable?.Select(string.Empty));
                         }
                     }
                     catch { }
@@ -196,22 +186,44 @@ namespace EPMLiveCore
                 {
                     query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
                     query.ViewFieldsOnly = true;
-                    SPListItemCollection items = list.GetItems(query);
-                    DataTable dt = items.GetDataTable();
-                    _sbResult = new StringBuilder();
-
-                    if (dt != null)
-                    {
-                        //dt.DefaultView.Sort = _field;
-                        //dt = dt.DefaultView.ToTable();
-                        DataRow[] results = dt.Select("", _field + " ASC");
-                        foreach (DataRow r in results)
-                        {
-                            _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                        }
-                    }
+                    var items = list.GetItems(query);
+                    var dataTable = items.Count > 0 ? items.GetDataTable() : null;
+                    ApplyFiltersAndCreateOutput(dataTable?.Select(string.Empty, _field + " ASC"));
                 }
             }
+        }
+
+        private void ApplyFiltersAndCreateOutput(DataRow[] results)
+        {
+            // if no results do not add anything
+            if (results == null)
+            {
+                return;
+            }
+
+            // check for archived status only if archived column exists
+            var checkArchivedRecords = results.Length > 0 && results[0].Table.Columns.Contains(ProjectArchiverService.ArchivedColumn);
+
+            _sbResult = new StringBuilder();
+            foreach (var row in results)
+            {
+                // skip record if status is archived
+                if (checkArchivedRecords && RecordIsArchived(row))
+                {
+                    continue;
+                }
+
+                // otherwise add row to output
+                _sbResult.Append(row["ID"] + "^^" + row[_field] + "^^" +
+                                 (!string.IsNullOrEmpty(row[_field].ToString()) ? row[_field].ToString() : string.Empty) + ";#");
+            }
+        }
+
+        private static bool RecordIsArchived(DataRow row)
+        {
+            return row[ProjectArchiverService.ArchivedColumn] != DBNull.Value
+                          && row[ProjectArchiverService.ArchivedColumn] != null
+                          && (bool)row[ProjectArchiverService.ArchivedColumn];
         }
 
         private string GetTableName(Guid listID)
