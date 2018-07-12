@@ -15,9 +15,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         private const string ArchivedProjectsViewName = "Archived Projects";
         private const string ArchivedRecordsViewName = "Archived Items";
-        private const string ViewFilterArchived = "<Eq><FieldRef Name=\"EPM_Archived\" /><Value Type=\"Boolean\">1</Value></Eq>";
+
+        private const string ViewFilterArchived = "<Eq><FieldRef Name=\"" + ProjectArchiverService.ArchivedColumn
+                                                                          + "\" /><Value Type=\"Boolean\">1</Value></Eq>";
+
+        private const string ViewFilterNonArchived = "<Neq><FieldRef Name=\"" + ProjectArchiverService.ArchivedColumn
+                                                                              + "\" /><Value Type=\"Boolean\">1</Value></Neq>";
+
         private const string ViewFilterJoinTemplate = "<And>{0}{1}</And>";
-        private const string ViewFilterNonArchived = "<Neq><FieldRef Name=\"EPM_Archived\" /><Value Type=\"Boolean\">1</Value></Neq>";
         private const string DefaultTargetProjectCenterList = "Project Center";
         private const string TargetProjectCenterConfigSetting = "ProjectArchvierTargetLists";
         private const char ConfigSettingSeparator = ',';
