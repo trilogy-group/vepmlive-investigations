@@ -21,6 +21,7 @@ import {ResourceCapacityHeatMapPageHelper} from '../../../../page-objects/pages/
 import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.helper';
 import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
 import {ResourceAvailablePageHelpergeHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
+
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
@@ -240,6 +241,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
+
     it('Generate Resource Capacity Heat Map Report - [743180]', async () => {
         const stepLogger = new StepLogger(743180);
         stepLogger.stepId(1);
@@ -408,6 +410,52 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Validate that Added user is present ');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
+    });
+    it('View the Work hours via Resource Work vs Capacity report. - [59772477]', async () => {
+        const stepLogger = new StepLogger(743185);
+        stepLogger.stepId(1);
+        const hours = '10.00' ;
+        // Step #1 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
+        stepLogger.stepId(1);
+        // Add hours for the resource added in the top-grid
+        stepLogger.step('Add hours for the resource added in the top-grid');
+        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        stepLogger.stepId(2);
+
+        // navigate to Reporter setting page
+        stepLogger.step('navigate to Reporter setting page');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        stepLogger.stepId(3);
+        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        await CommonPageHelper.editTeam(stepLogger);
+        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.switchToContentFrame(stepLogger);
+        stepLogger.stepId(4);
+        stepLogger.step('Click On Resource Capacity Heat Map');
+        await EditTeamPageHelper.clickviewReport(stepLogger);
+        await EditTeamPageHelper.resourceWorkVsCapacity(stepLogger);
+        stepLogger.stepId(5);
+        stepLogger.step('Getting Value from  Resource Capacity Heat Map');
+        //await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
+        stepLogger.step('Validate that Added Hours is present ');
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
+
     });
 
 });

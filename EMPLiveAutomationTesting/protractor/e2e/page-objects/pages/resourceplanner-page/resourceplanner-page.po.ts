@@ -41,4 +41,65 @@ export class ResourceplannerPage extends BasePage {
     static get privateCheckImg(){
         return element(By.css('[class*=\'rp-pm-private\']'));
     }
+    static getTopSectionButtonById(id: string) {
+        return element(By.xpath(`//*[@id='idEditorTabDiv_ul']//*[@id='${id}']`));
+    }
+
+    static getbuttonSectionButtonById(id: string) {
+        return element(By.xpath(`//*[@id='idResourcesTabDiv_ul']//*[@id='${id}']`));
+    }
+    static getTopGridItemsByText(title: string) {
+        return element(By.xpath(`//*[@id='gridDiv_RPE']//td[contains(text(),'${title}')]`));
+    }
+    static getButtomGridItemsByText(title: string) {
+        return element(By.xpath(`//*[@id='g_Res']//td[contains(text(),'${title}')]`));
+    }
+
+    static get topSection() {
+        const labels = ResourcePlannerConstants.topSection;
+        return {
+            save: ResourceplannerPage.getTopSectionButtonById(labels.save),
+            close: ResourceplannerPage.getTopSectionButtonById(labels.close),
+            delete: ResourceplannerPage.getTopSectionButtonById(labels.delete),
+            allocateValue: ResourceplannerPage.getTopSectionButtonById(labels.allocateValue),
+            exportToExcel: ResourceplannerPage.getTopSectionButtonById(labels.exportToExcel),
+            importCostPlan: ResourceplannerPage.getTopSectionButtonById(labels.importCostPlan),
+            makePublic: ResourceplannerPage.getTopSectionButtonById(labels.makePublic),
+            note: ResourceplannerPage.getTopSectionButtonById(labels.note),
+            print: ResourceplannerPage.getTopSectionButtonById(labels.print),
+            importWork: ResourceplannerPage.getTopSectionButtonById(labels.importWork),
+
+        };
+    }
+
+    static get topGrid() {
+        const labels = ResourcePlannerConstants.topGrid;
+        return {
+            comment: ResourceplannerPage.getTopGridItemsByText(labels.comment),
+            department: ResourceplannerPage.getTopGridItemsByText(labels.department),
+            itemName: ResourceplannerPage.getTopGridItemsByText(labels.itemName),
+            role: ResourceplannerPage.getTopGridItemsByText(labels.role),
+        };
+    }
+    static get buttomGrid() {
+        const labels = ResourcePlannerConstants.topGrid;
+        return {
+            department: ResourceplannerPage.getButtomGridItemsByText(labels.department),
+            itemName: ResourceplannerPage.getButtomGridItemsByText(labels.itemName),
+            role: ResourceplannerPage.getButtomGridItemsByText(labels.role),
+        };
+    }
+    static get buttonSection() {
+        const labels = ResourcePlannerConstants.buttonSection;
+        return {
+            add: ResourceplannerPage.getbuttonSectionButtonById(labels.addButton),
+            analyze: ResourceplannerPage.getbuttonSectionButtonById(labels.analyzeButton),
+            clearSorting: ResourceplannerPage.getbuttonSectionButtonById(labels.clearSorting),
+            heatMap: ResourceplannerPage.getbuttonSectionButtonById(labels.heatMap),
+            match: ResourceplannerPage.getbuttonSectionButtonById(labels.matchButton),
+            selectColumn: ResourceplannerPage.getbuttonSectionButtonById(labels.selectResColumnsBtn),
+            filter: ResourceplannerPage.getbuttonSectionButtonById(labels.showFilter),
+            showGrouping: ResourceplannerPage.getbuttonSectionButtonById(labels.showGrouping),
+        };
+    }
 }
