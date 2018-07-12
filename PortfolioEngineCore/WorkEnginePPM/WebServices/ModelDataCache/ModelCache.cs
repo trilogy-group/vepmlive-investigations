@@ -5049,31 +5049,25 @@ namespace ModelDataCache
 
         }
 
-        public String GetTopGrid()
+        public string GetTopGrid()
         {
-            TopGrid oGrid = new TopGrid();
-            oGrid.InitializeGridLayout(m_Det_grouped, bShowFTEs, bShowGantt, m_dtMin, m_dtMax, m_DetColRoot, m_DetFreeze);
+            var oGrid = new TopGrid(m_Det_grouped, bShowFTEs, bShowGantt, m_dtMin, m_dtMax, m_DetColRoot, m_DetFreeze);
+            oGrid.InitializeGridLayout();
             int i = 0;
             if (bShowGantt == false)
             {
-
-
                 foreach (PeriodData period in m_Periods.Values)
                 {
                     ++i;
-
                     if (i >= m_display_minp && i <= m_display_maxp)
                         oGrid.AddPeriodColumn(i.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
                 }
             }
 
             oGrid.FinalizeGridLayout();
-
             oGrid.InitializeGridData();
-
-            i = 0;
-
             m_tgrid_displayed = new List<DetailRowData>();
+            i = 0;
 
             foreach (DetailRowData oDet in m_tgrid_sorted)
             {
@@ -5084,25 +5078,17 @@ namespace ModelDataCache
                         oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
                         m_tgrid_displayed.Add(oDet);
                     }
-
                 }
                 else
                 {
                     oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
                     m_tgrid_displayed.Add(oDet);
                 }
-
             }
 
-            string s = oGrid.GetString();
-
-            return s;
-
+            return oGrid.GetString();
         }
-
-
-
-
+        
         public String GetTopGridLayout()
         {
             TopGridCostsLayout oGrid = new TopGridCostsLayout();

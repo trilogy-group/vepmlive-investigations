@@ -3,7 +3,7 @@
 namespace ModelDataCache
 {
     [Serializable()]
-    class PeriodData
+    public class PeriodData
     {
         public string PeriodName;
         public int PeriodID;
