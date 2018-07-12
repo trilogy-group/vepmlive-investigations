@@ -35,4 +35,10 @@ export class ResourceplannerPage extends BasePage {
         return element(By.xpath('//input[@value="Yes"]'));
     }
 
+    static get greenCheckImg(){
+        return element(By.css('[class*=\'rp-commitment\']'));
+    }
+    static get privateCheckImg(){
+        return element(By.css('[class*=\'rp-pm-private\']'));
+    }
 }

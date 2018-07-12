@@ -36,7 +36,7 @@ export class ResourcesPage extends BasePage {
     }
 
     static get searchIcon() {
-        return element(By.className('icon-search-3'));
+        return element(By.id('toolbar-search-icon'));
     }
 
     static get searchTextbox() {

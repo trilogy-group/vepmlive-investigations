@@ -5,6 +5,8 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {browser} from 'protractor';
 import {ElementHelper} from "../../../components/html/element-helper";
+import {ValidationsHelper} from "../../../components/misc-utils/validation-helper";
+import {ResourcePlannerConstants} from "./resourceplanner-page.constants";
 
 
 export class ResourcePlannerPageHelper  {
@@ -23,6 +25,8 @@ export class ResourcePlannerPageHelper  {
         stepLogger.step('Adding  the resources');
         await PageHelper.click(ResourceplannerPage.selectUser);
         await PageHelper.click(CommonPage.ribbonItems.add);
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.privateCheckImg))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.privateCheckImg));
         await PageHelper.click(ResourceplannerPage.selectMonth);
         await PageHelper.sendKeysToInputField(ResourceplannerPage.inputHours, hours );
         await PageHelper.click(CommonPage.ribbonItems.save);
@@ -31,6 +35,8 @@ export class ResourcePlannerPageHelper  {
          }
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.close);
         await browser.sleep(PageHelper.timeout.s);
+        await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.greenCheckImg))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.greenCheckImg));
         await PageHelper.click(CommonPage.ribbonItems.close);
         stepLogger.step('Adding  the resources');
 

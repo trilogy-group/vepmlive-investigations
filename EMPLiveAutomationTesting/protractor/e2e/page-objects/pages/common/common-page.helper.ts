@@ -104,7 +104,7 @@ export class CommonPageHelper {
 
     static getRibbonButtonByText(title: string) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
-         and (${ComponentHelpers.getXPathFunctionForDot(title)})]`));
+         and (${ComponentHelpers.getXPathFunctionForDot(title,true)})]//parent::a`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
@@ -310,7 +310,7 @@ export class CommonPageHelper {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editResource);
-        await PageHelper.click(CommonPageHelper.getElementUsingTextContent(CommonPageConstants.ribbonLabels.editResource, false));
+        await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }
     static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {

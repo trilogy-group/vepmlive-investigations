@@ -103,7 +103,7 @@ export class CommonPage extends BasePage {
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
             resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
             editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
-            editResource: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editResource),
+            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource),
         };
     }
 
@@ -485,4 +485,5 @@ export class CommonPage extends BasePage {
     static get latestNotification(){
         return element(By.className('EPMLiveNotificationTitle'));
     }
+
 }
