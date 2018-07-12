@@ -230,6 +230,7 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="ControlDataBuilder.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
