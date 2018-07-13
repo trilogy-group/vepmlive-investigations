@@ -345,9 +345,6 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 
                         if (txtDatabaseServer.Text != "")
                             errors = mapReports(site);
-
-                        var archiverSetup = new ProjectArchiverSetupService();
-                        archiverSetup.EnsureFeatureIsInstalledForWeb(site.ID, web.ID);
                     }
                 }
                 catch (Exception ex) { errors = ex.ToString(); }
