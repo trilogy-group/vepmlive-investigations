@@ -17,6 +17,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
     {
         private IDisposable _shimsContext;
 
+        private ICollection<string> _substructsCreated = new HashSet<string>();
         private IDictionary<string, IDictionary<string, string>> _stringAttributesCreated;
         private IDictionary<string, IDictionary<string, bool>> _booleanAttributesCreated;
         private IDictionary<string, IDictionary<string, int>> _intAttributesCreated;
@@ -76,10 +77,14 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             _doubleAttributesCreated = new Dictionary<string, IDictionary<string, double>>();
 
             ShimCStruct.AllInstances.CreateSubStructString = (instance, subStructName) =>
-                new ShimCStruct
+            {
+                _substructsCreated.Add(subStructName);
+
+                return new ShimCStruct
                 {
                     NameGet = () => subStructName
                 };
+            };
 
             ShimCStruct.AllInstances.CreateStringAttrStringString = (element, name, value) =>
             {
@@ -166,9 +171,9 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             gridBase.AddDetailRow(_detailRowParameter, idExpected);
 
             // Assert
-            Assert.AreEqual(idExpected.ToString(), _stringAttributesCreated["id"]);
-            Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
-            Assert.AreEqual(false, _booleanAttributesCreated["CanEdit"]);
+            Assert.AreEqual(idExpected.ToString(), _stringAttributesCreated["I"]["id"]);
+            Assert.AreEqual("255,255,255", _stringAttributesCreated["I"]["Color"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
         }
 
         [TestMethod]
@@ -182,7 +187,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["Grouping"]);
+            Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["I"]["Grouping"]);
         }
 
         [TestMethod]
@@ -217,6 +222,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void AddDetailRow_Realone_AddsColor()
         {
             // Arrange
+            _useQuantityParameter = true;
             _detailRowParameter.bRealone = true;
             var gridBase = CreateGridBase();
 
@@ -224,7 +230,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             gridBase.AddDetailRow(_detailRowParameter, 0);
 
             // Assert
-            Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
+            Assert.AreEqual("255,255,255", _stringAttributesCreated["I"]["Color"]);
         }
 
         [TestMethod]
@@ -319,6 +325,77 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             Assert.AreEqual("", _stringAttributesCreated["D"]["FocusCell"]);
             Assert.AreEqual("ClearSelection+Grid.SelectRow(Row,!Row.Selected)", _stringAttributesCreated["D"]["OnFocus"]);
             Assert.AreEqual(1, _intAttributesCreated["D"]["NoColorState"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridData_InvalidRenderingType_Throws()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            Action action = () => grid.InitializeGridData(GridBase.RenderingTypes.None);
+
+            // Assert
+            try
+            {
+                action();
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void InitializeGridData_Always_CreatesCorrectDataStructure()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridData(GridBase.RenderingTypes.Combined);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Body"));
+            Assert.IsTrue(_substructsCreated.Contains("B"));
+            Assert.IsTrue(_substructsCreated.Contains("I"));
+            Assert.AreEqual("Totals", _stringAttributesCreated["I"]["Grouping"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
+            Assert.AreEqual("Summary", _stringAttributesCreated["I"]["Def"]);
+
+            Assert.AreEqual(0, grid.Level);
+            Assert.AreEqual("I", grid.Levels[grid.Level].Name);
+        }
+
+        [TestMethod]
+        public void InitializeGridData_DataRenderingType_CreatesCfg()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridData(GridBase.RenderingTypes.Data);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Cfg"));
+        }
+
+        [TestMethod]
+        public void ResolvePeriodId_Always_ReturnsPeriodDataId()
+        {
+            // Arrange
+            var periodData = new PeriodData { PeriodID = 18 };
+            const int index = 5;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.ResolvePeriodId(periodData, index);
+
+            // Assert
+            Assert.AreEqual(periodData.PeriodID.ToString(), result);
         }
     }
 }
