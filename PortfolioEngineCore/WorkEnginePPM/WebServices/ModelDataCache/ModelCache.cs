@@ -5122,110 +5122,85 @@ namespace ModelDataCache
             return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
         }
 
-        public String GetBottomGrid()
+        public string GetBottomGrid()
         {
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            BottomGrid oGrid = new BottomGrid();
-            oGrid.InitializeGridLayout(m_Tot_grouped, m_TotColRoot, m_TotFreeze);
+            oGrid.AddPeriodsData(m_Periods.Values);
+            oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            int i = 0;
-
-            foreach (PeriodData period in m_Periods.Values)
-            {
-                i++;
-                if (i >= m_display_minp && i <= m_display_maxp)
-                    oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData(false);
-            i = 0;
-
-            DetailRowData oTar = null;
-
-            foreach (DetailRowData oDet in m_bgrid_sorted)
-            {
-                if (m_apply_target != 0)
-                {
-                    oTar = m_target_sorted.ElementAt(i);
-
-
-                }
-                else
-                    oTar = null;
-
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                        oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-                }
-                else
-                    oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
         }
 
 
-        public String GetBottomGridLayout()
+        public string GetBottomGridLayout()
         {
-            if (bottomgridlayoutcache != "")
+            if (bottomgridlayoutcache != string.Empty)
                 return bottomgridlayoutcache;
 
-            BottomGridCostsLayout oGrid = new BottomGridCostsLayout();
-            oGrid.InitializeGridLayout(m_Tot_grouped, m_TotColRoot, m_TotFreeze);
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            int i = 0;
 
-            foreach (PeriodData period in m_Periods.Values)
-            {
-                i++;
-                if (i >= m_display_minp && i <= m_display_maxp)
-                    oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-            }
+            oGrid.AddPeriodsData(m_Periods.Values);
 
-            oGrid.FinalizeGridLayout();
-
-            bottomgridlayoutcache = oGrid.GetString();
+            bottomgridlayoutcache = oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
             return bottomgridlayoutcache;
         }
 
-        public String GetBottomGridData()
+        public string GetBottomGridData()
         {
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            BottomGridCostsData oGrid = new BottomGridCostsData();
-            oGrid.InitializeGridData(false);
-            int i = 0;
-
-            DetailRowData oTar = null;
-
-            foreach (DetailRowData oDet in m_bgrid_sorted)
-            {
-                if (m_apply_target != 0)
-                {
-                    oTar = m_target_sorted.ElementAt(i);
-
-
-                }
-                else
-                    oTar = null;
-
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                        oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-                }
-                else
-                    oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
+            oGrid.AddDetailRowsData(m_tgrid_sorted);
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
         }
 
         public void SetFTEMode(int FTEMode)
