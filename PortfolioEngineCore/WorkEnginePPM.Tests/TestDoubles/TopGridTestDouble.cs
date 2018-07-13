@@ -8,9 +8,9 @@ using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
-    public class TopGridBaseTestDouble : TopGrid
+    public class TopGridTestDouble : TopGrid
     {
-        public TopGridBaseTestDouble(
+        public TopGridTestDouble(
             bool useGrouping, 
             bool showFTEs, 
             bool showGantt, 

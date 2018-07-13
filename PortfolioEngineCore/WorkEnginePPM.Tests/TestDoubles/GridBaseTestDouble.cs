@@ -41,6 +41,11 @@ namespace WorkEnginePPM.Tests.TestDoubles
             base.AddPeriodColumns(periodsData);
         }
 
+        public new bool TryGetDataFromDetailRowDataField(DetailRowData detailRowData, int fid, out string value)
+        {
+            return base.TryGetDataFromDetailRowDataField(detailRowData, fid, out value);
+        }
+
         protected override void AddDetailRow(DetailRowData detailRowData, int rowId)
         {
         }

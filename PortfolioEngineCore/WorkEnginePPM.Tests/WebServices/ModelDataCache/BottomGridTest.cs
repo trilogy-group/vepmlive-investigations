@@ -13,7 +13,7 @@ using WorkEnginePPM.Tests.TestDoubles;
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {
     [TestClass]
-    public class BottomGridBaseTest
+    public class BottomGridTest
     {
         private IDisposable _shimsContext;
 
@@ -105,9 +105,9 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             };
         }
 
-        private BottomGridBaseTestDouble CreateGridBase()
+        private BottomGridTestDouble CreateGridBase()
         {
-            return new BottomGridBaseTestDouble(
+            return new BottomGridTestDouble(
                 _applyTargetParameter,
                 _targetsSortedParameter,
                 _targetColorsParameter,
@@ -137,17 +137,58 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void AddDetailRow_Always_AddsExpectedAttributes()
         {
             // Arrange
+            const int idExpected = 12;
+            var gridBase = CreateGridBase();
+
+            // Act
+            gridBase.AddDetailRow(_detailRowParameter, idExpected);
+
+            // Assert
+            Assert.AreEqual(idExpected.ToString(), _stringAttributesCreated["id"]);
+            Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["CanEdit"]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_UseGrouping_AddsGroupingAttribute()
+        {
+            // Arrange
+            _useGroupingParameter = true;
             var gridBase = CreateGridBase();
 
             // Act
             gridBase.AddDetailRow(_detailRowParameter);
 
             // Assert
-            Assert.AreEqual("0", _stringAttributesCreated["id"]);
-            Assert.AreEqual("1", _stringAttributesCreated["Select"]);
-            Assert.AreEqual(true, _booleanAttributesCreated["SelectCanEdit"]);
-            Assert.AreEqual(false, _booleanAttributesCreated["CanEdit"]);
-            Assert.AreEqual(1, _intAttributesCreated["NoColorState"]);
+            Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["Grouping"]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_HasSortFields_TriesToGetDataFromAllSortFields()
+        {
+            // Arrange
+            _useGroupingParameter = true;
+            _sortFieldsParameter = new[] {
+                new SortFieldDefn { fid = 1, name = "1" },
+                new SortFieldDefn { fid = 2, name = "2" },
+                new SortFieldDefn { fid = 4, name = "4" },
+            };
+            var gridBase = CreateGridBase();
+            var fieldIdsUsed = new HashSet<int>();
+            
+            ShimGridBase.AllInstances.TryGetDataFromDetailRowDataFieldDetailRowDataInt32StringOut = (GridBase grid, DetailRowData detailRow, int fieldId, out string value) =>
+            {
+                value = null;
+                fieldIdsUsed.Add(fieldId);
+                return true;
+            };
+
+            // Act
+            gridBase.AddDetailRow(_detailRowParameter);
+
+            // Assert
+            Assert.AreEqual(_sortFieldsParameter.Count, fieldIdsUsed.Count);
+            Assert.IsTrue(_sortFieldsParameter.All(pred => fieldIdsUsed.Contains(pred.fid)));
         }
 
         [TestMethod]
@@ -158,105 +199,10 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
 
             // Act
-            gridBase.AddDetailRow(_detailRowParameter);
+            gridBase.AddDetailRow(_detailRowParameter, 0);
 
             // Assert
             Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
-        }
-
-        [TestMethod]
-        public void AddDetailRow_LevelNotEqualTo1_AddsCanFilterAttribute()
-        {
-            // Arrange
-            _detailRowParameter.m_lev = 2;
-            var gridBase = CreateGridBase();
-
-            // Act
-            gridBase.AddDetailRow(_detailRowParameter);
-
-            // Assert
-            Assert.AreEqual(2, _intAttributesCreated["CanFilter"]);
-        }
-
-        [TestMethod]
-        public void AddDetailRow_UseGroupping_AddsSpecificAttributes()
-        {
-            // Arrange
-            _useGroupingParameter = true;
-            _detailRowParameter.sName = "test-name";
-            var gridBase = CreateGridBase();
-
-            // Act
-            gridBase.AddDetailRow(_detailRowParameter);
-
-            // Assert
-            Assert.AreEqual(_detailRowParameter.sName, _stringAttributesCreated["xGrouping"]);
-        }
-
-        [TestMethod]
-        public void AddDetailRow_ShowGanttAndNoChildren_AddsSpecificAttributes()
-        {
-            // Arrange
-            _showGanttParameter = true;
-            _detailRowParameter.bGotChildren = false;
-
-            var gridBase = CreateGridBase();
-
-            // Act
-            gridBase.AddDetailRow(_detailRowParameter);
-
-            // Assert
-            Assert.AreEqual("GanttBlue", _stringAttributesCreated["GGanttClass"]);
-        }
-
-        [TestMethod]
-        public void AddDetailRow_NoGanttUseCostNoRounding_CreatesAttributesForMinToMaxP()
-        {
-            // Arrange
-            _showGanttParameter = false;
-            _useCostParameter = true;
-            _showCostDetailedParameter = true;
-
-            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
-            {
-                _detailRowParameter.zCost[i] = 1.1 * i;
-            }
-
-            var gridBase = CreateGridBase();
-
-            // Act
-            gridBase.AddDetailRow(_detailRowParameter);
-
-            // Assert
-            for (var i = _fromPeriodIndexParameter; i <= _fromPeriodIndexParameter; i++)
-            {
-                Assert.AreEqual(_detailRowParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
-            }
-        }
-
-        [TestMethod]
-        public void AddDetailRow_NoGanttUseCostWithRounding_CreatesAttributesForMinToMaxP()
-        {
-            // Arrange
-            _showGanttParameter = false;
-            _useCostParameter = true;
-            _showCostDetailedParameter = false;
-
-            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
-            {
-                _detailRowParameter.zCost[i] = 1.1 * i;
-            }
-
-            var gridBase = CreateGridBase();
-
-            // Act
-            gridBase.AddDetailRow(_detailRowParameter);
-
-            // Assert
-            for (var i = _fromPeriodIndexParameter; i <= _toPeriodIndexParameter; i++)
-            {
-                Assert.AreEqual((double)(int)_detailRowParameter.zCost[i], _doubleAttributesCreated["P" + i + "C"]);
-            }
         }
     }
 }

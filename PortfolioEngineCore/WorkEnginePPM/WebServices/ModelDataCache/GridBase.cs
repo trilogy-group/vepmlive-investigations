@@ -199,6 +199,7 @@ namespace ModelDataCache
         protected bool TryGetDataFromDetailRowDataField(DetailRowData detailRowData, int fid, out string value)
         {
             var result = true;
+            value = null;
 
             switch (fid)
             {
@@ -271,7 +272,6 @@ namespace ModelDataCache
                     break;
             }
 
-            value = null;
             return result;
         }
 
