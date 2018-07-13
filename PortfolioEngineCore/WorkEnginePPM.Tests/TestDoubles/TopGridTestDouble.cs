@@ -29,6 +29,9 @@ namespace WorkEnginePPM.Tests.TestDoubles
             {
                 Levels[i] = new ShimCStruct();
             }
+
+            Constructor = new PortfolioEngineCore.CStruct();
+            Constructor.Initialize("Grid");
         }
 
         public new string RemoveNastyCharacters(string input)

@@ -27,6 +27,11 @@ namespace ModelDataCache
 
         protected override void InitializeGridLayout(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             var useCols = Freeze == 0;
 
             var xToolbar = Constructor.CreateSubStruct("Toolbar");
@@ -136,15 +141,15 @@ namespace ModelDataCache
 
             foreach (var sng in SortFields)
             {
-                string sn = sng.name.Replace(" ", "");
+                var sn = sng.name.Replace(" ", "");
 
                 sn = sn.Replace("\r", "");
                 sn = sn.Replace("\n", "");
                 sn = RemoveNastyCharacters(sn);
 
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
+                var h1 = " ";
+                var h2 = " ";
+                var isp = sng.name.IndexOf(" ");
 
                 if (isp == -1)
                 {
@@ -157,9 +162,13 @@ namespace ModelDataCache
                     h2 = sng.name.Substring(isp + 1);
                 }
                 if (useCols)
+                {
                     categoryColumn = xCols.CreateSubStruct("C");
+                }
                 else
+                {
                     categoryColumn = xLeftCols.CreateSubStruct("C");
+                }
 
                 categoryColumn.CreateStringAttr("Name", sn);
                 if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
@@ -174,7 +183,9 @@ namespace ModelDataCache
 
                 }
                 else
+                {
                     categoryColumn.CreateStringAttr("Type", "Text");
+                }
 
                 categoryColumn.CreateIntAttr("CanMove", 0);
 
@@ -188,7 +199,9 @@ namespace ModelDataCache
                 Header2.CreateStringAttr(sn, h2);
 
                 if (sng.fid == Freeze)
+                {
                     useCols = true;
+                }
             }
 
             if (ShowGantt)
@@ -262,6 +275,11 @@ namespace ModelDataCache
 
         protected override void InitializeGridData(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             if (renderingType == RenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");

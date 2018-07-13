@@ -34,6 +34,9 @@ namespace WorkEnginePPM.Tests.TestDoubles
             Header1 = header1Shim;
             Header2 = header2Shim;
             PeriodCols = periodColsShim;
+
+            Constructor = new PortfolioEngineCore.CStruct();
+            Constructor.Initialize("Grid");
         }
 
         public new void AddPeriodColumns(IEnumerable<PeriodData> periodsData)

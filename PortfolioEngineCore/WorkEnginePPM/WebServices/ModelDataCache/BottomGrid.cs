@@ -41,10 +41,12 @@ namespace ModelDataCache
         
         protected override void InitializeGridLayout(RenderingTypes renderingType)
         {
-            var useCols = Freeze == 0;
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
 
-            Constructor = new CStruct();
-            Constructor.Initialize("Grid");
+            var useCols = Freeze == 0;
 
             var xToolbar = Constructor.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
@@ -91,7 +93,6 @@ namespace ModelDataCache
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("HoverRow", "Color");
             m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefTree.CreateIntAttr("NoColorState", 1);
 
@@ -203,6 +204,11 @@ namespace ModelDataCache
 
         protected override void InitializeGridData(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             if (renderingType == RenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");

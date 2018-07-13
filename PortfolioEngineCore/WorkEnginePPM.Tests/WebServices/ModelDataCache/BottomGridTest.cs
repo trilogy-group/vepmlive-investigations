@@ -17,10 +17,10 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
     {
         private IDisposable _shimsContext;
 
-        private IDictionary<string, string> _stringAttributesCreated;
-        private IDictionary<string, bool> _booleanAttributesCreated;
-        private IDictionary<string, int> _intAttributesCreated;
-        private IDictionary<string, double> _doubleAttributesCreated;
+        private IDictionary<string, IDictionary<string, string>> _stringAttributesCreated;
+        private IDictionary<string, IDictionary<string, bool>> _booleanAttributesCreated;
+        private IDictionary<string, IDictionary<string, int>> _intAttributesCreated;
+        private IDictionary<string, IDictionary<string, double>> _doubleAttributesCreated;
 
         private bool _applyTargetParameter;
         private IList<DetailRowData> _targetsSortedParameter;
@@ -70,31 +70,53 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             _fromPeriodIndexParameter = 0;
             _toPeriodIndexParameter = 10;
 
-            _stringAttributesCreated = new Dictionary<string, string>();
-            _booleanAttributesCreated = new Dictionary<string, bool>();
-            _intAttributesCreated = new Dictionary<string, int>();
-            _doubleAttributesCreated = new Dictionary<string, double>();
+            _stringAttributesCreated = new Dictionary<string, IDictionary<string, string>>();
+            _booleanAttributesCreated = new Dictionary<string, IDictionary<string, bool>>();
+            _intAttributesCreated = new Dictionary<string, IDictionary<string, int>>();
+            _doubleAttributesCreated = new Dictionary<string, IDictionary<string, double>>();
 
             ShimCStruct.AllInstances.CreateSubStructString = (instance, subStructName) =>
                 new ShimCStruct
                 {
-                    CreateStringAttrStringString = (name, value) =>
-                    {
-                        _stringAttributesCreated.Add(name, value);
-                    },
-                    CreateBooleanAttrStringBoolean = (name, value) =>
-                    {
-                        _booleanAttributesCreated.Add(name, value);
-                    },
-                    CreateIntAttrStringInt32 = (name, value) =>
-                    {
-                        _intAttributesCreated.Add(name, value);
-                    },
-                    CreateDoubleAttrStringDouble = (name, value) =>
-                    {
-                        _doubleAttributesCreated.Add(name, value);
-                    },
+                    NameGet = () => subStructName
                 };
+
+            ShimCStruct.AllInstances.CreateStringAttrStringString = (element, name, value) =>
+            {
+                if (!_stringAttributesCreated.ContainsKey(element.Name))
+                {
+                    _stringAttributesCreated[element.Name] = new Dictionary<string, string>();
+                }
+
+                _stringAttributesCreated[element.Name][name] = value;
+            };
+            ShimCStruct.AllInstances.CreateBooleanAttrStringBoolean = (element, name, value) =>
+            {
+                if (!_booleanAttributesCreated.ContainsKey(element.Name))
+                {
+                    _booleanAttributesCreated[element.Name] = new Dictionary<string, bool>();
+                }
+
+                _booleanAttributesCreated[element.Name][name] = value;
+            };
+            ShimCStruct.AllInstances.CreateIntAttrStringInt32 = (element, name, value) =>
+            {
+                if (!_intAttributesCreated.ContainsKey(element.Name))
+                {
+                    _intAttributesCreated[element.Name] = new Dictionary<string, int>();
+                }
+
+                _intAttributesCreated[element.Name][name] = value;
+            };
+            ShimCStruct.AllInstances.CreateDoubleAttrStringDouble = (element, name, value) =>
+            {
+                if (!_doubleAttributesCreated.ContainsKey(element.Name))
+                {
+                    _doubleAttributesCreated[element.Name] = new Dictionary<string, double>();
+                }
+
+                _doubleAttributesCreated[element.Name][name] = value;
+            };
 
             _detailRowParameter = new DetailRowData(64)
             {
@@ -203,6 +225,100 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 
             // Assert
             Assert.AreEqual("255,255,255", _stringAttributesCreated["Color"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_InvalidRenderingType_Throws()
+        {
+            // Arrange
+            _detailRowParameter.bRealone = true;
+            var grid = CreateGridBase();
+
+            // Act
+            Action action = () => grid.InitializeGridLayout(GridBase.RenderingTypes.None);
+
+            // Assert
+            try
+            {
+                action();
+            }
+            catch(ArgumentException)
+            {
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_ValidRenderingType_GeneratesOtherAttributesRequired()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+
+            // Assert
+            Assert.AreEqual(0, _intAttributesCreated["Toolbar"]["Visible"]);
+            Assert.AreEqual(1, _intAttributesCreated["Panel"]["Visible"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_ValidRenderingType_GeneratesCfgAttributesRequired()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+
+            // Assert
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["MaxHeight"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["ShowDeleted"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["Deleting"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["Selecting"]);
+            Assert.AreEqual(3, _intAttributesCreated["Cfg"]["SuppressCfg"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["PrintCols"]);
+            Assert.AreEqual(true, _booleanAttributesCreated["Cfg"]["DateStrings"]);
+            Assert.AreEqual(true, _booleanAttributesCreated["Cfg"]["NoTreeLines"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["MaxWidth"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["AppendId"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["FullId"]);
+            Assert.AreEqual("0123456789", _stringAttributesCreated["Cfg"]["IdChars"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["NumberId"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["Dragging"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["DragEdit"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["LeftWidth"]);
+            Assert.AreEqual("R", _stringAttributesCreated["Cfg"]["IdPrefix"]);
+            Assert.AreEqual("x", _stringAttributesCreated["Cfg"]["IdPostfix"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["CaseSensitiveId"]);
+            Assert.AreEqual("GTACCNPSQEBSLC", _stringAttributesCreated["Cfg"]["Code"]);
+            Assert.AreEqual("GM", _stringAttributesCreated["Cfg"]["Style"]);
+            Assert.AreEqual("Modeler", _stringAttributesCreated["Cfg"]["CSS"]);
+            Assert.AreEqual(800, _intAttributesCreated["Cfg"]["RightWidth"]);
+            Assert.AreEqual(200, _intAttributesCreated["Cfg"]["MinMidWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["MinRightWidth"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["LeftCanResize"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["RightCanResize"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_ValidRenderingType_GeneratesMDefTreeAttributesRequired()
+        {
+            // Arrange
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+
+            // Assert
+            Assert.AreEqual("R", _stringAttributesCreated["D"]["Name"]);
+            Assert.AreEqual("Color", _stringAttributesCreated["D"]["HoverCell"]);
+            Assert.AreEqual("Color", _stringAttributesCreated["D"]["HoverRow"]);
+            Assert.AreEqual("", _stringAttributesCreated["D"]["FocusCell"]);
+            Assert.AreEqual("ClearSelection+Grid.SelectRow(Row,!Row.Selected)", _stringAttributesCreated["D"]["OnFocus"]);
+            Assert.AreEqual(1, _intAttributesCreated["D"]["NoColorState"]);
         }
     }
 }

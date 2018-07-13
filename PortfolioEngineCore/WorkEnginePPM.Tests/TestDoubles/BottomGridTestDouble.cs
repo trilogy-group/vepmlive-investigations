@@ -16,6 +16,9 @@ namespace WorkEnginePPM.Tests.TestDoubles
             {
                 Levels[i] = new ShimCStruct();
             }
+
+            Constructor = new PortfolioEngineCore.CStruct();
+            Constructor.Initialize("Grid");
         }
 
         public void AddDetailRow(DetailRowData detailRowData)
@@ -26,6 +29,11 @@ namespace WorkEnginePPM.Tests.TestDoubles
         public new void AddDetailRow(DetailRowData detailRowData, int rowId)
         {
             base.AddDetailRow(detailRowData, rowId);
+        }
+
+        public new void InitializeGridLayout(RenderingTypes renderingType)
+        {
+            base.InitializeGridLayout(renderingType);
         }
     }
 }
