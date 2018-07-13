@@ -190,6 +190,10 @@
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
     <Compile Include="API\PlatformIntegration.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverService.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupServiceLogEventArgs.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -1304,7 +1308,7 @@
     <Compile Include="PfeData\ProjectResourceRateRepository.cs" />
     <Compile Include="PfeData\ProjectResourceRate.cs" />
     <Compile Include="PlatformIntegrationEvent.cs" />
-    <Compile Include="ProjectArchiverService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

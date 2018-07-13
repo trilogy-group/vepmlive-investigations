@@ -7,6 +7,9 @@ using Microsoft.SharePoint.Administration;
 using System.IO;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
+
+using EPMLiveCore.API.ProjectArchiver;
 
 namespace EPMLiveCore.Layouts.EPMLiveCore
 {
@@ -342,6 +345,9 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 
                         if (txtDatabaseServer.Text != "")
                             errors = mapReports(site);
+
+                        var archiverSetup = new ProjectArchiverSetupService();
+                        archiverSetup.EnsureFeatureIsInstalledForWeb(site.ID, web.ID);
                     }
                 }
                 catch (Exception ex) { errors = ex.ToString(); }

@@ -21,6 +21,8 @@ using Microsoft.SharePoint.Utilities;
 
 using System.DirectoryServices;
 using System.Text.RegularExpressions;
+
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
@@ -2114,6 +2116,8 @@ namespace EPMLiveCore
 
                         }
                         sUrl = web.Url;
+
+                        InstallArchiveRestoreFeatureIfApplicable(web);
                     }
                     catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                     finally
@@ -2395,6 +2399,8 @@ namespace EPMLiveCore
                         });
                     }
                     sUrl = web.Url;
+
+                    InstallArchiveRestoreFeatureIfApplicable(web);
                 }
                 catch { }
                 finally { if (web != null) web.Dispose(); }
@@ -2774,6 +2780,8 @@ namespace EPMLiveCore
                     #endregion
 
                     sUrl = web.Url;
+
+                    InstallArchiveRestoreFeatureIfApplicable(web);
 
                     return "0:" + sUrl;
                 }
@@ -4166,6 +4174,35 @@ namespace EPMLiveCore
             MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
             object apiClass = Activator.CreateInstance(thisClass);
             return (string)m.Invoke(apiClass, new object[] { null, spWeb });
+        }
+
+        private static void InstallArchiveRestoreFeatureIfApplicable(SPWeb web)
+        {
+            try
+            {
+                var siteId = web.Site.ID;
+                var webId = web.ID;
+
+                SPSecurity.RunWithElevatedPrivileges(
+                    () =>
+                        {
+                            var archiverSetup = new ProjectArchiverSetupService();
+                            archiverSetup.LogEvent += ProjectArchiverSetupServiceLogEvent;
+                            archiverSetup.EnsureFeatureIsInstalledForWeb(siteId, webId);
+                        });
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+            }
+        }
+
+        private static void ProjectArchiverSetupServiceLogEvent(object sender, ProjectArchiverSetupServiceLogEventArgs e)
+        {
+            var severity = e.LogLevel == ProjectArchiverSetupServiceLogEventArgs.Error
+                               ? TraceSeverity.High
+                               : TraceSeverity.Verbose;
+            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, severity, e.Message);
         }
     }
 }

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Linq;
-using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Logging;
 using EPMLiveCore.ListDefinitions;
 using EPMLiveCore.PfeData;
-
 using Microsoft.SharePoint;
 
-namespace EPMLiveCore
+namespace EPMLiveCore.API.ProjectArchiver
 {
     /// <summary>
     /// Implements Archive / Restore project functionality.
     /// </summary>
-    public class ProjectArchiverService
+    public class ProjectArchiverService : IProjectArchiverService
     {
         public const string ArchivedColumn = "EPM_Archived";
 
@@ -130,7 +128,7 @@ namespace EPMLiveCore
                                 {
                                     elevatedWeb.AllowUnsafeUpdates = true;
 
-                                    if (PfeData.ConnectionProvider.AllowDatabaseConnections(elevatedWeb))
+                                    if (ConnectionProvider.AllowDatabaseConnections(elevatedWeb))
                                     {
                                         var pfeProjectRepository = new ProjectRepository();
                                         pfeProjectRepository.UpdateArchivedStatus(web, projectListItem.ParentList.ID, projectListItem.ID, status);
