@@ -21,6 +21,8 @@ using Microsoft.SharePoint.Utilities;
 
 using System.DirectoryServices;
 using System.Text.RegularExpressions;
+
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 

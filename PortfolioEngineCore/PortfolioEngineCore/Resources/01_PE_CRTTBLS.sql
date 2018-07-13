@@ -1200,7 +1200,8 @@ CREATE TABLE dbo.EPGP_PROJECTS
     PROJECT_CHECKEDOUT_BY int,
     PROJECT_CHECKEDOUT_DATE datetime,
     PROJECT_EXT_UID nvarchar(128) NULL,
-    PROJECT_LIST_ID nvarchar(400) NULL
+    PROJECT_LIST_ID nvarchar(400) NULL,
+    PROJECT_ARCHIVED tinyint NULL
 )
 
                 end
@@ -1211,6 +1212,12 @@ else
                                 begin
                                                 Print '     Add Column PROJECT_LIST_ID'
                                                 ALTER TABLE EPGP_PROJECTS ADD PROJECT_LIST_ID nvarchar(400) NULL
+                                end
+
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_PROJECTS' and column_name = 'PROJECT_ARCHIVED')
+                                begin
+                                                Print '     Add Column PROJECT_ARCHIVED'
+                                                ALTER TABLE EPGP_PROJECTS ADD PROJECT_ARCHIVED tinyint NULL
                                 end
                 end
 

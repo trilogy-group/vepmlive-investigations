@@ -123,8 +123,11 @@ namespace PortfolioEngineCore
                     bool bSuperPIM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperPIM);
                     bool bSuperRM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperRM);
 
-                    string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
-                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    var sqlCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS "
+                                      + "WHERE (PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '')"
+                                      + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                                      + " ORDER BY PROJECT_NAME";
+                    SqlCommand oCommand = new SqlCommand(sqlCommand, _dba.Connection);
                     SqlDataReader reader = null;
                     reader = oCommand.ExecuteReader();
                     while (reader.Read())
@@ -148,12 +151,14 @@ namespace PortfolioEngineCore
                         xPIs = new CStruct();
                         xPIs.Initialize("PIs");
 
-                        sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
-                       " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
-                       " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" +
-                       " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+                        sqlCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS"
+                                     + " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID"
+                                     + " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = "
+                                     + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" 
+                                     + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                                     + " AND PROJECT_ID in (" + sProjectIDs + ") ORDER BY PROJECT_NAME";
 
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sqlCommand, _dba.Connection, _dba.Transaction);
                         reader = oCommand.ExecuteReader();
                         while (reader.Read())
                         {
@@ -1730,6 +1735,7 @@ namespace PortfolioEngineCore
                         sCommand = "SELECT DISTINCT PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_MANAGER"
                                     + "  FROM EPGP_PROJECTS"
                                     + " WHERE PROJECT_MARKED_DELETION = 0"
+                                    + "  AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
                                     + "   AND PROJECT_ID IN "
                                     + " (SELECT DISTINCT PROJECT_ID"
                                     + "    FROM EPG_RESOURCEPLANS "
