@@ -357,7 +357,7 @@ export class ProjectItemPageHelper {
     }
 
     static async verifyGanttChart() {
-        await expect(await ProjectItemPage.ganttChart.isPresent()).toBe(false,
+        await expect(await ProjectItemPage.ganttChartBars.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
     }
 

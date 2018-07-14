@@ -198,7 +198,11 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get ganttChart() {
-        return element(By.xpath('.//*[@class="GSHeadRight"]//parent::td[contains(@style,"none")]'));
+        return './/*[contains(@class,"GSHeadRight")]';
+    }
+
+    static get ganttChartBars() {
+        return element(By.xpath(`${this.ganttChart}//parent::td[contains(@style,"none")]`));
     }
 
     static get fragmentUploadMessage() {
