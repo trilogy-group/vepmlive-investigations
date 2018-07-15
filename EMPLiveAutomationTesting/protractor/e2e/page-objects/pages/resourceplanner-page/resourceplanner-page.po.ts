@@ -11,13 +11,14 @@ export class ResourceplannerPage extends BasePage {
 
     static get selectUser(){
         // selecting User which have department Test department 1
-        return element(By.xpath(`//*[normalize-space(text())=\'${ResourcePlannerConstants.user}\']//following-sibling::td[text()=\'${ResourcePlannerConstants.department}\']`));
+     return element(By.xpath(`//*[normalize-space(text())=\'${ResourcePlannerConstants.user}\']//'
+     +'following-sibling::td[text()=\'${ResourcePlannerConstants.department}\']`));
     }
     static get showMe(){
         // selecting User which have department Test department 1
         return element(By.id('idResourcesTab_ShowMe_button'));
     }
-    static getHoursHeader(){
+    static getHoursHeader() {
         // selecting User which have department Test department 1
         return element.all(By.xpath('//*[@id=\'g_RPE\']//*[@class=\'GMHeadRight\']//td[contains(@class,\'GMHeaderText\')]'));
     }
@@ -26,7 +27,8 @@ export class ResourceplannerPage extends BasePage {
         return ElementHelper.getElementByText(ResourcePlannerConstants.user);
     }
     static get selectMonth(){
-        return element(By.xpath('//*[@id=\'g_RPE\']//div[@class=\'GMBodyRight\']//*[@class=\'GMDataRow \']//td[contains(@class,\'GMClassEdit\')]'));
+        return element(By.xpath('//*[@id=\'g_RPE\']//div[@class=\'GMBodyRight\']//*[@class=\'GMDataRow \']' +
+            '//td[contains(@class,\'GMClassEdit\')]'));
     }
     static get inputHours(){
         return element(By.xpath('//input[contains(@class,\'GMEditInput\')]'));

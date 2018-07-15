@@ -4,10 +4,9 @@ import {StepLogger} from '../../../../core/logger/step-logger';
 import {PageHelper} from '../../../components/html/page-helper';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {browser} from 'protractor';
-import {ElementHelper} from "../../../components/html/element-helper";
-import {ValidationsHelper} from "../../../components/misc-utils/validation-helper";
-import {ResourcePlannerConstants} from "./resourceplanner-page.constants";
-
+import {ElementHelper} from '../../../components/html/element-helper';
+import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
+import {ResourcePlannerConstants} from './resourceplanner-page.constants';
 
 export class ResourcePlannerPageHelper  {
 
@@ -54,22 +53,19 @@ export class ResourcePlannerPageHelper  {
         stepLogger.step('Delete resource and save');
         await PageHelper.click(CommonPage.ribbonItems.save);
         stepLogger.step('Click Close button');
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close)
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
     }
-    static  async  getInputHoursMonth(stepLogger: StepLogger)
-    {
+    static  async  getInputHoursMonth(stepLogger: StepLogger) {
         stepLogger.step('Get Input Hour Month ');
         return ElementHelper.getText(ResourceplannerPage.getHoursHeader().get(0));
     }
-    static  async  getInputHoursNextMonth(stepLogger: StepLogger)
-    {
+    static  async  getInputHoursNextMonth(stepLogger: StepLogger) {
         stepLogger.step('Get Input Hour Month ');
         return ElementHelper.getText(ResourceplannerPage.getHoursHeader().get(1));
     }
-    static async validateTopGrid(stepLogger: StepLogger)
-    {
+    static async validateTopGrid(stepLogger: StepLogger) {
         stepLogger.step('Validating Top Grid Item Name is Present');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.topGrid.itemName))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topGrid.itemName));
@@ -83,8 +79,7 @@ export class ResourcePlannerPageHelper  {
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.topGrid.comment))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topGrid.comment));
     }
-    static async validateButtomGrid(stepLogger: StepLogger)
-    {
+    static async validateButtomGrid(stepLogger: StepLogger) {
         stepLogger.step('Validating Top Grid Item Name is Present');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.buttomGrid.itemName))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topGrid.itemName));
@@ -96,8 +91,7 @@ export class ResourcePlannerPageHelper  {
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topGrid.role));
        }
 
-    static async validateTopSection(stepLogger: StepLogger)
-    {
+    static async validateTopSection(stepLogger: StepLogger) {
         stepLogger.step('Validating save is Present');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.topSection.save))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topSection.save));
@@ -129,8 +123,7 @@ export class ResourcePlannerPageHelper  {
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.topSection.importWork))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.topSection.importWork));
         }
-     static  async validatebuttonSection(stepLogger: StepLogger)
-     {
+     static  async validatebuttonSection(stepLogger: StepLogger) {
          stepLogger.step('Validating Show Grouping  is Present');
          await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.buttonSection.showGrouping))
              .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.buttonSection.showGrouping));

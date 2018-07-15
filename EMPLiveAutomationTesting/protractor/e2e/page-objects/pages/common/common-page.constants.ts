@@ -66,7 +66,8 @@ export class CommonPageConstants {
         return {
             newItem: ' - New Item',
             editItem: ' - Edit Item',
-            subject: ' - Subject'
+            subject: ' - Subject',
+            resourceAnalyzer: 'Resource Analyzer'
         };
     }
 
@@ -91,7 +92,8 @@ export class CommonPageConstants {
             resourceCommitments: 'Resource Commitments',
             resourceRequirements: 'Resource Requirements',
             resourceWorkVsCapacity: 'Resource Work vs. Capacity',
-            editResource: 'Edit Resource'
+            editResource: 'Edit Resource',
+            resourceAnalyzer: 'ResourceAnalyzer'
         };
     }
 

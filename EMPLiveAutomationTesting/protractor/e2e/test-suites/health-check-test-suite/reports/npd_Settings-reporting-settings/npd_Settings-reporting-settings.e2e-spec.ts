@@ -1,13 +1,12 @@
-import {SuiteNames} from "../../../helpers/suite-names";
-import {HomePage} from "../../../../page-objects/pages/homepage/home.po";
-import {LoginPage} from "../../../../page-objects/pages/login/login.po";
-import {PageHelper} from "../../../../components/html/page-helper";
-import {StepLogger} from "../../../../../core/logger/step-logger";
-import {CommonPageHelper} from "../../../../page-objects/pages/common/common-page.helper";
-import {CommonPage} from "../../../../page-objects/pages/common/common.po";
-import {CommonPageConstants} from "../../../../page-objects/pages/common/common-page.constants";
-import {ReportingSettingsPageHelper} from "../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper";
-
+import {SuiteNames} from '../../../helpers/suite-names';
+import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
+import {LoginPage} from '../../../../page-objects/pages/login/login.po';
+import {PageHelper} from '../../../../components/html/page-helper';
+import {StepLogger} from '../../../../../core/logger/step-logger';
+import {CommonPageHelper} from '../../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../../page-objects/pages/common/common.po';
+import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
+import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let homePage: HomePage;

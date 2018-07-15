@@ -15,7 +15,9 @@ import {HomePageConstants} from '../homepage/home-page.constants';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
 import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
-
+import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
+import {ResourceAnalyzerPageHelper} from '../../resource-analyzer-page/resource-analyzer-page.helper';
+import {ResourceAnalyzerPage} from '../../resource-analyzer-page/resource-analyzer-page.po';
 const fs = require('fs');
 
 export class CommonPageHelper {
@@ -102,9 +104,9 @@ export class CommonPageHelper {
             title);
     }
 
-    static getRibbonButtonByText(title: string) {
+    static getRibbonButtonByText(title: string,  boolean = false ) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
-         and (${ComponentHelpers.getXPathFunctionForDot(title,true)})]//parent::a`));
+         and (${ComponentHelpers.getXPathFunctionForDot(title,  boolean )})]//parent::a`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
@@ -312,6 +314,32 @@ export class CommonPageHelper {
         await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editResource);
         await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+    }
+    static async resourceAnalyzerViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+        stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
+        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.resourceAnalyzer);
+        await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await PageHelper.switchToDefaultContent();
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+        await ResourceAnalyzerPageHelper.clickDisplayButton(stepLogger);
+        let maxAttempts = 0;
+        while (maxAttempts < 5) {
+                  try {
+                    await PageHelper.acceptAlert();
+                    break;
+                    } catch (NoAlertPresentException) {
+                    stepLogger.step('Alert is not displayed try it again');
+                    maxAttempts++;
+                    await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+                    continue;
+                }
+        }
+        stepLogger.step('Resource Analyzer Page is displayed');
+        await expect(await PageHelper.isElementDisplayed(ResourceAnalyzerPage.analyzerTab))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.resourceAnalyzer));
     }
     static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);

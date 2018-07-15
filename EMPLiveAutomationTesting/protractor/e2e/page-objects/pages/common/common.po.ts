@@ -103,7 +103,8 @@ export class CommonPage extends BasePage {
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
             resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
             editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
-            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource),
+            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource,true),
+            resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer)
         };
     }
 
@@ -148,6 +149,10 @@ export class CommonPage extends BasePage {
     static get contentFrame() {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
+    }
+    static get analyzerFrame() {
+        // element(By.css('.ms-dlgFrame')) never works in case of iframe
+        return browser.driver.findElement(By.css('.dhx_modal_cover_ifr'));
     }
 
     static get userInfoFrame() {
