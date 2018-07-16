@@ -34,11 +34,19 @@ namespace WorkEnginePPM.Tests.TestDoubles
             Header1 = header1Shim;
             Header2 = header2Shim;
             PeriodCols = periodColsShim;
+
+            Constructor = new PortfolioEngineCore.CStruct();
+            Constructor.Initialize("Grid");
         }
 
         public new void AddPeriodColumns(IEnumerable<PeriodData> periodsData)
         {
             base.AddPeriodColumns(periodsData);
+        }
+
+        public new bool TryGetDataFromDetailRowDataField(DetailRowData detailRowData, int fid, out string value)
+        {
+            return base.TryGetDataFromDetailRowDataField(detailRowData, fid, out value);
         }
 
         protected override void AddDetailRow(DetailRowData detailRowData, int rowId)

@@ -38,6 +38,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         private int _toPeriodIndexParameter;
 
         private IList<PeriodData> _periodsParameter;
+        private DetailRowData _detailRowParameter;
 
         [TestInitialize]
         public void SetUp()
@@ -73,6 +74,14 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
                     PeriodID = 46,
                     PeriodName = "test-2"
                 }
+            };
+
+            _detailRowParameter = new DetailRowData(64)
+            {
+                m_lev = 1,
+                bSelected = true,
+                bRealone = true,
+                bGotChildren = true
             };
 
             _header1Shim = new ShimCStruct();
@@ -203,6 +212,94 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 
             // Assert
             Assert.AreEqual(0, attributes.Count);
+        }
+
+        [TestMethod]
+        public void TryGetDataFromDetailRowDataField_UnknownField_EmptyValue()
+        {
+            // Arrange
+            const int unknownFieldId = -1;
+            string value;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, unknownFieldId, out value);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(" ", value);
+        }
+
+        [TestMethod]
+        public void TryGetDataFromDetailRowDataField_StartDateFieldWithNoDate_ReturnsFalseWithNullValue()
+        {
+            // Arrange
+            const int fieldId = 5;
+            _detailRowParameter.Det_Start = DateTime.MinValue;
+            string value;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsNull(value);
+        }
+
+        [TestMethod]
+        public void TryGetDataFromDetailRowDataField_EndDateFieldWithNoDate_ReturnsFalseWithNullValue()
+        {
+            // Arrange
+            const int fieldId = 6;
+            _detailRowParameter.Det_Start = DateTime.MinValue;
+            string value;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsNull(value);
+        }
+
+        [TestMethod]
+        public void TryGetDataFromDetailRowDataField_FieldBetween11801And11805_ReturnsValueFromText_OCVal()
+        {
+            // Arrange
+            const int fieldId = 11802;
+            _detailRowParameter.Text_OCVal = new string[3];
+            _detailRowParameter.Text_OCVal[2] = "test-text";
+
+            string value;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(_detailRowParameter.Text_OCVal[2], value);
+        }
+
+        [TestMethod]
+        public void TryGetDataFromDetailRowDataField_FieldBetween11811And11815_ReturnsValueFromTXVal()
+        {
+            // Arrange
+            const int fieldId = 11813;
+            _detailRowParameter.TXVal = new string[4];
+            _detailRowParameter.TXVal[3] = "test-text";
+
+            string value;
+            var grid = CreateGridBase();
+
+            // Act
+            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(_detailRowParameter.TXVal[3], value);
         }
     }
 }

@@ -13,7 +13,7 @@ using WorkEnginePPM.Tests.TestDoubles;
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {
     [TestClass]
-    public class TopGridBaseTest
+    public class TopGridTest
     {
         private IDisposable _shimsContext;
 
@@ -96,9 +96,9 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             };
         }
 
-        private TopGridBaseTestDouble CreateGridBase()
+        private TopGridTestDouble CreateGridBase()
         {
-            return new TopGridBaseTestDouble(
+            return new TopGridTestDouble(
                 _useGroupingParameter,
                 _showFTEsParameter,
                 _showGanttParameter,

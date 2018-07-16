@@ -8,9 +8,9 @@ using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
-    public class TopGridBaseTestDouble : TopGrid
+    public class TopGridTestDouble : TopGrid
     {
-        public TopGridBaseTestDouble(
+        public TopGridTestDouble(
             bool useGrouping, 
             bool showFTEs, 
             bool showGantt, 
@@ -29,6 +29,9 @@ namespace WorkEnginePPM.Tests.TestDoubles
             {
                 Levels[i] = new ShimCStruct();
             }
+
+            Constructor = new PortfolioEngineCore.CStruct();
+            Constructor.Initialize("Grid");
         }
 
         public new string RemoveNastyCharacters(string input)

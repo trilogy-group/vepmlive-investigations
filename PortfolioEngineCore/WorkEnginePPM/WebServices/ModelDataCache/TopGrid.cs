@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EPMLiveCore;
 using PortfolioEngineCore;
 
 namespace ModelDataCache
@@ -27,7 +28,12 @@ namespace ModelDataCache
 
         protected override void InitializeGridLayout(RenderingTypes renderingType)
         {
-            var useCols = DetFreeze == 0;
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
+            var useCols = Freeze == 0;
 
             var xToolbar = Constructor.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
@@ -87,7 +93,7 @@ namespace ModelDataCache
             m_xDefTree.CreateStringAttr("Name", "R");
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
+            m_xDefTree.CreateStringAttr("FocusCell", string.Empty);
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefTree.CreateIntAttr("NoColorState", 1);
@@ -110,9 +116,9 @@ namespace ModelDataCache
             Header1.CreateIntAttr("SortIcons", 0);
 
             Header1.CreateStringAttr("HoverCell", "Color");
-            Header1.CreateStringAttr("HoverRow", "");
+            Header1.CreateStringAttr("HoverRow", string.Empty);
             Header2.CreateStringAttr("HoverCell", "Color");
-            Header2.CreateStringAttr("HoverRow", "");
+            Header2.CreateStringAttr("HoverRow", string.Empty);
 
             // Add category column
             var categoryColumn = xLeftCols.CreateSubStruct("C");
@@ -121,8 +127,8 @@ namespace ModelDataCache
             categoryColumn.CreateBooleanAttr("CanEdit", true);
             categoryColumn.CreateIntAttr("CanMove", 0);
             categoryColumn.CreateStringAttr("Width", "20");
-            Header1.CreateStringAttr("Select", " ");
-            Header2.CreateStringAttr("Select", " ");
+            Header1.CreateStringAttr("Select", GlobalConstants.Whitespace);
+            Header2.CreateStringAttr("Select", GlobalConstants.Whitespace);
             if (UseGrouping)
             {
                 categoryColumn = xLeftCols.CreateSubStruct("C");
@@ -130,25 +136,25 @@ namespace ModelDataCache
                 categoryColumn.CreateStringAttr("Type", "Text");
                 categoryColumn.CreateIntAttr("CanMove", 0);
                 categoryColumn.CreateBooleanAttr("CanEdit", false);
-                Header1.CreateStringAttr("xGrouping", " ");
+                Header1.CreateStringAttr("xGrouping", GlobalConstants.Whitespace);
                 Header2.CreateStringAttr("xGrouping", "Grouping");
             }
-
+            
             foreach (var sng in SortFields)
             {
-                string sn = sng.name.Replace(" ", "");
+                var sn = sng.name.Replace(GlobalConstants.Whitespace, string.Empty);
 
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
+                sn = sn.Replace("\r", string.Empty);
+                sn = sn.Replace("\n", string.Empty);
                 sn = RemoveNastyCharacters(sn);
 
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
+                var h1 = GlobalConstants.Whitespace;
+                var h2 = GlobalConstants.Whitespace;
+                var isp = sng.name.IndexOf(GlobalConstants.Whitespace);
 
                 if (isp == -1)
                 {
-                    h1 = " ";
+                    h1 = GlobalConstants.Whitespace;
                     h2 = sng.name;
                 }
                 else
@@ -157,9 +163,13 @@ namespace ModelDataCache
                     h2 = sng.name.Substring(isp + 1);
                 }
                 if (useCols)
+                {
                     categoryColumn = xCols.CreateSubStruct("C");
+                }
                 else
+                {
                     categoryColumn = xLeftCols.CreateSubStruct("C");
+                }
 
                 categoryColumn.CreateStringAttr("Name", sn);
                 if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
@@ -174,7 +184,9 @@ namespace ModelDataCache
 
                 }
                 else
+                {
                     categoryColumn.CreateStringAttr("Type", "Text");
+                }
 
                 categoryColumn.CreateIntAttr("CanMove", 0);
 
@@ -187,8 +199,10 @@ namespace ModelDataCache
                 Header1.CreateStringAttr(sn, h1);
                 Header2.CreateStringAttr(sn, h2);
 
-                if (sng.fid == DetFreeze)
+                if (sng.fid == Freeze)
+                {
                     useCols = true;
+                }
             }
 
             if (ShowGantt)
@@ -211,7 +225,7 @@ namespace ModelDataCache
                 categoryColumn.CreateStringAttr("GanttChartMinEnd", DateEnd.ToString("MM/dd/yyyy"));
                 categoryColumn.CreateStringAttr("GanttChartMaxStart", DateStart.ToString("MM/dd/yyyy"));
                 categoryColumn.CreateStringAttr("GanttChartMaxEnd", DateEnd.ToString("MM/dd/yyyy"));
-                Header1.CreateStringAttr("G", " ");
+                Header1.CreateStringAttr("G", GlobalConstants.Whitespace);
 
                 var xZoom = Constructor.CreateSubStruct("Zoom");
                 var xZ = xZoom.CreateSubStruct("Z");
@@ -262,6 +276,11 @@ namespace ModelDataCache
 
         protected override void InitializeGridData(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             if (renderingType == RenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");
@@ -338,6 +357,22 @@ namespace ModelDataCache
                 string value;
                 if (TryGetDataFromDetailRowDataField(detailRowData, sortField.fid, out value))
                 {
+                    // (CC-76681, 2018-07-13) Additional condition, specific to TopGrid
+                    if (value == GlobalConstants.Whitespace)
+                    {
+                        if (sortField.fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && sortField.fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                        {
+                            if (detailRowData.m_PI_Format_Extra_data != null)
+                            {
+                                value = detailRowData.m_PI_Format_Extra_data[sortField.fid - (int)FieldIDs.PI_USE_EXTRA];
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
                     iSubStruct.CreateStringAttr(sortFieldName, value);
                 }
             }
@@ -394,96 +429,6 @@ namespace ModelDataCache
                     }
                 }
             }
-        }
-
-        private bool TryGetDataFromDetailRowDataField(DetailRowData detailRowData, int fid, out string value)
-        {
-            var result = true;
-
-            switch (fid)
-            {
-                case (int)FieldIDs.SD_FID:
-                    if (detailRowData.Det_Start != DateTime.MinValue)
-                    {
-                        value = detailRowData.Det_Start.ToShortDateString();
-                    }
-                    else
-                    {
-                        result = false;
-                    }
-                    break;
-                case (int)FieldIDs.FD_FID:
-                    if (detailRowData.Det_Finish != DateTime.MinValue)
-                    {
-                        value = detailRowData.Det_Finish.ToShortDateString();
-                    }
-                    else
-                    {
-                        result = false;
-                    }
-                    break;
-                case (int)FieldIDs.FTOT_FID:
-                    value = detailRowData.m_tot1.ToString();
-                    break;
-                case (int)FieldIDs.DTOT_FID:
-                    value = detailRowData.m_tot2.ToString();
-                    break;
-                case (int)FieldIDs.PI_FID:
-                    value = detailRowData.PI_Name;
-                    break;
-                case (int)FieldIDs.CT_FID:
-                    value = detailRowData.CT_Name;
-                    break;
-                case (int)FieldIDs.SCEN_FID:
-                    value = detailRowData.Scen_Name;
-                    break;
-                case (int)FieldIDs.BC_FID:
-                    value = detailRowData.Cat_Name;
-                    break;
-                case (int)FieldIDs.FULLC_FID:
-                    value = detailRowData.FullCatName;
-                    break;
-                case (int)FieldIDs.CAT_FID:
-                    value = detailRowData.CC_Name;
-                    break;
-                case (int)FieldIDs.FULLCAT_FID:
-                    value = detailRowData.FullCCName;
-                    break;
-                case (int)FieldIDs.BC_ROLE:
-                    value = detailRowData.Role_Name;
-                    break;
-                case (int)FieldIDs.MC_FID:
-                    value = detailRowData.MC_Name;
-                    break;
-                default:
-                    if (fid >= 11801 && fid <= 11805)
-                    {
-                        value = detailRowData.Text_OCVal[fid - 11800];
-                    }
-                    else if (fid >= 11811 && fid <= 11815)
-                    {
-                        value = detailRowData.TXVal[fid - 11810];
-                    }
-                    else if (fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                    {
-                        if (detailRowData.m_PI_Format_Extra_data != null)
-                        {
-                            value = detailRowData.m_PI_Format_Extra_data[fid - (int)FieldIDs.PI_USE_EXTRA];
-                        }
-                        else
-                        {
-                            result = false;
-                        }
-                    }
-                    else
-                    {
-                        value = " ";
-                    }
-                    break;
-            }
-
-            value = null;
-            return result;
         }
 
         protected override string ResolvePeriodId(PeriodData periodData, int index)
