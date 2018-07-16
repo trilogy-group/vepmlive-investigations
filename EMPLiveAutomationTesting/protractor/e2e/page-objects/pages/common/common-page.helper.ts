@@ -308,6 +308,24 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
+    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+
+        stepLogger.step('Select "Delete" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.delete);
+        let maxAttempts = 0;
+        while (maxAttempts < 5) {
+            try {
+                await PageHelper.acceptAlert();
+                break;
+            } catch (NoAlertPresentException) {
+                stepLogger.step('Alert is not displayed try it again');
+                maxAttempts++;
+                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+                continue;
+            }
+        }
+    }
     static async resourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');

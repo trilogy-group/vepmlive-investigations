@@ -81,6 +81,7 @@ export class CommonPageConstants {
             addTask: 'AddTask-Large',
             add: 'Add',
             attachFile: 'AttachFile',
+            delete: 'Ribbon.ListItem.Manage.Delete-Small',
             editTeam: 'Edit Team',
             buildTeam: 'Build Team',
             close: 'Close',

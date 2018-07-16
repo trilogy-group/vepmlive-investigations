@@ -103,8 +103,9 @@ export class CommonPage extends BasePage {
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
             resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
             editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
-            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource,true),
-            resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer)
+            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource, true ),
+            resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer),
+            delete: CommonPageHelper.getRibbonButtonById(labels.delete),
         };
     }
 

@@ -20,7 +20,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     it('Run Refresh Schedule - [82979]', async () => {
         const stepLogger = new StepLogger(82979);
         stepLogger.stepId(1);
-         await CommonPageHelper.navigateToItemPageUnderNavigation(
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,

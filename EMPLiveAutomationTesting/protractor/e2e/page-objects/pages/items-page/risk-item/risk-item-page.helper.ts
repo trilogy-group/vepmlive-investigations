@@ -152,4 +152,22 @@ export class RiskItemPageHelper {
                         .toBe(true,
                             ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
     }
+    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+        stepLogger.step('Select "Delete" from the options displayed');
+        await PageHelper.click(RiskItemPage.deleteRisk);
+        let maxAttempts = 0;
+        while (maxAttempts < 5) {
+            try {
+                await PageHelper.acceptAlert();
+                break;
+            } catch (NoAlertPresentException) {
+                stepLogger.step('Alert is not displayed try it again');
+                maxAttempts++;
+                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+                continue;
+            }
+        }
+    }
+
 }

@@ -15,9 +15,7 @@ export class ProjectItemPageConstants {
     static readonly applyButton = 'Apply Button';
     static readonly resourcePlanner = 'Resource Planner - Project Mode';
     static readonly resourceAnalyzer = 'Resource Analyzer';
-
-
-
+    static  readonly noDataFound = 'No data found';
     static get inputLabels() {
         return {
             projectName: 'Project Name *',

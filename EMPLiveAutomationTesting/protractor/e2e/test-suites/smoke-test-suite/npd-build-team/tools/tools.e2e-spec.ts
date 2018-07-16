@@ -451,7 +451,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EditTeamPageHelper.resourceWorkVsCapacity(stepLogger);
         stepLogger.stepId(5);
         stepLogger.step('Getting Value from  Resource Capacity Heat Map');
-        //await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
+        // await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
         stepLogger.step('Validate that Added Hours is present ');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ResourcePlannerConstants.user));
