@@ -362,6 +362,7 @@
     <Compile Include="GenericPickerDialog.cs" />
     <Compile Include="GenericPublishEvent.cs" />
     <Compile Include="GenericQueryControl.cs" />
+    <Compile Include="GlobalConstants.cs" />
     <Compile Include="GlobalResourceHelper.cs" />
     <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
     <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />

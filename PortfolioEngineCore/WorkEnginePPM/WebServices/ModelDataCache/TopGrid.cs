@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EPMLiveCore;
 using PortfolioEngineCore;
 
 namespace ModelDataCache
@@ -92,7 +93,7 @@ namespace ModelDataCache
             m_xDefTree.CreateStringAttr("Name", "R");
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
+            m_xDefTree.CreateStringAttr("FocusCell", string.Empty);
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefTree.CreateIntAttr("NoColorState", 1);
@@ -115,9 +116,9 @@ namespace ModelDataCache
             Header1.CreateIntAttr("SortIcons", 0);
 
             Header1.CreateStringAttr("HoverCell", "Color");
-            Header1.CreateStringAttr("HoverRow", "");
+            Header1.CreateStringAttr("HoverRow", string.Empty);
             Header2.CreateStringAttr("HoverCell", "Color");
-            Header2.CreateStringAttr("HoverRow", "");
+            Header2.CreateStringAttr("HoverRow", string.Empty);
 
             // Add category column
             var categoryColumn = xLeftCols.CreateSubStruct("C");
@@ -126,8 +127,8 @@ namespace ModelDataCache
             categoryColumn.CreateBooleanAttr("CanEdit", true);
             categoryColumn.CreateIntAttr("CanMove", 0);
             categoryColumn.CreateStringAttr("Width", "20");
-            Header1.CreateStringAttr("Select", " ");
-            Header2.CreateStringAttr("Select", " ");
+            Header1.CreateStringAttr("Select", GlobalConstants.Whitespace);
+            Header2.CreateStringAttr("Select", GlobalConstants.Whitespace);
             if (UseGrouping)
             {
                 categoryColumn = xLeftCols.CreateSubStruct("C");
@@ -135,25 +136,25 @@ namespace ModelDataCache
                 categoryColumn.CreateStringAttr("Type", "Text");
                 categoryColumn.CreateIntAttr("CanMove", 0);
                 categoryColumn.CreateBooleanAttr("CanEdit", false);
-                Header1.CreateStringAttr("xGrouping", " ");
+                Header1.CreateStringAttr("xGrouping", GlobalConstants.Whitespace);
                 Header2.CreateStringAttr("xGrouping", "Grouping");
             }
-
+            
             foreach (var sng in SortFields)
             {
-                var sn = sng.name.Replace(" ", "");
+                var sn = sng.name.Replace(GlobalConstants.Whitespace, string.Empty);
 
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
+                sn = sn.Replace("\r", string.Empty);
+                sn = sn.Replace("\n", string.Empty);
                 sn = RemoveNastyCharacters(sn);
 
-                var h1 = " ";
-                var h2 = " ";
-                var isp = sng.name.IndexOf(" ");
+                var h1 = GlobalConstants.Whitespace;
+                var h2 = GlobalConstants.Whitespace;
+                var isp = sng.name.IndexOf(GlobalConstants.Whitespace);
 
                 if (isp == -1)
                 {
-                    h1 = " ";
+                    h1 = GlobalConstants.Whitespace;
                     h2 = sng.name;
                 }
                 else
@@ -224,7 +225,7 @@ namespace ModelDataCache
                 categoryColumn.CreateStringAttr("GanttChartMinEnd", DateEnd.ToString("MM/dd/yyyy"));
                 categoryColumn.CreateStringAttr("GanttChartMaxStart", DateStart.ToString("MM/dd/yyyy"));
                 categoryColumn.CreateStringAttr("GanttChartMaxEnd", DateEnd.ToString("MM/dd/yyyy"));
-                Header1.CreateStringAttr("G", " ");
+                Header1.CreateStringAttr("G", GlobalConstants.Whitespace);
 
                 var xZoom = Constructor.CreateSubStruct("Zoom");
                 var xZ = xZoom.CreateSubStruct("Z");
@@ -357,7 +358,7 @@ namespace ModelDataCache
                 if (TryGetDataFromDetailRowDataField(detailRowData, sortField.fid, out value))
                 {
                     // (CC-76681, 2018-07-13) Additional condition, specific to TopGrid
-                    if (value == " ")
+                    if (value == GlobalConstants.Whitespace)
                     {
                         if (sortField.fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && sortField.fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
                         {
