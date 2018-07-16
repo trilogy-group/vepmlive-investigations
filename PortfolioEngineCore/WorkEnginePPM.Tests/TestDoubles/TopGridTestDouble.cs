@@ -34,9 +34,9 @@ namespace WorkEnginePPM.Tests.TestDoubles
             Constructor.Initialize("Grid");
         }
 
-        public new string RemoveNastyCharacters(string input)
+        public new string CleanUpString(string input)
         {
-            return base.RemoveCharacters(input);
+            return base.CleanUpString(input);
         }
 
         public void AddDetailRow(DetailRowData detailRowData)

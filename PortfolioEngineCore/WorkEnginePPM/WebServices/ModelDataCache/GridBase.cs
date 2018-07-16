@@ -88,6 +88,11 @@ namespace ModelDataCache
 
         public string RenderToXml(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
 
@@ -152,7 +157,7 @@ namespace ModelDataCache
             return result.ToString();
         }
 
-        protected void AddPeriodColumns(IEnumerable<PeriodData> periods)
+        protected virtual void AddPeriodColumns(IEnumerable<PeriodData> periods)
         {
             var iNatural = 0;
             foreach(var period in periods)
