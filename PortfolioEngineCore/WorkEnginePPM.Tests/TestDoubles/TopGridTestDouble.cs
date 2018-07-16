@@ -36,7 +36,7 @@ namespace WorkEnginePPM.Tests.TestDoubles
 
         public new string RemoveNastyCharacters(string input)
         {
-            return base.RemoveNastyCharacters(input);
+            return base.RemoveCharacters(input);
         }
 
         public void AddDetailRow(DetailRowData detailRowData)
