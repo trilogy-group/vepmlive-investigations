@@ -360,6 +360,17 @@ export class ProjectItemPageHelper {
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
     }
 
+    static async verifyGanttChart() {
+        const isBarChartPresent = await ProjectItemPage.ganttChartBars.isPresent();
+        await expect(await isBarChartPresent).toBe(false,
+            ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
+    }
+
+    static async verifyAlertMessage() {
+        await expect(await browser.switchTo().alert().getText()).toContain(ProjectItemPageConstants.baseLineMessage.clear,
+            ValidationsHelper.getRecordContainsMessage(ProjectItemPageConstants.baseLineMessage.clear));
+    }
+
     static async verifyFragmentDropDownLabel() {
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.fragmentDropDownLabels.insert)).toBe(true,
             ValidationsHelper.getLabelDisplayedValidation(ProjectItemPageConstants.fragmentLabels.insert));
@@ -375,6 +386,14 @@ export class ProjectItemPageHelper {
         const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
         await browser.actions().keyDown(protractor.Key.CONTROL).perform();
         await elm2.click();
+        await elm3.click();
+        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
+    }
+
+    static async selectCreatedTaskTwoAndThree() {
+        await ProjectItemPageHelper.getselectTask(2, ProjectItemPageConstants.newTaskFields.start).click();
+        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
+        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
         await elm3.click();
         await browser.actions().keyUp(protractor.Key.CONTROL).perform();
     }
@@ -406,6 +425,10 @@ export class ProjectItemPageHelper {
 
     static selectFirstAssign() {
         return this.selectAssign(1);
+    }
+
+    static selectLastAssign() {
+        return this.selectAssign(3);
     }
 
     static selectAssign(index: number) {

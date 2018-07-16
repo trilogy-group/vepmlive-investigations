@@ -286,8 +286,20 @@ export class CommonPage extends BasePage {
         return element(By.css('#addlinkdiv [value="Add Link"]'));
     }
 
+    static get addLinkCancelButton() {
+        return element(By.css('#addlinkdiv [value="Cancel"]'));
+    }
+
     static get projectTab() {
         return element(By.css('[id*="Project-title"]'));
+    }
+
+    static get setBaselineTab() {
+        return element(By.css('[id*="SetBaseline"] [class*="img"]'));
+    }
+
+    static get clearBaselineTab() {
+        return element(By.css('[id*="ClearBaseline"] [class*="img"]'));
     }
 
     static get okButton () {
@@ -328,7 +340,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+            return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
     static get costButton(){

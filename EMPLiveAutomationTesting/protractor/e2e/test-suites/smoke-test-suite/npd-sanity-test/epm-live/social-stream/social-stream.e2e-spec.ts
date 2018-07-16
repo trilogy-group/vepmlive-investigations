@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -8,6 +9,13 @@ import {SocialStreamPage} from '../../../../../page-objects/pages/settings/socia
 import {SocialStreamPageConstants} from '../../../../../page-objects/pages/settings/social-stream/social-stream-page.constants';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
+import {CreateNewPageConstants} from '../../../../../page-objects/pages/items-page/create-new-page.constants';
+import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
+import {HomePage} from '../../../../../page-objects/pages/homepage/home.po';
+import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
+import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
+import {DocumentPageHelper} from '../../../../../page-objects/pages/documents/document-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -132,5 +140,75 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Comment added by another user should be displayed to admin user');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(comment))).toBe(true,
             ValidationsHelper.getDisplayedValidation(comment));
+    });
+
+    it('Add Shared Document - [907964]', async () => {
+        const stepLogger = new StepLogger(907964);
+        const newFile = CommonPageHelper.uniqueDocumentFilePath;
+
+        stepLogger.stepId(1);
+        stepLogger.step('Select Navigation icon  from left side menu');
+        await PageHelper.click(HomePage.navigateMenu);
+
+        stepLogger.verification('Different Navigation options displayed');
+        await expect(await PageHelper.isElementPresent(HomePage.navigationMenu))
+            .toBe(true, ValidationsHelper.getMenuDisplayedValidation(HomePageConstants.navigation));
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on Home link displayed in Navigation options');
+        await PageHelper.click(HomePage.navigateToHome);
+
+        stepLogger.verification('Logged in users Home Page is displayed');
+        await expect(await browser.getTitle())
+            .toBe(HomePageConstants.homePage, ValidationsHelper.getPageDisplayedValidation(HomePageConstants.pageName));
+
+        stepLogger.verification('Social Stream web part is shown on the Home Page');
+        await expect(await PageHelper.isElementPresent(HomePage.toolBarMenuItems.socialStream))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(CreateNewPageConstants.navigationLabels.libraryApps.socialStream));
+
+        stepLogger.stepId(3);
+        stepLogger.step('Click on + More button displayed in CREATE options in social stream');
+        // Sleep required because of bug of two "More" buttons
+        await browser.sleep(PageHelper.timeout.s);
+        await PageHelper.click(HomePage.toolBarMenuItems.more);
+
+        stepLogger.step('Click on Shared Document link from the options displayed');
+        await PageHelper.click(HomePage.toolBarMenuItems.sharedDocument);
+
+        stepLogger.verification('Add a document pop up displayed');
+        await DocumentPageHelper.verifyDocumentPopUp;
+
+        stepLogger.stepId(4);
+        // #4 and #5 step are inside the function
+        stepLogger.step('Click in Choose file button displayed in Choose a file row in Add a document popup' +
+            'Search and select the file to upload [Ex: Testwordfile.docx] and click Open button');
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await PageHelper.uploadFile(CommonPage.browseButton, newFile.fullFilePath);
+
+        // Selected file name is displayed on right side of Choose file button is not possible.
+
+        stepLogger.stepId(6);
+        stepLogger.step('Click OK button in Add a document popup');
+        await PageHelper.click(CommonPage.formButtons.ok);
+
+        stepLogger.verification('Add a document popup is to select file is closed');
+        await browser.sleep(PageHelper.timeout.s);
+        await expect(await CommonPage.browseButton.isPresent()).toBe(false,
+            ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
+
+        stepLogger.verification('Project Documents (Add a document) window displayed');
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
+
+        stepLogger.stepId(7);
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.sharedDocuments,
+            CommonPage.pageHeaders.myWorkplace.sharedDocuments,
+            CommonPageConstants.pageHeaders.myWorkplace.sharedDocuments,
+            stepLogger);
+
+        stepLogger.verification('Project Documents (Add a document) window displayed');
+        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 });
