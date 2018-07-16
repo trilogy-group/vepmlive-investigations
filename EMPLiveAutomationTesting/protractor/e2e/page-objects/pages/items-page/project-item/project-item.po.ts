@@ -234,7 +234,7 @@ export class ProjectItemPage extends BasePage {
     }
 
     static get linkDropDownId() {
-        return `slctAddLinkType`;
+        return 'slctAddLinkType';
     }
 
     static get linkTypeDropDownId() {

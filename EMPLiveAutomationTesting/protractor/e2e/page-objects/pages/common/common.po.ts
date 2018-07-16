@@ -248,7 +248,7 @@ export class CommonPage extends BasePage {
     }
 
     static get projectCheckbox() {
-        return element(By.css(`${this.projectFirstRow} [class*='GMCellPanel GMEmpty']`));
+        return element(By.css(`(${this.projectFirstRow}) [class*='GMCellPanel GMEmpty']`));
     }
 
     static get projectFirstRow() {
