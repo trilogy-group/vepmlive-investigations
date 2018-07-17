@@ -4,12 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ModelDataCache;
+using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
     public class TopGridTestDouble : TopGrid
     {
+        public new int Level => base.Level;
+        public new CStruct[] Levels => base.Levels;
+
         public TopGridTestDouble(
             bool useGrouping, 
             bool showFTEs, 
@@ -39,9 +43,29 @@ namespace WorkEnginePPM.Tests.TestDoubles
             return base.CleanUpString(input);
         }
 
+        public new string ResolvePeriodId(PeriodData period, int index)
+        {
+            return base.ResolvePeriodId(period, index);
+        }
+
         public void AddDetailRow(DetailRowData detailRowData)
         {
-            base.AddDetailRow(detailRowData, 0);
+            AddDetailRow(detailRowData, 0);
+        }
+
+        public new void AddDetailRow(DetailRowData detailRowData, int rowId)
+        {
+            base.AddDetailRow(detailRowData, rowId);
+        }
+
+        public new void InitializeGridLayout(RenderingTypes renderingType)
+        {
+            base.InitializeGridLayout(renderingType);
+        }
+
+        public new void InitializeGridData(RenderingTypes renderingType)
+        {
+            base.InitializeGridData(renderingType);
         }
     }
 }
