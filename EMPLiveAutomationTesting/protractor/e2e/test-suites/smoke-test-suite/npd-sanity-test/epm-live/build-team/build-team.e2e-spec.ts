@@ -378,6 +378,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
             ' drop down');
+
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));

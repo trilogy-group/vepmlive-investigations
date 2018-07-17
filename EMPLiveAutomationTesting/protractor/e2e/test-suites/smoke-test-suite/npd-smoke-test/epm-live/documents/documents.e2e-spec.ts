@@ -38,6 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly uploaded Project document [Ex: testfile.txt] is displayed under the expanded ' +
             'Project node');
+
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.file)))
             .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.file));
     });

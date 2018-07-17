@@ -12,8 +12,6 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {LinkPageConstants} from '../../../../../page-objects/pages/my-workplace/link/link-page.constants';
 import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my-workplace.po';
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
@@ -85,7 +83,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
+<<<<<<< HEAD
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
+=======
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
+>>>>>>> origin/TestAutomation
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
@@ -168,9 +170,14 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
+<<<<<<< HEAD
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
+=======
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(title)))
+>>>>>>> origin/TestAutomation
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
+
 
     it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);

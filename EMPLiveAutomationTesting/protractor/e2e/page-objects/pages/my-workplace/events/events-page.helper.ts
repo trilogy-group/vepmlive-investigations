@@ -161,6 +161,7 @@ export class EventsPageHelper {
 
         stepLogger.verification('View should be created and user should be navigated to event page');
         await PageHelper.click(EventsPage.rollOverEventList);
+
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(uniqueId)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(CommonPageConstants.createdView));
 

@@ -58,6 +58,10 @@ export class ElementHelper {
         return select.element(by.xpath(`./option[${ComponentHelpers.getXPathFunctionForDot(option)}]`)).isSelected();
     }
 
+    static async rightClickAndSelectNewTab() {
+        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN).sendKeys(protractor.Key.ENTER).perform();
+    }
+
     static async getFocusedElement() {
         return browser
             .driver
