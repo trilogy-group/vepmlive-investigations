@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using EPMLiveCore;
 using PortfolioEngineCore;
 
 namespace ModelDataCache
@@ -86,6 +88,11 @@ namespace ModelDataCache
 
         public string RenderToXml(RenderingTypes renderingType)
         {
+            if (renderingType == RenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
 
@@ -128,7 +135,29 @@ namespace ModelDataCache
 
         protected abstract string ResolvePeriodId(PeriodData periodData, int index);
 
-        protected void AddPeriodColumns(IEnumerable<PeriodData> periods)
+        protected abstract string CleanUpString(string input);
+
+        protected string RemoveCharacters(string input, string characters)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            var result = new StringBuilder(input.Length);
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (characters.IndexOf(input[i]) < 0)
+                {
+                    result.Append(input[i]);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        protected virtual void AddPeriodColumns(IEnumerable<PeriodData> periods)
         {
             var iNatural = 0;
             foreach(var period in periods)
@@ -274,6 +303,145 @@ namespace ModelDataCache
 
             return result;
         }
+
+        protected bool AddSortFieldsToColumns(CStruct xLeftCols, CStruct xCols, ref CStruct categoryColumn)
+        {
+            bool useCols = false;
+
+            foreach (var sortField in SortFields)
+            {
+                var sortFieldName = CleanUpString(sortField.name);
+
+                var h1 = GlobalConstants.Whitespace;
+                var h2 = GlobalConstants.Whitespace;
+
+                var indexOfSpace = sortField.name.IndexOf(GlobalConstants.Whitespace);
+                if (indexOfSpace == -1)
+                {
+                    h1 = GlobalConstants.Whitespace;
+                    h2 = sortField.name;
+                }
+                else
+                {
+                    h1 = sortField.name.Substring(0, indexOfSpace);
+                    h2 = sortField.name.Substring(indexOfSpace + 1);
+                }
+
+                if (useCols)
+                {
+                    categoryColumn = xCols.CreateSubStruct("C");
+                }
+                else
+                {
+                    categoryColumn = xLeftCols.CreateSubStruct("C");
+                }
+
+                categoryColumn.CreateStringAttr("Name", sortFieldName);
+
+                switch (sortField.fid)
+                {
+                    case (int)FieldIDs.SD_FID:
+                    case (int)FieldIDs.FD_FID:
+                        categoryColumn.CreateStringAttr("Type", "Date");
+                        categoryColumn.CreateStringAttr("Format", "MM/dd/yyyy");
+                        break;
+                    case (int)FieldIDs.FTOT_FID:
+                    case (int)FieldIDs.DTOT_FID:
+                        categoryColumn.CreateStringAttr("Type", "Float");
+                        categoryColumn.CreateStringAttr("Format", ",#.##");
+                        break;
+                    default:
+                        categoryColumn.CreateStringAttr("Type", "Text");
+                        break;
+                }
+
+                categoryColumn.CreateIntAttr("CanMove", 0);
+
+                if (sortField.selected == 0)
+                {
+                    categoryColumn.CreateIntAttr("Width", 0);
+                }
+
+                categoryColumn.CreateBooleanAttr("CanEdit", false);
+                Header1.CreateStringAttr(sortFieldName, h1);
+                Header2.CreateStringAttr(sortFieldName, h2);
+
+                if (sortField.fid == Freeze)
+                {
+                    useCols = true;
+                }
+            }
+
+            return useCols;
+        }
+
+        protected CStruct InitializeGridLayoutConfig()
+        {
+            var config = Constructor.CreateSubStruct("Cfg");
+
+            config.CreateIntAttr("MaxHeight", 0);
+            config.CreateIntAttr("ShowDeleted", 0);
+            config.CreateIntAttr("Deleting", 0);
+            config.CreateIntAttr("Selecting", 0);
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateBooleanAttr("NoTreeLines", true);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("DragEdit", 0);
+            config.CreateIntAttr("SuppressCfg", 3);
+            config.CreateIntAttr("PrintCols", 0);
+            config.CreateIntAttr("LeftWidth", 400);
+            config.CreateStringAttr("IdPrefix", "R");
+            config.CreateStringAttr("IdPostfix", "x");
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "Modeler");
+            config.CreateIntAttr("RightWidth", 800);
+            config.CreateIntAttr("MinMidWidth", 200);
+            config.CreateIntAttr("MinRightWidth", 400);
+            config.CreateIntAttr("LeftCanResize", 1);
+            config.CreateIntAttr("RightCanResize", 1);
+
+            return config;
+        }
+
+        protected void InitializeGridLayoutDefinition()
+        {
+            var m_xDef = Constructor.CreateSubStruct("Def");
+            var m_xDefTree = m_xDef.CreateSubStruct("D");
+            m_xDefTree.CreateStringAttr("Name", "R");
+
+            m_xDefTree.CreateStringAttr("HoverCell", "Color");
+            m_xDefTree.CreateStringAttr("HoverRow", "Color");
+            m_xDefTree.CreateStringAttr("FocusCell", "");
+            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
+            m_xDefTree.CreateIntAttr("NoColorState", 1);
+        }
+
+        protected void InitializeGridLayoutHeader1(CStruct xHead)
+        {
+            Header1 = xHead.CreateSubStruct("Header");
+            Header1.CreateIntAttr("Spanned", -1);
+            Header1.CreateIntAttr("SortIcons", 0);
+            Header1.CreateStringAttr("HoverCell", "Color");
+            Header1.CreateStringAttr("HoverRow", string.Empty);
+        }
+
+        protected void InitializeGridLayoutHeader2(CStruct xHead)
+        {
+            Header2 = xHead.CreateSubStruct("Header");
+            Header2.CreateStringAttr("id", "Header");
+            Header2.CreateIntAttr("SortIcons", 0);
+            Header2.CreateStringAttr("HoverCell", "Color");
+            Header2.CreateStringAttr("HoverRow", string.Empty);
+        }
+
+        protected abstract CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols);
 
         [Flags]
         public enum RenderingTypes

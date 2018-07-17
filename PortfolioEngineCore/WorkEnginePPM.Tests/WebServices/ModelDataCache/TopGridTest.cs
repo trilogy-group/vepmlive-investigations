@@ -121,7 +121,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         }
 
         [TestMethod]
-        public void RemoveNastyCharacters_InputNull_Throws()
+        public void CleanUpString_InputNull_Throws()
         {
             // Arrange
             const string input = null;
@@ -130,7 +130,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             try
             {
                 // Act
-                gridBase.RemoveNastyCharacters(input);
+                gridBase.CleanUpString(input);
             }
             // Assert
             catch (ArgumentNullException)
@@ -142,14 +142,14 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         }
 
         [TestMethod]
-        public void RemoveNastyCharacters_InputHasNastyCharacters_Removes()
+        public void CleanUpString_InputHasNastyCharacters_Removes()
         {
             // Arrange
             const string input = "valid" + "!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\";
             var gridBase = CreateGridBase();
 
             // Act
-            var result = gridBase.RemoveNastyCharacters(input);
+            var result = gridBase.CleanUpString(input);
 
             // Assert
             Assert.AreEqual("valid", result);

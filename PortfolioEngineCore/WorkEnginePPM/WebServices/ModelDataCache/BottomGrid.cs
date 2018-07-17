@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EPMLiveCore;
 using PortfolioEngineCore;
 
 namespace ModelDataCache
@@ -55,151 +56,36 @@ namespace ModelDataCache
             xPanel.CreateIntAttr("Visible", 1);
             xPanel.CreateIntAttr("Delete", 0);
 
-            var xCfg = Constructor.CreateSubStruct("Cfg");
+            var xCfg = InitializeGridLayoutConfig();
 
             if (UseGrouping)
             {
                 xCfg.CreateStringAttr("MainCol", "Grouping");
             }
 
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("LeftWidth", 400);
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
             xCfg.CreateIntAttr("FocusWholeRow", 1);
-            
-            var m_xDef = Constructor.CreateSubStruct("Def");
-            var m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
 
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
+            InitializeGridLayoutDefinition();
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");
-
             PeriodCols = Constructor.CreateSubStruct("RightCols");
             var xHead = Constructor.CreateSubStruct("Head");
-            Header1 = xHead.CreateSubStruct("Header");
+
+            InitializeGridLayoutHeader1(xHead);
+            InitializeGridLayoutHeader2(xHead);
+
             Header1.CreateIntAttr("CategoryVisible", -1);
-            Header1.CreateIntAttr("Spanned", -1);
-            Header1.CreateIntAttr("SortIcons", 0);
-
-            Header2 = xHead.CreateSubStruct("Header");
-            Header2.CreateStringAttr("id", "Header");
-            Header2.CreateIntAttr("SortIcons", 0);
-
-            Header1.CreateStringAttr("HoverCell", "Color");
-            Header1.CreateStringAttr("HoverRow", "");
-            Header2.CreateStringAttr("HoverCell", "Color");
-            Header2.CreateStringAttr("HoverRow", "");
-
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 200);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 1);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-
-            // Add category column
-            var xC = xLeftCols.CreateSubStruct("C");
 
             if (UseGrouping)
             {
-                xC = xLeftCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "Grouping");
-                xC.CreateStringAttr("Type", "Text");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateBooleanAttr("CanEdit", false);
-                Header1.CreateStringAttr("Grouping", " ");
+                Header1.CreateStringAttr("Grouping", GlobalConstants.Whitespace);
                 Header2.CreateStringAttr("Grouping", "Grouping");
             }
 
-            foreach (var sortField in SortFields)
-            {
-                var sortFieldName = sortField.name.Replace(" ", string.Empty);
-                sortFieldName = sortFieldName.Replace("\r", string.Empty);
-                sortFieldName = sortFieldName.Replace("\n", string.Empty);
+            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols);
 
-                var h1 = " ";
-                var h2 = " ";
-
-                var indexOfSpace = sortField.name.IndexOf(" ");
-                if (indexOfSpace == -1)
-                {
-                    h1 = " ";
-                    h2 = sortField.name;
-                }
-                else
-                {
-                    h1 = sortField.name.Substring(0, indexOfSpace);
-                    h2 = sortField.name.Substring(indexOfSpace + 1);
-                }
-
-                if (useCols)
-                {
-                    xC = xCols.CreateSubStruct("C");
-                }
-                else
-                {
-                    xC = xLeftCols.CreateSubStruct("C");
-                }
-
-                xC.CreateStringAttr("Name", sortFieldName);
-
-                switch (sortField.fid)
-                {
-                    case (int)FieldIDs.SD_FID:
-                    case (int)FieldIDs.FD_FID:
-                        xC.CreateStringAttr("Type", "Date");
-                        xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                        break;
-                    case (int)FieldIDs.FTOT_FID:
-                    case (int)FieldIDs.DTOT_FID:
-                        xC.CreateStringAttr("Type", "Float");
-                        xC.CreateStringAttr("Format", ",#.##");
-                        break;
-                    default:
-                        xC.CreateStringAttr("Type", "Text");
-                        break;
-                }
-
-                xC.CreateIntAttr("CanMove", 0);
-
-                if (sortField.selected == 0)
-                {
-                    xC.CreateIntAttr("Width", 0);
-                }
-
-                xC.CreateBooleanAttr("CanEdit", false);
-                Header1.CreateStringAttr(sortFieldName, h1);
-                Header2.CreateStringAttr(sortFieldName, h2);
-
-                if (sortField.fid == Freeze)
-                {
-                    useCols = true;
-                }
-            }
+            useCols |= AddSortFieldsToColumns(xLeftCols, xCols, ref categoryColumn);
         }
 
         protected override void InitializeGridData(RenderingTypes renderingType)
@@ -246,7 +132,7 @@ namespace ModelDataCache
 
             foreach (var sortField in SortFields)
             {
-                var sortFieldName = sortField.name.Replace(" ", string.Empty);
+                var sortFieldName = sortField.name.Replace(GlobalConstants.Whitespace, string.Empty);
                 sortFieldName = sortFieldName.Replace("\r", string.Empty);
                 sortFieldName = sortFieldName.Replace("\n", string.Empty);
 
@@ -348,6 +234,11 @@ namespace ModelDataCache
             return periodData.PeriodID.ToString();
         }
 
+        protected override string CleanUpString(string input)
+        {
+            return RemoveCharacters(input, " \r\n");
+        }
+
         private string TargetBackground(double t, double p, IList<TargetColours> targetColors)
         {
             var result = "RGB(217, 255, 255)";
@@ -392,6 +283,22 @@ namespace ModelDataCache
             }
 
             return result;
+        }
+
+        protected override CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
+        {
+            var categoryColumn = xLeftCols.CreateSubStruct("C");
+
+            if (UseGrouping)
+            {
+                categoryColumn = xLeftCols.CreateSubStruct("C");
+                categoryColumn.CreateStringAttr("Name", "Grouping");
+                categoryColumn.CreateStringAttr("Type", "Text");
+                categoryColumn.CreateIntAttr("CanMove", 0);
+                categoryColumn.CreateBooleanAttr("CanEdit", false);
+            }
+
+            return categoryColumn;
         }
     }
 }
