@@ -44,7 +44,7 @@ namespace TimerService
                         try
                         {
                             cn.Open();
-                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 5", cn))
+                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
                             {
                                 cmd.ExecuteNonQuery();
                             }
