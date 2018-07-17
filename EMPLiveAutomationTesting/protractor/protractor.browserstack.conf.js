@@ -18,14 +18,10 @@ exports.config = {
     multiCapabilities: defaultConfigSetup.bsMultiCapabilities,
     onPrepare: function () {
         reportersSetup.configureAllReporters();
-    },
-    onComplete: reportersSetup.testRailSetupOnComplete,
-    // Code to start browserstack local before start of test
-    beforeLaunch() {
         console.log('Connecting local');
         return new Promise(function (resolve, reject) {
             exports.bs_local = new browserstack.Local();
-            exports.bs_local.start({'key': defaultConfigSetup.bsMultiCapabilities.key}, function (error) {
+            exports.bs_local.start({'key': '7TNC2arNqF6cqxrxDiyp'}, function (error) {
                 if (error) return reject(error);
                 console.log('Connected. Now testing...');
 
@@ -34,10 +30,10 @@ exports.config = {
         });
     },
 
-    // Code to stop browserstack local after end of test
-    afterLaunch() {
+    onComplete() {
+        reportersSetup.testRailSetupOnComplete();
         return new Promise(function (resolve, reject) {
             exports.bs_local.stop(resolve);
         });
-    },
+    }
 };
