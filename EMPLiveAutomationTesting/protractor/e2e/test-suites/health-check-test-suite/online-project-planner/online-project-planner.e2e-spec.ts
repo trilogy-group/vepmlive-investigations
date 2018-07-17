@@ -43,7 +43,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         stepLogger.stepId(1);
         // Add hours for the resource added in the top-grid
         stepLogger.step('Add hours for the resource added in the top-grid');
-        await ResourcePlannerPageHelper.addingHours(stepLogger, hours);
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
     });
     it('Add, Edit and Delete Project - [829527]', async () => {

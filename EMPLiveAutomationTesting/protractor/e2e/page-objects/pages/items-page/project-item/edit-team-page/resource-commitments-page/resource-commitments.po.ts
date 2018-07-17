@@ -8,18 +8,13 @@ export class ResourceCommitments extends BasePage {
     {
         return element.all(By.xpath('(//*[@data-parametername=\'Resource\']//select)')).get(1);
     }
-    static get resourceOption()
-    {
-        return element.all(By.xpath('(//*[@data-parametername=\'Resource\']//select//option)'));
-    }
     static get applyButton()
     {
-        return element(By.xpath('//*[@value=\'Apply\']'));
+        return element(By.css('[value=\'Apply\']'));
     }
     static get specifyParameterValues() {
         return ElementHelper.getElementByText(ResourceCommitmentsConstansts.specifyParameterValues);
     }
-
     static get resourceCommitmentsMessage() {
         return ElementHelper.getElementByText(ResourceCommitmentsConstansts.resourceCommitmentsMessage);
     }

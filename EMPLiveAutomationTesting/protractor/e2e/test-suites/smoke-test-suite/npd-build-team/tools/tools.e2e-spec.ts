@@ -20,7 +20,7 @@ import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/p
 import {ResourceCapacityHeatMapPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-capacity-heatMap-page/resource-capacity-heatMap-page.helper';
 import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.helper';
 import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
-import {ResourceAvailablePageHelpergeHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
+import {ResourceAvailablePageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -261,7 +261,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // Add hours for the resource added in the top-grid
         stepLogger.step('Add hours for the resource added in the top-grid');
-        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
         stepLogger.stepId(2);
         // navigate to Reporter setting page
         stepLogger.step('navigate to Reporter setting page');
@@ -380,7 +380,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(2);
         // Add hours for the resource added in the top-grid
         stepLogger.step('Add hours for the resource added in the top-grid');
-        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
         stepLogger.stepId(3);
         // navigate to Reporter setting page
         stepLogger.step('navigate to Reporter setting page');
@@ -405,7 +405,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EditTeamPageHelper.resourceAvailableVsPlannedByDept(stepLogger);
         stepLogger.stepId(7);
         stepLogger.step('Getting Value from  Resource Available Vs Planned By Dept');
-        await ResourceAvailablePageHelpergeHelper.selectParametersAndApply(stepLogger);
+        await ResourceAvailablePageHelper.selectParametersAndApply(stepLogger);
         stepLogger.stepId(8);
         stepLogger.step('Validate that Added user is present ');
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.addedUser))
@@ -430,7 +430,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         // Add hours for the resource added in the top-grid
         stepLogger.step('Add hours for the resource added in the top-grid');
-        await ResourcePlannerPageHelper.addingHours(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
         stepLogger.stepId(2);
 
         // navigate to Reporter setting page

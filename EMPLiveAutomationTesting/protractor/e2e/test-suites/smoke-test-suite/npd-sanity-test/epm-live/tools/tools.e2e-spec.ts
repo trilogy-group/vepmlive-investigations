@@ -49,10 +49,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourcePlannerPageHelper.validateTopGrid(stepLogger);
         stepLogger.stepId(4);
         stepLogger.verification('Check options displayed in \'Resource Planner - Project Mode\' window bottom section');
-        await ResourcePlannerPageHelper.validatebuttonSection(stepLogger);
+        await ResourcePlannerPageHelper.validateButtonSection(stepLogger);
         stepLogger.stepId(5);
         stepLogger.verification('Check the columns displayed in bottom grid');
-        await ResourcePlannerPageHelper.validatebuttonSection(stepLogger);
+        await ResourcePlannerPageHelper.validateButtonSection(stepLogger);
         await PageHelper.click(CommonPage.ribbonItems.close);
         stepLogger.verification(`${CommonPageConstants.pageHeaders.projects.projectCenter} page is displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter))

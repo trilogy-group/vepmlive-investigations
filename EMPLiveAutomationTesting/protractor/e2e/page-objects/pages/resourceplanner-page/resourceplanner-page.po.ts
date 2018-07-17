@@ -14,27 +14,22 @@ export class ResourceplannerPage extends BasePage {
      return element(By.xpath(`//*[normalize-space(text())=\'${ResourcePlannerConstants.user}\']//'
      +'following-sibling::td[text()=\'${ResourcePlannerConstants.department}\']`));
     }
-    static get showMe(){
-        // selecting User which have department Test department 1
-        return element(By.id('idResourcesTab_ShowMe_button'));
-    }
     static getHoursHeader() {
         // selecting User which have department Test department 1
-        return element.all(By.xpath('//*[@id=\'g_RPE\']//*[@class=\'GMHeadRight\']//td[contains(@class,\'GMHeaderText\')]'));
+        return element.all(By.css('#g_RPE .GMHeadRight td.GMHeaderText'));
     }
     static get addedUser(){
         // selecting User which have department Test department 1
         return ElementHelper.getElementByText(ResourcePlannerConstants.user);
     }
     static get selectMonth(){
-        return element(By.xpath('//*[@id=\'g_RPE\']//div[@class=\'GMBodyRight\']//*[@class=\'GMDataRow \']' +
-            '//td[contains(@class,\'GMClassEdit\')]'));
+        return element(By.css('#g_RPE .GMBodyRight .GMDataRow td.GMClassEdit'));
     }
     static get inputHours(){
-        return element(By.xpath('//input[contains(@class,\'GMEditInput\')]'));
+        return element(By.xpath('input.GMEditInput'));
     }
     static get yesButton(){
-        return element(By.xpath('//input[@value="Yes"]'));
+        return element(By.css('[value="Yes"]'));
     }
 
     static get greenCheckImg(){
@@ -44,11 +39,11 @@ export class ResourceplannerPage extends BasePage {
         return element(By.css('[class*=\'rp-pm-private\']'));
     }
     static getTopSectionButtonById(id: string) {
-        return element(By.xpath(`//*[@id='idEditorTabDiv_ul']//*[@id='${id}']`));
+    return element(By.css(`#idEditorTabDiv_ul #${id}`));
     }
 
     static getbuttonSectionButtonById(id: string) {
-        return element(By.xpath(`//*[@id='idResourcesTabDiv_ul']//*[@id='${id}']`));
+        return element(By.xpath(`#idResourcesTabDiv_ul #${id}`));
     }
     static getTopGridItemsByText(title: string) {
         return element(By.xpath(`//*[@id='gridDiv_RPE']//td[contains(text(),'${title}')]`));

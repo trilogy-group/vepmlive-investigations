@@ -104,9 +104,9 @@ export class CommonPageHelper {
             title);
     }
 
-    static getRibbonButtonByText(title: string,  boolean = false ) {
+    static getRibbonButtonByText(title: string,  isContains = false ) {
         return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-largelabel')
-         and (${ComponentHelpers.getXPathFunctionForDot(title,  boolean )})]//parent::a`));
+         and (${ComponentHelpers.getXPathFunctionForDot(title,  isContains )})]//parent::a`));
     }
 
     static getDisabledRibbonButtonById(id: string) {
@@ -310,51 +310,26 @@ export class CommonPageHelper {
     }
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
-
         stepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.delete);
-        let maxAttempts = 0;
-        while (maxAttempts < 5) {
-            try {
-                await PageHelper.acceptAlert();
-                break;
-            } catch (NoAlertPresentException) {
-                stepLogger.step('Alert is not displayed try it again');
-                maxAttempts++;
-                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
-                continue;
-            }
-        }
+        await PageHelper.acceptAlert();
     }
     static async resourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editResource);
         await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }
     static async resourceAnalyzerViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.resourceAnalyzer);
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
         await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
         await ResourceAnalyzerPageHelper.clickDisplayButton(stepLogger);
-        let maxAttempts = 0;
-        while (maxAttempts < 5) {
-                  try {
-                    await PageHelper.acceptAlert();
-                    break;
-                    } catch (NoAlertPresentException) {
-                    stepLogger.step('Alert is not displayed try it again');
-                    maxAttempts++;
-                    await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
-                    continue;
-                }
-        }
+        await PageHelper.acceptAlert();
         stepLogger.step('Resource Analyzer Page is displayed');
         await expect(await PageHelper.isElementDisplayed(ResourceAnalyzerPage.analyzerTab))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.resourceAnalyzer));
@@ -362,7 +337,6 @@ export class CommonPageHelper {
     static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);

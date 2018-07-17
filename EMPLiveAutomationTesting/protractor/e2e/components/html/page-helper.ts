@@ -196,11 +196,18 @@ export class PageHelper {
         await browser.sleep(PageHelper.timeout.s);
         return browser.driver.switchTo().frame(frameEle);
     }
-    static async acceptAlert() {
+    static async acceptAlert( maxAttempts = 0) {
         // Wait for frame to exist first
-        await browser.sleep(PageHelper.timeout.s);
-        return browser.switchTo().alert().accept();
-    }
+        while (maxAttempts++ < 5) {
+            try {
+                await  browser.switchTo().alert().accept();
+                break;
+            } catch (NoAlertPresentException) {
+                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+                continue;
+            }
+        }
+      }
 
     /**
      * Verify whether element is displayed on page or not
