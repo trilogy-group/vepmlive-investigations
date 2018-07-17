@@ -489,7 +489,7 @@ export class CommonPage extends BasePage {
     }
 
     static get latestNotification(){
-        return element(By.className('EPMLiveNotificationTitle'));
+        return element.all(By.className('EPMLiveNotificationTitle')).get(0);
     }
 
 }
