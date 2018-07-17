@@ -17,7 +17,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
     {
         private IDisposable _shimsContext;
 
-        private ICollection<string> _substructsCreated = new HashSet<string>();
+        private ICollection<string> _substructsCreated;
         private IDictionary<string, IDictionary<string, string>> _stringAttributesCreated;
         private IDictionary<string, IDictionary<string, bool>> _booleanAttributesCreated;
         private IDictionary<string, IDictionary<string, int>> _intAttributesCreated;
@@ -71,6 +71,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             _fromPeriodIndexParameter = 0;
             _toPeriodIndexParameter = 10;
 
+            _substructsCreated = new HashSet<string>();
             _stringAttributesCreated = new Dictionary<string, IDictionary<string, string>>();
             _booleanAttributesCreated = new Dictionary<string, IDictionary<string, bool>>();
             _intAttributesCreated = new Dictionary<string, IDictionary<string, int>>();
@@ -325,6 +326,26 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             Assert.AreEqual("", _stringAttributesCreated["D"]["FocusCell"]);
             Assert.AreEqual("ClearSelection+Grid.SelectRow(Row,!Row.Selected)", _stringAttributesCreated["D"]["OnFocus"]);
             Assert.AreEqual(1, _intAttributesCreated["D"]["NoColorState"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_ValidRenderingTypeUseGrouping_GroupingSpecificDataSet()
+        {
+            // Arrange
+            _useGroupingParameter = true;
+            var grid = CreateGridBase();
+
+            // Act
+            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+
+            // Assert
+            Assert.AreEqual("Grouping", _stringAttributesCreated["Cfg"]["MainCol"]);
+            Assert.AreEqual("Grouping", _stringAttributesCreated["Header"]["Grouping"]);
+            Assert.IsTrue(_substructsCreated.Contains("C"));
+            Assert.AreEqual("Grouping", _stringAttributesCreated["C"]["Name"]);
+            Assert.AreEqual("Text", _stringAttributesCreated["C"]["Type"]);
+            Assert.AreEqual(0, _intAttributesCreated["C"]["CanMove"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["C"]["CanEdit"]);
         }
 
         [TestMethod]
