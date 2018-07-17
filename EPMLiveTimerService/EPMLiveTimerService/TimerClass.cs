@@ -28,8 +28,11 @@ namespace TimerService
         {
             if (!base.InitializeTask())
                 return false;
+            return true;
+        }
 
-            logMessage("INIT", "STMR", "Clearing Queue");
+        public void ReQueueTimerStuckJobs()
+        {
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
@@ -41,7 +44,7 @@ namespace TimerService
                         try
                         {
                             cn.Open();
-                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
+                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 5", cn))
                             {
                                 cmd.ExecuteNonQuery();
                             }
@@ -54,20 +57,28 @@ namespace TimerService
                         }
                         catch
                         {
-                            return false;
+                            
                         }
 
                     }
                 }
             }
-
-            return true;
         }
+
         DateTime lastRun = DateTime.Now;
+        DateTime lastHeartBeat = DateTime.Now;
+        const int HEART_BEAT_MINUTES = 30;
         public override void RunTask(CancellationToken token)
         {
             try
             {
+                DateTime newHeartBeat = DateTime.Now;
+                if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
+                {
+                    lastHeartBeat = newHeartBeat;
+                    ReQueueTimerStuckJobs();
+                }
+               
                 SPWebApplicationCollection _webcolections = GetWebApplications();
                 foreach (SPWebApplication webApp in _webcolections)
                 {
