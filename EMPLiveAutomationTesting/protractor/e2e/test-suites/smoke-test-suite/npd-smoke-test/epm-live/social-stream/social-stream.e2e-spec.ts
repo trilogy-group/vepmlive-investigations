@@ -83,11 +83,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
-<<<<<<< HEAD
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
-=======
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(newFile.newFileName)))
->>>>>>> origin/TestAutomation
             .toBe(true,
                 ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
@@ -170,15 +166,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-<<<<<<< HEAD
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(title)))
-=======
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(title)))
->>>>>>> origin/TestAutomation
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
-
-
     it('Add an item from Social Stream - [1124294]', async () => {
         const stepLogger = new StepLogger(1124294);
 
