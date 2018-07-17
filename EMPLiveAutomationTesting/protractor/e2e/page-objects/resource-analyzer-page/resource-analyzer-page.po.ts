@@ -16,16 +16,17 @@ export class ResourceAnalyzerPage extends BasePage {
         return element(By.xpath('//*[@tab_id= \'tab_Display\']//*[text()=\'Analyzer\']'));
     }
     static get viewTab() {
-        return element(By.xpath('//*[@tab_id= \'tab_View\']'));
+        return element(By.css('[tab_id= \'tab_View\']'));
     }
     static getTopAnalyserTabButtonById(id: string) {
-        return element(By.xpath(`//*[@id='idAnalyzerTabDiv_ul']//*[@id='${id}']`));
+        return element(By.css(`#idAnalyzerTabDiv_ul #'${id}'`));
     }
+
     static getTopViewTabButtonById(id: string) {
-        return element(By.xpath(`//*[@id='idViewTabDiv_ul']//*[@id='${id}']`));
+        return element(By.css(`#idViewTabDiv_ul #'${id}'`));
     }
     static getBottomTabButtonById(id: string) {
-        return element(By.xpath(`//*[@id='idBottomTabDiv_ribbon']//*[@id='${id}']`));
+        return element(By.css(`#idBottomTabDiv_ribbon #'${id}'`));
     }
     static getBottomTabButtonByText(text: string) {
         return element(By.xpath(`//*[@id='idBottomTabDiv_ribbon']//*[contains(text(),'${text}')]//parent::a`));

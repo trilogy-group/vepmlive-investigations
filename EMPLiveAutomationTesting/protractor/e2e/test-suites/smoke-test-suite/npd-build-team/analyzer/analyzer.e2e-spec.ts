@@ -28,7 +28,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
         stepLogger.stepId(1);
         stepLogger.step('Click Cancel button in Select Analyzer Periods popup window and validate it ');
-        await ResourceAnalyzerPageHelper.resourceAnalyzerCancelButton(stepLogger);
+        await ResourceAnalyzerPageHelper.verifyResourceAnalyzerCancelButtonFunctionality(stepLogger);
         stepLogger.stepId(2);
         stepLogger.step('Click on Display button in Select Analyzer Periods popup windowand validate it ');
         await CommonPageHelper.resourceAnalyzerViaRibbon(stepLogger);
