@@ -65,7 +65,7 @@ namespace EPMLiveCore.API
                              if (bErrors)
                                 cmd.Parameters.AddWithValue("@status", 0);
                             else
-                                cmd.Parameters.AddWithValue("@status", 3);
+                                cmd.Parameters.AddWithValue("@status", 2);
 
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             cmd.ExecuteNonQuery();
