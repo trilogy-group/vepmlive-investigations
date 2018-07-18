@@ -47,9 +47,7 @@ namespace EPMLiveCore.Tests.Jobs
                 ItemGetGuid = id => new object()
             };
 
-            var listItemCollection = new ShimSPListItemCollection
-            {
-            };
+            var listItemCollection = new ShimSPListItemCollection();
 
             var webList = new ShimSPList
             {
@@ -100,7 +98,13 @@ namespace EPMLiveCore.Tests.Jobs
             _resourceUrl = "  ";
 
             // Act
-            var result = ResourcePlan.ProcessResourcePlan(_resourceUrl, _webShim.Instance, _resourcePlanListsString, _siteId, _hours, _workdays);
+            var result = ResourcePlan.ProcessResourcePlan(
+                _resourceUrl, 
+                _webShim.Instance, 
+                _resourcePlanListsString, 
+                _siteId, 
+                _hours, 
+                _workdays);
 
             // Assert
             Assert.AreEqual(0, result.InfoMessages.Count);
@@ -116,7 +120,13 @@ namespace EPMLiveCore.Tests.Jobs
             _resourcePlanListsString = null;
 
             // Act
-            var result = ResourcePlan.ProcessResourcePlan(_resourceUrl, _webShim.Instance, _resourcePlanListsString, _siteId, _hours, _workdays);
+            var result = ResourcePlan.ProcessResourcePlan(
+                _resourceUrl, 
+                _webShim.Instance, 
+                _resourcePlanListsString,
+                _siteId,
+                _hours,
+                _workdays);
 
             // Assert
             Assert.AreEqual(1, result.ResourceLinks.Count);
@@ -139,7 +149,13 @@ namespace EPMLiveCore.Tests.Jobs
                 };
 
             // Act
-            var result = ResourcePlan.ProcessResourcePlan(_resourceUrl, _webShim.Instance, _resourcePlanListsString, _siteId, _hours, _workdays);
+            var result = ResourcePlan.ProcessResourcePlan(
+                _resourceUrl,
+                _webShim.Instance,
+                _resourcePlanListsString,
+                _siteId,
+                _hours,
+                _workdays);
 
             // Assert
             Assert.AreEqual(1, result.ResourceLinks.Count);
@@ -166,7 +182,13 @@ namespace EPMLiveCore.Tests.Jobs
                 };
 
             // Act
-            var result = ResourcePlan.ProcessResourcePlan(_resourceUrl, _webShim.Instance, _resourcePlanListsString, _siteId, _hours, _workdays);
+            var result = ResourcePlan.ProcessResourcePlan(
+                _resourceUrl,
+                _webShim.Instance,
+                _resourcePlanListsString,
+                _siteId,
+                _hours, 
+                _workdays);
 
             // Assert
             Assert.IsTrue(isPlanListItemProcessingCalled);

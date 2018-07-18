@@ -156,8 +156,7 @@ namespace EPMLiveCore.Jobs
                 resPlanLists,
                 siteId,
                 hours,
-                workdays
-            );
+                workdays);
 
             foreach(var resourceLinkRow in processingResult.ResourceLinkRows)
             {
@@ -178,7 +177,9 @@ namespace EPMLiveCore.Jobs
             foreach(var errorMessage in processingResult.ErrorMessages)
             {
                 bErrors = true;
-                sbErrors.Append("...<font color=\"red\">Error: " + errorMessage + "</font>");
+                sbErrors.Append("...<font color=\"red\">Error: ")
+                    .Append(errorMessage)
+                    .Append("</font>");
             }
         }
 

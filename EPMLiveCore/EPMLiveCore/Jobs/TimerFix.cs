@@ -283,14 +283,13 @@ namespace EPMLiveCore.Jobs
         {
             var resourceUrl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            var processingResult = ResourcePlan.ProcessResourcePlan(
+            var processingResult = ProcessResourcePlan(
                 resourceUrl,
                 web,
                 resPlanLists,
                 siteId,
                 hours,
-                workdays
-            );
+                workdays);
 
             foreach (var resourceLinkRow in processingResult.ResourceLinkRows)
             {
@@ -311,7 +310,9 @@ namespace EPMLiveCore.Jobs
             foreach (var errorMessage in processingResult.ErrorMessages)
             {
                 bErrors = true;
-                sbErrors.Append("...<font color=\"red\">Error: " + errorMessage + "</font>");
+                sbErrors.Append("...<font color=\"red\">Error: ")
+                    .Append(errorMessage)
+                    .Append("</font>");
             }
         }
 

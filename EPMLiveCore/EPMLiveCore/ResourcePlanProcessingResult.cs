@@ -11,8 +11,8 @@ namespace EPMLiveCore
         public readonly IList<string> InfoMessages = new List<string>();
         public readonly IList<string> ErrorMessages = new List<string>();
 
-        public IList<ResourceLink> ResourceLinks = new List<ResourceLink>();
-        public IList<ResourceInfo> ResourceInfos = new List<ResourceInfo>();
+        public readonly IList<ResourceLink> ResourceLinks = new List<ResourceLink>();
+        public readonly IList<ResourceInfo> ResourceInfos = new List<ResourceInfo>();
 
         public IEnumerable<object[]> ResourceLinkRows
         {
