@@ -62,11 +62,8 @@ namespace EPMLiveCore.API
                     {
                         using (SqlCommand cmd = new SqlCommand("update queue set status = @status, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
                         {
-                             if (bErrors)
-                                cmd.Parameters.AddWithValue("@status", 0);
-                            else
-                                cmd.Parameters.AddWithValue("@status", 2);
-
+                            var paramValue = bErrors ? 0 : 2;
+                            cmd.Parameters.AddWithValue("@status", paramValue);
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             cmd.ExecuteNonQuery();
                         }
