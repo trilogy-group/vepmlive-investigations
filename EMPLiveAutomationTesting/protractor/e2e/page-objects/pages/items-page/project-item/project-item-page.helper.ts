@@ -156,7 +156,19 @@ export class ProjectItemPageHelper {
             overallHealthOnTrack,
             projectUpdateManual,
             stepLogger);
+        stepLogger.verification('Navigate to page');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
 
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+            stepLogger);
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
         return projectNameValue;
     }
 
@@ -382,5 +394,43 @@ export class ProjectItemPageHelper {
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
+    static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
+        projectNameValue = projectNameValue + 'Edited';
+        stepLogger.verification('"Edit Project" page is displayed');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+        await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
+        await PageHelper.click(CommonPage.formButtons.save);
+        stepLogger.verification('"Project - New Item" window is closed');
+        await expect(await CommonPage.dialogTitle.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+            stepLogger);
 
+        stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
+        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+    }
+    static async    deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+        await CommonPageHelper.deleteOptionViaRibbon(stepLogger);
+        stepLogger.verification('Navigate to page');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+            stepLogger);
+        stepLogger.step('Validating deleted Project  is not  Present');
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.noProjecrMsg))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.noDataFound));
+
+    }
 }

@@ -62,4 +62,5 @@ export class RiskItemPage extends BasePage {
             },
         };
     }
+
 }

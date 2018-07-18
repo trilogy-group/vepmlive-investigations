@@ -23,7 +23,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     it('Validate the Functionality of Edit Resource plan- [2488591]', async () => {
         const stepLogger = new StepLogger(2488591);
         stepLogger.stepId(1);
-        const hours = '10.00';
+        const hours = 10.00;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,

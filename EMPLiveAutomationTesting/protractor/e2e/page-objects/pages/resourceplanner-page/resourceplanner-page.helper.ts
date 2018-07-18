@@ -9,7 +9,7 @@ import {ResourcePlannerConstants} from './resourceplanner-page.constants';
 
 export class ResourcePlannerPageHelper  {
 
-    static async validatingAddingHoursFunctionality(stepLogger: StepLogger, hours: string) {
+    static async validatingAddingHoursFunctionality(stepLogger: StepLogger, hours: number) {
         // first deleting all the resources
 
         stepLogger.stepId(1);
@@ -23,7 +23,7 @@ export class ResourcePlannerPageHelper  {
         await  this.addUser(stepLogger);
 
         stepLogger.stepId(3);
-        await this.inputHourAndSave(stepLogger);
+        await this.inputHourAndSave(stepLogger, hours );
 
         stepLogger.stepId(4);
         await expect(await PageHelper.isElementDisplayed(ResourceplannerPage.greenCheckImg))
@@ -31,9 +31,10 @@ export class ResourcePlannerPageHelper  {
         await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
-    static async inputHourAndSave(stepLogger: StepLogger) {
+    static async inputHourAndSave(stepLogger: StepLogger, hours: number) {
+        stepLogger.step('input hour and save it');
         await PageHelper.click(ResourceplannerPage.selectMonth);
-        await PageHelper.sendKeysToInputField(ResourceplannerPage.inputHours, hours );
+        await PageHelper.sendKeysToInputField(ResourceplannerPage.inputHours, hours.toString() );
         await PageHelper.click(CommonPage.ribbonItems.save);
         if (PageHelper.isElementDisplayed(ResourceplannerPage.yesButton)) {
             await PageHelper.click(ResourceplannerPage.yesButton);

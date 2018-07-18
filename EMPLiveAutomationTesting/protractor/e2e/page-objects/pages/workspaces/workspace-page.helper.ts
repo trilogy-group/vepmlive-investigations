@@ -8,10 +8,11 @@ import { PageHelper } from '../../../components/html/page-helper';
 import { CommonPage } from '../common/common.po';
 import { ValidationsHelper } from '../../../components/misc-utils/validation-helper';
 import { TextboxHelper } from '../../../components/html/textbox-helper';
+import {browser} from 'protractor';
 
 export class WorkspacePageHelper {
 
-static async createWorkspace(stepLogger: StepLogger) {
+  static async createWorkspace(stepLogger: StepLogger) {
     stepLogger.stepId(1);
     stepLogger.step('Click on Workspaces icon from the left navigation panel');
     await PageHelper.click(CommonPage.sidebarMenus.workspaces);
@@ -53,4 +54,16 @@ static async createWorkspace(stepLogger: StepLogger) {
         .toBe(true, ValidationsHelper.getNotificationDisplayedValidation(WorkspacesConstants.notification));
     return title;
     }
+     static async validateLatestNotification(stepLogger: StepLogger , title: string ) {
+        let maxAttempts = 0;
+        while (!((await CommonPage.latestNotification.getText()).includes(title.replace('* ', ''))) && maxAttempts++ < 10) {
+            browser.refresh();
+            await PageHelper.click(CommonPage.personIcon);
+            await browser.sleep(PageHelper.timeout.xs);
+        }
+        stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
+        displayed in the pop down`);
+        await expect(await CommonPage.latestNotification.getText())
+    .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
+}
 }
