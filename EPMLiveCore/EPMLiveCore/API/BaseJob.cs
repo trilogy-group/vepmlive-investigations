@@ -60,8 +60,13 @@ namespace EPMLiveCore.API
 
                     //if (!tempJob)
                     {
-                        using (SqlCommand cmd = new SqlCommand("update queue set status = 2, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = @status, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
                         {
+                             if (bErrors)
+                                cmd.Parameters.AddWithValue("@status", 0);
+                            else
+                                cmd.Parameters.AddWithValue("@status", 3);
+
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             cmd.ExecuteNonQuery();
                         }
