@@ -12,8 +12,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it(
-        'Add, Edit and Delete Change - [829742]', async () => {
+    it('Add, Edit and Delete Change - [829742]', async () => {
         const stepLogger = new StepLogger(829742);
         stepLogger.stepId(1);
         const titleValue = await ChangeItemPageHelper.createNewChangeAndValidateIt(stepLogger);

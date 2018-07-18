@@ -245,7 +245,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Generate Resource Capacity Heat Map Report - [743180]', async () => {
         const stepLogger = new StepLogger(743180);
         stepLogger.stepId(1);
-        const hours = '10.00' ;
+        const hours = 10.00 ;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -364,7 +364,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('Generate "Resource Available Vs. Planned by Dept." reports. - [743185]', async () => {
         const stepLogger = new StepLogger(743185);
         stepLogger.stepId(1);
-        const hours = '10.00' ;
+        const hours = 10.00 ;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -414,7 +414,7 @@ describe(SuiteNames.smokeTestSuite, () => {
     it('View the Work hours via Resource Work vs Capacity report. - [59772477]', async () => {
         const stepLogger = new StepLogger(743185);
         stepLogger.stepId(1);
-        const hours = '10.00' ;
+        const hours = 10.00 ;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
