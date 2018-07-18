@@ -64,7 +64,7 @@ namespace TimerService
         }
 
         DateTime lastRun = DateTime.Now;
-        var lastHeartBeat = DateTime.Now;
+        DateTime lastHeartBeat = DateTime.Now;
         const int HEARTBEATMINUTES = 30;
         public override void RunTask(CancellationToken token)
         {
