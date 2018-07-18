@@ -62,7 +62,9 @@ namespace EPMLiveCore.Jobs
                             sErrors = ex.ToString();
                         }
                     }
-                    buildResPlanInfo();
+
+                    dtResInfo = BuildResourceInfoDataTable();
+                    dtResLink = BuildResourceLinkDataTable();
 
                     int hours = 0;
                     string workdays = " ";
@@ -220,27 +222,6 @@ namespace EPMLiveCore.Jobs
             }
         }
 
-        private void buildResPlanInfo()
-        {
-            dtResInfo = new DataTable();
-            dtResInfo.Columns.Add("Project");
-            dtResInfo.Columns.Add("Title");
-            dtResInfo.Columns.Add("AssignedTo");
-            dtResInfo.Columns.Add("StartDate", typeof(DateTime));
-            dtResInfo.Columns.Add("DueDate", typeof(DateTime));
-            dtResInfo.Columns.Add("ItemType");
-            dtResInfo.Columns.Add("Status");
-            dtResInfo.Columns.Add("Work");
-            dtResInfo.Columns.Add("SiteId", typeof(Guid));
-
-            dtResLink = new DataTable();
-            dtResLink.Columns.Add("weburl");
-            dtResLink.Columns.Add("resurl");
-            dtResLink.Columns.Add("siteid", typeof(Guid));
-            dtResLink.Columns.Add("nonworkdays");
-            dtResLink.Columns.Add("workhours");
-        }
-
         private void storeResPlanInfo()
         {
             using (SqlConnection cn = CreateConnection())
@@ -303,6 +284,36 @@ namespace EPMLiveCore.Jobs
             }
 
             return resUrl;
+        }
+
+        public static DataTable BuildResourceInfoDataTable()
+        {
+            var result = new DataTable();
+
+            result.Columns.Add("Project");
+            result.Columns.Add("Title");
+            result.Columns.Add("AssignedTo");
+            result.Columns.Add("StartDate", typeof(DateTime));
+            result.Columns.Add("DueDate", typeof(DateTime));
+            result.Columns.Add("ItemType");
+            result.Columns.Add("Status");
+            result.Columns.Add("Work");
+            result.Columns.Add("SiteId", typeof(Guid));
+
+            return result;
+        }
+
+        public static DataTable BuildResourceLinkDataTable()
+        {
+            var result = new DataTable();
+
+            result.Columns.Add("weburl");
+            result.Columns.Add("resurl");
+            result.Columns.Add("siteid", typeof(Guid));
+            result.Columns.Add("nonworkdays");
+            result.Columns.Add("workhours");
+
+            return result;
         }
     }
 }
