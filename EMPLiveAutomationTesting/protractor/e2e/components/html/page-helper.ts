@@ -136,11 +136,11 @@ export class PageHelper {
         // because your test involves client-side navigation, which can interfere with Protractor's bootstrapping.
         // See http://git.io/v4gXM for details
         return browser.driver.get(url);
-    }
+  }
     static async closeTab(windowNumber = 1) {
-        const handles = await browser.getAllWindowHandles();
-        const newWindowHandle = handles[windowNumber]; // this is your new window
-        if (newWindowHandle) {
+         const handles = await browser.getAllWindowHandles();
+         const newWindowHandle = handles[windowNumber]; // this is your new window
+         if (newWindowHandle) {
             await browser.driver.close();
             await browser.switchTo().window(handles[0]);
         }
