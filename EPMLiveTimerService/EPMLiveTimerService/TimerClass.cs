@@ -26,9 +26,7 @@ namespace TimerService
 
         public override bool InitializeTask()
         {
-            if (!base.InitializeTask())
-                return false;
-            return true;
+            return base.InitializeTask();
         }
 
         public void ReQueueTimerStuckJobs()
@@ -66,14 +64,14 @@ namespace TimerService
         }
 
         DateTime lastRun = DateTime.Now;
-        DateTime lastHeartBeat = DateTime.Now;
-        const int HEART_BEAT_MINUTES = 30;
+        var lastHeartBeat = DateTime.Now;
+        const int HEARTBEATMINUTES = 30;
         public override void RunTask(CancellationToken token)
         {
             try
             {
                 DateTime newHeartBeat = DateTime.Now;
-                if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
+                if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEARTBEATMINUTES, 0))
                 {
                     lastHeartBeat = newHeartBeat;
                     ReQueueTimerStuckJobs();
