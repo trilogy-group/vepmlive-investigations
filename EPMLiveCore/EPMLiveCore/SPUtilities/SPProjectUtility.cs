@@ -243,6 +243,8 @@ namespace EPMLiveCore.SPUtilities
                             break;
                     }
                     break;
+                default:
+                    break;
             }
 
             return true;

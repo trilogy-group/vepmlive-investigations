@@ -185,7 +185,7 @@ namespace EPMLiveCore.Tests
             // Arrange
             _projectInfo.StatusCode = System.Net.HttpStatusCode.Forbidden;
             string urlUsed = null;
-            SPRedirectFlags flagsUsed = SPRedirectFlags.Default;
+            var flagsUsed = SPRedirectFlags.Default;
             ShimSPUtility.RedirectStringSPRedirectFlagsHttpContext = (url, flags, context) =>
             {
                 urlUsed = url;
@@ -393,7 +393,6 @@ namespace EPMLiveCore.Tests
             _testable.BtnOK_Click();
 
             // Assert
-            //baseURL + url + ", " + title
             Assert.IsTrue(_dbUpdateExecuted);
             Assert.AreEqual(_testable.txtURL.Text + ", " + _testable.txtTitle.Text, _workspaceUrl);
         }

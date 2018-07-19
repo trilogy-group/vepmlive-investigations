@@ -18,9 +18,9 @@ namespace EPMLiveCore
     {
         private SPProjectUtility _spProjectUtility = new SPProjectUtility();
 
-        protected string baseURL = "";
-        protected string metaDataString = "";
-        protected string processString = "";
+        protected string baseURL = string.Empty;
+        protected string metaDataString = string.Empty;
+        protected string processString = string.Empty;
         protected bool requiredOK = true;
         protected Button btnOK;
         protected DropDownList DdlGroup;
@@ -31,7 +31,7 @@ namespace EPMLiveCore
         protected TextBox txtTitle;
         protected Label label1;
         protected Panel Panel2;
-        protected string URL = "";
+        protected string URL = string.Empty;
         protected RadioButton rdoTopLinkYes;
         protected RadioButton rdoTopLinkNo;
         protected RadioButton rdoUnique;
@@ -77,7 +77,7 @@ namespace EPMLiveCore
 
                         inpName.Title = "Workspace Name";
                         txtTitle.Text = strName;
-                        txtURL.Text = strName.ToLower().Replace(" ", "");
+                        txtURL.Text = strName.ToLower().Replace(" ", string.Empty);
                         btnOK.Text = "Create Workspace";
 
                         if (projectInfo.IsNavigationEnabled.HasValue)
@@ -270,23 +270,30 @@ namespace EPMLiveCore
                     pnlURL.Visible = false;
                     pnlURLBad.Visible = false;
 
-                    var url = txtURL.Text;
-                    var title = txtTitle.Text;
-                    var group = DdlGroup.SelectedItem.Value;
+                    var inputUrl = txtURL.Text;
+                    var inputTitle = txtTitle.Text;
+                    var inputGroup = DdlGroup.SelectedItem.Value;
 
                     if (requiredOK)
                     {
-                        if (IsAlphaNumeric(title))
+                        if (IsAlphaNumeric(inputTitle))
                         {
-                            var err = CoreFunctions.createSite(title, url, group, SPContext.Current.Web.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, web);
-                            if (err.Substring(0, 1) == "0")
+                            var errorCode = CoreFunctions.createSite(
+                                inputTitle, 
+                                inputUrl, 
+                                inputGroup, 
+                                SPContext.Current.Web.CurrentUser.LoginName, 
+                                rdoUnique.Checked, 
+                                rdoTopLinkYes.Checked, web);
+
+                            if (errorCode.Substring(0, 1) == "0")
                             {
                                 SPListItem li = null;
                                 try
                                 {
                                     var workspacelist = web.Lists["Workspace Center"];
                                     li = workspacelist.Items.Add();
-                                    li["URL"] = baseURL + url + ", " + title;
+                                    li["URL"] = baseURL + inputUrl + ", " + inputTitle;
                                     li.Update();
 
                                     int workspaceID = li.ID;
@@ -297,14 +304,14 @@ namespace EPMLiveCore
                                     WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.LayoutPage, TraceSeverity.VerboseEx, ex.ToString());
                                 }
 
-                                using (var newWeb = web.Webs[url])
+                                using (var newWeb = web.Webs[inputUrl])
                                 {
                                     retURL = createProject(newWeb, curList);
                                 }
                             }
                             else
                             {
-                                label1.Text = err;
+                                label1.Text = errorCode;
                                 Panel2.Visible = true;
                             }
                         }
@@ -314,7 +321,6 @@ namespace EPMLiveCore
                             Panel2.Visible = true;
                         }
                     }
-                    
                 }
                 catch (Exception ex)
                 {
