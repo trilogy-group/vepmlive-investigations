@@ -1111,7 +1111,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
-                    LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, true, 2050);
+                    LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, false, 2050);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1251,7 +1251,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
-                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, true, 2050);
+                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, 2050);
                 });
 
                 _sqlErrorOccurred = true;
@@ -2065,7 +2065,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessage(ex);
-                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, true, 2040);
+                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, 2040);
                 });
             }
             return _conClientReporting;
