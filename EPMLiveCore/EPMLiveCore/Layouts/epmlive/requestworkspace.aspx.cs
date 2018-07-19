@@ -22,7 +22,7 @@ namespace EPMLiveCore
 {
     public partial class requestworkspace : LayoutsPageBase
     {
-        private SPProjectUtility _sharePointProjectUtility = new SPProjectUtility();
+        private SPProjectUtility _spProjectUtility = new SPProjectUtility();
 
         protected string baseURL = "";
         protected string metaDataString = "";
@@ -57,19 +57,25 @@ namespace EPMLiveCore
 
             if (!IsPostBack)
             {
-                var info = _sharePointProjectUtility.RequestProjectInfoExtended(new Guid(Request["List"]), int.Parse(Request["id"]));
+                var projectInfo = _spProjectUtility.RequestProjectInfoExtended();
 
-                switch (info.StatusCode)
+                switch (projectInfo.StatusCode)
                 {
                     case HttpStatusCode.Forbidden:
                         SPUtility.Redirect("accessdenied.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
                         break;
                     default:
-                        URL = info.ServerRelativeUrl;
-                        strName = info.WorkspaceName;
-                        baseURL = info.BaseUrl;
+                        var workspaceInfo = _spProjectUtility.RequestWorkspaceInfo(
+                            new Guid(Request["List"]), 
+                            int.Parse(Request["id"]));
 
-                        foreach (DictionaryEntry dictionaryEntry in info.PopulatedTemplates)
+                        listName = workspaceInfo.ListName;
+                        strName = workspaceInfo.WorkspaceName;
+
+                        URL = projectInfo.ServerRelativeUrl;
+                        baseURL = projectInfo.BaseUrl;
+
+                        foreach (DictionaryEntry dictionaryEntry in projectInfo.PopulatedTemplates)
                         {
                             var li = new ListItem(dictionaryEntry.Key.ToString(), dictionaryEntry.Value.ToString());
                             DdlGroup.Items.Add(li);
@@ -80,7 +86,7 @@ namespace EPMLiveCore
                         txtURL.Text = strName.ToLower().Replace(" ", "");
                         btnOK.Text = "Create Workspace";
 
-                        if (info.IsNavigationEnabled)
+                        if (projectInfo.IsNavigationEnabled)
                         {
                             rdoTopLinkYes.Checked = true;
                             rdoTopLinkNo.Enabled = false;
@@ -93,7 +99,7 @@ namespace EPMLiveCore
                             rdoTopLinkYes.Enabled = false;
                         }
 
-                        if (info.IsUnique)
+                        if (projectInfo.IsUnique)
                         {
                             rdoInherit.Checked = false;
                             rdoUnique.Checked = true;
@@ -108,7 +114,7 @@ namespace EPMLiveCore
                             rdoInherit.Checked = true;
                         }
 
-                        if (info.IsWorkspaceExisting)
+                        if (projectInfo.IsWorkspaceExisting)
                         {
                             wsTypeNew = "checked disabled=\"true\"";
                             wsTypeExisting = " disabled=\"true\"";

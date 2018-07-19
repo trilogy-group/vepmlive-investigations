@@ -15,9 +15,9 @@ namespace EPMLiveCore.SPUtilities
 {
     public class SPProjectUtility
     {
-        public ProjectInfoExtendedResult RequestProjectInfoExtended(Guid listId, int listItemId)
+        public ProjectInfoResult RequestProjectInfoExtended()
         {
-            var result = new ProjectInfoExtendedResult();
+            var result = new ProjectInfoResult();
 
             string login = SPContext.Current.Web.CurrentUser.LoginName;
             string url = SPContext.Current.Web.Url;
@@ -44,24 +44,6 @@ namespace EPMLiveCore.SPUtilities
                         }
 
                         result.ServerRelativeUrl = myweb.ServerRelativeUrl;
-
-                        var list = myweb.Lists[listId];
-                        var gSettings = new GridGanttSettings(list);
-
-                        try
-                        {
-                            string[] tRollupLists = gSettings.RollupLists.Split(',');
-                            result.ListName = tRollupLists[0].Split('|')[0];
-                        }
-                        catch(Exception ex)
-                        {
-                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.LayoutPage, TraceSeverity.VerboseEx, ex.ToString());
-                        }
-
-                        result.WorkspaceName = string.Empty;
-
-                        var li = list.GetItemById(listItemId);
-                        result.WorkspaceName = li.Title;
                         result.BaseUrl = myweb.Url + "/";
 
                         var lockweb = CoreFunctions.getLockedWeb(myweb);
@@ -77,6 +59,42 @@ namespace EPMLiveCore.SPUtilities
                         }
 
                         result.PopulatedTemplates = PopulateTemplates(myweb, result.ValidTemplates);
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        public WorkspaceInfoResult RequestWorkspaceInfo(Guid listId, int listItemId)
+        {
+            var result = new WorkspaceInfoResult();
+
+            string login = SPContext.Current.Web.CurrentUser.LoginName;
+            string url = SPContext.Current.Web.Url;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (SPSite mysite = new SPSite(url))
+                {
+                    using (SPWeb myweb = mysite.OpenWeb())
+                    {
+                        var list = myweb.Lists[listId];
+                        var gSettings = new GridGanttSettings(list);
+
+                        try
+                        {
+                            string[] tRollupLists = gSettings.RollupLists.Split(',');
+                            result.ListName = tRollupLists[0].Split('|')[0];
+                        }
+                        catch (Exception ex)
+                        {
+                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.LayoutPage, TraceSeverity.VerboseEx, ex.ToString());
+                        }
+
+                        result.WorkspaceName = string.Empty;
+
+                        var li = list.GetItemById(listItemId);
+                        result.WorkspaceName = li.Title;
                     }
                 }
             });
@@ -244,22 +262,26 @@ namespace EPMLiveCore.SPUtilities
             return true;
         }
 
-        public class ProjectInfoExtendedResult
+        public class ProjectInfoResult
         {
-            public static readonly ProjectInfoExtendedResult AccessDenied = new ProjectInfoExtendedResult { StatusCode = HttpStatusCode.Forbidden };
+            public static readonly ProjectInfoResult AccessDenied = new ProjectInfoResult { StatusCode = HttpStatusCode.Forbidden };
 
             public HttpStatusCode StatusCode = HttpStatusCode.OK;
             public string RedirectUrl;
 
             public string BaseUrl;
             public string ServerRelativeUrl;
-            public string ListName;
-            public string WorkspaceName;
             public bool IsNavigationEnabled;
             public bool IsUnique;
             public bool IsWorkspaceExisting;
             public IList<string> ValidTemplates = new List<string>();
             public SortedList PopulatedTemplates = new SortedList();
+        }
+
+        public class WorkspaceInfoResult
+        {
+            public string ListName;
+            public string WorkspaceName;
         }
     }
 }
