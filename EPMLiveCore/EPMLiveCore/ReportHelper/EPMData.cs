@@ -20,6 +20,14 @@ namespace EPMLiveCore.ReportHelper
         private readonly Guid _webAppId;
         private Guid _webId;
 
+        private const int MaxKilobytes = 32768;
+        private const string DotDelimiter = ".";
+        private const string EpmLiveKey = "EPM Live";
+        private const string EpmLiveReportingKey = "EPMLive Reporting";
+        private const string GetClientReportingConnectionKey = "GetClientReportingConnection";
+        private const string GetMasterDbConnectionKey = "GetMasterDbConnection";
+        private const string OpenEpmLiveConnectionKey = "OpenEPMLiveConnection";
+
         private string _DefaultLists;
         private string _command;
         private CommandType _commandType = CommandType.Text;
@@ -328,17 +336,39 @@ namespace EPMLiveCore.ReportHelper
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetClientReportingConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionKey, eventMessage, 2040);
                     });
                 }
                 return _conClientReporting;
+            }
+        }
+
+        private string CreateEventMessage(Exception exception)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            return $"Name: {_siteName} Url: {_siteUrl} ID: {_siteID} : {exception.Message}{exception.StackTrace}";
+        }
+
+        private void LogWindowsEvents(string logName, string source, string eventMessage, int eventId)
+        {
+            var fullSource = $"{EpmLiveReportingKey} - {source}";
+
+            if (!EventLog.SourceExists(fullSource))
+            {
+                EventLog.CreateEventSource(fullSource, logName);
+            }
+
+            using (var eventLog = new EventLog(logName))
+            {
+                eventLog.Source = $"{EpmLiveReportingKey} {source}";
+                eventLog.MaximumKilobytes = MaxKilobytes;
+                eventLog.MachineName = DotDelimiter;
+                eventLog.WriteEntry(eventMessage, EventLogEntryType.Error, eventId);
             }
         }
 
@@ -359,14 +389,8 @@ namespace EPMLiveCore.ReportHelper
                     _sqlError = ex.Message;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetMasterDbConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetMasterDbConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetMasterDbConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2020);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, GetMasterDbConnectionKey, eventMessage, 2020);
                     });
                 }
                 return _conMaster;
@@ -404,6 +428,9 @@ namespace EPMLiveCore.ReportHelper
                         myLog.WriteEntry(
                             "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
                             ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
+
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, OpenEpmLiveConnectionKey, eventMessage, 2010);
                     });
                 }
             }

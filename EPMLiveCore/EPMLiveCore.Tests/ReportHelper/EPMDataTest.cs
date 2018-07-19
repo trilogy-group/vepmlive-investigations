@@ -1,16 +1,28 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveCore.ReportHelper;
-using EPMLiveCore.ReportHelper.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Data;
-using EPMLiveCore.Tests;
+using EPMLiveCore.ReportHelper;
+using EPMLiveCore.ReportHelper.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveCore.Tests.ReportHelper
 {
     [TestClass]
     public class EPMDataTest
     {
+        private readonly EPMData EpmData = new EPMData(Guid.NewGuid());
+        private const string CreateEventMessageMethod = "CreateEventMessage";
+        private const string LogWindowsEventsMethod = "LogWindowsEvents";
+        private Exception _exception;
+        private PrivateObject _privateObject;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _exception = new Exception();
+            _privateObject = new PrivateObject(EpmData);
+        }
+
         [TestMethod]
         public void BulkInsertTest()
         {
@@ -136,9 +148,30 @@ namespace EPMLiveCore.Tests.ReportHelper
             }
         }
 
-        
+        //[TestMethod]
+        //public void CreateEventMessage_WhenExceptionIsNull_ThrowsException()
+        //{
+        //    using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+        //    {
+        //        // Arrange
+        //        _exception = null;
+
+        //        try
+        //        {
+        //            // Act
+        //            _privateObject.Invoke(CreateEventMessageMethod, _exception);
+        //            Assert.Fail("CreateEventMessage: not throw ArgumentNullException");
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Assert
+        //            Assert.IsTrue(ex is ArgumentNullException);
+        //        }
+        //    }
+        //}
 
 
-        
+
+
     }
 }
