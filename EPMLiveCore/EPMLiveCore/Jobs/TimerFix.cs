@@ -283,7 +283,7 @@ namespace EPMLiveCore.Jobs
         {
             var resourceUrl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            var processingResult = ProcessResourcePlan(
+            var processingResult = ResourcePlan.ProcessResourcePlan(
                 resourceUrl,
                 web,
                 resPlanLists,
