@@ -2,10 +2,8 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../helpers/suite-names';
-import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {ResourcePlannerPageHelper} from '../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
 import {StepLogger} from '../../../../core/logger/step-logger';
-import {WaitHelper} from '../../../components/html/wait-helper';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
@@ -32,13 +30,9 @@ describe(SuiteNames.healthCheckTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
-
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(ProjectItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(2);
         // Add hours for the resource added in the top-grid

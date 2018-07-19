@@ -30,7 +30,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())

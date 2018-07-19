@@ -54,16 +54,21 @@ export class WorkspacePageHelper {
         .toBe(true, ValidationsHelper.getNotificationDisplayedValidation(WorkspacesConstants.notification));
     return title;
     }
-     static async validateLatestNotification(stepLogger: StepLogger , title: string ) {
+
+    static async validateLatestNotification(stepLogger: StepLogger , title: string ) {
         let maxAttempts = 0;
+
         while (!((await CommonPage.latestNotification.getText()).includes(title.replace('* ', ''))) && maxAttempts++ < 10) {
+
             browser.refresh();
+
             await PageHelper.click(CommonPage.personIcon);
+
             await browser.sleep(PageHelper.timeout.xs);
         }
+
         stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
-        await expect(await CommonPage.latestNotification.getText())
-    .toContain(title.replace('* ', ''), ValidationsHelper.getLabelDisplayedValidation(title));
+        await CommonPageHelper.labelContainValidation(title.replace('* ', ''));
 }
 }

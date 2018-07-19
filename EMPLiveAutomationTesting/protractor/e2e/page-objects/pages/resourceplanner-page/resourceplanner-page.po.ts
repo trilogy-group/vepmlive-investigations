@@ -11,8 +11,8 @@ export class ResourceplannerPage extends BasePage {
 
     static get selectUser(){
         // selecting User which have department Test department 1
-     return element(By.xpath(`//*[normalize-space(text())=\'${ResourcePlannerConstants.user}\']//'
-     +'following-sibling::td[text()=\'${ResourcePlannerConstants.department}\']`));
+     return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//'
+     +'following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
     }
     static getHoursHeader() {
         // selecting User which have department Test department 1
@@ -33,10 +33,10 @@ export class ResourceplannerPage extends BasePage {
     }
 
     static get greenCheckImg(){
-        return element(By.css('[class*=\'rp-commitment\']'));
+        return element(By.css('[class*="rp-commitment"]'));
     }
     static get privateCheckImg(){
-        return element(By.css('[class*=\'rp-pm-private\']'));
+        return element(By.css('[class*="rp-pm-private"]'));
     }
     static getTopSectionButtonById(id: string) {
     return element(By.css(`#idEditorTabDiv_ul #${id}`));
@@ -46,10 +46,10 @@ export class ResourceplannerPage extends BasePage {
         return element(By.xpath(`#idResourcesTabDiv_ul #${id}`));
     }
     static getTopGridItemsByText(title: string) {
-        return element(By.xpath(`//*[@id='gridDiv_RPE']//td[contains(text(),'${title}')]`));
+        return element(By.xpath(`//*[@id="gridDiv_RPE"]//td[contains(text(),"${title}")]`));
     }
     static getButtomGridItemsByText(title: string) {
-        return element(By.xpath(`//*[@id='g_Res']//td[contains(text(),'${title}')]`));
+        return element(By.xpath(`//*[@id="g_Res"]//td[contains(text(),"${title}")]`));
     }
 
     static get topSection() {

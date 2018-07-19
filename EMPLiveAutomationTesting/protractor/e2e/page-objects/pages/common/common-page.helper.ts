@@ -18,6 +18,7 @@ import {ProjectItemPageHelper} from '../items-page/project-item/project-item-pag
 import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../../resource-analyzer-page/resource-analyzer-page.po';
+
 const fs = require('fs');
 
 export class CommonPageHelper {
@@ -314,7 +315,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.delete);
         await PageHelper.acceptAlert();
     }
-    static async resourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+    static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editResource);
@@ -619,4 +620,37 @@ export class CommonPageHelper {
             `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
             `//u[contains(@class,'${sortingClass}')]`));
     }
-}
+    static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
+        await expect(await PageHelper.isElementDisplayed(targetElement))
+            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(name));
+    }
+    static async notificationDisplayedValidation(targetElement: ElementFinder , name: string) {
+        await expect(await PageHelper.isElementDisplayed(targetElement))
+            .toBe(true, ValidationsHelper.getNotDisplayedValidation(name));
+    }
+    static async labelDisplayedValidation(targetElement: ElementFinder , name: string) {
+        await expect(await PageHelper.isElementPresent(targetElement))
+            .toBe(true,
+                ValidationsHelper.getLabelDisplayedValidation(name));
+    }
+    static async   labelContainValidation( title: string) {
+        await expect(await CommonPage.latestNotification.getText())
+            .toContain(title, ValidationsHelper.getLabelDisplayedValidation(title));
+    }
+    static async windowShouldNotBeDisplayedValidation( name: string) {
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await expect(await CommonPage.dialogTitle.isPresent())
+            .toBe(false,
+                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(name));
+    }
+    static async pageDisplayedValidation( name: string) {
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect((await CommonPage.title.getText()).trim())
+            .toBe(name,
+                ValidationsHelper.getPageDisplayedValidation(name));
+    }
+    static async clickNewLink( stepLogger: StepLogger) {
+        stepLogger.step('click on add new link ')
+        await PageHelper.click(CommonPage.addNewLink);
+    }
+   }

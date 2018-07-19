@@ -59,7 +59,8 @@ export class ElementHelper {
     }
 
     static async rightClickAndSelectNewTab() {
-        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN).sendKeys(protractor.Key.ENTER).perform();
+        return browser.actions().click(protractor.Button.RIGHT).sendKeys(protractor.Key.ARROW_DOWN)
+            .sendKeys(protractor.Key.ENTER).perform();
     }
 
     static async getFocusedElement() {

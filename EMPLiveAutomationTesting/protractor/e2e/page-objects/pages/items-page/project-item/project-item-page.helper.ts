@@ -124,6 +124,12 @@ export class ProjectItemPageHelper {
     }
 
     static async createNewProject(uniqueId: string, stepLogger: StepLogger) {
+        const labels = ProjectItemPageConstants.inputLabels;
+        const projectNameValue = `${labels.projectName} ${uniqueId}`;
+        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
+        const benefits = `${labels.benefits} ${uniqueId}`;
+        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
+        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -132,22 +138,13 @@ export class ProjectItemPageHelper {
             stepLogger);
 
         stepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
-        await PageHelper.click(CommonPage.addNewLink);
+        await CommonPageHelper.clickNewLink(stepLogger);
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(ProjectItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
-        const labels = ProjectItemPageConstants.inputLabels;
-        const projectNameValue = `${labels.projectName} ${uniqueId}`;
-        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
-        const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
-        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
         await ProjectItemPageHelper.fillForm(
             projectNameValue,
@@ -157,6 +154,7 @@ export class ProjectItemPageHelper {
             projectUpdateManual,
             stepLogger);
         stepLogger.verification('Navigate to page');
+
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
@@ -166,9 +164,8 @@ export class ProjectItemPageHelper {
         await CommonPageHelper.searchItemByTitle(projectNameValue,
             ProjectItemPageConstants.columnNames.title,
             stepLogger);
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue),projectNameValue )
+
         return projectNameValue;
     }
 

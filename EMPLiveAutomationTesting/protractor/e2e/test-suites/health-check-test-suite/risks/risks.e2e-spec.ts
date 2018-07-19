@@ -17,12 +17,13 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     it('Add, Edit and Delete Risk- [829719]', async () => {
         const stepLogger = new StepLogger(829719);
         stepLogger.stepId(1);
-        const titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
+        let titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
 
         stepLogger.step('Edit Risk');
-        await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue );
+        titleValue = await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue );
 
         stepLogger.step('Select a Risk and Click on "ITEMS" >> Delete Item');
+
         await RiskItemPageHelper.deleteRiskAndValidateIt(stepLogger, titleValue );
     });
 });

@@ -226,7 +226,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.actionHoverOver(CommonPage.record);
         await ElementHelper.rightClickAndSelectNewTab();
         await PageHelper.switchToNewTabIfAvailable(1);
-        
+
         stepLogger.stepId(3);
         stepLogger.step('Verify The project gets opened in a new tab as shown.');
         await PageHelper.isElementDisplayed(ProjectItemPage.inputs.projectName);

@@ -1,6 +1,5 @@
 import {By, element} from 'protractor';
 import {StepLogger} from '../../../../../core/logger/step-logger';
-import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ProjectItemPageHelper} from '../../items-page/project-item/project-item-page.helper';
 import {HomePage} from '../../homepage/home.po';
@@ -9,6 +8,7 @@ import {ProjectItemPageConstants} from '../../items-page/project-item/project-it
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import {WaitHelper} from '../../../../components/html/wait-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class SocialStreamPageHelper {
 
@@ -29,12 +29,6 @@ export class SocialStreamPageHelper {
 
         await ElementHelper.click(HomePage.toolBarMenuItems.project);
 
-        stepLogger.verification('Verify Project Center - New Item window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(ProjectItemPageConstants.pageName,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
-
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
 
@@ -47,8 +41,8 @@ export class SocialStreamPageHelper {
             stepLogger);
 
         await PageHelper.switchToDefaultContent();
+
         stepLogger.verification('Newly created Project displayed in "Project" page');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+        await CommonPageHelper.labelDisplayedValidation(ElementHelper.getElementByText(projectNameValue), projectNameValue );
     }
 }

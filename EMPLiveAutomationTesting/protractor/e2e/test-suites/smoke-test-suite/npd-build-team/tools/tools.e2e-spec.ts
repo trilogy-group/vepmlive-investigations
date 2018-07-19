@@ -14,12 +14,15 @@ import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
 import {ResourceplannerPage} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.po';
 import {ResourcePlannerConstants} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.constants';
-import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
 import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.constansts';
+// tslint:disable-next-line:max-line-length
+import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 import {ResourceCapacityHeatMapPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-capacity-heatMap-page/resource-capacity-heatMap-page.helper';
+// tslint:disable-next-line:max-line-length
 import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.helper';
 import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
+// tslint:disable-next-line:max-line-length
 import {ResourceAvailablePageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
@@ -252,7 +255,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
@@ -328,13 +331,13 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
         stepLogger.step('Navigate to resource Planner page');
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.resourcePlanner));
-        await ResourcePlannerPageHelper.deletingUser(stepLogger);
+        await ResourcePlannerPageHelper.deletingUserAndSave(stepLogger);
         await ReportingSettingsPageHelper.navigateTo(stepLogger);
         stepLogger.stepId(6);
         // Run Schedule
@@ -371,7 +374,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
@@ -421,7 +424,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        await CommonPageHelper.resourcePlanViaRibbon(stepLogger);
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())

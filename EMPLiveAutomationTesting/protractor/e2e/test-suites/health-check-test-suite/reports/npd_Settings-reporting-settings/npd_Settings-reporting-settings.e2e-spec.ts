@@ -6,6 +6,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {CommonPageHelper} from '../../../../page-objects/pages/common/common-page.helper';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
+// tslint:disable-next-line:max-line-length
 import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {

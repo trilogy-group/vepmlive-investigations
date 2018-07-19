@@ -11,7 +11,6 @@ import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
 import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
-import {CreateNewPageConstants} from '../create-new-page.constants';
 import {CreateNewPage} from '../create-new.po';
 import {HomePage} from '../../homepage/home.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
@@ -160,117 +159,113 @@ export class RiskItemPageHelper {
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Delete" from the options displayed');
+
         await PageHelper.click(RiskItemPage.deleteRisk);
-        let maxAttempts = 0;
-        while (maxAttempts < 5) {
-            try {
-                await PageHelper.acceptAlert();
-                break;
-            } catch (NoAlertPresentException) {
-                stepLogger.step('Alert is not displayed try it again');
-                maxAttempts++;
-                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
-                continue;
-            }
-        }
+
+        await PageHelper.acceptAlert();
+
     }
-    static async  createRiskAndValidateIt(stepLogger: StepLogger) {
+    static async clickCreateNew(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
-        stepLogger.step('Various Create New options are displayed');
-        await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.risk))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.risk));
-        stepLogger.stepId(2);
+
+    }
+    static async clickNewRiskIcon(stepLogger: StepLogger) {
         stepLogger.step('Click on "Risk" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
-        stepLogger.verification('"Risks - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(RiskItemPageConstants.pageName,
-                ValidationsHelper.getPageDisplayedValidation(RiskItemPageConstants.pageName));
 
-        stepLogger.stepId(3);
-        stepLogger.step('Enter/Select required details in "Risks - New Item" window as described below');
+    }
+    static async enterRiskTitle(stepLogger: StepLogger) {
         const uniqueId = PageHelper.getUniqueId();
         const labels = RiskItemPageConstants.inputLabels;
+        const titleValue = `${labels.title} ${uniqueId}`;
+
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
+
         stepLogger.step('Title *: Random New Risk Item');
-        const titleValue = `${labels.title} ${uniqueId}`;
         await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
-        stepLogger.verification('Required values entered/selected in title Field');
-        await expect(await TextboxHelper.hasValue(RiskItemPage.inputs.title, titleValue))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.title, titleValue));
-        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
-        await PageHelper.click(CommonPage.projectShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.inputs.project);
-        const projectName = await RiskItemPage.inputs.project.getText();
-        await PageHelper.click(RiskItemPage.inputs.project);
-        stepLogger.verification('Required values entered/selected in Project Field');
-        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.project, projectName));
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Save" button in "Risks - New Item" window');
-        await PageHelper.click(CommonPage.formButtons.save);
-        stepLogger.verification('"Risks - New Item" window is closed');
-        await expect(await CommonPage.dialogTitle.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName));
-        await PageHelper.switchToDefaultContent();
-        stepLogger
-            .verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
-            .toBe(true,
-                ValidationsHelper.getNotificationDisplayedValidation(RiskItemPageConstants.pageName));
-        stepLogger.stepId(5);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.risks,
-            CommonPage.pageHeaders.projects.risks,
-            CommonPageConstants.pageHeaders.projects.risks,
-            stepLogger);
-        stepLogger.step('Project *:Search Project ');
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            RiskItemPageConstants.columnNames.title,
-            stepLogger);
-        stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(titleValue));
 
         return titleValue;
     }
-    static async  editRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
-        stepLogger.verification('Make some changes and click on \'Save\' button');
-        await CommonPageHelper.editOptionViaRibbon(stepLogger);
-        titleValue = titleValue + 'Edited';
-        await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
+    static async selectProjectFromDropDown(stepLogger: StepLogger) {
+
+        stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
+        await PageHelper.click(CommonPage.projectShowAllButton);
+
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.inputs.project);
+
+        await PageHelper.click(RiskItemPage.inputs.project);
+    }
+    static async saveRisk(stepLogger: StepLogger) {
         stepLogger.step('Click on "Save" button in "Risks - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.risks,
-            CommonPage.pageHeaders.projects.risks,
-            CommonPageConstants.pageHeaders.projects.risks,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            RiskItemPageConstants.columnNames.title,
-            stepLogger);
+
+        stepLogger.verification('"Risks - New Item" window is closed');
+        await CommonPageHelper.windowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName);
+     }
+
+    static async  createRiskAndValidateIt(stepLogger: StepLogger) {
+        stepLogger.step('Enter/Select required details in "Risks - New Item" window as described below');
+
+        await this.clickCreateNew(stepLogger);
+
+        await this.clickNewRiskIcon(stepLogger);
+
+        const titleValue = await this.enterRiskTitle(stepLogger );
+
+        await this.selectProjectFromDropDown(stepLogger );
+
+        await this.saveRisk(stepLogger);
+
+        await PageHelper.switchToDefaultContent();
+
+        stepLogger
+            .verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
+        await CommonPageHelper.notificationDisplayedValidation
+        (CommonPageHelper.getNotificationByText(titleValue), RiskItemPageConstants.pageName );
+
+        await this.searchRiskByTitle(stepLogger, titleValue );
+
+        stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        return titleValue;
+    }
+    static async  editRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+        await this.searchRiskByTitle(stepLogger, titleValue );
+
+        stepLogger.step('Make some changes and click on "Save" button');
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
+
+        titleValue = titleValue + 'Edited';
+        await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
+
+        await this.saveRisk(stepLogger);
+        return titleValue;
 
     }
-    static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
-        await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
+    static  async searchRiskByTitle(stepLogger: StepLogger , titleValue: string) {
+        stepLogger.step('Navigate to risk page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
+
+        stepLogger.step('Search risk by title');
         await CommonPageHelper.searchItemByTitle(titleValue,
             RiskItemPageConstants.columnNames.title,
             stepLogger);
-        stepLogger.step('Validating deleted Risk  is not  Present');
-        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.noProjecrMsg))
-            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.noDataFound));
     }
+
+    static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+        await this.searchRiskByTitle(stepLogger, titleValue );
+
+        await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
+
+        await this.searchRiskByTitle(stepLogger, titleValue );
+
+        stepLogger.step('Validating deleted Risk  is not  Present');
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound );
+      }
 }
