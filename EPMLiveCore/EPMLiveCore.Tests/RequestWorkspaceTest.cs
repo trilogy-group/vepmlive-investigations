@@ -37,7 +37,6 @@ namespace EPMLiveCore.Tests
                 WorkspaceName = "test-workspace"
             };
 
-
             ShimSPProjectUtility.AllInstances.RequestProjectInfo = (instance) =>
             {
                 return _projectInfo;

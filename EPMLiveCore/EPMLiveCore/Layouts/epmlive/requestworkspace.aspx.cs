@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
+using System.Collections;
+using System.Text.RegularExpressions;
+using System.Net;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
-using System.Xml;
-using System.Data.SqlClient;
-using System.Collections;
-using System.Text.RegularExpressions;
 using EPMLiveCore.SPUtilities;
-using System.Net;
 using Microsoft.SharePoint.Utilities;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
@@ -54,7 +47,7 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            btnOK.Attributes.Add("onclick", "javascript:" + btnOK.ClientID + ".disabled=true;");
+            btnOK.Attributes.Add("onclick", string.Format("javascript:{0}.disabled=true;", btnOK.ClientID));
 
             if (!IsPostBack)
             {

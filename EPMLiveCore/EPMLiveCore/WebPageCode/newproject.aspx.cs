@@ -1,16 +1,16 @@
 using System;
+using System.Collections;
+using System.Text.RegularExpressions;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
-using System.Collections;
-using System.Text.RegularExpressions;
-using EPMLiveCore.Infrastructure.Logging;
-using static EPMLiveCore.Infrastructure.Logging.LoggingService;
-using System.Net;
 using Microsoft.SharePoint.Utilities;
+using EPMLiveCore.Infrastructure.Logging;
 using EPMLiveCore.SPUtilities;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
 {
@@ -44,7 +44,7 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            btnOK.Attributes.Add("onclick", "javascript:" + btnOK.ClientID + ".disabled=true;");
+            btnOK.Attributes.Add("onclick", string.Format("javascript:{0}.disabled=true;", btnOK.ClientID));
             
             if (!IsPostBack)
             {
