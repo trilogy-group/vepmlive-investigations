@@ -9,7 +9,7 @@ namespace PortfolioEngineCore
 
     public class dbaCostTypes
     {
-        public const int RatePerProjectPublishMainKey = 101;
+        private const int RatePerProjectPublishMainKey = 101;
 
         private const string DeletePostScheduleOnProjectRateChangeQuery =
             "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY = 101 AND CT_ID = @CT_ID";
@@ -831,8 +831,7 @@ namespace PortfolioEngineCore
                 command.Parameters.AddWithValue(CostTypeIdQueryParameter, costTypeId);
                 command.ExecuteNonQuery();
             }
-
-            // create config with new values
+            
             AddPostScheduleOnProjectRateChange(dba, costTypeId, calendarId);
         }
 
