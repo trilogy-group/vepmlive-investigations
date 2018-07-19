@@ -20,12 +20,18 @@ namespace EPMLiveCore.Tests.Testables
             base.rdoTopLinkNo = new RadioButton();
             base.rdoInherit = new RadioButton();
             base.rdoUnique = new RadioButton();
+            txtTitle = new TextBox();
             Page = new System.Web.UI.Page();
         }
 
         public void Page_Load()
         {
             base.Page_Load(this, null);
+        }
+
+        public void BtnOK_Click()
+        {
+            base.BtnOK_Click(this, null);
         }
     }
 }

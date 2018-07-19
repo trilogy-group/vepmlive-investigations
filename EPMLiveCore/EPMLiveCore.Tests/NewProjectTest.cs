@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using EPMLiveCore.SPUtilities.Fakes;
 using EPMLiveCore.Tests.Testables;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,20 +17,77 @@ namespace EPMLiveCore.Tests
     [TestClass]
     public class NewProjectTest
     {
+        private const string _webAtUrlSuffix = "@url";
+
         private IDisposable _shimsContext;
         private NewProjectTestable _testable;
         private ProjectInfoResult _projectInfo;
-        
+        private IDictionary<string, string> _requestParameters;
+        private string _serverRelativeUrl;
+        private string _redirectUrl;
+        private bool _dbUpdateExecuted;
+
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
             _testable = new NewProjectTestable();
             _projectInfo = new ProjectInfoResult();
+            _requestParameters = new Dictionary<string, string>();
+            _serverRelativeUrl = "http://test.test";
+            _redirectUrl = null;
+            _dbUpdateExecuted = false;
 
             ShimSPProjectUtility.AllInstances.RequestProjectInfo = (instance) =>
             {
                 return _projectInfo;
+            };
+
+            var webShim = new ShimSPWeb
+            {
+                CurrentUserGet = () => new ShimSPUser(),
+                ServerRelativeUrlGet = () => _serverRelativeUrl,
+                ListsGet = () => new ShimSPListCollection
+                {
+                    ItemGetString = (key) => new ShimSPList
+                    {
+                        ItemsGet = () => new ShimSPListItemCollection
+                        {
+                            Add = () => new ShimSPListItem
+                            {
+                                ItemSetStringObject = (liName, value) => { },
+                                Update = () => _dbUpdateExecuted = true
+                            }
+                        },
+                        FormsGet = () => new ShimSPFormCollection
+                        {
+                            ItemGetPAGETYPE = (pageType) => new ShimSPForm
+                            {
+                                ServerRelativeUrlGet = () => _serverRelativeUrl
+                            }
+                        }
+                    }
+                }
+            };
+
+            webShim.WebsGet = () => new ShimSPWebCollection
+            {
+                ItemGetString = name => new ShimSPWeb(webShim) // TODO: Spoof Url
+            };
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                WebGet = () => webShim
+            };
+
+            ShimPage.AllInstances.RequestGet = (instance) => new ShimHttpRequest
+            {
+                ItemGetString = (name) => _requestParameters[name]
+            };
+
+            ShimPage.AllInstances.ResponseGet = (instance) => new ShimHttpResponse
+            {
+                RedirectString = (url) => _redirectUrl = url
             };
         }
 
@@ -193,6 +249,36 @@ namespace EPMLiveCore.Tests
             Assert.IsTrue(_testable.rdoInherit.Checked);
             Assert.IsFalse(_testable.rdoUnique.Enabled);
             Assert.IsFalse(_testable.rdoInherit.Enabled);
+        }
+
+        [TestMethod]
+        public void BtnOKClick_WorkspaceExistingUrlEmpty_ProjectCreatedAtWebAtUrl()
+        {
+            // Arrange
+            _requestParameters["hdnWorkspaceType"] = "Existing";
+            _requestParameters["hdnSelectedWorkspace"] = "!test";
+
+            // Act
+            _testable.BtnOK_Click();
+
+            // Assert
+            Assert.IsTrue(_dbUpdateExecuted);
+            Assert.AreEqual(_serverRelativeUrl + _webAtUrlSuffix + "?ID=" + 0, _redirectUrl);
+        }
+
+        [TestMethod]
+        public void BtnOKClick_WorkspaceExistingUrlNotEmpty_ProjectCreatedAtWebAtUrl()
+        {
+            // Arrange
+            _requestParameters["hdnWorkspaceType"] = "Existing";
+            _requestParameters["hdnSelectedWorkspace"] = string.Empty;
+
+            // Act
+            _testable.BtnOK_Click();
+
+            // Assert
+            Assert.IsTrue(_dbUpdateExecuted);
+            Assert.AreEqual(_serverRelativeUrl + "?ID=" + 0, _redirectUrl);
         }
     }
 }
