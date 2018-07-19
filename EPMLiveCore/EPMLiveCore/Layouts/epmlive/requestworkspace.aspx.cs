@@ -14,11 +14,16 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
+using EPMLiveCore.SPUtilities;
+using System.Net;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
 {
     public partial class requestworkspace : LayoutsPageBase
     {
+        private SPProjectUtility _sharePointProjectUtility = new SPProjectUtility();
+
         protected string baseURL = "";
         protected string metaDataString = "";
         protected string processString = "";
@@ -44,127 +49,78 @@ namespace EPMLiveCore
         protected string listName;
         protected string strName;
 
-        protected Microsoft.SharePoint.WebControls.InputFormSection inpName;
-
-        ArrayList validTemplates = new ArrayList();
+        protected InputFormSection inpName;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-
             btnOK.Attributes.Add("onclick", "javascript:" + btnOK.ClientID + ".disabled=true;");
 
             if (!IsPostBack)
             {
-                string login = SPContext.Current.Web.CurrentUser.LoginName;
-                string url = SPContext.Current.Web.Url;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                var info = _sharePointProjectUtility.RequestProjectInfoExtended(new Guid(Request["List"]), int.Parse(Request["id"]));
+
+                switch (info.StatusCode)
                 {
-                    using(SPSite mysite = new SPSite(url))
-                    {
-                        using(SPWeb myweb = mysite.OpenWeb())
+                    case HttpStatusCode.Forbidden:
+                        SPUtility.Redirect("accessdenied.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                        break;
+                    default:
+                        URL = info.ServerRelativeUrl;
+                        strName = info.WorkspaceName;
+                        baseURL = info.BaseUrl;
+
+                        foreach (DictionaryEntry dictionaryEntry in info.PopulatedTemplates)
                         {
-                            myweb.Site.CatchAccessDeniedException = false;
-                            try
-                            {
-                                if (!myweb.DoesUserHavePermissions(login, SPBasePermissions.ManageSubwebs))
-                                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            catch
-                            {
-                                Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            URL = myweb.ServerRelativeUrl;
-
-                            SPList list = myweb.Lists[new Guid(Request["List"])];
-
-                            GridGanttSettings gSettings = new GridGanttSettings(list);
-
-                            try
-                            {
-                                string[] tRollupLists = gSettings.RollupLists.Split(',');
-                                listName = tRollupLists[0].Split('|')[0];
-                            }
-                            catch { }
-                            strName = "";
-
-                            SPListItem li = list.GetItemById(int.Parse(Request["id"]));
-                            strName = li.Title;
-
-                            inpName.Title = "Workspace Name";
-                            txtTitle.Text = strName;
-                            txtURL.Text = strName.ToLower().Replace(" ", "");
-                            btnOK.Text = "Create Workspace";
-
-                            baseURL = myweb.Url + "/";
-                            Guid lockweb = CoreFunctions.getLockedWeb(myweb);
-                            if (lockweb != Guid.Empty)
-                            {
-                                //using (SPWeb web = myweb.Site.AllWebs[lockweb])
-                                using(SPWeb web = myweb.Site.AllWebs[lockweb])
-                                {
-                                    string wsType = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-                                    string nav = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
-                                    string perms = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
-
-                                    string sTemplates = CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates");
-
-                                    if (sTemplates != "")
-                                    {
-                                        string[] ssTemplates = sTemplates.Split('|');
-                                        foreach (string sTemplate in ssTemplates)
-                                        {
-                                            validTemplates.Add(sTemplate);
-                                        }
-                                    }
-
-
-                                    if (nav == "True")
-                                    {
-                                        rdoTopLinkYes.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-                                    else if (nav == "False")
-                                    {
-                                        rdoTopLinkNo.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-
-                                    if (perms == "Unique")
-                                    {
-                                        rdoInherit.Checked = false;
-                                        rdoUnique.Checked = true;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                    }
-                                    else if (perms == "Same")
-                                    {
-                                        rdoUnique.Checked = false;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                        rdoInherit.Checked = true;
-                                    }
-
-                                    if (wsType == "New")
-                                    {
-                                        wsTypeNew = "checked disabled=\"true\"";
-                                        wsTypeExisting = " disabled=\"true\"";
-
-                                    }
-                                    else if (wsType == "Existing")
-                                    {
-                                        wsTypeNew = " disabled=\"true\"";
-                                        wsTypeExisting = "checked disabled=\"true\"";
-                                        Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
-                                    }
-                                }
-                            }
-                            populateTemplates(myweb);
+                            var li = new ListItem(dictionaryEntry.Key.ToString(), dictionaryEntry.Value.ToString());
+                            DdlGroup.Items.Add(li);
                         }
-                    }
-                });
+
+                        inpName.Title = "Workspace Name";
+                        txtTitle.Text = strName;
+                        txtURL.Text = strName.ToLower().Replace(" ", "");
+                        btnOK.Text = "Create Workspace";
+
+                        if (info.IsNavigationEnabled)
+                        {
+                            rdoTopLinkYes.Checked = true;
+                            rdoTopLinkNo.Enabled = false;
+                            rdoTopLinkYes.Enabled = false;
+                        }
+                        else
+                        {
+                            rdoTopLinkNo.Checked = true;
+                            rdoTopLinkNo.Enabled = false;
+                            rdoTopLinkYes.Enabled = false;
+                        }
+
+                        if (info.IsUnique)
+                        {
+                            rdoInherit.Checked = false;
+                            rdoUnique.Checked = true;
+                            rdoUnique.Enabled = false;
+                            rdoInherit.Enabled = false;
+                        }
+                        else
+                        {
+                            rdoUnique.Checked = false;
+                            rdoUnique.Enabled = false;
+                            rdoInherit.Enabled = false;
+                            rdoInherit.Checked = true;
+                        }
+
+                        if (info.IsWorkspaceExisting)
+                        {
+                            wsTypeNew = "checked disabled=\"true\"";
+                            wsTypeExisting = " disabled=\"true\"";
+                        }
+                        else
+                        {
+                            wsTypeNew = " disabled=\"true\"";
+                            wsTypeExisting = "checked disabled=\"true\"";
+                            Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
+                        }
+                        break;
+                }
             }
         }
 
