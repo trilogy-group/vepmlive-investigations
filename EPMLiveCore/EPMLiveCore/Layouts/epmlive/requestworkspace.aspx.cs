@@ -60,10 +60,8 @@ namespace EPMLiveCore
                 string url = SPContext.Current.Web.Url;
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    //using (SPSite mysite = new SPSite(url))
                     using(SPSite mysite = new SPSite(url))
                     {
-                        //using (SPWeb myweb = mysite.OpenWeb())
                         using(SPWeb myweb = mysite.OpenWeb())
                         {
                             myweb.Site.CatchAccessDeniedException = false;
@@ -168,75 +166,6 @@ namespace EPMLiveCore
                     }
                 });
             }
-        }
-
-        private void populateTemplates(SPWeb site)
-        {
-            SortedList sl = new SortedList();
-            string version = getMajorVersion(site);
-            foreach (SPWebTemplate template in site.GetAvailableWebTemplates(site.Language))
-            {
-                if (!template.IsHidden)
-                {
-                    if (!template.Title.Contains("EPM Live"))
-                    {
-                        if (validTemplates.Count == 0)
-                        {
-                            if (template.IsCustomTemplate && isValidTemplate(template.Title, version, site))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
-                        }
-                        else
-                        {
-                            if (validTemplates.Contains(template.Title))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (DictionaryEntry de in sl)
-            {
-                ListItem li = new ListItem(de.Key.ToString(), de.Value.ToString());
-                DdlGroup.Items.Add(li);
-            }
-        }
-
-        private bool isValidTemplate(string template, string version, SPWeb web)
-        {
-            if (version == "2")
-            {
-                switch (template)
-                {
-                    case "Basic Project Workspace":
-                    case "Enterprise Project Management Workgroup":
-                        return false;
-                };
-            }
-            else if (version == "1")
-            {
-                switch (template)
-                {
-                    case "Project Workspace":
-                        return false;
-                }
-            }
-            return true;
-        }
-
-
-        private string getMajorVersion(SPWeb web)
-        {
-            try
-            {
-                string[] fullversion = web.Properties["TemplateVersion"].Split('.');
-                return fullversion[0];
-            }
-            catch { }
-            return "1";
         }
 
         private string createProject(SPWeb newWeb, SPList curList)
