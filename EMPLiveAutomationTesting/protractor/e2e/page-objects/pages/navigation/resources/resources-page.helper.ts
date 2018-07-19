@@ -7,6 +7,7 @@ import {ResourcesPageConstants} from './resources-page.constants';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {WaitHelper} from '../../../../components/html/wait-helper';
+import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class ResourcesPageHelper {
 
@@ -37,34 +38,46 @@ export class ResourcesPageHelper {
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ResourcesPageConstants.editPageName));
     }
-    static async addResourceAndValidateIt(stepLogger: StepLogger) {
+    static async clickNewInviteLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "+ Invite" link displayed on top of "Resources" page');
-        await expect(await PageHelper.isElementDisplayed(ResourcesPage.newInviteLink, true))
-            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(ResourcesPageConstants.inviteLink));
-        await PageHelper.click(ResourcesPage.newInviteLink);
-        stepLogger.verification('"Resources - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(ResourcesPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ResourcesPageConstants.pageName));
+        await CommonPageHelper.buttonDisplayedValidation(ResourcesPage.newInviteLink, ResourcesPageConstants.inviteLink );
 
-        stepLogger.stepId(2);
+        await PageHelper.click(ResourcesPage.newInviteLink);
+
+    }
+    static async selectGenericBox(stepLogger: StepLogger) {
         stepLogger.step(`Check 'Generic' check box`);
         await PageHelper.click(ResourcesPage.inputs.generic);
+    }
+    static async clickSearchIcon(stepLogger: StepLogger) {
+        stepLogger.step('Click on search');
+        await PageHelper.click(ResourcesPage.searchIcon);
+    }
+    static async addResourceAndValidateIt(stepLogger: StepLogger) {
+        const uniqueId = PageHelper.getUniqueId();
+        const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
+
+        stepLogger.step('Click on "+ Invite" link displayed on top of "Resources" page');
+        await this.clickNewInviteLink(stepLogger);
+
+        stepLogger.verification('"Resources - New Item" window is displayed');
+        await CommonPageHelper.pageDisplayedValidation(ResourcesPageConstants.pagePrefix);
+
+        stepLogger.stepId(2);
+        await this.selectGenericBox(stepLogger);
 
         stepLogger.stepId(3);
         stepLogger.step('Provide values in required fields');
-        const uniqueId = PageHelper.getUniqueId();
-        const displayName = `${ResourcesPageConstants.inputLabels.displayName} ${uniqueId}`;
         await this.fillFormAndSave(displayName, stepLogger);
 
         stepLogger.stepId(4);
-        stepLogger.step('Click on search');
-        await PageHelper.click(ResourcesPage.searchIcon);
+        await this.clickSearchIcon(stepLogger);
+
         stepLogger.step('Enter newly created resource name');
         await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
+
         stepLogger.verification('Newly created Resource [Ex: Display Name 1] displayed in "Resources" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(displayName)))
-            .toBe(true, ValidationsHelper.getLabelDisplayedValidation(displayName));
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(displayName), displayName );
+
     }
 }

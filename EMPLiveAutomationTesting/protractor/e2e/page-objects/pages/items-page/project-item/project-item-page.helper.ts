@@ -15,6 +15,7 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
+
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -122,6 +123,18 @@ export class ProjectItemPageHelper {
         stepLogger.step('Click on Project record');
         await PageHelper.click(CommonPageHelper.getRowForTableData(firstTableColumns));
     }
+    static  async searchProjectByTitle(stepLogger: StepLogger , projectNameValue: string) {
+        stepLogger.step('Search Project by title');
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        await CommonPageHelper.searchItemByTitle(projectNameValue,
+            ProjectItemPageConstants.columnNames.title,
+            stepLogger);
+    }
 
     static async createNewProject(uniqueId: string, stepLogger: StepLogger) {
         const labels = ProjectItemPageConstants.inputLabels;
@@ -153,18 +166,10 @@ export class ProjectItemPageHelper {
             overallHealthOnTrack,
             projectUpdateManual,
             stepLogger);
-        stepLogger.verification('Navigate to page');
 
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
+        await this.searchProjectByTitle(stepLogger, projectNameValue );
 
-        await CommonPageHelper.searchItemByTitle(projectNameValue,
-            ProjectItemPageConstants.columnNames.title,
-            stepLogger);
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue),projectNameValue )
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue );
 
         return projectNameValue;
     }
@@ -395,39 +400,28 @@ export class ProjectItemPageHelper {
         await CommonPageHelper.editOptionViaRibbon(stepLogger);
         projectNameValue = projectNameValue + 'Edited';
         stepLogger.verification('"Edit Project" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-        await expect(await CommonPage.title.getText())
-            .toBe(ProjectItemPageConstants.pagePrefix,
-                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
+
         await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
+
         await PageHelper.click(CommonPage.formButtons.save);
+
         stepLogger.verification('"Project - New Item" window is closed');
-        await expect(await CommonPage.dialogTitle.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
-        await CommonPageHelper.searchItemByTitle(projectNameValue,
-            ProjectItemPageConstants.columnNames.title,
-            stepLogger);
+        await CommonPageHelper.windowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName);
+
+        await this.searchProjectByTitle(stepLogger, projectNameValue );
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(projectNameValue)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
+
     }
     static async    deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
         await CommonPageHelper.deleteOptionViaRibbon(stepLogger);
-        stepLogger.verification('Navigate to page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(projectNameValue,
-            ProjectItemPageConstants.columnNames.title,
-            stepLogger);
-        stepLogger.step('Validating deleted Project  is not  Present');
-        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.noProjecrMsg))
-            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.noDataFound));
 
-    }
+        stepLogger.verification('Navigate to page');
+        await this.searchProjectByTitle(stepLogger, projectNameValue );
+
+        stepLogger.step('Validating deleted Project  is not  Present');
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+     }
 }

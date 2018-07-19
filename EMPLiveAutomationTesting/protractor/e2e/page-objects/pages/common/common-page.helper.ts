@@ -18,6 +18,8 @@ import {ProjectItemPageHelper} from '../items-page/project-item/project-item-pag
 import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../../resource-analyzer-page/resource-analyzer-page.po';
+import {ResourcesPage} from '../navigation/resources/resources.po';
+import {ResourcesPageConstants} from '../navigation/resources/resources-page.constants';
 
 const fs = require('fs');
 
@@ -311,13 +313,16 @@ export class CommonPageHelper {
     }
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
+
         stepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.delete);
+
         await PageHelper.acceptAlert();
     }
     static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+
         await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
     }
@@ -643,6 +648,10 @@ export class CommonPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(name));
     }
+    static async buttonDisplayedValidation(targetElement: ElementFinder , name: string ) {
+        await expect(await PageHelper.isElementDisplayed(targetElement, true))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(name));
+    }
     static async pageDisplayedValidation( name: string) {
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await expect((await CommonPage.title.getText()).trim())
@@ -650,7 +659,7 @@ export class CommonPageHelper {
                 ValidationsHelper.getPageDisplayedValidation(name));
     }
     static async clickNewLink( stepLogger: StepLogger) {
-        stepLogger.step('click on add new link ')
+        stepLogger.step('click on add new link ');
         await PageHelper.click(CommonPage.addNewLink);
     }
    }
