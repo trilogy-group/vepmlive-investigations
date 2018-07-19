@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient.Fakes;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.Fakes;
 using EPMLiveCore.Fakes;
@@ -16,16 +18,14 @@ namespace EPMLiveCore.Tests.ReportHelper
     [TestClass]
     public class EPMDataTest
     {
-        private static Guid _dummyGuid = new Guid();
+        private static readonly Guid DummyGuid = new Guid();
+        private const string DummyCommand = "Dummy Command";
         private const string DummyName = "Dummy Name";
         private const string DummyString = "Dummy String";
         private const string DummyUrl = "http://www.dummy.com";
         private const string CreateEventMessageMethod = "CreateEventMessage";
+        private const string CreateEventMessageWithParamsMethod = "CreateEventMessageWithParams";
         private const string LogWindowsEventsMethod = "LogWindowsEvents";
-
-        private const int MaxKilobytes = 32768;
-        private const string DotDelimiter = ".";
-        private const string EpmLiveKey = "EPM Live";
         private const string EpmLiveReportingKey = "EPMLive Reporting";
 
         private int _eventId;
@@ -211,6 +211,66 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
+        public void CreateEventMessageWithParams_WhenExceptionIsNull_ThrowsException()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForContructor();
+
+                var epmData = new EPMData(Guid.NewGuid());
+                _privateObject = new PrivateObject(epmData);
+                _exception = null;
+
+                var sqlParameters = new List<SqlParameter>();
+
+                try
+                {
+                    // Act
+                    _privateObject.Invoke(CreateEventMessageWithParamsMethod, _exception, DummyCommand, sqlParameters);
+                    Assert.Fail("CreateEventMessageWithParamsMethod: not throw ArgumentNullException");
+                }
+                catch (Exception ex)
+                {
+                    // Assert
+                    Assert.IsTrue(ex is ArgumentNullException);
+                }
+            };
+        }
+
+        [TestMethod]
+        public void CreateEventMessageWithParams_ShouldFillAllMessageParameters_ReturnsString()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForContructor();
+
+                var guid = Guid.NewGuid();
+                var epmData = new EPMData(guid);
+                _privateObject = new PrivateObject(epmData);
+                _exception = new ArgumentNullException(nameof(epmData));
+
+                var sqlParameters = new List<SqlParameter>
+                {
+                    new SqlParameter(DummyName, SqlDbType.Int),
+                    new SqlParameter(DummyString, null)
+                };
+                var cmdDetails = $"Command: {DummyCommand}";
+                var cmdParams = CreateParametersResult(sqlParameters);
+
+                // Act
+                var message = _privateObject.Invoke(CreateEventMessageWithParamsMethod, _exception, DummyCommand, sqlParameters);
+
+                // Assert
+                var result = $"Name: {DummyName} Url: {DummyUrl}  ID: {guid} : {_exception.Message}{cmdDetails}{cmdParams}";
+                Assert.AreEqual(result, message);
+            };
+        }
+
+        [TestMethod]
         public void LogWindowsEvents_ShouldCreateEventLog_WriteEntry()
         {
             using (ShimsContext.Create())
@@ -269,6 +329,20 @@ namespace EPMLiveCore.Tests.ReportHelper
             _eventMessage = DummyUrl;
         }
 
+        private static string CreateParametersResult(IEnumerable<SqlParameter> parameters)
+        {
+            var cmdParams = " Params: ";
+
+            foreach (var param in parameters)
+            {
+                cmdParams = param.Value != DBNull.Value
+                    ? $"{cmdParams}[Name:{param.ParameterName} Value:{param.Value}],"
+                    : $"{cmdParams}[Name:{param.ParameterName} Value: Null],";
+            }
+
+            return cmdParams;
+        }
+
         private static void FakesForSpSecurity()
         {
             ShimSqlConnection.ConstructorString = (_, stringConn) => new ShimSqlConnection();
@@ -291,7 +365,7 @@ namespace EPMLiveCore.Tests.ReportHelper
                 {
                     ServerRelativeUrlGet = () => DummyUrl,
                     NameGet = () => DummyName,
-                    IDGet = () => _dummyGuid
+                    IDGet = () => DummyGuid
                 }
             };
         }
