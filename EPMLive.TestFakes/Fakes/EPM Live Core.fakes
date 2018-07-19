@@ -23,5 +23,6 @@
     <Add FullName="EPMLiveCore.ControlDataBuilder!"/>
     <Add FullName="EPMLiveCore.LookupConfigData!"/>
     <Add FullName="EPMLiveCore.SPUtilities.SPListUtility!"/>
+    <Add FullName="EPMLiveCore.SPUtilities.SPProjectUtility!"/>
   </ShimGeneration>
 </Fakes>

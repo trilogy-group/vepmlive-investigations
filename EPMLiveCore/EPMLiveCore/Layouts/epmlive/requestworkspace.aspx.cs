@@ -57,7 +57,7 @@ namespace EPMLiveCore
 
             if (!IsPostBack)
             {
-                var projectInfo = _spProjectUtility.RequestProjectInfoExtended();
+                var projectInfo = _spProjectUtility.RequestProjectInfo();
 
                 switch (projectInfo.StatusCode)
                 {
@@ -86,40 +86,28 @@ namespace EPMLiveCore
                         txtURL.Text = strName.ToLower().Replace(" ", "");
                         btnOK.Text = "Create Workspace";
 
-                        if (projectInfo.IsNavigationEnabled)
+                        if (projectInfo.IsNavigationEnabled.HasValue)
                         {
-                            rdoTopLinkYes.Checked = true;
-                            rdoTopLinkNo.Enabled = false;
-                            rdoTopLinkYes.Enabled = false;
-                        }
-                        else
-                        {
-                            rdoTopLinkNo.Checked = true;
+                            rdoTopLinkYes.Checked = projectInfo.IsNavigationEnabled == true;
+                            rdoTopLinkNo.Checked = projectInfo.IsNavigationEnabled == false;
                             rdoTopLinkNo.Enabled = false;
                             rdoTopLinkYes.Enabled = false;
                         }
 
-                        if (projectInfo.IsUnique)
+                        if (projectInfo.IsUnique.HasValue)
                         {
-                            rdoInherit.Checked = false;
-                            rdoUnique.Checked = true;
+                            rdoUnique.Checked = projectInfo.IsUnique == true;
+                            rdoInherit.Checked = projectInfo.IsUnique == false;
                             rdoUnique.Enabled = false;
                             rdoInherit.Enabled = false;
-                        }
-                        else
-                        {
-                            rdoUnique.Checked = false;
-                            rdoUnique.Enabled = false;
-                            rdoInherit.Enabled = false;
-                            rdoInherit.Checked = true;
                         }
 
-                        if (projectInfo.IsWorkspaceExisting)
+                        if (projectInfo.IsWorkspaceExisting == false)
                         {
                             wsTypeNew = "checked disabled=\"true\"";
                             wsTypeExisting = " disabled=\"true\"";
                         }
-                        else
+                        else if (projectInfo.IsWorkspaceExisting == true)
                         {
                             wsTypeNew = " disabled=\"true\"";
                             wsTypeExisting = "checked disabled=\"true\"";

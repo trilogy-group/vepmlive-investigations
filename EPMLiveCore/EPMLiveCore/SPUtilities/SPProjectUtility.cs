@@ -15,7 +15,7 @@ namespace EPMLiveCore.SPUtilities
 {
     public class SPProjectUtility
     {
-        public ProjectInfoResult RequestProjectInfoExtended()
+        public ProjectInfoResult RequestProjectInfo()
         {
             var result = new ProjectInfoResult();
 
@@ -102,9 +102,9 @@ namespace EPMLiveCore.SPUtilities
             return result;
         }
 
-        private bool ReadConfigWorkspaceFlag(SPWeb web)
+        private bool? ReadConfigWorkspaceFlag(SPWeb web)
         {
-            bool result;
+            bool? result;
 
             var wsType = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
             switch (wsType)
@@ -116,21 +116,16 @@ namespace EPMLiveCore.SPUtilities
                     result = true;
                     break;
                 default:
-                    result = false;
-                    WriteTrace(
-                        Area.EPMLiveCore,
-                        Categories.EPMLiveCore.LayoutPage,
-                        TraceSeverity.VerboseEx,
-                        "Unexpected workspace new flag value: " + wsType);
+                    result = null;
                     break;
             }
 
             return result;
         }
 
-        private bool ReadConfigUniqueFlag(SPWeb web)
+        private bool? ReadConfigUniqueFlag(SPWeb web)
         {
-            bool result;
+            bool? result;
 
             var perms = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
             switch (perms)
@@ -142,30 +137,21 @@ namespace EPMLiveCore.SPUtilities
                     result = false;
                     break;
                 default:
-                    result = false;
-                    WriteTrace(
-                        Area.EPMLiveCore,
-                        Categories.EPMLiveCore.LayoutPage,
-                        TraceSeverity.VerboseEx,
-                        "Unexpected unique flag value: " + perms);
+                    result = null;
                     break;
             }
 
             return result;
         }
 
-        private bool ReadConfigNavigationFlag(SPWeb web)
+        private bool? ReadConfigNavigationFlag(SPWeb web)
         {
             bool result;
 
             var nav = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
             if (!bool.TryParse(nav, out result))
             {
-                WriteTrace(
-                    Area.EPMLiveCore,
-                    Categories.EPMLiveCore.LayoutPage,
-                    TraceSeverity.VerboseEx,
-                    "Unexpected navigation flag value: " + nav);
+                return null;
             }
 
             return result;
@@ -271,9 +257,9 @@ namespace EPMLiveCore.SPUtilities
 
             public string BaseUrl;
             public string ServerRelativeUrl;
-            public bool IsNavigationEnabled;
-            public bool IsUnique;
-            public bool IsWorkspaceExisting;
+            public bool? IsNavigationEnabled;
+            public bool? IsUnique;
+            public bool? IsWorkspaceExisting;
             public IList<string> ValidTemplates = new List<string>();
             public SortedList PopulatedTemplates = new SortedList();
         }
