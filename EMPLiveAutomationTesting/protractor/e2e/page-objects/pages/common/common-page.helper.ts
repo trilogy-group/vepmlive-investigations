@@ -74,7 +74,9 @@ export class CommonPageHelper {
         const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
         return currentDate;
     }
-
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
     public static get getYesterdayInMMDDYYYY() {
         const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
         return tomorrowDate;

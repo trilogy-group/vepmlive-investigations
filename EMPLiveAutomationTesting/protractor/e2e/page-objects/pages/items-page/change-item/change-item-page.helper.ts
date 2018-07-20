@@ -64,9 +64,7 @@ export class ChangeItemPageHelper {
     static async createChangeLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "Change" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
-        stepLogger.verification('"Changes - New Item" window is displayed');
-        await CommonPageHelper.pageDisplayedValidation(ChangeItemPageConstants.pageName);
-    }
+       }
     static async createNewChangeAndValidateIt(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await this.createNewChange(stepLogger);
@@ -120,8 +118,16 @@ export class ChangeItemPageHelper {
             ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        return titleValue;
       }
     static async deleteChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            stepLogger,
+            titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
+
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
