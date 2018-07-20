@@ -15,7 +15,6 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {RiskItemPageHelper} from '../risk-item/risk-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item/project-item-page.constants';
 import {ProjectItemPage} from '../project-item/project-item.po';
-import {IssueItemPageConstants} from '../issue-item/issue-item-page.constants';
 
 export class ChangeItemPageHelper {
     static async fillForm(titleValue: string, priority: string, stepLogger: StepLogger) {

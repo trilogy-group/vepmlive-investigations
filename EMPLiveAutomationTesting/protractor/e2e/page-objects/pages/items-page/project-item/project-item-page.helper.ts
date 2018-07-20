@@ -1,4 +1,3 @@
-import {browser, By, element, ElementFinder, protractor} from 'protractor';
 import {ProjectItemPage} from './project-item.po';
 import {ProjectItemPageConstants} from './project-item-page.constants';
 import {StepLogger} from '../../../../../core/logger/step-logger';
@@ -6,6 +5,7 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {PageHelper} from '../../../../components/html/page-helper';
 import {ElementHelper} from '../../../../components/html/element-helper';
+import {browser, By, element, ElementFinder} from 'protractor';
 import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 import {CommonPage} from '../../common/common.po';
@@ -15,7 +15,6 @@ import {HomePage} from '../../homepage/home.po';
 import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {ComponentHelpers} from '../../../../components/devfactory/component-helpers/component-helpers';
 import {MyTimeOffPage} from '../../my-workplace/my-time-off/my-time-off.po';
-
 export class ProjectItemPageHelper {
     static async fillForm(projectNameValue: string,
                           projectDescription: string,
@@ -125,12 +124,6 @@ export class ProjectItemPageHelper {
     }
 
     static async createNewProject(uniqueId: string, stepLogger: StepLogger) {
-        const labels = ProjectItemPageConstants.inputLabels;
-        const projectNameValue = `${labels.projectName} ${uniqueId}`;
-        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
-        const benefits = `${labels.benefits} ${uniqueId}`;
-        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
-        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -139,13 +132,22 @@ export class ProjectItemPageHelper {
             stepLogger);
 
         stepLogger.step('Click on "+ New item" link displayed on top of "Project Center" Page');
-        await CommonPageHelper.clickNewLink(stepLogger);
+        await PageHelper.click(CommonPage.addNewLink);
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await expect(await CommonPage.title.getText())
+            .toBe(ProjectItemPageConstants.pagePrefix,
+                ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
 
         stepLogger.step('Enter/Select required details in "Project Center - New Item" window as described below');
+        const labels = ProjectItemPageConstants.inputLabels;
+        const projectNameValue = `${labels.projectName} ${uniqueId}`;
+        const projectDescription = `${labels.projectDescription} ${uniqueId}`;
+        const benefits = `${labels.benefits} ${uniqueId}`;
+        const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
+        const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
         await ProjectItemPageHelper.fillForm(
             projectNameValue,
@@ -154,15 +156,6 @@ export class ProjectItemPageHelper {
             overallHealthOnTrack,
             projectUpdateManual,
             stepLogger);
-
-        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
-            projectNameValue,
-            ProjectItemPageConstants.columnNames.title);
-
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue );
 
         return projectNameValue;
     }
@@ -243,7 +236,7 @@ export class ProjectItemPageHelper {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Verify Project page is displayed');
-        await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(projectNameValue)))
+        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getElementByText(projectNameValue)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(projectNameValue));
 
         stepLogger.step('Navigate and open specific project page');
@@ -296,9 +289,9 @@ export class ProjectItemPageHelper {
 
     static get getlink() {
         return {
-            myLanguageAndRegion: ElementHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
-            adminUser: ElementHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
-            region: ElementHelper.getElementByText(ProjectItemPageConstants.region),
+            myLanguageAndRegion: CommonPageHelper.getElementByText(ProjectItemPageConstants.userInformation.myLanguageAndRegion),
+            adminUser: CommonPageHelper.getElementByText(ProjectItemPageConstants.users.adminUser),
+            region: CommonPageHelper.getElementByText(ProjectItemPageConstants.region),
         };
     }
 
@@ -323,7 +316,7 @@ export class ProjectItemPageHelper {
     }
     static get button() {
         return {
-            ok: ElementHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
+            ok: CommonPageHelper.getElementByText(ProjectItemPageConstants.inputLabels.ok),
         };
     }
 
@@ -334,39 +327,9 @@ export class ProjectItemPageHelper {
             work: ProjectItemPageHelper.getField(fields.work),
             duration: ProjectItemPageHelper.getField(fields.duration),
             date: ProjectItemPageHelper.dateField(fields.date),
-            predecessors: ProjectItemPageHelper.getField(fields.predecessors),
         };
 
     }
-
-    static getselectTask(index: number, column: string) {
-        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
-        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains
-        (@class,"${column}")]`));
-    }
-
-    static getFinishDate(index: number) {
-        // because xpath get change when tab selected, it used only once and "GSDataRow" I have managed for other locator.
-        return element(By.xpath(`.//*[@class="GSSection"]/tbody/tr[3]//*[contains(@class,"GSDataRow")][${index}]//*[contains(@class,
-        "GSNoRight") and contains(@class,"Due")]`));
-    }
-
-    static async verifyTitleAndDuration(uniqueId: string, value: string) {
-        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
-            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
-        await expect(await ProjectItemPageHelper.newTasksFields.duration.getText()).toBe(value,
-            ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.duration, value));
-    }
-
-    static async selectCreatedTask() {
-        await ProjectItemPageHelper.getselectTask(1, ProjectItemPageConstants.newTaskFields.start).click();
-        const elm2 = this.getselectTask(2, ProjectItemPageConstants.newTaskFields.start);
-        const elm3 = this.getselectTask(3, ProjectItemPageConstants.newTaskFields.start);
-        await browser.actions().keyDown(protractor.Key.CONTROL).perform();
-        await elm2.click();
-        await elm3.click();
-        await browser.actions().keyUp(protractor.Key.CONTROL).perform();
-        }
 
     static async clickOnViewReports() {
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
@@ -378,53 +341,8 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
     }
 
-    static async removeAssignedUserIfPresent(stepLogger: StepLogger) {
-        stepLogger.step('Removed assigned user from current team');
-        if (await ProjectItemPage.selectTeamMemberCheckBox.isPresent() === true) {
-            await PageHelper.click(ProjectItemPage.selectTeamMemberCheckBox);
-            await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
-        }
-    }
-
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
-    static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
-        await CommonPageHelper.editOptionViaRibbon(stepLogger);
-        projectNameValue = projectNameValue + 'Edited';
-        stepLogger.verification('"Edit Project" page is displayed');
-        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
-        await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
-
-        await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"Project - New Item" window is closed');
-        await CommonPageHelper.windowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName);
-
-        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
-            projectNameValue,
-            ProjectItemPageConstants.columnNames.title);
-
-        stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
-
-    }
-    static async    deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
-        await CommonPageHelper.deleteOptionViaRibbon(stepLogger);
-
-        stepLogger.verification('Navigate to page');
-        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger,
-            projectNameValue,
-            ProjectItemPageConstants.columnNames.title);
-
-        stepLogger.step('Validating deleted Project  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
-     }
 }
