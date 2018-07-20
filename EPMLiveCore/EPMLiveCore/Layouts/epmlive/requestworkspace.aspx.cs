@@ -18,9 +18,9 @@ namespace EPMLiveCore
     {
         private SPProjectUtility _spProjectUtility = new SPProjectUtility();
 
-        protected string baseURL = "";
-        protected string metaDataString = "";
-        protected string processString = "";
+        protected string baseURL = string.Empty;
+        protected string metaDataString = string.Empty;
+        protected string processString = string.Empty;
         protected bool requiredOK = true;
         protected Button btnOK;
         protected DropDownList DdlGroup;
@@ -31,7 +31,7 @@ namespace EPMLiveCore
         protected TextBox txtTitle;
         protected Label label1;
         protected Panel Panel2;
-        protected string URL = "";
+        protected string URL = string.Empty;
         protected RadioButton rdoTopLinkYes;
         protected RadioButton rdoTopLinkNo;
         protected RadioButton rdoUnique;
@@ -77,7 +77,7 @@ namespace EPMLiveCore
 
                         inpName.Title = "Workspace Name";
                         txtTitle.Text = strName;
-                        txtURL.Text = strName.ToLower().Replace(" ", "");
+                        txtURL.Text = strName.ToLower().Replace(" ", string.Empty);
                         btnOK.Text = "Create Workspace";
 
                         if (projectInfo.IsNavigationEnabled.HasValue)
@@ -198,7 +198,12 @@ namespace EPMLiveCore
 
                     try
                     {
-                        var sourceItemAttachmentsFolder = SPContext.Current.Web.Folders["Lists"].SubFolders[oldLi.ParentList.Title].SubFolders["Attachments"].SubFolders[oldLi.ID.ToString()];
+                        var sourceItemAttachmentsFolder = SPContext.Current.Web
+                            .Folders["Lists"]
+                            .SubFolders[oldLi.ParentList.Title]
+                            .SubFolders["Attachments"]
+                            .SubFolders[oldLi.ID.ToString()];
+
                         foreach (SPFile file in sourceItemAttachmentsFolder.Files)
                         {
                             var binFile = file.OpenBinary();

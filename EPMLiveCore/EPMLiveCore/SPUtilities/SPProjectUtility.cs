@@ -19,13 +19,13 @@ namespace EPMLiveCore.SPUtilities
         {
             var result = new ProjectInfoResult();
 
-            string login = SPContext.Current.Web.CurrentUser.LoginName;
-            string url = SPContext.Current.Web.Url;
+            var login = SPContext.Current.Web.CurrentUser.LoginName;
+            var url = SPContext.Current.Web.Url;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                using (SPSite mysite = new SPSite(url))
+                using (var mysite = new SPSite(url))
                 {
-                    using (SPWeb myweb = mysite.OpenWeb())
+                    using (var myweb = mysite.OpenWeb())
                     {
                         myweb.Site.CatchAccessDeniedException = false;
                         try
@@ -70,13 +70,13 @@ namespace EPMLiveCore.SPUtilities
         {
             var result = new WorkspaceInfoResult();
 
-            string login = SPContext.Current.Web.CurrentUser.LoginName;
-            string url = SPContext.Current.Web.Url;
+            var login = SPContext.Current.Web.CurrentUser.LoginName;
+            var url = SPContext.Current.Web.Url;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                using (SPSite mysite = new SPSite(url))
+                using (var mysite = new SPSite(url))
                 {
-                    using (SPWeb myweb = mysite.OpenWeb())
+                    using (var myweb = mysite.OpenWeb())
                     {
                         var list = myweb.Lists[listId];
                         var gSettings = new GridGanttSettings(list);
@@ -242,6 +242,8 @@ namespace EPMLiveCore.SPUtilities
                         default:
                             break;
                     }
+                    break;
+                default:
                     break;
             }
 
