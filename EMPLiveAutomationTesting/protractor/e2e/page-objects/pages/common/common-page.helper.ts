@@ -595,7 +595,17 @@ export class CommonPageHelper {
     static getCreateNewPublicViewOfDropDown(publicViewTitle: string) {
         return element(By.xpath(ComponentHelpers.getElementByTagXpath(HtmlHelper.tags.li, publicViewTitle, false)));
     }
+    static async clickLhsSideBarMenuIcon(icon: ElementFinder, stepLogger: StepLogger) {
+        stepLogger.step('Click on icon from the left navigation panel');
+        await PageHelper.click(icon);
+    }
 
+    static async verifyPanelHeaderDisplayed(item: ElementFinder, itemName: string, stepLogger: StepLogger) {
+        stepLogger.verification(`verify "${itemName}" header is displayed`);
+        const panelHeadingDisplayed = await PageHelper.isElementDisplayed(item);
+        await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            itemName));
+    }
     static searchedItemList(text: string) {
         return AnchorHelper.getAnchorByTextInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly, text);
     }
