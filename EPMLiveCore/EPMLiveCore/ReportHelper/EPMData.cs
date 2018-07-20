@@ -659,18 +659,24 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                if (_sTextFilePath != null || _sTextFilePath != string.Empty)
+                WriteTextFile(_sTextFilePath, sText);
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Exception suppressed: {0}", exception);
+            }
+        }
+
+        private void WriteTextFile(string path, string text)
+        {
+            if (!string.IsNullOrWhiteSpace(_sTextFilePath))
+            {
+                using (TextWriter writer = new StreamWriter(path))
                 {
-                    TextWriter tw = new StreamWriter(_sTextFilePath);
-
-                    // write a line of text to the file
-                    tw.WriteLine(sText);
-
-                    // close the stream
-                    tw.Close();
+                    writer.WriteLine(text);
+                    writer.Close();
                 }
             }
-            catch (Exception ex) { }
         }
 
         public bool DeleteWork(Guid listid, int itemid)
@@ -1046,21 +1052,32 @@ namespace EPMLiveCore.ReportHelper
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    var staticCn = new SqlConnection(cs);
-                    try
-                    {
-                        staticCn.Open();
-                    }
-                    catch (SqlException ex)
-                    {
-                        Trace.Write(ex.Message);
-                        success = false;
-                    }
-                    finally
-                    {
-                        staticCn.Close();
-                    }
+                    success = TryToConnect(cs);
                 });
+            return success;
+        }
+
+        public static bool TryToConnect(string connectionString)
+        {
+            var success = true;
+
+            using (var sqlConnection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    sqlConnection.Open();
+                }
+                catch (SqlException ex)
+                {
+                    Trace.Write(ex.Message);
+                    success = false;
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+            }
+
             return success;
         }
 
@@ -1370,26 +1387,22 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                var cmd = new SqlCommand();
-                var con = new SqlConnection(CoreFunctions.getConnectionString(webAppId));
-                con.Open();
-                //cmd.CommandText = "SELECT * FROM RPTDatabases WHERE WebApplicationId = @webAppId";
-                //cmd.Parameters.AddWithValue("@webAppId", webAppId);
-
-                cmd.CommandText = "SELECT * FROM RPTDatabases WHERE SiteId = @siteId";
-                cmd.Parameters.AddWithValue("@siteId", siteId);
-
-                cmd.Connection = con;
-                DataTable dt = GetTable(cmd);
-                con.Close();
-
-                if (dt != null && dt.Rows.Count > 0)
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(webAppId)))
                 {
-                    return dt.Rows[0];
-                }
-                else
-                {
-                    return null;
+                    connection.Open();
+
+                    using (var command = new SqlCommand("SELECT * FROM RPTDatabases WHERE SiteId = @siteId", connection))
+                    {
+                        command.Parameters.AddWithValue("@siteId", siteId);
+
+                        var dataTable = GetTable(command);
+                        if (dataTable != null && dataTable.Rows.Count > 0)
+                        {
+                            return dataTable.Rows[0];
+                        }
+
+                        return null;
+                    }
                 }
             }
             catch (Exception ex)
@@ -2871,21 +2884,28 @@ namespace EPMLiveCore.ReportHelper
         /// <summary>
         ///     Encrypts string value using the HASH MD5 cryptoservice provider.
         /// </summary>
-        /// <param name="Plaintext"></param>
+        /// <param name="plaintext"></param>
         /// <returns></returns>
-        public static string Encrypt(string Plaintext)
+        public static string Encrypt(string plaintext)
         {
-            var Buffer = new byte[0];
-            string Key = "EPMLIVE";
-            var DES = new TripleDESCryptoServiceProvider();
-            var hashMD5 = new MD5CryptoServiceProvider();
-            DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-            DES.Mode = CipherMode.ECB;
-            ICryptoTransform DESEncrypt = DES.CreateEncryptor();
-            Buffer = ASCIIEncoding.ASCII.GetBytes(Plaintext);
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
 
-            string TripleDES = Convert.ToBase64String(DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-            return TripleDES;
+            using (var md5 = new MD5CryptoServiceProvider())
+            {
+                using (var tdes = new TripleDESCryptoServiceProvider())
+                {
+                    tdes.Key = md5.ComputeHash(Encoding.ASCII.GetBytes(Key));
+                    tdes.Mode = CipherMode.ECB;
+
+                    using (var transform = tdes.CreateEncryptor())
+                    {
+                        buffer = Encoding.ASCII.GetBytes(plaintext);
+
+                        return Convert.ToBase64String(transform.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -2895,20 +2915,24 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public static string Decrypt(string base64Text)
         {
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
+
             try
             {
-                var Buffer = new byte[0];
-                string Key = "EPMLIVE";
-                var DES = new TripleDESCryptoServiceProvider();
-                var hashMD5 = new MD5CryptoServiceProvider();
-                DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-                DES.Mode = CipherMode.ECB;
-                ICryptoTransform DESDecrypt = DES.CreateDecryptor();
-                Buffer = Convert.FromBase64String(base64Text);
+                using (var tDes = new TripleDESCryptoServiceProvider())
+                {
+                    using (var md5 = new MD5CryptoServiceProvider())
+                    {
+                        tDes.Key = md5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+                        tDes.Mode = CipherMode.ECB;
 
-                string DecTripleDES =
-                    ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-                return DecTripleDES;
+                        var DESDecrypt = tDes.CreateDecryptor();
+                        buffer = Convert.FromBase64String(base64Text);
+
+                        return ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
             }
             catch (Exception ex)
             {
