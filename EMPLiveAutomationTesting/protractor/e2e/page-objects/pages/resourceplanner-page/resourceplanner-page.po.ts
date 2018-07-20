@@ -11,8 +11,8 @@ export class ResourceplannerPage extends BasePage {
 
     static get selectUser(){
         // selecting User which have department Test department 1
-     return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//'
-     +'following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
+        // tslint:disable-next-line:max-line-length
+        return element(By.xpath(`//*[normalize-space(text())="${ResourcePlannerConstants.user}"]//following-sibling::td[text()="${ResourcePlannerConstants.department}"]`));
     }
     static getHoursHeader() {
         // selecting User which have department Test department 1
@@ -26,7 +26,7 @@ export class ResourceplannerPage extends BasePage {
         return element(By.css('#g_RPE .GMBodyRight .GMDataRow td.GMClassEdit'));
     }
     static get inputHours(){
-        return element(By.xpath('input.GMEditInput'));
+        return element(By.css('input.GMEditInput'));
     }
     static get yesButton(){
         return element(By.css('[value="Yes"]'));
@@ -43,7 +43,7 @@ export class ResourceplannerPage extends BasePage {
     }
 
     static getbuttonSectionButtonById(id: string) {
-        return element(By.xpath(`#idResourcesTabDiv_ul #${id}`));
+        return element(By.css(`#idResourcesTabDiv_ul #${id}`));
     }
     static getTopGridItemsByText(title: string) {
         return element(By.xpath(`//*[@id="gridDiv_RPE"]//td[contains(text(),"${title}")]`));

@@ -27,8 +27,6 @@ export class ResourcePlannerPageHelper  {
 
         stepLogger.stepId(4);
         await CommonPageHelper.fieldDisplayedValidation(ResourceplannerPage.greenCheckImg , ResourcePlannerConstants.greenCheckImg );
-
-        await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
     static async inputHourAndSave(stepLogger: StepLogger, hours: number) {
@@ -42,8 +40,6 @@ export class ResourcePlannerPageHelper  {
         if (PageHelper.isElementDisplayed(ResourceplannerPage.yesButton)) {
             await PageHelper.click(ResourceplannerPage.yesButton);
         }
-
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.close);
 
        }
 

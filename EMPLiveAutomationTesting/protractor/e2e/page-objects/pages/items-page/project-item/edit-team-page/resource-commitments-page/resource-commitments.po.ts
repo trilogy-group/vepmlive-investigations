@@ -6,11 +6,7 @@ import {ResourceCommitmentsConstansts} from './resource-commitments.constansts';
 export class ResourceCommitments extends BasePage {
     static get resource()
     {
-        return element.all(By.xpath('(//*[@data-parametername=\'Resource\']//select)')).get(1);
-    }
-    static get applyButton()
-    {
-        return element(By.css('[value=\'Apply\']'));
+        return element.all(By.xpath('(//*[@data-parametername="Resource"]//select)')).get(1);
     }
     static get specifyParameterValues() {
         return ElementHelper.getElementByText(ResourceCommitmentsConstansts.specifyParameterValues);

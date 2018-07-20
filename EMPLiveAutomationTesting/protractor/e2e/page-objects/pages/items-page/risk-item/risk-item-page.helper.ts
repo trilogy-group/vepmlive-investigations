@@ -200,10 +200,7 @@ export class RiskItemPageHelper {
     static async saveRisk(stepLogger: StepLogger) {
         stepLogger.step('Click on "Save" button in "Risks - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"Risks - New Item" window is closed');
-        await CommonPageHelper.windowShouldNotBeDisplayedValidation(RiskItemPageConstants.pageName);
-     }
+        }
 
     static async  createRiskAndValidateIt(stepLogger: StepLogger) {
         stepLogger.step('Enter/Select required details in "Risks - New Item" window as described below');
@@ -220,19 +217,24 @@ export class RiskItemPageHelper {
 
         await PageHelper.switchToDefaultContent();
 
-        stepLogger
-            .verification('Notification about New Risks created [Ex: New Risk Item 1] displayed on the Home Page');
-        await CommonPageHelper.notificationDisplayedValidation
-        (CommonPageHelper.getNotificationByText(titleValue), RiskItemPageConstants.pageName );
-
-        await this.searchRiskByTitle(stepLogger, titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger,
+            titleValue,
+            RiskItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
         return titleValue;
     }
     static async  editRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
-        await this.searchRiskByTitle(stepLogger, titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger,
+            titleValue,
+            RiskItemPageConstants.columnNames.title);
 
         stepLogger.step('Make some changes and click on "Save" button');
         await CommonPageHelper.editOptionViaRibbon(stepLogger);
@@ -240,30 +242,39 @@ export class RiskItemPageHelper {
         titleValue = titleValue + 'Edited';
         await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
 
-        await this.saveRisk(stepLogger);
+        await this.saveRisk(stepLogger );
+
+        await PageHelper.switchToDefaultContent();
+
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger,
+            titleValue,
+            RiskItemPageConstants.columnNames.title);
+
+        stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+
         return titleValue;
 
     }
-    static  async searchRiskByTitle(stepLogger: StepLogger , titleValue: string) {
-        stepLogger.step('Navigate to risk page');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.risks,
+    static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,
-            stepLogger);
-
-        stepLogger.step('Search risk by title');
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            RiskItemPageConstants.columnNames.title,
-            stepLogger);
-    }
-
-    static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
-        await this.searchRiskByTitle(stepLogger, titleValue );
+            stepLogger,
+            titleValue,
+            RiskItemPageConstants.columnNames.title);
 
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
 
-        await this.searchRiskByTitle(stepLogger, titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
+            CommonPage.pageHeaders.projects.risks,
+            CommonPageConstants.pageHeaders.projects.risks,
+            stepLogger,
+            titleValue,
+            RiskItemPageConstants.columnNames.title);
 
         stepLogger.step('Validating deleted Risk  is not  Present');
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound );

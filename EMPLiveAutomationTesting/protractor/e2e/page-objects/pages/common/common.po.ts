@@ -173,16 +173,9 @@ export class CommonPage extends BasePage {
         return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
     }
 
-    static get resourceAddGroupingColumn() {
-        return element(By.css(`.//*[@class='GMHeaderGroup']/*[text()='Department']`));
-    }
-
-    static get editTeamButtonOnTask() {
+      static get editTeamButtonOnTask() {
         return ElementHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
 }
-    static get resourceDepartment() {
-        return element(By.css(`.GMHeaderRow [class*='Department']`));
-    }
 
     static get closeButton() {
         return element(By.css(`[id*=".CloseButton"]`));

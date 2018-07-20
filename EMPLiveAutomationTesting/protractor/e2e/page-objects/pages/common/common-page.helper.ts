@@ -18,8 +18,6 @@ import {ProjectItemPageHelper} from '../items-page/project-item/project-item-pag
 import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../../resource-analyzer-page/resource-analyzer-page.po';
-import {ResourcesPage} from '../navigation/resources/resources.po';
-import {ResourcesPageConstants} from '../navigation/resources/resources-page.constants';
 
 const fs = require('fs');
 
@@ -215,6 +213,17 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
     }
+    static async searchByTitle(linkOfThePage: ElementFinder,
+                               pageHeader: ElementFinder,
+                               pageName: string,
+                               stepLogger: StepLogger, titleValue: string , columnName: string ) {
+        await this.navigateToItemPageUnderNavigation(
+            linkOfThePage,
+            pageHeader,
+            pageName,
+            stepLogger);
+        await this.searchItemByTitle(titleValue, columnName, stepLogger);
+    }
 
     static async navigateToItemPageUnderMyWorkplace(linkOfThePage: ElementFinder,
                                                     pageHeader: ElementFinder,
@@ -263,7 +272,7 @@ export class CommonPageHelper {
         stepLogger.step('Select column name as Title');
         await PageHelper.sendKeysToInputField(CommonPage.searchControls.column, columnName);
 
-        stepLogger.step('Enter search term');
+        stepLogger.step('Enter search title');
         await TextboxHelper.sendKeys(CommonPage.searchControls.text, titleValue, true);
     }
 
@@ -600,7 +609,9 @@ export class CommonPageHelper {
     static getElementAllByText(text: string, isContains = false) {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
-
+    static getApplyButton(text: string, isContains = false) {
+        return element(By.css(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
+    }
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
     }
@@ -628,6 +639,10 @@ export class CommonPageHelper {
     static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(name));
+    }
+    static async fieldNotDisplayedValidation(targetElement: ElementFinder , name: string) {
+        await expect(await PageHelper.isElementDisplayed(targetElement))
+            .toBe(false, ValidationsHelper.getNotDisplayedValidation(name));
     }
     static async notificationDisplayedValidation(targetElement: ElementFinder , name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
@@ -658,8 +673,43 @@ export class CommonPageHelper {
             .toBe(name,
                 ValidationsHelper.getPageDisplayedValidation(name));
     }
+    static async fieldShouldHaveValueValidation( projectName: string , labels: string ) {
+        await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
+            .toBe(true,
+                ValidationsHelper.getFieldShouldHaveValueValidation(labels, projectName));
+    }
     static async clickNewLink( stepLogger: StepLogger) {
         stepLogger.step('click on add new link ');
         await PageHelper.click(CommonPage.addNewLink);
+    }
+    static getApplyLink() {
+        return element(By.css(`[value="${CommonPageConstants.ribbonLabels.apply}"]`));
+    }
+    static async clickApplyButton(stepLogger: StepLogger) {
+        stepLogger.step('Click on Apply Button ');
+        await ElementHelper.actionMouseMove(this.getApplyLink());
+        await PageHelper.click(this.getApplyLink());
+       }
+    static async waitForApplyButtontoDisplayed() {
+        await  WaitHelper.getInstance().waitForElementToBeClickable(this.getApplyLink());
+    }
+    static getDropDownByParameterNameXpath(name: string) {
+        return `//*[@data-parametername="${name}"]//select`;
+    }
+    static getDropDownByParameterName(name: string, index = 1) {
+        return element.all(By.xpath(this.getDropDownByParameterNameXpath(name))).get(index);
+    }
+    static  periodStartOption(name: string ) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  periodEndOption(name: string) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  department(name: string) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  periodEndOptionValue(name: string) {
+        return element(By.xpath(`("${this.getDropDownByParameterNameXpath
+        (name)}")[2]//option[last()]`));
     }
    }

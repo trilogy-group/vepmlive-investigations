@@ -53,86 +53,79 @@ export class ChangeItemPageHelper {
 
         return projectName;
     }
-    static async createNewChangeAndValidateIt(stepLogger: StepLogger) {
-        stepLogger.step('Select "Create New" icon  from left side menu');
+    static async searchChangeByTitle(stepLogger: StepLogger , titleValue: string ) {
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            stepLogger);
+        await CommonPageHelper.searchItemByTitle(titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
+            stepLogger);
+    }
+    static async createNewChange(stepLogger: StepLogger) {
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
         stepLogger.step('Various Create New options are displayed');
-        await expect(await PageHelper.isElementDisplayed(CreateNewPage.navigation.listApps.change))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(CreateNewPageConstants.navigationLabels.listApps.change));
-        stepLogger.stepId(2);
+
+        await CommonPageHelper.labelDisplayedValidation
+        (CreateNewPage.navigation.listApps.change , CreateNewPageConstants.navigationLabels.listApps.change );
+    }
+    static async createChangeLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "Change" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
         stepLogger.verification('"Changes - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
-        await expect(await CommonPage.dialogTitle.getText())
-            .toBe(ChangeItemPageConstants.pageName,
-                ValidationsHelper.getPageDisplayedValidation(ChangeItemPageConstants.pageName));
+        await CommonPageHelper.pageDisplayedValidation(ChangeItemPageConstants.pageName);
+    }
+    static async createNewChangeAndValidateIt(stepLogger: StepLogger) {
+        stepLogger.step('Select "Create New" icon  from left side menu');
+        await this.createNewChange(stepLogger);
+
+        stepLogger.stepId(2);
+        stepLogger.step('Click on "Change" link from the options displayed');
+        await this.createChangeLink(stepLogger);
+
         stepLogger.stepId(3);
         stepLogger.step('Enter/Select required details in "Changes - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
         const labels = ChangeItemPageConstants.inputLabels;
         const titleValue = `${labels.title} ${uniqueId}`;
         const priority = CommonPageConstants.priorities.high;
+
         stepLogger.step('Switch to frame');
         await CommonPageHelper.switchToFirstContentFrame();
+
         await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
+
         stepLogger.verification('"Changes - New Item" window is closed');
-        await expect(await CommonPage.dialogTitle.isPresent())
-            .toBe(false,
-                ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName));
-        await PageHelper.switchToDefaultContent();
+        await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
+
         stepLogger
             .verification('Notification about New Changes created [Ex: New Change Item 1]' +
                 ' displayed on the Home Page');
-        await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getNotificationByText(titleValue)))
-            .toBe(true,
-                ValidationsHelper.getNotificationDisplayedValidation(ChangeItemPageConstants.pageName));
-        stepLogger.stepId(5);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.changes,
-            CommonPage.pageHeaders.projects.changes,
-            CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger);
-        stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(titleValue));
+        await CommonPageHelper.notificationDisplayedValidation
+        (CommonPageHelper.getNotificationByText(titleValue) , ChangeItemPageConstants.pageName );
+
+        await this.searchChangeByTitle(stepLogger , titleValue );
         return titleValue;
     }
     static async editChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await CommonPageHelper.editOptionViaRibbon(stepLogger);
         titleValue = titleValue + 'Edited';
+
         await TextboxHelper.sendKeys(ChangeItemPage.inputs.title, titleValue);
+
         await PageHelper.click(CommonPage.formButtons.save);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.changes,
-            CommonPage.pageHeaders.projects.changes,
-            CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger);
+
+        await this.searchChangeByTitle(stepLogger , titleValue );
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
-        await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
-            .toBe(true,
-                ValidationsHelper.getLabelDisplayedValidation(titleValue));
-    }
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+      }
     static async deleteChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.changes,
-            CommonPage.pageHeaders.projects.changes,
-            CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger);
+
+        await this.searchChangeByTitle(stepLogger , titleValue );
+
         stepLogger.step('Validating deleted Risk  is not  Present');
-        await expect(await PageHelper.isElementDisplayed(ProjectItemPage.noProjecrMsg))
-            .toBe(true, ValidationsHelper.getFieldDisplayedValidation(ProjectItemPageConstants.noDataFound));
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
     }
 }

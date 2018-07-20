@@ -15,7 +15,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Create and Remove Workspace - [829751]', async () => {
+    it('Create and Remove Workspace - [829751]', async () => {
         const stepLogger = new StepLogger(829751);
         const title = await WorkspacePageHelper.createWorkspace(stepLogger);
 

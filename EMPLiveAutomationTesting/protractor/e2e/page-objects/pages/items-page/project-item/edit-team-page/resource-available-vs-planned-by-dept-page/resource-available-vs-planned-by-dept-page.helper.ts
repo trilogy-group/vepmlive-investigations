@@ -1,10 +1,8 @@
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
 import {PageHelper} from '../../../../../../components/html/page-helper';
-import {ResourceAvailablePage} from './resource-available-vs-planned-by-dept-page.po';
 import {DropDownHelper} from '../../../../../../components/html/dropdown-helper';
-import {ElementHelper} from '../../../../../../components/html/element-helper';
 import {ResourceAvailablePageConstants} from './resource-available-vs-planned-by-dept-page.constansts';
+import {CommonPageHelper} from '../../../../common/common-page.helper';
 
 export class ResourceAvailablePageHelper {
          static async selectParametersAndApply(stepLogger: StepLogger) {
@@ -18,34 +16,35 @@ export class ResourceAvailablePageHelper {
 
         await this.selectDepartment(stepLogger);
 
-        await this.clickApplyButton(stepLogger);
+        await CommonPageHelper.clickApplyButton(stepLogger);
          }
 
-    static async selectPeriodStartDate(stepLogger: StepLogger) {
-        await  PageHelper.click(ResourceAvailablePage.periodStartOption);
+     static async selectPeriodStartDate(stepLogger: StepLogger) {
+        await  PageHelper.click(CommonPageHelper.periodStartOption(ResourceAvailablePageConstants.periodStart));
         stepLogger.step('Select Period start Date ');
-        await DropDownHelper.selectOptionByVal(ResourceAvailablePage.periodStartOption, '2');
-        await  WaitHelper.getInstance().waitForElementToBeClickable(ResourceAvailablePage.applyButton);
+
+        await DropDownHelper.selectOptionByVal(CommonPageHelper.periodStartOption(ResourceAvailablePageConstants.periodStart) , '2');
+
+        await  CommonPageHelper.waitForApplyButtontoDisplayed;
     }
 
     static async selectValuePeriodEndDate(stepLogger: StepLogger) {
         stepLogger.step('Select Period End Date ');
-        await  PageHelper.click(ResourceAvailablePage.periodEndOption);
-        await PageHelper.click(ResourceAvailablePage.periodEndOptionValue);
-        await  WaitHelper.getInstance().waitForElementToBeClickable(ResourceAvailablePage.applyButton);
+        await  PageHelper.click(CommonPageHelper.periodEndOption(ResourceAvailablePageConstants.periodEnd));
+
+        await PageHelper.click(CommonPageHelper.periodEndOptionValue(ResourceAvailablePageConstants.periodEnd));
+
+        await  CommonPageHelper.waitForApplyButtontoDisplayed;
     }
 
     static async selectDepartment(stepLogger: StepLogger) {
         stepLogger.step('Select Department ');
-        await PageHelper.click(ResourceAvailablePage.department);
-        await DropDownHelper.selectOptionByVal(ResourceAvailablePage.department, ResourceAvailablePageConstants.departmentValue);
-        await  WaitHelper.getInstance().waitForElementToBeClickable(ResourceAvailablePage.applyButton);
+        await PageHelper.click(CommonPageHelper.department(ResourceAvailablePageConstants.department));
+
+        await DropDownHelper.selectOptionByVal
+        (CommonPageHelper.department(ResourceAvailablePageConstants.department), ResourceAvailablePageConstants.departmentValue);
+
+        await  CommonPageHelper.waitForApplyButtontoDisplayed;
     }
 
-    static async clickApplyButton(stepLogger: StepLogger) {
-        stepLogger.step('Click on Apply Button ');
-        await ElementHelper.actionMouseMove(ResourceAvailablePage.applyButton);
-        await PageHelper.click(ResourceAvailablePage.applyButton);
-        await  WaitHelper.getInstance().waitForElementToBeClickable(ResourceAvailablePage.applyButton);
-    }
 }

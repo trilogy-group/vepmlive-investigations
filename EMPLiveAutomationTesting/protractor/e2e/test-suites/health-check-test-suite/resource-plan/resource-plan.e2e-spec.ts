@@ -4,10 +4,8 @@ import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../helpers/suite-names';
 import {ResourcePlannerPageHelper} from '../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
 import {StepLogger} from '../../../../core/logger/step-logger';
-import {WaitHelper} from '../../../components/html/wait-helper';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../page-objects/pages/common/common.po';
-import {ProjectItemPageConstants} from '../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {CommonPageHelper} from '../../../page-objects/pages/common/common-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
@@ -33,10 +31,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
 
-        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.resourcePlanner);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
-
-      // Add hours for the resource added in the top-grid
+        // Add hours for the resource added in the top-grid
         stepLogger.step('Add hours for the resource added in the top-grid');
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 

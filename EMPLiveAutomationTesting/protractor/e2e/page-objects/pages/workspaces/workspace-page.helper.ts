@@ -58,7 +58,7 @@ export class WorkspacePageHelper {
     static async validateLatestNotification(stepLogger: StepLogger , title: string ) {
         let maxAttempts = 0;
 
-        while (!((await CommonPage.latestNotification.getText()).includes(title.replace('* ', ''))) && maxAttempts++ < 10) {
+        while (!((await CommonPage.latestNotification.getText()).includes(title.replace('* ', ''))) && maxAttempts++ < 20) {
 
             browser.refresh();
 

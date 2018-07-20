@@ -6,7 +6,6 @@ import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {ResourcesPageConstants} from './resources-page.constants';
 import {ValidationsHelper} from '../../../../components/misc-utils/validation-helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
-import {WaitHelper} from '../../../../components/html/wait-helper';
 import {CommonPageHelper} from '../../common/common-page.helper';
 
 export class ResourcesPageHelper {
