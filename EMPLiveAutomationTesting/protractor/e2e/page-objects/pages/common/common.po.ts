@@ -6,6 +6,7 @@ import {ButtonHelper} from '../../../components/html/button-helper';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {RiskItemPageConstants} from '../items-page/risk-item/risk-item-page.constants';
+import {TextComponentSelectors} from '../../../components/component-types/text-component/text-component-selectors';
 import {ElementHelper} from '../../../components/html/element-helper';
 
 export class CommonPage extends BasePage {
@@ -24,6 +25,19 @@ export class CommonPage extends BasePage {
             mostRecent: element(By.id(`${idPrefix}recent`)),
             settings: element(By.id(`${idPrefix}settings`)),
             workspaces: element(By.id(`${idPrefix}workspaces`))
+        };
+    }
+
+    static get sidebarMenuPanelHeader() {
+        const label = CommonPageConstants.sidebarMenuPanelHeader;
+        return {
+            workspaces: TextComponentSelectors.getListByText(label.workspaces),
+            createNew: TextComponentSelectors.getListByText(label.createNew),
+            myWorkplace: TextComponentSelectors.getListByText(label.myWorkplace),
+            favorites: TextComponentSelectors.getListByText(label.favorites),
+            mostRecent: TextComponentSelectors.getListByText(label.mostRecent),
+            settings: TextComponentSelectors.getListByText(label.settings),
+            frequentApps: TextComponentSelectors.getListByText(label.frequentApps),
         };
     }
 
@@ -77,7 +91,8 @@ export class CommonPage extends BasePage {
             hide: CommonPageHelper.getMenuItemFromRibbonContainer(titles.hide),
             items: CommonPageHelper.getMenuItemFromRibbonContainer(titles.items),
             manage: CommonPageHelper.getMenuItemFromRibbonContainer(titles.manage),
-            list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list)
+            list: CommonPageHelper.getMenuItemFromRibbonContainer(titles.list),
+            page: CommonPageHelper.getMenuItemFromRibbonContainer(titles.page)
         };
     }
 
@@ -165,8 +180,16 @@ export class CommonPage extends BasePage {
         return `[id='tdRes']`;
     }
 
+    static get savePopupBox() {
+        return element(By.css(`[title="Save Fragment"]`));
+    }
+
     static get resourceGroupingButton() {
         return element(By.css(`${this.resourceGrid} [data-original-title*='Grouping']`));
+    }
+
+    static get createColumnDlgBox() {
+        return element(By.css(`[class*="ColumnsMenuHead"]`));
     }
 
     static get resourceGroupingColumn() {
@@ -264,12 +287,28 @@ export class CommonPage extends BasePage {
         return element(By.css('#addlinkdiv [value="Add Link"]'));
     }
 
+    static get addLinkCancelButton() {
+        return element(By.css('#addlinkdiv [value="Cancel"]'));
+    }
+
     static get projectTab() {
-        return element(By.id('Ribbon.Project-title'));
+        return element(By.css('[id*="Project-title"]'));
+    }
+
+    static get setBaselineTab() {
+        return element(By.css('[id*="SetBaseline"] [class*="img"]'));
+    }
+
+    static get clearBaselineTab() {
+        return element(By.css('[id*="ClearBaseline"] [class*="img"]'));
     }
 
     static get okButton () {
         return element(By.css('#onetidSaveItem'));
+    }
+
+    static get cancelButton () {
+        return element(By.id('onetidCancelItem'));
     }
 
     static get UpdatePropertyDocument() {
@@ -302,7 +341,7 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+            return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
     static get costButton(){

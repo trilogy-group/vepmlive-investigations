@@ -20,7 +20,7 @@ export class CreateNewPageConstants {
             libraryApps: {
                 pictures: 'Pictures',
                 projectDocument: 'Project Document',
-                sharedDocument: 'SharedDocument',
+                sharedDocument: 'Shared Document',
                 sitePages: 'SitePages',
                 socialStream: 'Social Stream'
             }

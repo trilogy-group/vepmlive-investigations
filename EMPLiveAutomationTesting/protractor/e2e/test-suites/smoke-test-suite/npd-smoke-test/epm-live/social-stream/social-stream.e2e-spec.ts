@@ -6,6 +6,8 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
+import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
+import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
 import {ElementHelper} from '../../../../../components/html/element-helper';
@@ -85,8 +87,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Verify newly uploaded file is displayed under My shared documents section');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(newFile.newFileName)))
-            .toBe(true,
-                ValidationsHelper.getDisplayedValidation(newFile.newFileName));
+            .toBe(true, ValidationsHelper.getDisplayedValidation(newFile.newFileName));
     });
 
     it('Validate the Comments Section & the Ability to add a Project from the Social Stream - [743926]', async () => {

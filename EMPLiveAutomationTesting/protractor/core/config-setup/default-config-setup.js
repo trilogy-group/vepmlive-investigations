@@ -11,7 +11,6 @@ const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x8
     This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
     To fix, run the container with docker run --shm-size=1gb to increase the size of /dev/shm.
     Since Chrome 65, this is no longer necessary. Instead, launch the browser with the --disable-dev-shm-usage flag
-
     sources:
         - https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         - https://developers.google.com/web/tools/puppeteer/troubleshooting
@@ -57,8 +56,8 @@ const configSetup = {
         'resolution': browserStackBrowser.resolution,
         'browserstack.user': process.env.BROWSERSTACK_USERNAME || setupUtilities.getParam("", "--params.browserstack.user", false),
         'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || setupUtilities.getParam("", "--params.browserstack.key", false),
-        'browserstack.local': process.env.BROWSERSTACK_LOCAL || setupUtilities.getParam(false, "--params.browserstack.local", false),
-        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER || setupUtilities.getParam("LocalIdentifier", "--params.browserstack.localIdentifier", false),
+        'browserstack.local': process.env.BROWSERSTACK_LOCAL || setupUtilities.getParam(true, "--params.browserstack.local", false),
+        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER || setupUtilities.getParam("BUILD#" + process.env.BUILD_NUMBER, "--params.browserstack.localIdentifier", false),
         'build': process.env.BROWSERSTACK_BUILD || setupUtilities.getParam('Local Build - ' + new Date().toISOString(), "--params.browserstack.build", false),
         'browserstack.debug': 'true',
         'acceptSslCerts': 'true',

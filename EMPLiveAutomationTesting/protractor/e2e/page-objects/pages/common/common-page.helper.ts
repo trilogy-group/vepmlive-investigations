@@ -417,6 +417,16 @@ export class CommonPageHelper {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
 
+    static getElementByValue(text: string) {
+        const xpath = `//*[@value="${text}"]`;
+        return element(By.xpath(xpath));
+    }
+
+    static getATagByText(text: string, isContains: boolean) {
+        const xpath = `//a[${ComponentHelpers.getXPathFunctionForDot(text, isContains)}]`;
+        return element(By.xpath(xpath));
+    }
+
     static getElementByRole(role: string) {
         const xpath = `[role="${role}"]`;
         return element(By.css(xpath));
@@ -638,7 +648,7 @@ export class CommonPageHelper {
             `//following-sibling::td[contains(@class,'${CommonPageConstants.classNames.headerButtonClass}')][1]` +
             `//u[contains(@class,'${sortingClass}')]`));
     }
-    static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
+  static async fieldDisplayedValidation(targetElement: ElementFinder , name: string) {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getFieldDisplayedValidation(name));
     }
@@ -715,3 +725,15 @@ export class CommonPageHelper {
         (name)}")[2]//option[last()]`));
     }
    }
+    static async clickLhsSideBarMenuIcon(icon: ElementFinder, stepLogger: StepLogger) {
+        stepLogger.step('Click on icon from the left navigation panel');
+        await PageHelper.click(icon);
+    }
+
+    static async verifyPanelHeaderDisplayed(item: ElementFinder, itemName: string, stepLogger: StepLogger) {
+        stepLogger.verification(`verify "${itemName}" header is displayed`);
+        const panelHeadingDisplayed = await PageHelper.isElementDisplayed(item);
+        await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
+            itemName));
+    }
+}

@@ -135,6 +135,9 @@ export class HtmlHelper extends HtmlHelperFactory {
             gmNoDataRow: 'GMNoDataRow',
             postMainContainer: 'postMainContainer',
             gmClassReadOnly: 'GMClassReadOnly',
+            dropdown: 'ms-cui-ctl-a2',
+            subWorkspaces: 'epm-nav-sub-workspaces',
+            navTrans: 'epm-nav-trans',
         };
     }
 }

@@ -85,6 +85,7 @@ export class CommonPageConstants {
             editTeam: 'Edit Team',
             buildTeam: 'Build Team',
             close: 'Close',
+            insert: 'Insert',
             saveAndClose: 'Save &Close',
             assignmentPlanner: 'Assignment Planner',
             viewReports: 'View Reports',
@@ -134,7 +135,8 @@ export class CommonPageConstants {
             hide: `Hide`,
             manage: `Manage`,
             items: `Items`,
-            list: `List`
+            list: `List`,
+            page: `Page`,
         };
     }
 
@@ -364,9 +366,22 @@ export class CommonPageConstants {
         };
     }
 
+    static get sidebarMenuPanelHeader() {
+        return {
+            createNew: 'Create New',
+            myWorkplace: 'My Workplace',
+            favorites: 'Favorites',
+            mostRecent: 'Recent Items',
+            settings: 'Settings',
+            workspaces: 'Workspaces',
+            frequentApps: 'Frequent Apps',
+        };
+    }
+
     static get predecessorsData() {
         return {
             predecessors1: '1',
+            predecessorsNull: ' ',
             predecessors2: '2',
         };
     }

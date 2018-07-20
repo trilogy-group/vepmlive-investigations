@@ -372,7 +372,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.step('Check the users displayed in the drop down');
-        await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectAssign(1)))
+        await expect(await PageHelper.isElementPresent(ProjectItemPageHelper.selectFirstAssign()))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
             (ProjectItemPageConstants.teamSectionlabels.currentTeam));
 
@@ -381,7 +381,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
-            (ProjectItemPageConstants.teamSectionlabels.currentTeam));
+                  (ProjectItemPageConstants.teamSectionlabels.currentTeam));
     });
 
     it('Verify functionality of "Always follow Web-Settings" check-box.. - [778281]', async () => {

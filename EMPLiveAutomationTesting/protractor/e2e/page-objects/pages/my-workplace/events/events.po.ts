@@ -71,6 +71,10 @@ export class EventsPage {
         return element(By.id('onetidTypeChoice'));
     }
 
+    static get numberCheckbox() {
+        return element(By.id('onetidTypeNumber'));
+    }
+
     static get descriptionField () {
         return element(By.id('idDesc'));
     }
@@ -100,7 +104,11 @@ export class EventsPage {
     }
 
     static get createColumn () {
-        return element(By.css(`[id*="CustomViews.CreateColumn"]`));
+        return element(By.css(`[id*="CreateColumn"]`));
+    }
+
+    static get selectColumn () {
+        return element(By.css(`[id*="SelectColumns"]`));
     }
 
 }

@@ -16,6 +16,7 @@ import {HomePage} from '../../homepage/home.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../project-item/project-item.po';
 
+
 export class RiskItemPageHelper {
 
     static async editRisk(stepLogger: StepLogger) {
@@ -106,19 +107,19 @@ export class RiskItemPageHelper {
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
+        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column "Exposure"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
+        await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column Schedule "Due"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))
         .toBe(true,
             ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
-        CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
+        await CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
     }
 
     static async verifyPage(stepLogger: StepLogger) {

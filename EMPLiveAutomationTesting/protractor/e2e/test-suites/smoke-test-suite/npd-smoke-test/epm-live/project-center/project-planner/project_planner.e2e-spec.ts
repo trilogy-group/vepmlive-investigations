@@ -158,9 +158,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Publishes successfully');
         // Wait required to let it published
-        await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.publishstatus);
-        await expect(await ProjectItemPage.publishstatus.isPresent()).toBe(true,
+        await browser.sleep(PageHelper.timeout.s);
+        await expect(await PageHelper.isElementPresent(ProjectItemPage.publishstatus)).toBe(true,
             ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.publish));
 
         stepLogger.stepId(10);
@@ -173,7 +172,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.profilePicOfUser);
 
         stepLogger.verification('Verify that the notification has been received by the assigned User');
-        await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.publishstatus);
         // Notification verification is not possible because its take lot of time to visible.
 
     });

@@ -78,7 +78,7 @@ export class SocialStreamPage {
     }
 
     static get updateBox() {
-        return element.all(By.css(`${this.statusBox}>div`));
+        return element.all(By.css(`${this.statusBox} [class*="comment-input"]`));
     }
 
     static get commentTextBox() {

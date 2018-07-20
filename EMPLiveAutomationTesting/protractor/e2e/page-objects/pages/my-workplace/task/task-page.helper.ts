@@ -13,7 +13,7 @@ import {ProjectItemPageConstants} from '../../items-page/project-item/project-it
 
 export class TaskPageHelper {
 
-    static async increaseAndDecreaseTaskDuration(stepLogger: StepLogger, uniqueId: string, updatedHours: string, testCase: string) {
+    static async increaseAndDecreaseTaskDuration(stepLogger: StepLogger, uniqueId: string, updatedHours: string, operation: string) {
 
         stepLogger.stepId(1);
         stepLogger.step('Click on "Task" button');
@@ -84,7 +84,7 @@ export class TaskPageHelper {
             ProjectItemPageConstants.newTaskFields.start).getText();
 
         stepLogger.stepId(5);
-        stepLogger.step(`${testCase} the Duration for task1 from, say, 5 to 3 days`);
+        stepLogger.step(`${operation} the Duration for task1 from, say, 5 to 3 days`);
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
         await PageHelper.click(ProjectItemPageHelper.newTasksFields.duration);
         await PageHelper.actionSendKeys(updatedHours);

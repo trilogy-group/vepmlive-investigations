@@ -8,9 +8,16 @@ export class ProjectItemPageConstants {
     static readonly buildTeamPage = 'Build Team';
     static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
+    static readonly associated = 'Associated';
+    static readonly changeWindow = 'Changes - All Changes';
+    static readonly issueWindow = 'Issues - All Issues by Status';
     static readonly nonAdminUser = 'Non Admin User';
     static readonly region  = 'Region';
+    static readonly ganttChart  = 'Gantt Chart';
     static readonly views  = 'Views';
+    static readonly actualCost  = 'Actual Cost';
+    static readonly saveView  = 'Save View';
+    static readonly createColumn  = 'Create Column';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
     static readonly resourcePlanner = 'Resource Planner - Project Mode';
@@ -158,10 +165,30 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get createColumnTabLabel() {
+        return {
+            createColumn: 'Create Column',
+            nameAndType: 'Name and Type',
+            additionalColumnSetting: 'Additional Column Settings',
+            columnValidation: 'Column Validation',
+        };
+    }
+
+    static get associatedItems() {
+        return {
+            lists: 'Lists',
+            changes: 'Changes',
+            issues: 'Issues',
+            risks: 'Risks',
+            documentLibraries: 'Document Libraries',
+        };
+    }
+
     static get messageText() {
         return {
             saveAndCloseDisabled: 'Save & Close Button is disabled',
-            saveAndCloseEnabled: 'Save & Close Button is enabled'
+            saveAndCloseEnabled: 'Save & Close Button is enabled',
+            uploadSuccessfully: 'imported successfully'
         };
     }
 
@@ -201,6 +228,15 @@ export class ProjectItemPageConstants {
             units: 'Units'
         };
     }
+
+    static get fragmentLabels() {
+        return {
+            fragment: 'Fragments ',
+            insert: 'Insert Fragment',
+            save: 'Save Fragment',
+            manage: 'Manage Fragments',
+        };
+    }
     static get itemOptions() {
         return {
             resourceAnalyzer: 'Resource Analyzer',
@@ -209,11 +245,25 @@ export class ProjectItemPageConstants {
         };
     }
 
+    static get selectColumnLabel() {
+        return {
+            ok: 'OK',
+            hideAll: 'Hide all',
+            cancel: 'Cancel',
+        };
+    }
+
     static get addLinkPopup() {
         return {
             linkType: 'Link Type',
             addLink: 'Add Link',
             cancel: 'Cancel',
+        };
+    }
+
+    static get linkDropDownValues() {
+        return {
+            finishToStart: 'FS (Finish-to-Start)',
         };
     }
 
@@ -262,6 +312,12 @@ export class ProjectItemPageConstants {
     static get users() {
         return {
             adminUser: 'Admin User'
+        };
+    }
+
+    static get baseLineMessage() {
+        return {
+            clear: 'Would you like to overwrite the baseline saved on'
         };
     }
 

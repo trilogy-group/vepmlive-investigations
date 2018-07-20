@@ -74,8 +74,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Name entered for the task is displayed in "Task Name" column' +
             ' [Ex: Task 1 Smoke Test Project 1]');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
-        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+        await expect(await ElementHelper.getText(ProjectItemPageHelper.newTasksFields.title)).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
 
         stepLogger.stepId(5);
@@ -83,19 +82,19 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.assignToDropDown);
 
         stepLogger.verification('List of users drop down with a check box on Right side of user name is displayed');
-        const user = await ElementHelper.getText(ProjectItemPageHelper.selectAssign(1));
-        await expect(await PageHelper.isElementDisplayed(ProjectItemPageHelper.selectAssign(1))).toBe(true,
+        const user = await ElementHelper.getText(ProjectItemPageHelper.selectFirstAssign());
+        await expect(await PageHelper.isElementDisplayed(ProjectItemPageHelper.selectFirstAssign())).toBe(true,
             ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.newTaskFields.assignedList));
 
         stepLogger.stepId(6);
         stepLogger.step('Select the check box for user to which the task need to be assigned [Ex: User1 User1]');
-        await PageHelper.click(ProjectItemPageHelper.selectAssign(1));
+        await PageHelper.click(ProjectItemPageHelper.selectFirstAssign());
 
         stepLogger.step('Click OK button');
         await PageHelper.click(ProjectItemPageHelper.button.ok);
 
         stepLogger.verification('List of users drop down is closed');
-        await expect(await ProjectItemPageHelper.selectAssign(1).isPresent()).toBe(false,
+        await expect(await ProjectItemPageHelper.selectFirstAssign().isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.newTaskFields.assignedList));
 
         stepLogger.verification('Selected user name is displayed in "Assigned To" column [Ex: User1 User1] in' +
@@ -110,8 +109,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('Changes done in "Project Planner" window are saved');
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
-        await expect(await ProjectItemPageHelper.newTasksFields.title.getText()).toBe(uniqueId,
+        await expect(await ElementHelper.getText(ProjectItemPageHelper.newTasksFields.title)).toBe(uniqueId,
             ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.title, uniqueId));
         await expect(await ElementHelper.getElementByText(user).isPresent()).toBe(true,
             ValidationsHelper.getDisplayedValidation(user));
@@ -122,9 +120,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Wait till the Publishing is completed [Publish Status will show the status]');
         stepLogger.verification('Project Planner details are published successfully');
+        // Wait required to let it publish
         await browser.sleep(PageHelper.timeout.s);
-        await WaitHelper.getInstance().waitForElementToBePresent(ProjectItemPage.publishstatus);
-        await expect(await ProjectItemPage.publishstatus.isPresent()).toBe(true,
+        await expect(await PageHelper.isElementPresent(ProjectItemPage.publishstatus)).toBe(true,
             ValidationsHelper.getDisplayedValidation(ProjectItemPageConstants.itemOptions.publish));
 
         stepLogger.stepId(9);

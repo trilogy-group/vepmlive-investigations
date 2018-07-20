@@ -50,6 +50,12 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('Ribbon.BuildTeam.StandardGroup.SaveCloseButton-Large'));
     }
 
+    static get cancelPopupButton() {
+        return {
+            cancel: ElementHelper.getElementByText(CommonPageConstants.formLabels.cancel)
+        };
+    }
+
     static get selectTeamMember() {
         return element(By.xpath(`.//a[.="${ProjectItemPageConstants.teamMember}"]`));
     }
@@ -96,6 +102,14 @@ export class ProjectItemPage extends BasePage {
         return element(By.id('txtNewTask'));
     }
 
+    static get changeWindow() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.changeWindow);
+    }
+
+    static get issueWindow() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.issueWindow);
+    }
+
     static get selectPlanner() {
         const label = ProjectItemPageConstants.plannerLabels;
         return {
@@ -118,6 +132,15 @@ export class ProjectItemPage extends BasePage {
             from: ProjectItemPageHelper.getReportParametersByTitle(label.from),
             to: ProjectItemPageHelper.getReportParametersByTitle(label.to),
             units: ProjectItemPageHelper.getReportParametersByTitle(label.units)
+        };
+    }
+
+    static get fragmentDropDownLabels() {
+        const label = ProjectItemPageConstants.fragmentLabels;
+        return {
+            insert: element(By.xpath(`.//a[.="${label.insert}"]//*[contains(@class,"glass")]`)),
+            save: element(By.xpath(`.//a[.="${label.save}"]//*[contains(@class,"glass")]`)),
+            manage: element(By.xpath(`.//a[.="${label.manage}"]//*[contains(@class,"glass")]`)),
         };
     }
 
@@ -146,8 +169,96 @@ export class ProjectItemPage extends BasePage {
         return element(By.css(`input[name*="ApplyParameters"][value="Apply"]`));
     }
 
+    static get saveViewButton() {
+        return element(By.css(`[id*="SaveView"]`));
+    }
+
+    static get associatedItemsDropDown() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.associated);
+    }
+
+    static get OkButton() {
+        return element(By.css(`[id="viewNameDiv"] [value="OK"]`));
+    }
+
+    static get fragmentIcon() {
+        return element(By.xpath(`.//a[.="${ProjectItemPageConstants.fragmentLabels.fragment}"]`));
+    }
+
+    static get privateCheckBox() {
+        return element(By.css(`[id*="chkPrivate"]`));
+    }
+
+    static get closeFragmentButton() {
+        return element(By.css('[id*="btnClose"]'));
+    }
+
+    static get firstFragment() {
+        return element(By.css('.modal-body tbody tr:nth-child(1)'));
+    }
+
+    static get ganttChart() {
+        return './/*[contains(@class,"GSHeadRight")]';
+    }
+
+    static get ganttChartBars() {
+        return element(By.xpath(`${this.ganttChart}//parent::td[contains(@style,"none")]`));
+    }
+
+    static get fragmentUploadMessage() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.messageText.uploadSuccessfully, true);
+    }
+
+    static get insertFragmentButton() {
+        return element(By.css('[id*="btnImport"]'));
+    }
+
+    static get saveViewNameField() {
+        return element(By.id(`viewname`));
+    }
+
+    static get currentViewDropDown() {
+        return element(By.css(`[id*="WorkViewsGroup"][class*="arrow-button"]`));
+    }
+
     static get viewsButton() {
         return ElementHelper.getElementByText(ProjectItemPageConstants.views);
+    }
+
+    static get actuallCostColumn() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.actualCost);
+    }
+
+    static get selectColumnName() {
+        return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.unCheckedCheckbox}`));
+    }
+
+    static get linkDropDownId() {
+        return 'slctAddLinkType';
+    }
+
+    static get linkTypeDropDownId() {
+        return element(By.id(`slctAddLinkType`));
+}
+
+    static get lagTimeTextBox() {
+        return element(By.id(`txtAddLinkLag`));
+    }
+
+    static get linkDropDownValue() {
+        return element(By.xpath(`.//*[@id="${this.linkDropDownId}"]/option[1]`));
+    }
+
+    static get unCheckedCheckbox() {
+        return '/div[contains(@class,"Unchecked")]';
+    }
+
+    static get checkedSelectColumn() {
+        return element(By.xpath(`.//div[.="${ProjectItemPageConstants.actualCost}"]${this.checkedCheckbox}`));
+    }
+
+    static get checkedCheckbox() {
+        return '/div[contains(@class,"Checked")]';
     }
 
     static get showGanttButton() {
@@ -188,10 +299,40 @@ export class ProjectItemPage extends BasePage {
         };
     }
 
+    static get createColumnTabLabel() {
+        return {
+            nameAndType: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.nameAndType, true),
+            additionalColumnSetting: ElementHelper.getElementByText(ProjectItemPageConstants.createColumnTabLabel.additionalColumnSetting),
+            columnValidation: CommonPageHelper.getATagByText(ProjectItemPageConstants.createColumnTabLabel.columnValidation, true),
+        };
+    }
+
+    static get associatedItems() {
+        return {
+            // Below xpath required, element will not be clickable by other xpath css is not possible.
+            lists: ElementHelper.getElementByText(ProjectItemPageConstants.associatedItems.lists),
+            changes: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.changes}"]
+            /following-sibling::span`)),
+            issues: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.issues}"]
+            /following-sibling::span`)),
+            risks: element(By.xpath(`${this.associatedGroup}//*[text()="${ProjectItemPageConstants.associatedItems.risks}"]
+            /following-sibling::span`)),
+            documentLibraries: ElementHelper.getElementByText(ProjectItemPageConstants.associatedItems.documentLibraries),
+        };
+    }
+
     static get periodButtons() {
         return {
             fromPeriod: element(By.css('[id*="FromPeriod_button"]')),
             toPeriod: element(By.css('[id*="ToPeriod_button"]'))
+        };
+    }
+
+    static get selectColumnLabel() {
+        return {
+            ok: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.ok),
+            hideAll: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.hideAll),
+            cancel: ElementHelper.getElementByText(ProjectItemPageConstants.selectColumnLabel.cancel),
         };
     }
 
@@ -204,12 +345,16 @@ export class ProjectItemPage extends BasePage {
         return element(By.css('[class*= "AssignedTo"][class*="Edit"][style]'));
     }
 
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
     static get close() {
         return element(By.css('[id*="CloseButton"]'));
     }
 
-    static get save() {
-        return element(By.css('[id*="SaveButton"]'));
+    static get associatedGroup() {
+        return `.//*[contains(@id,"CreateNewItem-Menu")]`;
     }
 
     static get publishstatus() {
