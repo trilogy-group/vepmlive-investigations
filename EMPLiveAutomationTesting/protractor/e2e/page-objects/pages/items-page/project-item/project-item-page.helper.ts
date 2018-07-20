@@ -352,7 +352,15 @@ export class ProjectItemPageHelper {
             await PageHelper.click(ProjectItemPage.teamChangeButtons.remove);
         }
     }
-
+    static async verifyGanttChart() {
+        const isBarChartPresent = await ProjectItemPage.ganttChartBars.isPresent();
+        await expect(await isBarChartPresent).toBe(false,
+            ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
+    }
+    static async verifyAlertMessage() {
+        await expect(await browser.switchTo().alert().getText()).toContain(ProjectItemPageConstants.baseLineMessage.clear,
+            ValidationsHelper.getRecordContainsMessage(ProjectItemPageConstants.baseLineMessage.clear));
+    }
     static async unCheckedSelectColumnIfChecked() {
         if (await ProjectItemPage.selectColumnName.isPresent() === false) {
             await PageHelper.click(ElementHelper.getElementByText(ProjectItemPageConstants.actualCost));
