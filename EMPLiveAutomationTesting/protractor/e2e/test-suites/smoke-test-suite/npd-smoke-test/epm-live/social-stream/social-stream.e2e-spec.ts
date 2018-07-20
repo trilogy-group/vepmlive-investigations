@@ -6,7 +6,6 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {HomePageConstants} from '../../../../../page-objects/pages/homepage/home-page.constants';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {WaitHelper} from '../../../../../components/html/wait-helper';
-import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
 import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
 import {CommonPageConstants} from '../../../../../page-objects/pages/common/common-page.constants';
@@ -19,7 +18,6 @@ import {MyWorkplacePage} from '../../../../../page-objects/pages/my-workplace/my
 import {LinkPageHelper} from '../../../../../page-objects/pages/my-workplace/link/link-page.helper';
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {MyTimeOffPageConstants} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.constants';
-import {MyTimeOffPageHelper} from '../../../../../page-objects/pages/my-workplace/my-time-off/my-time-off-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
