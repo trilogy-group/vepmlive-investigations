@@ -198,7 +198,12 @@ namespace EPMLiveCore
 
                     try
                     {
-                        var sourceItemAttachmentsFolder = SPContext.Current.Web.Folders["Lists"].SubFolders[oldLi.ParentList.Title].SubFolders["Attachments"].SubFolders[oldLi.ID.ToString()];
+                        var sourceItemAttachmentsFolder = SPContext.Current.Web
+                            .Folders["Lists"]
+                            .SubFolders[oldLi.ParentList.Title]
+                            .SubFolders["Attachments"]
+                            .SubFolders[oldLi.ID.ToString()];
+
                         foreach (SPFile file in sourceItemAttachmentsFolder.Files)
                         {
                             var binFile = file.OpenBinary();
