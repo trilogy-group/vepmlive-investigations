@@ -715,7 +715,7 @@ export class CommonPageHelper {
         return this.getDropDownByParameterName(name);
     }
     static  periodEndOption(name: string) {
-        return this.getDropDownByParameterName(name);
+       return this.getDropDownByParameterName(name);
     }
     static  department(name: string) {
         return this.getDropDownByParameterName(name);
@@ -725,15 +725,3 @@ export class CommonPageHelper {
         (name)}")[2]//option[last()]`));
     }
    }
-    static async clickLhsSideBarMenuIcon(icon: ElementFinder, stepLogger: StepLogger) {
-        stepLogger.step('Click on icon from the left navigation panel');
-        await PageHelper.click(icon);
-    }
-
-    static async verifyPanelHeaderDisplayed(item: ElementFinder, itemName: string, stepLogger: StepLogger) {
-        stepLogger.verification(`verify "${itemName}" header is displayed`);
-        const panelHeadingDisplayed = await PageHelper.isElementDisplayed(item);
-        await expect(panelHeadingDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
-            itemName));
-    }
-}

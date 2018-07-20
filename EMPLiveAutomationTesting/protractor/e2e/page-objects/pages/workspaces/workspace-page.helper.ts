@@ -9,6 +9,7 @@ import {CommonPage} from '../common/common.po';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
 import {TextboxHelper} from '../../../components/html/textbox-helper';
 import {CommonPageConstants} from '../common/common-page.constants';
+import {browser} from 'protractor';
 
 export class WorkspacePageHelper {
 
