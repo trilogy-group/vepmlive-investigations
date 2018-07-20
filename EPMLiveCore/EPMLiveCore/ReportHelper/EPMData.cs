@@ -22,6 +22,14 @@ namespace EPMLiveCore.ReportHelper
 
         private const int RetentionDays = 1;
         private const int MaxKilobytes = 32768;
+
+        private const int OpenEpmLiveConnectionEvent = 2010;
+        private const int GetMasterDbConnectionEvent = 2020;
+        private const int OpenMasterDbConnectionEvent = 2030;
+        private const int GetEpmLiveConnectionEvent = 2040;
+        private const int ExecuteScalarEvent = 2050;
+        private const int UpdateForeignKeyEvent = 4001;
+
         private const string DotDelimiter = ".";
         private const string EpmLiveKey = "EPM Live";
         private const string EpmLiveReportingKey = "EPMLive Reporting";
@@ -316,7 +324,7 @@ namespace EPMLiveCore.ReportHelper
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         var eventMessage = CreateEventMessage(ex);
-                        LogWindowsEvents(EpmLiveKey, GetEpmLiveConnectionKey, eventMessage, false, 2040);
+                        LogWindowsEvents(EpmLiveKey, GetEpmLiveConnectionKey, eventMessage, false, GetEpmLiveConnectionEvent);
                     });
                 }
                 return _conEPMLive;
@@ -340,7 +348,7 @@ namespace EPMLiveCore.ReportHelper
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         var eventMessage = CreateEventMessage(ex);
-                        LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionKey, eventMessage, false, 2040);
+                        LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionKey, eventMessage, false, GetEpmLiveConnectionEvent);
                     });
                 }
                 return _conClientReporting;
@@ -424,7 +432,7 @@ namespace EPMLiveCore.ReportHelper
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         var eventMessage = CreateEventMessage(ex);
-                        LogWindowsEvents(EpmLiveKey, GetMasterDbConnectionKey, eventMessage, false, 2020);
+                        LogWindowsEvents(EpmLiveKey, GetMasterDbConnectionKey, eventMessage, false, GetMasterDbConnectionEvent);
                     });
                 }
                 return _conMaster;
@@ -455,7 +463,7 @@ namespace EPMLiveCore.ReportHelper
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         var eventMessage = CreateEventMessage(ex);
-                        LogWindowsEvents(EpmLiveKey, OpenEpmLiveConnectionKey, eventMessage, false, 2010);
+                        LogWindowsEvents(EpmLiveKey, OpenEpmLiveConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
                     });
                 }
             }
@@ -498,7 +506,7 @@ namespace EPMLiveCore.ReportHelper
                         SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, 2010);
+                            LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
                         });
                     }
                 }
@@ -540,7 +548,7 @@ namespace EPMLiveCore.ReportHelper
                         SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, 2030);
+                            LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
                         });
                     }
                 }
@@ -792,7 +800,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessage(ex);
-                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, 4001);
+                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, UpdateForeignKeyEvent);
                 });
                 blnPassed = false;
             }
@@ -850,7 +858,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessage(ex);
-                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, 4001);
+                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, UpdateForeignKeyEvent);
                 });
                 blnPassed = false;
             }
@@ -1075,7 +1083,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
-                    LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, 2050);
+                    LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1111,7 +1119,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
-                    LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, false, 2050);
+                    LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1251,7 +1259,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
-                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, 2050);
+                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, ExecuteScalarEvent);
                 });
 
                 _sqlErrorOccurred = true;
@@ -2065,7 +2073,7 @@ namespace EPMLiveCore.ReportHelper
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     var eventMessage = CreateEventMessage(ex);
-                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, 2040);
+                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, GetEpmLiveConnectionEvent);
                 });
             }
             return _conClientReporting;

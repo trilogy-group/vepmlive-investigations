@@ -161,29 +161,23 @@ namespace EPMLiveCore.Tests.ReportHelper
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void CreateEventMessage_WhenExceptionIsNull_ThrowsException()
         {
             using (ShimsContext.Create())
             {
                 // Arrange
                 FakesForSpSecurity();
-                FakesForContructor();
+                FakesForConstructor();
 
                 var epmData = new EPMData(Guid.NewGuid());
                 _privateObject = new PrivateObject(epmData);
                 _exception = null;
 
-                try
-                {
-                    // Act
-                    _privateObject.Invoke(CreateEventMessageMethod, _exception);
-                    Assert.Fail("CreateEventMessage: not throw ArgumentNullException");
-                }
-                catch (Exception ex)
-                {
-                    // Assert
-                    Assert.IsTrue(ex is ArgumentNullException);
-                }
+                // Act
+                _privateObject.Invoke(CreateEventMessageMethod, _exception);
+
+                // Assert - Expects exception
             };
         }
 
@@ -194,7 +188,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             {
                 // Arrange
                 FakesForSpSecurity();
-                FakesForContructor();
+                FakesForConstructor();
 
                 var guid = Guid.NewGuid();
                 var epmData = new EPMData(guid);
@@ -217,7 +211,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             {
                 // Arrange
                 FakesForSpSecurity();
-                FakesForContructor();
+                FakesForConstructor();
 
                 var epmData = new EPMData(Guid.NewGuid());
                 _privateObject = new PrivateObject(epmData);
@@ -246,7 +240,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             {
                 // Arrange
                 FakesForSpSecurity();
-                FakesForContructor();
+                FakesForConstructor();
 
                 var guid = Guid.NewGuid();
                 var epmData = new EPMData(guid);
@@ -277,7 +271,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             {
                 // Arrange
                 FakesForSpSecurity();
-                FakesForContructor();
+                FakesForConstructor();
                 SetupParameters();
 
                 var guid = Guid.NewGuid();
@@ -353,7 +347,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             };
         }
 
-        private static void FakesForContructor()
+        private static void FakesForConstructor()
         {
             ShimCoreFunctions.getConnectionStringGuid = _ => string.Empty;
 
