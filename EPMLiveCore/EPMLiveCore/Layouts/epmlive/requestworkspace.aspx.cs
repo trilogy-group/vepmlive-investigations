@@ -246,7 +246,7 @@ namespace EPMLiveCore
 
                     if (url != string.Empty)
                     {
-                        using (SPWeb newWeb = web.Webs[url])
+                        using (var newWeb = web.Webs[url])
                         {
                             retURL = createProject(newWeb, curList);
                         }
@@ -284,9 +284,10 @@ namespace EPMLiveCore
                                 inputGroup, 
                                 SPContext.Current.Web.CurrentUser.LoginName, 
                                 rdoUnique.Checked, 
-                                rdoTopLinkYes.Checked, web);
+                                rdoTopLinkYes.Checked, 
+                                web);
 
-                            if (errorCode.Substring(0, 1) == "0")
+                            if (errorCode[0] == '0')
                             {
                                 SPListItem li = null;
                                 try

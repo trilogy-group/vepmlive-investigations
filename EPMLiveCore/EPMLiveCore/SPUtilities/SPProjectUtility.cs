@@ -23,9 +23,9 @@ namespace EPMLiveCore.SPUtilities
             string url = SPContext.Current.Web.Url;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                using (SPSite mysite = new SPSite(url))
+                using (var mysite = new SPSite(url))
                 {
-                    using (SPWeb myweb = mysite.OpenWeb())
+                    using (var myweb = mysite.OpenWeb())
                     {
                         myweb.Site.CatchAccessDeniedException = false;
                         try
@@ -83,7 +83,7 @@ namespace EPMLiveCore.SPUtilities
 
                         try
                         {
-                            string[] tRollupLists = gSettings.RollupLists.Split(',');
+                            var tRollupLists = gSettings.RollupLists.Split(',');
                             result.ListName = tRollupLists[0].Split('|')[0];
                         }
                         catch (Exception ex)
