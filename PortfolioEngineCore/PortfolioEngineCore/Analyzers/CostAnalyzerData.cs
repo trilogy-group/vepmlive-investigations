@@ -300,7 +300,6 @@ namespace PortfolioEngineCore
 
         public static bool CheckIfCostViewsExist(SqlConnection sqlConnection)
         {
-            var found = false;
             var commandText = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
             using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
@@ -308,20 +307,17 @@ namespace PortfolioEngineCore
                 {
                     while (reader.Read())
                     {
-                        if (found == false)
-                        {
-                            found = true;
+                        // (CC-76796, 2018-07-20) For some reason, original code was reading these values without using them further.
+                        // It's unlikely that deleting these lines would break anything, but no-change policy assumes no changes.
+                        var costViewId = DBAccess.ReadIntValue(reader["VIEW_UID"]);
+                        var costViewIdString = costViewId.ToString();
 
-                            // (CC-76796, 2018-07-20) For some reason, original code was reading these values without using them further.
-                            // It's unlikely that deleting these lines would break anything, but no-change policy assumes no changes.
-                            var costViewId = DBAccess.ReadIntValue(reader["VIEW_UID"]);
-                            var costViewIdString = costViewId.ToString();
-                        }
+                        return true;
                     }
                 }
             }
 
-            return found;
+            return false;
         }
 
         public static int GrabCostViewInfo(
