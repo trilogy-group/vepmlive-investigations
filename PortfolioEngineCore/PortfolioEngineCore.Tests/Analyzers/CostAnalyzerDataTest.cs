@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,6 +14,19 @@ namespace PortfolioEngineCore.Tests.Analyzers
         private int _readsCountTotal;
         private int _currentReadNumber;
         private int _viewId;
+        private string _costViewIdString;
+        private string _calculatedCostTypesString;
+        private string _costTypesString;
+        private string _otherCostTypesString;
+        private int _costBreakdownIdOut;
+        private int _firstPeriodOut;
+        private int _lastPeriodOut;
+        private int _costBreakdownIdDb;
+        private int _firstPeriodDb;
+        private int _lastPeriodDb;
+        private int _costTypeId;
+        private int _costTypeEditMode;
+        private HashSet<string> _sqlCommandsRun;
 
         [TestInitialize]
         public void SetUp()
@@ -22,12 +36,37 @@ namespace PortfolioEngineCore.Tests.Analyzers
             _readsCountTotal = 1;
             _sqlConnectionShim = new ShimSqlConnection();
             _viewId = 2;
+            _costViewIdString = "10";
+            _calculatedCostTypesString = "15";
+            _costBreakdownIdDb = 11;
+            _firstPeriodDb = 12;
+            _lastPeriodDb = 13;
+            _costTypeId = 21;
+            _costTypeEditMode = 1;
+            _sqlCommandsRun = new HashSet<string>();
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, sqlConnection) =>
+            {
+                if (_sqlCommandsRun.Add(commandText))
+                {
+                    _currentReadNumber = 0;
+                }
+            };
 
             ShimSqlCommand.AllInstances.ExecuteReader = (instance) => new ShimSqlDataReader
             {
-                Read = () => _currentReadNumber++ < _readsCountTotal,
+                Read = () => 
+                {
+                    return _currentReadNumber++ < _readsCountTotal;
+                },
+
                 ItemGetString = columnName =>
                                     columnName == "VIEW_UID" ? (object)_viewId :
+                                    columnName == "VIEW_COST_BREAKDOWN" ? (object) _costBreakdownIdDb :
+                                    columnName == "VIEW_FIRST_PERIOD" ? (object) _firstPeriodDb :
+                                    columnName == "VIEW_LAST_PERIOD" ? (object) _lastPeriodDb :                                    
+                                    columnName == "CT_ID" ? (object) _costTypeId :                                    
+                                    columnName == "CT_EDIT_MODE" ? (object) _costTypeEditMode:                                    
                                     DBNull.Value
             };
         }
@@ -42,17 +81,12 @@ namespace PortfolioEngineCore.Tests.Analyzers
         public void CheckIfCostViewsExist_Always_CorrectSqlExecuted()
         {
             // Arrange
-            string commandTextUsed = null;
-            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, sqlConnection) =>
-            {
-                commandTextUsed = commandText;
-            };
 
             // Act
             CostAnalyzerData.CheckIfCostViewsExist(_sqlConnectionShim.Instance);
 
             // Assert
-            Assert.AreEqual("SELECT * FROM EPGT_COSTVIEW_DISPLAY", commandTextUsed);
+            Assert.IsTrue(_sqlCommandsRun.Contains("SELECT * FROM EPGT_COSTVIEW_DISPLAY"));
         }
 
         [TestMethod]
@@ -79,6 +113,283 @@ namespace PortfolioEngineCore.Tests.Analyzers
 
             // Assert
             Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostViewIdUnparsable_Returns1()
+        {
+            // Arrange
+            _costViewIdString = "test";
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostViewId0_Returns1()
+        {
+            // Arrange
+            _costViewIdString = "0";
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostViewIdValid_ReadsCostViewDisplayFromDb()
+        {
+            // Arrange
+            _costBreakdownIdDb = 0;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.IsTrue(_sqlCommandsRun.Contains("SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + _costViewIdString));
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostViewIdValid_ReadsValuesFromDb()
+        {
+            // Arrange
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costBreakdownIdDb, _costBreakdownIdOut);
+            Assert.AreEqual(_firstPeriodDb, _firstPeriodOut);
+            Assert.AreEqual(_lastPeriodDb, _lastPeriodOut);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostBreakdownId0_Returns1()
+        {
+            // Arrange
+            _costBreakdownIdDb = 0;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_CostBreakdownIdNot0_ReadsCostTypesFromDb()
+        {
+            // Arrange
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.IsTrue(_sqlCommandsRun.Contains(@"
+                SELECT 
+                    EPGT_COSTVIEW_COST_TYPES.CT_ID, 
+                    EPGP_COST_TYPES.CT_EDIT_MODE 
+                FROM EPGT_COSTVIEW_COST_TYPES 
+                     INNER JOIN EPGP_COST_TYPES ON EPGT_COSTVIEW_COST_TYPES.CT_ID = EPGP_COST_TYPES.CT_ID 
+                WHERE VIEW_UID = " + _costViewIdString));
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditMode1RunsOnce_AssignsIdToCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 1;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId.ToString(), _costTypesString);
+        }
+
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditMode1RunsMultiple_AppendsIdToCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 1;
+            _readsCountTotal = 2;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId + "," + _costTypeId, _costTypesString);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditModeNon1Or3RunsOnce_AssignsIdToOtherCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 2;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId.ToString(), _otherCostTypesString);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditModeNon1Or3RunsMultiple_AppendsIdToOtherCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 2;
+            _readsCountTotal = 2;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId + "," + _costTypeId, _otherCostTypesString);
+        }
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditMode3RunsOnce_AssignsIdToCalculatedCostTypesAndOtherCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 3;
+            var calculatedCostTypesInitialState = _calculatedCostTypesString;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId.ToString(), _otherCostTypesString);
+            Assert.AreEqual(calculatedCostTypesInitialState + "," + _costTypeId, _calculatedCostTypesString);
+        }
+
+
+        [TestMethod]
+        public void GrabCostViewInfo_EditMode3RunsMultiple_AppendsIdToCostTypesAndCalculatedCostTypes()
+        {
+            // Arrange
+            _costTypeEditMode = 3;
+            _readsCountTotal = 2;
+            var calculatedCostTypesInitialState = _calculatedCostTypesString;
+
+            // Act
+            var result = CostAnalyzerData.GrabCostViewInfo(
+                _sqlConnectionShim.Instance,
+                _costViewIdString,
+                ref _calculatedCostTypesString,
+                out _costBreakdownIdOut,
+                out _costTypesString,
+                out _otherCostTypesString,
+                out _firstPeriodOut,
+                out _lastPeriodOut
+            );
+
+            // Assert
+            Assert.AreEqual(_costTypeId + "," + _costTypeId, _otherCostTypesString);
+            Assert.AreEqual(calculatedCostTypesInitialState + "," + _costTypeId + "," + _costTypeId, _calculatedCostTypesString);
         }
     }
 }
