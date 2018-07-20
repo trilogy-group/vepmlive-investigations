@@ -131,6 +131,7 @@ export class IssueItemPageHelper {
             stepLogger,
             titleValue,
             IssueItemPageConstants.columnNames.title);
+        return titleValue;
     }
     static async deleteItemAndValidateIt(stepLogger: StepLogger, titleValue: string ) {
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);

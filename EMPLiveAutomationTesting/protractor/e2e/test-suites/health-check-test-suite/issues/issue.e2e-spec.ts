@@ -16,10 +16,10 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     it('Add, Edit and Delete Issue - [829740]', async () => {
         const stepLogger = new StepLogger(829740);
         stepLogger.stepId(1);
-        const titleValue = await IssueItemPageHelper.createIssueAndValidateIt(stepLogger);
+        let titleValue = await IssueItemPageHelper.createIssueAndValidateIt(stepLogger);
 
         stepLogger.stepId(2);
-        await IssueItemPageHelper.editItemAndValidateIt(stepLogger, titleValue );
+        titleValue = await IssueItemPageHelper.editItemAndValidateIt(stepLogger, titleValue );
 
         stepLogger.stepId(3);
         await IssueItemPageHelper.deleteItemAndValidateIt(stepLogger, titleValue );
