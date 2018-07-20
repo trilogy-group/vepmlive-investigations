@@ -8,7 +8,6 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../../../page-objects/resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../../../../page-objects/resource-analyzer-page/resource-analyzer-page.po';
-import {WaitHelper} from '../../../../components/html/wait-helper';
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -26,10 +25,13 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
+
         stepLogger.stepId(1);
         stepLogger.step('Click Cancel button in Select Analyzer Periods popup window and validate it ');
+
         await ResourceAnalyzerPageHelper.verifyResourceAnalyzerCancelButtonFunctionality(stepLogger);
         stepLogger.stepId(2);
+
         stepLogger.step('Click on Display button in Select Analyzer Periods popup windowand validate it ');
         await CommonPageHelper.resourceAnalyzerViaRibbon(stepLogger);
 
@@ -44,16 +46,20 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
+
         await CommonPageHelper.resourceAnalyzerViaRibbon(stepLogger);
         stepLogger.stepId(1);
+
         stepLogger.step('Validate Top panel in analyser Tab');
         await ResourceAnalyzerPageHelper.validateTopPannelAnalyserTab(stepLogger);
+
         stepLogger.stepId(2);
         stepLogger.step('click on  view Tab');
-        await WaitHelper.getInstance().waitForElementToBeClickable(ResourceAnalyzerPage.viewTab);
         await PageHelper.click(ResourceAnalyzerPage.viewTab);
+
         stepLogger.step('Validate Top panel in view Tab');
         await ResourceAnalyzerPageHelper.validateTopPannelViewTab(stepLogger);
+
         stepLogger.stepId(3);
         stepLogger.step('Validate Bottom  panel');
         await ResourceAnalyzerPageHelper.validatebottomPannel(stepLogger);

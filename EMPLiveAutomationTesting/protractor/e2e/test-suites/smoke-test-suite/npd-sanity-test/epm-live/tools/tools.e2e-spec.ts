@@ -29,6 +29,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
+
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);

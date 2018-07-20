@@ -18,8 +18,8 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Run Refresh Schedule - [82979]', async () => {
-        const stepLogger = new StepLogger(82979);
+    it('Run Refresh Schedule - [829793]', async () => {
+        const stepLogger = new StepLogger(829793);
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
