@@ -216,7 +216,6 @@ export class RiskItemPageHelper {
         await this.saveRisk(stepLogger);
 
         await PageHelper.switchToDefaultContent();
-
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,
