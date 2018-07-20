@@ -198,89 +198,95 @@ namespace PortfolioEngineCore
             //return 2;
         }
 
-        private int GrabPidsFromTickect(SqlConnection oDataAccess, string ticket, out string sPids, out bool bNoneMissing, out int PICount)
+        public static int GrabPidsFromTickect(
+            SqlConnection sqlConnection,
+            string ticket,
+            out string projectIdsString,
+            out bool projectsExist,
+            out int projectsCount)
         {
+            var commandText = string.Empty;
+            var guidsString = string.Empty;
+            var ginString = string.Empty;
+            var eStatus = 0;
+            projectIdsString = string.Empty;
+            projectsExist = true;
+            projectsCount = 0;
+            int projectId;
 
-            string sCommand = "";
-            int eStatus = 0;
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            string sGuids = "";
-            string sGin = "";
-            sPids = "";
-            bNoneMissing = true;
-            PICount = 0;
-            int i = 0;
-            int lPid;
-
-             sCommand = "SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '" + ticket + "'";
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            commandText = string.Format("SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '{0}'", ticket);
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
-                sGuids = DBAccess.ReadStringValue(reader["DC_DATA"]);
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        guidsString = DBAccess.ReadStringValue(reader["DC_DATA"]);
+                    }
+                }
             }
-            reader.Close();
-            reader = null;
 
+            guidsString = guidsString.Replace(",", " ");
+            guidsString = guidsString.ToUpper();
+            guidsString = guidsString.Trim();
 
-            sGuids = sGuids.Replace(",", " ");
-            sGuids = sGuids.ToUpper();
-            sGuids = sGuids.Trim();
-
-
-            while (sGuids.Length != 0)
+            var i = 0;
+            while (guidsString.Length != 0)
             {
-                sGin = "";
+                ginString = string.Empty;
 
-                i = sGuids.IndexOf(" ");
+                i = guidsString.IndexOf(" ");
 
                 if (i == -1)
                 {
-                    sGin = sGuids;
-                    sGuids = "";
+                    ginString = guidsString;
+                    guidsString = string.Empty;
                 }
                 else
                 {
-                    sGin = sGuids.Substring(0, i);
-                    sGuids = sGuids.Substring(i + 1);
+                    ginString = guidsString.Substring(0, i);
+                    guidsString = guidsString.Substring(i + 1);
                 }
 
                 // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
                 // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
+                if (ginString != string.Empty && !ginString.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
                 {
-
-                    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
-
-                    oCommand = new SqlCommand(sCommand, oDataAccess);
-                    reader = oCommand.ExecuteReader();
-                    lPid = 0;
-                    while (reader.Read())
+                    commandText = string.Format("SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '{0}'", ginString);
+                    using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
                     {
-                        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                        using (var reader = sqlCommand.ExecuteReader())
+                        {
+                            projectId = 0;
+                            while (reader.Read())
+                            {
+                                projectId = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                            }
+                        }
                     }
-                    reader.Close();
-                    reader = null;
 
-                    if (lPid == 0)
-                        bNoneMissing = false;
+                    if (projectId == 0)
+                    {
+                        projectsExist = false;
+                    }
                     else
                     {
-                        ++PICount;
-                        if (sPids == "")
-                            sPids = lPid.ToString();
+                        ++projectsCount;
+                        if (projectIdsString == string.Empty)
+                        {
+                            projectIdsString = projectId.ToString();
+                        }
                         else
-                            sPids = sPids + "," + lPid.ToString();
+                        {
+                            projectIdsString = projectIdsString + "," + projectId.ToString();
+                        }
                     }
-
                 }
-
             }
-            return eStatus;
 
+            return eStatus;
         }
+
         private int GrabCostViewInfo(SqlConnection oDataAccess, string sCostView, out int lCB_ID, out string sCostTypes, out string sOtherCostTypes, out string m_sCalcCostTypes, out int lMinP, out int lMaxP)
         {
 
