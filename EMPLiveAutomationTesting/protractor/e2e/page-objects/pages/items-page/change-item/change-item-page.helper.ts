@@ -15,6 +15,7 @@ import {CommonPageConstants} from '../../common/common-page.constants';
 import {RiskItemPageHelper} from '../risk-item/risk-item-page.helper';
 import {ProjectItemPageConstants} from '../project-item/project-item-page.constants';
 import {ProjectItemPage} from '../project-item/project-item.po';
+import {IssueItemPageConstants} from '../issue-item/issue-item-page.constants';
 
 export class ChangeItemPageHelper {
     static async fillForm(titleValue: string, priority: string, stepLogger: StepLogger) {
@@ -53,16 +54,7 @@ export class ChangeItemPageHelper {
 
         return projectName;
     }
-    static async searchChangeByTitle(stepLogger: StepLogger , titleValue: string ) {
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.changes,
-            CommonPage.pageHeaders.projects.changes,
-            CommonPageConstants.pageHeaders.projects.changes,
-            stepLogger);
-        await CommonPageHelper.searchItemByTitle(titleValue,
-            ChangeItemPageConstants.columnNames.linkTitleNoMenu,
-            stepLogger);
-    }
+
     static async createNewChange(stepLogger: StepLogger) {
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
         stepLogger.step('Various Create New options are displayed');
@@ -105,7 +97,12 @@ export class ChangeItemPageHelper {
         await CommonPageHelper.notificationDisplayedValidation
         (CommonPageHelper.getNotificationByText(titleValue) , ChangeItemPageConstants.pageName );
 
-        await this.searchChangeByTitle(stepLogger , titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            stepLogger,
+            titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         return titleValue;
     }
     static async editChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
@@ -116,14 +113,24 @@ export class ChangeItemPageHelper {
 
         await PageHelper.click(CommonPage.formButtons.save);
 
-        await this.searchChangeByTitle(stepLogger , titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            stepLogger,
+            titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
       }
     static async deleteChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
 
-        await this.searchChangeByTitle(stepLogger , titleValue );
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
+            CommonPage.pageHeaders.projects.changes,
+            CommonPageConstants.pageHeaders.projects.changes,
+            stepLogger,
+            titleValue,
+            ChangeItemPageConstants.columnNames.linkTitleNoMenu);
 
         stepLogger.step('Validating deleted Risk  is not  Present');
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
