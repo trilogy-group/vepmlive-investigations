@@ -21,25 +21,16 @@ export class IssueItemPageHelper {
     static async clickCreateNewIssue(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
-        stepLogger.step('Various Create New options are displayed');
-        await CommonPageHelper.labelDisplayedValidation
-        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
-    }
+        }
     static async newIconFromLeftSideMenu(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
-        stepLogger.step('Various Create New options are displayed');
-        await CommonPageHelper.labelDisplayedValidation
-        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
-    }
+        }
     static async clickIssueLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "Issue" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
-
-        stepLogger.verification('"Issues - New Item" window is displayed');
-        await CommonPageHelper.pageDisplayedValidation(IssueItemPageConstants.pageName);
-    }
+         }
     static async clickProject(stepLogger: StepLogger , projectName: string , labels: string) {
         await PageHelper.click(IssueItemPage.inputs.project);
         stepLogger.verification('Required values entered/selected in Project Field');
@@ -50,15 +41,32 @@ export class IssueItemPageHelper {
 
     }
 
+    static async enterIssueTitle(stepLogger: StepLogger , titleValue: string ) {
+        stepLogger.step('Title *: Random New Issue Item');
+        await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
+
+    }
+
     static  async createIssueAndValidateIt(stepLogger: StepLogger ) {
         stepLogger.stepId(1);
         await this.clickCreateNewIssue(stepLogger);
 
+        stepLogger.step('Various Create New options are displayed');
+        await CommonPageHelper.labelDisplayedValidation
+        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
+
         stepLogger.stepId(2);
         await this.newIconFromLeftSideMenu(stepLogger);
 
+        stepLogger.step('Various Create New options are displayed');
+        await CommonPageHelper.labelDisplayedValidation
+        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
+
         stepLogger.stepId(3);
         await this.clickIssueLink(stepLogger);
+
+        stepLogger.verification('"Issues - New Item" window is displayed');
+        await CommonPageHelper.pageDisplayedValidation(IssueItemPageConstants.pageName);
 
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
@@ -70,7 +78,7 @@ export class IssueItemPageHelper {
 
         stepLogger.step('Title *: Random New Issue Item');
         const titleValue = `${labels.title} ${uniqueId}`;
-        await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
+        await this.enterIssueTitle(stepLogger, titleValue ) ;
 
         stepLogger.verification('Required values entered/selected in title Field');
         await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, titleValue))

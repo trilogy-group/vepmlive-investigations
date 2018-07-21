@@ -458,8 +458,16 @@ export class ProjectItemPageHelper {
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
 
     }
+    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+
+        stepLogger.step('Select "Delete" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.delete);
+
+        await PageHelper.acceptAlert();
+    }
     static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
-        await CommonPageHelper.deleteOptionViaRibbon(stepLogger);
+        await this.deleteOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Navigate to page');
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,

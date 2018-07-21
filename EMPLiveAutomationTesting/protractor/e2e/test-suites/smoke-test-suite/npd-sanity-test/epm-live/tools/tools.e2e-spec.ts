@@ -14,8 +14,8 @@ import {ValidationsHelper} from '../../../../../components/misc-utils/validation
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
-import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
-import {ResourceplannerPage} from '../../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.po';
+import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
+import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resourceplanner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -40,7 +40,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceplannerPage.delete);
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.delete);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 

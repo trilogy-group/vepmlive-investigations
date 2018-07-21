@@ -70,7 +70,7 @@ export class ReportingSettingsPageHelper {
 
        await this.refreshBrowserTileLastRunPresent(stepLogger);
 
-       stepLogger.verification('Last Result - commonly "No Errors" displayed (Note: Can display other results]');
+       stepLogger.verification('Last Result - commonly "No Errors" displayed ]');
        await expect((await ReportManagerPage.formControls.messages.getText()).trim())
            .toBe(ReportManagerPageConstants.noErrorMessage,
                ReportManagerPageValidation.lastResultValidation);

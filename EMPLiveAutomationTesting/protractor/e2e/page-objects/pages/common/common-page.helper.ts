@@ -322,14 +322,6 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
     }
-    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
-        await this.selectRecordFromGrid(stepLogger, item);
-
-        stepLogger.step('Select "Delete" from the options displayed');
-        await PageHelper.click(CommonPage.ribbonItems.delete);
-
-        await PageHelper.acceptAlert();
-    }
     static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
@@ -631,9 +623,6 @@ export class CommonPageHelper {
     static getElementAllByText(text: string, isContains = false) {
         return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
     }
-    static getApplyButton(text: string, isContains = false) {
-        return element(By.css(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`)).first();
-    }
     static getDescendingColumnSelector(columnName: string) {
         return this.getColumnSelector(columnName, CommonPageConstants.classNames.descendingClass);
     }
@@ -714,24 +703,5 @@ export class CommonPageHelper {
        }
     static async waitForApplyButtontoDisplayed() {
         await  WaitHelper.getInstance().waitForElementToBeClickable(this.getApplyLink());
-    }
-    static getDropDownByParameterNameXpath(name: string) {
-        return `//*[@data-parametername="${name}"]//select`;
-    }
-    static getDropDownByParameterName(name: string, index = 1) {
-        return element.all(By.xpath(this.getDropDownByParameterNameXpath(name))).get(index);
-    }
-    static  periodStartOption(name: string ) {
-        return this.getDropDownByParameterName(name);
-    }
-    static  periodEndOption(name: string) {
-       return this.getDropDownByParameterName(name);
-    }
-    static  department(name: string) {
-        return this.getDropDownByParameterName(name);
-    }
-    static  periodEndOptionValue(name: string) {
-        return element(By.xpath(`("${this.getDropDownByParameterNameXpath
-        (name)}")[2]//option[last()]`));
     }
    }

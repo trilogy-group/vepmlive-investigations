@@ -2,7 +2,7 @@ import {PageHelper} from '../../../components/html/page-helper';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../helpers/suite-names';
-import {ResourcePlannerPageHelper} from '../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
+import {ResourcePlannerPageHelper} from '../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 import {StepLogger} from '../../../../core/logger/step-logger';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 import {CommonPage} from '../../../page-objects/pages/common/common.po';

@@ -12,9 +12,9 @@ import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
-import {ResourceplannerPage} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.po';
-import {ResourcePlannerConstants} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.constants';
-import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resourceplanner-page/resourceplanner-page.helper';
+import {ResourcePlannerPage} from '../../../../page-objects/pages/resource-planner-page/resourceplanner-page.po';
+import {ResourcePlannerConstants} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.constants';
+import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.constansts';
 // tslint:disable-next-line:max-line-length
 import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
@@ -301,7 +301,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await ResourceCapacityHeatMapPageHelper.selectParametersAndApply(stepLogger);
         stepLogger.step('Validate that User  is present ');
-        await CommonPageHelper.fieldDisplayedValidation(ResourceplannerPage.addedUser , ResourcePlannerConstants.user );
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
       });
     it('Generate "Resource Commitments" Report - [743183]', async () => {
         const stepLogger = new StepLogger(743183);
@@ -453,7 +453,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(8);
         stepLogger.step('Validate that Added user is present ');
-        await CommonPageHelper.fieldDisplayedValidation(ResourceplannerPage.addedUser , ResourcePlannerConstants.user );
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
 
     });
     it('View the Work hours via Resource Work vs Capacity report. - [59772477]', async () => {
@@ -502,7 +502,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Getting Value from  Resource Capacity Heat Map');
         // await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
         stepLogger.step('Validate that Added Hours is present ');
-        await CommonPageHelper.fieldDisplayedValidation(ResourceplannerPage.addedUser , ResourcePlannerConstants.user);
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user);
     });
 
 });

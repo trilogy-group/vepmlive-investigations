@@ -1,9 +1,9 @@
 import {BasePage} from '../base-page';
-import {ResourcePlannerConstants} from './resourceplanner-page.constants';
+import {ResourcePlannerConstants} from './resource-planner-page.constants';
 import {By, element} from 'protractor';
 import {ElementHelper} from '../../../components/html/element-helper';
 
-export class ResourceplannerPage extends BasePage {
+export class ResourcePlannerPage extends BasePage {
 
     static get delete(){
         return element(By.id('DeleteBtn'));
@@ -55,16 +55,16 @@ export class ResourceplannerPage extends BasePage {
     static get topSection() {
         const labels = ResourcePlannerConstants.topSection;
         return {
-            save: ResourceplannerPage.getTopSectionButtonById(labels.save),
-            close: ResourceplannerPage.getTopSectionButtonById(labels.close),
-            delete: ResourceplannerPage.getTopSectionButtonById(labels.delete),
-            allocateValue: ResourceplannerPage.getTopSectionButtonById(labels.allocateValue),
-            exportToExcel: ResourceplannerPage.getTopSectionButtonById(labels.exportToExcel),
-            importCostPlan: ResourceplannerPage.getTopSectionButtonById(labels.importCostPlan),
-            makePublic: ResourceplannerPage.getTopSectionButtonById(labels.makePublic),
-            note: ResourceplannerPage.getTopSectionButtonById(labels.note),
-            print: ResourceplannerPage.getTopSectionButtonById(labels.print),
-            importWork: ResourceplannerPage.getTopSectionButtonById(labels.importWork),
+            save: ResourcePlannerPage.getTopSectionButtonById(labels.save),
+            close: ResourcePlannerPage.getTopSectionButtonById(labels.close),
+            delete: ResourcePlannerPage.getTopSectionButtonById(labels.delete),
+            allocateValue: ResourcePlannerPage.getTopSectionButtonById(labels.allocateValue),
+            exportToExcel: ResourcePlannerPage.getTopSectionButtonById(labels.exportToExcel),
+            importCostPlan: ResourcePlannerPage.getTopSectionButtonById(labels.importCostPlan),
+            makePublic: ResourcePlannerPage.getTopSectionButtonById(labels.makePublic),
+            note: ResourcePlannerPage.getTopSectionButtonById(labels.note),
+            print: ResourcePlannerPage.getTopSectionButtonById(labels.print),
+            importWork: ResourcePlannerPage.getTopSectionButtonById(labels.importWork),
 
         };
     }
@@ -72,31 +72,31 @@ export class ResourceplannerPage extends BasePage {
     static get topGrid() {
         const labels = ResourcePlannerConstants.topGrid;
         return {
-            comment: ResourceplannerPage.getTopGridItemsByText(labels.comment),
-            department: ResourceplannerPage.getTopGridItemsByText(labels.department),
-            itemName: ResourceplannerPage.getTopGridItemsByText(labels.itemName),
-            role: ResourceplannerPage.getTopGridItemsByText(labels.role),
+            comment: ResourcePlannerPage.getTopGridItemsByText(labels.comment),
+            department: ResourcePlannerPage.getTopGridItemsByText(labels.department),
+            itemName: ResourcePlannerPage.getTopGridItemsByText(labels.itemName),
+            role: ResourcePlannerPage.getTopGridItemsByText(labels.role),
         };
     }
     static get buttomGrid() {
         const labels = ResourcePlannerConstants.topGrid;
         return {
-            department: ResourceplannerPage.getButtomGridItemsByText(labels.department),
-            itemName: ResourceplannerPage.getButtomGridItemsByText(labels.itemName),
-            role: ResourceplannerPage.getButtomGridItemsByText(labels.role),
+            department: ResourcePlannerPage.getButtomGridItemsByText(labels.department),
+            itemName: ResourcePlannerPage.getButtomGridItemsByText(labels.itemName),
+            role: ResourcePlannerPage.getButtomGridItemsByText(labels.role),
         };
     }
     static get buttonSection() {
         const labels = ResourcePlannerConstants.buttonSection;
         return {
-            add: ResourceplannerPage.getbuttonSectionButtonById(labels.addButton),
-            analyze: ResourceplannerPage.getbuttonSectionButtonById(labels.analyzeButton),
-            clearSorting: ResourceplannerPage.getbuttonSectionButtonById(labels.clearSorting),
-            heatMap: ResourceplannerPage.getbuttonSectionButtonById(labels.heatMap),
-            match: ResourceplannerPage.getbuttonSectionButtonById(labels.matchButton),
-            selectColumn: ResourceplannerPage.getbuttonSectionButtonById(labels.selectResColumnsBtn),
-            filter: ResourceplannerPage.getbuttonSectionButtonById(labels.showFilter),
-            showGrouping: ResourceplannerPage.getbuttonSectionButtonById(labels.showGrouping),
+            add: ResourcePlannerPage.getbuttonSectionButtonById(labels.addButton),
+            analyze: ResourcePlannerPage.getbuttonSectionButtonById(labels.analyzeButton),
+            clearSorting: ResourcePlannerPage.getbuttonSectionButtonById(labels.clearSorting),
+            heatMap: ResourcePlannerPage.getbuttonSectionButtonById(labels.heatMap),
+            match: ResourcePlannerPage.getbuttonSectionButtonById(labels.matchButton),
+            selectColumn: ResourcePlannerPage.getbuttonSectionButtonById(labels.selectResColumnsBtn),
+            filter: ResourcePlannerPage.getbuttonSectionButtonById(labels.showFilter),
+            showGrouping: ResourcePlannerPage.getbuttonSectionButtonById(labels.showGrouping),
         };
     }
 }

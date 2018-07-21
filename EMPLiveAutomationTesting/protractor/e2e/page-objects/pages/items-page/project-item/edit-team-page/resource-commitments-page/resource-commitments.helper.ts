@@ -5,6 +5,7 @@ import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {ResourceCommitments} from './resource-commitments.po';
 import {ResourceCommitmentsConstansts} from './resource-commitments.constansts';
 import {CommonPageHelper} from '../../../../common/common-page.helper';
+import {CommonPage} from '../../../../common/common.po';
 
 export class ResourceCommitmentsHelper {
     static async selectResourceAndApply(stepLogger: StepLogger) {
@@ -18,17 +19,18 @@ export class ResourceCommitmentsHelper {
         await CommonPageHelper.fieldDisplayedValidation
         (ResourceCommitments.specifyParameterValues, ResourceCommitmentsConstansts.specifyParameterValues );
 
-        await  PageHelper.click(ResourceCommitments.resource);
+        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ));
 
         await this.selectResource(stepLogger);
 
         await CommonPageHelper.clickApplyButton(stepLogger);
     }
     static async selectResource(stepLogger: StepLogger) {
-        await  PageHelper.click(ResourceCommitments.resource);
+        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ));
         stepLogger.step('Select Resource ');
 
-        await DropDownHelper.selectOptionByVal(ResourceCommitments.resource, '10001' );
+        await DropDownHelper.selectOptionByVal
+        (CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ), '10001' );
         await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 }

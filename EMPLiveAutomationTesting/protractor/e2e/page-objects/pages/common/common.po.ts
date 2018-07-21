@@ -523,5 +523,23 @@ export class CommonPage extends BasePage {
     static get latestNotification(){
         return element.all(By.className('EPMLiveNotificationTitle')).get(0);
     }
-
+    static getDropDownByParameterNameXpath(name: string) {
+        return `//*[@data-parametername="${name}"]//select`;
+    }
+    static getDropDownByParameterName(name: string, index = 1) {
+        return element.all(By.xpath(this.getDropDownByParameterNameXpath(name))).get(index);
+    }
+    static  periodStartOption(name: string ) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  periodEndOption(name: string) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  department(name: string) {
+        return this.getDropDownByParameterName(name);
+    }
+    static  periodEndOptionValue(name: string) {
+        return element(By.xpath(`("${this.getDropDownByParameterNameXpath
+        (name)}")[2]//option[last()]`));
+    }
 }
