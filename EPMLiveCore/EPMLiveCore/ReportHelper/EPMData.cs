@@ -669,13 +669,15 @@ namespace EPMLiveCore.ReportHelper
 
         private void WriteTextFile(string path, string text)
         {
-            if (!string.IsNullOrWhiteSpace(_sTextFilePath))
+            if (string.IsNullOrWhiteSpace(path))
             {
-                using (TextWriter writer = new StreamWriter(path))
-                {
-                    writer.WriteLine(text);
-                    writer.Close();
-                }
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            using (TextWriter writer = new StreamWriter(path))
+            {
+                writer.WriteLine(text);
+                writer.Close();
             }
         }
 
