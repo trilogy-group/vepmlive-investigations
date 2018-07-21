@@ -25,7 +25,7 @@ namespace EPMLiveCore.Tests.API.Integration
         private const int OneCall = 1;
         private const int TwoCalls = 2;
         private const int ThreeCalls = 3;
-
+        private const string FieldSqlConnection = "cn";
         private static readonly Guid _siteId = Guid.NewGuid();
         private static readonly Guid _webId = Guid.NewGuid();
 
@@ -60,7 +60,7 @@ namespace EPMLiveCore.Tests.API.Integration
             shimSqlConnection.Close = () => _sqlConnectionState = ConnectionState.Closed;
             shimSqlConnection.StateGet = () => _sqlConnectionState;
 
-            _testEntityPrivate.SetField("cn", _sqlConnection);
+            _testEntityPrivate.SetField(FieldSqlConnection, _sqlConnection);
         }
 
         [TestCleanup]
@@ -73,7 +73,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void GetIntegrationControl()
+        public void GetIntegrationControl_WhenCalled_ReturnsDataTable()
         {
             // Arrange
             const string expectedCommandText = "SELECT     dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.INT_COLID, WINDOWSTYLE FROM         dbo.INT_CONTROLS INNER JOIN dbo.INT_LISTS ON dbo.INT_CONTROLS.INT_LIST_ID = dbo.INT_LISTS.INT_LIST_ID where LIST_ID=@listid and control=@control";
@@ -145,7 +145,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void GetIntegrationControlByIntId()
+        public void GetIntegrationControlByIntId_WhenCalled_ReturnsDataTable()
         {
             // Arrange
             const string expectedCommandText = "SELECT   LIST_ID,  dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.INT_COLID, WINDOWSTYLE FROM         dbo.INT_CONTROLS INNER JOIN dbo.INT_LISTS ON dbo.INT_CONTROLS.INT_LIST_ID = dbo.INT_LISTS.INT_LIST_ID where INT_LISTS.INT_LIST_ID=@IntListId and control=@control";
@@ -217,7 +217,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void GetIntegrationsForList()
+        public void GetIntegrationsForList_WhenCalled_ReturnsDataTable()
         {
             // Arrange
             const string expectedCommandText = "select INT_LIST_ID as intlistid, priority, Title as intname , CASE WHEN ACTIVE = 1 THEN 'Yes' ELSE 'No' END AS Active, INT_COLID FROM dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID where LIST_ID=@listid order by priority";
@@ -285,7 +285,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void RemoveIntegration()
+        public void RemoveIntegration_IfIntegrationRemovedByIntegrator_RemovesIntegration()
         {
             // Arrange
             const string expectedCommandText = "DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid";
@@ -347,7 +347,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void GetIntegrations()
+        public void GetIntegrations_WhenCalled_ReturnsItegrationsDataSet()
         {
             // Arrange
             const string expectedCommand01Text = "SELECT * FROM INT_CATEGORY ORDER BY ORDERBY";
@@ -366,8 +366,7 @@ namespace EPMLiveCore.Tests.API.Integration
                     instance.CommandText = commandText;
                     sqlCommandCtor01CommandText = commandText;
                 }
-                else if (sqlCommandCtorCallCount == TwoCalls ||
-                         sqlCommandCtorCallCount == ThreeCalls)
+                else if (sqlCommandCtorCallCount == TwoCalls)
                 {
                     instance.CommandText = commandText;
                     sqlCommandCtor02CommandText = commandText;
@@ -391,8 +390,7 @@ namespace EPMLiveCore.Tests.API.Integration
                 {
                     sqlDataAdapterCtor01CommandText = sqlCommand.CommandText;
                 }
-                else if (sqlDataAdapterCtorCallCount == TwoCalls ||
-                         sqlDataAdapterCtorCallCount == ThreeCalls)
+                else if (sqlDataAdapterCtorCallCount == TwoCalls)
                 {
                     sqlDataAdapterCtor02CommandText = sqlCommand.CommandText;
 
@@ -405,28 +403,16 @@ namespace EPMLiveCore.Tests.API.Integration
 
             const string categoriesTableName = "Categories";
             const string columnCategoryId = "INT_CAT_ID";
-            const string columnCategoryName = "INT_CAT_NAME";
             const string columnModuleId = "INT_MOD_ID";
-            const string columnModuleName = "INT_MOD_NAME";
             const int row01CatId = 1;
-            const int row02CatId = 2;
-            const string row01CatName = "Category 1";
-            const string row02CatName = "Category 2";
 
             var fillMethodCallCount = 0;
             var producedCategoriesTable = new DataTable();
             producedCategoriesTable.Columns.Add(columnCategoryId);
-            producedCategoriesTable.Columns.Add(columnCategoryName);
 
             var producedModulesTable01 = new DataTable();
             producedModulesTable01.Columns.Add(columnModuleId);
-            producedModulesTable01.Columns.Add(columnModuleName);
             producedModulesTable01.Columns.Add(columnCategoryId);
-
-            var producedModulesTable02 = new DataTable();
-            producedModulesTable02.Columns.Add(columnModuleId);
-            producedModulesTable02.Columns.Add(columnModuleName);
-            producedModulesTable02.Columns.Add(columnCategoryId);
 
             ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
             {
@@ -441,27 +427,16 @@ namespace EPMLiveCore.Tests.API.Integration
                 {
                     var row01 = producedCategoriesTable.NewRow();
                     row01[columnCategoryId] = row01CatId;
-                    row01[columnCategoryName] = row01CatName;
-
-                    var row02 = producedCategoriesTable.NewRow();
-                    row02[columnCategoryId] = row02CatId;
-                    row02[columnCategoryName] = row02CatName;
 
                     producedCategoriesTable.Rows.Add(row01);
-                    producedCategoriesTable.Rows.Add(row02);
-
                     dataSet.Tables.Add(producedCategoriesTable);
                 }
                 else if (fillMethodCallCount == TwoCalls)
                 {
                     dataSet.Tables.Add(producedModulesTable01);
                 }
-                else if (fillMethodCallCount == ThreeCalls)
-                {
-                    dataSet.Tables.Add(producedModulesTable02);
-                }
 
-                return 0;
+                return -1;
             };
 
             var listId = Guid.NewGuid();
@@ -472,7 +447,7 @@ namespace EPMLiveCore.Tests.API.Integration
             // Assert
             returnedDataSet.ShouldSatisfyAllConditions(
                 () => returnedDataSet.ShouldNotBeNull(),
-                () => returnedDataSet.Tables.Count.ShouldBe(3),
+                () => returnedDataSet.Tables.Count.ShouldBe(2),
                 () =>
                 {
                     var returnedCatTable = returnedDataSet.Tables[0];
@@ -484,13 +459,7 @@ namespace EPMLiveCore.Tests.API.Integration
                 {
                     var returnedModTable01 = returnedDataSet.Tables[1];
                     returnedModTable01.TableName.ShouldBe(row01CatId.ToString());
-                    returnedModTable01.Columns.Count.ShouldBe(3);
-                },
-                () =>
-                {
-                    var returnedModTable02 = returnedDataSet.Tables[2];
-                    returnedModTable02.TableName.ShouldBe(row02CatId.ToString());
-                    returnedModTable02.Columns.Count.ShouldBe(3);
+                    returnedModTable01.Columns.Count.ShouldBe(2);
                 },
                 () => sqlCommandCtor01CommandText.ShouldBe(expectedCommand01Text),
                 () => sqlCommandCtor02CommandText.ShouldBe(expectedCommand02Text),
@@ -498,15 +467,13 @@ namespace EPMLiveCore.Tests.API.Integration
                 () => sqlDataAdapterCtor02CommandText.ShouldBe(expectedCommand02Text),
                 () => parameterList.ShouldContain(param => param.ParameterName == expectedCommand02Param &&
                                                            param.Value.Equals(row01CatId.ToString())),
-                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommand02Param &&
-                                                           param.Value.Equals(row02CatId.ToString())),
-                () => sqlCommandCtorCallCount.ShouldBe(3),
-                () => sqlDataAdapterCtorCallCount.ShouldBe(3),
-                () => fillMethodCallCount.ShouldBe(3));
+                () => sqlCommandCtorCallCount.ShouldBe(2),
+                () => sqlDataAdapterCtorCallCount.ShouldBe(2),
+                () => fillMethodCallCount.ShouldBe(2));
         }
 
         [TestMethod]
-        public void SaveProperties()
+        public void SaveProperties_WhenCalled_SavesPropertiesToDb()
         {
             // Arrange
             const string expectedCommandText = "SPIntSetProperty";
@@ -565,7 +532,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void GetDataSet()
+        public void GetDataSet_WhenCalled_ExecutesGivenQueryAndReturnsDataTable()
         {
             // Arrange
             const string sqlCommandText = "select * from DummyTable where Id = @id";
@@ -623,7 +590,7 @@ namespace EPMLiveCore.Tests.API.Integration
         }
 
         [TestMethod]
-        public void ExecuteQuery()
+        public void ExecuteQuery_WhenCalled_ExecutesGivenQuery()
         {
             // Arrange
             const string sqlCommandText = "insert into DummyTable (Name) values (@name)";
