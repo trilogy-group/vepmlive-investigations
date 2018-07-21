@@ -677,7 +677,6 @@ namespace EPMLiveCore.ReportHelper
             using (TextWriter writer = new StreamWriter(path))
             {
                 writer.WriteLine(text);
-                writer.Close();
             }
         }
 
@@ -1073,10 +1072,6 @@ namespace EPMLiveCore.ReportHelper
                 {
                     Trace.Write(ex.Message);
                     success = false;
-                }
-                finally
-                {
-                    sqlConnection.Close();
                 }
             }
 

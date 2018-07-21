@@ -21,15 +21,12 @@ namespace EPMLiveCore.Tests.ReportHelper
         private static readonly Guid DummyGuid = new Guid();
         private const string DummyCommand = "Dummy Command";
         private const string DummyName = "Dummy Name";
-        private const string DummyPath = "/dummy/dummy.dmy";
         private const string DummyString = "Dummy String";
         private const string DummyUrl = "http://www.dummy.com";
         private const string CreateEventMessageMethod = "CreateEventMessage";
         private const string CreateEventMessageWithParamsMethod = "CreateEventMessageWithParams";
         private const string LogWindowsEventsMethod = "LogWindowsEvents";
-        private const string TryToConnectMethod = "TryToConnect";
         private const string EpmLiveReportingKey = "EPMLive Reporting";
-        private const string TestKey = "A!9HHhi%XjjYY4YP2@Nob009X";
 
         private int _eventId;
         private string _logName;
