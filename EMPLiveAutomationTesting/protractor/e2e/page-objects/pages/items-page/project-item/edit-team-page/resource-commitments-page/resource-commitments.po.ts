@@ -1,4 +1,3 @@
-import {By, element} from 'protractor';
 import {BasePage} from '../../../../base-page';
 import {ElementHelper} from '../../../../../../components/html/element-helper';
 import {ResourceCommitmentsConstansts} from './resource-commitments.constansts';

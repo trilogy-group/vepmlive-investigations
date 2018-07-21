@@ -260,6 +260,7 @@ export class RiskItemPageHelper {
 
     }
     static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+        stepLogger.step('Select a Risk and Click on "ITEMS" >> Delete Item');
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,

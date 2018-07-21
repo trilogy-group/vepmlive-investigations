@@ -15,7 +15,7 @@ import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
-import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resourceplanner-page.po';
+import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;

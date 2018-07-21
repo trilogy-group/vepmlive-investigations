@@ -6,8 +6,8 @@ import {CommonPageHelper} from '../../../../page-objects/pages/common/common-pag
 import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-import {ResourceAnalyzerPageHelper} from '../../../../page-objects/resource-analyzer-page/resource-analyzer-page.helper';
-import {ResourceAnalyzerPage} from '../../../../page-objects/resource-analyzer-page/resource-analyzer-page.po';
+import {ResourceAnalyzerPageHelper} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.helper';
+import {ResourceAnalyzerPage} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.po';
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -62,7 +62,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         stepLogger.step('Validate Bottom  panel');
-        await ResourceAnalyzerPageHelper.validatebottomPannel(stepLogger);
+        await ResourceAnalyzerPageHelper.validateBottomPannel(stepLogger);
     });
 
 }) ;

@@ -19,10 +19,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         stepLogger.stepId(1);
         let titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
 
-        stepLogger.step('Edit Risk');
         titleValue = await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue );
-
-        stepLogger.step('Select a Risk and Click on "ITEMS" >> Delete Item');
 
         await RiskItemPageHelper.deleteRiskAndValidateIt(stepLogger, titleValue );
     });

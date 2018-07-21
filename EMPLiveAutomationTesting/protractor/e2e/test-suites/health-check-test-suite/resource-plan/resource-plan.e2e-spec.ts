@@ -29,10 +29,8 @@ describe(SuiteNames.healthCheckTestSuite, () => {
             stepLogger);
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
-        stepLogger.verification('"Edit Project" page is displayed');
 
         // Add hours for the resource added in the top-grid
-        stepLogger.step('Add hours for the resource added in the top-grid');
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
     });

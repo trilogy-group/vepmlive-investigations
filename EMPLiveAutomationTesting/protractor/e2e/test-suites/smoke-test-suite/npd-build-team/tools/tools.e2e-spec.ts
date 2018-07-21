@@ -12,7 +12,6 @@ import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
-import {ResourcePlannerPage} from '../../../../page-objects/pages/resource-planner-page/resourceplanner-page.po';
 import {ResourcePlannerConstants} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.constants';
 import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
 import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.constansts';
@@ -24,6 +23,7 @@ import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-pa
 import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
 // tslint:disable-next-line:max-line-length
 import {ResourceAvailablePageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
+import {ResourcePlannerPage} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -257,23 +257,19 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
-        stepLogger.verification('"Edit Project" page is displayed');
-
-        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.resourcePlanner);
-
-        stepLogger.stepId(1);
-        // Add hours for the resource added in the top-grid
-        stepLogger.step('Add hours for the resource added in the top-grid');
-        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
 
         stepLogger.stepId(2);
-        // navigate to Reporter setting page
-        stepLogger.step('navigate to Reporter setting page');
-        await ReportingSettingsPageHelper.navigateTo(stepLogger);
-        stepLogger.stepId(3);
-        // Run Schedule
-        stepLogger.step('Run Schedule');
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.resourcePlanner);
 
+        stepLogger.stepId(3);
+        // Add hours for the resource added in the top-grid
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
+
+        stepLogger.stepId(4);
+        // navigate to Reporter setting page
+        await ReportingSettingsPageHelper.navigateTo(stepLogger);
+        stepLogger.stepId(5);
+        // Run Schedule
         await ReportingSettingsPageHelper.runSchedule(stepLogger);
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -281,26 +277,23 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        stepLogger.stepId(4);
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        stepLogger.stepId(6);
 
         await CommonPageHelper.editTeam(stepLogger);
 
         await PageHelper.switchToDefaultContent();
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
-        stepLogger.stepId(5);
-        stepLogger.step('Click On Resource Capacity Heat Map');
+        stepLogger.stepId(7);
 
         await EditTeamPageHelper.clickviewReport(stepLogger);
 
         await EditTeamPageHelper.clickResourceCapacityHeatMap(stepLogger);
 
-        stepLogger.stepId(6);
-        stepLogger.step('Getting Value from  Resource Capacity Heat Map');
+        stepLogger.stepId(8);
 
         await ResourceCapacityHeatMapPageHelper.selectParametersAndApply(stepLogger);
-        stepLogger.step('Validate that User  is present ');
+
         await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
       });
     it('Generate "Resource Commitments" Report - [743183]', async () => {
@@ -311,7 +304,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         // Run Schedule
-        stepLogger.step('Run Schedule');
 
         await ReportingSettingsPageHelper.runSchedule(stepLogger);
 
@@ -322,7 +314,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.stepId(3);
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
 
         await CommonPageHelper.editTeam(stepLogger);
 
@@ -331,7 +322,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(4);
-        stepLogger.step('Click On Resource Commitments ');
 
         await EditTeamPageHelper.clickviewReport(stepLogger);
 
@@ -339,11 +329,10 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(5);
 
         await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
-        stepLogger.step('Validate that Resource commitment Message displayed ');
+
         await CommonPageHelper.fieldDisplayedValidation
         (ResourceCommitments.resourceCommitmentsMessage , EditItemPageConstants.resourceCommitmentsMessage );
 
-        stepLogger.step('Closing the tab');
         await PageHelper.closeTab();
 
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.sidebarMenus.navigation);
@@ -352,11 +341,9 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
-        stepLogger.step('Navigate to resource Planner page');
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
 
-        stepLogger.verification('"Edit Project" page is displayed');
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         await ResourcePlannerPageHelper.deletingUserAndSave(stepLogger);
@@ -367,31 +354,28 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Run Schedule
         await ReportingSettingsPageHelper.runSchedule(stepLogger);
 
-        stepLogger.stepId(6);
+        stepLogger.stepId(7);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
             stepLogger);
 
-        stepLogger.stepId(7);
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
+        stepLogger.stepId(8);
 
         await CommonPageHelper.editTeam(stepLogger);
 
         await PageHelper.switchToDefaultContent();
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
-        stepLogger.stepId(8);
-        stepLogger.step('Click On Resource Commitments ');
+        stepLogger.stepId(9);
         await EditTeamPageHelper.clickviewReport(stepLogger);
 
         await EditTeamPageHelper.clickResourceCommitments(stepLogger);
 
-        stepLogger.stepId(9);
+        stepLogger.stepId(10);
         await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
 
-        stepLogger.step('Validate that Resource commitment Message is not displayed ');
         await CommonPageHelper.fieldNotDisplayedValidation
         (ResourceCommitments.resourceCommitmentsMessage , EditItemPageConstants.resourceCommitmentsMessage );
         });
@@ -409,23 +393,19 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
 
-        stepLogger.verification('"Edit Project" page is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(2);
         // Add hours for the resource added in the top-grid
-        stepLogger.step('Add hours for the resource added in the top-grid');
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
 
         stepLogger.stepId(3);
         // navigate to Reporter setting page
-        stepLogger.step('navigate to Reporter setting page');
         await ReportingSettingsPageHelper.navigateTo(stepLogger);
 
         stepLogger.stepId(4);
         // Run Schedule
-        stepLogger.step('Run Schedule');
         await ReportingSettingsPageHelper.runSchedule(stepLogger);
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -435,24 +415,20 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.stepId(5);
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await CommonPageHelper.editTeam(stepLogger);
 
         await PageHelper.switchToDefaultContent();
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(6);
-        stepLogger.step('Click On Resource Available Vs Planned By Dept');
         await EditTeamPageHelper.clickviewReport(stepLogger);
 
         await EditTeamPageHelper.resourceAvailableVsPlannedByDept(stepLogger);
 
         stepLogger.stepId(7);
-        stepLogger.step('Getting Value from  Resource Available Vs Planned By Dept');
         await ResourceAvailablePageHelper.selectParametersAndApply(stepLogger);
 
         stepLogger.stepId(8);
-        stepLogger.step('Validate that Added user is present ');
         await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
 
     });
@@ -468,17 +444,14 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
-        stepLogger.verification('"Edit Project" page is displayed');
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(1);
         // Add hours for the resource added in the top-grid
-        stepLogger.step('Add hours for the resource added in the top-grid');
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
 
         stepLogger.stepId(2);
         // navigate to Reporter setting page
-        stepLogger.step('navigate to Reporter setting page');
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
@@ -486,22 +459,18 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.stepId(3);
-        stepLogger.step('Click on "Edit Team" icon from ribbon panel');
         await CommonPageHelper.editTeam(stepLogger);
 
         await PageHelper.switchToDefaultContent();
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.stepId(4);
-        stepLogger.step('Click On Resource Capacity Heat Map');
         await EditTeamPageHelper.clickviewReport(stepLogger);
 
         await EditTeamPageHelper.resourceWorkVsCapacity(stepLogger);
 
         stepLogger.stepId(5);
-        stepLogger.step('Getting Value from  Resource Capacity Heat Map');
         // await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
-        stepLogger.step('Validate that Added Hours is present ');
         await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user);
     });
 

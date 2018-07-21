@@ -1,16 +1,16 @@
-import {ResourcePlannerPage} from './resourceplanner-page.po';
 import {CommonPage} from '../common/common.po';
 import {StepLogger} from '../../../../core/logger/step-logger';
 import {PageHelper} from '../../../components/html/page-helper';
 import {WaitHelper} from '../../../components/html/wait-helper';
 import {ResourcePlannerConstants} from './resource-planner-page.constants';
 import {CommonPageHelper} from '../common/common-page.helper';
+import {ResourcePlannerPage} from './resource-planner-page.po';
 
 export class ResourcePlannerPageHelper  {
 
     static async validatingAddingHoursFunctionality(stepLogger: StepLogger, hours: number) {
         // first deleting all the resources
-
+        stepLogger.step('Add hours for the resource added in the top-grid');
         stepLogger.stepId(1);
         await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
 

@@ -21,7 +21,6 @@ describe(SuiteNames.healthCheckTestSuite, () => {
 
         await PageHelper.click(CommonPage.personIcon);
 
-        stepLogger.step('Refresh the page and wait till the notification about completion of workspace ');
         await WorkspacePageHelper. validateLatestNotification(stepLogger , title );
     });
 });

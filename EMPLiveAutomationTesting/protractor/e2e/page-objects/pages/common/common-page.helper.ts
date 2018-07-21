@@ -16,8 +16,8 @@ import {AnchorHelper} from '../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../items-page/project-item/project-item.po';
 import {ProjectItemPageHelper} from '../items-page/project-item/project-item-page.helper';
 import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
-import {ResourceAnalyzerPageHelper} from '../../resource-analyzer-page/resource-analyzer-page.helper';
-import {ResourceAnalyzerPage} from '../../resource-analyzer-page/resource-analyzer-page.po';
+import {ResourceAnalyzerPageHelper} from '../resource-analyzer-page/resource-analyzer-page.helper';
+import {ResourceAnalyzerPage} from '../resource-analyzer-page/resource-analyzer-page.po';
 
 const fs = require('fs');
 
@@ -703,5 +703,14 @@ export class CommonPageHelper {
        }
     static async waitForApplyButtontoDisplayed() {
         await  WaitHelper.getInstance().waitForElementToBeClickable(this.getApplyLink());
+    }
+    static async resourceAnalyzerPopUp(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+        stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await PageHelper.switchToDefaultContent();
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+        await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
     }
    }
