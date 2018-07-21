@@ -674,7 +674,7 @@ namespace EPMLiveCore.ReportHelper
                 throw new ArgumentNullException(nameof(path));
             }
 
-            using (TextWriter writer = new StreamWriter(path))
+            using (var writer = new StreamWriter(path))
             {
                 writer.WriteLine(text);
             }
