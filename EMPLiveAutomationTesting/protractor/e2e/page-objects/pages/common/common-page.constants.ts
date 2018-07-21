@@ -25,6 +25,7 @@ export class CommonPageConstants {
     static readonly fileUpload = 'fileUpload';
     static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
+    static readonly linkDisable = 'This control is currently disabled.';
 
     static get viewDropDownLabels() {
         return {

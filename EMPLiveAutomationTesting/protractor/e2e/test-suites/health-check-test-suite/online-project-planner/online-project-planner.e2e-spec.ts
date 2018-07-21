@@ -46,9 +46,9 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         // Step #1 Inside this function
         const uniqueId = PageHelper.getUniqueId();
 
-        const projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger );
+        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger );
 
-        await ProjectItemPageHelper.editProjectAndValidateIt(stepLogger , projectNameValue );
+        projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(stepLogger , projectNameValue );
 
         await ProjectItemPageHelper.deleteProjectAndValidateIt(stepLogger , projectNameValue );
         });

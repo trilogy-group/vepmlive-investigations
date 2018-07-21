@@ -3,7 +3,6 @@ import {CommonPage} from '../../../common/common.po';
 import {SettingsPage} from '../../settings.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ReportingSettingsPageConstants} from './reporting-settings-page.constants';
-import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {ReportManagerPageValidation} from './report-manager/report-manager-page.validation';
 import {Constants} from '../../../../../components/misc-utils/constants';
@@ -31,9 +30,8 @@ export class ReportingSettingsPageHelper {
        stepLogger.step('Click on "Reporting Settings" sub node displayed under "Enterprise Reporting" node');
        await PageHelper.click(SettingsPage.menuItems.enterpriseReporting.childMenus.reportingSettings);
        stepLogger.verification('"Mapped Lists" page is displayed');
-       await expect((await CommonPage.title.getText()).trim())
-      .toBe(ReportingSettingsPageConstants.pageName,
-       ValidationsHelper.getPageDisplayedValidation(ReportingSettingsPageConstants.pageName));
+       await CommonPageHelper.pageDisplayedValidation(ReportingSettingsPageConstants.pageName);
+
    }
    static async clickSettingLink(stepLogger: StepLogger ) {
        stepLogger.step(`Click on 'Settings' link displayed on top of the page`);
@@ -51,7 +49,7 @@ export class ReportingSettingsPageHelper {
         stepLogger.step('Refresh the page using browser Refresh button');
         const lastRunLabel = ReportManagerPage.formControls.lastRun;
         let maxAttempts = 0;
-        while (!((await lastRunLabel.getText()).trim() !== Constants.EMPTY_STRING) && maxAttempts++ < 10) {
+        while (!((await lastRunLabel.getText()).trim() !== Constants.EMPTY_STRING) && maxAttempts++ < 20) {
             browser.refresh();
             await browser.sleep(PageHelper.timeout.s);
         }

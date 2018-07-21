@@ -438,7 +438,10 @@ export class CommonPage extends BasePage {
     static get searchIcon(){
         return element(By.css(`[src*='find_icon']`));
     }
-
+    static get linkDisable()
+    {
+        return ElementHelper.getElementByText(CommonPageConstants.linkDisable, true );
+    }
     static get regionCheckBox(){
         return element(By.css(`[id*="WebRegional"]`));
     }
@@ -539,7 +542,7 @@ export class CommonPage extends BasePage {
         return this.getDropDownByParameterName(name);
     }
     static  periodEndOptionValue(name: string) {
-        return element(By.xpath(`("${this.getDropDownByParameterNameXpath
-        (name)}")[2]//option[last()]`));
+        return element(By.xpath(`(${this.getDropDownByParameterNameXpath
+        (name)})[2]//option[last()]`));
     }
 }

@@ -65,9 +65,6 @@ export class IssueItemPageHelper {
         stepLogger.stepId(3);
         await this.clickIssueLink(stepLogger);
 
-        stepLogger.verification('"Issues - New Item" window is displayed');
-        await CommonPageHelper.pageDisplayedValidation(IssueItemPageConstants.pageName);
-
         stepLogger.stepId(4);
         stepLogger.step('Enter/Select required details in "Issues - New Item" window as described below');
         const uniqueId = PageHelper.getUniqueId();
@@ -96,9 +93,6 @@ export class IssueItemPageHelper {
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Issues - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"Issues - New Item" window is closed');
-        await CommonPageHelper.windowShouldNotBeDisplayedValidation(IssueItemPageConstants.pageName);
 
         await PageHelper.switchToDefaultContent();
         stepLogger

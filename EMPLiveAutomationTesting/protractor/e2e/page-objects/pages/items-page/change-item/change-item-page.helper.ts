@@ -86,7 +86,7 @@ export class ChangeItemPageHelper {
         await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Changes - New Item" window is closed');
-        await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
+      //  await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
 
         stepLogger
             .verification('Notification about New Changes created [Ex: New Change Item 1]' +

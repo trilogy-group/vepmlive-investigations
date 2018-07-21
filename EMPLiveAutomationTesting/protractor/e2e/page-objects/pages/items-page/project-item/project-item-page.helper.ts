@@ -435,6 +435,12 @@ export class ProjectItemPageHelper {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
     static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
         await CommonPageHelper.editOptionViaRibbon(stepLogger);
         projectNameValue = projectNameValue + 'Edited';
         stepLogger.verification('"Edit Project" page is displayed');
@@ -443,9 +449,6 @@ export class ProjectItemPageHelper {
         await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
 
         await PageHelper.click(CommonPage.formButtons.save);
-
-        stepLogger.verification('"Project - New Item" window is closed');
-        await CommonPageHelper.windowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
@@ -456,6 +459,7 @@ export class ProjectItemPageHelper {
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
         await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
+        return projectNameValue;
 
     }
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {

@@ -316,15 +316,31 @@ export class CommonPageHelper {
         return element(By.css(`#RibbonContainer li[title="${title}"]`));
     }
 
+    static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
+        let maxAttempts = 0;
+        await ElementHelper.actionMouseMove(targetElement);
+        await browser.sleep(PageHelper.timeout.s);
+        while ((await PageHelper.isElementPresent(CommonPage.linkDisable, false )) && maxAttempts++ < 10) {
+            browser.refresh();
+            await this.selectRecordFromGrid(stepLogger, item );
+            await ElementHelper.actionMouseMove(targetElement);
+            await browser.sleep(PageHelper.timeout.s);
+        }
+    }
     static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
 
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editItem );
+
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
+
     }
     static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editResource );
 
         await PageHelper.click(CommonPage.ribbonItems.editResource);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
@@ -346,7 +362,11 @@ export class CommonPageHelper {
     static async editTeam(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Plan" from the options displayed');
+
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editTeam );
+
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
+
         stepLogger.verification('"Edit Team" window is displayed');
         await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())

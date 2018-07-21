@@ -258,9 +258,6 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
 
-        stepLogger.stepId(2);
-        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.resourcePlanner);
-
         stepLogger.stepId(3);
         // Add hours for the resource added in the top-grid
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
@@ -294,7 +291,8 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await ResourceCapacityHeatMapPageHelper.selectParametersAndApply(stepLogger);
 
-        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
+      /*  await CommonPageHelper.fieldDisplayedValidation
+        (ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );*/
       });
     it('Generate "Resource Commitments" Report - [743183]', async () => {
         const stepLogger = new StepLogger(743183);

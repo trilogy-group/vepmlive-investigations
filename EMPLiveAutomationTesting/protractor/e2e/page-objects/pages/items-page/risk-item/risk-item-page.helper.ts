@@ -16,7 +16,6 @@ import {HomePage} from '../../homepage/home.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {ProjectItemPage} from '../project-item/project-item.po';
 
-
 export class RiskItemPageHelper {
 
     static async editRisk(stepLogger: StepLogger) {
@@ -159,12 +158,13 @@ export class RiskItemPageHelper {
     }
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
-        stepLogger.step('Select "Delete" from the options displayed');
 
+        await CommonPageHelper.refreshPageIfRibbonElementIsDisable(stepLogger, RiskItemPage.deleteRisk );
+
+        stepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(RiskItemPage.deleteRisk);
 
         await PageHelper.acceptAlert();
-
     }
     static async clickCreateNew(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');

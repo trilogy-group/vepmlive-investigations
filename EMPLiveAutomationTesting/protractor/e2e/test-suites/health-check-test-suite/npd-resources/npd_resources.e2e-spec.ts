@@ -18,7 +18,6 @@ describe(SuiteNames.healthCheckTestSuite, () => {
 
     it('Add  resource - [829512]', async () => {
         const stepLogger = new StepLogger(829512);
-        stepLogger.step('PRECONDITION: Navigate to Resources page');
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.resources,

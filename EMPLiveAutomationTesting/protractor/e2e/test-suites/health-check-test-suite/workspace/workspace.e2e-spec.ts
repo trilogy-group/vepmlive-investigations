@@ -4,7 +4,6 @@ import {SuiteNames} from '../../helpers/suite-names';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {StepLogger} from '../../../../core/logger/step-logger';
 import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/workspace-page.helper';
-import {CommonPage} from '../../../page-objects/pages/common/common.po';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
     let homePage: HomePage;
@@ -18,9 +17,6 @@ describe(SuiteNames.healthCheckTestSuite, () => {
     it('Create and Remove Workspace - [829751]', async () => {
         const stepLogger = new StepLogger(829751);
         const title = await WorkspacePageHelper.createWorkspace(stepLogger);
-
-        await PageHelper.click(CommonPage.personIcon);
-
         await WorkspacePageHelper. validateLatestNotification(stepLogger , title );
     });
 });
