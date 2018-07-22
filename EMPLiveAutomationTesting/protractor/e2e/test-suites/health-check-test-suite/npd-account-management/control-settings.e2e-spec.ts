@@ -8,7 +8,7 @@ import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
-     it('Valid License for viewing EPM Live site- [743132]', async () => {
+     fit('Valid License for viewing EPM Live site- [743132]', async () => {
         let loginPage: LoginPage;
         const stepLogger = new StepLogger(743132);
         await PageHelper.maximizeWindow();

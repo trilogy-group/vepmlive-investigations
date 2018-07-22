@@ -14,7 +14,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Add, Edit and Delete Risk- [829719]', async () => {
+    fit('Add, Edit and Delete Risk- [829719]', async () => {
         const stepLogger = new StepLogger(829719);
         stepLogger.stepId(1);
         let titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
