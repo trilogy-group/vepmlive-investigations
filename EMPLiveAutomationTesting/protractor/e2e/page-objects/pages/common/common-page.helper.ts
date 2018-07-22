@@ -680,6 +680,7 @@ export class CommonPageHelper {
             .toBe(true, ValidationsHelper.getNotDisplayedValidation(name));
     }
     static async labelDisplayedValidation(targetElement: ElementFinder , name: string) {
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
         await expect(await PageHelper.isElementPresent(targetElement))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(name));

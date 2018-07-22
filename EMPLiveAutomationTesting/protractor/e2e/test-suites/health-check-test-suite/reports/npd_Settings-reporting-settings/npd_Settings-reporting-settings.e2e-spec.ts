@@ -18,6 +18,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
     fit('Run Refresh Schedule - [829793]', async () => {
         const stepLogger = new StepLogger(829793);
         stepLogger.stepId(1);
