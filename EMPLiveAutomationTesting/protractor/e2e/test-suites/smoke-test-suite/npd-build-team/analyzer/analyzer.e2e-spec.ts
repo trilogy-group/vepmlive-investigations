@@ -8,6 +8,7 @@ import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
 import {ResourceAnalyzerPageHelper} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../../../../page-objects/pages/resource-analyzer-page/resource-analyzer-page.po';
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -15,7 +16,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Resource Analyzer period popup window. - [744532]', async () => {
+    fit('Resource Analyzer period popup window. - [744532]', async () => {
         const stepLogger = new StepLogger(744532);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -36,7 +37,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.resourceAnalyzerViaRibbon(stepLogger);
 
     });
-    it('Verify Analyzer tab of resource analyzer page. - [744534]', async () => {
+    fit('Verify Analyzer tab of resource analyzer page. - [744534]', async () => {
         const stepLogger = new StepLogger(744534);
         stepLogger.step('Select "Navigation" icon  from left side menu');
         stepLogger.step('Select Projects -> Projects from the options displayed');
@@ -65,4 +66,4 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourceAnalyzerPageHelper.validateBottomPannel(stepLogger);
     });
 
-}) ;
+});

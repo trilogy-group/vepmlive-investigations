@@ -26,9 +26,9 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Navigate to Edit Resource Plan- [966351]', async () => {
+    fit('Navigate to Edit Resource Plan- [966351]', async () => {
         const stepLogger = new StepLogger(966351);
-    // Step #1 Inside this function
+        // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
@@ -69,7 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     });
 
-  it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
+    it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
         const stepLogger = new StepLogger(966249);
         stepLogger.precondition('Select "Navigation" icon  from left side menu');
         stepLogger.precondition('Select Projects -> Projects from the options displayed');
@@ -109,7 +109,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(ProjectItemPage.privateCheckBox, false);
 
         stepLogger.verification('User is able to Un-check Private: check box');
-       // Unable to verify that CheckBOx is checked or not because nothing is changing in dom.
+        // Unable to verify that CheckBOx is checked or not because nothing is changing in dom.
 
         stepLogger.stepId(4);
         stepLogger.step('Check the Private: check box');
