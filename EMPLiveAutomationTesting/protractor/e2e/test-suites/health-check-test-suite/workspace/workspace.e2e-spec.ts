@@ -14,9 +14,9 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Create and Remove Workspace - [829751]', async () => {
-        const stepLogger = new StepLogger(829751);
-        const title = await WorkspacePageHelper.createWorkspace(stepLogger);
-        await WorkspacePageHelper. validateLatestNotification(stepLogger , title );
+    it('To Verify User is Able to Create Workspace - [2488594]', async () => {
+        const stepLogger = new StepLogger(2488594);
+        await WorkspacePageHelper.createWorkspace(stepLogger);
+        // await WorkspacePageHelper. validateLatestNotification(stepLogger , title );
     });
 });
