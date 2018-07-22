@@ -245,10 +245,10 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
 
-    it('Generate Resource Capacity Heat Map Report - [743180]', async () => {
+    fit('Generate Resource Capacity Heat Map Report - [743180]', async () => {
         const stepLogger = new StepLogger(743180);
         stepLogger.stepId(1);
-        const hours = 10.00 ;
+        const hours = 10.00;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -260,7 +260,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(3);
         // Add hours for the resource added in the top-grid
-        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
         stepLogger.stepId(4);
         // navigate to Reporter setting page
@@ -291,10 +291,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await ResourceCapacityHeatMapPageHelper.selectParametersAndApply(stepLogger);
 
-      /*  await CommonPageHelper.fieldDisplayedValidation
-        (ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );*/
-      });
-    it('Generate "Resource Commitments" Report - [743183]', async () => {
+        /*  await CommonPageHelper.fieldDisplayedValidation
+          (ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );*/
+    });
+    fit('Generate "Resource Commitments" Report - [743183]', async () => {
         const stepLogger = new StepLogger(743183);
         stepLogger.stepId(1);
         // Step #1 Inside this function
@@ -329,7 +329,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
 
         await CommonPageHelper.fieldDisplayedValidation
-        (ResourceCommitments.resourceCommitmentsMessage , EditItemPageConstants.resourceCommitmentsMessage );
+        (ResourceCommitments.resourceCommitmentsMessage, EditItemPageConstants.resourceCommitmentsMessage);
 
         await PageHelper.closeTab();
 
@@ -375,13 +375,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourceCommitmentsHelper.selectResourceAndApply(stepLogger);
 
         await CommonPageHelper.fieldNotDisplayedValidation
-        (ResourceCommitments.resourceCommitmentsMessage , EditItemPageConstants.resourceCommitmentsMessage );
-        });
+        (ResourceCommitments.resourceCommitmentsMessage, EditItemPageConstants.resourceCommitmentsMessage);
+    });
 
-    it('Generate "Resource Available Vs. Planned by Dept." reports. - [743185]', async () => {
+    fit('Generate "Resource Available Vs. Planned by Dept." reports. - [743185]', async () => {
         const stepLogger = new StepLogger(743185);
         stepLogger.stepId(1);
-        const hours = 10.00 ;
+        const hours = 10.00;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -396,7 +396,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         // Add hours for the resource added in the top-grid
-        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
         stepLogger.stepId(3);
         // navigate to Reporter setting page
@@ -427,13 +427,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ResourceAvailablePageHelper.selectParametersAndApply(stepLogger);
 
         stepLogger.stepId(8);
-        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user );
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser, ResourcePlannerConstants.user);
 
     });
     it('View the Work hours via Resource Work vs Capacity report. - [59772477]', async () => {
         const stepLogger = new StepLogger(59772477);
         stepLogger.stepId(1);
-        const hours = 10.00 ;
+        const hours = 10.00;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -446,7 +446,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         // Add hours for the resource added in the top-grid
-        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours );
+        await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
         stepLogger.stepId(2);
         // navigate to Reporter setting page
@@ -469,7 +469,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         // await ResourceWorkVsCapacityHelper.selectParametersAndApply(stepLogger);
-        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser , ResourcePlannerConstants.user);
+        await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.addedUser, ResourcePlannerConstants.user);
     });
 
 });

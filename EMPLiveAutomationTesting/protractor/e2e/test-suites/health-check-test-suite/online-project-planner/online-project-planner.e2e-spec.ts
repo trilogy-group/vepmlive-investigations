@@ -19,10 +19,10 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    it('Edit Resource plan - [829770]', async () => {
+    fit('Edit Resource plan - [829770]', async () => {
         const stepLogger = new StepLogger(829770);
         stepLogger.stepId(1);
-        const hours = 10.00 ;
+        const hours = 10.00;
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
             HomePage.navigation.projects.projects,
@@ -40,16 +40,16 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await ResourcePlannerPageHelper.validatingAddingHoursFunctionality(stepLogger, hours);
 
     });
-    it('Add, Edit and Delete Project - [829527]', async () => {
+    fit('Add, Edit and Delete Project - [829527]', async () => {
         const stepLogger = new StepLogger(829527);
         stepLogger.stepId(1);
         // Step #1 Inside this function
         const uniqueId = PageHelper.getUniqueId();
 
-        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger );
+        let projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
 
-        projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(stepLogger , projectNameValue );
+        projectNameValue = await ProjectItemPageHelper.editProjectAndValidateIt(stepLogger, projectNameValue);
 
-        await ProjectItemPageHelper.deleteProjectAndValidateIt(stepLogger , projectNameValue );
-        });
+        await ProjectItemPageHelper.deleteProjectAndValidateIt(stepLogger, projectNameValue);
+    });
 });
