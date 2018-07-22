@@ -7,26 +7,26 @@ export class ResourceAnalyzerPage extends BasePage {
         return element(By.id('idDisplayPress'));
     }
     static get cancel() {
-        return element(By.xpath('//*[@class=\'button-container\']//*[@value=\'Cancel\']'));
+        return element(By.xpath('//*[@class="button-container"]//*[@value="Cancel"]'));
     }
     static get fiscalCalendarDropDown() {
         return element(By.id('idCalList'));
     }
     static get analyzerTab() {
-        return element(By.xpath('//*[@tab_id= \'tab_Display\']//*[text()=\'Analyzer\']'));
+        return element(By.xpath('//*[@tab_id= "tab_Display"]//*[text()="Analyzer"]'));
     }
     static get viewTab() {
-        return element(By.css('[tab_id= \'tab_View\']'));
+        return element(By.css('[tab_id= "tab_View"]'));
     }
     static getTopAnalyserTabButtonById(id: string) {
-        return element(By.css(`#idAnalyzerTabDiv_ul #'${id}'`));
+        return element(By.css(`#idAnalyzerTabDiv_ul #${id}`));
     }
 
     static getTopViewTabButtonById(id: string) {
-        return element(By.css(`#idViewTabDiv_ul #'${id}'`));
+        return element(By.css(`#idViewTabDiv_ul #${id}`));
     }
     static getBottomTabButtonById(id: string) {
-        return element(By.css(`#idBottomTabDiv_ribbon #'${id}'`));
+        return element(By.css(`#idBottomTabDiv_ribbon #${id}`));
     }
     static getBottomTabButtonByText(text: string) {
         return element(By.xpath(`//*[@id='idBottomTabDiv_ribbon']//*[contains(text(),'${text}')]//parent::a`));
