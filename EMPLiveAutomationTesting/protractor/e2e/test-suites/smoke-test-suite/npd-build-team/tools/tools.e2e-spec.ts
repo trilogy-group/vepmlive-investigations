@@ -11,19 +11,6 @@ import {ValidationsHelper} from '../../../../components/misc-utils/validation-he
 import {ProjectItemPage} from '../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
-import {EditTeamPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.helper';
-import {ResourcePlannerConstants} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.constants';
-import {ResourcePlannerPageHelper} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
-import {EditItemPageConstants} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/edit-team-page.constansts';
-// tslint:disable-next-line:max-line-length
-import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
-import {ResourceCapacityHeatMapPageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-capacity-heatMap-page/resource-capacity-heatMap-page.helper';
-// tslint:disable-next-line:max-line-length
-import {ResourceCommitmentsHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.helper';
-import {ResourceCommitments} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-commitments-page/resource-commitments.po';
-// tslint:disable-next-line:max-line-length
-import {ResourceAvailablePageHelper} from '../../../../page-objects/pages/items-page/project-item/edit-team-page/resource-available-vs-planned-by-dept-page/resource-available-vs-planned-by-dept-page.helper';
-import {ResourcePlannerPage} from '../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let homePage: HomePage;
@@ -244,6 +231,5 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
     });
-
 
 });
