@@ -24,5 +24,6 @@
     <Add FullName="EPMLiveCore.LookupConfigData!"/>
     <Add FullName="EPMLiveCore.SPUtilities.SPListUtility!"/>
     <Add FullName="EPMLiveCore.SPUtilities.SPProjectUtility!"/>
+    <Add FullName="EPMLiveCore.Jobs.ResourcePlan!"/>
   </ShimGeneration>
 </Fakes>
