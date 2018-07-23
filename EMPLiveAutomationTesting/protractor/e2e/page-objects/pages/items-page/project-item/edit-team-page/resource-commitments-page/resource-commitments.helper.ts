@@ -26,11 +26,11 @@ export class ResourceCommitmentsHelper {
         await CommonPageHelper.clickApplyButton(stepLogger);
     }
     static async selectResource(stepLogger: StepLogger) {
-        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ));
+        await  PageHelper.click(ResourceCommitments.getDropDownByParameterName);
         stepLogger.step('Select Resource ');
 
         await DropDownHelper.selectOptionByVal
-        (CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ), '10001' );
+        (ResourceCommitments.getDropDownByParameterName, '10001' );
         await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 }

@@ -538,18 +538,6 @@ export class CommonPage extends BasePage {
         return element.all(By.xpath(this.getDropDownByParameterNameXpath(name))).get(index);
     }
 
-    static periodStartOption(name: string) {
-        return this.getDropDownByParameterName(name);
-    }
-
-    static periodEndOption(name: string) {
-        return this.getDropDownByParameterName(name);
-    }
-
-    static department(name: string) {
-        return this.getDropDownByParameterName(name);
-    }
-
     static periodEndOptionValue(name: string) {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
         (name)})[2]//option[last()]`));

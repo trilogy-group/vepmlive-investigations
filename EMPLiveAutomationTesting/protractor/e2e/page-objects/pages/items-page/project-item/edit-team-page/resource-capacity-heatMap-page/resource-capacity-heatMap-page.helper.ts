@@ -4,8 +4,7 @@ import {WaitHelper} from '../../../../../../components/html/wait-helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {ResourceCapacityHeatMapPageConstants} from './resource-capacity-heatMap-page.constants';
 import {CommonPageHelper} from '../../../../common/common-page.helper';
-import {CommonPage} from '../../../../common/common.po';
-import {ResourceCapacityHeatMapPage} from "./resource-capacity-heatMap-page.po";
+import {ResourceCapacityHeatMapPage} from './resource-capacity-heatMap-page.po';
 
 export class ResourceCapacityHeatMapPageHelper {
     static async selectParametersAndApply(stepLogger: StepLogger) {
@@ -36,20 +35,19 @@ export class ResourceCapacityHeatMapPageHelper {
 
     static async selectLastValuePeriodEndDate(stepLogger: StepLogger) {
         stepLogger.step('Select Period End Date ');
-        await  PageHelper.click(CommonPage.periodEndOption(ResourceCapacityHeatMapPageConstants.periodEnd));
-        await PageHelper.click(CommonPage.periodEndOptionValue(ResourceCapacityHeatMapPageConstants.periodEnd));
+        await  PageHelper.click(ResourceCapacityHeatMapPage.periodEnd);
+        await PageHelper.click(ResourceCapacityHeatMapPage.periodEndOptionValue);
         await  CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectDepartment(stepLogger: StepLogger) {
         stepLogger.step('Select Department ');
-        await PageHelper.click(CommonPage.department(ResourceCapacityHeatMapPageConstants.department));
+        await PageHelper.click(ResourceCapacityHeatMapPage.department);
 
         await DropDownHelper.selectOptionByVal(
-            CommonPage.department
-            (ResourceCapacityHeatMapPageConstants.department), ResourceCapacityHeatMapPageConstants.departmentValue);
+            ResourceCapacityHeatMapPage.department, ResourceCapacityHeatMapPageConstants.departmentValue);
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed;
+        await  CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
 }
