@@ -15,26 +15,6 @@ namespace EPMLiveCore.Jobs
         private string sResErrors = "";
         private bool bResErrors = false;
         StringBuilder sbErrors = null;
-        private void buildResPlanInfo()
-        {
-            dtResInfo = new DataTable();
-            dtResInfo.Columns.Add("Project");
-            dtResInfo.Columns.Add("Title");
-            dtResInfo.Columns.Add("AssignedTo");
-            dtResInfo.Columns.Add("StartDate", typeof(DateTime));
-            dtResInfo.Columns.Add("DueDate", typeof(DateTime));
-            dtResInfo.Columns.Add("ItemType");
-            dtResInfo.Columns.Add("Status");
-            dtResInfo.Columns.Add("Work");
-            dtResInfo.Columns.Add("SiteId", typeof(Guid));
-
-            dtResLink = new DataTable();
-            dtResLink.Columns.Add("weburl");
-            dtResLink.Columns.Add("resurl");
-            dtResLink.Columns.Add("siteid", typeof(Guid));
-            dtResLink.Columns.Add("nonworkdays");
-            dtResLink.Columns.Add("workhours");
-        }
 
         private void storeResPlanInfo()
         {
@@ -147,7 +127,8 @@ namespace EPMLiveCore.Jobs
                         }
                     }
 
-                    buildResPlanInfo();
+                    dtResInfo = ResourcePlan.BuildResourceInfoDataTable();
+                    dtResLink = ResourcePlan.BuildResourceLinkDataTable();
 
                     int hours = 0;
                     string workdays = " ";
