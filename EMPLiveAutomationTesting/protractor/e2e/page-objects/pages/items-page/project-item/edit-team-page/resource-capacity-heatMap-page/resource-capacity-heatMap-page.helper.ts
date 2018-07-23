@@ -5,6 +5,8 @@ import {StepLogger} from '../../../../../../../core/logger/step-logger';
 import {ResourceCapacityHeatMapPageConstants} from './resource-capacity-heatMap-page.constants';
 import {CommonPageHelper} from '../../../../common/common-page.helper';
 import {CommonPage} from '../../../../common/common.po';
+import {ResourceCapacityHeatMapPage} from "./resource-capacity-heatMap-page.po";
+
 export class ResourceCapacityHeatMapPageHelper {
     static async selectParametersAndApply(stepLogger: StepLogger) {
         const optionValue = 2;
@@ -13,7 +15,7 @@ export class ResourceCapacityHeatMapPageHelper {
         await PageHelper.switchToNewTabIfAvailable(0);
         await PageHelper.switchToNewTabIfAvailable(1);
 
-        await this.selectPeriodStartDate(stepLogger , optionValue );
+        await this.selectPeriodStartDate(stepLogger, optionValue);
 
         await this.selectLastValuePeriodEndDate(stepLogger);
 
@@ -21,30 +23,27 @@ export class ResourceCapacityHeatMapPageHelper {
 
         await CommonPageHelper.clickApplyButton(stepLogger);
 
-}
-    static async selectPeriodStartDate(stepLogger: StepLogger, optionValue: Number ) {
-        await  PageHelper.click(CommonPage.periodStartOption(ResourceCapacityHeatMapPageConstants.periodStart));
+    }
+
+    static async selectPeriodStartDate(stepLogger: StepLogger, optionValue: Number) {
+        await  PageHelper.click(ResourceCapacityHeatMapPage.periodStart);
         stepLogger.step('Select Period start Date ');
 
-        await DropDownHelper.selectOptionByVal
-        (CommonPage.periodStartOption(ResourceCapacityHeatMapPageConstants.periodStart), optionValue.toString() );
+        await DropDownHelper.selectOptionByVal(ResourceCapacityHeatMapPage.periodStart, optionValue.toString());
 
-        await  CommonPageHelper.waitForApplyButtontoDisplayed;
+        await  CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectLastValuePeriodEndDate(stepLogger: StepLogger) {
         stepLogger.step('Select Period End Date ');
         await  PageHelper.click(CommonPage.periodEndOption(ResourceCapacityHeatMapPageConstants.periodEnd));
-
-        await PageHelper.click(CommonPage.periodEndOptionValue
-        (ResourceCapacityHeatMapPageConstants.periodEnd));
-
-        await  CommonPageHelper.waitForApplyButtontoDisplayed;
+        await PageHelper.click(CommonPage.periodEndOptionValue(ResourceCapacityHeatMapPageConstants.periodEnd));
+        await  CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 
     static async selectDepartment(stepLogger: StepLogger) {
         stepLogger.step('Select Department ');
-        await PageHelper.click( CommonPage.department(ResourceCapacityHeatMapPageConstants.department));
+        await PageHelper.click(CommonPage.department(ResourceCapacityHeatMapPageConstants.department));
 
         await DropDownHelper.selectOptionByVal(
             CommonPage.department
@@ -53,4 +52,4 @@ export class ResourceCapacityHeatMapPageHelper {
         await  CommonPageHelper.waitForApplyButtontoDisplayed;
     }
 
-  }
+}

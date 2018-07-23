@@ -118,7 +118,7 @@ export class CommonPage extends BasePage {
             resourceRequirements: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceRequirements),
             resourceWorkVsCapacity: CommonPageHelper.getRibbonMediumButtonByTitle(labels.resourceWorkVsCapacity),
             editTeamProjectPlanner: CommonPageHelper.getRibbonMediumButtonByTitle(labels.editTeam),
-            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource, true ),
+            editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource, true),
             resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer),
             delete: CommonPageHelper.getRibbonButtonById(labels.delete),
         };
@@ -166,6 +166,7 @@ export class CommonPage extends BasePage {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('.ms-dlgFrame'));
     }
+
     static get analyzerFrame() {
         // element(By.css('.ms-dlgFrame')) never works in case of iframe
         return browser.driver.findElement(By.css('.dhx_modal_cover_ifr'));
@@ -196,9 +197,9 @@ export class CommonPage extends BasePage {
         return element(By.css(`${this.resourceGrid} .GMHeaderGroupCustom`));
     }
 
-      static get editTeamButtonOnTask() {
+    static get editTeamButtonOnTask() {
         return ElementHelper.getElementByText(CommonPageConstants.ribbonLabels.editTeam);
-}
+    }
 
     static get closeButton() {
         return element(By.css(`[id*=".CloseButton"]`));
@@ -242,11 +243,12 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }
 
-    static get uploadSuccessFullyText(){
-        return{
-        message: ElementHelper.getElementByText(CommonPageConstants.documentUploadText),
-     };
+    static get uploadSuccessFullyText() {
+        return {
+            message: ElementHelper.getElementByText(CommonPageConstants.documentUploadText),
+        };
     }
+
     static get records() {
         return element.all(By.xpath(this.selectorForRecordsWithGreenTick));
     }
@@ -303,11 +305,11 @@ export class CommonPage extends BasePage {
         return element(By.css('[id*="ClearBaseline"] [class*="img"]'));
     }
 
-    static get okButton () {
+    static get okButton() {
         return element(By.css('#onetidSaveItem'));
     }
 
-    static get cancelButton () {
+    static get cancelButton() {
         return element(By.id('onetidCancelItem'));
     }
 
@@ -341,10 +343,10 @@ export class CommonPage extends BasePage {
 
     static get project() {
         // This xpath is best we have. Onmouse click is required
-            return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
+        return element(By.css(`${CommonPage.projectFirstRow} [href*='Lists/Project']`));
     }
 
-    static get costButton(){
+    static get costButton() {
         const fields = CommonPageConstants.costButtonLabel;
         return {
             budget: CommonPageHelper.getActiveButtonByText(fields.budget),
@@ -354,7 +356,7 @@ export class CommonPage extends BasePage {
 
     }
 
-    static get editCostButton(){
+    static get editCostButton() {
         const fields = CommonPageConstants.costButtonLabel;
         return {
             budget: CommonPageHelper.getEditCostTab(fields.budget),
@@ -364,7 +366,7 @@ export class CommonPage extends BasePage {
 
     }
 
-    static get  costTab() {
+    static get costTab() {
         // its required it will not work without "ref", there is another tab as well only one thing different that is "ref"
         return `//div[not(contains(@tab_id,"ref"))]`;
     }
@@ -374,7 +376,7 @@ export class CommonPage extends BasePage {
     }
 
     static get calendearView() {
-            return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
+        return element(By.css('[id="Ribbon.Calendar.Calendar"]'));
     }
 
     static get singleSearchTextBox() {
@@ -425,24 +427,25 @@ export class CommonPage extends BasePage {
 
     static get tabPanel() {
         return CommonPageHelper.getElementByRole(HtmlHelper.tags.tabPanel);
-   }
+    }
 
-    static get searchChoiceOption(){
+    static get searchChoiceOption() {
         return {
-           proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
-           active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
-           closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
+            proposed: element(By.css(`[value="${CommonPageConstants.states.proposed}"]`)),
+            active: element(By.css(`[value="${CommonPageConstants.states.active}"]`)),
+            closed: element(By.css(`[value="${CommonPageConstants.states.closed}"]`)),
         };
     }
 
-    static get searchIcon(){
+    static get searchIcon() {
         return element(By.css(`[src*='find_icon']`));
     }
-    static get linkDisable()
-    {
-        return ElementHelper.getElementByText(CommonPageConstants.linkDisable, true );
+
+    static get linkDisable() {
+        return ElementHelper.getElementByText(CommonPageConstants.linkDisable, true);
     }
-    static get regionCheckBox(){
+
+    static get regionCheckBox() {
         return element(By.css(`[id*="WebRegional"]`));
     }
 
@@ -519,29 +522,35 @@ export class CommonPage extends BasePage {
         return AnchorHelper.getAnchorInsideGridByClass(HtmlHelper.attributeValue.gmClassReadOnly);
     }
 
-    static get personIcon(){
+    static get personIcon() {
         return element(By.id('EPMLiveNotificationCounterProfilePic'));
     }
 
-    static get latestNotification(){
+    static get latestNotification() {
         return element.all(By.className('EPMLiveNotificationTitle')).get(0);
     }
+
     static getDropDownByParameterNameXpath(name: string) {
         return `//*[@data-parametername="${name}"]//select`;
     }
+
     static getDropDownByParameterName(name: string, index = 1) {
         return element.all(By.xpath(this.getDropDownByParameterNameXpath(name))).get(index);
     }
-    static  periodStartOption(name: string ) {
+
+    static periodStartOption(name: string) {
         return this.getDropDownByParameterName(name);
     }
-    static  periodEndOption(name: string) {
+
+    static periodEndOption(name: string) {
         return this.getDropDownByParameterName(name);
     }
-    static  department(name: string) {
+
+    static department(name: string) {
         return this.getDropDownByParameterName(name);
     }
-    static  periodEndOptionValue(name: string) {
+
+    static periodEndOptionValue(name: string) {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
         (name)})[2]//option[last()]`));
     }
