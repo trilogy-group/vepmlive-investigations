@@ -207,7 +207,6 @@ namespace PortfolioEngineCore
         {
             var commandText = string.Empty;
             var guidsString = string.Empty;
-            var ginString = string.Empty;
             var eStatus = 0;
             projectIdsString = string.Empty;
             projectsExist = true;
@@ -230,55 +229,43 @@ namespace PortfolioEngineCore
             guidsString = guidsString.ToUpper();
             guidsString = guidsString.Trim();
 
-            var i = 0;
-            while (guidsString.Length != 0)
+            if (!string.IsNullOrEmpty(guidsString))
             {
-                ginString = string.Empty;
-
-                i = guidsString.IndexOf(" ");
-
-                if (i == -1)
+                var guids = guidsString.Split(' ');
+                foreach (var guid in guids)
                 {
-                    ginString = guidsString;
-                    guidsString = string.Empty;
-                }
-                else
-                {
-                    ginString = guidsString.Substring(0, i);
-                    guidsString = guidsString.Substring(i + 1);
-                }
-
-                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
-                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (ginString != string.Empty && !ginString.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    commandText = string.Format("SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '{0}'", ginString);
-                    using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
+                    // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
+                    // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
+                    if (guid != string.Empty && !guid.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        using (var reader = sqlCommand.ExecuteReader())
+                        commandText = string.Format("SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE {{ fn UCASE(PROJECT_EXT_UID) }}  = '{0}'", guid);
+                        using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
                         {
-                            projectId = 0;
-                            while (reader.Read())
+                            using (var reader = sqlCommand.ExecuteReader())
                             {
-                                projectId = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                                projectId = 0;
+                                while (reader.Read())
+                                {
+                                    projectId = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                                }
                             }
                         }
-                    }
 
-                    if (projectId == 0)
-                    {
-                        projectsExist = false;
-                    }
-                    else
-                    {
-                        ++projectsCount;
-                        if (projectIdsString == string.Empty)
+                        if (projectId == 0)
                         {
-                            projectIdsString = projectId.ToString();
+                            projectsExist = false;
                         }
                         else
                         {
-                            projectIdsString = projectIdsString + "," + projectId.ToString();
+                            ++projectsCount;
+                            if (projectIdsString == string.Empty)
+                            {
+                                projectIdsString = projectId.ToString();
+                            }
+                            else
+                            {
+                                projectIdsString = projectIdsString + "," + projectId.ToString();
+                            }
                         }
                     }
                 }
