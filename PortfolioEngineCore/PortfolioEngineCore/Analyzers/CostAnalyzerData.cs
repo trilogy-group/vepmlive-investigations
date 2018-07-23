@@ -300,7 +300,12 @@ namespace PortfolioEngineCore
 
         public static bool CheckIfCostViewsExist(SqlConnection sqlConnection)
         {
-            var commandText = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
+            if (sqlConnection == null)
+            {
+                throw new ArgumentNullException("sqlConnection");
+            }
+
+            const string commandText = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
             using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
                 using (var reader = sqlCommand.ExecuteReader())
@@ -330,6 +335,11 @@ namespace PortfolioEngineCore
             out int firstPeriod,
             out int lastPeriod)
         {
+            if (sqlConnection == null)
+            {
+                throw new ArgumentNullException("sqlConnection");
+            }
+
             var costViewId = 0;
             var statusCode = 0;
             var commandText = string.Empty;
