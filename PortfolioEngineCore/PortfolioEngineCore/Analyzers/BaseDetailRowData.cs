@@ -178,6 +178,21 @@ namespace PortfolioEngineCore.Analyzers
         /// <param name="periodsModes">true if this period should be included in the calc</param>
         public void DragBar(IList<DateTime> periodsStartDates, IList<DateTime> periodsEndDates, IList<int> periodsModes, int minp, int maxp)
         {
+            if (periodsStartDates.Count != mxdim + 1)
+            {
+                throw new ArgumentOutOfRangeException("periodsStartDates");
+            }
+
+            if (periodsEndDates.Count != mxdim + 1)
+            {
+                throw new ArgumentOutOfRangeException("periodsEndDates");
+            }
+
+            if (periodsModes.Count != mxdim + 1)
+            {
+                throw new ArgumentOutOfRangeException("periodsModes");
+            }
+
             // useadj is used to apportion the burn rate - handling the expand and compress affect
             double oDetTimespanDays = oDet_Finish.Subtract(oDet_Start).Days;
             double detTimespanDays = Det_Finish.Subtract(Det_Start).Days;
@@ -241,18 +256,17 @@ namespace PortfolioEngineCore.Analyzers
             for (var periodIndex = 1; periodIndex <= mxdim; periodIndex++)
             {
                 // only perform these calculations if this period "visible" in the Analyzer view.
+                Budget[periodIndex] = 0;
 
                 if (periodModes[periodIndex] != 0)
                 {
                     totalCost = totalCost + (bUseCosts ? zCost[periodIndex] : zValue[periodIndex]);
-                    Budget[periodIndex] = 0;
                     OutsideAdj[periodIndex] = 0;
                     UseBurnrate[periodIndex] = Burnrate[periodIndex];
                 }
                 else
                 {
                     OutsideAdj[periodIndex] = (bUseCosts ? zCost[periodIndex] : zValue[periodIndex]);
-                    Budget[periodIndex] = 0;
                     UseBurnrate[periodIndex] = 0;
                 }
             }
