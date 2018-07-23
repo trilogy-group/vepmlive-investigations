@@ -262,86 +262,38 @@ namespace EPMLiveCore.Jobs
 
         private void processResPlan(SPWeb web, string resPlanLists, Guid siteId, int hours, string workdays)
         {
-            string resurl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
+            var resourceUrl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            if (resurl.Trim() != "")
+            var processingResult = ResourcePlan.ProcessResourcePlan(
+                resourceUrl,
+                web,
+                resPlanLists,
+                siteId,
+                hours,
+                workdays);
+
+            foreach (var resourceLinkRow in processingResult.ResourceLinkRows)
             {
+                dtResLink.Rows.Add(resourceLinkRow);
+            }
 
+            foreach (var resourceInfoRow in processingResult.ResourceInfoRows)
+            {
+                dtResInfo.Rows.Add(resourceInfoRow);
+            }
 
-                //sResErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing Resource Plan";
+            foreach (var infoMessage in processingResult.InfoMessages)
+            {
+                sbErrors.Append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                sbErrors.Append(infoMessage);
+            }
 
-                //SqlCommand cmd = new SqlCommand("INSERT INTO RESLINK (weburl,resurl,siteid,workhours,nonworkdays) VALUES (@weburl,@resurl,@siteid,@workhours,@nonworkdays)", cn);
-                //cmd.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
-                //cmd.Parameters.AddWithValue("@resurl", resurl);
-                //cmd.Parameters.AddWithValue("@siteid", siteId);
-                //cmd.Parameters.AddWithValue("@workhours", hours);
-                //cmd.Parameters.AddWithValue("@nonworkdays", workdays);
-
-                //cmd.ExecuteNonQuery();
-
-                dtResLink.Rows.Add(new object[] { web.ServerRelativeUrl, resurl, siteId, workdays, hours });
-
-                if (resPlanLists.Trim().Length > 0)
-                {
-                    string[] arLists = resPlanLists.Replace("\r\n", "\n").Split('\n');
-
-                    foreach (string sList in arLists)
-                    {
-                        if (sList.Trim().Length > 0)
-                        {
-                            sResErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing: " + sList;
-                            try
-                            {
-                                SPList list = web.Lists[sList];
-                                SPQuery query = new SPQuery();
-                                query.Query = "<Where><And><And><And><IsNotNull><FieldRef Name=\"StartDate\"/></IsNotNull><IsNotNull><FieldRef Name=\"DueDate\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"Work\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"AssignedTo\"/></IsNotNull></And></Where>";
-
-                                foreach (SPListItem li in list.GetItems(query))
-                                {
-                                    string project = "";
-                                    string assignedTo = "";
-
-                                    try
-                                    {
-                                        project = li[list.Fields.GetFieldByInternalName("Project").Id].ToString();
-                                        SPFieldLookupValue lv = new SPFieldLookupValue(project);
-                                        project = lv.LookupValue;
-                                    }
-                                    catch { }
-
-                                    try
-                                    {
-                                        assignedTo = li[list.Fields.GetFieldByInternalName("AssignedTo").Id].ToString();
-                                    }
-                                    catch { }
-
-                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedTo);
-                                    foreach (SPFieldUserValue uv in uvc)
-                                    {
-                                        float work = 0;
-                                        try
-                                        {
-                                            work = float.Parse(li[list.Fields.GetFieldByInternalName("Work").Id].ToString());
-                                            work = work / uvc.Count;
-                                        }
-                                        catch { }
-                                        dtResInfo.Rows.Add(new object[] { project, li.Title, uv.LookupValue, li[list.Fields.GetFieldByInternalName("StartDate").Id].ToString(), li[list.Fields.GetFieldByInternalName("DueDate").Id].ToString(), sList, li[list.Fields.GetFieldByInternalName("Status").Id].ToString(), work, siteId });
-                                    }
-
-
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (ex.Message != "Value does not fall within the expected range.")
-                                {
-                                    bResErrors = true;
-                                    sResErrors += "...<font color=\"red\">Error: " + ex.Message + "</font>";
-                                }
-                            }
-                        }
-                    }
-                }
+            foreach (var errorMessage in processingResult.ErrorMessages)
+            {
+                bErrors = true;
+                sbErrors.Append("...<font color=\"red\">Error: ")
+                    .Append(errorMessage)
+                    .Append("</font>");
             }
         }
 
