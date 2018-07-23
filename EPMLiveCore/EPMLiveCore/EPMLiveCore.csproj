@@ -1315,6 +1315,7 @@
     <Compile Include="ReportingProxy\ReportingLogger.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
+    <Compile Include="ResourcePlanProcessingResult.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsField.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />

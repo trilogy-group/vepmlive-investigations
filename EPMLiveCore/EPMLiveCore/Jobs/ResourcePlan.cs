@@ -148,75 +148,38 @@ namespace EPMLiveCore.Jobs
 
         private void processResPlan(SPWeb web, string resPlanLists, Guid siteId, int hours, string workdays)
         {
-            string resurl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
+            var resourceUrl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            if (resurl.Trim() != "")
+            var processingResult = ProcessResourcePlan(
+                resourceUrl,
+                web,
+                resPlanLists,
+                siteId,
+                hours,
+                workdays);
+
+            foreach(var resourceLinkRow in processingResult.ResourceLinkRows)
             {
+                dtResLink.Rows.Add(resourceLinkRow);
+            }
 
-                dtResLink.Rows.Add(new object[] { web.ServerRelativeUrl, resurl, siteId, workdays, hours });
+            foreach(var resourceInfoRow in processingResult.ResourceInfoRows)
+            {
+                dtResInfo.Rows.Add(resourceInfoRow);
+            }
 
-                if (resPlanLists.Trim().Length > 0)
-                {
-                    string[] arLists = resPlanLists.Replace("\r\n", "\n").Split('\n');
+            foreach(var infoMessage in processingResult.InfoMessages)
+            {
+                sbErrors.Append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                sbErrors.Append(infoMessage);
+            }
 
-                    foreach (string sList in arLists)
-                    {
-                        if (sList.Trim().Length > 0)
-                        {
-                            sbErrors.Append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing: " + sList);
-                            try
-                            {
-                                SPList list = web.Lists[sList];
-                                SPQuery query = new SPQuery();
-                                query.Query = "<Where><And><And><And><IsNotNull><FieldRef Name=\"StartDate\"/></IsNotNull><IsNotNull><FieldRef Name=\"DueDate\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"Work\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"AssignedTo\"/></IsNotNull></And></Where>";
-
-                                foreach (SPListItem li in list.GetItems(query))
-                                {
-                                    string project = "";
-                                    string assignedTo = "";
-
-                                    try
-                                    {
-                                        project = li[list.Fields.GetFieldByInternalName("Project").Id].ToString();
-                                        SPFieldLookupValue lv = new SPFieldLookupValue(project);
-                                        project = lv.LookupValue;
-                                    }
-                                    catch { }
-
-                                    try
-                                    {
-                                        assignedTo = li[list.Fields.GetFieldByInternalName("AssignedTo").Id].ToString();
-                                    }
-                                    catch { }
-
-                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedTo);
-                                    foreach (SPFieldUserValue uv in uvc)
-                                    {
-                                        float work = 0;
-                                        try
-                                        {
-                                            work = float.Parse(li[list.Fields.GetFieldByInternalName("Work").Id].ToString());
-                                            work = work / uvc.Count;
-                                        }
-                                        catch { }
-                                        dtResInfo.Rows.Add(new object[] { project, li.Title, uv.LookupValue, li[list.Fields.GetFieldByInternalName("StartDate").Id].ToString(), li[list.Fields.GetFieldByInternalName("DueDate").Id].ToString(), sList, li[list.Fields.GetFieldByInternalName("Status").Id].ToString(), work, siteId });
-                                    }
-
-
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
-                                if (ex.Message != "Value does not fall within the expected range.")
-                                {
-                                    bErrors = true;
-                                    sbErrors.Append("...<font color=\"red\">Error: " + ex.Message + "</font>");
-                                }
-                            }
-                        }
-                    }
-                }
+            foreach(var errorMessage in processingResult.ErrorMessages)
+            {
+                bErrors = true;
+                sbErrors.Append("...<font color=\"red\">Error: ")
+                    .Append(errorMessage)
+                    .Append("</font>");
             }
         }
 
@@ -303,6 +266,140 @@ namespace EPMLiveCore.Jobs
             }
 
             return resUrl;
+        }
+        
+        public static ResourcePlanProcessingResult ProcessResourcePlan(
+            string resourceUrl,
+            SPWeb web, 
+            string resourcePlanListsString, 
+            Guid siteId, 
+            int hours, 
+            string workdays
+        )
+        {
+            var result = new ResourcePlanProcessingResult();
+            if (!string.IsNullOrWhiteSpace(resourceUrl))
+            {
+                result.ResourceLinks.Add(new ResourcePlanProcessingResult.ResourceLink(
+                    web.ServerRelativeUrl, 
+                    resourceUrl, 
+                    siteId, 
+                    workdays, 
+                    hours));
+
+                if (!string.IsNullOrWhiteSpace(resourcePlanListsString))
+                {
+                    var resourcePlanListsCollection = resourcePlanListsString.Replace("\r\n", "\n").Split('\n');
+
+                    foreach (var resourcePlanList in resourcePlanListsCollection)
+                    {
+                        if (!string.IsNullOrWhiteSpace(resourcePlanList))
+                        {
+                            result.InfoMessages.Add("Processing: " + resourcePlanList);
+                            ProcessResourcePlanList(resourcePlanList, web, siteId, ref result);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static void ProcessResourcePlanList(string resourcePlanList, SPWeb web, Guid siteId, ref ResourcePlanProcessingResult result)
+        {
+            try
+            {
+                var list = web.Lists[resourcePlanList];
+                var query = new SPQuery();
+                query.Query = "<Where><And><And><And><IsNotNull><FieldRef Name=\"StartDate\"/></IsNotNull><IsNotNull><FieldRef Name=\"DueDate\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"Work\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"AssignedTo\"/></IsNotNull></And></Where>";
+
+                foreach (SPListItem listItem in list.GetItems(query))
+                {
+                    var resourceInfos = ProcessResourcePlanListItem(listItem, list, web, siteId, resourcePlanList);
+                    foreach(var resourceInfo in resourceInfos)
+                    {
+                        result.ResourceInfos.Add(resourceInfo);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(
+                    Area.EPMLiveCore,
+                    Categories.EPMLiveCore.TimerJob,
+                    TraceSeverity.High,
+                    string.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+
+                if (ex.Message != "Value does not fall within the expected range.")
+                {
+                    result.ErrorMessages.Add(ex.Message);
+                }
+            }
+        }
+
+        private static IEnumerable<ResourcePlanProcessingResult.ResourceInfo> ProcessResourcePlanListItem(SPListItem listItem, SPList list, SPWeb web, Guid siteId, string resourcePlanList)
+        {
+            var project = string.Empty;
+            var assignedTo = string.Empty;
+
+            try
+            {
+                project = listItem[list.Fields.GetFieldByInternalName("Project").Id].ToString();
+                var lookupValue = new SPFieldLookupValue(project);
+                project = lookupValue.LookupValue;
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(
+                    Area.EPMLiveCore,
+                    Categories.EPMLiveCore.TimerJob,
+                    TraceSeverity.VerboseEx,
+                    string.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+            }
+
+            try
+            {
+                assignedTo = listItem[list.Fields.GetFieldByInternalName("AssignedTo").Id].ToString();
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(
+                    Area.EPMLiveCore,
+                    Categories.EPMLiveCore.TimerJob,
+                    TraceSeverity.VerboseEx,
+                    string.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+            }
+
+            var userValueCollection = new SPFieldUserValueCollection(web, assignedTo);
+            foreach (SPFieldUserValue userValue in userValueCollection)
+            {
+                float work = 0;
+                try
+                {
+                    work = float.Parse(listItem[list.Fields.GetFieldByInternalName("Work").Id].ToString());
+                    work = work / userValueCollection.Count;
+                }
+                catch (Exception ex)
+                {
+                    WriteTrace(
+                        Area.EPMLiveCore,
+                        Categories.EPMLiveCore.TimerJob,
+                        TraceSeverity.VerboseEx,
+                        string.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+                }
+
+                yield return new ResourcePlanProcessingResult.ResourceInfo(
+                    project,
+                    listItem.Title,
+                    userValue.LookupValue,
+                    listItem[list.Fields.GetFieldByInternalName("StartDate").Id].ToString(),
+                    listItem[list.Fields.GetFieldByInternalName("DueDate").Id].ToString(),
+                    resourcePlanList,
+                    listItem[list.Fields.GetFieldByInternalName("Status").Id].ToString(),
+                    work,
+                    siteId
+                );
+            }
         }
     }
 }
