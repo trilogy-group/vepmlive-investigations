@@ -2888,11 +2888,11 @@ namespace EPMLiveCore.ReportHelper
             const string Key = "EPMLIVE";
             var buffer = new byte[0];
 
-            using (var md5 = new MD5CryptoServiceProvider())
+            using (var cryptoProvider = new MD5CryptoServiceProvider())
             {
                 using (var tdes = new TripleDESCryptoServiceProvider())
                 {
-                    tdes.Key = md5.ComputeHash(Encoding.ASCII.GetBytes(Key));
+                    tdes.Key = cryptoProvider.ComputeHash(Encoding.ASCII.GetBytes(Key));
                     tdes.Mode = CipherMode.ECB;
 
                     using (var transform = tdes.CreateEncryptor())
@@ -2919,9 +2919,9 @@ namespace EPMLiveCore.ReportHelper
             {
                 using (var tDes = new TripleDESCryptoServiceProvider())
                 {
-                    using (var md5 = new MD5CryptoServiceProvider())
+                    using (var cryptoProvider = new MD5CryptoServiceProvider())
                     {
-                        tDes.Key = md5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+                        tDes.Key = cryptoProvider.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
                         tDes.Mode = CipherMode.ECB;
 
                         var DESDecrypt = tDes.CreateDecryptor();
