@@ -174,5 +174,212 @@ namespace PortfolioEngineCore.Analyzers
                 Budget[i] = source.Budget[i];
             }
         }
+
+        /// <param name="periodsModes">true if this period should be included in the calc</param>
+        public void DragBar(IList<DateTime> periodsStartDates, IList<DateTime> periodsEndDates, IList<int> periodsModes, int minp, int maxp)
+        {
+            // useadj is used to apportion the burn rate - handling the expand and compress affect
+            double oDetTimespanDays = oDet_Finish.Subtract(oDet_Start).Days;
+            double detTimespanDays = Det_Finish.Subtract(Det_Start).Days;
+            double adjustment = oDetTimespanDays <= 0
+                ? 1
+                : detTimespanDays / oDetTimespanDays;
+            if (adjustment == 0)
+            {
+                adjustment = 0.00001;
+            }
+
+            var totalCost = InitializePeriodsBugets(periodsModes);
+
+            ApplyPeriodsBudgetAdjustments(periodsStartDates, periodsEndDates, periodsModes, adjustment);
+
+            // dump overflow into start or end buckets
+            for (var periodIndex = 1; periodIndex < minp; periodIndex++)
+            {
+                Budget[minp] = Budget[minp] + Budget[periodIndex];
+                Budget[periodIndex] = 0;
+            }
+
+            for (var periodIndex = maxp + 1; periodIndex < mxdim; periodIndex++)
+            {
+                Budget[maxp] = Budget[maxp] + Budget[periodIndex];
+                Budget[periodIndex] = 0;
+            }
+
+            double totalBudget = 0;
+            for (var periodIndex = minp; periodIndex <= maxp; periodIndex++)
+            {
+                totalBudget += Budget[periodIndex];
+            }
+
+            var totalCostDelta = totalCost - totalBudget;
+            if (Det_Start < oDet_Start)
+            {
+                Budget[minp] = Budget[minp] + totalCostDelta;
+            }
+            else
+            {
+                Budget[maxp] = Budget[maxp] + totalCostDelta;
+            }
+
+            for (var periodIndex = 1; periodIndex <= mxdim; periodIndex++)
+            {
+                if (bUseCosts)
+                {
+                    zCost[periodIndex] = Budget[periodIndex] + OutsideAdj[periodIndex];
+                }
+                else
+                {
+                    zValue[periodIndex] = Budget[periodIndex] + OutsideAdj[periodIndex];
+                }
+            }
+        }
+
+        private double InitializePeriodsBugets(IList<int> periodModes)
+        {
+            double totalCost = 0;
+            for (var periodIndex = 1; periodIndex <= mxdim; periodIndex++)
+            {
+                // only perform these calculations if this period "visible" in the Analyzer view.
+
+                if (periodModes[periodIndex] != 0)
+                {
+                    totalCost = totalCost + (bUseCosts ? zCost[periodIndex] : zValue[periodIndex]);
+                    Budget[periodIndex] = 0;
+                    OutsideAdj[periodIndex] = 0;
+                    UseBurnrate[periodIndex] = Burnrate[periodIndex];
+                }
+                else
+                {
+                    OutsideAdj[periodIndex] = (bUseCosts ? zCost[periodIndex] : zValue[periodIndex]);
+                    Budget[periodIndex] = 0;
+                    UseBurnrate[periodIndex] = 0;
+                }
+            }
+
+            return totalCost;
+        }
+
+        private void ApplyPeriodsBudgetAdjustments(IList<DateTime> periodsStartDates, IList<DateTime> periodsEndDates, IList<int> periodModes, double adjustment)
+        {
+            // (CC-77750, 2018-07-23) Not sure if the variables are not reused in the loop due to the difficultly comprehendable logic
+            // Therefore not safe to refactor
+            double overlapTimespanDays;
+            double overlapOffsetDays;
+            double useamt;
+            int amt, xtraburn;
+            for (var periodIndex = 1; periodIndex <= mxdim; periodIndex++)
+            {
+                // only perform these calculations if this period "visible" in the Analyzer view.
+                if (periodModes[periodIndex] != 0)
+                {
+                    // For each period - calculate the overlap (in days) between the period and the new start and finish dates
+                    if (periodIndex == 6)
+                    {
+                        overlapTimespanDays = 1;
+                    }
+
+                    overlapTimespanDays = CalculateOverlapLocal(
+                        Det_Start,
+                        Det_Finish,
+                        periodsStartDates[periodIndex],
+                        periodsEndDates[periodIndex]);
+
+                    // we should never get a -ve value but its always worth checking.....
+                    if (overlapTimespanDays < 0)
+                    {
+                        overlapTimespanDays = 0;
+                    }
+
+                    // map this span into expanded or compressed amount
+                    overlapTimespanDays = overlapTimespanDays / adjustment;
+                    if (overlapTimespanDays != 0)
+                    {
+                        // OK there is some overlap - so now calculate where this overlap starts wrt the new startdate
+                        overlapOffsetDays = periodsStartDates[periodIndex].Subtract(Det_Start).Days;
+                        if (overlapOffsetDays < 0)
+                        {
+                            // well the new start is after the period start - so the offest must be 0
+                            overlapOffsetDays = 0;
+                        }
+
+                        // so now find where this offset starts in the burn duration list....
+                        // and map the period offest into expanded/compressed offsets as well
+                        overlapOffsetDays = overlapOffsetDays / adjustment;
+                        for (int burn = 1; burn <= mxdim; burn++)
+                        {
+                            if (overlapOffsetDays - BurnDuration[burn] < 0)
+                            {
+                                // OK this offset starts in this burn period - so calc how many days left in this burn
+                                amt = BurnDuration[burn] - (int)(overlapOffsetDays + 0.5);
+                                xtraburn = 0;
+
+                                while (overlapTimespanDays > 0)
+                                {
+                                    if (amt > overlapTimespanDays)
+                                    {
+                                        useamt = overlapTimespanDays;
+                                    }
+                                    else
+                                    {
+                                        useamt = amt;
+                                    }
+
+                                    // apply this amts burn to this period
+                                    Budget[periodIndex] = Budget[periodIndex] + AFiddler(useamt * UseBurnrate[burn + xtraburn]);
+                                    overlapTimespanDays = overlapTimespanDays - useamt;
+                                    if (overlapTimespanDays > 0)
+                                    {
+                                        // step onto the next burn .... if not off the end - other wise use the last periods burn...
+                                        if (burn + xtraburn < mxdim)
+                                        {
+                                            xtraburn = xtraburn + 1;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+
+                                        amt = BurnDuration[burn + xtraburn];
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                overlapOffsetDays = overlapOffsetDays - BurnDuration[burn];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
+        {
+            if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)
+            {
+                return 0;
+            }
+
+            if (dtBarStart <= dtPeriodStart && dtBarFinish >= dtPeriodFinish)
+            {
+                return dtPeriodFinish.Subtract(dtPeriodStart).Days + 1;
+            }
+
+            var maxStartDate = (dtBarStart < dtPeriodStart ? dtPeriodStart : dtBarStart);
+            var minEndDate = (dtBarFinish < dtPeriodFinish ? dtBarFinish : dtPeriodFinish);
+
+            if (maxStartDate > minEndDate)
+            {
+                return 0;
+            }
+
+            return minEndDate.Subtract(maxStartDate).Days + 1;
+        }
+
+        private double AFiddler(double f)
+        {
+            return double.Parse(f.ToString("0.00"));
+        }
     }
 }
