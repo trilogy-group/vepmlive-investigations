@@ -36,13 +36,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPMLiveTimerService.Fakes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      
     </Reference>
-   <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
@@ -56,7 +54,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
@@ -85,6 +82,10 @@
     <Compile Include="TimerRunnerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService.csproj">
       <Project>{6C2BE0DE-AF49-4F4D-BAB8-AE256F1CBDD7}</Project>
       <Name>EPMLiveTimerService</Name>
