@@ -81,23 +81,25 @@ namespace PortfolioEngineCore.Analyzers
             LinkedToPI = false;
 
             mxdim = arraysize;
-            zCost = new double[arraysize + 1];
-            zValue = new double[arraysize + 1];
-            zFTE = new double[arraysize + 1];
-            oCosts = new double[arraysize + 1];
-            oUnits = new double[arraysize + 1];
-            oFTE = new double[arraysize + 1];
+            var actualArraySize = arraysize + 1;
+
+            zCost = new double[actualArraySize];
+            zValue = new double[actualArraySize];
+            zFTE = new double[actualArraySize];
+            oCosts = new double[actualArraySize];
+            oUnits = new double[actualArraySize];
+            oFTE = new double[actualArraySize];
             for (int i = 0; i <= mxdim; i++)
             {
                 zCost[i] = 0;
                 zValue[i] = 0;
             }
 
-            BurnDuration = new int[arraysize + 1];
-            Burnrate = new double[arraysize + 1];
-            UseBurnrate = new double[arraysize + 1];
-            OutsideAdj = new double[arraysize + 1];
-            Budget = new double[arraysize + 1];
+            BurnDuration = new int[actualArraySize];
+            Burnrate = new double[actualArraySize];
+            UseBurnrate = new double[actualArraySize];
+            OutsideAdj = new double[actualArraySize];
+            Budget = new double[actualArraySize];
 
             OCVal = new int[6];
             Text_OCVal = new string[6];
