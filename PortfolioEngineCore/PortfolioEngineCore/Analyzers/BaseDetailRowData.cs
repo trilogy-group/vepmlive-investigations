@@ -106,67 +106,72 @@ namespace PortfolioEngineCore.Analyzers
             TXVal = new string[6];
         }
 
-        protected void CopyData(BaseDetailRowData src)
+        protected void CopyData(BaseDetailRowData source)
         {
-            CB_ID = src.CB_ID;
-            CT_ID = src.CT_ID;
-            PROJECT_ID = src.PROJECT_ID;
-            BC_UID = src.BC_UID;
-            BC_ROLE_UID = src.BC_ROLE_UID;
-            BC_SEQ = src.BC_SEQ;
-            MC_Val = src.MC_Val;
-            CAT_UID = src.CAT_UID;
-            Det_Start = src.Det_Start;
-            Det_Finish = src.Det_Finish;
-            oDet_Start = src.oDet_Start;
-            oDet_Finish = src.oDet_Finish;
-            bHadPData = src.bHadPData;
-            PI_Name = src.PI_Name;
-            CT_Name = src.CT_Name;
-            Scen_Name = src.Scen_Name;
-            Cat_Name = src.Cat_Name;
-            Role_Name = src.Role_Name;
-            MC_Name = src.MC_Name;
-            FullCatName = src.FullCatName;
-            Scenario_ID = src.Scenario_ID;
-            b_PIOver = src.b_PIOver;
-            LinkedToPI = src.LinkedToPI;
-            m_mode = src.m_mode;
-            CC_Name = src.CC_Name;
-            FullCCName = src.FullCCName;
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
 
-            OCVal = src.OCVal;
-            Text_OCVal = src.Text_OCVal;
-            TXVal = src.TXVal;
-            m_PI_Format_Extra_data = src.m_PI_Format_Extra_data;
-            m_tot1 = src.m_tot1;
-            m_tot2 = src.m_tot2;
-            m_tot3 = src.m_tot3;
-            m_rt = src.m_rt;
-            m_rt_name = src.m_rt_name;
-            bSelected = src.bSelected;
-            bRealone = src.bRealone;
-            lUoM = src.lUoM;
-            HasValues = src.HasValues;
-            bUseCosts = src.bUseCosts;
+            CB_ID = source.CB_ID;
+            CT_ID = source.CT_ID;
+            PROJECT_ID = source.PROJECT_ID;
+            BC_UID = source.BC_UID;
+            BC_ROLE_UID = source.BC_ROLE_UID;
+            BC_SEQ = source.BC_SEQ;
+            MC_Val = source.MC_Val;
+            CAT_UID = source.CAT_UID;
+            Det_Start = source.Det_Start;
+            Det_Finish = source.Det_Finish;
+            oDet_Start = source.oDet_Start;
+            oDet_Finish = source.oDet_Finish;
+            bHadPData = source.bHadPData;
+            PI_Name = source.PI_Name;
+            CT_Name = source.CT_Name;
+            Scen_Name = source.Scen_Name;
+            Cat_Name = source.Cat_Name;
+            Role_Name = source.Role_Name;
+            MC_Name = source.MC_Name;
+            FullCatName = source.FullCatName;
+            Scenario_ID = source.Scenario_ID;
+            b_PIOver = source.b_PIOver;
+            LinkedToPI = source.LinkedToPI;
+            m_mode = source.m_mode;
+            CC_Name = source.CC_Name;
+            FullCCName = source.FullCCName;
+
+            OCVal = source.OCVal;
+            Text_OCVal = source.Text_OCVal;
+            TXVal = source.TXVal;
+            m_PI_Format_Extra_data = source.m_PI_Format_Extra_data;
+            m_tot1 = source.m_tot1;
+            m_tot2 = source.m_tot2;
+            m_tot3 = source.m_tot3;
+            m_rt = source.m_rt;
+            m_rt_name = source.m_rt_name;
+            bSelected = source.bSelected;
+            bRealone = source.bRealone;
+            lUoM = source.lUoM;
+            HasValues = source.HasValues;
+            bUseCosts = source.bUseCosts;
 
             for (int i = 1; i <= mxdim; i++)
             {
-                zCost[i] = src.zCost[i];
-                zValue[i] = src.zValue[i];
-                zFTE[i] = src.zFTE[i];
+                zCost[i] = source.zCost[i];
+                zValue[i] = source.zValue[i];
+                zFTE[i] = source.zFTE[i];
 
-                oCosts[i] = src.oCosts[i];
-                oUnits[i] = src.oUnits[i];
-                zFTE[i] = src.oFTE[i];
+                oCosts[i] = source.oCosts[i];
+                oUnits[i] = source.oUnits[i];
+                zFTE[i] = source.oFTE[i];
 
-                BurnDuration[i] = src.BurnDuration[i];
-                Burnrate[i] = src.Burnrate[i];
-                UseBurnrate[i] = src.UseBurnrate[i];
+                BurnDuration[i] = source.BurnDuration[i];
+                Burnrate[i] = source.Burnrate[i];
+                UseBurnrate[i] = source.UseBurnrate[i];
 
-                OutsideAdj[i] = src.OutsideAdj[i];
-                oUnits[i] = src.oUnits[i];
-                Budget[i] = src.Budget[i];
+                OutsideAdj[i] = source.OutsideAdj[i];
+                oUnits[i] = source.oUnits[i];
+                Budget[i] = source.Budget[i];
             }
         }
     }

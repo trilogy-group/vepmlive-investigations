@@ -18,8 +18,8 @@ namespace ModelDataCache
 
         public void CopyData(DetailRowData src)
         {
-            sKey = src.sKey;
             base.CopyData(src);
+            sKey = src.sKey;
         }
 
         public void CopyToTargetData(ref TargetRowData dest)

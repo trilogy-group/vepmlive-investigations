@@ -9,7 +9,7 @@ namespace PortfolioEngineCore.Tests.Testables
 {
     public class BaseDetailRowDataTestable : BaseDetailRowData
     {
-        public double[] oCosts
+        public new double[] oCosts
         {
             get
             {
@@ -21,7 +21,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] oUnits
+        public new double[] oUnits
         {
             get
             {
@@ -33,7 +33,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] oFTE
+        public new double[] oFTE
         {
             get
             {
@@ -45,7 +45,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public int[] BurnDuration
+        public new int[] BurnDuration
         {
             get
             {
@@ -57,7 +57,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] Burnrate
+        public new double[] Burnrate
         {
             get
             {
@@ -69,7 +69,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] UseBurnrate
+        public new double[] UseBurnrate
         {
             get
             {
@@ -81,7 +81,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] OutsideAdj
+        public new double[] OutsideAdj
         {
             get
             {
@@ -93,7 +93,7 @@ namespace PortfolioEngineCore.Tests.Testables
             }
         }
 
-        public double[] Budget
+        public new double[] Budget
         {
             get
             {
