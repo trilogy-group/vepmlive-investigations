@@ -1,21 +1,26 @@
 using System;
+using System.Collections;
+using System.Text.RegularExpressions;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
-using System.Collections;
-using System.Text.RegularExpressions;
+using Microsoft.SharePoint.Utilities;
 using EPMLiveCore.Infrastructure.Logging;
+using EPMLiveCore.SPUtilities;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
 {
-    public partial class newproject : System.Web.UI.Page
+    public partial class newproject : Page
     {
-        protected string baseURL = "";
-        protected string metaDataString = "";
-        protected string processString = "";
+        private SPProjectUtility _spProjectUtility = new SPProjectUtility();
+
+        protected string baseURL = string.Empty;
+        protected string metaDataString = string.Empty;
+        protected string processString = string.Empty;
         protected bool requiredOK = true;
         protected Button btnOK;
         protected DropDownList DdlGroup;
@@ -39,181 +44,59 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            btnOK.Attributes.Add("onclick", "javascript:" +
-                      btnOK.ClientID + ".disabled=true;");
-
+            btnOK.Attributes.Add("onclick", string.Format("javascript:{0}.disabled=true;", btnOK.ClientID));
             
+            if (!IsPostBack)
+            {
+                var projectInfo = _spProjectUtility.RequestProjectInfo();
 
-                //SPSLists.Lists spsLists = new SPSLists.Lists();
-                //spsLists.Url = mySite.Url + "/_vti_bin/lists.asmx";
-                //spsLists.UseDefaultCredentials = true;
-
-                if (!IsPostBack)
+                switch (projectInfo.StatusCode)
                 {
-                    string login = SPContext.Current.Web.CurrentUser.LoginName;
-                    string url = SPContext.Current.Web.Url;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        using (SPSite mysite = new SPSite(url))
+                    case HttpStatusCode.Forbidden:
+                        SPUtility.Redirect("accessdenied.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                        break;
+                    default:
+                        URL = projectInfo.ServerRelativeUrl;
+                        baseURL = projectInfo.BaseUrl;
+
+                        foreach (DictionaryEntry dictionaryEntry in projectInfo.PopulatedTemplates)
                         {
-                            using (SPWeb myweb = mysite.OpenWeb())
-                            {
-                                myweb.Site.CatchAccessDeniedException = false;
-                                try
-                                {
-                                    if (!myweb.DoesUserHavePermissions(login, SPBasePermissions.ManageSubwebs))
-                                        Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-
-                                    
-                                    
-                                }
-                                catch
-                                {
-                                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                                }
-                                URL = myweb.ServerRelativeUrl;
-
-                                baseURL = myweb.Url + "/";
-                                Guid lockweb = CoreFunctions.getLockedWeb(myweb);
-                                if (lockweb != Guid.Empty)
-                                {
-                                    using (SPWeb web = myweb.Site.AllWebs[lockweb])
-                                    {
-                                        string wsType = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-                                        string nav = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
-                                        string perms = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
-                                        string sTemplates = CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates");
-
-                                        if (sTemplates != "")
-                                        {
-                                            string[] ssTemplates = sTemplates.Split('|');
-                                            foreach (string sTemplate in ssTemplates)
-                                            {
-                                                validTemplates.Add(sTemplate);
-                                            }
-                                        }
-
-                                        if (nav == "True")
-                                        {
-                                            rdoTopLinkYes.Checked = true;
-                                            rdoTopLinkNo.Enabled = false;
-                                            rdoTopLinkYes.Enabled = false;
-                                        }
-                                        else if (nav == "False")
-                                        {
-                                            rdoTopLinkNo.Checked = true;
-                                            rdoTopLinkNo.Enabled = false;
-                                            rdoTopLinkYes.Enabled = false;
-                                        }
-
-                                        if (perms == "Unique")
-                                        {
-                                            rdoInherit.Checked = false;
-                                            rdoUnique.Checked = true;
-                                            rdoUnique.Enabled = false;
-                                            rdoInherit.Enabled = false;
-                                        }
-                                        else if (perms == "Same")
-                                        {
-                                            rdoUnique.Checked = false;
-                                            rdoUnique.Enabled = false;
-                                            rdoInherit.Enabled = false;
-                                            rdoInherit.Checked = true;
-                                        }
-
-                                        if (wsType == "New")
-                                        {
-                                            wsTypeNew = "checked disabled=\"true\"";
-                                            wsTypeExisting = " disabled=\"true\"";
-
-                                        }
-                                        else if (wsType == "Existing")
-                                        {
-                                            wsTypeNew = " disabled=\"true\"";
-                                            wsTypeExisting = "checked disabled=\"true\"";
-                                            Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
-                                        }
-                                    }
-                                }
-                                populateTemplates(myweb);
-                            }
+                            var li = new ListItem(dictionaryEntry.Key.ToString(), dictionaryEntry.Value.ToString());
+                            DdlGroup.Items.Add(li);
                         }
-                    });
-                   //if(hideDefaultTemplates == "")
-                   //    hideDefaultTemplates = CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveHideDefaultTemplates");
-                
+
+                        if (projectInfo.IsNavigationEnabled.HasValue)
+                        {
+                            rdoTopLinkYes.Checked = projectInfo.IsNavigationEnabled == true;
+                            rdoTopLinkNo.Checked = projectInfo.IsNavigationEnabled == false;
+                            rdoTopLinkNo.Enabled = false;
+                            rdoTopLinkYes.Enabled = false;
+                        }
+                        
+                        if (projectInfo.IsUnique.HasValue)
+                        {
+                            rdoUnique.Checked = projectInfo.IsUnique == true;
+                            rdoInherit.Checked = projectInfo.IsUnique == false;
+                            rdoUnique.Enabled = false;
+                            rdoInherit.Enabled = false;
+                        }
+
+                        if (projectInfo.IsWorkspaceExisting == false)
+                        {
+                            wsTypeNew = "checked disabled=\"true\"";
+                            wsTypeExisting = " disabled=\"true\"";
+                        }
+                        else if (projectInfo.IsWorkspaceExisting == true)
+                        {
+                            wsTypeNew = " disabled=\"true\"";
+                            wsTypeExisting = "checked disabled=\"true\"";
+                            Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
+                        }
+                        break;
+                }
             }
         }
-
         
-        private void populateTemplates(SPWeb site)
-        {
-            SortedList sl = new SortedList();
-            string version = getMajorVersion(site);
-            foreach (SPWebTemplate template in site.GetAvailableWebTemplates(site.Language))
-            {
-                if (!template.IsHidden)
-                {
-                    if (!template.Title.Contains("EPM Live"))
-                    {
-                        if (validTemplates.Count == 0)
-                        {
-                            if (template.IsCustomTemplate && isValidTemplate(template.Title, version, site))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
-                        }
-                        else
-                        {
-                            if (validTemplates.Contains(template.Title))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (DictionaryEntry de in sl)
-            {
-                ListItem li = new ListItem(de.Key.ToString(), de.Value.ToString());
-                DdlGroup.Items.Add(li);
-            }
-        }
-
-        private bool isValidTemplate(string template, string version, SPWeb web)
-        {
-            if (version == "2")
-            {
-                switch (template)
-                {
-                    case "Basic Project Workspace":
-                    case "Enterprise Project Management Workgroup":
-                        return false;
-                };
-            }
-            else if (version == "1")
-            {
-                switch (template)
-                {
-                    case "Project Workspace":
-                        return false;
-                }
-            }
-            return true;
-        }
-
-        private string getMajorVersion(SPWeb web)
-        {
-            try
-            {
-                string[] fullversion = web.Properties["TemplateVersion"].Split('.');
-                return fullversion[0];
-            }
-            catch { }
-            return "1";
-        }
-
         private string createProject(SPWeb web)
         {
             SPList list = web.Lists["Project Center"];
