@@ -941,7 +941,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
+        public static void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
         {
             switch ((CustomFieldDBTable)lTableID)
             {

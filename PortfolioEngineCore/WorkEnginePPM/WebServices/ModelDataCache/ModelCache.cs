@@ -661,7 +661,7 @@ namespace ModelDataCache
                 string sfnam = "";
 
 
-                GetCFFieldName(lTid, lfit, out stab, out sfnam);
+                OptimizerData.GetCFFieldName(lTid, lfit, out stab, out sfnam);
                 m_Selected_Table = stab;
                 m_Select_FieldName = sfnam;
             }
@@ -3669,101 +3669,6 @@ namespace ModelDataCache
             return "";
         }
 
-        private void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
-        {
-            switch ((CustomFieldDBTable)lTableID)
-            {
-                case CustomFieldDBTable.ResourceINT:
-                    sTable = "EPGC_RESOURCE_INT_VALUES";
-                    sField = "RI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceTEXT:
-                    sTable = "EPGC_RESOURCE_TEXT_VALUES";
-                    sField = "RT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDEC:
-                    sTable = "EPGC_RESOURCE_DEC_VALUES";
-                    sField = "RC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceNTEXT:
-                    sTable = "EPGC_RESOURCE_NTEXT_VALUES";
-                    sField = "RN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDATE:
-                    sTable = "EPGC_RESOURCE_DATE_VALUES";
-                    sField = "RD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceMV:
-                    sTable = "EPGC_RESOURCE_MV_VALUES";
-                    sField = "MVR_UID";
-                    break;
-                case CustomFieldDBTable.PortfolioINT:
-                    sTable = "EPGP_PROJECT_INT_VALUES";
-                    sField = "PI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioTEXT:
-                    sTable = "EPGP_PROJECT_TEXT_VALUES";
-                    sField = "PT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDEC:
-                    sTable = "EPGP_PROJECT_DEC_VALUES";
-                    sField = "PC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioNTEXT:
-                    sTable = "EPGP_PROJECT_NTEXT_VALUES";
-                    sField = "PN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDATE:
-                    sTable = "EPGP_PROJECT_DATE_VALUES";
-                    sField = "PD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.Program:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_UID";
-                    break;
-                case CustomFieldDBTable.ProjectINT:
-                    sTable = "EPGX_PROJ_INT_VALUES";
-                    sField = "XI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectTEXT:
-                    sTable = "EPGX_PROJ_TEXT_VALUES";
-                    sField = "XT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDEC:
-                    sTable = "EPGX_PROJ_DEC_VALUES";
-                    sField = "XC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectNTEXT:
-                    sTable = "EPGX_PROJ_NTEXT_VALUES";
-                    sField = "XN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDATE:
-                    sTable = "EPGX_PROJ_DATE_VALUES";
-                    sField = "XD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProgramText:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_PI_TEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIINT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_FLAG" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWITEXT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_CTEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIDEC:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_NUMBER" + lFieldID.ToString("0");
-                    break;
-                default:
-                    sTable = "Unknown Table";
-                    sField = "";
-                    break;
-            }
-
-        }
         private void PerformCalcs(DetailRowData odet, bool bConvFtoQ)
         {
 
