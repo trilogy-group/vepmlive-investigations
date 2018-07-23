@@ -749,13 +749,23 @@ namespace PortfolioEngineCore
 
         public static int ReadFieldDataFieldId(SqlDataReader reader, string columnName)
         {
-            return DBAccess.ReadIntValue(reader["FA_FIELD_ID"]);
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
+            return DBAccess.ReadIntValue(reader[columnName]);
         }
 
         public static string ReadFieldDataFieldName(SqlDataReader reader, params string[] columns)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             var result = string.Empty;
-            for(var i = 0; i < columns.Length || result == string.Empty; i++)
+            for(var i = 0; i < columns.Length && result == string.Empty; i++)
             {
                 result = DBAccess.ReadStringValue(reader[columns[i]]);
             }
@@ -766,13 +776,18 @@ namespace PortfolioEngineCore
 
         public static int ReadFieldDataFieldFormat(SqlDataReader reader, int fieldExtraId, params string[] columns)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             if (fieldExtraId == 9911)
             {
                 return 9911; // ' change Stage from an integer (2) to a special text field (9911)
             }
 
             int result = 0;
-            for (var i = 0; i < columns.Length || result == 0; i++)
+            for (var i = 0; i < columns.Length && result == 0; i++)
             {
                 result = DBAccess.ReadIntValue(reader[columns[i]]);
             }
@@ -782,6 +797,11 @@ namespace PortfolioEngineCore
 
         public static string ReadFieldDataSExtra(SqlDataReader reader, string columnName)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             return DBAccess.ReadStringValue(reader[columnName]);
         }
 
@@ -790,8 +810,8 @@ namespace PortfolioEngineCore
             var result = ReadFieldDataSExtra(reader, columnName);
             if (result == string.Empty)
             {
-                var tableId = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                var fieldInTable = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                var tableId = DBAccess.ReadIntValue(reader[tableIdColumnName]);
+                var fieldInTable = DBAccess.ReadIntValue(reader[fieldInTableColumnName]);
 
                 var stab = string.Empty;
                 var sfnam = string.Empty;
