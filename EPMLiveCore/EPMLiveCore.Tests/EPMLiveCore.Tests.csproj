@@ -91,12 +91,24 @@
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
+    <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
+    <Compile Include="RequestWorkspaceTest.cs" />
+    <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
+    <Compile Include="Testables\InputFormSectionTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Testables\RequestWorkspaceTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Testables\NewProjectTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="TestCheck.cs" />
   </ItemGroup>
   <ItemGroup>
