@@ -319,6 +319,11 @@ export class CommonPageHelper {
     static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
+        while ((!await PageHelper.isElementDisplayed(targetElement) ) && maxAttempts++ < 10) {
+            browser.refresh();
+            await this.selectRecordFromGrid(stepLogger, item );
+        }
+        maxAttempts = 0;
         while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
             browser.refresh();
             await this.selectRecordFromGrid(stepLogger, item );
