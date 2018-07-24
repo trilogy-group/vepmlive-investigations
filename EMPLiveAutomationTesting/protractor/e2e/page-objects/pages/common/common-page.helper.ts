@@ -318,13 +318,10 @@ export class CommonPageHelper {
 
     static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
         let maxAttempts = 0;
-        await ElementHelper.actionMouseMove(targetElement);
         await browser.sleep(PageHelper.timeout.s);
-        while ((await PageHelper.isElementPresent(CommonPage.linkDisable, false )) && maxAttempts++ < 10) {
+        while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
             browser.refresh();
             await this.selectRecordFromGrid(stepLogger, item );
-            await ElementHelper.actionMouseMove(targetElement);
-            await browser.sleep(PageHelper.timeout.s);
         }
     }
     static async editOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
@@ -733,5 +730,8 @@ export class CommonPageHelper {
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+    }
+    static async getRibbonIsDisable( targetElement: ElementFinder, attributeName: string) {
+        return await ElementHelper.getAttributeValue(targetElement, attributeName);
     }
    }
