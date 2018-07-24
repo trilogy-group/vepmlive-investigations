@@ -9,6 +9,9 @@ namespace PortfolioEngineCore
 {
     public class Admininfos : PFEBase
     {
+        private const string MaxIdColumn = "MaxId";
+        private const string CantCreateNewGroupRecordMessage = "Can't create new Group record";
+
         #region Fields (1) 
 
         private readonly SqlConnection _sqlConnection;
@@ -2300,37 +2303,17 @@ namespace PortfolioEngineCore
                         if (sExistingTitle != sTitle)
                         {
                             sCommand = @"Update EPG_GROUPS SET GROUP_NAME=@NewName Where GROUP_ID=@Id";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Transaction = transaction;
-                            SqlCommand.Parameters.AddWithValue("@Id", Id);
-                            SqlCommand.Parameters.AddWithValue("@NewName", sTitle);
-                            SqlCommand.ExecuteNonQuery();
+                            InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
                         }
                     }
                     else
                     {
                         // insert new GROUPS record
                         sCommand = "SELECT MAX(GROUP_ID) as MaxId FROM EPG_GROUPS";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlReader = SqlCommand.ExecuteReader();
-
-                        if (SqlReader.Read())
-                        {
-                            Id = DBAccess.ReadIntValue(SqlReader["MaxId"]) + 1;
-                        }
-                        else
-                        {
-                            throw new PFEException((int)PFEError.UpdateWorkSchedule, "Can't create new Group record");
-                        }
-                        SqlReader.Close();
+                        InitializeId(transaction, sCommand, out Id);
 
                         sCommand = "INSERT Into EPG_GROUPS (GROUP_ID,GROUP_NAME,GROUP_ENTITY) Values (@Id,@NewName,11)";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@Id", Id);
-                        SqlCommand.Parameters.AddWithValue("@NewName", sTitle);
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.ExecuteNonQuery();
+                        InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
                     }
 
                     // Delete and then Insert nonwork items record
@@ -2454,6 +2437,60 @@ namespace PortfolioEngineCore
             catch (Exception exception)
             {
                 throw new PFEException((int)PFEError.UpdateHolidaySchedule, exception.GetBaseMessage());
+            }
+        }
+
+        private void InitializeId(SqlTransaction transaction, string sCommand, out int id)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            using (var sqlCommand = new SqlCommand(sCommand, _sqlConnection))
+            {
+                sqlCommand.Transaction = transaction;
+
+                var sqlReader = sqlCommand.ExecuteReader();
+                id = GetNextIdValue(sqlReader);
+
+                sqlReader.Close();
+            }
+        }
+
+        private int GetNextIdValue(IDataReader sqlReader)
+        {
+            if (sqlReader == null)
+            {
+                throw new ArgumentNullException(nameof(sqlReader));
+            }
+
+            int id;
+            if (sqlReader.Read())
+            {
+                id = SqlDb.ReadIntValue(sqlReader[MaxIdColumn]) + 1;
+            }
+            else
+            {
+                throw new PFEException((int)PFEError.UpdateWorkSchedule, CantCreateNewGroupRecordMessage);
+            }
+
+            return id;
+        }
+
+        private void InsertOrUpdateEpgGroups(SqlTransaction transaction, string sCommand, string sTitle, int id)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            using (var sqlCommand = new SqlCommand(sCommand, _sqlConnection))
+            {
+                sqlCommand.Transaction = transaction;
+                sqlCommand.Parameters.AddWithValue("@Id", id);
+                sqlCommand.Parameters.AddWithValue("@NewName", sTitle);
+                sqlCommand.ExecuteNonQuery();
             }
         }
 
@@ -4500,37 +4537,17 @@ namespace PortfolioEngineCore
                         if (sExistingTitle != sTitle)
                         {
                             sCommand = @"Update EPG_GROUPS SET GROUP_NAME=@NewName Where GROUP_ID=@Id";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Transaction = transaction;
-                            SqlCommand.Parameters.AddWithValue("@Id", Id);
-                            SqlCommand.Parameters.AddWithValue("@NewName", sTitle);
-                            SqlCommand.ExecuteNonQuery();
+                            InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
                         }
                     }
                     else
                     {
                         // insert new GROUPS record
                         sCommand = "SELECT MAX(GROUP_ID) as MaxId FROM EPG_GROUPS";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlReader = SqlCommand.ExecuteReader();
-
-                        if (SqlReader.Read())
-                        {
-                            Id = DBAccess.ReadIntValue(SqlReader["MaxId"]) + 1;
-                        }
-                        else
-                        {
-                            throw new PFEException((int)PFEError.UpdateWorkSchedule, "Can't create new Group record");
-                        }
-                        SqlReader.Close();
+                        InitializeId(transaction, sCommand, out Id);
 
                         sCommand = "INSERT Into EPG_GROUPS (GROUP_ID,GROUP_NAME,GROUP_ENTITY) Values (@Id,@NewName,10)";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@Id", Id);
-                        SqlCommand.Parameters.AddWithValue("@NewName", sTitle);
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.ExecuteNonQuery();
+                        InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
                     }
 
                     // Delete and then Insert attributes record
