@@ -12,7 +12,7 @@ using WorkEnginePPM;
 
 namespace RPADataCache
 {
-    internal class RPATopGrid1 : RPADataCacheGridBase
+    internal class RPATopGrid : RPADataCacheGridBase
     {
         private readonly List<clsRXDisp> _columns;
         private readonly int _pmoAdmin;
@@ -26,14 +26,22 @@ namespace RPADataCache
         private CStruct DefinitionLeaf;
         private CStruct MiddleCols;
 
-        public RPATopGrid1(List<clsRXDisp> columns, int pmoAdmin, string xmlString, int displayMode, IList<RPATGRow> displayList, int fromPeriodIndex, int toPeriodIndex)
-            : base(fromPeriodIndex, toPeriodIndex)
+        public RPATopGrid(
+            List<clsRXDisp> columns, 
+            int pmoAdmin, 
+            string xmlString, 
+            int displayMode, 
+            IList<RPATGRow> displayList, 
+            clsResourceValues resourceValues,
+            clsLookupList categoryLookupList)
         {
             _columns = columns;
             _pmoAdmin = pmoAdmin;
             _xmlString = xmlString;
             _displayMode = displayMode;
             _displayList = displayList;
+            _resourceValues = resourceValues;
+            _categoryLookupList = categoryLookupList;
         }        
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -981,7 +989,6 @@ namespace RPADataCache
         {
             return HandleError(sContext, nStatus, "Exception in RPAGrids.cs (" + sStage + "): '" + ex.Message.ToString() + "'");
         }
-
 
         private double GetDetailRowValue(clsResXData detailRowData, int fieldId, int i)
         {

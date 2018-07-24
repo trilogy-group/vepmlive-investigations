@@ -18,16 +18,7 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected IList<TPeriodData> Periods;
     protected IList<TDetailRowData> DetailRows;
-        
-    public readonly int FromPeriodIndex;
-    public readonly int ToPeriodIndex;
-
-    public GridBase(int fromPeriodIndex, int toPeriodIndex)
-    {
-        FromPeriodIndex = fromPeriodIndex;
-        ToPeriodIndex = toPeriodIndex;
-    }
-
+    
     protected abstract bool CheckIfDetailRowShouldBeAdded(TDetailRowData detailRow);
 
     public void AddPeriodsData(IEnumerable<TPeriodData> periods)

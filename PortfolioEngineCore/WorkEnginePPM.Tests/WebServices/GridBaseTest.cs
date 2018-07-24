@@ -21,12 +21,6 @@ namespace WorkEnginePPM.Tests.WebServices
         private ShimCStruct _header1Shim;
         private ShimCStruct _header2Shim;
         private ShimCStruct _periodColsShim;
-        
-        private string _idParameter;
-        private string _nameParameter;
-        private int _fromPeriodIndexParameter;
-        private int _toPeriodIndexParameter;
-
         private IList<PeriodData> _periodsParameter;
         private DetailRowData _detailRowParameter;
 
@@ -34,11 +28,6 @@ namespace WorkEnginePPM.Tests.WebServices
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
-
-            _idParameter = "test-id";
-            _nameParameter = "test-name";
-            _fromPeriodIndexParameter = 0;
-            _toPeriodIndexParameter = int.MaxValue;
 
             _periodsParameter = new PeriodData[]
             {
@@ -75,10 +64,7 @@ namespace WorkEnginePPM.Tests.WebServices
             return new GridBaseTestDouble(
                 _header1Shim, 
                 _header2Shim, 
-                _periodColsShim,
-
-                _fromPeriodIndexParameter,
-                _toPeriodIndexParameter
+                _periodColsShim
             );
         }
 

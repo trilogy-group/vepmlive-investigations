@@ -20,6 +20,8 @@ namespace ModelDataCache
         public readonly bool UseQuantity;
         public readonly bool UseCost;
         public readonly bool ShowCostDetailed;
+        public readonly int FromPeriodIndex;
+        public readonly int ToPeriodIndex;
 
         public ModelDataCacheGridBase(
             bool useGrouping,
@@ -34,7 +36,6 @@ namespace ModelDataCache
             bool showCostDetailed,
             int fromPeriodIndex,
             int toPeriodIndex)
-        : base (fromPeriodIndex, toPeriodIndex)
         {
             UseGrouping = useGrouping;
             ShowFTEs = showFTEs;
@@ -46,8 +47,9 @@ namespace ModelDataCache
             UseQuantity = useQuantity;
             UseCost = useCost;
             ShowCostDetailed = showCostDetailed;
+            FromPeriodIndex = fromPeriodIndex;
+            ToPeriodIndex = toPeriodIndex;
         }
-
 
         protected virtual CStruct InitializeGridLayoutConfig()
         {

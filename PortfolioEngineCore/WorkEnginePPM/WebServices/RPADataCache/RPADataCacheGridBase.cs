@@ -10,8 +10,7 @@ namespace RPADataCache
 {
     internal abstract class RPADataCacheGridBase : GridBase<CPeriod, Tuple<clsResXData, clsPIData>>
     {
-        public RPADataCacheGridBase(int fromPeriodIndex, int toPeriodIndex) 
-            : base(fromPeriodIndex, toPeriodIndex)
+        public RPADataCacheGridBase()
         {
         }
     }

@@ -21,11 +21,8 @@ namespace WorkEnginePPM.Tests.TestDoubles
         public GridBaseTestDouble(
             ShimCStruct header1Shim,
             ShimCStruct header2Shim,
-            ShimCStruct periodColsShim,
-
-            int fromPeriodIndex, 
-            int toPeriodIndex
-        ) : base(fromPeriodIndex, toPeriodIndex)
+            ShimCStruct periodColsShim
+        )
         {
 
             Header1 = header1Shim;
