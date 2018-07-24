@@ -135,11 +135,8 @@ export class WorkspacePageHelper {
             await browser.sleep(PageHelper.timeout.s);
 
             while (!(await PageHelper.isElementPresent(CommonPage.latestNotification, false ) && maxClickAttempts++ < 10)) {
-                browser.refresh();
-
-                await PageHelper.click(CommonPage.personIcon);
-
-                await browser.sleep(PageHelper.timeout.s);
+                 await PageHelper.click(CommonPage.personIcon);
+                 await browser.sleep(PageHelper.timeout.s);
             }
 
         }
