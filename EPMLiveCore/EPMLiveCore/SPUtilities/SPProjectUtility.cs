@@ -83,7 +83,7 @@ namespace EPMLiveCore.SPUtilities
 
                         try
                         {
-                            string[] tRollupLists = gSettings.RollupLists.Split(',');
+                            var tRollupLists = gSettings.RollupLists.Split(',');
                             result.ListName = tRollupLists[0].Split('|')[0];
                         }
                         catch (Exception ex)

@@ -1759,10 +1759,10 @@ namespace EPMLiveCore
                 return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
-        
+
         public static string SetPropertiesBagSettings(string data, SPWeb spWeb)
         {
-            string webAppId;            
+            string webAppId;
             try
             {
                 string param = GetPropertiesBagParams(data, out webAppId);
@@ -1773,13 +1773,13 @@ namespace EPMLiveCore
                 else
                 {
                     CoreFunctions.setWebAppSetting(new Guid(webAppId), "EPMLiveAPIURL", param);
-                }                
+                }
                 return Response.Success(param);
             }
             catch (Exception ex)
             {
                 return Response.Failure(21021, string.Format("[UAandEpmlAPIService-SetPropertiesBagSettings] {0}", ex.Message));
-            }            
+            }
         }
 
         #endregion
