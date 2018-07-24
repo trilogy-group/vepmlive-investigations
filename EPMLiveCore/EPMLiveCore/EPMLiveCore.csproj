@@ -89,24 +89,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+       </Reference>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -125,8 +117,10 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint" />
-    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
@@ -234,6 +228,7 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="ControlDataBuilder.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
@@ -365,6 +360,7 @@
     <Compile Include="GenericPickerDialog.cs" />
     <Compile Include="GenericPublishEvent.cs" />
     <Compile Include="GenericQueryControl.cs" />
+    <Compile Include="GlobalConstants.cs" />
     <Compile Include="GlobalResourceHelper.cs" />
     <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
     <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />
@@ -1330,6 +1326,7 @@
     <Compile Include="ReportingProxy\ReportingLogger.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
+    <Compile Include="ResourcePlanProcessingResult.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsField.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
@@ -1374,6 +1371,8 @@
     <Compile Include="SocialEngine\SocialEngineProxy.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
+    <Compile Include="SPUtilities\SPListUtility.cs" />
+    <Compile Include="SPUtilities\SPProjectUtility.cs" />
     <Compile Include="StatusingEvent.cs" />
     <Compile Include="TagManager\API\Gateway.cs" />
     <Compile Include="TagManager\Tag.cs" />
