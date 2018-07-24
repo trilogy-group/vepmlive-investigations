@@ -174,6 +174,12 @@ namespace EPMLiveCore.Tests
             };
         }
 
+        [TestCleanup]
+        public void TearDown()
+        {
+            _shimsContext.Dispose();
+        }
+
         [TestMethod]
         public void OnLoad_PostBack_ProjectInfoNotReinitialized()
         {
