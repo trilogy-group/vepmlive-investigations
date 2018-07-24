@@ -319,7 +319,7 @@ export class CommonPageHelper {
     static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
-        while ((!await PageHelper.isElementDisplayed(targetElement) ) && maxAttempts++ < 10) {
+        while ((!(await PageHelper.isElementDisplayed(targetElement, false )) ) && maxAttempts++ < 10) {
             browser.refresh();
             await this.selectRecordFromGrid(stepLogger, item );
         }
