@@ -126,7 +126,7 @@ export class WorkspacePageHelper {
         stepLogger.step('Title is ' + modifiedTitle );
         // tslint:disable-next-line:max-line-length
 
-        while (!((await CommonPage.latestNotification.getText()).includes(modifiedTitle)) && maxAttempts++ < 20) {
+        while (!((await CommonPage.latestNotification.getText()).includes(modifiedTitle)) && maxAttempts++ < 30) {
             stepLogger.step(await CommonPage.latestNotification.getText());
             browser.refresh();
 
@@ -134,14 +134,13 @@ export class WorkspacePageHelper {
 
             await browser.sleep(PageHelper.timeout.s);
 
-            while (!(await PageHelper.isElementPresent(CommonPage.latestNotification, false ) && maxClickAttempts++ < 10)) {
+            while (!(await PageHelper.isElementPresent(CommonPage.latestNotification, false ) && maxClickAttempts++ < 20)) {
                 browser.refresh();
                 await PageHelper.click(CommonPage.personIcon);
                 await browser.sleep(PageHelper.timeout.s);
             }
 
         }
-
 
         stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
