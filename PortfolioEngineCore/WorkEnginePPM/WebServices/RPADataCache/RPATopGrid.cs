@@ -417,9 +417,9 @@ namespace RPADataCache
                 var periodId = ResolvePeriodId(period, i++);
                 var periodName = RPAData.GetPeriodName(period.PeriodName, _displayMode);
 
-                foreach (RPATGRow ot in _displayList)
+                foreach (var displayRow in _displayList)
                 {
-                    if (ot.bUse)
+                    if (displayRow.bUse)
                         ++count;
                 }
 
@@ -432,11 +432,11 @@ namespace RPADataCache
 
                 count = 0;
 
-                foreach (RPATGRow ot in _displayList)
+                foreach (var displayRow in _displayList)
                 {
                     try
                     {
-                        if (ot.bUse)
+                        if (displayRow.bUse)
                         {
                             ++count;
 
@@ -479,19 +479,15 @@ namespace RPADataCache
                                 }
                             }
 
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", "");
-
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", string.Empty);
                             DefinitionLeaf.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
                             DefinitionRight.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
-
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", "");
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", "");
-
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", "");
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", "");
-
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", "");
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", "");
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", string.Empty);
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", string.Empty);
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", string.Empty);
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", string.Empty);
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", string.Empty);
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", string.Empty);
 
                             xC.CreateIntAttr("MinWidth", 45);
                             xC.CreateIntAttr("Width", 65);
@@ -533,8 +529,6 @@ namespace RPADataCache
 
             var xIParent = Levels[0];
             var xI = xIParent.CreateSubStruct("I");
-            clsEPKItem oItem;
-            clsListItem oListItem;
             clsResCap oRCap;
             clsCatItem oc;
 
@@ -553,269 +547,9 @@ namespace RPADataCache
             xI.CreateStringAttr("rowid", "r" + resxData.rowid);
             xI.CreateBooleanAttr("rowidCanEdit", false);
 
-            foreach (var column in _columns)
-            {
-                try
-                {
-                    var sn = RemoveCharacters(column.m_realname, " \r\n")
-                        .Replace("/n", "");
+            ProcessDetailRowColumns(resxData, piData, xI);
 
-                    switch (column.m_id)
-                    {
-                        case RPConstants.TGRID_GRP_ID:
-                            break;
-                        case RPConstants.TGRID_STAT_ID:
-                            if (resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, GetStatusText(resxData.Status));
-                            }
-                            break;
-                        case RPConstants.TGRID_DEPT_ID:
-                            if (_resourceValues.Departments != null
-                                && _resourceValues.Departments.TryGetValue(resxData.DeptUID, out oItem) 
-                                && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, oItem.Name);
-                            }
-                            break;
-
-                        case RPConstants.TGRID_ROLE_ID:
-                            if (_resourceValues.Roles != null
-                                && _resourceValues.Roles.TryGetValue(resxData.RoleUID, out oListItem) 
-                                && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, oListItem.Name);
-                            }
-                            break;
-                        case RPConstants.TGRID_ITEM_ID:
-                            if (piData != null)
-                            {
-                                xI.CreateStringAttr(sn, piData.PIName);
-                            }
-                            break;
-                        case RPConstants.TGRID_RES_ID:
-                            if (resxData.bRealone == true)
-                            {
-                                xI.CreateStringAttr(
-                                    sn,
-                                    _resourceValues.Resources.TryGetValue(resxData.WResID, out oRCap)
-                                        ? oRCap.Name
-                                        : "Unassigned");
-                            }
-                            break;
-                        case RPConstants.TGRID_CC_ID:
-                            if (_resourceValues.CostCategories != null
-                                && _resourceValues.CostCategories.TryGetValue(resxData.CostCat, out oc) 
-                                && resxData.bRealone)
-                            {
-                                    xI.CreateStringAttr(sn, oc.Name);
-                            }
-                            break;
-                        case RPConstants.TGRID_CCFULL_ID:
-                            if (_resourceValues.CostCategories != null
-                                && _resourceValues.CostCategories.TryGetValue(resxData.CostCat, out oc) 
-                                && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, oc.FullName);
-                            }
-                            break;
-                        case RPConstants.TGRID_CCROLE_ID:
-                            if (_resourceValues.CostCategories != null
-                                && _resourceValues.CostCategories.TryGetValue(resxData.CostCatRole, out oc)
-                                && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, oc.Name);
-                            }
-                            break;
-                        case RPConstants.TGRID_CCROLEFULL_ID:
-                            if (_resourceValues.CostCategories != null)
-                            {
-
-                                if (_resourceValues.CostCategories.TryGetValue(resxData.CostCatRole, out oc)
-                                    && resxData.bRealone)
-                                {
-                                    xI.CreateStringAttr(sn, oc.FullName);
-                                }
-                            }
-                            break;
-                        case RPConstants.TGRID_SDATE:
-                            if (piData != null)
-                            {
-                                if (piData.start != DateTime.MinValue)
-                                {
-                                    xI.CreateStringAttr(sn, piData.start.ToString("yyyy-MM-dd HH:mm:ss"));
-                                }
-                            }
-                            break;
-                        case RPConstants.TGRID_FDATE:
-                            if (piData != null)
-                            {
-                                if (piData.finish != DateTime.MinValue)
-                                {
-                                    xI.CreateStringAttr(sn, piData.finish.ToString("yyyy-MM-dd HH:mm:ss"));
-                                }
-                            }
-                            break;
-                        case RPConstants.TGRID_OWNER:
-                            if (piData != null)
-                            {
-                                xI.CreateStringAttr(sn, piData.ItemManager);
-                            }
-                            break;
-                        case RPConstants.TGRID_STAGE:
-                            if (piData != null)
-                            {
-                                xI.CreateStringAttr(sn, piData.Stage);
-                            }
-                            break;
-                        case RPConstants.TGRID_STAGE_OWNER:
-                            if (piData != null)
-                            {
-                                xI.CreateStringAttr(sn, piData.StageOwner);
-                            }
-                            break;
-                        case RPConstants.TGRID_CSDATE:
-                            if (resxData.cSDate != DateTime.MinValue && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.cSDate.ToShortDateString());
-                            }
-                            break;
-                        case RPConstants.TGRID_CFDATE:
-                            if (resxData.cFDate != DateTime.MinValue && resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.cFDate.ToShortDateString());
-                            }
-                            break;
-                        case RPConstants.TGRID_CRATE:
-                            if (resxData.cRate != 0 && resxData.bRealone)
-                            {
-                                xI.CreateDoubleAttr(sn, resxData.cRate);
-                            }
-                            else
-                            {
-                                xI.CreateStringAttr(sn, string.Empty);
-                            }
-                            break;
-                        case RPConstants.TGRID_CCOST:
-                            if (resxData.cCost != 0 && resxData.bRealone)
-                            {
-                                xI.CreateDoubleAttr(sn, resxData.cCost);
-                            }
-                            break;
-                        case RPConstants.TGRID_CRTYPE:
-                            if (resxData.bRealone && resxData.cRateType != string.Empty)
-                            {
-                                xI.CreateStringAttr(sn, resxData.cRateType);
-                            }
-                            break;
-                        case RPConstants.TGRID_PLANID:
-                            if (resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.PlanID);
-                            }
-                            break;
-                        case RPConstants.TGRID_PLANGRP:
-                            if (resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.PlanGroup);
-                            }
-                            break;
-                        case RPConstants.TGRID_PRIORITY:
-                            if (resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.Priority);
-                            }
-                            break;
-                        case RPConstants.TGRID_MAJCAT:
-                            if (resxData.bRealone)
-                            {
-                                xI.CreateStringAttr(sn, resxData.majorcat);
-                            }
-                            break;
-                        case RPConstants.TGRID_FROLL:
-                            if (_resourceValues.CostCategories != null)
-                            {
-                                if (_resourceValues.CostCategories.TryGetValue(resxData.CostCatRole, out oc)
-                                    && resxData.bRealone)
-                                {
-                                    xI.CreateStringAttr(sn, oc.FullName);
-                                }
-                            }
-                            break;
-                        case RPConstants.TGRID_GENERIC:
-                            if (resxData.bRealone == true)
-                            {
-                                if (_resourceValues.Resources.TryGetValue(resxData.WResID, out oRCap))
-                                    xI.CreateStringAttr(sn, (oRCap.IsGeneric ? "Yes" : "No"));
-                                else
-                                    xI.CreateStringAttr(sn, " ");
-                            }
-                            break;
-                        default:
-                            var j = 0;
-                            var sFull = string.Empty;
-
-                            if (column.m_col_hidden || !resxData.bRealone)
-                            {
-                                break;
-                            }
-                            if (_resourceValues.PlanFields != null)
-                            {
-                                foreach (clsPortField opf in _resourceValues.PlanFields)
-                                {
-                                    if (column.m_id == opf.ID)
-                                    {
-                                        RPConstants.GetCustValue(opf.ID, resxData.otherdata, out j, out sFull, _resourceValues);
-                                        xI.CreateStringAttr(sn, sFull);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (_resourceValues.PIFields != null)
-                            {
-                                foreach (var opf in _resourceValues.PIFields)
-                                {
-                                    if (column.m_id == opf.ID)
-                                    {
-                                        RPConstants.GetCustValue(opf.ID, resxData.PIotherdata, out j, out sFull, _resourceValues);
-                                        xI.CreateStringAttr(sn, sFull);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (_resourceValues.ResFields != null)
-                            {
-                                foreach (var opf in _resourceValues.ResFields)
-                                {
-                                    if (column.m_id == opf.ID)
-                                    {
-                                        RPConstants.GetCustValue(opf.ID, resxData.Resotherdata, out j, out sFull, _resourceValues);
-                                        xI.CreateStringAttr(sn, sFull);
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LoggingService.WriteTrace(
-                       Area.EPMLiveWorkEnginePPM,
-                       Categories.EPMLiveWorkEnginePPM.Others,
-                       TraceSeverity.VerboseEx,
-                       ex.ToString());
-                }
-            }
-
-            double value;
-            string cellval;
-
-            var i = 0;
             var counter = 0;
-
             foreach (var displayRow in _displayList)
             {
                 if (displayRow.bUse)
@@ -828,20 +562,111 @@ namespace RPADataCache
             {
                 return;
             }
+            
+            var periodMin = CalculateInternalPeriodMin(resxData);
+            var periodMax = 0;
+            if (periodMin != 0)
+            {
+                periodMax = CalculateInternalPeriodMax(resxData);
+            }
 
+            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
+            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
+            xI.CreateIntAttr("xinterenalPeriodTotal", _resourceValues.Periods.Values.Count());
 
-            int fp = 0;
-            int lp = 0;
-            i = 0;
+            var i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                try
+                {
+                    ProcessDetailDataRowPeriod(period, ++i, resxData, xI);
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.WriteTrace(
+                       Area.EPMLiveWorkEnginePPM,
+                       Categories.EPMLiveWorkEnginePPM.Others,
+                       TraceSeverity.VerboseEx,
+                       ex.ToString());
+                }
+            }
+        }
 
-            foreach (CPeriod oPer in _resourceValues.Periods.Values)
+        private void ProcessDetailDataRowPeriod(CPeriod period, int i, clsResXData resxData, CStruct xI)
+        {
+            string cellval;
+            string name;
+            var counter = 0;
+
+            foreach (var displayRow in _displayList)
+            {
+                if (displayRow.bUse)
+                {
+                    ++counter;
+                    name = "P" + period.PeriodID.ToString() + "C" + counter.ToString();
+                    var value = GetDetailRowValue(resxData, displayRow.fid, i);
+
+                    cellval = string.Empty;
+
+                    if (value != 0)
+                    {
+                        switch (_displayMode)
+                        {
+                            case 0:
+                                cellval = value.ToString("0.##");
+                                break;
+                            case 2:
+                            default:
+                                cellval = value.ToString("0.###");
+                                break;
+                        }
+                    }
+
+                    if (cellval != string.Empty)
+                    {
+                        xI.CreateStringAttr(name, cellval);
+                    }
+
+                    xI.CreateStringAttr(name + "ClassInner", string.Empty);
+                    xI.CreateStringAttr(name + "HtmlPostfix", string.Empty);
+                    xI.CreateStringAttr(name + "HtmlPrefix", string.Empty);
+                }
+            }
+        }
+
+        private int CalculateInternalPeriodMax(clsResXData resxData)
+        {
+            for (int i = _resourceValues.Periods.Values.Count(); i > 1; i--)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
+
+                        if (value != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        private int CalculateInternalPeriodMin(clsResXData resxData)
+        {
+            var i = 0;
+            var fp = 0;
+            foreach (var period in _resourceValues.Periods.Values)
             {
                 ++i;
                 foreach (var displayRow in _displayList)
                 {
                     if (displayRow.bUse)
                     {
-                        value = GetDetailRowValue(resxData, displayRow.fid, i);
+                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
 
                         if (value != 0)
                         {
@@ -857,76 +682,58 @@ namespace RPADataCache
                 }
             }
 
-            if (fp != 0)
-            {
-                for (int xi = _resourceValues.Periods.Values.Count(); xi > 1; xi--)
-                {
-                    foreach (var displayRow in _displayList)
-                    {
-                        if (displayRow.bUse)
-                        {
-                            value = GetDetailRowValue(resxData, displayRow.fid, xi);
+            return fp;
+        }
 
-                            if (value != 0)
-                            {
-                                lp = xi;
-                                break;
-                            }
-                        }
-                    }
+        private void ProcessDetailRowColumns(clsResXData resxData, clsPIData piData, CStruct xI)
+        {
+            clsEPKItem oItem;
+            clsListItem oListItem;
 
-                    if (lp != 0)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            xI.CreateIntAttr("xinterenalPeriodMin", fp);
-            xI.CreateIntAttr("xinterenalPeriodMax", lp);
-            xI.CreateIntAttr("xinterenalPeriodTotal", _resourceValues.Periods.Values.Count());
-
-            i = 0;
-            foreach (var oPer in _resourceValues.Periods.Values)
+            foreach (var column in _columns)
             {
                 try
                 {
-                    string name;
+                    var sn = RemoveCharacters(column.m_realname, " \r\n")
+                        .Replace("/n", string.Empty);
 
-                    ++i;
-                    counter = 0;
-                    foreach (var displayRow in _displayList)
+                    if (!TryProcessCostCategoryColumn(column, sn, resxData, xI)
+                        && !TryProcessCostRealoneColumn(column, sn, resxData, xI)
+                        && !TryProcessCostPIDataColumn(column, sn, piData, xI))
                     {
-                        if (displayRow.bUse)
+                        switch (column.m_id)
                         {
-                            ++counter;
-                            name = "P" + oPer.PeriodID.ToString() + "C" + counter.ToString();
-                            value = GetDetailRowValue(resxData, displayRow.fid, i);
-
-                            cellval = string.Empty;
-
-                            if (value != 0)
-                            {
-                                switch (_displayMode)
+                            case RPConstants.TGRID_GRP_ID:
+                                break;
+                            case RPConstants.TGRID_DEPT_ID:
+                                if (_resourceValues.Departments != null
+                                    && _resourceValues.Departments.TryGetValue(resxData.DeptUID, out oItem)
+                                    && resxData.bRealone)
                                 {
-                                    case 0:
-                                        cellval = value.ToString("0.##");
-                                        break;
-                                    case 2:
-                                    default:
-                                        cellval = value.ToString("0.###");
-                                        break;
+                                    xI.CreateStringAttr(sn, oItem.Name);
                                 }
-                            }
-
-                            if (cellval != "")
-                            {
-                                xI.CreateStringAttr(name, cellval);
-                            }
-
-                            xI.CreateStringAttr(name + "ClassInner", "");
-                            xI.CreateStringAttr(name + "HtmlPostfix", "");
-                            xI.CreateStringAttr(name + "HtmlPrefix", "");
+                                break;
+                            case RPConstants.TGRID_ROLE_ID:
+                                if (_resourceValues.Roles != null
+                                    && _resourceValues.Roles.TryGetValue(resxData.RoleUID, out oListItem)
+                                    && resxData.bRealone)
+                                {
+                                    xI.CreateStringAttr(sn, oListItem.Name);
+                                }
+                                break;
+                            case RPConstants.TGRID_CRATE:
+                                if (resxData.cRate != 0 && resxData.bRealone)
+                                {
+                                    xI.CreateDoubleAttr(sn, resxData.cRate);
+                                }
+                                else
+                                {
+                                    xI.CreateStringAttr(sn, string.Empty);
+                                }
+                                break;
+                            default:
+                                ProcessOtherColumn(column, sn, resxData, xI);
+                                break;
                         }
                     }
                 }
@@ -939,6 +746,210 @@ namespace RPADataCache
                        ex.ToString());
                 }
             }
+        }
+
+        private void ProcessOtherColumn(clsRXDisp column, string sn, clsResXData resxData, CStruct xI)
+        {
+            var j = 0;
+            var sFull = string.Empty;
+
+            if (column.m_col_hidden || !resxData.bRealone)
+            {
+                return;
+            }
+
+            if (_resourceValues.PlanFields != null)
+            {
+                foreach (clsPortField opf in _resourceValues.PlanFields)
+                {
+                    if (column.m_id == opf.ID)
+                    {
+                        RPConstants.GetCustValue(opf.ID, resxData.otherdata, out j, out sFull, _resourceValues);
+                        xI.CreateStringAttr(sn, sFull);
+                        break;
+                    }
+                }
+            }
+
+            if (_resourceValues.PIFields != null)
+            {
+                foreach (var opf in _resourceValues.PIFields)
+                {
+                    if (column.m_id == opf.ID)
+                    {
+                        RPConstants.GetCustValue(opf.ID, resxData.PIotherdata, out j, out sFull, _resourceValues);
+                        xI.CreateStringAttr(sn, sFull);
+                        break;
+                    }
+                }
+            }
+
+            if (_resourceValues.ResFields != null)
+            {
+                foreach (var opf in _resourceValues.ResFields)
+                {
+                    if (column.m_id == opf.ID)
+                    {
+                        RPConstants.GetCustValue(opf.ID, resxData.Resotherdata, out j, out sFull, _resourceValues);
+                        xI.CreateStringAttr(sn, sFull);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private bool TryProcessCostPIDataColumn(clsRXDisp column, string sn, clsPIData piData, CStruct xI)
+        {
+            Func<string> valueFunc = null;
+            switch (column.m_id)
+            {
+                case RPConstants.TGRID_ITEM_ID:
+                    valueFunc = () => piData.PIName;
+                    break;
+                case RPConstants.TGRID_SDATE:
+                    if (piData != null && piData.start != DateTime.MinValue)
+                    {
+                        valueFunc = () => piData.start.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    break;
+                case RPConstants.TGRID_FDATE:
+                    if (piData != null && piData.finish != DateTime.MinValue)
+                    {
+                        valueFunc = () => piData.finish.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    break;
+                case RPConstants.TGRID_OWNER:
+                    valueFunc = () => piData.ItemManager;
+                    break;
+                case RPConstants.TGRID_STAGE:
+                    valueFunc = () => piData.Stage;
+                    break;
+                case RPConstants.TGRID_STAGE_OWNER:
+                    valueFunc = () => piData.StageOwner;
+                    break;
+                default:
+                    return false;
+            }
+
+            if (valueFunc != null)
+            {
+                if (piData != null)
+                {
+                    xI.CreateStringAttr(sn, valueFunc());
+                }
+            }
+
+            return true;
+        }
+
+        private bool TryProcessCostRealoneColumn(clsRXDisp column, string sn, clsResXData resxData, CStruct xI)
+        {
+            Func<string> valueFunc = null;
+            switch (column.m_id)
+            {
+                case RPConstants.TGRID_RES_ID:
+                    valueFunc = () =>
+                    {
+                        clsResCap resourceCap;
+                        return _resourceValues.Resources.TryGetValue(resxData.WResID, out resourceCap)
+                            ? resourceCap.Name
+                            : "Unassigned";
+                    };
+                    break;
+                case RPConstants.TGRID_GENERIC:
+                    valueFunc = () =>
+                    {
+                        clsResCap resourceCap;
+                        return _resourceValues.Resources.TryGetValue(resxData.WResID, out resourceCap)
+                            ? (resourceCap.IsGeneric ? "Yes" : "No")
+                            : GlobalConstants.Whitespace;
+                    };
+                    break;
+                case RPConstants.TGRID_STAT_ID:
+                    valueFunc = () => GetStatusText(resxData.Status);
+                    break;
+                case RPConstants.TGRID_PLANID:
+                    valueFunc = () => resxData.PlanID;
+                    break;
+                case RPConstants.TGRID_PLANGRP:
+                    valueFunc = () => resxData.PlanGroup;
+                    break;
+                case RPConstants.TGRID_PRIORITY:
+                    valueFunc = () => resxData.Priority;
+                    break;
+                case RPConstants.TGRID_MAJCAT:
+                    valueFunc = () => resxData.majorcat;
+                    break;
+                case RPConstants.TGRID_CSDATE:
+                    if (resxData.cSDate != DateTime.MinValue)
+                    {
+                        valueFunc = () => resxData.cSDate.ToShortDateString();
+                    }
+                    break;
+                case RPConstants.TGRID_CFDATE:
+                    if (resxData.cFDate != DateTime.MinValue)
+                    {
+                        valueFunc = () => resxData.cFDate.ToShortDateString();
+                    }
+                    break;
+                case RPConstants.TGRID_CCOST:
+                    if (resxData.cCost != 0)
+                    {
+                        xI.CreateDoubleAttr(sn, resxData.cCost);
+                        return true;
+                    }
+                    break;
+                case RPConstants.TGRID_CRTYPE:
+                    if (resxData.cRateType != string.Empty)
+                    {
+                        valueFunc = () => resxData.cRateType;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+
+            if (valueFunc != null)
+            {
+                if (resxData.bRealone)
+                {
+                    xI.CreateStringAttr(sn, valueFunc());
+                }
+            }
+
+            return true;
+        }
+
+        private bool TryProcessCostCategoryColumn(clsRXDisp column, string sn, clsResXData resxData, CStruct xI)
+        {
+            Func<clsCatItem, string> valueFunc = null;
+            switch (column.m_id)
+            {
+                case RPConstants.TGRID_CC_ID:
+                case RPConstants.TGRID_CCROLE_ID:
+                    valueFunc = item => item.Name;
+                    break;
+                case RPConstants.TGRID_CCFULL_ID:
+                case RPConstants.TGRID_CCROLEFULL_ID:
+                case RPConstants.TGRID_FROLL:
+                    valueFunc = item => item.FullName;
+                    break;
+                default:
+                    return false;
+            }
+
+            if (valueFunc != null)
+            {
+                clsCatItem item;
+                if (_resourceValues.CostCategories != null
+                    && _resourceValues.CostCategories.TryGetValue(resxData.CostCat, out item)
+                    && resxData.bRealone)
+                {
+                    xI.CreateStringAttr(sn, valueFunc(item));
+                }
+            }
+
+            return true;
         }
 
         private string GetResourceAnalyzerView(string sXML)
