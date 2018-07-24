@@ -38,6 +38,7 @@ namespace EPMLiveCore.Tests.Testables
             base.pnlURLBad = new Panel();
             base.label1 = new Label();
             base.Panel2 = new Panel();
+            base.inpName = new InputFormSectionTestable();
             Page = new System.Web.UI.Page();
         }
 

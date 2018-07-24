@@ -76,7 +76,13 @@ namespace EPMLiveCore
 
                         URL = projectInfo.ServerRelativeUrl;
                         baseURL = projectInfo.BaseUrl;
-                        
+
+                        foreach (DictionaryEntry dictionaryEntry in projectInfo.PopulatedTemplates)
+                        {
+                            var li = new ListItem(dictionaryEntry.Key.ToString(), dictionaryEntry.Value.ToString());
+                            DdlGroup.Items.Add(li);
+                        }
+
                         inpName.Title = strName + " Name";
                         btnOK.Text = "Create " + strName;
 
