@@ -18,6 +18,7 @@ namespace EPMLiveCore
 {
     public partial class SaveTeam : System.Web.UI.Page
     {
+        private const string ProjectRateColumn = "ProjectRate";
         protected string data;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -45,6 +46,10 @@ namespace EPMLiveCore
 
                 nattr = docOut.CreateAttribute("Permissions");
                 nattr.Value = nd.Attributes["Permissions"].Value;
+                ndNew.Attributes.Append(nattr);
+
+                nattr = docOut.CreateAttribute(ProjectRateColumn);
+                nattr.Value = nd.Attributes[ProjectRateColumn] != null ? nd.Attributes[ProjectRateColumn].Value : string.Empty;
                 ndNew.Attributes.Append(nattr);
 
                 docOut.FirstChild.AppendChild(ndNew);

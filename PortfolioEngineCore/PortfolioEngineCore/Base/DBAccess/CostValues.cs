@@ -2,6 +2,9 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
+
+using PortfolioEngineCore.Base.DBAccess;
 
 namespace PortfolioEngineCore
 {
@@ -452,6 +455,8 @@ namespace PortfolioEngineCore
                         }
                     }
 
+                    var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+
                     oCommand = new SqlCommand("EPG_SP_PCTReadWEActuals", dba.Connection);
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     oCommand.Parameters.AddWithValue("@ProjID", ProjectID);
@@ -479,7 +484,7 @@ namespace PortfolioEngineCore
                                 // get rates for this resource or cost category
                                 double dblRate;
                                 double dblOvertimeRate;
-                                GetRate(namedrates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
+                                GetRate(namedrates, projectRates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
 
                                 // tabulate quantity and cost
                                 quantity[costcategory.ID, periodid] += hours;
@@ -565,6 +570,8 @@ namespace PortfolioEngineCore
                         }
                     }
 
+                    var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+
                     int lReadCustomFields = 0;
                     oCommand = new SqlCommand("EPG_SP_PCTReadCommitments", dba.Connection);
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -602,7 +609,7 @@ namespace PortfolioEngineCore
                                     // get rates for this resource or cost category
                                     double dblRate;
                                     double dblOvertimeRate;
-                                    GetRate(namedrates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
+                                    GetRate(namedrates, projectRates, rates, costcategory.UID, lWResID, periodid, startdate, out dblRate, out dblOvertimeRate);
 
                                     // tabulate quantity and cost
                                     // in the old system here we checked the editmode for: Commitments, Forecast Commitments, Revenue, or Forecast Revenue
@@ -966,16 +973,30 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static bool GetRate(PfENamedRates namedrates, Dictionary<int, Dictionary<int, double>> categoryrates, int costcategory, int lWresID, int periodid, DateTime startdate, out double dblRate, out double dblOvertimeRate)
+        private static bool GetRate(PfENamedRates namedrates, List<ProjectResourceRate> projectRates, Dictionary<int, Dictionary<int, double>> categoryrates, int costcategory, int lWresID, int periodid, DateTime startdate, out double dblRate, out double dblOvertimeRate)
         {
             dblRate = 0;
             dblOvertimeRate = 0;
 
             // if resource specified and it has a rate use that
             bool bfoundresourcerate = false;
+            var foundProjectRate = false;
             if (lWresID > 0)
             {
-                if (namedrates.resourcerates.ContainsKey(lWresID))
+                // first try to get resource rate for the project (specified in project team)
+                var projectRateForResource = projectRates.Where(x => x.ResourceId == lWresID && x.EffectiveDate <= startdate)
+                    .OrderBy(x => x.EffectiveDate)
+                    .LastOrDefault();
+
+                if (projectRateForResource != null)
+                {
+                    dblRate = Convert.ToDouble(projectRateForResource.Rate);
+                    dblOvertimeRate = dblRate;
+                    foundProjectRate = true;
+                }
+
+                // then try to get resource rate specified in Rates configuration
+                if (!foundProjectRate && namedrates.resourcerates.ContainsKey(lWresID))
                 {
                     int lRTUID=namedrates.resourcerates[lWresID];
                     if (namedrates.rates.ContainsKey(lRTUID))
@@ -1001,8 +1022,9 @@ namespace PortfolioEngineCore
                     }
                 }
             }
+
             // if no resource rate then use Cost Category rate
-            if (!bfoundresourcerate && costcategory > 0)
+            if (!foundProjectRate && !bfoundresourcerate && costcategory > 0)
             {
                 if (categoryrates.ContainsKey(costcategory))
                 {
