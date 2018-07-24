@@ -3926,5 +3926,107 @@ namespace EPMLiveCore
             object apiClass = Activator.CreateInstance(thisClass);
             return (string)m.Invoke(apiClass, new object[] { null, spWeb });
         }
+        
+        public static string CreateProjectInNewWorkspace(SPWeb web, string listTitle, string url, string title)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException("web");
+            }
+
+            SPListItem li = null;
+            try
+            {
+                var workspacelist = web.Lists["Workspace Center"];
+                li = workspacelist.Items.Add();
+                li["URL"] = url + ", " + title;
+                li.Update();
+
+                var workspaceID = li.ID;
+                var listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+
+            using (var webAtUrl = web.Webs[url])
+            {
+                SPList list = null;
+                try
+                {
+                    list = webAtUrl.Lists[listTitle];
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                }
+
+                if (list != null)
+                {
+                    SPField field = null;
+                    try
+                    {
+                        field = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                    }
+
+                    if (field == null)
+                    {
+                        if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
+                        {
+                            try
+                            {
+                                list.ParentWeb.AllowUnsafeUpdates = true;
+                                field = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
+                                field.Hidden = true;
+                                list.Fields.Add(field);
+                                field.Update();
+                                list.Update();
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                            }
+                        }
+                    }
+
+                    var query = new SPQuery();
+                    query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
+
+                    li = null;
+
+                    foreach (SPListItem listItem in list.GetItems(query))
+                    {
+                        li = listItem;
+                        listItem["Title"] = title;
+                        listItem.SystemUpdate();
+                        break;
+                    }
+
+                    if (li == null)
+                    {
+                        li = list.Items.Add();
+                        li["Title"] = title;
+                        li.Update();
+                    }
+
+                    return list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID;
+                }
+
+                return null;
+            }
+        }
+
+        // (CC-76700, 2018-07-24) Ideally, we should add | RegexOptions.CultureInvariand and .IgnoreCase, but this will break the existing behavior, therefore not adding
+        // We're making the RegexCompiled to save time on compliation on every call
+        private static readonly Regex _alphaNumericRegex = new Regex(@"[^a-zA-Z0-9\s]", RegexOptions.Compiled);
+        public static bool IsAlphaNumeric(string strToCheck)
+        {
+            return !_alphaNumericRegex.IsMatch(strToCheck);
+        }
     }
 }
