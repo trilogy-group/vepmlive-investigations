@@ -98,9 +98,7 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
     protected abstract void AddDetailRow(TDetailRowData detailRowData, int rowId);
 
     protected abstract string ResolvePeriodId(TPeriodData periodData, int index);
-
-    protected abstract string CleanUpString(string input);
-
+    
     protected string RemoveCharacters(string input, string characters)
     {
         if (input == null)

@@ -307,5 +307,7 @@ namespace ModelDataCache
 
             return useCols;
         }
+
+        protected abstract string CleanUpString(string input);
     }
 }

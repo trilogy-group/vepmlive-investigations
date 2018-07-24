@@ -51,11 +51,6 @@ namespace WorkEnginePPM.Tests.TestDoubles
             AddDetailRowCalls.Add(Tuple.Create(detailRowData, rowId));
         }
         
-        protected override string CleanUpString(string input)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
             InitializeGridDataCalls.Add(renderingType);
