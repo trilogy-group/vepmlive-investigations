@@ -182,11 +182,11 @@ namespace WorkEnginePPM
                 if (role != null && role.Member != null &&
                     role.Member is SPGroup && role.Member.Name != null)
                 {
-                    if (role.Member.Name.ToUpper().Contains("VISITOR"))
+                    if (role.Member.Name.ToUpper().Contains(projectNameDB.ToUpper()+ " VISITOR"))
                         role.Member.Name = projectNameNew + " Visitor";
-                    else if (role.Member.Name.ToUpper().Contains("OWNER"))
+                    else if (role.Member.Name.ToUpper().Contains(projectNameDB.ToUpper() + " OWNER"))
                         role.Member.Name = projectNameNew + " Owner";
-                    else if (role.Member.Name.ToUpper().Contains("MEMBER"))
+                    else if (role.Member.Name.ToUpper().Contains(projectNameDB.ToUpper() + " MEMBER"))
                         role.Member.Name = projectNameNew + " Member";
                     else
                         role.Member.Name = role.Member.Name.Replace(projectNameDB, projectNameNew);
