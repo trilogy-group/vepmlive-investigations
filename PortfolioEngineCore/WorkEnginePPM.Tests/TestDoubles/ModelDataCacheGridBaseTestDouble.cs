@@ -86,11 +86,6 @@ namespace WorkEnginePPM.Tests.TestDoubles
             FinalizeGridLayoutCalls.Add(renderingType);
         }
 
-        protected override IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
-        {
-            yield return Constructor.CreateSubStruct("C");
-        }
-
         protected override string ResolvePeriodId(PeriodData periodData, int index)
         {
             return index.ToString();

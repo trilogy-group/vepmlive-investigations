@@ -286,8 +286,6 @@ public abstract class GridBase
         Header2.CreateStringAttr("HoverRow", string.Empty);
     }
 
-    protected abstract IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols);
-
     [Flags]
     public enum RenderingTypes
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using EPMLiveCore;
 using ModelDataCache;
 using PortfolioEngineCore;
 using WorkEnginePPM;
@@ -303,99 +304,100 @@ namespace RPADataCache
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
+        protected IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
-            var categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "RowSel");
-            categoryColumn.CreateStringAttr("Type", "Icon");
-            categoryColumn.CreateBooleanAttr("CanEdit", false);
-            categoryColumn.CreateIntAttr("CanMove", 0);
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateIntAttr("CanExport", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateStringAttr("Width", "20");
+            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowSel", "Icon",
+                width: 20,
+                canMove: false,
+                canExport: false,
+                canEdit: false);
             categoryColumn.CreateStringAttr("Color", "rgb(223, 227, 232)");
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
-            Header1.CreateStringAttr("RowSel", " ");
+            Header1.CreateStringAttr("RowSel", GlobalConstants.Whitespace);
+            yield return categoryColumn;
+            
+            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "rowid", "Text",
+                visible: false,
+                canExport: false);
             yield return categoryColumn;
 
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "rowid");
-            categoryColumn.CreateStringAttr("Type", "Text");
-            categoryColumn.CreateIntAttr("CanExport", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateIntAttr("Visible", 0);
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
-            yield return categoryColumn;
-
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "Select");
-            categoryColumn.CreateStringAttr("Type", "Bool");
-            categoryColumn.CreateBooleanAttr("CanEdit", true);
-            categoryColumn.CreateIntAttr("CanMove", 0);
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateStringAttr("Width", "20");
+            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "Select", "Bool",
+                width: 20,
+                canEdit: true,
+                canMove: false);
             categoryColumn.CreateStringAttr("Class", string.Empty);
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
             Header1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
             yield return categoryColumn;
 
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "ChangedIcon");
-            categoryColumn.CreateStringAttr("Type", "Icon");
-            categoryColumn.CreateBooleanAttr("CanEdit", false);
-            categoryColumn.CreateIntAttr("CanMove", 0);
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateIntAttr("CanExport", 0);
-            categoryColumn.CreateStringAttr("Width", "20");
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
-            Header1.CreateStringAttr("ChangedIcon", " ");
+            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "ChangedIcon", "Type",
+                width: 20,
+                canEdit: false,
+                canMove: false,
+                canExport: false);
+            Header1.CreateStringAttr("ChangedIcon", GlobalConstants.Whitespace);
             yield return categoryColumn;
 
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "RowDraggable");
-            categoryColumn.CreateStringAttr("Type", "Bool");
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateBooleanAttr("CanEdit", false);
-            categoryColumn.CreateIntAttr("CanMove", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("Visible", 0);
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
+            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowDraggable", "Bool",
+                visible: false,
+                canEdit: false,
+                canMove: false);
             yield return categoryColumn;
 
-            categoryColumn = xLeftCols.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", "RowChanged");
-            categoryColumn.CreateStringAttr("Type", "Int");
-            categoryColumn.CreateBooleanAttr("CanEdit", false);
-            categoryColumn.CreateIntAttr("CanMove", 0);
-            categoryColumn.CreateIntAttr("CanResize", 0);
-            categoryColumn.CreateIntAttr("CanFilter", 0);
-            categoryColumn.CreateIntAttr("ShowHint", 0);
-            categoryColumn.CreateIntAttr("CanSort", 0);
-            categoryColumn.CreateIntAttr("CanExport", 0);
-            categoryColumn.CreateIntAttr("Visible", 0);
-            categoryColumn.CreateIntAttr("CanHide", 0);
-            categoryColumn.CreateIntAttr("CanSelect", 0);
+            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowChanged", "Int",
+                visible: false,
+                canEdit: false,
+                canMove: false,
+                canExport: false);
             yield return categoryColumn;
+        }
+
+        protected CStruct InitializeGridLayoutCategoryColumn(
+            CStruct xLeftCols,
+            string name,
+            string type,
+            bool? visible = null,
+            int? width = null,
+            bool? canEdit = null,
+            bool? canMove = null,
+            bool? canExport = null,
+            bool canResize = false,
+            bool canFilter = false,
+            bool showHint = false,
+            bool canSort = false,
+            bool canHide = false,
+            bool canSelect = false)
+        {
+            var categoryColumn = xLeftCols.CreateSubStruct("C");
+            categoryColumn.CreateStringAttr("Name", name);
+            categoryColumn.CreateStringAttr("Type", type);
+
+            if (visible != null)
+            {
+                categoryColumn.CreateIntAttr("Visible", visible.Value ? 1 : 0);
+            }
+            if (width != null)
+            {
+                categoryColumn.CreateStringAttr("Width", width.ToString());
+            }
+            if (canEdit != null)
+            {
+                categoryColumn.CreateBooleanAttr("CanEdit", canEdit.Value);
+            }
+            if (canMove != null)
+            {
+                categoryColumn.CreateIntAttr("CanMove", canMove.Value ? 1 : 0);
+            }
+            if (canExport != null)
+            {
+                categoryColumn.CreateIntAttr("CanExport", canExport.Value ? 1 : 0);
+            }
+            categoryColumn.CreateIntAttr("CanResize", canResize ? 1 : 0);
+            categoryColumn.CreateIntAttr("CanFilter", canFilter ? 1 : 0);
+            categoryColumn.CreateIntAttr("ShowHint", showHint ? 1 : 0);
+            categoryColumn.CreateIntAttr("CanSort", canSort ? 1 : 0);
+            categoryColumn.CreateIntAttr("CanHide", canHide ? 1 : 0);
+            categoryColumn.CreateIntAttr("CanSelect", canSelect ? 1 : 0);
+
+            return categoryColumn;
         }
 
         private string GetResourceAnalyzerView(string sXML)
