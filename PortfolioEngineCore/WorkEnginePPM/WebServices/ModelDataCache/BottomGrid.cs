@@ -6,7 +6,7 @@ using PortfolioEngineCore;
 
 namespace ModelDataCache
 {
-    public class BottomGrid : GridBase
+    public class BottomGrid : ModelDataCacheGridBase
     {
         public readonly bool ApplyTarget;
         public readonly IList<DetailRowData> TargetsSorted;

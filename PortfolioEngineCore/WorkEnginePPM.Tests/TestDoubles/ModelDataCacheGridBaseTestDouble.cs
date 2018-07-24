@@ -9,23 +9,32 @@ using PortfolioEngineCore.Fakes;
 
 namespace WorkEnginePPM.Tests.TestDoubles
 {
-    public class GridBaseTestDouble : GridBase
+    public class ModelDataCacheGridBaseTestDouble : ModelDataCacheGridBase
     {
         public readonly IList<RenderingTypes> InitializeGridLayoutCalls = new List<RenderingTypes>();
         public readonly IList<RenderingTypes> FinalizeGridLayoutCalls = new List<RenderingTypes>();
         public readonly IList<IEnumerable<PeriodData>> AddPeriodColumnsCalls = new List<IEnumerable<PeriodData>>();
         public readonly IList<RenderingTypes> InitializeGridDataCalls = new List<RenderingTypes>();
         public readonly IList<Tuple<DetailRowData, int>> AddDetailRowCalls = new List<Tuple<DetailRowData, int>>();
-        public readonly IList<Tuple<string, string>> AddPeriodColumnCalls = new List<Tuple<string, string>>();
 
-        public GridBaseTestDouble(
+        public ModelDataCacheGridBaseTestDouble(
             ShimCStruct header1Shim,
             ShimCStruct header2Shim,
             ShimCStruct periodColsShim,
 
+            bool useGrouping, 
+            bool showFTEs, 
+            bool showGantt, 
+            DateTime dateStart, 
+            DateTime dateEnd, 
+            IList<SortFieldDefn> sortFields, 
+            int detFreeze, 
+            bool useQuantity, 
+            bool useCost, 
+            bool roundCost, 
             int fromPeriodIndex, 
             int toPeriodIndex
-        ) : base(fromPeriodIndex, toPeriodIndex)
+        ) : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, roundCost, fromPeriodIndex, toPeriodIndex)
         {
 
             Header1 = header1Shim;
@@ -55,11 +64,6 @@ namespace WorkEnginePPM.Tests.TestDoubles
         protected override void AddDetailRow(DetailRowData detailRowData, int rowId)
         {
             AddDetailRowCalls.Add(Tuple.Create(detailRowData, rowId));
-        }
-
-        protected override void AddPeriodColumn(string id, string name)
-        {
-            AddPeriodColumnCalls.Add(Tuple.Create(id, name));
         }
 
         protected override string CleanUpString(string input)

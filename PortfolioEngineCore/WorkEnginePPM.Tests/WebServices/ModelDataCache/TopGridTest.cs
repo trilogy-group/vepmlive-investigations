@@ -9,7 +9,7 @@ using ModelDataCache;
 using ModelDataCache.Fakes;
 using PortfolioEngineCore.Fakes;
 using WorkEnginePPM.Tests.TestDoubles;
-using static ModelDataCache.GridBase;
+using static GridBase;
 
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {

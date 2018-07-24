@@ -6,7 +6,7 @@ using PortfolioEngineCore;
 
 namespace ModelDataCache
 {
-    public class TopGrid : GridBase
+    public class TopGrid : ModelDataCacheGridBase
     {
         public TopGrid(
             bool useGrouping,
