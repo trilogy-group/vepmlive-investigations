@@ -3929,6 +3929,11 @@ namespace EPMLiveCore
         
         public static string CreateProjectInNewWorkspace(SPWeb web, string listTitle, string url, string title)
         {
+            if (web == null)
+            {
+                throw new ArgumentNullException("web");
+            }
+
             SPListItem li = null;
             try
             {
