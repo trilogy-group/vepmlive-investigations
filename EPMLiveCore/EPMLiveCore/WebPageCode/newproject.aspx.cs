@@ -115,7 +115,7 @@ namespace EPMLiveCore
             if (workspaceType == "Existing")
             {
                 var redirectUrl = CreateProjectInExistingWorkspace(selectedWorkspace);
-                if (redirectUrl != string.Empty)
+                if (!string.IsNullOrEmpty(redirectUrl))
                 {
                     Response.Redirect(redirectUrl);
                 }
@@ -134,15 +134,15 @@ namespace EPMLiveCore
 
                     if (requiredOK)
                     {
-                        if (IsAlphaNumeric(title))
+                        if (CoreFunctions.IsAlphaNumeric(title))
                         {
                             var web = SPContext.Current.Web;
                             var err = CoreFunctions.createSite(title, url, group, web.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, web);
 
                             if (err.Substring(0, 1) == "0")
                             {
-                                var redirectUrl = CreateProjectInNewWorkspace(web, url, title);
-                                if (redirectUrl != string.Empty)
+                                var redirectUrl = CoreFunctions.CreateProjectInNewWorkspace(web, "Project Center", baseURL + url, title);
+                                if (!string.IsNullOrEmpty(redirectUrl))
                                 {
                                     Response.Redirect(redirectUrl);
                                 }
@@ -165,82 +165,6 @@ namespace EPMLiveCore
                     label1.Text = "Error: " + ex.Message + ex.StackTrace;
                     Panel2.Visible = true;
                 }
-            }
-        }
-
-        private string CreateProjectInNewWorkspace(SPWeb web, string url, string title)
-        {
-            SPListItem li = null;
-            try
-            {
-                var workspacelist = web.Lists["Workspace Center"];
-                li = workspacelist.Items.Add();
-                li["URL"] = baseURL + url + ", " + title;
-                li.Update();
-
-                var workspaceID = li.ID;
-                var listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
-            }
-            catch (Exception ex)
-            {
-                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-            }
-
-            using (var webAtUrl = web.Webs[url])
-            {
-                var list = webAtUrl.Lists["Project Center"];
-
-                SPField field = null;
-                try
-                {
-                    field = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
-                }
-                catch (Exception ex)
-                {
-                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
-                }
-
-                if (field == null)
-                {
-                    if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
-                    {
-                        try
-                        {
-                            list.ParentWeb.AllowUnsafeUpdates = true;
-                            field = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
-                            field.Hidden = true;
-                            list.Fields.Add(field);
-                            field.Update();
-                            list.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
-                        }
-                    }
-                }
-
-                var query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
-
-                li = null;
-
-                foreach (SPListItem listItem in list.GetItems(query))
-                {
-                    li = listItem;
-                    listItem["Title"] = txtTitle.Text;
-                    listItem.SystemUpdate();
-                    break;
-                }
-
-                if (li == null)
-                {
-                    li = list.Items.Add();
-                    li["Title"] = txtTitle.Text;
-                    li.Update();
-                }
-
-                return list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID;
             }
         }
 
@@ -276,12 +200,6 @@ namespace EPMLiveCore
             }
 
             return redirectUrl;
-        }
-
-        public bool IsAlphaNumeric(String strToCheck)
-        {
-            Regex objAlphaNumericPattern = new Regex(@"[^a-zA-Z0-9\s]");
-            return !objAlphaNumericPattern.IsMatch(strToCheck);
         }
     }
 }
