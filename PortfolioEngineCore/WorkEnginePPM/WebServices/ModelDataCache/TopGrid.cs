@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using EPMLiveCore;
 using PortfolioEngineCore;
@@ -83,7 +84,7 @@ namespace ModelDataCache
                 Header2.CreateStringAttr("xGrouping", "Grouping");
             }
 
-            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols);
+            var categoryColumn = InitializeGridLayoutCategoryColumns(xLeftCols).Single();
 
             useCols |= AddSortFieldsToColumns(xLeftCols, xCols, ref categoryColumn);
 
@@ -308,7 +309,7 @@ namespace ModelDataCache
             xZ.CreateStringAttr("GanttHeader2", "d#dd");
         }
 
-        protected override CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
+        protected override IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
             // Add category column
             var categoryColumn = xLeftCols.CreateSubStruct("C");
@@ -327,7 +328,7 @@ namespace ModelDataCache
                 categoryColumn.CreateBooleanAttr("CanEdit", false);
             }
 
-            return categoryColumn;
+            yield return categoryColumn;
         }
     }
 }

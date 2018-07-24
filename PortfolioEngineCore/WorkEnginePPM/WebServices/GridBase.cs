@@ -254,24 +254,25 @@ public abstract class GridBase
         return config;
     }
 
-    protected void InitializeGridLayoutDefinition()
+    protected CStruct InitializeGridLayoutDefinition(string name = "R")
     {
         var m_xDef = Constructor.CreateSubStruct("Def");
         var m_xDefTree = m_xDef.CreateSubStruct("D");
-        m_xDefTree.CreateStringAttr("Name", "R");
-
+        m_xDefTree.CreateStringAttr("Name", name);
         m_xDefTree.CreateStringAttr("HoverCell", "Color");
         m_xDefTree.CreateStringAttr("HoverRow", "Color");
         m_xDefTree.CreateStringAttr("FocusCell", "");
         m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
         m_xDefTree.CreateIntAttr("NoColorState", 1);
+
+        return m_xDefTree;
     }
 
-    protected void InitializeGridLayoutHeader1(CStruct xHead)
+    protected void InitializeGridLayoutHeader1(CStruct xHead, int spanned = -1, int sortIcons = 0)
     {
         Header1 = xHead.CreateSubStruct("Header");
-        Header1.CreateIntAttr("Spanned", -1);
-        Header1.CreateIntAttr("SortIcons", 0);
+        Header1.CreateIntAttr("Spanned", spanned);
+        Header1.CreateIntAttr("SortIcons", sortIcons);
         Header1.CreateStringAttr("HoverCell", "Color");
         Header1.CreateStringAttr("HoverRow", string.Empty);
     }
@@ -285,7 +286,7 @@ public abstract class GridBase
         Header2.CreateStringAttr("HoverRow", string.Empty);
     }
 
-    protected abstract CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols);
+    protected abstract IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols);
 
     [Flags]
     public enum RenderingTypes

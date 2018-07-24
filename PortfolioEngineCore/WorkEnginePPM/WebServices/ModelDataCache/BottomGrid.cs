@@ -83,8 +83,7 @@ namespace ModelDataCache
                 Header2.CreateStringAttr("Grouping", "Grouping");
             }
 
-            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols);
-
+            var categoryColumn = InitializeGridLayoutCategoryColumns(xLeftCols).Single();
             useCols |= AddSortFieldsToColumns(xLeftCols, xCols, ref categoryColumn);
         }
 
@@ -285,7 +284,7 @@ namespace ModelDataCache
             return result;
         }
 
-        protected override CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
+        protected override IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
             var categoryColumn = xLeftCols.CreateSubStruct("C");
 
@@ -298,7 +297,7 @@ namespace ModelDataCache
                 categoryColumn.CreateBooleanAttr("CanEdit", false);
             }
 
-            return categoryColumn;
+            yield return categoryColumn;
         }
     }
 }
