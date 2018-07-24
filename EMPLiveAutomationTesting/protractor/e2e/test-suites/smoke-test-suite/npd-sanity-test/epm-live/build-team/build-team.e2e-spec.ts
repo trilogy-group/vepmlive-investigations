@@ -15,7 +15,6 @@ import {ProjectItemPageValidations} from '../../../../../page-objects/pages/item
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
-
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -379,6 +378,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.verification('Newly added resource as per pre requisites [Ex: Generic Resource 1] is displayed in the' +
             ' drop down');
+
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(selectedResourcePoolResourceName)))
             .toBe(true, ProjectItemPageValidations.getResourceAddedValidation
                   (ProjectItemPageConstants.teamSectionlabels.currentTeam));
@@ -459,4 +459,5 @@ describe(SuiteNames.smokeTestSuite, () => {
         await expect(await CommonPage.timeZone.isPresent()).toBe(false,
                 ValidationsHelper.getFieldDisplayedValidation(CommonPageConstants.timeZone));
     });
+
 });

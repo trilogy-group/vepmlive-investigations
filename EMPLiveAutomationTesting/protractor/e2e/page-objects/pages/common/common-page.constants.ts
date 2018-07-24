@@ -25,6 +25,7 @@ export class CommonPageConstants {
     static readonly fileUpload = 'fileUpload';
     static readonly column = 'Column Popup';
     static readonly dropDown: string = 'dropdown-toggle';
+    static readonly linkDisable = 'This control is currently disabled.';
 
     static get viewDropDownLabels() {
         return {
@@ -66,7 +67,8 @@ export class CommonPageConstants {
         return {
             newItem: ' - New Item',
             editItem: ' - Edit Item',
-            subject: ' - Subject'
+            subject: ' - Subject',
+            resourceAnalyzer: 'Resource Analyzer'
         };
     }
 
@@ -78,7 +80,9 @@ export class CommonPageConstants {
             editItem: 'EditItem',
             editCost: 'EPKCosts',
             addTask: 'AddTask-Large',
+            add: 'Add',
             attachFile: 'AttachFile',
+            delete: 'Ribbon.ListItem.Manage.Delete-Small',
             editTeam: 'Edit Team',
             buildTeam: 'Build Team',
             close: 'Close',
@@ -90,7 +94,10 @@ export class CommonPageConstants {
             resourceCapacityHeatMap: 'Resource Capacity Heat Map',
             resourceCommitments: 'Resource Commitments',
             resourceRequirements: 'Resource Requirements',
-            resourceWorkVsCapacity: 'Resource Work vs. Capacity'
+            resourceWorkVsCapacity: 'Resource Work vs. Capacity',
+            editResource: 'Edit Resource',
+            resourceAnalyzer: 'ResourceAnalyzer',
+            apply: 'Apply'
         };
     }
 
@@ -109,6 +116,7 @@ export class CommonPageConstants {
             okWithSmallK: 'Ok',
             add: '< Add',
             remove: 'Remove >',
+            delete: 'Delete',
             topSave: 'onetidSaveItemtop'
         };
     }

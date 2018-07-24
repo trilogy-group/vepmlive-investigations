@@ -106,7 +106,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.clickUsingJs(ProjectItemPage.linkDropDownValue);
 
         stepLogger.step('Enter a value in Lag Time (Days) text box [Ex: 5]');
-        TextboxHelper.sendKeys(ProjectItemPage.lagTimeTextBox, CommonPageConstants.hours.durationHours4);
+        await TextboxHelper.sendKeys(ProjectItemPage.lagTimeTextBox, CommonPageConstants.hours.durationHours4);
 
         stepLogger.verification('Required values Entered/Selected in Add Link pop up');
         await expect(await ElementHelper.getText(ProjectItemPage.linkDropDownValue)).toBe

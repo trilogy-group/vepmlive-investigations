@@ -43,6 +43,9 @@ export class RiskItemPage extends BasePage {
     static get attachmentButton() {
         return element(By.css('.upload-attach'));
     }
+    static get deleteRisk() {
+        return element(By.xpath('//*[contains(text(),"Delete Item")]//parent::a'));
+    }
 
     static get columnHeaderSelector() {
         return {
@@ -59,4 +62,5 @@ export class RiskItemPage extends BasePage {
             },
         };
     }
+
 }

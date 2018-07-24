@@ -434,5 +434,55 @@ export class ProjectItemPageHelper {
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
+    static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+        await CommonPageHelper.editOptionViaRibbon(stepLogger);
+        projectNameValue = projectNameValue + 'Edited';
+        stepLogger.verification('"Edit Project" page is displayed');
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
+
+        await TextboxHelper.sendKeys(ProjectItemPage.inputs.projectName, projectNameValue);
+
+        await PageHelper.click(CommonPage.formButtons.save);
+
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+
+        stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
+        return projectNameValue;
+
+    }
+    static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+
+        stepLogger.step('Select "Delete" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.delete);
+
+        await PageHelper.acceptAlert();
+    }
+    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+        await this.deleteOptionViaRibbon(stepLogger);
+
+        stepLogger.verification('Navigate to page');
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+
+        stepLogger.step('Validating deleted Project  is not  Present');
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+    }
 
 }

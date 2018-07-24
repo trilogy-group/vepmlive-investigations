@@ -20,5 +20,4 @@ export class IssueItemPage extends BasePage {
             resolution: CommonPageHelper.getTextAreaByLabel(labels.resolution)
         };
     }
-
 }

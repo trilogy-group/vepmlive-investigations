@@ -1,6 +1,5 @@
 import {browser} from 'protractor';
 import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-page.helper';
-import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ProjectItemPage} from '../../../../../page-objects/pages/items-page/project-item/project-item.po';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -14,24 +13,66 @@ import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {StepLogger} from '../../../../../../core/logger/step-logger';
+import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.helper';
+import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
+    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
+        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
+    });
+    fit('Navigate to Edit Resource Plan- [966351]', async () => {
+        const stepLogger = new StepLogger(966351);
+        // Step #1 Inside this function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+
+        await CommonPageHelper.clickEditResourcePlanViaRibbon(stepLogger);
+        stepLogger.verification('"Edit Project" page is displayed');
+        await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
+
+        stepLogger.stepId(1);
+        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.delete);
+        await PageHelper.switchToDefaultContent();
+        await PageHelper.switchToFrame(CommonPage.contentFrame);
+
+        stepLogger.stepId(2);
+        stepLogger.verification('\t\n' +
+            'Check options displayed in \'Resource Planner - Project Mode\' window top section');
+        await ResourcePlannerPageHelper.validateTopSection(stepLogger);
+
+        stepLogger.stepId(3);
+        stepLogger.verification('Check the columns displayed in top grid');
+        await ResourcePlannerPageHelper.validateTopGrid(stepLogger);
+
+        stepLogger.stepId(4);
+        stepLogger.verification('Check options displayed in \'Resource Planner - Project Mode\' window bottom section');
+        await ResourcePlannerPageHelper.validateButtonSection(stepLogger);
+
+        stepLogger.stepId(5);
+        stepLogger.verification('Check the columns displayed in bottom grid');
+        await ResourcePlannerPageHelper.validateButtonSection(stepLogger);
+
+        await PageHelper.click(CommonPage.ribbonItems.close);
+
+        stepLogger.verification(`${CommonPageConstants.pageHeaders.projects.projectCenter} page is displayed`);
+        await CommonPageHelper.fieldDisplayedValidation
+        (CommonPage.pageHeaders.projects.projectsCenter, CommonPageConstants.pageHeaders.projects.projectCenter);
+
     });
 
     it('Check Admin user has permissions to create Public fragments - [966249]', async () => {
         const stepLogger = new StepLogger(966249);
         stepLogger.precondition('Select "Navigation" icon  from left side menu');
         stepLogger.precondition('Select Projects -> Projects from the options displayed');
-        await CommonPageHelper.navigateToItemPageUnderNavigation(
-            HomePage.navigation.projects.projects,
-            CommonPage.pageHeaders.projects.projectsCenter,
-            CommonPageConstants.pageHeaders.projects.projectCenter,
-            stepLogger);
         stepLogger.precondition('Select any project from project center');
         await PageHelper.click(CommonPage.project);
         stepLogger.precondition('Click ITEMS tab select Edit Plan');
@@ -68,7 +109,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(ProjectItemPage.privateCheckBox, false);
 
         stepLogger.verification('User is able to Un-check Private: check box');
-       // Unable to verify that CheckBOx is checked or not because nothing is changing in dom.
+        // Unable to verify that CheckBOx is checked or not because nothing is changing in dom.
 
         stepLogger.stepId(4);
         stepLogger.step('Check the Private: check box');

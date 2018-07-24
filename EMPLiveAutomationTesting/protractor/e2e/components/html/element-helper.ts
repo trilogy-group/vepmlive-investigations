@@ -169,10 +169,12 @@ export class ElementHelper {
     }
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
-        const value = await elem.getAttribute(attribute);
-        return value.trim();
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(elem);
+        try {
+            const value = await elem.getAttribute(attribute);
+            return value.trim();
+        } catch (e) { return '' ; }
     }
-
     static async getText(elem: ElementFinder) {
         await WaitHelper.getInstance().waitForElementToBePresent(elem);
         const text = await elem.getText();

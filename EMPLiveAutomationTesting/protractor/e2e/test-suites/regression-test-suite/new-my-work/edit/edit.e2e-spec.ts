@@ -16,7 +16,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Edit page via Edit page option. - [745079]', async () => {
+    it('Edit page via Edit page option. - [745079]', async () => {
         const stepLogger = new StepLogger(745079);
         const pageHeader = CommonPage.pageHeaders;
         const pageHeaderName = CommonPageConstants.pageHeaders.myWorkplace;

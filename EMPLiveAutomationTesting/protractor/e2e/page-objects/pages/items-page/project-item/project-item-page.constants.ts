@@ -4,6 +4,7 @@ export class ProjectItemPageConstants {
     static readonly pagePrefix = 'Project Center';
     static readonly pageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.newItem}`;
     static readonly editPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
+    static readonly resourceAnalyzerPageName = `${ProjectItemPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.resourceAnalyzer}`;
     static readonly buildTeamPage = 'Build Team';
     static readonly teamMember = 'Team Member';
     static readonly languageAndRegion = 'Language and Region';
@@ -19,6 +20,9 @@ export class ProjectItemPageConstants {
     static readonly createColumn  = 'Create Column';
     static readonly actionsDropdown = 'Actions Dropdown';
     static readonly applyButton = 'Apply Button';
+    static readonly resourcePlanner = 'Resource Planner - Project Mode';
+    static readonly resourceAnalyzer = 'Resource Analyzer';
+    static  readonly noDataFound = 'No data found';
     static get inputLabels() {
         return {
             projectName: 'Project Name *',

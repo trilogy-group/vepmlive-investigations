@@ -136,7 +136,15 @@ export class PageHelper {
         // because your test involves client-side navigation, which can interfere with Protractor's bootstrapping.
         // See http://git.io/v4gXM for details
         return browser.driver.get(url);
-    }
+  }
+    static async closeTab(windowNumber = 1) {
+         const handles = await browser.getAllWindowHandles();
+         const newWindowHandle = handles[windowNumber]; // this is your new window
+         if (newWindowHandle) {
+            await browser.driver.close();
+            await browser.switchTo().window(handles[0]);
+        }
+        }
 
     /**
      * Gets html attribute value
@@ -188,6 +196,18 @@ export class PageHelper {
         await browser.sleep(PageHelper.timeout.s);
         return browser.driver.switchTo().frame(frameEle);
     }
+    static async acceptAlert( maxAttempts = 0) {
+        // Wait for frame to exist first
+        while (maxAttempts++ < 5) {
+            try {
+                await  browser.switchTo().alert().accept();
+                break;
+            } catch (NoAlertPresentException) {
+                await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+                continue;
+            }
+        }
+      }
 
     /**
      * Verify whether element is displayed on page or not
@@ -220,4 +240,5 @@ export class PageHelper {
         await WaitHelper.getInstance().waitForElementToBePresent(item);
         await item.sendKeys(filePath);
     }
+
 }

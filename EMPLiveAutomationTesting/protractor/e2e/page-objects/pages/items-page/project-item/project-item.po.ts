@@ -376,5 +376,7 @@ export class ProjectItemPage extends BasePage {
     static get cancelButton() {
         return element(By.css('#addlinkdiv [value="Cancel"]'));
     }
-
+    static get noProjecrMsg() {
+        return ElementHelper.getElementByText(ProjectItemPageConstants.noDataFound);
+    }
 }
