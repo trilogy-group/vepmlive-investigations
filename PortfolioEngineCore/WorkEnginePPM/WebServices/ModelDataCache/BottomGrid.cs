@@ -40,9 +40,9 @@ namespace ModelDataCache
             ShowRemaining = showRemaining;
         }
         
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
@@ -87,14 +87,14 @@ namespace ModelDataCache
             useCols |= AddSortFieldsToColumns(xLeftCols, xCols, ref categoryColumn);
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
 
-            if (renderingType == RenderingTypes.Data)
+            if (renderingType == GridRenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");
             }

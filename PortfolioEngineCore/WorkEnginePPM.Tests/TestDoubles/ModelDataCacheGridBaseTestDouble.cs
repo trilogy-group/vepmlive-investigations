@@ -11,10 +11,10 @@ namespace WorkEnginePPM.Tests.TestDoubles
 {
     public class ModelDataCacheGridBaseTestDouble : ModelDataCacheGridBase
     {
-        public readonly IList<RenderingTypes> InitializeGridLayoutCalls = new List<RenderingTypes>();
-        public readonly IList<RenderingTypes> FinalizeGridLayoutCalls = new List<RenderingTypes>();
+        public readonly IList<GridRenderingTypes> InitializeGridLayoutCalls = new List<GridRenderingTypes>();
+        public readonly IList<GridRenderingTypes> FinalizeGridLayoutCalls = new List<GridRenderingTypes>();
         public readonly IList<IEnumerable<PeriodData>> AddPeriodColumnsCalls = new List<IEnumerable<PeriodData>>();
-        public readonly IList<RenderingTypes> InitializeGridDataCalls = new List<RenderingTypes>();
+        public readonly IList<GridRenderingTypes> InitializeGridDataCalls = new List<GridRenderingTypes>();
         public readonly IList<Tuple<DetailRowData, int>> AddDetailRowCalls = new List<Tuple<DetailRowData, int>>();
 
         public ModelDataCacheGridBaseTestDouble(
@@ -71,17 +71,17 @@ namespace WorkEnginePPM.Tests.TestDoubles
             throw new NotImplementedException();
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
             InitializeGridDataCalls.Add(renderingType);
         }
 
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
             InitializeGridLayoutCalls.Add(renderingType);
         }
 
-        protected override void FinalizeGridLayout(RenderingTypes renderingType)
+        protected override void FinalizeGridLayout(GridRenderingTypes renderingType)
         {
             FinalizeGridLayoutCalls.Add(renderingType);
         }

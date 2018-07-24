@@ -27,9 +27,9 @@ namespace ModelDataCache
         {
         }
 
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
@@ -49,7 +49,7 @@ namespace ModelDataCache
             xCfg.CreateIntAttr("FilterEmpty", 1);
             xCfg.CreateIntAttr("ExportFormat", 1);
 
-            if (renderingType == RenderingTypes.Combined)
+            if (renderingType == GridRenderingTypes.Combined)
             {
                 xCfg.CreateIntAttr("Sorting", 0);
                 xCfg.CreateStringAttr("Filtering", "0");
@@ -94,14 +94,14 @@ namespace ModelDataCache
             }
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
 
-            if (renderingType == RenderingTypes.Data)
+            if (renderingType == GridRenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");
                 xCfg.CreateIntAttr("FilterEmpty", 1);

@@ -89,101 +89,13 @@ namespace WorkEnginePPM.Tests.WebServices
         }
 
         [TestMethod]
-        public void TryGetDataFromDetailRowDataField_UnknownField_EmptyValue()
-        {
-            // Arrange
-            const int unknownFieldId = -1;
-            string value;
-            var grid = CreateGridBase();
-
-            // Act
-            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, unknownFieldId, out value);
-
-            // Assert
-            Assert.IsTrue(result);
-            Assert.AreEqual(" ", value);
-        }
-
-        [TestMethod]
-        public void TryGetDataFromDetailRowDataField_StartDateFieldWithNoDate_ReturnsFalseWithNullValue()
-        {
-            // Arrange
-            const int fieldId = 5;
-            _detailRowParameter.Det_Start = DateTime.MinValue;
-            string value;
-            var grid = CreateGridBase();
-
-            // Act
-            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
-
-            // Assert
-            Assert.IsFalse(result);
-            Assert.IsNull(value);
-        }
-
-        [TestMethod]
-        public void TryGetDataFromDetailRowDataField_EndDateFieldWithNoDate_ReturnsFalseWithNullValue()
-        {
-            // Arrange
-            const int fieldId = 6;
-            _detailRowParameter.Det_Start = DateTime.MinValue;
-            string value;
-            var grid = CreateGridBase();
-
-            // Act
-            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
-
-            // Assert
-            Assert.IsFalse(result);
-            Assert.IsNull(value);
-        }
-
-        [TestMethod]
-        public void TryGetDataFromDetailRowDataField_FieldBetween11801And11805_ReturnsValueFromText_OCVal()
-        {
-            // Arrange
-            const int fieldId = 11802;
-            _detailRowParameter.Text_OCVal = new string[3];
-            _detailRowParameter.Text_OCVal[2] = "test-text";
-
-            string value;
-            var grid = CreateGridBase();
-
-            // Act
-            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
-
-            // Assert
-            Assert.IsTrue(result);
-            Assert.AreEqual(_detailRowParameter.Text_OCVal[2], value);
-        }
-
-        [TestMethod]
-        public void TryGetDataFromDetailRowDataField_FieldBetween11811And11815_ReturnsValueFromTXVal()
-        {
-            // Arrange
-            const int fieldId = 11813;
-            _detailRowParameter.TXVal = new string[4];
-            _detailRowParameter.TXVal[3] = "test-text";
-
-            string value;
-            var grid = CreateGridBase();
-
-            // Act
-            var result = grid.TryGetDataFromDetailRowDataField(_detailRowParameter, fieldId, out value);
-
-            // Assert
-            Assert.IsTrue(result);
-            Assert.AreEqual(_detailRowParameter.TXVal[3], value);
-        }
-
-        [TestMethod]
         public void RenderToXML_RenderingTypeInvalid_Throws()
         {
             // Arrange
             var grid = CreateGridBase();
 
             // Act
-            Action action = () => grid.RenderToXml(GridBase.RenderingTypes.None);
+            Action action = () => grid.RenderToXml(GridRenderingTypes.None);
 
             // Assert
             try
@@ -214,7 +126,7 @@ namespace WorkEnginePPM.Tests.WebServices
             };
 
             // Act
-            var xml = grid.RenderToXml(GridBase.RenderingTypes.Layout);
+            var xml = grid.RenderToXml(GridRenderingTypes.Layout);
 
             // Assert
             Assert.AreEqual("Grid", structNameUsed);
@@ -224,7 +136,7 @@ namespace WorkEnginePPM.Tests.WebServices
         public void RenderToXML_Layout_RendersGridLayout()
         {
             // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Layout;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Layout;
             var grid = CreateGridBase();
 
             // Act
@@ -241,7 +153,7 @@ namespace WorkEnginePPM.Tests.WebServices
         public void RenderToXML_LayoutPeriodsNotNull_AddsPeriodColumns()
         {
             // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Layout;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Layout;
             var periodsData = Enumerable.Empty<PeriodData>();
 
             var grid = CreateGridBase();
@@ -259,7 +171,7 @@ namespace WorkEnginePPM.Tests.WebServices
         public void RenderToXML_Data_GridDataInitialized()
         {
             // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             var grid = CreateGridBase();
 
             // Act
@@ -274,7 +186,7 @@ namespace WorkEnginePPM.Tests.WebServices
         public void RenderToXML_DataDetailRowsNotNull_AddsDetailRows()
         {
             // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             var detailsRows = new DetailRowData[] 
             {
                 new DetailRowData(10) { bRealone = true },

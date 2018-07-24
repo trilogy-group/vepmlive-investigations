@@ -5073,7 +5073,7 @@ namespace ModelDataCache
 
             m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
+            return oGrid.RenderToXml(GridRenderingTypes.Combined);
         }
         
         public string GetTopGridLayout()
@@ -5098,7 +5098,7 @@ namespace ModelDataCache
                 oGrid.AddPeriodsData(m_Periods.Values);
             }
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
+            return oGrid.RenderToXml(GridRenderingTypes.Layout);
         }
 
         public string GetTopGridData()
@@ -5119,7 +5119,7 @@ namespace ModelDataCache
             
             m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
+            return oGrid.RenderToXml(GridRenderingTypes.Data);
         }
 
         public string GetBottomGrid()
@@ -5145,7 +5145,7 @@ namespace ModelDataCache
             oGrid.AddPeriodsData(m_Periods.Values);
             oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
+            return oGrid.RenderToXml(GridRenderingTypes.Combined);
         }
 
 
@@ -5175,7 +5175,7 @@ namespace ModelDataCache
 
             oGrid.AddPeriodsData(m_Periods.Values);
 
-            bottomgridlayoutcache = oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
+            bottomgridlayoutcache = oGrid.RenderToXml(GridRenderingTypes.Layout);
             return bottomgridlayoutcache;
         }
 
@@ -5200,7 +5200,7 @@ namespace ModelDataCache
                 m_display_maxp);
 
             oGrid.AddDetailRowsData(m_tgrid_sorted);
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
+            return oGrid.RenderToXml(GridRenderingTypes.Data);
         }
 
         public void SetFTEMode(int FTEMode)

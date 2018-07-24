@@ -7,6 +7,7 @@ using System.Xml;
 using EPMLiveCore;
 using ModelDataCache;
 using PortfolioEngineCore;
+using ResourceValues;
 using WorkEnginePPM;
 
 namespace RPADataCache
@@ -14,42 +15,38 @@ namespace RPADataCache
     internal class RPATopGrid1 : RPADataCacheGridBase
     {
         private readonly List<clsRXDisp> _columns;
-        private readonly int _pmoAdminId;
+        private readonly int _pmoAdmin;
         private readonly string _xmlString;
+        private readonly int _displayMode;
+        private readonly IList<RPATGRow> _displayList;
 
+        private CStruct DefinitionRight;
+        private CStruct DefinitionLeaf;
         private CStruct MiddleCols;
 
-        public RPATopGrid1(List<clsRXDisp> columns, int pmoAdminId, string xmlString, int fromPeriodIndex, int toPeriodIndex)
+        public RPATopGrid1(List<clsRXDisp> columns, int pmoAdmin, string xmlString, int displayMode, IList<RPATGRow> displayList, int fromPeriodIndex, int toPeriodIndex)
             : base(fromPeriodIndex, toPeriodIndex)
         {
             _columns = columns;
-            _pmoAdminId = pmoAdminId;
+            _pmoAdmin = pmoAdmin;
             _xmlString = xmlString;
-        }
-
-        protected override void AddDetailRow(DetailRowData detailRowData, int rowId)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void AddPeriodColumn(string id, string name)
-        {
-            throw new NotImplementedException();
-        }
+            _displayMode = displayMode;
+            _displayList = displayList;
+        }        
 
         protected override string CleanUpString(string input)
         {
             throw new NotImplementedException();
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
             throw new NotImplementedException();
         }
 
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
@@ -60,22 +57,65 @@ namespace RPADataCache
             xdoc.LoadXml(currentViewResult.ToString());
             var currentViewCols = xdoc.SelectSingleNode("Result/View/g_1").Attributes["Cols"].InnerText;
             var strCurrentViewCols = currentViewCols.Split(',').Select(x => x.Split(':')).ToArray();
+
+            InitializeGridLayoutConfig();
+
+            var xLeftCols = Constructor.CreateSubStruct("LeftCols");
+            var xCols = Constructor.CreateSubStruct("Cols");
+            var xRightCols = Constructor.CreateSubStruct("RightCols");
+            PeriodCols = xRightCols;
+            MiddleCols = xCols;
+
+            DefinitionRight = InitializeGridLayoutDefinition("R");
+            DefinitionRight.CreateStringAttr("Calculated", "1");
+
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf");
+            DefinitionLeaf.CreateStringAttr("Calculated", "0");
             
+            var xHead = Constructor.CreateSubStruct("Head");
+            var xFilter = xHead.CreateSubStruct("Filter");
+            xFilter.CreateStringAttr("id", "Filter");
+
+            InitializeGridLayoutHeader1(xHead, -1, 2);
+            Header1.CreateIntAttr("PortfolioItemVisible", 1);
+            Header1.CreateIntAttr("NoEscape", 1);
+
+            var categoryColumn = InitializeGridLayoutCategoryColumns(xLeftCols).Last();
+
+            DefinitionRight.CreateBooleanAttr("SelectCanEdit", true);
+            DefinitionRight.CreateStringAttr("rowid", string.Empty);
+
+            var xSolid = Constructor.CreateSubStruct("Solid");
+            var xGroup = xSolid.CreateSubStruct("Group");
+
+            foreach (clsRXDisp col in _columns)
+            {
+                if (col.m_id != RPConstants.TGRID_GRP_ID)
+                {
+                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, categoryColumn, col);
+                }
+            }
+        }
+
+        private CStruct InitializeGridLayoutConfig()
+        {
             var xToolbar = Constructor.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
+
             var xPanel = Constructor.CreateSubStruct("Panel");
             xPanel.CreateIntAttr("Visible", 0);
             xPanel.CreateIntAttr("Select", 0);
             xPanel.CreateIntAttr("Delete", 0);
             xPanel.CreateIntAttr("CanHide", 0);
             xPanel.CreateIntAttr("CanSelect", 0);
+
             var xCfg = Constructor.CreateSubStruct("Cfg");
             xCfg.CreateStringAttr("MainCol", "PortfolioItem");
             xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
             xCfg.CreateIntAttr("SuppressCfg", 3);
             xCfg.CreateIntAttr("SuppressMessage", 3);
             xCfg.CreateIntAttr("PrintCols", 0);
-            xCfg.CreateIntAttr("Dragging", _pmoAdminId);
+            xCfg.CreateIntAttr("Dragging", _pmoAdmin);
             xCfg.CreateIntAttr("Sorting", 1);
             xCfg.CreateIntAttr("ColsMoving", 1);
             xCfg.CreateIntAttr("ColsPosLap", 1);
@@ -112,48 +152,12 @@ namespace RPADataCache
             xCfg.CreateIntAttr("NoTreeLines", 1);
             xCfg.CreateIntAttr("ShowVScroll", 1);
 
-            var xLeftCols = Constructor.CreateSubStruct("LeftCols");
-            var xCols = Constructor.CreateSubStruct("Cols");
-            var xRightCols = Constructor.CreateSubStruct("RightCols");
-            PeriodCols = xRightCols;
-            MiddleCols = xCols;
-
-            var definitionRight = InitializeGridLayoutDefinition("R");
-            definitionRight.CreateStringAttr("Calculated", "1");
-
-            var definitionLeaf = InitializeGridLayoutDefinition("Leaf");
-            definitionLeaf.CreateStringAttr("Calculated", "0");
-            
-            var xHead = Constructor.CreateSubStruct("Head");
-            var xFilter = xHead.CreateSubStruct("Filter");
-            xFilter.CreateStringAttr("id", "Filter");
-
-            InitializeGridLayoutHeader1(xHead, -1, 2);
-            Header1.CreateIntAttr("PortfolioItemVisible", 1);
-            Header1.CreateIntAttr("NoEscape", 1);
-
-            var categoryColumn = InitializeGridLayoutCategoryColumns(xLeftCols).Last();
-
-            definitionRight.CreateBooleanAttr("SelectCanEdit", true);
-            definitionRight.CreateStringAttr("rowid", string.Empty);
-
-            var xSolid = Constructor.CreateSubStruct("Solid");
-            var xGroup = xSolid.CreateSubStruct("Group");
-
-            foreach (clsRXDisp col in _columns)
-            {
-                if (col.m_id != RPConstants.TGRID_GRP_ID)
-                {
-                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, definitionRight, definitionLeaf, categoryColumn, col);
-                }
-            }
+            return xCfg;
         }
 
         private CStruct InitializeViewColumn(
             IList<string[]> strCurrentViewCols, 
-            CStruct xCols, 
-            CStruct definitionRight, 
-            CStruct definitionLeaf, 
+            CStruct xCols,
             CStruct categoryColumn, 
             clsRXDisp col)
         {
@@ -182,12 +186,12 @@ namespace RPADataCache
                     categoryColumn.CreateIntAttr("Visible", 0);
                 }
 
-                definitionRight.CreateIntAttr(sn + "CanDrag", 0);
-                definitionRight.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-                definitionRight.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-                definitionLeaf.CreateIntAttr(sn + "CanDrag", 0);
-                definitionLeaf.CreateStringAttr(sn + "HtmlPrefix", string.Empty);
-                definitionLeaf.CreateStringAttr(sn + "HtmlPostfix", string.Empty);
+                DefinitionRight.CreateIntAttr(sn + "CanDrag", 0);
+                DefinitionRight.CreateStringAttr(sn + "HtmlPrefix", "<B>");
+                DefinitionRight.CreateStringAttr(sn + "HtmlPostfix", "</B>");
+                DefinitionLeaf.CreateIntAttr(sn + "CanDrag", 0);
+                DefinitionLeaf.CreateStringAttr(sn + "HtmlPrefix", string.Empty);
+                DefinitionLeaf.CreateStringAttr(sn + "HtmlPostfix", string.Empty);
 
                 if (col.m_type == 2)
                 {
@@ -199,14 +203,14 @@ namespace RPADataCache
                         categoryColumn.CreateStringAttr("Type", "Date");
 
                         string sminFunc = "(Row.id == 'Filter' ? '' : min())";
-                        definitionRight.CreateStringAttr(sn + "Formula", sminFunc);
+                        DefinitionRight.CreateStringAttr(sn + "Formula", sminFunc);
                     }
                     else if (col.m_id == RPConstants.TGRID_FDATE)
                     {
                         categoryColumn.CreateStringAttr("Type", "Date");
 
                         string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
-                        definitionRight.CreateStringAttr(sn + "Formula", smaxFunc);
+                        DefinitionRight.CreateStringAttr(sn + "Formula", smaxFunc);
                     }
                 }
                 else if (col.m_type == 3)
@@ -249,10 +253,10 @@ namespace RPADataCache
                 categoryColumn.CreateIntAttr("CanHide", 0);
                 categoryColumn.CreateIntAttr("CanDrag", 0);
 
-                definitionRight.CreateStringAttr("xinterenalPeriodMin" + "Formula", sMinFunc);
-                definitionLeaf.CreateStringAttr("xinterenalPeriodMin" + "Formula", string.Empty);
-                definitionLeaf.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
-                definitionRight.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
+                DefinitionRight.CreateStringAttr("xinterenalPeriodMin" + "Formula", sMinFunc);
+                DefinitionLeaf.CreateStringAttr("xinterenalPeriodMin" + "Formula", string.Empty);
+                DefinitionLeaf.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
+                DefinitionRight.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
 
                 categoryColumn = MiddleCols.CreateSubStruct("C");
                 categoryColumn.CreateStringAttr("Name", "xinterenalPeriodMax");
@@ -267,13 +271,10 @@ namespace RPADataCache
                 categoryColumn.CreateIntAttr("CanHide", 0);
                 categoryColumn.CreateIntAttr("CanDrag", 0);
 
-                definitionRight.CreateStringAttr("xinterenalPeriodMax" + "Formula", sMaxFunc);
-
-
-                definitionLeaf.CreateStringAttr("xinterenalPeriodMax" + "Formula", string.Empty);
-
-                definitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
-                definitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+                DefinitionRight.CreateStringAttr("xinterenalPeriodMax" + "Formula", sMaxFunc);
+                DefinitionLeaf.CreateStringAttr("xinterenalPeriodMax" + "Formula", string.Empty);
+                DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+                DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
 
                 categoryColumn = MiddleCols.CreateSubStruct("C");
                 categoryColumn.CreateStringAttr("Name", "xinterenalPeriodTotal");
@@ -288,8 +289,8 @@ namespace RPADataCache
                 categoryColumn.CreateIntAttr("CanHide", 0);
                 categoryColumn.CreateIntAttr("CanDrag", 0);
 
-                definitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
-                definitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+                DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+                DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
             }
             catch (Exception ex)
             {
@@ -299,12 +300,7 @@ namespace RPADataCache
             return categoryColumn;
         }
 
-        protected override string ResolvePeriodId(PeriodData periodData, int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
+        private IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
             var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowSel", "Icon",
                 width: 20,
@@ -350,7 +346,7 @@ namespace RPADataCache
             yield return categoryColumn;
         }
 
-        protected CStruct InitializeGridLayoutCategoryColumn(
+        private CStruct InitializeGridLayoutCategoryColumn(
             CStruct xLeftCols,
             string name,
             string type,
@@ -398,6 +394,118 @@ namespace RPADataCache
             categoryColumn.CreateIntAttr("CanSelect", canSelect ? 1 : 0);
 
             return categoryColumn;
+        }
+
+        protected override string ResolvePeriodId(CPeriod periodData, int index)
+        {
+            return periodData.PeriodID.ToString();
+        }
+
+        protected override void AddPeriodColumns(IEnumerable<CPeriod> periods)
+        {
+            var i = 0;
+            foreach (var period in periods)
+            {
+                var count = 0;
+                var periodId = ResolvePeriodId(period, i++);
+                var periodName = RPAData.GetPeriodName(period.PeriodName, _displayMode);
+
+                foreach (RPATGRow ot in _displayList)
+                {
+                    if (ot.bUse)
+                        ++count;
+                }
+
+                if (count == 0)
+                {
+                    return;
+                }
+
+                Header1.CreateStringAttr("P" + periodId + "C1", periodName);
+
+                count = 0;
+
+                foreach (RPATGRow ot in _displayList)
+                {
+                    try
+                    {
+                        if (ot.bUse)
+                        {
+                            ++count;
+
+                            var xC = InitializeGridLayoutCategoryColumn(
+                                PeriodCols,
+                                "P" + periodId + "C" + count.ToString(),
+                                "Float",
+                                canMove: false);
+
+                            xC.CreateIntAttr("CanDrag", _pmoAdmin);
+
+                            if (_displayMode == 1)
+                            {
+                                xC.CreateStringAttr("Format", ",0.###");
+                            }
+                            else
+                            {
+                                xC.CreateStringAttr("Format", ",0.##");
+                            }
+
+                            if (_pmoAdmin != 0)
+                            {
+                                xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
+                            }
+
+                            xC.CreateStringAttr("Align", "Right");
+
+                            if (_displayMode != 3)
+                            {
+                                var sFunc = "(Row.id == 'Filter' ? '' : sum())";
+                                DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", sFunc);
+                                
+                                if (_displayMode == 1)
+                                {
+                                    DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Format", ",0.###");
+                                }
+                                else
+                                {
+                                    DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Format", ",0.##");
+                                }
+                            }
+
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", "");
+
+                            DefinitionLeaf.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
+                            DefinitionRight.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
+
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", "");
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", "");
+
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", "");
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", "");
+
+                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", "");
+                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", "");
+
+                            xC.CreateIntAttr("MinWidth", 45);
+                            xC.CreateIntAttr("Width", 65);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        protected override bool CheckIfDetailRowShouldBeAdded(clsResXData detailRow)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void AddDetailRow(clsResXData detailRowData, int rowId)
+        {
+            throw new NotImplementedException();
         }
 
         private string GetResourceAnalyzerView(string sXML)

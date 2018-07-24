@@ -2566,7 +2566,7 @@ namespace RPADataCache
             }
         }
 
-        private string GetPeriodName(string periodName, int disp_mode)
+        public static string GetPeriodName(string periodName, int disp_mode)
         {
             if (disp_mode == 2)
             {

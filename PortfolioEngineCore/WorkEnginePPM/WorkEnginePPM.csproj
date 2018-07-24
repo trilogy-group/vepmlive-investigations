@@ -835,6 +835,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>EditCosts.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebServices\GridRenderingTypes.cs" />
     <Compile Include="WebServices\Integration.cs">
       <SubType>Component</SubType>
     </Compile>
