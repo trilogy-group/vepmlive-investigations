@@ -463,7 +463,7 @@ namespace EPMLiveCore.API
 
                                             if (dataSet.Tables.Count > 0)
                                             {
-                                                DataRow[] drFound = dataSet.Tables[0].Select("userid='" + user + "'");
+                                                var drFound = dataSet.Tables[0].Select("userid='" + user + "'");
 
                                                 if (drFound.Length > 0)
                                                 {
@@ -531,7 +531,17 @@ namespace EPMLiveCore.API
             catch (Exception Exception) { throw new Exception(Exception.Message); }
         }
 
-        private static void iQueueItemMessage(int templateid, bool hidefrom, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPWeb oWeb, SPUser curUser, bool forceNewEntry)
+        private static void iQueueItemMessage(
+            int templateid, 
+            bool hidefrom, 
+            Hashtable additionalParams, 
+            string[] newusers, 
+            string[] delusers, 
+            bool doNotEmail, 
+            bool unmarkread, 
+            SPWeb oWeb, 
+            SPUser curUser, 
+            bool forceNewEntry)
         {
             try
             {
@@ -545,121 +555,136 @@ namespace EPMLiveCore.API
                             {
                                 string body = "";
                                 string subject = "";
-                                //string shortmessage = "";
 
-                                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-                                cn.Open();
-
-                                GetCoreInformation(cn, templateid, out body, out subject, web, curUser);
-
-                                foreach(string s in additionalParams.Keys)
+                                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                                 {
-                                    body = body.Replace("{" + s + "}", additionalParams[s].ToString());
-                                    subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
-                                    //shortmessage = shortmessage.Replace("{" + s + "}", additionalParams[s].ToString());
-                                }
+                                    connection.Open();
 
-                                SqlCommand cmd = new SqlCommand("SELECT id from NOTIFICATIONS where webid=@webid and type=@type", cn);
-                                cmd.Parameters.AddWithValue("@webid", web.ID);
-                                cmd.Parameters.AddWithValue("@type", templateid);
+                                    GetCoreInformation(connection, templateid, out body, out subject, web, curUser);
 
-                                SqlDataReader dr = cmd.ExecuteReader();
-
-                                string id = null;
-
-                                if(dr.Read())
-                                {
-                                    id = dr.GetGuid(0).ToString();
-                                }
-                                dr.Close();
-
-                                if(id == null || forceNewEntry)
-                                {
-                                    id = Guid.NewGuid().ToString();
-
-                                    cmd = new SqlCommand("INSERT INTO NOTIFICATIONS (id, title, message, type, createdby, createdat, siteid, webid, listid, itemid, emailed) VALUES (@id, @title, @message, @type, @createdby, GETDATE(), @siteid, @webid, @listid, @itemid, @emailed)", cn);
-                                }
-                                else
-                                {
-                                    cmd = new SqlCommand("UPDATE NOTIFICATIONS set title=@title, message=@message, type=@type, createdby=@createdby, siteid=@siteid, webid=@webid, listid=@listid, emailed=@emailed, itemid=@itemid where id=@id", cn);
-                                }
-
-                                cmd.Parameters.AddWithValue("@id", id);
-                                cmd.Parameters.AddWithValue("@title", subject);
-                                cmd.Parameters.AddWithValue("@message", body);
-                                cmd.Parameters.AddWithValue("@type", templateid);
-                                if(hidefrom)
-                                    cmd.Parameters.AddWithValue("@createdby", 1073741823);
-                                else
-                                    cmd.Parameters.AddWithValue("@createdby", curUser.ID);
-                                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                                cmd.Parameters.AddWithValue("@webid", web.ID);
-                                cmd.Parameters.AddWithValue("@listid", DBNull.Value);
-                                cmd.Parameters.AddWithValue("@itemid", DBNull.Value);
-                                cmd.Parameters.AddWithValue("@emailed", doNotEmail);
-                                cmd.ExecuteNonQuery();
-
-                                cmd = new SqlCommand("select * from personalizations where FK=@id", cn);
-                                cmd.Parameters.AddWithValue("@id", id);
-                                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                DataSet ds = new DataSet();
-                                da.Fill(ds);
-
-                                foreach(string user in newusers)
-                                {
-                                    if(user != "")
+                                    foreach (string s in additionalParams.Keys)
                                     {
-                                        bool found = false;
+                                        body = body.Replace("{" + s + "}", additionalParams[s].ToString());
+                                        subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
+                                    }
 
-                                        if(ds.Tables.Count > 0)
+                                    SqlCommand cmd = new SqlCommand("SELECT id from NOTIFICATIONS where webid=@webid and type=@type", connection);
+                                    cmd.Parameters.AddWithValue("@webid", web.ID);
+                                    cmd.Parameters.AddWithValue("@type", templateid);
+
+                                    SqlDataReader dr = cmd.ExecuteReader();
+
+                                    string id = null;
+
+                                    if (dr.Read())
+                                    {
+                                        id = dr.GetGuid(0).ToString();
+                                    }
+                                    dr.Close();
+                                    using (var upsertNotificationCommand = new SqlCommand())
+                                    {
+                                        upsertNotificationCommand.Connection = connection;
+                                        if (id == null || forceNewEntry)
                                         {
-                                            DataRow[] drFound = ds.Tables[0].Select("userid='" + user + "'");
+                                            id = Guid.NewGuid().ToString();
+                                            upsertNotificationCommand.CommandText = 
+                                                "INSERT INTO NOTIFICATIONS (id, title, message, type, createdby, createdat, " +
+                                                "siteid, webid, listid, itemid, emailed) VALUES (@id, @title, @message, @type, " +
+                                                "@createdby, GETDATE(), @siteid, @webid, @listid, @itemid, @emailed)";
+                                        }
+                                        else
+                                        {
+                                            upsertNotificationCommand.CommandText = 
+                                                "UPDATE NOTIFICATIONS set title=@title, message=@message, type=@type, " +
+                                                "createdby=@createdby, siteid=@siteid, webid=@webid, listid=@listid, " +
+                                                "emailed=@emailed, itemid=@itemid where id=@id";
+                                        }
 
-                                            if(drFound.Length > 0)
+                                        upsertNotificationCommand.Parameters.AddWithValue("@id", id);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@message", body);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@type", templateid);
+                                        if (hidefrom)
+                                        {
+                                            upsertNotificationCommand.Parameters.AddWithValue("@createdby", _defaultUserId);
+                                        }
+                                        else
+                                        {
+                                            upsertNotificationCommand.Parameters.AddWithValue("@createdby", curUser.ID);
+                                        }
+                                        upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@listid", DBNull.Value);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@itemid", DBNull.Value);
+                                        upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
+                                        upsertNotificationCommand.ExecuteNonQuery();
+                                    }
+
+                                    var dataSet = new DataSet();
+                                    using (var personalizationCommand =
+                                        new SqlCommand("select * from personalizations where FK=@id", connection))
+                                    {
+                                        personalizationCommand.Parameters.AddWithValue("@id", id);
+                                        using (var dataAdapter = new SqlDataAdapter(personalizationCommand))
+                                        {
+                                            dataAdapter.Fill(dataSet);
+                                        }
+                                    }
+
+                                    foreach (string user in newusers)
+                                    {
+                                        if (user != "")
+                                        {
+                                            bool found = false;
+
+                                            if (dataSet.Tables.Count > 0)
                                             {
-                                                found = true;
-                                                ds.Tables[0].Rows.Remove(drFound[0]);
+                                                DataRow[] drFound = dataSet.Tables[0].Select("userid='" + user + "'");
+
+                                                if (drFound.Length > 0)
+                                                {
+                                                    found = true;
+                                                    dataSet.Tables[0].Rows.Remove(drFound[0]);
+                                                }
+                                            }
+                                            if (!found)
+                                            {
+                                                cmd = new SqlCommand("INSERT INTO personalizations (FK, [key], value, userid, siteid, webid, listid, itemid) VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)", connection);
+                                                cmd.Parameters.AddWithValue("@id", id);
+                                                cmd.Parameters.AddWithValue("@value", "00");
+                                                cmd.Parameters.AddWithValue("@userid", user);
+                                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                                cmd.Parameters.AddWithValue("@webid", web.ID);
+                                                cmd.Parameters.AddWithValue("@listid", DBNull.Value);
+                                                cmd.Parameters.AddWithValue("@itemid", DBNull.Value);
+                                                cmd.ExecuteNonQuery();
+                                            }
+                                            if (unmarkread)
+                                            {
+                                                using (var spNSetBitCommand = new SqlCommand("spNSetBit", connection))
+                                                {
+                                                    spNSetBitCommand.CommandType = CommandType.StoredProcedure;
+                                                    spNSetBitCommand.Parameters.AddWithValue("@FK", id);
+                                                    spNSetBitCommand.Parameters.AddWithValue("@userid", user);
+                                                    spNSetBitCommand.Parameters.AddWithValue("@index", 2);
+                                                    spNSetBitCommand.Parameters.AddWithValue("@val", 0);
+                                                    spNSetBitCommand.ExecuteNonQuery();
+                                                }
                                             }
                                         }
-                                        if(!found)
-                                        {
-                                            cmd = new SqlCommand("INSERT INTO personalizations (FK, [key], value, userid, siteid, webid, listid, itemid) VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)", cn);
-                                            cmd.Parameters.AddWithValue("@id", id);
-                                            cmd.Parameters.AddWithValue("@value", "00");
-                                            cmd.Parameters.AddWithValue("@userid", user);
-                                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                                            cmd.Parameters.AddWithValue("@listid", DBNull.Value);
-                                            cmd.Parameters.AddWithValue("@itemid", DBNull.Value);
-                                            cmd.ExecuteNonQuery();
-                                        }
-                                        if(unmarkread)
-                                        {
-                                            cmd = new SqlCommand("spNSetBit", cn);
-                                            cmd.CommandType = CommandType.StoredProcedure;
-                                            cmd.Parameters.AddWithValue("@FK", id);
-                                            cmd.Parameters.AddWithValue("@userid", user);
-                                            cmd.Parameters.AddWithValue("@index", 2);
-                                            cmd.Parameters.AddWithValue("@val", 0);
-                                            cmd.ExecuteNonQuery();
-                                        }
-
-
                                     }
-                                }
 
-                                if(delusers != null)
-                                {
-                                    foreach(string user in delusers)
+                                    if (delusers != null)
                                     {
-                                        cmd = new SqlCommand("delete from personalizations where FK=@id and userid=@userid", cn);
-                                        cmd.Parameters.AddWithValue("@id", id);
-                                        cmd.Parameters.AddWithValue("@userid", user);
-                                        cmd.ExecuteNonQuery();
+                                        foreach (string user in delusers)
+                                        {
+                                            cmd = new SqlCommand("delete from personalizations where FK=@id and userid=@userid", connection);
+                                            cmd.Parameters.AddWithValue("@id", id);
+                                            cmd.Parameters.AddWithValue("@userid", user);
+                                            cmd.ExecuteNonQuery();
+                                        }
                                     }
                                 }
-                                cn.Close();
-
                             }
                             catch(Exception Exception) { throw new Exception(Exception.Message); }
                         }
