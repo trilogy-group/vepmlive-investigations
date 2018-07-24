@@ -1,3804 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Xml;
-using System.Data.Sql;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using WorkEnginePPM;
-//using WorkEnginePPM_old;
 using PortfolioEngineCore;
+using WorkEnginePPM;
+using WorkEnginePPM.WebServices.ModelDataCache;
 
-using System.Text;
-using System.Data;
-using System.Globalization;
 namespace ModelDataCache
 {
     [Serializable()]
-    public class CSNamedRate
-    {
-        public int UID, ID, Level;
-        public string Name;
-        public double[] Rates;
-    }
-    [Serializable()]
-    public class CSCategoryEntry
-    {
-        public int UID, ID, Level, Role_UID, Mode, PID, MC_UID, Category;
-        public string Name, UoM, FullName, MC_Val, Role_Name;
-        public double[] Rates, FTEConv;
-    }
-    [Serializable()]
-    public class ListItemData
-    {
-        public int UID, ID, Level;
-        public string Name, FullName;
-        public bool InActive;
-    }
-    [Serializable()]
-    public class CustomFieldsDefn
-    {
-        public int FieldID;
-        public string Name;
-        public int LookupOnly, LookupID, LeafOnly, UseFullName;
-        public ListItemData[] LookUp;
-        public string jsonMenu;
-    }
-    [Serializable()]
-    public class CSRatesAndCategory
-    {
-        public int numberPeriods;
-        public CSNamedRate[] NamedRates;
-        public CSCategoryEntry[] Categories;
-        public string CatjsonMenu;
-        public ItemDefn[] Versions;
-        public ItemDefn[] CostTypes;
-        public CustomFieldsDefn[] CustomFields;
-        // custom codes and lookups...
-    }
-    [Serializable()]
-    public class TargetRowData
-    {
-        public int CT_ID;
-        public int BC_UID;
-        public int BC_ROLE_UID;
-        public int BC_SEQ;
-        public string MC_Val;
-        public int CAT_UID;
-        public string CT_Name, Cat_Name, Role_Name, MC_Name, FullCatName, CC_Name, FullCCName, Grouping;
-        public bool bGroupRow;
-
-        public int m_rt;
-        public string m_rt_name;
-
-
-        public string sUoM;
-        public double[] zCost, zValue, zFTE;
-        public int[] OCVal;
-        public string[] Text_OCVal;
-        public string[] TXVal;
-    }
-    [Serializable()]
-    public class CSTargetData
-    {
-        public TargetRowData[] targetRows;
-    }
-    [Serializable()]
-    public class ModelBarsChanged
-    {
-        public int redrawCompleteGrid;
-        public int barsAffected;
-        public int[] RowID;
-        public string[] Starts;
-        public string[] Finishs;
-    }
-    [Serializable()]
-    public class ItemDefn
-    {
-        public int Id;
-        public string Name;
-        public int Deflt;
-        public int editable;
-    }
-    public class SortRowDefn
-    {
-        public int fid;
-        public int decf;
-        public int grpf;
-    }
-    [Serializable()]
-    public class SortFieldDefn
-    {
-        public int fid;
-        public string name;
-        public int selected;
-        public bool touched;
-    }
-    [Serializable()]
-    public class SortGroupDefn
-    {
-        public SortRowDefn[] DetRows;
-        public SortRowDefn[] TotRows;
-        public SortFieldDefn[] DetFields, TotFields;
-        public int DetFreeze, TotFreeze, DetShowToLevel, TotShowToLevel;
-        public int NumPIs, MissingPIs, LoadReturnCode, HaveLowlevelData;
-        public string errMsg;
-        public int TotalsCmp;
-        public string ViewZoomTo = "";
-    }
-    [Serializable()]
-    public class PeriodsAndOptions
-    {
-        public ItemDefn[] Periods;
-        public int displayStart, displayFinish, dragStart, dragFinish, showQTY, showWhichQTY, showCosts, showRHSDecCosts;
-    }
-
-    internal enum CustomFieldDBTable : int
-    {
-        ResourceINT = 101,
-        ResourceTEXT = 102,
-        ResourceDEC = 103,
-        ResourceNTEXT = 104,
-        ResourceDATE = 105,
-        ResourceMV = 151,
-        PortfolioINT = 201,
-        PortfolioTEXT = 202,
-        PortfolioDEC = 203,
-        PortfolioNTEXT = 204,
-        PortfolioDATE = 205,
-        Program = 251,
-        ProjectINT = 301,
-        ProjectTEXT = 302,
-        ProjectDEC = 303,
-        ProjectNTEXT = 304,
-        ProjectDATE = 305,
-        ProgramText = 402,
-        TaskWIINT = 801,
-        TaskWITEXT = 802,
-        TaskWIDEC = 803
-    }
-    internal enum FieldIDs : int
-    {
-        PI_FID = 1,
-        CT_FID = 2,
-        SCEN_FID = 3,
-        BC_FID = 4,
-        SD_FID = 5,
-        FD_FID = 6,
-        UOM_FID = 7,
-        BC_ROLE = 8,
-        MC_FID = 9,
-        FULLC_FID = 10,
-        CAT_FID = 11,
-        FULLCAT_FID = 12,
-        FTOT_FID = 13,
-        DTOT_FID = 14,
-        PI_USE_EXTRA = 100,
-        MAX_PI_EXTRA = 256
-    }
-    static class ModelErrorHandling
-    {
-        static public void HandleStatusError(SqlConnection oDataAccess, PortfolioEngineCore.SeverityEnum eSeverity, string sFunction, PortfolioEngineCore.StatusEnum eStatus, string sText, int UserWResID, string sSessionInfo)
-        {
-            DBTrace(oDataAccess, eStatus, PortfolioEngineCore.TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), UserWResID, sSessionInfo);
-            return;
-        }
-
-        static void DBTrace(SqlConnection oDataAccess, PortfolioEngineCore.StatusEnum eStatus, PortfolioEngineCore.TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, int UserWResID, string sSessionInfo)
-        {
-            CStruct xTraceMessages = new CStruct();
-            xTraceMessages.Initialize("TraceMessages");
-
-            CStruct xTrace;
-            xTrace = xTraceMessages.CreateSubStruct("Trace");
-            xTrace.CreateIntAttr("Status", (int)eStatus);
-            xTrace.CreateIntAttr("Channel", (int)eChannel);
-            xTrace.CreateDateAttr("Timestamp", DateTime.Now);
-            xTrace.CreateStringAttr("Keyword", sKeyword);
-            xTrace.CreateStringAttr("Function", sFunction);
-            xTrace.CreateStringAttr("Text", sText);
-            xTrace.CreateStringAttr("Details", sDetails);
-
-            WriteTrace(oDataAccess, xTraceMessages, UserWResID, sSessionInfo);
-        }
-
-        static void WriteTrace(SqlConnection oDataAccess, CStruct xTrace, int UserWResID, string sSessionInfo)
-        {
-
-            if (xTrace == null)
-                return;
-
-
-
-            string sCommand =
-                "INSERT INTO EPG_LOG (LOG_WRES_ID,LOG_SESSION,LOG_STATUS,LOG_CHANNEL,LOG_TIMESTAMP,LOG_KEYWORD,LOG_FUNCTION,LOG_TEXT,LOG_DETAILS) "
-              + " VALUES(@LOG_WRES_ID,@LOG_SESSION,@LOG_STATUS,@LOG_CHANNEL,@LOG_TIMESTAMP,@LOG_KEYWORD,@LOG_FUNCTION,@LOG_TEXT,@LOG_DETAILS)";
-            try
-            {
-                SqlCommand oCommand = new SqlCommand(sCommand, oDataAccess);
-
-                oCommand.Parameters.AddWithValue("@LOG_WRES_ID", UserWResID);
-                oCommand.Parameters.AddWithValue("@LOG_SESSION", sSessionInfo);
-
-                oCommand.Parameters.AddWithValue("LOG_STATUS", xTrace.GetIntAttr("Status"));
-                oCommand.Parameters.AddWithValue("LOG_CHANNEL", xTrace.GetIntAttr("Channel"));
-                oCommand.Parameters.AddWithValue("LOG_TIMESTAMP",  xTrace.GetDateAttr("Timestamp"));
-                oCommand.Parameters.AddWithValue("LOG_KEYWORD", vb.Left(xTrace.GetStringAttr("Keyword"), 48));
-                oCommand.Parameters.AddWithValue("LOG_FUNCTION", vb.Left(xTrace.GetStringAttr("Function"), 48));
-                oCommand.Parameters.AddWithValue("LOG_TEXT", vb.Left(xTrace.GetStringAttr("Text"), 253));
-                oCommand.Parameters.AddWithValue("LOG_DETAILS", vb.Left(xTrace.GetStringAttr("Details"), 2048));
-
-                int lRowsAffected = oCommand.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                string StatusText = "";
-                StatusText = "WriteTrace Exception : " + ex.Message.ToString();
-            }
-            return;
-        }
-
-    }
-    [Serializable()]
-    class BarMoved
-    {
-        public int RowID;
-        public string Starts;
-        public string Finishs;
-    }
-    [Serializable()]
-    class DataItem
-    {
-        public string Name = "";
-        public string Desc = "";
-        public int ID = 0;
-        public int UID = 0;
-        public int level = 0, group = 0;
-        public bool bLoaded = false;
-        public bool bEditiable = false;
-        public bool bSelected = false;
-        public bool bAllSelected = false;
-        public int filterpos = 0;
-    };
-    [Serializable()]
-    class PeriodData
-    {
-        public string PeriodName;
-        public int PeriodID;
-        public DateTime StartDate;
-        public DateTime FinishDate;
-    };
-    [Serializable()]
-    class CatItemData
-    {
-        public int UID, ID, Level, Role_UID, Mode, PID, MC_UID, Category;
-        public string Name, UoM, FullName, MC_Val, Role_Name;
-        public double[] Rates, FTEConv;
-
-        public CatItemData(int arraysize)
-        {
-
-            Rates = new double[arraysize + 1];
-            FTEConv = new double[arraysize + 1];
-        }
-
-    }
-    [Serializable()]
-    class CustomFieldData
-    {
-        public int FieldID;
-        public string Name;
-        public string DisplayName;
-        public int LookupOnly, LookupID, LeafOnly, UseFullName;
-        public Dictionary<int, ListItemData> ListItems;
-        public string jsonMenu;
-    }
-    [Serializable()]
-    class PortFieldData
-    {
-        public int ID, Editable, Required, Identity, Visible, Frozen, Sequence;
-        public string Name, GivenName;
-    }
-    [Serializable()]
-    class SecItemData
-    {
-        public int Group_ID, Allow_Read, Allow_Edit, Object_UID;
-    }
-    [Serializable()]
-    class PIData : IComparable<PIData>
-    {
-        public int PI_ID, ScenarioID, Internal_ID, PISelected, GroupingPosn;
-        public DateTime StartDate, FinishDate, oStartDate, oFinishDate;
-        public string PI_Name, Scenario_name, GroupingID;
-        public string[] m_PI_Extra_data;
-        public string[] m_PI_Format_Extra_data;
-
-        public int CompareTo(PIData rhs)
-        {
-            return this.PI_Name.CompareTo(rhs.PI_Name);
-        }
-
-
-        public PIData(int arraysize)
-        {
-            m_PI_Extra_data = new string[arraysize + 1];
-            m_PI_Format_Extra_data = new string[arraysize + 1];
-            Scenario_name = "";
-            GroupingID = "";
-
-        }
-    }
-    [Serializable()]
-    class DetailRowData
-    {
-        public int CB_ID;
-        public int CT_ID;
-        public int PROJECT_ID;
-        public int Internal_ID;
-        public int BC_UID;
-        public int BC_ROLE_UID;
-        public int BC_SEQ;
-        public string MC_Val;
-        public int CAT_UID;
-        public DateTime Det_Start;
-        public DateTime Det_Finish;
-        public DateTime oDet_Start;
-        public DateTime oDet_Finish;
-        public bool bHadPData;
-        public string PI_Name, CT_Name, Scen_Name, Cat_Name, Role_Name, MC_Name, FullCatName, CC_Name, FullCCName;
-        public int Scenario_ID;
-        public bool b_PIOver;
-        public bool LinkedToPI;
-        public int m_mode;   //' bitwise field 1 = no edit - data cannot move be changed
-        //   '               2 = can move it but not save it...
-        //   '               4 = Don't recalc the values for cost here
-
-
-        public double m_tot1;
-        public double m_tot2;
-        public double m_tot3;
-
-        public int m_rt;
-        public string m_rt_name;
-
-        public bool bSelected;
-
-        public int m_uid;
-        public int m_total_to;
-
-        public int g1, g2, g3;
-        public int m_par;
-        public bool bRealone;
-        public bool bGotChildren;
-        public string sName;
-        public string sUoM;
-        public bool bRollupTouched;
-
-        public int m_sort_id;
-        public int lUoM;
-        public bool HasValues;
-        public string sKey;
-        public int m_lev, m_index;
-
-        public bool bUseCosts;
-        public double[] zCost, zValue, zFTE;
-
-        private double[] oCosts, oUnits, oFTE;
-
-        private int[] BurnDuration;
-        private double[] Burnrate;
-        private double[] UseBurnrate;
-        private double[] OutsideAdj;
-        private double[] Budget;
-        public bool bCapture;
-
-
-
-
-        public int mxdim;
-        public int[] OCVal;
-        public string[] Text_OCVal;
-        public string[] TXVal;
-
-
-        public string[] m_PI_Format_Extra_data;
-
-        public DetailRowData(int arraysize)
-        {
-            PI_Name = "";
-            CT_Name = "";
-            Scen_Name = "";
-            Cat_Name = "";
-            Role_Name = "";
-            MC_Name = "";
-            FullCatName = "";
-            FullCCName = "";
-            CC_Name = "";
-            m_rt_name = "";
-            sKey = "";
-            HasValues = false;
-            LinkedToPI = false;
-
-            mxdim = arraysize;
-            zCost = new double[arraysize + 1];
-            zValue = new double[arraysize + 1];
-            zFTE = new double[arraysize + 1];
-
-            for (int i = 0; i <= mxdim; i++)
-            {
-                zCost[i] = 0;
-                zValue[i] = 0;
-            }
-
-            oCosts = new double[arraysize + 1];
-            oUnits = new double[arraysize + 1];
-            oFTE = new double[arraysize + 1];
-
-
-
-            BurnDuration = new int[arraysize + 1];
-            Burnrate = new double[arraysize + 1];
-            UseBurnrate = new double[arraysize + 1];
-            OutsideAdj = new double[arraysize + 1];
-            Budget = new double[arraysize + 1];
-
-            OCVal = new int[6];
-            Text_OCVal = new string[6];
-            TXVal = new string[6];
-        }
-
-        public void CopyData(DetailRowData src)
-        {
-
-            CB_ID = src.CB_ID;
-            CT_ID = src.CT_ID;
-
-            PROJECT_ID = src.PROJECT_ID;
-            BC_UID = src.BC_UID;
-            BC_ROLE_UID = src.BC_ROLE_UID;
-            BC_SEQ = src.BC_SEQ;
-            MC_Val = src.MC_Val;
-            CAT_UID = src.CAT_UID;
-            Det_Start = src.Det_Start;
-            Det_Finish = src.Det_Finish;
-            oDet_Start = src.oDet_Start;
-            oDet_Finish = src.oDet_Finish;
-            bHadPData = src.bHadPData;
-            PI_Name = src.PI_Name;
-            CT_Name = src.CT_Name;
-            Scen_Name = src.Scen_Name;
-            Cat_Name = src.Cat_Name;
-            Role_Name = src.Role_Name;
-            MC_Name = src.MC_Name;
-            FullCatName = src.FullCatName;
-            Scenario_ID = src.Scenario_ID;
-            b_PIOver = src.b_PIOver;
-            LinkedToPI = src.LinkedToPI;
-            m_mode = src.m_mode;
-            CC_Name = src.CC_Name;
-            FullCCName = src.FullCCName;
-
-            OCVal = src.OCVal;
-            Text_OCVal = src.Text_OCVal;
-            TXVal = src.TXVal;
-            m_PI_Format_Extra_data = src.m_PI_Format_Extra_data;
-
-
-            m_tot1 = src.m_tot1;
-            m_tot2 = src.m_tot2;
-            m_tot3 = src.m_tot3;
-
-            m_rt = src.m_rt;
-            m_rt_name = src.m_rt_name;
-
-            bSelected = src.bSelected;
-
-            bRealone = src.bRealone;
-            lUoM = src.lUoM;
-            HasValues = src.HasValues;
-            sKey = src.sKey;
-
-            bUseCosts = src.bUseCosts;
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                zCost[i] = src.zCost[i];
-                zValue[i] = src.zValue[i];
-                zFTE[i] = src.zFTE[i];
-
-                oCosts[i] = src.oCosts[i];
-                oUnits[i] = src.oUnits[i];
-                zFTE[i] = src.oFTE[i];
-
-                BurnDuration[i] = src.BurnDuration[i];
-                Burnrate[i] = src.Burnrate[i];
-                UseBurnrate[i] = src.UseBurnrate[i];
-
-                OutsideAdj[i] = src.OutsideAdj[i];
-                oUnits[i] = src.oUnits[i];
-                Budget[i] = src.Budget[i];
-            }
-
-        }
-        public void CopyToTargetData(ref TargetRowData dest)
-        {
-
-            dest.CT_ID = CT_ID;
-
-            dest.BC_UID = BC_UID;
-            dest.BC_ROLE_UID = BC_ROLE_UID;
-            dest.BC_SEQ = BC_SEQ;
-            dest.MC_Val = MC_Val;
-            dest.CAT_UID = CAT_UID;
-            dest.CT_Name = CT_Name;
-            dest.Cat_Name = Cat_Name;
-            dest.Role_Name = Role_Name;
-            dest.MC_Name = MC_Name;
-            dest.FullCatName = FullCatName;
-            dest.CC_Name = CC_Name;
-            dest.FullCCName = FullCCName;
-
-            dest.bGroupRow = false;
-            dest.Grouping = "";
-
-            dest.OCVal = OCVal;
-            dest.Text_OCVal = Text_OCVal;
-            dest.TXVal = TXVal;
-
-            dest.zCost = new double[mxdim + 1];
-            dest.zValue = new double[mxdim + 1];
-            dest.zFTE = new double[mxdim + 1];
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                dest.zCost[i] = zCost[i];
-                dest.zValue[i] = zValue[i];
-                dest.zFTE[i] = zFTE[i];
-
-            }
-
-        }
-
-        public void AddToTargetData(ref TargetRowData dest)
-        {
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                dest.zCost[i] += zCost[i];
-                dest.zValue[i] += zValue[i];
-                dest.zFTE[i] += zFTE[i];
-
-            }
-
-        }
-
-        public void SetSnGInd(int i, int lv)
-        {
-            switch (i)
-            {
-                case 0:
-                    g1 = lv;
-                    break;
-                case 1:
-                    g2 = lv;
-                    break;
-                case 2:
-                    g3 = lv;
-                    break;
-            }
-        }
-        public void CaputureInitialData(Dictionary<int, PeriodData> clnPer)
-        {
-            bCapture = true;
-            oDet_Start = Det_Start;
-            oDet_Finish = Det_Finish;
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-                oCosts[i] = zCost[i];
-                oUnits[i] = zValue[i];
-                oFTE[i] = zFTE[i];
-            }
-
-            bUseCosts = (sUoM == "");
-
-
-            CaptureBurnRates(clnPer);
-        }
-
-        public void RestoreInitialData(Dictionary<int, PeriodData> clnPer)
-        {
-            Det_Start = oDet_Start;
-            Det_Finish = oDet_Finish;
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-                zCost[i] = oCosts[i];
-                zValue[i] = oUnits[i];
-                zFTE[i] = oFTE[i];
-            }
-
-            CaptureBurnRates(clnPer);
-        }
-
-        private void CaptureBurnRates(Dictionary<int, PeriodData> clnPer)
-        {
-            int i = 0;
-            int lPerSpan = 0;
-
-            foreach (PeriodData oPer in clnPer.Values)
-            {
-                ++i;
-                lPerSpan = CalculateOverlapLocal(Det_Start, Det_Finish, oPer.StartDate, oPer.FinishDate);
-                BurnDuration[i] = lPerSpan;
-
-                if (bUseCosts)
-                    Burnrate[i] = zCost[i];
-                else
-                    Burnrate[i] = zValue[i];
-
-                if (Burnrate[i] != 0)
-                {
-                    if (lPerSpan == 0)
-                        Burnrate[i] = 0;
-                    else
-                        Burnrate[i] = Burnrate[i] / (double)lPerSpan;
-                }
-            }
-
-        }
-
-        private int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
-        {
-
-            if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)
-                return 0;
-
-            if (dtBarStart <= dtPeriodStart && dtBarFinish >= dtPeriodFinish)
-                return dtPeriodFinish.Subtract(dtPeriodStart).Days + 1;
-
-            DateTime dt1;
-            DateTime dt2;
-
-            dt1 = (dtBarStart < dtPeriodStart ? dtPeriodStart : dtBarStart);     //' take the max of the two start dates
-            dt2 = (dtBarFinish < dtPeriodFinish ? dtBarFinish : dtPeriodFinish);  //    ' take the min of the two finish dates dates
-
-            if (dt1 > dt2)
-                return 0;
-
-            return dt2.Subtract(dt1).Days + 1;
-        }
-
-        private double AFiddler(double f)
-        {
-            return double.Parse(f.ToString("0.00"));
-        }
-
-
-        public void DragBar(DateTime[] dtPeriodStart, DateTime[] dtPeriodFinish, int[] PeriodMode, int minp, int maxp)
-        {
-            //  Input data
-            // dtPeriodStart(num_periods)  - start date of each period
-            // dtPeriodFinish(num_periods)  - finish date of each period
-            // PeriodMode(num_periods)  - true if this period should be included in the calc.
-
-            double per_span;
-            double per_offset;
-            int xtraburn;
-            int amt;
-            double useamt;
-
-            double useadj;
-            double mvtotal;
-
-            double span1, span2;
-
-            // useadj is used to apportion the burn rate - handling the expand and compress affect
-
-            span1 = oDet_Finish.Subtract(oDet_Start).Days;
-            span2 = Det_Finish.Subtract(Det_Start).Days;
-
-            if (span1 <= 0)
-                useadj = 1;
-            else
-                useadj = span2 / span1;
-
-
-            if (useadj == 0)
-                useadj = 0.00001;
-
-            mvtotal = 0;
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                // only perform these calculations if this period "visible" in the Analyzer view.
-
-                if (PeriodMode[per] != 0)
-                {
-                    mvtotal = mvtotal + (bUseCosts ? zCost[per] : zValue[per]);
-                    Budget[per] = 0;
-                    OutsideAdj[per] = 0;
-                    UseBurnrate[per] = Burnrate[per];
-
-                }
-                else
-                {
-                    OutsideAdj[per] = (bUseCosts ? zCost[per] : zValue[per]);
-                    Budget[per] = 0;
-                    UseBurnrate[per] = 0;
-                }
-            }
-
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                // only perform these calculations if this period "visible" in the Analyzer view.
-
-                if (PeriodMode[per] != 0)
-                {
-
-                    // For each period - calculate the overlap (in days) between the period and the new start and finish dates
-
-
-                    if (per == 6)
-                        per_span = 1;
-
-                    per_span = CalculateOverlapLocal(Det_Start, Det_Finish, dtPeriodStart[per], dtPeriodFinish[per]);
-
-                    // we should never get a -ve value but its always worth checking.....
-
-                    if (per_span < 0)
-                        per_span = 0;
-
-
-                    // map this span into expanded or compressed amount
-
-                    per_span = per_span / useadj;
-
-                    if (per_span != 0)
-                    {
-
-                        // OK there is some overlap - so now calculate where this overlap starts wrt the new startdate
-
-                        per_offset = dtPeriodStart[per].Subtract(Det_Start).Days;
-
-                        if (per_offset < 0)
-                            // well the new start is after the period start - so the offest must be 0
-                            per_offset = 0;
-
-
-                        // so now find where this offset starts in the burn duration list....
-
-                        // and map the period offest into expanded/compressed offsets as well
-
-                        per_offset = per_offset / useadj;
-
-                        for (int burn = 1; burn <= mxdim; burn++)
-                        {
-                            if (per_offset - BurnDuration[burn] < 0)
-                            {
-
-                                // OK this offset starts in this burn period - so calc how many days left in this burn
-
-                                amt = BurnDuration[burn] - (int)(per_offset + 0.5);
-
-
-                                xtraburn = 0;
-
-                                while (per_span > 0)
-                                {
-
-                                    if (amt > per_span)
-                                        useamt = per_span;
-                                    else
-                                        useamt = amt;
-
-
-                                    // apply this amts burn to this period
-
-                                    Budget[per] = Budget[per] + AFiddler(useamt * UseBurnrate[burn + xtraburn]);
-
-
-                                    per_span = per_span - useamt;
-
-                                    if (per_span > 0)
-                                    {
-
-                                        // step onto the next burn .... if not off the end - other wise use the last periods burn...
-                                        if (burn + xtraburn < mxdim)
-                                            xtraburn = xtraburn + 1;
-                                        else
-                                            break;
-
-
-                                        amt = BurnDuration[burn + xtraburn];
-                                    }
-                                }
-
-                            }
-
-                            else
-                                per_offset = per_offset - BurnDuration[burn];
-
-                        }
-
-
-
-                    }
-                }
-            }
-
-            //     dump overflow into start or end buckets
-
-            for (int per = 1; per < minp; per++)
-            {
-                Budget[minp] = Budget[minp] + Budget[per];
-                Budget[per] = 0;
-            }
-
-            for (int per = maxp + 1; per < mxdim; per++)
-            {
-                Budget[maxp] = Budget[maxp] + Budget[per];
-                Budget[per] = 0;
-            }
-
-
-            double fnTot = 0;
-
-            for (int per = minp; per <= maxp; per++)
-            {
-                fnTot += Budget[per];
-            }
-
-
-            mvtotal = mvtotal - fnTot;
-
-            if (Det_Start < oDet_Start)
-                Budget[minp] = Budget[minp] + mvtotal;
-            else
-                Budget[maxp] = Budget[maxp] + mvtotal;
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                if (bUseCosts)
-                    zCost[per] = Budget[per] + OutsideAdj[per];
-                else
-                    zValue[per] = Budget[per] + OutsideAdj[per];
-            }
-        }
-
-    }
-    [Serializable()]
-    class RateTable
-    {
-        public int UID, ID, Level;
-        public string Name;
-        public double[] zRate;
-        private int mxdim;
-
-        public RateTable(int arraysize)
-        {
-            mxdim = arraysize + 1;
-            zRate = new double[arraysize + 1];
-            for (int i = 0; i < mxdim; i++)
-            {
-                zRate[i] = 0;
-            }
-
-        }
-    }
-    [Serializable()]
-    class RateFTECache
-    {
-        public double[] zRate, zFTE;
-        private int mxdim;
-
-        public RateFTECache(int arraysize)
-        {
-            mxdim = arraysize + 1;
-            zRate = new double[arraysize + 1];
-            zFTE = new double[arraysize + 1];
-            for (int i = 0; i < mxdim; i++)
-            {
-                zRate[i] = 0;
-                zFTE[i] = 0;
-            }
-
-        }
-    }
-    [Serializable()]
-    class TargetColours
-    {
-        public int ID, rgb_val;
-        public double low_val, high_val;
-        public string Desc;
-    }
-    
-    internal class TopGridCostsLayout
-    {
-        private CStruct xGrid;
-        private CStruct m_xPeriodCols;
-        private CStruct m_xHeader1;
-        private CStruct m_xHeader2;
-
-        private string RemoveNastyCharacters(string sn)
-        {
-
-            string retsn = "";
-            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
-
-            sn = sn.Replace(" ", "");
-            sn = sn.Replace("'", "");
-            sn = sn.Replace("\r", "");
-            sn = sn.Replace("\n", "");
-            sn = sn.Replace("\"", "");
-            sn = sn.Replace("\\", "");
-
-            for (int i = 0; i < sn.Length; i++)
-            {
-                string sx = sn.Substring(i, 1);
-
-                if (sNastyChars.IndexOf(sx) == -1)
-                    retsn += sx;
-            }
-
-            return retsn;
-
-        }
-
-        public bool InitializeGridLayout(bool UsingGrouping, bool ShowFTEs, bool ShowGantt, DateTime dtMin, DateTime dtMax, List<SortFieldDefn> DetCol, int DetFreeze)
-        {
-
-            bool UseCols = false;
-
-            if (DetFreeze == 0)
-                UseCols = true;
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateStringAttr("Grouping", "0");
-
-            if (UsingGrouping)
-                xCfg.CreateStringAttr("MainCol", "xGrouping");
-
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("ExportFormat", 1);
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            xCfg.CreateIntAttr("LeftWidth", 400);
-
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 200);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 1);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-
-            CStruct m_xDef;
-            CStruct m_xDefTree;
-
-            m_xDef = xGrid.CreateSubStruct("Def");
-
-            m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
-
-
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
-
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateStringAttr("HoverRow", "Color");
-            //xCfg.CreateStringAttr("FocusCell", "");
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateIntAttr("NoColorState", 1);
-            //xCfg.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            //xCfg.CreateIntAttr("FocusWholeRow", 1);
-            if (ShowGantt)
-            {
-
-                xCfg.CreateStringAttr("ScrollLeft", "0");
-            }
-
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-            m_xPeriodCols = xGrid.CreateSubStruct("RightCols");
-     //       m_xPeriodCols = xCols;
-            CStruct xHead = xGrid.CreateSubStruct("Head");
-            m_xHeader1 = xHead.CreateSubStruct("Header");
-            m_xHeader2 = xHead.CreateSubStruct("Header");
-
-            m_xHeader2.CreateStringAttr("id", "Header");
-            m_xHeader2.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateIntAttr("Spanned", -1);
-            m_xHeader1.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
-            m_xHeader2.CreateStringAttr("HoverCell", "Color");
-            m_xHeader2.CreateStringAttr("HoverRow", "");
-            // Add category column
-            CStruct xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "Select");
-            xC.CreateStringAttr("Type", "Bool");
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateStringAttr("Width", "20");
-            m_xHeader1.CreateStringAttr("Select", " ");
-            m_xHeader2.CreateStringAttr("Select", " ");
-
-            if (UsingGrouping)
-            {
-
-                xC = xLeftCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "xGrouping");
-                xC.CreateStringAttr("Type", "Text");
-                //xC.CreateIntAttr("Width", 250);
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr("xGrouping", " ");
-                m_xHeader2.CreateStringAttr("xGrouping", "Grouping");
-            }
-
-
-            foreach (SortFieldDefn sng in DetCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-                sn = RemoveNastyCharacters(sn);
-
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
-
-                if (isp == -1)
-                {
-                    h1 = " ";
-                    h2 = sng.name;
-                }
-                else
-                {
-                    h1 = sng.name.Substring(0, isp);
-                    h2 = sng.name.Substring(isp + 1);
-                }
-                if (UseCols)
-                    xC = xCols.CreateSubStruct("C");
-                else
-                    xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", sn);
-                if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    xC.CreateStringAttr("Type", "Date");
-                    xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                }
-                else if (sng.fid == (int)FieldIDs.FTOT_FID || sng.fid == (int)FieldIDs.DTOT_FID)
-                {
-                    xC.CreateStringAttr("Type", "Float");
-                    xC.CreateStringAttr("Format", ",#.##");
-
-                }
-                else
-                    xC.CreateStringAttr("Type", "Text");
-
-                xC.CreateIntAttr("CanMove", 0);
-
-                if (sng.selected == 0)
-                {
-                    xC.CreateIntAttr("Width", 0);
-                    //         xC.CreateIntAttr("Hidden", 1);
-                }
-
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr(sn, h1);
-                m_xHeader2.CreateStringAttr(sn, h2);
-
-                if (sng.fid == DetFreeze)
-                    UseCols = true;
-            }
-
-
-            if (ShowGantt == false)
-                return true;
-
-            xC = m_xPeriodCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "G");
-            xC.CreateStringAttr("Type", "Gantt");
-            xC.CreateStringAttr("GanttObject", "Main");
-
-            xC.CreateStringAttr("CanExport", "0");
-
-            xC.CreateIntAttr("GanttLap", 1);
-            xC.CreateStringAttr("GanttStart", "Start");
-            xC.CreateStringAttr("GanttEnd", "Finish");
-     //       xC.CreateStringAttr("GanttComplete", "0");
-
-
-
-            xC.CreateStringAttr("GanttUnits", "d");
-            xC.CreateStringAttr("GanttChartRound", "w");
-
-
-            xC.CreateStringAttr("GanttRight", "1");
-            xC.CreateStringAttr("GanttSlack", "Slack");
-            xC.CreateStringAttr("GanttHeader1", "y#yy");
-            xC.CreateStringAttr("GanttHeader2", "M#MMM");
-
-  //          xC.CreateStringAttr("GanttZoom", "Zoom1");
- 
- //           xC.CreateStringAttr("GanttRight", "1");
- //           xC.CreateStringAttr("GanttLeft", "0");
- //           xC.CreateStringAttr("GanttEndLast", "0");
-            xC.CreateStringAttr("GanttChartMinStart", dtMin.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMinEnd", dtMax.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMaxStart", dtMin.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMaxEnd", dtMax.ToString("MM/dd/yyyy"));
-
- //           xC.CreateIntAttr("GanttEditStartMove", 1);
-  //           xC.CreateStringAttr("GanttResizeDelete", "0");
-
-             
-                    
-
-            m_xHeader1.CreateStringAttr("G", " ");
-
-            CStruct xZoom = xGrid.CreateSubStruct("Zoom");
-
-            CStruct xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom1");
-            xZ.CreateStringAttr("GanttUnits", "M6");
-            //xZ.CreateStringAttr("GanttWidth", "100");
-            xZ.CreateStringAttr("GanttWidth", "60");
-            //          xZ.CreateStringAttr("GanttWidthEx", "101");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "y#yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M6#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom2");
-            //xZ.CreateStringAttr("GanttWidth", "200");
-            xZ.CreateStringAttr("GanttWidth", "40");
-            //          xZ.CreateStringAttr("GanttWidthEx", "101");
-            xZ.CreateStringAttr("GanttUnits", "M3");
-            xZ.CreateStringAttr("GanttChartRound", "y");
-            xZ.CreateStringAttr("GanttHeader1", "y#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M3#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom3");
-            xZ.CreateStringAttr("GanttUnits", "M");
-            xZ.CreateStringAttr("GanttWidth", "50");
-            //         xZ.CreateStringAttr("GanttWidthEx", "150");
-            xZ.CreateStringAttr("GanttChartRound", "y");
-            xZ.CreateStringAttr("GanttHeader1", "M6# MMM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom4");
-            xZ.CreateStringAttr("GanttUnits", "M");
-            //xZ.CreateStringAttr("GanttWidth", "90");
-            xZ.CreateStringAttr("GanttWidth", "50");
-            //         xZ.CreateStringAttr("GanttWidthEx", "50");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M3#MM");
-            xZ.CreateStringAttr("GanttHeader2", "M#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom5");
-            xZ.CreateStringAttr("GanttUnits", "d");
-            //xZ.CreateStringAttr("GanttWidth", "10");
-            xZ.CreateStringAttr("GanttWidth", "6");
-            //         xZ.CreateStringAttr("GanttWidthEx", "20");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "w#dd");
-
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom6");
-            xZ.CreateStringAttr("GanttUnits", "d");
-            xZ.CreateStringAttr("GanttWidth", "20");
-            //        xZ.CreateStringAttr("GanttWidthEx", "50");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "d#dd");
-
-
-            return true;
-        }
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs, bool bUseQTY, bool bUseCost, bool bShowdeccosts)
-        {
-            CStruct xC = null;
-
-            if (bUseQTY && bUseCost)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "VSpan", "2");
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else if (bUseQTY)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else
-                m_xHeader1.CreateStringAttr("P" + sId + "C", sName);
-
-
-            if (bUseQTY)
-            {
-
-                if (ShowFTEs)
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " FTE ");
-                else
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " Qty ");
-            }
-
-            if (bUseCost)
-                m_xHeader2.CreateStringAttr("P" + sId + "C", " Cost ");
-
-            if (bUseQTY)
-            {
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "V");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", "#.##");
-            }
-            //xC.CreateBooleanAttr("CanEdit", true);
-            if (bUseCost)
-            {
-
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "C");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                //             xC.CreateStringAttr("Format", "#.##");
-                xC.CreateStringAttr("Format", (bShowdeccosts ? ",#.00;-,#.00;0" : ",0"));
-            }
-            //xC.CreateBooleanAttr("CanEdit", false);
-
-        }
-        public void FinalizeGridLayout()
-        {
-            //m_xTabber.CreateStringAttr("Cells", m_sTabCells);
-
-
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class TopGridCostsData
-    {
-        private CStruct xGrid;
-        private CStruct[] m_xLevels = new CStruct[64];
-        private int m_nLevel = 0;
-
-        private string RemoveNastyCharacters(string sn)
-        {
-
-            string retsn = "";
-            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
-
-            sn = sn.Replace(" ", "");
-            sn = sn.Replace("'", "");
-            sn = sn.Replace("\r", "");
-            sn = sn.Replace("\n", "");
-            sn = sn.Replace("\"", "");
-            sn = sn.Replace("\\", "");
-
-            for (int i = 0; i < sn.Length; i++)
-            {
-                string sx = sn.Substring(i, 1);
-
-                if (sNastyChars.IndexOf(sx) == -1)
-                    retsn += sx;
-            }
-
-            return retsn;
-
-        }
-
-        public bool InitializeGridData()
-        {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            //xCfg.CreateStringAttr("id", "EditCostsGrid");
-            //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            m_nLevel = 0;
-            m_xLevels[m_nLevel] = xI;
-            return true;
-        }
-        public void AddDetailRow(DetailRowData oDet, int rID, bool UsingGrouping, bool ShowFTEs, bool ShowGantt, List<SortFieldDefn> DetCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowcostdec)
-        {
-            CStruct xIParent = m_xLevels[oDet.m_lev - 1];
-            CStruct xI = xIParent.CreateSubStruct("I");
-
-            bool bCellhtml = false;
-
-            m_xLevels[oDet.m_lev] = xI;
-            xI.CreateStringAttr("id", rID.ToString());
-            if (oDet.bRealone == false)
-            {
-
-        //        xI.CreateStringAttr("Color", "0xDADCDD");             //     "204,236,255");
-
-                //if (ShowGantt)
-                //    bCellhtml = true;
-                //else
-                //{
-
-                //    xI.CreateStringAttr("HtmlPrefix", "<B>");
-                //    xI.CreateStringAttr("HtmlPostfix", "</B>");
-                //}
-
-            }
-            else
-            {
-                xI.CreateStringAttr("Color", "255,255,255");
-
-            }
-
-        //    xI.CreateStringAttr("Color", "255,255,255");
-
-            xI.CreateStringAttr("Select", (oDet.bSelected ? "1" : "0"));
-            xI.CreateBooleanAttr("SelectCanEdit", true);
-             xI.CreateBooleanAttr("CanEdit", false);
-
-            if (oDet.m_lev != 1)
-                xI.CreateIntAttr("CanFilter", 2);
-
-
-            if (UsingGrouping)
-            {
-                xI.CreateStringAttr("xGrouping", oDet.sName);
-                if (bCellhtml)
-                {
-
-                    xI.CreateStringAttr("GroupingHtmlPrefix", "<B>");
-                    xI.CreateStringAttr("GroupingHtmlPostfix", "</B>");
-                }
-
-            }
-
-
-            foreach (SortFieldDefn sng in DetCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-                sn = RemoveNastyCharacters(sn);
- 
-
-                //if (bCellhtml)
-                //{
-
-                //    xI.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-                //    xI.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-                //}
-
-             //   if (oDet.bRealone == false)
-            //        xI.CreateStringAttr(sn + "Color", "0xDADCDD");  
-
-
-                if (sng.fid == (int)FieldIDs.SD_FID)
-                {
-
-                    if (oDet.Det_Start != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Start.ToShortDateString());
-
-                }
-                else if (sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    if (oDet.Det_Finish != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Finish.ToShortDateString());
-                }
-
-                else if (sng.fid == (int)FieldIDs.FTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot1.ToString());
-
-                else if (sng.fid == (int)FieldIDs.DTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot2.ToString());
-                else if (sng.fid == (int)FieldIDs.PI_FID)
-                    xI.CreateStringAttr(sn, oDet.PI_Name);
-
-                else if (sng.fid == (int)FieldIDs.CT_FID)
-                    xI.CreateStringAttr(sn, oDet.CT_Name);
-
-                else if (sng.fid == (int)FieldIDs.SCEN_FID)
-                    xI.CreateStringAttr(sn, oDet.Scen_Name);
-
-                else if (sng.fid == (int)FieldIDs.BC_FID)
-                    xI.CreateStringAttr(sn, oDet.Cat_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLC_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCatName);
-
-                else if (sng.fid == (int)FieldIDs.CAT_FID)
-                    xI.CreateStringAttr(sn, oDet.CC_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLCAT_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCCName);
-
-                else if (sng.fid == (int)FieldIDs.BC_ROLE)
-                    xI.CreateStringAttr(sn, oDet.Role_Name);
-
-                else if (sng.fid == (int)FieldIDs.MC_FID)
-                    xI.CreateStringAttr(sn, oDet.MC_Name);
-
-                else if (sng.fid >= 11801 && sng.fid <= 11805)
-                    xI.CreateStringAttr(sn, oDet.Text_OCVal[sng.fid - 11800]);
-
-                else if (sng.fid >= 11811 && sng.fid <= 11815)
-                    xI.CreateStringAttr(sn, oDet.TXVal[sng.fid - 11810]);
-                else if (sng.fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && sng.fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                {
-
-                    if (oDet.m_PI_Format_Extra_data != null)
-                        xI.CreateStringAttr(sn, oDet.m_PI_Format_Extra_data[sng.fid - (int)FieldIDs.PI_USE_EXTRA]);
-                }
-                else
-                    xI.CreateStringAttr(sn, " ");
-
-            }
-
-
-
-                xI.CreateIntAttr("NoColorState", 1);
-
-
-            if (ShowGantt)
-            {
-                if (oDet.bGotChildren == false)
-                     xI.CreateStringAttr("GGanttClass", "GanttBlue");
-
-
-                return;
-            }
-
-            for (int i = minp; i <= maxp; i++)
-            {
-
-                if (bUseQTY)
-                {
-                    if (ShowFTEs)
-                    {
-                        if (oDet.zFTE[i] != double.MinValue)
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zFTE[i]);
-                    }
-                    else
-                    {
-                        if (oDet.zValue[i] != double.MinValue)
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zValue[i]);
-                    }
-                }
-
-                if (bUseCost)
-                {
-                    double dcost = oDet.zCost[i];
-
-                    if (bshowcostdec == false)
-                        dcost = Math.Floor(dcost);
-
-                    if (oDet.zCost[i] != double.MinValue)
-                        xI.CreateDoubleAttr("P" + i.ToString() + "C", dcost);
-                }
-            }
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-
-
-    internal class TopGrid
-    {
-        private CStruct xGrid;
-        private CStruct m_xPeriodCols;
-        private CStruct m_xHeader1;
-        private CStruct m_xHeader2;
-        private CStruct[] m_xLevels = new CStruct[64];
-        private int m_nLevel = 0;
-
-        private string RemoveNastyCharacters(string sn)
-        {
-
-            string retsn = "";
-            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
-
-            sn = sn.Replace(" ", "");
-            sn = sn.Replace("'", "");
-            sn = sn.Replace("\r", "");
-            sn = sn.Replace("\n", "");
-            sn = sn.Replace("\"", "");
-            sn = sn.Replace("\\", "");
-
-            for (int i = 0; i < sn.Length; i++)
-            {
-                string sx = sn.Substring(i, 1);
-
-                if (sNastyChars.IndexOf(sx) == -1)
-                    retsn += sx;
-            }
-
-            return retsn;
-
-        }
-
-        public bool InitializeGridLayout(bool UsingGrouping, bool ShowFTEs, bool ShowGantt, DateTime dtMin, DateTime dtMax, List<SortFieldDefn> DetCol, int DetFreeze)
-        {
-
-            bool UseCols = false;
-
-            if (DetFreeze == 0)
-                UseCols = true;
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateStringAttr("Grouping", "0");
-
-
-            xCfg.CreateIntAttr("Sorting", 0);
-            xCfg.CreateStringAttr("Filtering", "0");
-
-            
-
-            if (UsingGrouping)
-                xCfg.CreateStringAttr("MainCol", "xGrouping");
-
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("ExportFormat", 1);
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            xCfg.CreateIntAttr("LeftWidth", 400);
-
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 200);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 1);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-
-            CStruct m_xDef;
-            CStruct m_xDefTree;
-
-            m_xDef = xGrid.CreateSubStruct("Def");
-
-            m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
-
-
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
-
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateStringAttr("HoverRow", "Color");
-            //xCfg.CreateStringAttr("FocusCell", "");
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateIntAttr("NoColorState", 1);
-            //xCfg.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            //xCfg.CreateIntAttr("FocusWholeRow", 1);
-            if (ShowGantt)
-            {
-
-                xCfg.CreateStringAttr("ScrollLeft", "0");
-            }
-
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-            m_xPeriodCols = xGrid.CreateSubStruct("RightCols");
-            //       m_xPeriodCols = xCols;
-            CStruct xHead = xGrid.CreateSubStruct("Head");
-            m_xHeader1 = xHead.CreateSubStruct("Header");
-            m_xHeader2 = xHead.CreateSubStruct("Header");
-
-            m_xHeader2.CreateStringAttr("id", "Header");
-            m_xHeader2.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateIntAttr("Spanned", -1);
-            m_xHeader1.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
-            m_xHeader2.CreateStringAttr("HoverCell", "Color");
-            m_xHeader2.CreateStringAttr("HoverRow", "");
-            // Add category column
-            CStruct xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "Select");
-            xC.CreateStringAttr("Type", "Bool");
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateStringAttr("Width", "20");
-            m_xHeader1.CreateStringAttr("Select", " ");
-            m_xHeader2.CreateStringAttr("Select", " ");
-
-            if (UsingGrouping)
-            {
-
-                xC = xLeftCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "xGrouping");
-                xC.CreateStringAttr("Type", "Text");
-                //xC.CreateIntAttr("Width", 250);
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr("xGrouping", " ");
-                m_xHeader2.CreateStringAttr("xGrouping", "Grouping");
-            }
-
-
-            foreach (SortFieldDefn sng in DetCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-                sn = RemoveNastyCharacters(sn);
-
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
-
-                if (isp == -1)
-                {
-                    h1 = " ";
-                    h2 = sng.name;
-                }
-                else
-                {
-                    h1 = sng.name.Substring(0, isp);
-                    h2 = sng.name.Substring(isp + 1);
-                }
-                if (UseCols)
-                    xC = xCols.CreateSubStruct("C");
-                else
-                    xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", sn);
-                if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    xC.CreateStringAttr("Type", "Date");
-                    xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                }
-                else if (sng.fid == (int)FieldIDs.FTOT_FID || sng.fid == (int)FieldIDs.DTOT_FID)
-                {
-                    xC.CreateStringAttr("Type", "Float");
-                    xC.CreateStringAttr("Format", ",#.##");
-
-                }
-                else
-                    xC.CreateStringAttr("Type", "Text");
-
-                xC.CreateIntAttr("CanMove", 0);
-
-                if (sng.selected == 0)
-                {
-                    xC.CreateIntAttr("Width", 0);
-                    //         xC.CreateIntAttr("Hidden", 1);
-                }
-
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr(sn, h1);
-                m_xHeader2.CreateStringAttr(sn, h2);
-
-                if (sng.fid == DetFreeze)
-                    UseCols = true;
-            }
-
-
-            if (ShowGantt == false)
-                return true;
-
-            xC = m_xPeriodCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "G");
-            xC.CreateStringAttr("Type", "Gantt");
-            xC.CreateStringAttr("GanttObject", "Main");
-
-            xC.CreateStringAttr("CanExport", "0");
-
-            xC.CreateIntAttr("GanttLap", 1);
-            xC.CreateStringAttr("GanttStart", "Start");
-            xC.CreateStringAttr("GanttEnd", "Finish");
-            //       xC.CreateStringAttr("GanttComplete", "0");
-
-
-
-            xC.CreateStringAttr("GanttUnits", "d");
-            xC.CreateStringAttr("GanttChartRound", "w");
-
-
-            xC.CreateStringAttr("GanttRight", "1");
-            xC.CreateStringAttr("GanttSlack", "Slack");
-            xC.CreateStringAttr("GanttHeader1", "y#yy");
-            xC.CreateStringAttr("GanttHeader2", "M#MMM");
-
-            //          xC.CreateStringAttr("GanttZoom", "Zoom1");
-
-            //           xC.CreateStringAttr("GanttRight", "1");
-            //           xC.CreateStringAttr("GanttLeft", "0");
-            //           xC.CreateStringAttr("GanttEndLast", "0");
-            xC.CreateStringAttr("GanttChartMinStart", dtMin.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMinEnd", dtMax.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMaxStart", dtMin.ToString("MM/dd/yyyy"));
-            xC.CreateStringAttr("GanttChartMaxEnd", dtMax.ToString("MM/dd/yyyy"));
-
-            //           xC.CreateIntAttr("GanttEditStartMove", 1);
-            //           xC.CreateStringAttr("GanttResizeDelete", "0");
-
-
-
-
-            m_xHeader1.CreateStringAttr("G", " ");
-
-            CStruct xZoom = xGrid.CreateSubStruct("Zoom");
-
-            CStruct xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom1");
-            xZ.CreateStringAttr("GanttUnits", "M6");
-            //xZ.CreateStringAttr("GanttWidth", "100");
-            xZ.CreateStringAttr("GanttWidth", "60");
-            //          xZ.CreateStringAttr("GanttWidthEx", "101");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "y#yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M6#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom2");
-            //xZ.CreateStringAttr("GanttWidth", "200");
-            xZ.CreateStringAttr("GanttWidth", "40");
-            //          xZ.CreateStringAttr("GanttWidthEx", "101");
-            xZ.CreateStringAttr("GanttUnits", "M3");
-            xZ.CreateStringAttr("GanttChartRound", "y");
-            xZ.CreateStringAttr("GanttHeader1", "y#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M3#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom3");
-            xZ.CreateStringAttr("GanttUnits", "M");
-            xZ.CreateStringAttr("GanttWidth", "50");
-            //         xZ.CreateStringAttr("GanttWidthEx", "150");
-            xZ.CreateStringAttr("GanttChartRound", "y");
-            xZ.CreateStringAttr("GanttHeader1", "M6# MMM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "M#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom4");
-            xZ.CreateStringAttr("GanttUnits", "M");
-            //xZ.CreateStringAttr("GanttWidth", "90");
-            xZ.CreateStringAttr("GanttWidth", "50");
-            //         xZ.CreateStringAttr("GanttWidthEx", "50");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M3#MM");
-            xZ.CreateStringAttr("GanttHeader2", "M#MMM");
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom5");
-            xZ.CreateStringAttr("GanttUnits", "d");
-            //xZ.CreateStringAttr("GanttWidth", "10");
-            xZ.CreateStringAttr("GanttWidth", "6");
-            //         xZ.CreateStringAttr("GanttWidthEx", "20");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "w#dd");
-
-
-            xZ = xZoom.CreateSubStruct("Z");
-            xZ.CreateStringAttr("Name", "Zoom6");
-            xZ.CreateStringAttr("GanttUnits", "d");
-            xZ.CreateStringAttr("GanttWidth", "20");
-            //        xZ.CreateStringAttr("GanttWidthEx", "50");
-            xZ.CreateStringAttr("GanttChartRound", "M");
-            xZ.CreateStringAttr("GanttHeader1", "M#MM yyyy");
-            xZ.CreateStringAttr("GanttHeader2", "d#dd");
-
-
-            return true;
-        }
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs, bool bUseQTY, bool bUseCost, bool bShowdeccosts)
-        {
-            CStruct xC = null;
-
-            if (bUseQTY && bUseCost)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "VSpan", "2");
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else if (bUseQTY)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else
-                m_xHeader1.CreateStringAttr("P" + sId + "C", sName);
-
-
-            if (bUseQTY)
-            {
-
-                if (ShowFTEs)
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " FTE ");
-                else
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " Qty ");
-            }
-
-            if (bUseCost)
-                m_xHeader2.CreateStringAttr("P" + sId + "C", " Cost ");
-
-            if (bUseQTY)
-            {
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "V");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", "#.##");
-            }
-            //xC.CreateBooleanAttr("CanEdit", true);
-            if (bUseCost)
-            {
-
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "C");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                //             xC.CreateStringAttr("Format", "#.##");
-                xC.CreateStringAttr("Format", (bShowdeccosts ? ",#.00;-,#.00;0" : ",0"));
-            }
-            //xC.CreateBooleanAttr("CanEdit", false);
-
-        }
-        public void FinalizeGridLayout()
-        {
-  
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-        public bool InitializeGridData()
-        {
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            m_nLevel = 0;
-            m_xLevels[m_nLevel] = xI;
-            return true;
-        }
-        public void AddDetailRow(DetailRowData oDet, int rID, bool UsingGrouping, bool ShowFTEs, bool ShowGantt, List<SortFieldDefn> DetCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowcostdec)
-        {
-            CStruct xIParent = m_xLevels[oDet.m_lev - 1];
-            CStruct xI = xIParent.CreateSubStruct("I");
-
-            bool bCellhtml = false;
-
-            m_xLevels[oDet.m_lev] = xI;
-            xI.CreateStringAttr("id", rID.ToString());
-            if (oDet.bRealone == false)
-            {
-
-
-            }
-            else
-            {
-                xI.CreateStringAttr("Color", "255,255,255");
-
-            }
-
-
-
-            xI.CreateStringAttr("Select", (oDet.bSelected ? "1" : "0"));
-            xI.CreateBooleanAttr("SelectCanEdit", true);
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            if (oDet.m_lev != 1)
-                xI.CreateIntAttr("CanFilter", 2);
-
-
-            if (UsingGrouping)
-            {
-                xI.CreateStringAttr("xGrouping", oDet.sName);
-                if (bCellhtml)
-                {
-
-                    xI.CreateStringAttr("GroupingHtmlPrefix", "<B>");
-                    xI.CreateStringAttr("GroupingHtmlPostfix", "</B>");
-                }
-
-            }
-
-
-            foreach (SortFieldDefn sng in DetCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-                sn = RemoveNastyCharacters(sn);
-
-                if (sng.fid == (int)FieldIDs.SD_FID)
-                {
-
-                    if (oDet.Det_Start != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Start.ToShortDateString());
-
-                }
-                else if (sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    if (oDet.Det_Finish != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Finish.ToShortDateString());
-                }
-
-                else if (sng.fid == (int)FieldIDs.FTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot1.ToString());
-
-                else if (sng.fid == (int)FieldIDs.DTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot2.ToString());
-                else if (sng.fid == (int)FieldIDs.PI_FID)
-                    xI.CreateStringAttr(sn, oDet.PI_Name);
-
-                else if (sng.fid == (int)FieldIDs.CT_FID)
-                    xI.CreateStringAttr(sn, oDet.CT_Name);
-
-                else if (sng.fid == (int)FieldIDs.SCEN_FID)
-                    xI.CreateStringAttr(sn, oDet.Scen_Name);
-
-                else if (sng.fid == (int)FieldIDs.BC_FID)
-                    xI.CreateStringAttr(sn, oDet.Cat_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLC_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCatName);
-
-                else if (sng.fid == (int)FieldIDs.CAT_FID)
-                    xI.CreateStringAttr(sn, oDet.CC_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLCAT_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCCName);
-
-                else if (sng.fid == (int)FieldIDs.BC_ROLE)
-                    xI.CreateStringAttr(sn, oDet.Role_Name);
-
-                else if (sng.fid == (int)FieldIDs.MC_FID)
-                    xI.CreateStringAttr(sn, oDet.MC_Name);
-
-                else if (sng.fid >= 11801 && sng.fid <= 11805)
-                    xI.CreateStringAttr(sn, oDet.Text_OCVal[sng.fid - 11800]);
-
-                else if (sng.fid >= 11811 && sng.fid <= 11815)
-                    xI.CreateStringAttr(sn, oDet.TXVal[sng.fid - 11810]);
-                else if (sng.fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && sng.fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                {
-
-                    if (oDet.m_PI_Format_Extra_data != null)
-                        xI.CreateStringAttr(sn, oDet.m_PI_Format_Extra_data[sng.fid - (int)FieldIDs.PI_USE_EXTRA]);
-                }
-                else
-                    xI.CreateStringAttr(sn, " ");
-
-            }
-
-
-
-            xI.CreateIntAttr("NoColorState", 1);
-
-
-            if (ShowGantt)
-            {
-                if (oDet.bGotChildren == false)
-                    xI.CreateStringAttr("GGanttClass", "GanttBlue");
-
-
-                return;
-            }
-
-            for (int i = minp; i <= maxp; i++)
-            {
-
-                if (bUseQTY)
-                {
-                    if (ShowFTEs)
-                    {
-                        if (oDet.zFTE[i] != double.MinValue)
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zFTE[i]);
-                    }
-                    else
-                    {
-                        if (oDet.zValue[i] != double.MinValue)
-                            xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zValue[i]);
-                    }
-                }
-
-                if (bUseCost)
-                {
-                    double dcost = oDet.zCost[i];
-
-                    if (bshowcostdec == false)
-                        dcost = Math.Floor(dcost);
-
-                    if (oDet.zCost[i] != double.MinValue)
-                        xI.CreateDoubleAttr("P" + i.ToString() + "C", dcost);
-                }
-            }
-        }
-
-    }
-
-    internal class BottomGrid
-    {
-        private CStruct xGrid;
-        private CStruct m_xPeriodCols;
-        private CStruct m_xHeader1;
-        private CStruct m_xHeader2;
-         private CStruct[] m_xLevels = new CStruct[64];
-        private int m_nLevel = 0;
-
-        public bool InitializeGridLayout(bool UsingGrouping, List<SortFieldDefn> TotCol, int TotFreeze)
-        {
-            bool UseCols = false;
-
-            if (TotFreeze == 0)
-                UseCols = true;
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
-            if (UsingGrouping)
-                xCfg.CreateStringAttr("MainCol", "Grouping");
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            //xCfg.CreateIntAttr("MaxHeight", 1);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            //xCfg.CreateStringAttr("IdNames", "Grouping");
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            //        xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("LeftWidth", 400);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateStringAttr("HoverRow", "Color");
-            //xCfg.CreateStringAttr("FocusCell", "");
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateIntAttr("NoColorState", 1);
-            //xCfg.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-
-            CStruct m_xDef;
-            CStruct m_xDefTree;
-
-            m_xDef = xGrid.CreateSubStruct("Def");
-
-            m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
-
-
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-
-            m_xPeriodCols = xGrid.CreateSubStruct("RightCols");
-            //m_xPeriodCols = xCols;
-            CStruct xHead = xGrid.CreateSubStruct("Head");
-            m_xHeader1 = xHead.CreateSubStruct("Header");
-            m_xHeader1.CreateIntAttr("CategoryVisible", -1);
-            m_xHeader1.CreateIntAttr("Spanned", -1);
-            m_xHeader1.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader2 = xHead.CreateSubStruct("Header");
-            m_xHeader2.CreateStringAttr("id", "Header");
-            m_xHeader2.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
-            m_xHeader2.CreateStringAttr("HoverCell", "Color");
-            m_xHeader2.CreateStringAttr("HoverRow", "");
-
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 200);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 1);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-
-            // Add category column
-            CStruct xC = xLeftCols.CreateSubStruct("C");
-
-            if (UsingGrouping)
-            {
-
-                xC = xLeftCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "Grouping");
-                xC.CreateStringAttr("Type", "Text");
-                //xC.CreateIntAttr("Width", 250);
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr("Grouping", " ");
-                m_xHeader2.CreateStringAttr("Grouping", "Grouping");
-            }
-
-
-            foreach (SortFieldDefn sng in TotCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
-
-                if (isp == -1)
-                {
-                    h1 = " ";
-                    h2 = sng.name;
-                }
-                else
-                {
-                    h1 = sng.name.Substring(0, isp);
-                    h2 = sng.name.Substring(isp + 1);
-                }
-                if (UseCols)
-                    xC = xCols.CreateSubStruct("C");
-                else
-                    xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", sn);
-                if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    xC.CreateStringAttr("Type", "Date");
-                    xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                }
-                else if (sng.fid == (int)FieldIDs.FTOT_FID || sng.fid == (int)FieldIDs.DTOT_FID)
-                {
-                    xC.CreateStringAttr("Type", "Float");
-                    xC.CreateStringAttr("Format", ",#.##");
-
-                }
-                else
-                    xC.CreateStringAttr("Type", "Text");
-
-                xC.CreateIntAttr("CanMove", 0);
-
-                if (sng.selected == 0)
-                {
-                    xC.CreateIntAttr("Width", 0);
-                    //         xC.CreateIntAttr("Hidden", 1);
-                }
-
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr(sn, h1);
-                m_xHeader2.CreateStringAttr(sn, h2);
-
-                if (sng.fid == TotFreeze)
-                    UseCols = true;
-            }
-
-
-
-            return true;
-        }
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs, bool bUseQTY, bool bUseCost, bool bShowdeccosts)
-        {
-
-
-            CStruct xC = null;
-
-            if (bUseQTY && bUseCost)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "VSpan", "2");
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else if (bUseQTY)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else
-                m_xHeader1.CreateStringAttr("P" + sId + "C", sName);
-
-
-            if (bUseQTY)
-            {
-
-                if (ShowFTEs)
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " FTE ");
-                else
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " Qty ");
-            }
-
-            if (bUseCost)
-                m_xHeader2.CreateStringAttr("P" + sId + "C", " Cost ");
-
-            if (bUseQTY)
-            {
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "V");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", "#.##");
-            }
-
-
-            if (bUseCost)
-            {
-
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "C");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", (bShowdeccosts ? ",#.00;-,#.00;0" : ",0"));
-            }
-        }
-        public void FinalizeGridLayout()
-        {
- 
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-   
-        public bool InitializeGridData(bool UsingGrouping)
-        {
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateStringAttr("Def", "Summary");
-            m_nLevel = 0;
-            m_xLevels[m_nLevel] = xI;
-            return true;
-        }
-        public void AddDetailRow(DetailRowData oDet, DetailRowData oTar, List<TargetColours> TargetColours, int rID, bool UsingGrouping, bool ShowFTEs, List<SortFieldDefn> TotCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowRemaining, bool bshowcostdec)
-        {
-            CStruct xIParent = m_xLevels[oDet.m_lev - 1];
-            CStruct xI = xIParent.CreateSubStruct("I");
-            m_xLevels[oDet.m_lev] = xI;
-            xI.CreateStringAttr("id", rID.ToString());
-            xI.CreateStringAttr("Color", "255,255,255");
-
-            xI.CreateBooleanAttr("CanEdit", false);
-            if (UsingGrouping)
-                xI.CreateStringAttr("Grouping", oDet.sName);
-
-            foreach (SortFieldDefn sng in TotCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-
-
-                if (sng.fid == (int)FieldIDs.SD_FID)
-                {
-
-                    if (oDet.Det_Start != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Start.ToShortDateString());
-
-                }
-                else if (sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    if (oDet.Det_Finish != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Finish.ToShortDateString());
-                }
-
-                else if (sng.fid == (int)FieldIDs.FTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot1.ToString());
-
-                else if (sng.fid == (int)FieldIDs.DTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot2.ToString());
-                else if (sng.fid == (int)FieldIDs.PI_FID)
-                    xI.CreateStringAttr(sn, oDet.PI_Name);
-
-                else if (sng.fid == (int)FieldIDs.CT_FID)
-                    xI.CreateStringAttr(sn, oDet.CT_Name);
-
-                else if (sng.fid == (int)FieldIDs.SCEN_FID)
-                    xI.CreateStringAttr(sn, oDet.Scen_Name);
-
-                else if (sng.fid == (int)FieldIDs.BC_FID)
-                    xI.CreateStringAttr(sn, oDet.Cat_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLC_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCatName);
-
-                else if (sng.fid == (int)FieldIDs.CAT_FID)
-                    xI.CreateStringAttr(sn, oDet.CC_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLCAT_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCCName);
-
-                else if (sng.fid == (int)FieldIDs.BC_ROLE)
-                    xI.CreateStringAttr(sn, oDet.Role_Name);
-
-                else if (sng.fid == (int)FieldIDs.MC_FID)
-                    xI.CreateStringAttr(sn, oDet.MC_Name);
-
-                else if (sng.fid >= 11801 && sng.fid <= 11805)
-                    xI.CreateStringAttr(sn, oDet.Text_OCVal[sng.fid - 11800]);
-
-                else if (sng.fid >= 11811 && sng.fid <= 11815)
-                    xI.CreateStringAttr(sn, oDet.TXVal[sng.fid - 11810]);
-                else
-                    xI.CreateStringAttr(sn, " ");
-
-            }
-
-
-            //xI.CreateStringAttr("CostCat", oDet.Cat_Name);
-            //xI.CreateStringAttr("FullCostCat", oDet.FullCatName);
-
-            //xI.CreateStringAttr("TotCost", oDet.m_tot1.ToString());
-            //xI.CreateStringAttr("DispCost", oDet.m_tot2.ToString());
-
-
-            //xI.CreateStringAttr("Def", "Row");
-
-            double t1, t2, p1, p2, xval;
-
-            string crgb = "", qrgb = "";
-
-
-
-            for (int i = minp; i <= maxp; i++)
-            {
-                if (bUseQTY)
-                {
-                    if (ShowFTEs)
-                    {
-
-                        t1 = oDet.zFTE[i];
-
-                        if (oTar != null)
-                            p1 = oTar.zFTE[i];
-                        else
-                            p1 = 0;
-
-                        xval = t1;
-
-                        if (bshowRemaining)
-                            xval -= p1;
-
-                        if (xval != 0)
-                            xI.CreateStringAttr("P" + i.ToString() + "V", xval.ToString("0.###"));
-                    }
-                    else
-                    {
-
-                        t1 = oDet.zValue[i];
-
-                        if (oTar != null)
-                            p1 = oTar.zValue[i];
-                        else
-                            p1 = 0;
-
-                        xval = t1;
-
-                        if (bshowRemaining)
-                            xval -= p1;
-
-                        if (xval != 0)
-                            xI.CreateStringAttr("P" + i.ToString() + "V", xval.ToString("0.##"));
-                    }
-
-                    if (t1 == 0 && p1 == 0)
-                        qrgb = TargetBackground(t1, 1, TargetColours);
-                    else
-                        qrgb = TargetBackground(t1, p1, TargetColours);
-
-
-                }
-
-                if (bUseCost)
-                {
-
-
-                    t2 = oDet.zCost[i];
-
-                    if (oTar != null)
-                        p2 = oTar.zCost[i];
-                    else
-                        p2 = 0;
-
-                    if (t2 == 0 && p2 == 0)
-                        crgb = TargetBackground(t2, 1, TargetColours);
-                    else
-                        crgb = TargetBackground(t2, p2, TargetColours);
-
-
-                    xval = t2;
-
-                    if (bshowRemaining)
-                        xval -= p2;
-
-                    //       if (oDet.zCost[i] != 0)
-
-                    if (bshowcostdec == false)
-                        xval = Math.Floor(xval);
-
-                    xI.CreateStringAttr("P" + i.ToString() + "C", xval.ToString("0.##"));
-                }
-
-
-
-                if (crgb != "" && bUseCost)
-                    xI.CreateStringAttr("P" + i.ToString() + "CColor", crgb);
-
-                if (qrgb != "" && bUseQTY)
-                    xI.CreateStringAttr("P" + i.ToString() + "VColor", qrgb);
-
-
-
-            }
-        }
-
-
-        private string TargetBackground(double Tdbl, double Pdbl, List<TargetColours> TargetColours)
-        {
-
-
-            string sRet = "RGB(217, 255, 255)";
-
-            int rgb = -1;
-
-            if (TargetColours == null)
-                return sRet;
-
-            if (TargetColours.Count == 0)
-                return sRet;
-
-            if (Tdbl == 0 && Pdbl == 0)
-            {
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -3)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else if (Tdbl == 0)
-            {
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -2)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else if (Pdbl == 0)
-            {
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -1)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-
-                double percnt;
-
-                percnt = (Tdbl / Pdbl) * 100;
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID > 0)
-                    {
-
-                        if ((percnt >= oT.low_val && percnt <= oT.high_val) || (oT.high_val == 0))
-                        {
-                            rgb = oT.rgb_val;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (rgb == -1)
-                return "";
-
-            return "RGB(" + (rgb & 0xFF).ToString() + "," + ((rgb & 0xFF00) >> 8).ToString() + "," + ((rgb & 0xFF0000) >> 16).ToString() + ")";
-        }
-    }
-
-
-
-    internal class BottomGridCostsLayout
-    {
-        private CStruct xGrid;
-        private CStruct m_xPeriodCols;
-        private CStruct m_xHeader1;
-        private CStruct m_xHeader2;
-
-
-        public bool InitializeGridLayout(bool UsingGrouping, List<SortFieldDefn> TotCol, int TotFreeze)
-        {
-            bool UseCols = false;
-
-            if (TotFreeze == 0)
-                UseCols = true;
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
-            if (UsingGrouping)
-                xCfg.CreateStringAttr("MainCol", "Grouping");
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            //xCfg.CreateIntAttr("MaxHeight", 1);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            //xCfg.CreateStringAttr("IdNames", "Grouping");
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            //        xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("LeftWidth", 400);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateStringAttr("HoverRow", "Color");
-            //xCfg.CreateStringAttr("FocusCell", "");
-            //xCfg.CreateStringAttr("HoverCell", "Color");
-            //xCfg.CreateIntAttr("NoColorState", 1);
-            //xCfg.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-
-            CStruct m_xDef;
-            CStruct m_xDefTree;
-
-            m_xDef = xGrid.CreateSubStruct("Def");
-
-            m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
-
-
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-
-            m_xPeriodCols = xGrid.CreateSubStruct("RightCols");
-            //m_xPeriodCols = xCols;
-            CStruct xHead = xGrid.CreateSubStruct("Head");
-            m_xHeader1 = xHead.CreateSubStruct("Header");
-            m_xHeader1.CreateIntAttr("CategoryVisible", -1);
-            m_xHeader1.CreateIntAttr("Spanned", -1);
-            m_xHeader1.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader2 = xHead.CreateSubStruct("Header");
-            m_xHeader2.CreateStringAttr("id", "Header");
-            m_xHeader2.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
-            m_xHeader2.CreateStringAttr("HoverCell", "Color");
-            m_xHeader2.CreateStringAttr("HoverRow", "");
-
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 200);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 1);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-
-            // Add category column
-            CStruct xC = xLeftCols.CreateSubStruct("C");
-
-            if (UsingGrouping)
-            {
-
-                xC = xLeftCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "Grouping");
-                xC.CreateStringAttr("Type", "Text");
-                //xC.CreateIntAttr("Width", 250);
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr("Grouping", " ");
-                m_xHeader2.CreateStringAttr("Grouping", "Grouping");
-            }
-
-
-            foreach (SortFieldDefn sng in TotCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-
-                string h1 = " ";
-                string h2 = " ";
-                int isp = sng.name.IndexOf(" ");
-
-                if (isp == -1)
-                {
-                    h1 = " ";
-                    h2 = sng.name;
-                }
-                else
-                {
-                    h1 = sng.name.Substring(0, isp);
-                    h2 = sng.name.Substring(isp + 1);
-                }
-                if (UseCols)
-                    xC = xCols.CreateSubStruct("C");
-                else
-                    xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", sn);
-                if (sng.fid == (int)FieldIDs.SD_FID || sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    xC.CreateStringAttr("Type", "Date");
-                    xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                }
-                else if (sng.fid == (int)FieldIDs.FTOT_FID || sng.fid == (int)FieldIDs.DTOT_FID)
-                {
-                    xC.CreateStringAttr("Type", "Float");
-                    xC.CreateStringAttr("Format", ",#.##");
-
-                }
-                else
-                    xC.CreateStringAttr("Type", "Text");
-
-                xC.CreateIntAttr("CanMove", 0);
-
-                if (sng.selected == 0)
-                {
-                    xC.CreateIntAttr("Width", 0);
-                    //         xC.CreateIntAttr("Hidden", 1);
-                }
-
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr(sn, h1);
-                m_xHeader2.CreateStringAttr(sn, h2);
-
-                if (sng.fid == TotFreeze)
-                    UseCols = true;
-            }
-
-
-
-            return true;
-        }
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs, bool bUseQTY, bool bUseCost, bool bShowdeccosts)
-        {
-
-
-            CStruct xC = null;
-
-            if (bUseQTY && bUseCost)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "VSpan", "2");
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else if (bUseQTY)
-            {
-                m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-            }
-            else
-                m_xHeader1.CreateStringAttr("P" + sId + "C", sName);
-
-
-            if (bUseQTY)
-            {
-
-                if (ShowFTEs)
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " FTE ");
-                else
-                    m_xHeader2.CreateStringAttr("P" + sId + "V", " Qty ");
-            }
-
-            if (bUseCost)
-                m_xHeader2.CreateStringAttr("P" + sId + "C", " Cost ");
-
-            if (bUseQTY)
-            {
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "V");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", "#.##");
-            }
-
-
-            if (bUseCost)
-            {
-
-                xC = m_xPeriodCols.CreateSubStruct("C");
-                xC.CreateStringAttr("Name", "P" + sId + "C");
-                xC.CreateStringAttr("Type", "Float");
-                xC.CreateIntAttr("CanMove", 0);
-                xC.CreateStringAttr("Format", (bShowdeccosts ? ",#.00;-,#.00;0" : ",0"));
-            }
-        }
-        public void FinalizeGridLayout()
-        {
-            //m_xTabber.CreateStringAttr("Cells", m_sTabCells);
-
-
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class BottomGridCostsData
-    {
-        private CStruct xGrid;
-        private CStruct[] m_xLevels = new CStruct[64];
-        private int m_nLevel = 0;
-        public bool InitializeGridData(bool UsingGrouping)
-        {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            //xCfg.CreateStringAttr("id", "EditCostsGrid");
-            //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
-
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateStringAttr("Def", "Summary");
-            m_nLevel = 0;
-            m_xLevels[m_nLevel] = xI;
-            return true;
-        }
-        public void AddDetailRow(DetailRowData oDet, DetailRowData oTar, List<TargetColours> TargetColours, int rID, bool UsingGrouping, bool ShowFTEs, List<SortFieldDefn> TotCol, int minp, int maxp, bool bUseQTY, bool bUseCost, bool bshowRemaining, bool bshowcostdec)
-        {
-            CStruct xIParent = m_xLevels[oDet.m_lev - 1];
-            CStruct xI = xIParent.CreateSubStruct("I");
-            m_xLevels[oDet.m_lev] = xI;
-            xI.CreateStringAttr("id", rID.ToString());
-            xI.CreateStringAttr("Color", "255,255,255");
-
-            xI.CreateBooleanAttr("CanEdit", false);
-            if (UsingGrouping)
-                xI.CreateStringAttr("Grouping", oDet.sName);
-
-            foreach (SortFieldDefn sng in TotCol)
-            {
-                string sn = sng.name.Replace(" ", "");
-
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
-
-
-                if (sng.fid == (int)FieldIDs.SD_FID)
-                {
-
-                    if (oDet.Det_Start != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Start.ToShortDateString());
-
-                }
-                else if (sng.fid == (int)FieldIDs.FD_FID)
-                {
-                    if (oDet.Det_Finish != DateTime.MinValue)
-                        xI.CreateStringAttr(sn, oDet.Det_Finish.ToShortDateString());
-                }
-
-                else if (sng.fid == (int)FieldIDs.FTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot1.ToString());
-
-                else if (sng.fid == (int)FieldIDs.DTOT_FID)
-                    xI.CreateStringAttr(sn, oDet.m_tot2.ToString());
-                else if (sng.fid == (int)FieldIDs.PI_FID)
-                    xI.CreateStringAttr(sn, oDet.PI_Name);
-
-                else if (sng.fid == (int)FieldIDs.CT_FID)
-                    xI.CreateStringAttr(sn, oDet.CT_Name);
-
-                else if (sng.fid == (int)FieldIDs.SCEN_FID)
-                    xI.CreateStringAttr(sn, oDet.Scen_Name);
-
-                else if (sng.fid == (int)FieldIDs.BC_FID)
-                    xI.CreateStringAttr(sn, oDet.Cat_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLC_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCatName);
-
-                else if (sng.fid == (int)FieldIDs.CAT_FID)
-                    xI.CreateStringAttr(sn, oDet.CC_Name);
-
-                else if (sng.fid == (int)FieldIDs.FULLCAT_FID)
-                    xI.CreateStringAttr(sn, oDet.FullCCName);
-
-                else if (sng.fid == (int)FieldIDs.BC_ROLE)
-                    xI.CreateStringAttr(sn, oDet.Role_Name);
-
-                else if (sng.fid == (int)FieldIDs.MC_FID)
-                    xI.CreateStringAttr(sn, oDet.MC_Name);
-
-                else if (sng.fid >= 11801 && sng.fid <= 11805)
-                    xI.CreateStringAttr(sn, oDet.Text_OCVal[sng.fid - 11800]);
-
-                else if (sng.fid >= 11811 && sng.fid <= 11815)
-                    xI.CreateStringAttr(sn, oDet.TXVal[sng.fid - 11810]);
-                else
-                    xI.CreateStringAttr(sn, " ");
-
-            }
-
-
-            //xI.CreateStringAttr("CostCat", oDet.Cat_Name);
-            //xI.CreateStringAttr("FullCostCat", oDet.FullCatName);
-
-            //xI.CreateStringAttr("TotCost", oDet.m_tot1.ToString());
-            //xI.CreateStringAttr("DispCost", oDet.m_tot2.ToString());
-
-
-            //xI.CreateStringAttr("Def", "Row");
-
-            double t1, t2, p1, p2, xval;
-
-            string crgb = "", qrgb = "";
-
-
-
-            for (int i = minp; i <= maxp; i++)
-            {
-                if (bUseQTY)
-                {
-                    if (ShowFTEs)
-                    {
-
-                        t1 = oDet.zFTE[i];
-
-                        if (oTar != null)
-                            p1 = oTar.zFTE[i];
-                        else
-                            p1 = 0;
-
-                        xval = t1;
-
-                        if (bshowRemaining)
-                            xval -= p1;
-
-                        if (xval != 0)
-                            xI.CreateStringAttr("P" + i.ToString() + "V", xval.ToString("0.###"));
-                    }
-                    else
-                    {
-
-                        t1 = oDet.zValue[i];
-
-                        if (oTar != null)
-                            p1 = oTar.zValue[i];
-                        else
-                            p1 = 0;
-
-                        xval = t1;
-
-                        if (bshowRemaining)
-                            xval -= p1;
-
-                        if (xval != 0)
-                            xI.CreateStringAttr("P" + i.ToString() + "V", xval.ToString("0.##"));
-                    }
-
-                    if (t1 == 0 && p1 == 0)
-                        qrgb = TargetBackground(t1, 1, TargetColours);
-                    else
-                        qrgb = TargetBackground(t1, p1, TargetColours);
-
-
-                }
-
-                if (bUseCost)
-                {
-
-
-                    t2 = oDet.zCost[i];
-
-                    if (oTar != null)
-                        p2 = oTar.zCost[i];
-                    else
-                        p2 = 0;
-
-                    if (t2 == 0 && p2 == 0)
-                        crgb = TargetBackground(t2, 1, TargetColours);
-                    else
-                        crgb = TargetBackground(t2, p2, TargetColours);
-
-
-                    xval = t2;
-
-                    if (bshowRemaining)
-                        xval -= p2;
-
-             //       if (oDet.zCost[i] != 0)
-
-                    if (bshowcostdec == false)
-                        xval = Math.Floor(xval);
-
-                        xI.CreateStringAttr("P" + i.ToString() + "C", xval.ToString("0.##"));
-                }
-
-
-
-                if (crgb != "" && bUseCost)
-                    xI.CreateStringAttr("P" + i.ToString() + "CColor", crgb);
-
-                if (qrgb != "" && bUseQTY)
-                    xI.CreateStringAttr("P" + i.ToString() + "VColor", qrgb);
-
-
-
-            }
-        }
-
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-
-
-        private string TargetBackground(double Tdbl, double Pdbl, List<TargetColours> TargetColours)
-        {
-
-
-            string sRet = "RGB(217, 255, 255)";
-
-            int rgb = -1;
-
-            if (TargetColours == null)
-                return sRet;
-
-            if (TargetColours.Count == 0)
-                return sRet;
-
-            if (Tdbl == 0 && Pdbl == 0)
-            {
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -3)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else if (Tdbl == 0)
-            {
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -2)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else if (Pdbl == 0)
-            {
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID == -1)
-                    {
-                        rgb = oT.rgb_val;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-
-                double percnt;
-
-                percnt = (Tdbl / Pdbl) * 100;
-
-                foreach (TargetColours oT in TargetColours)
-                {
-                    if (oT.ID > 0)
-                    {
-
-                        if ((percnt >= oT.low_val && percnt <= oT.high_val) || (oT.high_val == 0))
-                        {
-                            rgb = oT.rgb_val;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (rgb == -1)
-                return "";
-
-            return "RGB(" + (rgb & 0xFF).ToString() + "," + ((rgb & 0xFF00) >> 8).ToString() + "," + ((rgb & 0xFF0000) >> 16).ToString() + ")";
-        }
-    }
-
-
-    internal class FilterGridCostsLayout
-    {
-        private CStruct xGrid;
-
-        public void InitializeGridLayout()
-        {
-
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateStringAttr("MainCol", "Filtering");
-
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            //          xCfg.CreateIntAttr("MaxWidth", 1);
-            //          xCfg.CreateIntAttr("ConstHeight", 1);
-
-            xCfg.CreateIntAttr("ExactSize", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-
-
-
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            //xCfg.CreateIntAttr("LeftWidth", 200);
-            //xCfg.CreateIntAttr("Width", 300);
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-
-
-
-
-
-            CStruct xCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xHead = xGrid.CreateSubStruct("Header");
-
-            xHead.CreateIntAttr("Visible", 0);
-            // Add category column
-            CStruct xC = xCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "Select");
-            xC.CreateStringAttr("Type", "Bool");
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateStringAttr("Width", "20");
-            xHead.CreateStringAttr("Select", " ");
-
-            xC = xCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "Filtering");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("Width", 200);
-            xC.CreateBooleanAttr("CanEdit", false);
-            xHead.CreateStringAttr("Filtering", "Filter");
-        }
-
-
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class FilterGridCostsData
-    {
-        private CStruct xGrid;
-        private CStruct[] m_xLevels = new CStruct[64];
-        private int m_nLevel = 0;
-        public void InitializeGridData()
-        {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            m_nLevel = 0;
-            m_xLevels[m_nLevel] = xI;
-        }
-        public void AddRow(int rID, int level, string Name, bool Selected)
-        {
-            CStruct xIParent = null;
-
-            if (level != 0)
-                xIParent = m_xLevels[level - 1];
-            else
-                xIParent = m_xLevels[0];
-
-            CStruct xI = xIParent.CreateSubStruct("I");
-
-            if (level != 0)
-                m_xLevels[level] = xI;
-
-            xI.CreateStringAttr("id", rID.ToString());
-            if (level == 1)
-            {
-
-                xI.CreateStringAttr("Color", "204,236,255");
-                xI.CreateStringAttr("SelectType", "Text");
-                xI.CreateStringAttr("Select", " ");
-                xI.CreateBooleanAttr("SelectCanEdit", false);
-            }
-            else
-            {
-                xI.CreateStringAttr("Color", "254,254,254");
-
-                xI.CreateStringAttr("Select", (Selected ? "1" : "0"));
-                xI.CreateBooleanAttr("SelectCanEdit", true);
-            }
-
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateIntAttr("NoColorState", 1);
-
-
-
-            xI.CreateStringAttr("Filtering", Name);
-
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class TargetGridLayout
-    {
-        private CStruct xGrid;
-
-        private CStruct m_xHeader1;
-        private CStruct m_xHeader2;
-        private CStruct m_xPeriodCols;
-
-
-        public bool InitializeGridLayout(bool ShowFTEs, Dictionary<int, CustomFieldData> CustFields, int ratecount, string costtypejsonMenu, string costcatjsonMenu, int MC_Count)
-        {
-
-            CStruct xC = null;
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("ColResizing", 1);
-
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("ExportFormat", 1);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM"); 
-            
-
-
- 
-            //xCfg.CreateIntAttr("ConstHeight", 0);
-            //xCfg.CreateIntAttr("ConstWidth", 1);
-
-         // xCfg.CreateIntAttr("MaxHeight", 300);
-
-    //        xCfg.CreateIntAttr("ResizingMain", 3);
-    //        xCfg.CreateIntAttr("ResizingMainLap", 1);
-
-            
-
-     //       xCfg.CreateIntAttr("ShowVScroll", 1);
-
-     //       xCfg.CreateIntAttr("ExactSize", 0);
-                      
-
-
-
-
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateIntAttr("LeftWidth", 400);
-
-
-
-            xCfg.CreateIntAttr("SuppressCfg", 1);
-            xCfg.CreateIntAttr("PrintCols", 0);
-
-            xCfg.CreateIntAttr("Sorting", 0);
-
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            m_xPeriodCols = xGrid.CreateSubStruct("Cols");
-            //           m_xPeriodCols = xGrid.CreateSubStruct("RightCols");
-
-            CStruct xHead = xGrid.CreateSubStruct("Head");
-            m_xHeader1 = xHead.CreateSubStruct("Header");
-            m_xHeader2 = xHead.CreateSubStruct("Header");
-
-            m_xHeader2.CreateStringAttr("id", "Header");
-            m_xHeader2.CreateIntAttr("SortIcons", 0);
-
-            m_xHeader1.CreateIntAttr("Spanned", -1);
-            m_xHeader1.CreateIntAttr("SortIcons", 0);
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "Select");
-            xC.CreateStringAttr("Type", "Bool");
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateStringAttr("Width", "20");
-            m_xHeader1.CreateStringAttr("Select", " ");
-            m_xHeader2.CreateStringAttr("Select", " ");
-
-
-            xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "GroupVal");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateBooleanAttr("Visible", false);
-            m_xHeader1.CreateStringAttr("GroupVal", "Group");
-            m_xHeader2.CreateStringAttr("GroupVal", "Value");
-
-            // Add category column
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateStringAttr("Name", "CostType");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateStringAttr("Defaults", costtypejsonMenu);
-            m_xHeader1.CreateStringAttr("CostType", "Cost");
-            m_xHeader2.CreateStringAttr("CostType", "Type");
-
-
-            xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "CostCategory");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateStringAttr("Defaults", costcatjsonMenu);
-            m_xHeader1.CreateStringAttr("CostCategory", "Cost");
-            m_xHeader2.CreateStringAttr("CostCategory", "Category");
-
-            xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "MajorCategory");
-            xC.CreateBooleanAttr("CanEdit", false);
-
-            if (MC_Count <= 1)
-                xC.CreateIntAttr("Visible", 0);
-
-            m_xHeader1.CreateStringAttr("MajorCategory", "Major");
-            m_xHeader2.CreateStringAttr("MajorCategory", "Category");
-
-            xC = xLeftCols.CreateSubStruct("C");
-
-            xC.CreateStringAttr("Name", "Role");
-            xC.CreateBooleanAttr("CanEdit", false);
-            m_xHeader1.CreateStringAttr("Role", " ");
-            m_xHeader2.CreateStringAttr("Role", "Role");
-
-            if (ratecount != 0)
-            {
-
-                xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", "NamedRate");
-                xC.CreateBooleanAttr("CanEdit", false);
-                m_xHeader1.CreateStringAttr("NamedRate", "Named ");
-                m_xHeader2.CreateStringAttr("NamedRate", "Rate");
-            }
-
-
-            foreach (CustomFieldData oc in CustFields.Values)
-            {
-                xC = xLeftCols.CreateSubStruct("C");
-
-                xC.CreateStringAttr("Name", "z" + oc.Name);
-
-                if (oc.jsonMenu == "")
-                    xC.CreateBooleanAttr("CanEdit", true);
-                else
-                {
-                    xC.CreateBooleanAttr("CanEdit", false);
-                    xC.CreateStringAttr("Defaults", oc.jsonMenu);
-                }
-                m_xHeader1.CreateStringAttr("z" + oc.Name, " ");
-                m_xHeader2.CreateStringAttr("z" + oc.Name, oc.DisplayName);
-
-            }
-
-
-
-            return true;
-        }
-        public void AddPeriodColumn(string sId, string sName, bool ShowFTEs)
-        {
-            CStruct xC = null;
-
-            m_xHeader1.CreateStringAttr("P" + sId + "VSpan", "2");
-            m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
-
-            if (ShowFTEs)
-                m_xHeader2.CreateStringAttr("P" + sId + "V", " FTE ");
-            else
-                m_xHeader2.CreateStringAttr("P" + sId + "V", " Qty ");
-
-            m_xHeader2.CreateStringAttr("P" + sId + "C", " Cost ");
-
-            xC = m_xPeriodCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "P" + sId + "V");
-            xC.CreateStringAttr("Type", "Float");
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateStringAttr("Format", "0.###");
-
-            xC = m_xPeriodCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "P" + sId + "C");
-            xC.CreateStringAttr("Type", "Float");
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateStringAttr("Format", "#.##");
-
-        }
-        public void FinalizeGridLayout()
-        {
-            //m_xTabber.CreateStringAttr("Cells", m_sTabCells);
-
-
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class TargetGridsData
-    {
-        private CStruct xGrid;
-        private CStruct m_xIParentRoot;
-
-        public bool InitializeGridData()
-        {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            //xCfg.CreateStringAttr("id", "EditCostsGrid");
-            //xCfg.CreateStringAttr("id", "g_" + CostTypeId.ToString());
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            m_xIParentRoot = xI;
-            return true;
-        }
-        public void AddDetailRow(DetailRowData oDet, int rID, bool ShowFTEs, int maxp, Dictionary<int, CustomFieldData> CustFields, int ratecount)
-        {
-            CStruct xIParent = m_xIParentRoot;
-            CStruct xI = xIParent.CreateSubStruct("I");
- 
-            xI.CreateStringAttr("id", rID.ToString());
-    
-
-            xI.CreateStringAttr("CostType", oDet.CT_Name);
-            xI.CreateStringAttr("CostCategory", oDet.FullCatName);
-
-            xI.CreateStringAttr("CostTypeButton", "Defaults");
-            xI.CreateStringAttr("CostCategoryButton", "Defaults");
-
-            xI.CreateStringAttr("MajorCategory", oDet.MC_Name);
-            xI.CreateIntAttr("MajorCategoryCanEdit", 0);
-            xI.CreateStringAttr("Role", oDet.Role_Name);
-            xI.CreateIntAttr("RoleCanEdit", 0);
-            if (ratecount != 0)
-            {
-                xI.CreateStringAttr("NamedRate", oDet.m_rt_name);
-            }
-
-
-            foreach (CustomFieldData oc in CustFields.Values)
-            {
-                string stxt;
-
-                if (oc.FieldID < 11810)
-                    stxt = oDet.Text_OCVal[oc.FieldID - 11800];
-                else
-                    stxt = oDet.TXVal[oc.FieldID - 11810];
-
-                xI.CreateStringAttr("z" + oc.Name, stxt);
-
-                if (oc.jsonMenu != "")
-                    xI.CreateStringAttr("z" + oc.Name + "Button", "Defaults");
-
-            }
-
-
-            xI.CreateIntAttr("NoColorState", 1);
-
-
-            for (int i = 0; i <= maxp; i++)
-            {
-                if (ShowFTEs)
-                {
-                    if (oDet.zFTE[i] != double.MinValue)
-                        xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zFTE[i]);
-                }
-                else
-                {
-                    if (oDet.zValue[i] != double.MinValue)
-                        xI.CreateDoubleAttr("P" + i.ToString() + "V", oDet.zValue[i]);
-                }
-
-                if (oDet.zCost[i] != double.MinValue)
-                    xI.CreateDoubleAttr("P" + i.ToString() + "C", oDet.zCost[i]);
-
-
-                if (oDet.sUoM == "")
-                {
-                    xI.CreateIntAttr("P" + i.ToString() + "VCanEdit", 0);
-                    xI.CreateIntAttr("P" + i.ToString() + "CCanEdit", 1);
-                }
-                else
-                {
-                    xI.CreateIntAttr("P" + i.ToString() + "CCanEdit", 0);
-                    xI.CreateIntAttr("P" + i.ToString() + "VCanEdit", 1);
-                }
-            }
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class TargetLegendGridLayout
-    {
-        private CStruct xGrid;
-
-        public void InitializeGridLayout()
-        {
-
-
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("HideHScroll", 1);
-
-            //xCfg.CreateIntAttr("ExactSize", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-
-
-
-
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "Modeler");
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-
-  
-
-            CStruct xCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xHead = xGrid.CreateSubStruct("Header");
-
-            xHead.CreateIntAttr("Visible", 0);
-            // Add category column
-            CStruct xC = xCols.CreateSubStruct("C");
-
-
-            xC = xCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "Key");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("Width", 400);
-            xC.CreateBooleanAttr("CanEdit", false);
-            xHead.CreateStringAttr("Key", " ");
-        }
-
-
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-    internal class TargetLegendGridData
-    {
-        private CStruct xGrid;
-        private CStruct m_Par = new CStruct();
-        public void InitializeGridData()
-        {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
-            CStruct xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            m_Par = xI;
-        }
-
-        public void AddRow(string Name, string srgb)
-        {
-
-            CStruct xI = m_Par.CreateSubStruct("I");
-
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateIntAttr("NoColorState", 1);
-
-
-
-            xI.CreateStringAttr("Key", Name);
-            if (srgb != "")
-                xI.CreateStringAttr("KeyColor", srgb);
-
-        }
-        public string GetString()
-        {
-            return xGrid.XML();
-        }
-    }
-
-    [Serializable()]
     public class ModelCache
     {
-
         private const int EPK_FTYPE_DATE = 1;
         private const int EPK_FTYPE_INTEGER = 2;
         private const int EPK_FTYPE_NUMBER = 3;
@@ -3897,7 +110,7 @@ namespace ModelDataCache
 
         private List<DetailRowData> m_filtersource = null;
         private List<DetailRowData> m_tgrid_sorted = null;
-        private List<DetailRowData> m_tgrid_displayed = null;
+        private IList<DetailRowData> m_tgrid_displayed = null;
         private List<DetailRowData> m_bgrid_sorted = null;
         private List<DetailRowData> m_target_sorted = null;
 
@@ -3952,7 +165,8 @@ namespace ModelDataCache
 
         public int InitalLoadData(SqlConnection oDataAccess, string ticket, string model, string versions, string sWResID, string sViewID)
         {
-            try {
+            try
+            {
 
                 m_loadmsg = "";
                 bShowFTEs = false;
@@ -4033,7 +247,7 @@ namespace ModelDataCache
                             m_init_def_view_pos = 0;
 
                         }
-  
+
                         if (oitem.UID == 1)
                         {
                             m_init_def_view = oitem;
@@ -4080,18 +294,19 @@ namespace ModelDataCache
                 int psfppid = 0;
                 int pslppid = 0;
 
-                            
-                foreach (PeriodData oPeriod in m_Periods.Values) {
+
+                foreach (PeriodData oPeriod in m_Periods.Values)
+                {
 
                     if (edate != DateTime.MinValue)
                     {
-                        if (oPeriod.StartDate <= edate && edate <= oPeriod.FinishDate) 
+                        if (oPeriod.StartDate <= edate && edate <= oPeriod.FinishDate)
                             psfppid = oPeriod.PeriodID;
                     }
 
                     if (ldate != DateTime.MinValue)
                     {
-                        if (oPeriod.StartDate <= ldate && ldate <= oPeriod.FinishDate) 
+                        if (oPeriod.StartDate <= ldate && ldate <= oPeriod.FinishDate)
                             pslppid = oPeriod.PeriodID;
                     }
 
@@ -4133,7 +348,7 @@ namespace ModelDataCache
                 if (versions != "")
                     LoadScenarios(oDataAccess, versions, false, true);
 
-                
+
                 m_allow_grouping = (m_PI_Group_fid != 0 && m_PI_Seq_fid != 0);
 
                 m_allow_grouping = false;
@@ -4153,7 +368,7 @@ namespace ModelDataCache
 
                 m_dtMin = m_dtMin.AddDays(-190);
                 m_dtMax = m_dtMax.AddDays(5 * 366);   // add 5 years onto the end of the Gantt
- 
+
                 BuildCustomFilterLists();
 
                 m_initial_zoom = SelectUserViewData(oDataAccess, m_init_def_view_pos);
@@ -4162,10 +377,10 @@ namespace ModelDataCache
                 oDataAccess = null;
                 ProcessAndCreateDistplayLists();
 
-                
+
 
                 return 0;
- 
+
 
             }
 
@@ -4532,7 +747,7 @@ namespace ModelDataCache
                         sCostTypes = sCostTypes + "," + lCTID.ToString();
 
                 }
-                else 
+                else
                 {
                     if (sOtherCostTypes == "")
                         sOtherCostTypes = lCTID.ToString();
@@ -4766,7 +981,7 @@ namespace ModelDataCache
 
             string[] sFull = new string[500];
 
-            foreach (CatItemData oxCat in m_CostCat.Values)
+            foreach (var oxCat in m_CostCat.Values)
             {
                 sFull[oxCat.Level] = oxCat.Name;
 
@@ -4777,9 +992,8 @@ namespace ModelDataCache
 
                 oxCat.FullName = oxCat.FullName + oxCat.Name;
             }
-
-
         }
+
         private void ReadCustomFields(SqlConnection oDataAccess)
         {
             m_CustFields = new Dictionary<int, CustomFieldData>();
@@ -5165,8 +1379,8 @@ namespace ModelDataCache
             int fintabextra = 0;
 
 
-//            sCommand = "Select rd.*,FIELD_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,at.FA_FORMAT, fl.FIELD_NAME_SQL, at.FA_NAME, fl.FIELD_NAME AS Expr1" +
-//                       " From EPGP_RD_FIELDS rd  Left Join EPGT_FIELDS fl On fl.FIELD_ID=rd.FIELD_ID  Left Join EPGC_FIELD_ATTRIBS at On at.FA_FIELD_ID=rd.FIELD_ID Where CONTEXT_ID = 101";
+            //            sCommand = "Select rd.*,FIELD_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,at.FA_FORMAT, fl.FIELD_NAME_SQL, at.FA_NAME, fl.FIELD_NAME AS Expr1" +
+            //                       " From EPGP_RD_FIELDS rd  Left Join EPGT_FIELDS fl On fl.FIELD_ID=rd.FIELD_ID  Left Join EPGC_FIELD_ATTRIBS at On at.FA_FIELD_ID=rd.FIELD_ID Where CONTEXT_ID = 101";
 
             sCommand =
                 "Select t.* From EPGT_FIELDS t Left Join  EPGP_RD_FIELDS r On t.FIELD_ID=r.FIELD_ID And CONTEXT_ID=101 " +
@@ -5176,7 +1390,8 @@ namespace ModelDataCache
             oCommand = new SqlCommand(sCommand, oDataAccess);
             reader = oCommand.ExecuteReader();
 
-            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA) {
+            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+            {
                 ++i;
 
                 m_fidextra[i] = DBAccess.ReadIntValue(reader["FIELD_ID"]);
@@ -5202,17 +1417,17 @@ namespace ModelDataCache
 
                 m_sextra[i] = DBAccess.ReadStringValue(reader["FIELD_NAME_SQL"]);
 
-   
+
 
             }
             reader.Close();
             reader = null;
 
-            sCommand =  "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
+            sCommand = "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
                 "  at.FA_NAME, fl.FIELD_NAME AS Expr1 FROM  EPGC_FIELD_ATTRIBS AS at LEFT OUTER JOIN EPGP_RD_FIELDS AS rd ON rd.FIELD_ID = at.FA_FIELD_ID AND rd.CONTEXT_ID = 101 LEFT OUTER JOIN " +
                 " EPGT_FIELDS AS fl ON fl.FIELD_ID = rd.FIELD_ID WHERE     (at.FA_TABLE_ID = 201) AND (at.FA_FORMAT = 4 OR at.FA_FORMAT = 13 OR at.FA_FORMAT = 7) OR " +
                 " (at.FA_TABLE_ID = 202) OR (at.FA_TABLE_ID = 203) OR (at.FA_TABLE_ID = 205)";
-            
+
             oCommand = new SqlCommand(sCommand, oDataAccess);
             reader = oCommand.ExecuteReader();
 
@@ -5313,7 +1528,7 @@ namespace ModelDataCache
 
                     long i;
 
-                    i = (long) DBAccess.ReadDecimalValue(obj);
+                    i = (long)DBAccess.ReadDecimalValue(obj);
                     return i.ToString();
 
                 case EPK_FTYPE_URL:
@@ -5408,7 +1623,7 @@ namespace ModelDataCache
 
                 if (earlystart == DateTime.MinValue)
                     earlystart = oPI.oStartDate;
-                else if (oPI.oStartDate !=  DateTime.MinValue)
+                else if (oPI.oStartDate != DateTime.MinValue)
                 {
                     if (earlystart > oPI.oStartDate)
                         earlystart = oPI.oStartDate;
@@ -5821,7 +2036,7 @@ namespace ModelDataCache
 
 
                             sCommand = "K" + xCT_ID.ToString() + " " + xProject_ID.ToString() + " " + xBC_UID.ToString() + " " + xBC_SEQ.ToString() + " " + xCurScen.ToString();
-                            
+
                             if (m_detaildata.TryGetValue(sCommand, out Det) == false)
                             {
                                 Det = new DetailRowData(m_max_period);
@@ -6133,8 +2348,8 @@ namespace ModelDataCache
             string sKey = "";
 
 
- //           if (Scenarios == "" || Scenarios == "0")
- //               return;
+            //           if (Scenarios == "" || Scenarios == "0")
+            //               return;
 
             List<DetailRowData> cln = new List<DetailRowData>();
 
@@ -7957,8 +4172,8 @@ namespace ModelDataCache
                     {
                         otot.PI_Name = odet.PI_Name;
 
-                   //     if (bPid)
-                            otot.Internal_ID = odet.Internal_ID;
+                        //     if (bPid)
+                        otot.Internal_ID = odet.Internal_ID;
                     }
 
                 }
@@ -8430,7 +4645,8 @@ namespace ModelDataCache
                 if (grp == 0)
                 {
 
-                    if (ID <= clnIn.Count && ID > 0) {
+                    if (ID <= clnIn.Count && ID > 0)
+                    {
                         ++i;
                         level = level - sub_Lev;
                         xPI = clnIn.ElementAt(ID - 1);
@@ -8749,7 +4965,7 @@ namespace ModelDataCache
                                     oPar.LinkedToPI = true;
 
                                     if (oPI.StartDate != DateTime.MinValue)
-                                         oPar.Det_Start = oPI.StartDate;
+                                        oPar.Det_Start = oPI.StartDate;
 
                                     if (oPI.FinishDate != DateTime.MinValue)
                                         oPar.Det_Finish = oPI.FinishDate;
@@ -8823,7 +5039,7 @@ namespace ModelDataCache
 
                                 if (xPI.FinishDate != DateTime.MinValue)
                                     xPar.Det_Finish = xPI.FinishDate;
- 
+
                                 break;
                             }
                         }
@@ -8833,223 +5049,158 @@ namespace ModelDataCache
 
         }
 
-        public String GetTopGrid()
+        public string GetTopGrid()
         {
-            TopGrid oGrid = new TopGrid();
-            oGrid.InitializeGridLayout(m_Det_grouped, bShowFTEs, bShowGantt, m_dtMin, m_dtMax, m_DetColRoot, m_DetFreeze);
-            int i = 0;
-            if (bShowGantt == false)
-            {
-
-
-                foreach (PeriodData period in m_Periods.Values)
-                {
-                    ++i;
-
-                    if (i >= m_display_minp && i <= m_display_maxp)
-                        oGrid.AddPeriodColumn(i.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
-            }
-
-            oGrid.FinalizeGridLayout();
-
-            oGrid.InitializeGridData();
-
-            i = 0;
-
-            m_tgrid_displayed = new List<DetailRowData>();
-
-            foreach (DetailRowData oDet in m_tgrid_sorted)
-            {
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                    {
-                        oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                        m_tgrid_displayed.Add(oDet);
-                    }
-
-                }
-                else
-                {
-                    oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                    m_tgrid_displayed.Add(oDet);
-                }
-
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
-        }
-
-
-
-
-        public String GetTopGridLayout()
-        {
-            TopGridCostsLayout oGrid = new TopGridCostsLayout();
-            oGrid.InitializeGridLayout(m_Det_grouped, bShowFTEs, bShowGantt, m_dtMin, m_dtMax, m_DetColRoot, m_DetFreeze);
+            var oGrid = new TopGrid(
+                m_Det_grouped, 
+                bShowFTEs, 
+                bShowGantt, 
+                m_dtMin, 
+                m_dtMax, 
+                m_DetColRoot, 
+                m_DetFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp
+            );
 
             if (bShowGantt == false)
             {
-                int i = 0;
-
-                foreach (PeriodData period in m_Periods.Values)
-                {
-                    ++i;
-
-                    if (i >= m_display_minp && i <= m_display_maxp)
-                        oGrid.AddPeriodColumn(i.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
+                oGrid.AddPeriodsData(m_Periods.Values);
             }
 
-            oGrid.FinalizeGridLayout();
+            m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            string s = oGrid.GetString();
-            return s;
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
+        }
+        
+        public string GetTopGridLayout()
+        {
+            var oGrid = new TopGrid(
+                m_Det_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_DetColRoot,
+                m_DetFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp
+            );
+
+            if (bShowGantt == false)
+            {
+                oGrid.AddPeriodsData(m_Periods.Values);
+            }
+
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
         }
 
-        public String GetTopGridData()
+        public string GetTopGridData()
         {
-            TopGridCostsData oGrid = new TopGridCostsData();
-            oGrid.InitializeGridData();
-            int i = 0;
+            var oGrid = new TopGrid(
+                m_Det_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_DetColRoot,
+                m_DetFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
+            
+            m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            m_tgrid_displayed = new List<DetailRowData>();
-
-            foreach (DetailRowData oDet in m_tgrid_sorted)
-            {
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                    {
-                        oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                        m_tgrid_displayed.Add(oDet);
-                    }
-
-                }
-                else
-                {
-                    oGrid.AddDetailRow(oDet, ++i, true, bShowFTEs, bShowGantt, m_DetColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                    m_tgrid_displayed.Add(oDet);
-                }
-
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
-  
-
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
         }
 
-        public String GetBottomGrid()
+        public string GetBottomGrid()
         {
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            BottomGrid oGrid = new BottomGrid();
-            oGrid.InitializeGridLayout(m_Tot_grouped, m_TotColRoot, m_TotFreeze);
+            oGrid.AddPeriodsData(m_Periods.Values);
+            oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            int i = 0;
-
-            foreach (PeriodData period in m_Periods.Values)
-            {
-                i++;
-                if (i >= m_display_minp && i <= m_display_maxp)
-                    oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData(false);
-            i = 0;
-
-            DetailRowData oTar = null;
-
-            foreach (DetailRowData oDet in m_bgrid_sorted)
-            {
-                if (m_apply_target != 0)
-                {
-                    oTar = m_target_sorted.ElementAt(i);
-
-
-                }
-                else
-                    oTar = null;
-
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                        oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-                }
-                else
-                    oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
         }
 
 
-        public String GetBottomGridLayout()
+        public string GetBottomGridLayout()
         {
-            if (bottomgridlayoutcache != "")
+            if (bottomgridlayoutcache != string.Empty)
                 return bottomgridlayoutcache;
 
-            BottomGridCostsLayout oGrid = new BottomGridCostsLayout();
-            oGrid.InitializeGridLayout(m_Tot_grouped, m_TotColRoot, m_TotFreeze);
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            int i = 0;
 
-            foreach (PeriodData period in m_Periods.Values)
-            {
-                i++;
-                if (i >= m_display_minp && i <= m_display_maxp)
-                    oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-            }
+            oGrid.AddPeriodsData(m_Periods.Values);
 
-            oGrid.FinalizeGridLayout();
-
-            bottomgridlayoutcache = oGrid.GetString();
+            bottomgridlayoutcache = oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
             return bottomgridlayoutcache;
         }
 
-        public String GetBottomGridData()
+        public string GetBottomGridData()
         {
+            var oGrid = new BottomGrid(
+                m_apply_target != 0,
+                m_target_sorted,
+                m_TargetColours,
+                m_ShowRemaining,
+                m_Tot_grouped,
+                bShowFTEs,
+                bShowGantt,
+                m_dtMin,
+                m_dtMax,
+                m_TotColRoot,
+                m_TotFreeze,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                m_display_minp,
+                m_display_maxp);
 
-            BottomGridCostsData oGrid = new BottomGridCostsData();
-            oGrid.InitializeGridData(false);
-            int i = 0;
-
-            DetailRowData oTar = null;
-
-            foreach (DetailRowData oDet in m_bgrid_sorted)
-            {
-                if (m_apply_target != 0)
-                {
-                    oTar = m_target_sorted.ElementAt(i);
-
-                    
-                }
-                else
-                    oTar = null;
-
-                if (oDet.bRealone == false)
-                {
-                    if (oDet.bGotChildren)
-                        oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-                }
-                else
-                    oGrid.AddDetailRow(oDet, oTar, m_TargetColours, ++i, m_Tot_grouped, bShowFTEs, m_TotColRoot, m_display_minp, m_display_maxp, bUseQTY, bUseCosts, m_ShowRemaining, m_show_rhs_dec_costs);
-            }
-
-            string s = oGrid.GetString();
-
-            return s;
-
+            oGrid.AddDetailRowsData(m_tgrid_sorted);
+            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
         }
 
         public void SetFTEMode(int FTEMode)
@@ -9290,7 +5441,7 @@ namespace ModelDataCache
                 retData.redrawCompleteGrid = 1;
                 return;
             }
- 
+
             //if (d2 == 0)      // basiclly bars should be streched from Finish - of moved not stretched from the start!)
             //    return;
 
@@ -9308,7 +5459,7 @@ namespace ModelDataCache
 
             retData.barsAffected = 0;
 
-           
+
 
             if (oDet.bRealone)
             {
@@ -9335,7 +5486,7 @@ namespace ModelDataCache
                 oDet.Det_Finish = inFinish;
                 PIData oPI = null;
 
- 
+
 
                 if (oDet.LinkedToPI == true && oDet.m_lev == 1)
                 {
@@ -9891,7 +6042,7 @@ namespace ModelDataCache
 
             }
 
-            bottomgridlayoutcache = "";            
+            bottomgridlayoutcache = "";
         }
 
         public void SetTotalData(string sTotalData)
@@ -9906,7 +6057,7 @@ namespace ModelDataCache
                 oi.bSelected = (i != 0);
 
 
- 
+
 
 
             }
@@ -9932,7 +6083,7 @@ namespace ModelDataCache
             sng.MissingPIs = (m_GotAllPIs == false ? 1 : 0);
 
             sng.TotalsCmp = (m_apply_target != 0 ? 1 : 0);
-         
+
             if (m_DetFields == null)
             {
                 sng.DetFields = new SortFieldDefn[0];
@@ -10112,17 +6263,17 @@ namespace ModelDataCache
                     return "";
 
                 case 2:
-                   try
+                    try
                     {
                         l = int.Parse(sIn);
                     }
 
                     catch
                     {
-                         l = 0;
+                        l = 0;
                     }
 
-                    
+
 
                     if (l != 0)
                         return l.ToString();
@@ -10131,7 +6282,7 @@ namespace ModelDataCache
 
 
                 case 3:
-                    
+
                     try
                     {
                         d = Double.Parse(sIn);
@@ -10142,21 +6293,21 @@ namespace ModelDataCache
                         d = 0;
                     }
 
-                    
+
                     if (d != 0)
                         return d.ToString();
 
                     return "";
 
                 case 11:
-                   try
+                    try
                     {
                         l = int.Parse(sIn);
                     }
 
                     catch
                     {
-                         l = 0;
+                        l = 0;
                     }
 
                     if (l != 0)
@@ -10165,14 +6316,14 @@ namespace ModelDataCache
                     return "";
 
                 case 13:
-                   try
+                    try
                     {
                         l = int.Parse(sIn);
                     }
 
                     catch
                     {
-                         l = 0;
+                        l = 0;
                     }
 
                     return (l == 0 ? "No" : "Yes");
@@ -10210,7 +6361,7 @@ namespace ModelDataCache
                         d = 0;
                     }
 
-                    
+
                     return FormatWork(d);
 
                 case 23:
@@ -10234,7 +6385,7 @@ namespace ModelDataCache
 
                     catch
                     {
-                         l = 0;
+                        l = 0;
                     }
 
                     if (m_codes.TryGetValue(l, out oi))
@@ -10603,9 +6754,9 @@ namespace ModelDataCache
                                 if (oPI.FinishDate <= DateTime.MinValue)
                                     project_Finish.Value = DBNull.Value;
                                 else
-                                    project_Finish.Value = oPI.FinishDate; 
-                                
-                                
+                                    project_Finish.Value = oPI.FinishDate;
+
+
                                 project_selected.Value = oPI.PISelected;
 
                                 lRowsAffected = oCommand.ExecuteNonQuery();
@@ -10708,7 +6859,7 @@ namespace ModelDataCache
                         {
                             if (oDet.Scenario_ID == iVers)
                             {
-  
+
                                 val_ct_id.Value = oDet.CT_ID;
                                 val_project_id.Value = oDet.PROJECT_ID;
                                 val_bc_uid.Value = oDet.BC_UID;
@@ -10920,25 +7071,25 @@ namespace ModelDataCache
 
                 if (lCopyfromTarget != 0)
                 {
-                   sCommand = "INSERT INTO EPGP_MODEL_TARGET_VALUES (TARGET_ID, TARGET_UID, BD_PERIOD, BD_VALUE, BD_COST) (SELECT " + targetID.ToString() + 
-                                 ",TARGET_UID, BD_PERIOD, BD_VALUE, BD_COST  FROM EPGP_MODEL_TARGET_VALUES WHERE TARGET_ID = " + lCopyfromTarget.ToString() + ")";
+                    sCommand = "INSERT INTO EPGP_MODEL_TARGET_VALUES (TARGET_ID, TARGET_UID, BD_PERIOD, BD_VALUE, BD_COST) (SELECT " + targetID.ToString() +
+                                  ",TARGET_UID, BD_PERIOD, BD_VALUE, BD_COST  FROM EPGP_MODEL_TARGET_VALUES WHERE TARGET_ID = " + lCopyfromTarget.ToString() + ")";
 
-                   cmd = new SqlCommand(sCommand, oDataAccess);
-                   cmd.ExecuteNonQuery();
+                    cmd = new SqlCommand(sCommand, oDataAccess);
+                    cmd.ExecuteNonQuery();
 
-                   sCommand = "INSERT INTO EPGP_MODEL_TARGET_DETAILS " +
-                              "(TARGET_ID, TARGET_UID, CT_ID, BC_UID, OC_01, OC_02, OC_03, OC_04, OC_05, TEXT_01, TEXT_02, TEXT_03, TEXT_04, TEXT_05) " + 
-                              " (SELECT " + targetID.ToString() +
-                                  ",TARGET_UID, CT_ID, BC_UID, OC_01, OC_02, OC_03, OC_04, OC_05, TEXT_01, TEXT_02, TEXT_03, TEXT_04, TEXT_05 " +
-                                  "  FROM EPGP_MODEL_TARGET_DETAILS WHERE TARGET_ID = " + lCopyfromTarget.ToString() + ")";
+                    sCommand = "INSERT INTO EPGP_MODEL_TARGET_DETAILS " +
+                               "(TARGET_ID, TARGET_UID, CT_ID, BC_UID, OC_01, OC_02, OC_03, OC_04, OC_05, TEXT_01, TEXT_02, TEXT_03, TEXT_04, TEXT_05) " +
+                               " (SELECT " + targetID.ToString() +
+                                   ",TARGET_UID, CT_ID, BC_UID, OC_01, OC_02, OC_03, OC_04, OC_05, TEXT_01, TEXT_02, TEXT_03, TEXT_04, TEXT_05 " +
+                                   "  FROM EPGP_MODEL_TARGET_DETAILS WHERE TARGET_ID = " + lCopyfromTarget.ToString() + ")";
 
 
-                   cmd = new SqlCommand(sCommand, oDataAccess);
-                   cmd.ExecuteNonQuery();
+                    cmd = new SqlCommand(sCommand, oDataAccess);
+                    cmd.ExecuteNonQuery();
 
 
                 }
-           }
+            }
 
             catch (Exception ex)
             {
@@ -10984,7 +7135,7 @@ namespace ModelDataCache
 
                     }
                 }
- 
+
 
                 //else if (index != 0)
                 //    return sRet;
@@ -11066,7 +7217,7 @@ namespace ModelDataCache
             rdata.Categories = new CSCategoryEntry[m_CostCat.Count];
             rdata.Versions = new ItemDefn[m_Scenario.Count];
             rdata.CostTypes = new ItemDefn[m_CostTypes.Count];
-            rdata.CustomFields = new CustomFieldsDefn[m_CustFields.Count];
+            rdata.CustomFields = new CustomFieldDefn[m_CustFields.Count];
 
             int cnt = 0;
 
@@ -11163,11 +7314,11 @@ namespace ModelDataCache
 
 
             cnt = 0;
-            CustomFieldsDefn cfd;
+            CustomFieldDefn cfd;
 
             foreach (CustomFieldData oc in m_CustFields.Values)
             {
-                cfd = new CustomFieldsDefn();
+                cfd = new CustomFieldDefn();
 
                 rdata.CustomFields[cnt] = cfd;
                 rdata.CustomFields[cnt].FieldID = oc.FieldID;
@@ -11322,7 +7473,7 @@ namespace ModelDataCache
 
             int cnt = 0;
             string sKey = "";
-            string presKey = ""; 
+            string presKey = "";
 
             Dictionary<string, string> preaggr = new Dictionary<string, string>();
 
@@ -11345,7 +7496,7 @@ namespace ModelDataCache
             Dictionary<string, TargetRowData> aggr = new Dictionary<string, TargetRowData>();
 
             cnt = 0;
-            TargetRowData tdata = null; 
+            TargetRowData tdata = null;
 
             foreach (DetailRowData odet in m_detaildata.Values)
             {
@@ -11369,27 +7520,27 @@ namespace ModelDataCache
 
         }
 
-         private string BuildTargetKey(DetailRowData odet) 
-         {
+        private string BuildTargetKey(DetailRowData odet)
+        {
             string sKey = "";
-      
+
             sKey = odet.CT_ID.ToString() + " " + odet.BC_UID.ToString();
 
-             for (int i = 1; i <= 5; i++)
-                sKey +=  " " + odet.OCVal[i].ToString();
-            
-             for (int i = 1; i <= 5; i++)
-                sKey +=  " <" + odet.TXVal[i] + ">";
+            for (int i = 1; i <= 5; i++)
+                sKey += " " + odet.OCVal[i].ToString();
 
-             return sKey;
-         }
-   
-      
+            for (int i = 1; i <= 5; i++)
+                sKey += " <" + odet.TXVal[i] + ">";
+
+            return sKey;
+        }
+
+
 
         public String GetTargetGridLayout()
         {
             TargetGridLayout oGrid = new TargetGridLayout();
-            oGrid.InitializeGridLayout(bShowFTEs, m_CustFields, m_Rates.Count, m_CostTypejsonMenu, m_CostCatjsonMenu, m_filter_sel[(int) FieldIDs.MC_FID].Count);
+            oGrid.InitializeGridLayout(bShowFTEs, m_CustFields, m_Rates.Count, m_CostTypejsonMenu, m_CostCatjsonMenu, m_filter_sel[(int)FieldIDs.MC_FID].Count);
 
             int i = 0;
 
@@ -11483,7 +7634,7 @@ namespace ModelDataCache
                 SqlParameter val_tar_uid = oCmdVal.Parameters.Add("@TARGET_UID", SqlDbType.Int);
 
                 SqlParameter val_per_id = oCmdVal.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-                SqlParameter val_cost_id = oCmdVal.Parameters.Add("@BD_COST", SqlDbType.Decimal );
+                SqlParameter val_cost_id = oCmdVal.Parameters.Add("@BD_COST", SqlDbType.Decimal);
                 SqlParameter val_val_id = oCmdVal.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
                 val_cost_id.Precision = 25;
                 val_cost_id.Scale = 6;
@@ -11637,7 +7788,7 @@ namespace ModelDataCache
 
             try
             {
-                sCommand = "UPDATE EPG_CT_VIEWS SET VIEW_NAME = " + PrepareText(snewName) +  " WHERE (WRES_ID = " + slocResID + ") AND UINF_CONTEXT = " + m_mode.ToString() + " AND VIEW_NAME = " + PrepareText(sviewName);
+                sCommand = "UPDATE EPG_CT_VIEWS SET VIEW_NAME = " + PrepareText(snewName) + " WHERE (WRES_ID = " + slocResID + ") AND UINF_CONTEXT = " + m_mode.ToString() + " AND VIEW_NAME = " + PrepareText(sviewName);
                 SqlCommand cmd = new SqlCommand(sCommand, oDataAccess);
                 lRowsAffected = cmd.ExecuteNonQuery();
             }
@@ -11695,7 +7846,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
- //               ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveUserViewData", (StatusEnum)99813, ex.Message.ToString(), 0, "");
+                //               ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveUserViewData", (StatusEnum)99813, ex.Message.ToString(), 0, "");
                 // hey ho they should have run the script01 - but carry on regardless
             }
 
@@ -11920,9 +8071,9 @@ namespace ModelDataCache
                 m_CT_Views = ringfence;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                
+
             }
         }
 
@@ -11935,31 +8086,31 @@ namespace ModelDataCache
             int fall = 0;
             int ftot = 0;
             bool bDoit = false;
-            string slook = "";
+            string slook = string.Empty;
 
             if (viewID == -1)
-                return "";
+            {
+                return string.Empty;
+            }
 
-            List<SortFieldDefn> new_DetColRoot = new List<SortFieldDefn>();
-            List<SortFieldDefn> new_TotColRoot = new List<SortFieldDefn>();
+            var new_DetColRoot = new List<SortFieldDefn>();
+            var new_TotColRoot = new List<SortFieldDefn>();
 
             oItem = m_CT_Views.ElementAt(viewID);
 
             slug = oItem.Desc;
 
-            CStruct xSlug = new CStruct();
+            var xSlug = new CStruct();
 
             //  XmlNode oNode = null;
 
             xSlug.LoadXML(slug);
-
-            //  oNode = xSlug.GetXMLNode();    Why has Rob made this a protected item - makes parsing xml a bit hard - so had to add a new method to build a list of all the nodes child nodes
-
+            
             List<CStruct> cln = xSlug.GetChildNodeCollection();
 
             if (m_bCTAMode)
             {
-                foreach (DataItem oi in m_CTARoot)
+                foreach (var oi in m_CTARoot)
                 {
                     oi.bSelected = false;
                 }
@@ -11967,12 +8118,12 @@ namespace ModelDataCache
 
             // mark if the fields have not been touched 
 
-            foreach (SortFieldDefn sng in m_DetColRoot)
+            foreach (var sng in m_DetColRoot)
             {
                 sng.touched = false;
             }
 
-            foreach (SortFieldDefn sng in m_TotColRoot)
+            foreach (var sng in m_TotColRoot)
             {
                 sng.touched = false;
             }
@@ -11980,24 +8131,22 @@ namespace ModelDataCache
 
             string sZoomTo = "";
 
-            foreach (CStruct odata in cln)
+            foreach (var odata in cln)
             {
                 slug = odata.GetString("");
 
                 switch (odata.Name)
                 {
-
                     case "ZoomTo":
                         sZoomTo = slug;
                         break;
-
                     case "FFID":
 
                         fid = StripNum(ref slug);
                         fall = StripNum(ref slug);
                         ftot = StripNum(ref slug);
 
-                        if (fid != (int) FieldIDs.SCEN_FID)
+                        if (fid != (int)FieldIDs.SCEN_FID)
                         {
 
                             foreach (DataItem oit in m_TotalRoot)
@@ -12028,7 +8177,6 @@ namespace ModelDataCache
                             }
                         }
                         break;
-
                     case "FFIDVal":
                         fid = StripNum(ref slug);
                         slug = " " + slug + " ";
@@ -12057,7 +8205,6 @@ namespace ModelDataCache
                             }
                         }
                         break;
-
                     case "QTY":
                         bUseQTY = (StripNum(ref slug) != 0);
                         bShowFTEs = (StripNum(ref slug) == 0);
@@ -12069,7 +8216,6 @@ namespace ModelDataCache
 
                         if (m_bCTAMode == false)
                         {
-
                             if (fid > 0 && fid <= m_max_period)
                                 m_display_minp = fid;
 
@@ -12085,23 +8231,19 @@ namespace ModelDataCache
                             if (fid > 0 && fid <= m_max_period)
                                 m_drag_maxp = fid;
                         }
-
                         break;
-
                     case "SHWDEC":
                         m_show_rhs_dec_costs = (StripNum(ref slug) != 0);
                         break;
-
                     case "LABDESC":
                     case "GWID":
                     case "BGWID":
                         break;
-
                     case "DR":
                         fid = StripNum(ref slug);
                         fall = StripNum(ref slug);
 
-                        foreach (SortFieldDefn sng in m_DetColRoot)
+                        foreach (var sng in m_DetColRoot)
                         {
                             if (sng.fid == fid)
                             {
@@ -12111,14 +8253,12 @@ namespace ModelDataCache
                                 break;
                             }
                         }
-
                         break;
-
                     case "TR":
                         fid = StripNum(ref slug);
                         fall = StripNum(ref slug);
 
-                        foreach (SortFieldDefn sng in m_TotColRoot)
+                        foreach (var sng in m_TotColRoot)
                         {
                             if (sng.fid == fid)
                             {
@@ -12128,10 +8268,7 @@ namespace ModelDataCache
                                 break;
                             }
                         }
-
                         break;
-
-
                     case "FRZ":
                         m_DetFreeze = StripNum(ref slug);
                         m_TotFreeze = StripNum(ref slug);
@@ -12159,7 +8296,8 @@ namespace ModelDataCache
 
                         if (m_apply_target != 0)
                         {
-                            try {
+                            try
+                            {
                                 LoadTargets(oDataAccess, m_apply_target.ToString());
                             }
                             catch (Exception ex) { }
@@ -12173,7 +8311,7 @@ namespace ModelDataCache
                     case "CTCmp":
                         fid = StripNum(ref slug);
 
-                        foreach (DataItem oi in m_CTARoot)
+                        foreach (var oi in m_CTARoot)
                         {
                             if (oi.UID == fid)
                                 oi.bSelected = true;
@@ -12181,55 +8319,41 @@ namespace ModelDataCache
                         break;
 
                     case "CTApCmp":
-                        foreach (DataItem oi in m_CTARoot)
+                        foreach (var oi in m_CTARoot)
                         {
                             if (oi.bSelected)
                                 m_apply_target = 1;
                         }
                         break;
-
                 }
-
-
             }
 
-
-            foreach (SortFieldDefn sng in m_DetColRoot)
+            foreach (var sng in m_DetColRoot)
             {
                 if (sng.touched == false)
+                {
                     new_DetColRoot.Add(sng);
-
+                }
             }
 
-            foreach (SortFieldDefn sng in m_TotColRoot)
+            foreach (var sng in m_TotColRoot)
             {
                 if (sng.touched == false)
+                {
                     new_TotColRoot.Add(sng);
+                }
             }
 
             m_DetColRoot = new_DetColRoot;
             m_TotColRoot = new_TotColRoot;
 
             SetTotColsbasedonTotaling();
-
-
-            bottomgridlayoutcache = "";
+            
+            bottomgridlayoutcache = string.Empty;
 
             ApplyUserOptions();
-
             SetHighlevelFilterFlag();
-
-
-
-
-
-
-
-            //m_oDataAccess = null;
-
             slug = sZoomTo;
-
-
 
             return slug;
         }
@@ -12238,11 +8362,5 @@ namespace ModelDataCache
         {
             return m_tarnames;
         }
-
-
-
     }
-
-
 }
-

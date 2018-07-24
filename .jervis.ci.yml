@@ -1,0 +1,60 @@
+#######################
+# Versata EPMlive
+#######################
+
+language: shell
+
+branches:
+  only:
+    - /^bugfix\/.*$/
+    - /^hotfix\/.*$/
+    - /^feature\/.*$/
+    
+cache:
+  directories:
+    - ${HOME}/.m2
+    - ${HOME}/.gradle
+    - ${HOME}/.sdkman
+
+
+# before_install:
+#  - cmd.exe /c "subst D: ." && d:
+
+install:
+  - echo "running build steps powershell etc"
+  - powershell BuildTeamCity/tl_buildCode.ps1 -ConfigurationToBuild Debug
+
+#script:
+  - powershell BuildTeamCity/calcCoverageForJervis.ps1 
+#  - sleep 3600
+
+jenkins:
+  os: windows
+  additional_labels:
+    - "epmlive"
+  stash: 
+    - allowEmpty: true
+#    includes: 'foo'
+    - name: 'artifacts'
+#  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
+  cobertura:
+      path: 'opencovertests.xml'
+      autoUpdateHealth: false
+      autoUpdateStability: false
+      failNoReports: false
+      failUnhealthy: true
+      failUnstable: false
+      maxNumberOfBuilds: 0
+      onlyStable: false
+      sourceEncoding: 'ASCII'
+      zoomCoverageChart: true
+      methodCoverageTargets: '80, 0, 0'
+      lineCoverageTargets: '80, 0, 0'
+      conditionalCoverageTargets: '70, 0, 0'
+  collect:
+    artifacts: 
+#      - 'nuget.exe'
+      - 'Artifacts/*.zip'
+      - 'CoverageReports/index.html'
+#    junit: '**/*.xml'
+
