@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure.Logging;
+using Microsoft.SharePoint.Administration;
 using ModelDataCache;
 using PortfolioEngineCore;
 using ResourceValues;
 using WorkEnginePPM;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace RPADataCache
 {
@@ -294,7 +297,11 @@ namespace RPADataCache
             }
             catch (Exception ex)
             {
-
+                LoggingService.WriteTrace(
+                    Area.EPMLiveWorkEnginePPM, 
+                    Categories.EPMLiveWorkEnginePPM.Others, 
+                    TraceSeverity.VerboseEx, 
+                    ex.ToString());
             }
 
             return categoryColumn;
@@ -492,7 +499,11 @@ namespace RPADataCache
                     }
                     catch (Exception ex)
                     {
-
+                        LoggingService.WriteTrace(
+                            Area.EPMLiveWorkEnginePPM,
+                            Categories.EPMLiveWorkEnginePPM.Others,
+                            TraceSeverity.VerboseEx,
+                            ex.ToString());
                     }
                 }
             }
@@ -791,7 +802,11 @@ namespace RPADataCache
                 }
                 catch (Exception ex)
                 {
-
+                    LoggingService.WriteTrace(
+                       Area.EPMLiveWorkEnginePPM,
+                       Categories.EPMLiveWorkEnginePPM.Others,
+                       TraceSeverity.VerboseEx,
+                       ex.ToString());
                 }
             }
 
@@ -917,7 +932,11 @@ namespace RPADataCache
                 }
                 catch (Exception ex)
                 {
-
+                    LoggingService.WriteTrace(
+                       Area.EPMLiveWorkEnginePPM,
+                       Categories.EPMLiveWorkEnginePPM.Others,
+                       TraceSeverity.VerboseEx,
+                       ex.ToString());
                 }
             }
         }
@@ -962,6 +981,12 @@ namespace RPADataCache
             catch (Exception ex)
             {
                 sReply = HandleException("GetResourceAnalyzerViews", 99999, ex, string.Empty);
+
+                LoggingService.WriteTrace(
+                    Area.EPMLiveWorkEnginePPM,
+                    Categories.EPMLiveWorkEnginePPM.Others,
+                    TraceSeverity.VerboseEx,
+                    ex.ToString());
             }
 
             return sReply;
@@ -1015,6 +1040,12 @@ namespace RPADataCache
                         catch(Exception ex)
                         {
                             result = 0;
+
+                            LoggingService.WriteTrace(
+                                Area.EPMLiveWorkEnginePPM,
+                                Categories.EPMLiveWorkEnginePPM.Others,
+                                TraceSeverity.VerboseEx,
+                                ex.ToString());
                         }
                         break;
                     case 0:
