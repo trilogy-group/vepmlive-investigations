@@ -121,13 +121,13 @@ export class WorkspacePageHelper {
     static async validateLatestNotification(stepLogger: StepLogger , title: string ) {
         let maxAttempts = 0;
         let maxClickAttempts = 0;
-        const modifiedTitle = title.replace('* ', '').replace(/-/g, '' );
+        const modifiedTitle = title.replace('* ', '').replace(/-/g, '' ).replace(/_/g, '' );
 
         stepLogger.step('Title is ' + modifiedTitle );
         // tslint:disable-next-line:max-line-length
 
         while (!((await CommonPage.latestNotification.getText()).includes(modifiedTitle)) && maxAttempts++ < 20) {
-
+            stepLogger.step(await CommonPage.latestNotification.getText());
             browser.refresh();
 
             await PageHelper.click(CommonPage.personIcon);
@@ -135,11 +135,13 @@ export class WorkspacePageHelper {
             await browser.sleep(PageHelper.timeout.s);
 
             while (!(await PageHelper.isElementPresent(CommonPage.latestNotification, false ) && maxClickAttempts++ < 10)) {
-                 await PageHelper.click(CommonPage.personIcon);
-                 await browser.sleep(PageHelper.timeout.s);
+                browser.refresh();
+                await PageHelper.click(CommonPage.personIcon);
+                await browser.sleep(PageHelper.timeout.s);
             }
 
         }
+
 
         stepLogger.verification(`Notification 'Your Workspace <Name of Workspace entered in step# 3> is now ready!'
         displayed in the pop down`);
