@@ -16,14 +16,19 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using EPMLiveCore.SPUtilities;
+using System.Net;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
 {
     public partial class newapp : LayoutsPageBase
     {
-        protected string baseURL = "";
-        protected string metaDataString = "";
-        protected string processString = "";
+        private SPProjectUtility _spProjectUtility = new SPProjectUtility();
+
+        protected string baseURL = string.Empty;
+        protected string metaDataString = string.Empty;
+        protected string processString = string.Empty;
         protected bool requiredOK = true;
         protected Button btnOK;
         protected DropDownList DdlGroup;
@@ -34,7 +39,7 @@ namespace EPMLiveCore
         protected TextBox txtTitle;
         protected Label label1;
         protected Panel Panel2;
-        protected string URL = "";
+        protected string URL = string.Empty;
         protected RadioButton rdoTopLinkYes;
         protected RadioButton rdoTopLinkNo;
         protected RadioButton rdoUnique;
@@ -46,194 +51,67 @@ namespace EPMLiveCore
         protected string listName;
         protected string strName;
 
-        protected Microsoft.SharePoint.WebControls.InputFormSection inpName;
+        protected InputFormSection inpName;
 
         ArrayList validTemplates = new ArrayList();
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-
-            btnOK.Attributes.Add("onclick", "javascript:" + btnOK.ClientID + ".disabled=true;");
+            btnOK.Attributes.Add("onclick", string.Format("javascript:{0}.disabled=true;", btnOK.ClientID));
 
             if (!IsPostBack)
             {
-                string login = SPContext.Current.Web.CurrentUser.LoginName;
-                string url = SPContext.Current.Web.Url;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                var projectInfo = _spProjectUtility.RequestProjectInfo();
+
+                switch (projectInfo.StatusCode)
                 {
-                    using(SPSite mysite = new SPSite(url))
-                    {
-                        using(SPWeb myweb = mysite.OpenWeb())
+                    case HttpStatusCode.Forbidden:
+                        SPUtility.Redirect("accessdenied.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                        break;
+                    default:
+                        var workspaceInfo = _spProjectUtility.RequestWorkspaceInfo(new Guid(Request["List"]));
+
+                        listName = workspaceInfo.ListName;
+                        strName = workspaceInfo.WorkspaceName;
+
+                        URL = projectInfo.ServerRelativeUrl;
+                        baseURL = projectInfo.BaseUrl;
+                        
+                        inpName.Title = strName + " Name";
+                        btnOK.Text = "Create " + strName;
+
+                        if (projectInfo.IsNavigationEnabled.HasValue)
                         {
-                            myweb.Site.CatchAccessDeniedException = false;
-                            try
-                            {
-                                if (!myweb.DoesUserHavePermissions(login, SPBasePermissions.ManageSubwebs))
-                                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            catch
-                            {
-                                Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            URL = myweb.ServerRelativeUrl;
-
-                            SPList list = myweb.Lists[new Guid(Request["List"])];
-                            listName = list.Title;
-                            strName = "";
-
-                            try
-                            {
-                                GridGanttSettings gSettings = new GridGanttSettings(list);
-                                strName = gSettings.NewMenuName;
-                            }
-                            catch { }
-                            if (strName == "")
-                                strName = listName;
-
-                            inpName.Title = strName + " Name";
-                            btnOK.Text = "Create " + strName;
-
-                            baseURL = myweb.Url + "/";
-                            Guid lockweb = CoreFunctions.getLockedWeb(myweb);
-                            if (lockweb != Guid.Empty)
-                            {
-                                using (SPWeb web = myweb.Site.AllWebs[lockweb])
-                                {
-                                    string wsType = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-                                    string nav = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
-                                    string perms = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
-
-                                    string sTemplates = CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates");
-
-                                    if (sTemplates != "")
-                                    {
-                                        string[] ssTemplates = sTemplates.Split('|');
-                                        foreach (string sTemplate in ssTemplates)
-                                        {
-                                            validTemplates.Add(sTemplate);
-                                        }
-                                    }
-
-
-                                    if (nav == "True")
-                                    {
-                                        rdoTopLinkYes.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-                                    else if (nav == "False")
-                                    {
-                                        rdoTopLinkNo.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-
-                                    if (perms == "Unique")
-                                    {
-                                        rdoInherit.Checked = false;
-                                        rdoUnique.Checked = true;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                    }
-                                    else if (perms == "Same")
-                                    {
-                                        rdoUnique.Checked = false;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                        rdoInherit.Checked = true;
-                                    }
-
-                                    if (wsType == "New")
-                                    {
-                                        wsTypeNew = "checked disabled=\"true\"";
-                                        wsTypeExisting = " disabled=\"true\"";
-
-                                    }
-                                    else if (wsType == "Existing")
-                                    {
-                                        wsTypeNew = " disabled=\"true\"";
-                                        wsTypeExisting = "checked disabled=\"true\"";
-                                        Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
-                                    }
-                                }
-                            }
-                            populateTemplates(myweb);
+                            rdoTopLinkYes.Checked = projectInfo.IsNavigationEnabled == true;
+                            rdoTopLinkNo.Checked = projectInfo.IsNavigationEnabled == false;
+                            rdoTopLinkNo.Enabled = false;
+                            rdoTopLinkYes.Enabled = false;
                         }
-                    }
-                });
-            }
-        }
 
-        private void populateTemplates(SPWeb site)
-        {
-            SortedList sl = new SortedList();
-            string version = getMajorVersion(site);
-            foreach (SPWebTemplate template in site.GetAvailableWebTemplates(site.Language))
-            {
-                if (!template.IsHidden)
-                {
-                    if (!template.Title.Contains("EPM Live"))
-                    {
-                        if (validTemplates.Count == 0)
+                        if (projectInfo.IsUnique.HasValue)
                         {
-                            if (template.IsCustomTemplate && isValidTemplate(template.Title, version, site))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
+                            rdoUnique.Checked = projectInfo.IsUnique == true;
+                            rdoInherit.Checked = projectInfo.IsUnique == false;
+                            rdoUnique.Enabled = false;
+                            rdoInherit.Enabled = false;
                         }
-                        else
+
+                        if (projectInfo.IsWorkspaceExisting == false)
                         {
-                            if (validTemplates.Contains(template.Title))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
+                            wsTypeNew = "checked disabled=\"true\"";
+                            wsTypeExisting = " disabled=\"true\"";
                         }
-                    }
+                        else if (projectInfo.IsWorkspaceExisting == true)
+                        {
+                            wsTypeNew = " disabled=\"true\"";
+                            wsTypeExisting = "checked disabled=\"true\"";
+                            Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
+                        }
+                        break;
                 }
             }
-
-            foreach (DictionaryEntry de in sl)
-            {
-                ListItem li = new ListItem(de.Key.ToString(), de.Value.ToString());
-                DdlGroup.Items.Add(li);
-            }
         }
-
-        private bool isValidTemplate(string template, string version, SPWeb web)
-        {
-            if (version == "2")
-            {
-                switch (template)
-                {
-                    case "Basic Project Workspace":
-                    case "Enterprise Project Management Workgroup":
-                        return false;
-                };
-            }
-            else if (version == "1")
-            {
-                switch (template)
-                {
-                    case "Project Workspace":
-                        return false;
-                }
-            }
-            return true;
-        }
-
-
-        private string getMajorVersion(SPWeb web)
-        {
-            try
-            {
-                string[] fullversion = web.Properties["TemplateVersion"].Split('.');
-                return fullversion[0];
-            }
-            catch { }
-            return "1";
-        }
-
+        
         protected void BtnOK_Click(object sender, EventArgs e)
         {
             string wType = Request["hdnWorkspaceType"];
