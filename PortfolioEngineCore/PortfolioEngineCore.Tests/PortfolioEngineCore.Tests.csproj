@@ -76,8 +76,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Testables\BaseDetailRowDataTestable.cs" />
     <Compile Include="Analyzers\CostAnalyzerDataTest.cs" />
-    <Compile Include="PfeJobTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
