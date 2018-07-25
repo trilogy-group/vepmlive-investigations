@@ -1798,11 +1798,15 @@ begin
     SET @createoralter = 'ALTER'
 end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_PCTDetailValues
+/*
+	Changes Log:
+		2018/07/24: Included columns used for project discount rate feature (EPMLCID-19885). Upgrade step marker: v6.4.0.4
+*/
    @ProjID INT,
    @CBID INT,
    @CTID INT 
 AS
- Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST
+ Select BC_UID,BC_SEQ,BD_PERIOD,PRD_START_DATE,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE
   From EPGP_DETAIL_VALUES cv
   Inner Join EPG_PERIODS p On cv.CB_ID = p.CB_ID And cv.BD_PERIOD = p.PRD_ID
   Where cv.CB_ID = @CBID And CT_ID = @CTID And PROJECT_ID=@ProjID

@@ -25,14 +25,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             try
             {
                 LogTitle(GetWebInfo(Web), 1);
-                if (Web.IsRootWeb)
-                {
-                    SPSecurity.RunWithElevatedPrivileges(UpgradeSharePoint);
-                }
-                else
-                {
-                    LogMessage($"Web {Web.Title} is not a root web", MessageKind.SKIPPED, 1);
-                }
+                SPSecurity.RunWithElevatedPrivileges(UpgradeSharePoint);
             }
             catch (Exception e)
             {
@@ -54,8 +47,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             var siteId = Web.Site.ID;
             var rootWebId = Web.ID;
             
-            // ensure feature is installed in root web
+            // ensure feature is installed in web
             _setupService.EnsureFeatureIsInstalledForWeb(siteId, rootWebId);
+
+            if (!Web.IsRootWeb)
+            {
+                // if not a root web do not try update child webs
+                // all sub-sites can only be updated when calling upgrade to root site
+                return;
+            }
 
             var childWebIds = GetChildWebIds(siteId, rootWebId);
 

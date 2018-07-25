@@ -1,12 +1,27 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace PortfolioEngineCore
 {
 
     public class dbaEditCosts
     {
+        private const string GetProjectDiscountRateQuery = "SELECT PROJECT_DISCOUNT_RATE FROM EPGP_PROJECTS WHERE PROJECT_ID = @p1";
+        private const string GetDetailValuesCostTypesAndCalendarsQuery = "SELECT DISTINCT CT_ID, CB_ID FROM EPGP_DETAIL_VALUES WHERE PROJECT_ID = @PROJECT_ID";
+        private const string UpdateDetailValuesQuery = "UPDATE EPGP_DETAIL_VALUES" +
+                                                           " SET BD_COST = (BD_COST + ISNULL(BD_DISCOUNT_VALUE,0)) * (1 - @BD_DISCOUNT_RATE)," +
+                                                           " BD_DISCOUNT_RATE = @BD_DISCOUNT_RATE," +
+                                                           " BD_DISCOUNT_VALUE = (BD_COST + ISNULL(BD_DISCOUNT_VALUE,0)) * @BD_DISCOUNT_RATE" +
+                                                           " WHERE PROJECT_ID = @PROJECT_ID AND BD_VALUE > 0";
+
+        private const string DetailValuesProjectIdParameter = "@PROJECT_ID";
+
+        private const StatusEnum GetDetailValuesCostTypesAndCalendarsFailed = (StatusEnum)99973;
+        private const StatusEnum UpdateCostValuesAfterDiscountChangedFailed = (StatusEnum)99974;
+        private const StatusEnum SelectDiscountRateFailed = (StatusEnum)99975;
+
         public static StatusEnum SelectProjectIDByExtUID(DBAccess dba, string sExtUID, out int nProjectID)
         {
             string cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @PROJECT_EXT_UID";
@@ -127,6 +142,25 @@ namespace PortfolioEngineCore
                 " LEFT OUTER JOIN EPG_RESOURCES ON EPGP_PROJECTS.PROJECT_CHECKEDOUT_BY = EPG_RESOURCES.WRES_ID" +
                 " WHERE PROJECT_ID = @p1";
             return dba.SelectDataById(cmdText, nProjectID, (StatusEnum)99949, out dt);
+        }
+
+        /// <summary>
+        /// Gets the discount rate for project.
+        /// </summary>
+        /// <param name="dba">Database connection object.</param>
+        /// <param name="projectId">The project identifier.</param>
+        /// <returns>The discount - % value.</returns>
+        public static decimal GetDiscountRate(DBAccess dba, int projectId)
+        {
+            DataTable results;
+            var status = dba.SelectDataById(GetProjectDiscountRateQuery, projectId, SelectDiscountRateFailed, out results);
+
+            if (status != StatusEnum.rsSuccess || results == null || results.Rows.Count == 0 || results.Rows[0][0] == DBNull.Value)
+            {
+                return 0;
+            }
+
+            return Convert.ToDecimal(results.Rows[0][0]);
         }
 
         public static StatusEnum SelectCostCategoryData(DBAccess dba, int nCalendarID, int nCostTypeID, int nProjectID, out DataTable dt)
@@ -380,7 +414,8 @@ namespace PortfolioEngineCore
                 try
                 {
                     string cmdText =
-                        "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST) VALUES(@CB_ID,@CT_ID,@PROJECT_ID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST)";
+                        "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE)" +
+                        " VALUES(@CB_ID,@CT_ID,@PROJECT_ID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_DISCOUNT_RATE,@BD_DISCOUNT_VALUE)";
                     SqlCommand cmd = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
                     cmd.Parameters.AddWithValue("@CB_ID", nCalendarID);
                     cmd.Parameters.AddWithValue("@CT_ID", nCostTypeID);
@@ -391,11 +426,17 @@ namespace PortfolioEngineCore
                     SqlParameter pBD_PERIOD = cmd.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
                     SqlParameter pBD_VALUE = cmd.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
                     SqlParameter pBD_COST = cmd.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+                    var discountRateParameter = cmd.Parameters.Add(dbaCostValues.DetailValuesDiscountRateParameter, SqlDbType.Decimal);
+                    var discountValueParameter = cmd.Parameters.Add(dbaCostValues.DetailValuesDiscountValueParameter, SqlDbType.Decimal);
 
                     pBD_VALUE.Precision = 25;
                     pBD_VALUE.Scale = 6;
                     pBD_COST.Precision = 25;
                     pBD_COST.Scale = 6;
+                    discountValueParameter.Precision = 25;
+                    discountValueParameter.Scale = 6;
+                    discountRateParameter.Precision = 6;
+                    discountRateParameter.Scale = 5;
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -404,6 +445,8 @@ namespace PortfolioEngineCore
                         pBD_PERIOD.Value = row["BD_PERIOD"];
                         pBD_VALUE.Value = row["BD_VALUE"];
                         pBD_COST.Value = row["BD_COST"];
+                        discountRateParameter.Value = row[dbaCostValues.DetailValuesDiscountRateColumn];
+                        discountValueParameter.Value = row[dbaCostValues.DetailValuesDiscountValueColumn];
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -413,6 +456,77 @@ namespace PortfolioEngineCore
                 }
             }
             return eStatus;
+        }
+
+        /// <summary>
+        /// Updates the cost values for editable cost types (the input) after discount rate changed.
+        /// Process all cost type / calendar pairs which already have the data.
+        /// </summary>
+        /// <param name="dba">The database connection object.</param>
+        /// <param name="projectId">The project identifier.</param>
+        /// <param name="newDiscountRate">The new discount rate.</param>
+        public static void UpdateCostValuesAfterDiscountChanged(DBAccess dba, int projectId, decimal newDiscountRate)
+        {
+            try
+            {
+                UpdateCostDetailValuesWithNewDiscount(dba, projectId, newDiscountRate);
+
+                var typesAndCalendars = GetDetailValuesCostTypesAndCalendars(dba, projectId);
+                foreach (var data in typesAndCalendars)
+                {
+                    var costTypeId = data[0];
+                    var calendarId = data[1];
+
+                    string result;
+                    if (dbaCCV.CalculateCostValues(dba, costTypeId, calendarId, projectId, out result) != StatusEnum.rsSuccess)
+                    {
+                        throw new PFEException((int)UpdateCostValuesAfterDiscountChangedFailed, "Could not update cost values. " + result);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                dba.HandleStatusError(
+                    SeverityEnum.Exception,
+                    "UpdateCostValuesAfterDiscountChanged",
+                    UpdateCostValuesAfterDiscountChangedFailed,
+                    ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the unique pairs of cost types and calendars from detail values table.
+        /// </summary>
+        /// <param name="dba">The database connection object.</param>
+        /// <param name="projectId">The project identifier.</param>
+        /// <returns>Array of 2 elements cost type id [0] and calendar id [1]</returns>
+        private static int[][] GetDetailValuesCostTypesAndCalendars(DBAccess dba, int projectId)
+        {
+            var query = GetDetailValuesCostTypesAndCalendarsQuery;
+            using (var sqlCommand = new SqlCommand(query, dba.Connection, dba.Transaction))
+            {
+                DataTable table;
+                sqlCommand.Parameters.AddWithValue(DetailValuesProjectIdParameter, projectId);
+                dba.SelectData(sqlCommand, GetDetailValuesCostTypesAndCalendarsFailed, out table);
+                var rows = table.Select();
+
+                return rows.Length > 0 ? rows.Select(x => new[] {(int)x[0], (int)x[1]}).ToArray() : new int[][] { };
+            }
+        }
+
+        private static void UpdateCostDetailValuesWithNewDiscount(DBAccess dba, int projectId, decimal newDiscountRate)
+        {
+            using (var sqlCommand = new SqlCommand(UpdateDetailValuesQuery, dba.Connection, dba.Transaction))
+            {
+                sqlCommand.Parameters.AddWithValue(DetailValuesProjectIdParameter, projectId);
+
+                var discountRateParameter = sqlCommand.Parameters.Add(dbaCostValues.DetailValuesDiscountRateParameter, SqlDbType.Decimal);
+                discountRateParameter.Precision = 6;
+                discountRateParameter.Scale = 5;
+                discountRateParameter.Value = newDiscountRate;
+
+                sqlCommand.ExecuteNonQuery();
+            }
         }
 
         //sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_CHECKEDOUT = 1, PROJECT_CHECKEDOUT_BY = " & Format(lWResID) & _

@@ -10,22 +10,10 @@ namespace PortfolioEngineCore
     public class dbaCostTypes
     {
         private const int RatePerProjectPublishMainKey = 101;
-
-        private const string DeletePostScheduleOnProjectRateChangeQuery =
-            "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY = 101 AND CT_ID = @CT_ID";
-
-        private const string DeleteCurrentPostScheduleOnProjectRateChangeQuery =
-            "DELETE FROM EPGP_COST_VALUES_TOSET WHERE(TOSET_MAINKEY = 101) AND (CT_ID = @CT_ID)"
-            + " AND (CB_ID = (SELECT TOP 1 ISNULL(CT_CB_ID, 0) FROM EPGP_COST_TYPES ct WHERE ct.CT_ID = @CT_ID))";
-
-        private const string InsertPostScheduleOnProjectRateChangeQuery =
-            "INSERT INTO EPGP_COST_VALUES_TOSET (TOSET_MAINKEY,CT_ID,CB_ID,CV_TIMESTAMP)"
-            + " VALUES(101,@CT_ID,@CB_ID,GETDATE())";
-
         private const string CostTypeIdQueryParameter = "@CT_ID";
-
-        private const string CalendarIdQueryParameter = "@CB_ID";
-
+        private const string DeleteAutoPostOnProjectRateChangeQuery = "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY = 101 AND CT_ID = @CT_ID";
+        private const string SelectAutoPostCountOnProjectRateChangeQuery = "SELECT COUNT(*) FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY = 101 AND CT_ID = @CT_ID";
+        
         public static StatusEnum SelectCalendars(DBAccess dba, out DataTable dt)
         {
             string cmdText = "SELECT * FROM EPGP_COST_BREAKDOWNS ORDER BY CB_ID";
@@ -42,6 +30,29 @@ namespace PortfolioEngineCore
         {
             string cmdText = "SELECT CL_CT_ID, CL_OP, CT_NAME FROM EPGP_COST_CALC CC LEFT JOIN EPGP_COST_TYPES CT ON (CC.CL_CT_ID = CT.CT_ID) WHERE CC.CT_ID = @p1 ORDER BY CL_ID";
             return dba.SelectDataById(cmdText, nCostType, (StatusEnum)99986, out dt);
+        }
+
+        /// <summary>
+        /// Determines whether automatic post is enabled on project rate (discount or resource) change.
+        /// </summary>
+        /// <param name="dba">The database connection object.</param>
+        /// <param name="costTypeId">The cost type identifier.</param>
+        /// <returns>
+        ///   <c>true</c> if automatic post is enabled (found at least one config record for cost type) otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsAutoPostEnabledOnRatePerProjectChange(DBAccess dba, int costTypeId)
+        {
+            DataTable results;
+            using (var command = new SqlCommand(SelectAutoPostCountOnProjectRateChangeQuery, dba.Connection))
+            {
+                command.Parameters.AddWithValue(CostTypeIdQueryParameter, costTypeId);
+                if (dba.SelectData(command, StatusEnum.rsServerError, out results) != StatusEnum.rsSuccess)
+                {
+                    return false;
+                }
+            }
+
+            return results != null && results.Rows.Count > 0 && (int)results.Rows[0][0] > 0;
         }
 
         public static StatusEnum SelectCostTypePostOptions(DBAccess dba, int nCostType, out DataTable dt)
@@ -508,19 +519,9 @@ namespace PortfolioEngineCore
                     oCommand.Parameters.AddWithValue("@pNamedRates", nNamedRates);
                     oCommand.ExecuteNonQuery();
                     dba.GetLastIdentityValue(out nCTId);
-
-                    if (nCTId > 0 && (nEditMode == (int)CTEditMode.ctCommitments || nEditMode == (int)CTEditMode.ctWEActuals))
-                    {
-                        AddPostScheduleOnProjectRateChange(dba, nCTId, nInputCalendar);
-                    }
                 }
                 else
                 {
-                    if (nEditMode == (int)CTEditMode.ctCommitments || nEditMode == (int)CTEditMode.ctWEActuals)
-                    {
-                        UpdatePostScheduleOnProjectRateChange(dba, nCTId, nInputCalendar);
-                    }
-
                     //  update
                     cmdText = "UPDATE EPGP_COST_TYPES "
                                 + " SET CT_NAME=@pCT_NAME,CT_EDIT_MODE=@pEditMode,INITIAL_LEVEL=@pInitialLevel,CT_CB_ID=@InputCalendar,CT_ALLOW_NAMED_RATES=@pNamedRates"
@@ -744,7 +745,7 @@ namespace PortfolioEngineCore
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
-        public static StatusEnum UpdatePostOptionsInfo(DBAccess dba, int nCTId, string sCalendars, out string sReply)
+        public static StatusEnum UpdatePostOptionsInfo(DBAccess dba, int nCTId, string sCalendars, bool autoPostOnRateChange, out string sReply)
         {
             string cmdText;
             SqlCommand oCommand;
@@ -777,7 +778,7 @@ namespace PortfolioEngineCore
                     if (lEMode == 41) lMainKey = 31;    //31 = WE Timesheet Actuals
 
                     SqlTransaction transaction = dba.Connection.BeginTransaction();
-                    cmdText = "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY > 0 AND TOSET_MAINKEY NOT IN (" + RatePerProjectPublishMainKey + ") AND CT_ID = @pCT_ID";
+                    cmdText = "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY > 0 AND CT_ID = @pCT_ID";
                     oCommand = new SqlCommand(cmdText, dba.Connection, transaction);
                     oCommand.Parameters.AddWithValue("@pCT_ID", nCTId);
                     oCommand.ExecuteNonQuery();
@@ -787,9 +788,9 @@ namespace PortfolioEngineCore
                         cmdText = "INSERT INTO EPGP_COST_VALUES_TOSET (TOSET_MAINKEY,CT_ID,CB_ID,CV_TIMESTAMP)"
                                     + " VALUES(@pMainKey,@pCT_ID,@pCB_ID,GETDATE())";
                         oCommand = new SqlCommand(cmdText, dba.Connection, transaction);
-                        oCommand.Parameters.AddWithValue("@pMainKey", lMainKey);
                         oCommand.Parameters.AddWithValue("@pCT_ID", nCTId);
                         SqlParameter pCB_ID = oCommand.Parameters.Add("@pCB_ID", SqlDbType.Int);
+                        var mainKeyParameter = oCommand.Parameters.Add("@pMainKey", SqlDbType.Int);
 
                         string[] cals = sCalendars.Split(',');
                         foreach (string sentry in cals)
@@ -798,8 +799,16 @@ namespace PortfolioEngineCore
                             int.TryParse(sentry, out ientry);
                             if (ientry > 0)
                             {
+                                mainKeyParameter.Value = lMainKey;
                                 pCB_ID.Value = ientry;
                                 oCommand.ExecuteNonQuery();
+
+                                if (autoPostOnRateChange)
+                                {
+                                    // when auto post on rate change is selected - adds additional auto post setting with key 101
+                                    mainKeyParameter.Value = RatePerProjectPublishMainKey;
+                                    oCommand.ExecuteNonQuery();
+                                }
                             }
                         }
                     }
@@ -814,39 +823,11 @@ namespace PortfolioEngineCore
             }
         }
 
-        private static void DeletePostScheduleOnProjectRateChange(DBAccess dba, int costTypeId)
+        private static void DeleteAutoPostOnProjectRateChange(DBAccess dba, int costTypeId)
         {
-            using (var command = new SqlCommand(DeletePostScheduleOnProjectRateChangeQuery, dba.Connection))
+            using (var command = new SqlCommand(DeleteAutoPostOnProjectRateChangeQuery, dba.Connection))
             {
                 command.Parameters.AddWithValue(CostTypeIdQueryParameter, costTypeId);
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private static void UpdatePostScheduleOnProjectRateChange(DBAccess dba, int costTypeId, int calendarId)
-        {
-            // remove existing value linked to cost type, old CT_CB_ID may be different from our new calendarId so we use value from database
-            using (var command = new SqlCommand(DeleteCurrentPostScheduleOnProjectRateChangeQuery, dba.Connection))
-            {
-                command.Parameters.AddWithValue(CostTypeIdQueryParameter, costTypeId);
-                command.ExecuteNonQuery();
-            }
-            
-            AddPostScheduleOnProjectRateChange(dba, costTypeId, calendarId);
-        }
-
-        private static void AddPostScheduleOnProjectRateChange(DBAccess dba, int costTypeId, int calendarId)
-        {
-            if (calendarId <= 0)
-            {
-                // this value means calendar not selected, should not add anything
-                return;
-            }
-
-            using (var command = new SqlCommand(InsertPostScheduleOnProjectRateChangeQuery, dba.Connection))
-            {
-                command.Parameters.AddWithValue(CostTypeIdQueryParameter, costTypeId);
-                command.Parameters.AddWithValue(CalendarIdQueryParameter, calendarId);
                 command.ExecuteNonQuery();
             }
         }
@@ -935,7 +916,7 @@ namespace PortfolioEngineCore
                 oCommand.ExecuteNonQuery();
 
                 // Remove post cost values configuration used by resource rate per project feature
-                DeletePostScheduleOnProjectRateChange(dba, nCTId);
+                DeleteAutoPostOnProjectRateChange(dba, nCTId);
 
                 // Delete the Cost Type itself
                 cmdText = "DELETE FROM EPGP_COST_TYPES WHERE CT_ID = @pCTld";

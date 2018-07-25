@@ -7,6 +7,7 @@ using System.Xml;
 using System.Data;
 using System.Globalization;
 using System.Data.SqlClient;
+using PortfolioEngineCore.Base.DBAccess;
 
 
 namespace PortfolioEngineCore.PortfolioItems
@@ -46,6 +47,12 @@ namespace PortfolioEngineCore.PortfolioItems
 
     public class PortfolioItems : PFEBase
     {
+        private const string LogKeyword = "PortfolioItems";
+        private const string LogProjectDiscountRateFunction = "ProjectDiscountRate";
+        private const string LogProjectDiscountRateMessage = "UpdateProjectDiscountRate";
+        private const string LogProjectDiscountRateError = "ErrorUpdateProjectDiscountRate";
+        private const string DiscountRateXmlAttribute = "DiscountRate";
+        private const string DiscountRatePreviousValueXmlAttribute = "DiscountRatePreviousValue";
 
         #region Fields (1)
 
@@ -289,6 +296,8 @@ namespace PortfolioEngineCore.PortfolioItems
                 {
                     string sGuid = xPI.GetStringAttr("EXTID", "");
                     string sListID = xPI.GetStringAttr("ListID", "");
+                    var discountRateString = xPI.GetStringAttr(DiscountRateXmlAttribute, string.Empty);
+                    var discountRatePreviousValueString = xPI.GetStringAttr(DiscountRatePreviousValueXmlAttribute, string.Empty);
 
                     sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0 WHERE PROJECT_EXT_UID = @extid";
 
@@ -369,6 +378,8 @@ namespace PortfolioEngineCore.PortfolioItems
                         _dba.WriteImmTrace("PortfolioItems", "UpdatePortfolioItems", "ErrorSetListID", "ListID: " + sListID + " Error: " + ex.Message);
 
                     }
+
+                    UpdateProjectDiscountRate(_dba, iPI, discountRateString, discountRatePreviousValueString);
 
                     // so by here we have an unclosed PI that "matches " the item - unless iPI is zero - inwhich case something nasty must have happened - as there was no match!
 
@@ -2116,6 +2127,52 @@ namespace PortfolioEngineCore.PortfolioItems
             string sValue = "";
             if (clnLookupValues.ContainsKey(lID)) sValue = clnLookupValues[lID];
             return sValue;
+        }
+
+        /// <summary>
+        /// Updates the project discount rate.
+        /// When rate is changed trigger cost value recalculation events:
+        ///   * updates editable cost values
+        ///   * adds job to update calculated cost values.
+        /// </summary>
+        /// <param name="dba">The database connection object.</param>
+        /// <param name="projectId">The project identifier.</param>
+        /// <param name="discountRate">The discount rate.</param>
+        /// <param name="discountRatePreviousValue">The previous discount rate value.</param>
+        private void UpdateProjectDiscountRate(DBAccess dba, int projectId, string discountRate, string discountRatePreviousValue)
+        {
+            try
+            {
+                if (projectId != 0 && !string.IsNullOrWhiteSpace(discountRate) && !string.IsNullOrWhiteSpace(discountRatePreviousValue))
+                {
+                    ProjectDiscountRates.UpdateProjectDiscountRate(dba, projectId, discountRate);
+
+                    if (discountRate != discountRatePreviousValue)
+                    {
+                        // we need to update discount values for editable cost type (CT) because auto posts not supported, and all main BL is in JavaScript,
+                        // so we will use simplified query to update CT discounts only on server side
+                        dbaEditCosts.UpdateCostValuesAfterDiscountChanged(dba, projectId, decimal.Parse(discountRate));
+
+                        // now we ready to use auto posts to update calculated CT
+                        dbaQueueManager.PostCostValuesOnProjectRatesChange(
+                            dba,
+                            _basepath,
+                            projectId.ToString("0"),
+                            true,
+                            false);
+                    }
+
+                    dba.WriteImmTrace(
+                        LogKeyword,
+                        LogProjectDiscountRateFunction,
+                        LogProjectDiscountRateMessage,
+                        "PID: " + projectId + ",DiscountRate: " + discountRate);
+                }
+            }
+            catch (Exception ex)
+            {
+                dba.WriteImmTrace(LogKeyword, LogProjectDiscountRateFunction, LogProjectDiscountRateError, "PID: " + projectId + " Error: " + ex.Message);
+            }
         }
     }
 }

@@ -19,7 +19,6 @@ namespace WorkEnginePPM
         private const string ProjectIdInAttribute = "ProjectId";
         private const string PublishInAttribute = "Publish";
         private const string PublishBaselineInAttribute = "PublishBaseline";
-        private const int UpdateOnProjectResourceRateChange = 101;
 
         #region IHttpHandler Members
 
@@ -168,7 +167,7 @@ namespace WorkEnginePPM
         /// <summary>
         /// Adds portfolio engine job for processing cost value updates after project resource rate change.
         /// </summary>
-        /// <param name="dbAccess">The database access object.</param>
+        /// <param name="dba">The database access object.</param>
         /// <param name="xmlData">Request data in XML format.
         /// Must have XML attributes:
         ///     ProjectId <see cref="ProjectIdInAttribute"/>
@@ -177,37 +176,13 @@ namespace WorkEnginePPM
         /// </param>
         /// <param name="basePath">The base path for site.</param>
         /// <returns>The string value "1" if succeed, "0" if no job created.</returns>
-        private static string PostOnProjectResourceRateChange(DBAccess dbAccess, CStruct xmlData, string basePath)
+        private static string PostOnProjectResourceRateChange(DBAccess dba, CStruct xmlData, string basePath)
         {
             // parse request data
             var projectId = xmlData.GetIntAttr(ProjectIdInAttribute).ToString("0");
             var publish = xmlData.GetBooleanAttr(PublishInAttribute);
             var publishBaseline = xmlData.GetBooleanAttr(PublishBaselineInAttribute);
-
-            // add job to Queue for immediate execution
-            var request = new CStruct();
-            request.Initialize("Request");
-            var epkSet = request.CreateSubStruct("EPKSet");
-            epkSet.CreateString("EPKAuth", "");
-            var process = epkSet.CreateSubStruct("EPKProcess");
-            process.CreateInt("RequestNo", UpdateOnProjectResourceRateChange);
-            process.CreateString("PIs", projectId);
-
-            if (publish)
-            {
-                process.CreateBoolean("Publish", true);
-            }
-
-            if (publishBaseline)
-            {
-                process.CreateBoolean("PublishBaseline", true);
-            }
-
-            int rowsAffected;
-            dbaQueueManager.PostCostValues(dbAccess, "ProjectResourceRateChange for ProjectID=" + projectId,
-                request.XML(), basePath, out rowsAffected);
-
-            return rowsAffected.ToString();
+            return dbaQueueManager.PostCostValuesOnProjectRatesChange(dba, basePath, projectId, publish, publishBaseline);
         }
 
         private static string PostCostValues(DBAccess dba, CStruct xData, string basePath)
