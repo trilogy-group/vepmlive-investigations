@@ -4024,8 +4024,14 @@ namespace EPMLiveCore
         // (CC-76700, 2018-07-24) Ideally, we should add | RegexOptions.CultureInvariand and .IgnoreCase, but this will break the existing behavior, therefore not adding
         // We're making the RegexCompiled to save time on compliation on every call
         private static readonly Regex _alphaNumericRegex = new Regex(@"[^a-zA-Z0-9\s]", RegexOptions.Compiled);
+
         public static bool IsAlphaNumeric(string strToCheck)
         {
+            if (strToCheck == null)
+            {
+                throw new ArgumentNullException("strToCheck");
+            }
+
             return !_alphaNumericRegex.IsMatch(strToCheck);
         }
     }
