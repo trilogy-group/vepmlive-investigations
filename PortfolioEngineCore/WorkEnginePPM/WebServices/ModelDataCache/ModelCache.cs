@@ -166,13 +166,13 @@ namespace ModelDataCache
                 bShowFTEs = false;
                 bShowGantt = false;
                 bUseQTY = true;
-                bUseCosts = true;
+                bUseCosts = true;                
                 bottomgridlayoutcache = string.Empty;
                 m_sTicket = ticket;
                 m_sModel = model;
                 m_WResID = sWResID;
 
-                GrabPidsFromTickect(oDataAccess, ticket, out m_sPids, out m_GotAllPIs, out m_PI_Count);
+                CostAnalyzerData.GrabPidsFromTickect(oDataAccess, ticket, out m_sPids, out m_GotAllPIs, out m_PI_Count);
 
                 int lFirstP = 0;
                 int lLastP = 0;
@@ -443,114 +443,7 @@ namespace ModelDataCache
 
 
         }
-        private int GrabPidsFromTickect(SqlConnection oDataAccess, string ticket, out string sPids, out bool bNoneMissing, out int PICount)
-        {
 
-            string sCommand = "";
-            int eStatus = 0;
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            string sGuids = "";
-            string sGin = "";
-            sPids = "";
-            bNoneMissing = true;
-            PICount = 0;
-            int i = 0;
-            int lPid;
-
-            //if (ticket == "debug")
-            //{
-            //    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS";
-
-            //    oCommand = new SqlCommand(sCommand, oDataAccess);
-            //    reader = oCommand.ExecuteReader();
-            //    lPid = 0;
-            //    while (reader.Read())
-            //    {
-            //        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-
-
-            //        ++PICount;
-            //        if (sPids == "")
-            //            sPids = lPid.ToString();
-            //        else
-            //            sPids = sPids + "," + lPid.ToString();
-            //    }
-            //    reader.Close();
-            //    reader = null;
-
-
-            //    return eStatus;
-            //}
-
-            sCommand = "SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '" + ticket + "'";
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                sGuids = DBAccess.ReadStringValue(reader["DC_DATA"]);
-            }
-            reader.Close();
-            reader = null;
-
-
-            sGuids = sGuids.Replace(",", " ");
-            sGuids = sGuids.ToUpper();
-            sGuids = sGuids.Trim();
-
-
-            while (sGuids.Length != 0)
-            {
-                sGin = "";
-
-                i = sGuids.IndexOf(" ");
-
-                if (i == -1)
-                {
-                    sGin = sGuids;
-                    sGuids = "";
-                }
-                else
-                {
-                    sGin = sGuids.Substring(0, i);
-                    sGuids = sGuids.Substring(i + 1);
-                }
-
-                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
-                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
-
-                    oCommand = new SqlCommand(sCommand, oDataAccess);
-                    reader = oCommand.ExecuteReader();
-                    lPid = 0;
-                    while (reader.Read())
-                    {
-                        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                    }
-                    reader.Close();
-                    reader = null;
-
-                    if (lPid == 0)
-                        bNoneMissing = false;
-                    else
-                    {
-                        ++PICount;
-                        if (sPids == "")
-                            sPids = lPid.ToString();
-                        else
-                            sPids = sPids + "," + lPid.ToString();
-                    }
-
-                }
-
-            }
-            return eStatus;
-
-        }
         private int GrabModelInfo(SqlConnection oDataAccess, string sModel, out int lCB_ID, out int lSelFID, out string sCostTypes, out string sOtherCostTypes)
         {
 
