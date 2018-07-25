@@ -14,6 +14,8 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Net.Mail.Fakes;
+using System.Net.Mail;
 
 namespace EPMLiveCore.Tests.API.Notification
 {
@@ -128,7 +130,7 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
-        public void iQueueItemMessage1_Called_Disposed()
+        public void IQueueItemMessage1_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
@@ -154,7 +156,7 @@ namespace EPMLiveCore.Tests.API.Notification
             _apiEmailPrivate.Invoke("iQueueItemMessage", BindingFlags.Static | BindingFlags.NonPublic, arguments);
 
             // Assert
-            AssetConnection();
+            AssertConnection();
 
             Assert.AreEqual(1, _executeReaderCommandsCalled.Count);
             Assert.AreSame(_createdConnection, _executeReaderCommandsCalled[0].Connection);
@@ -181,7 +183,7 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
-        public void iQueueItemMessage2_Called_Disposed()
+        public void IQueueItemMessage2_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
@@ -206,7 +208,7 @@ namespace EPMLiveCore.Tests.API.Notification
             _apiEmailPrivate.Invoke("iQueueItemMessage", BindingFlags.Static | BindingFlags.NonPublic, arguments);
 
             // Assert
-            AssetConnection();
+            AssertConnection();
 
             Assert.AreEqual(1, _executeReaderCommandsCalled.Count);
             Assert.AreSame(_createdConnection, _executeReaderCommandsCalled[0].Connection);
@@ -229,7 +231,124 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreSame(_createdCommands[5], _disposedCommands[3]);
         }
 
-        private void AssetConnection()
+        [TestMethod]
+        public void ISendEmail_Hidefrom_Disposed()
+        {
+            ISendEmail_Called_Disposed(true, "curuser@fake.com");
+        }
+
+        [TestMethod]
+        public void ISendEmail_DontHidefromCurEmailEmpty_Disposed()
+        {
+            ISendEmail_Called_Disposed(false, string.Empty);
+        }
+
+        [TestMethod]
+        public void ISendEmail_DontHidefromCurEmailSet_Disposed()
+        {
+            ISendEmail_Called_Disposed(false, "curuser@fake.com");
+        }
+
+        private void ISendEmail_Called_Disposed(bool hideFrom, string curUserEmail)
+        {
+            // Arrange
+            const string outboundEmail = "outbound@fake.com";
+            var siteId = new Guid("0E2FCE32-4507-452C-A8BF-D28C867DF0E9");
+            var webId = new Guid("4008FE64-56A8-4DDF-99C7-AF3C45AEBDDA");
+
+            var shimCurrentUser = new ShimSPUser
+            {
+                NameGet = () => "CurUserName",
+                EmailGet = () => curUserEmail
+            };
+            var currentUser = (SPUser)shimCurrentUser;
+            var shimUser = new ShimSPUser
+            {
+                NameGet = () => "EUserName",
+                EmailGet = () => "euser@fake.com"
+            };
+            var user = (SPUser)shimUser;
+
+            var arguments = new object[]
+            {
+                1,
+                hideFrom,
+                siteId,
+                webId,
+                (SPUser)shimCurrentUser,
+                (SPUser)shimUser,
+                new Hashtable()
+                {
+                    { "building", "64" }
+                }
+            };
+
+            ShimSPAdministrationWebApplication.LocalGet = () =>
+            {
+                var spAdministrationWebApplication = new ShimSPAdministrationWebApplication();
+                var spWebApplication = new ShimSPWebApplication(spAdministrationWebApplication)
+                {
+                    OutboundMailServiceInstanceGet = () => 
+                    {
+                        var spOutboundMailServiceInstance = new ShimSPOutboundMailServiceInstance();
+                        var spServiceInstance = new ShimSPServiceInstance(spOutboundMailServiceInstance)
+                        {
+                            ServerGet = () => new ShimSPServer
+                            {
+                                AddressGet = () => "15th ave"
+                            }
+                        };
+                        return spOutboundMailServiceInstance;
+                    },
+                    OutboundMailSenderAddressGet = () => outboundEmail
+                };
+                return spAdministrationWebApplication;
+            };
+
+            string setHost = null;
+            MailMessage sentMessage = null;
+            ShimSmtpClient.Constructor = client =>
+            {
+                new ShimSmtpClient(client)
+                {
+                    HostSetString = host =>
+                    {
+                        setHost = host;
+                    },
+                    SendMailMessage = message =>
+                    {
+                        sentMessage = message;
+                    }
+                };
+            };
+
+            // Act
+            _apiEmailPrivate.Invoke("iSendEmail", BindingFlags.Static | BindingFlags.NonPublic, arguments);
+
+            // Assert
+            //AssertConnection();
+            if (hideFrom)
+            {
+                Assert.AreEqual(outboundEmail, sentMessage.From.Address);
+                Assert.IsTrue(string.IsNullOrWhiteSpace(sentMessage.From.DisplayName));
+            }
+            else if (string.IsNullOrWhiteSpace(curUserEmail))
+            {
+                Assert.AreEqual(outboundEmail, sentMessage.From.Address);
+                Assert.AreEqual(currentUser.Name, sentMessage.From.DisplayName);
+            }
+            else
+            {
+                Assert.AreEqual(currentUser.Email, sentMessage.From.Address);
+                Assert.AreEqual(currentUser.Name, sentMessage.From.DisplayName);
+            }
+            Assert.AreEqual(user.Email, sentMessage.To[0].Address);
+            Assert.AreEqual("64 house", sentMessage.Subject);
+            Assert.AreEqual("goose live in 64 house", sentMessage.Body);
+        }
+
+
+        private void AssertConnection()
         {
             Assert.AreSame(_createdConnection, _openedConnection);
             Assert.AreSame(_openedConnection, _disposedConnection);
@@ -382,7 +501,7 @@ namespace EPMLiveCore.Tests.API.Notification
                 (SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser) =>
                 {
                     body = "goose live in {building} house";
-                    subject = string.Empty;
+                    subject = "{building} house";
                 };
         }
 

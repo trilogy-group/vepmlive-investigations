@@ -720,9 +720,15 @@ namespace EPMLiveCore.API
                 iSendEmail(templateid, false, site, web, curUser, eUser, additionalParams);
             });
         }
-
         
-        private static void iSendEmail(int templateid, bool hidefrom, Guid siteid, Guid webid, SPUser curUser, SPUser eUser, Hashtable additionalParams)
+        private static void iSendEmail(
+            int templateid, 
+            bool hidefrom, 
+            Guid siteid, 
+            Guid webid, 
+            SPUser curUser, 
+            SPUser eUser, 
+            Hashtable additionalParams)
         {
             try
             {
