@@ -141,8 +141,8 @@ namespace ModelDataCache
 
         private int m_detShowToLevel, m_totShowToLevel;
 
-        string m_CostCatjsonMenu = "";
-        string m_CostTypejsonMenu = "";
+        string m_CostCatjsonMenu = string.Empty;
+        string m_CostTypejsonMenu = string.Empty;
 
         List<DetailRowData> m_editTargetList = null;
 
@@ -150,36 +150,26 @@ namespace ModelDataCache
         private int m_mode = 0;
 
         private bool m_ShowRemaining = false;
-        private string m_WResID = "";
+        private string m_WResID = string.Empty;
         private bool m_show_rhs_dec_costs = false;
         private DataItem m_init_def_view = null;
         private int m_init_def_view_pos = -1;
 
-        private string m_tarnames = "";
-        private string m_initial_zoom = "";
-
-
-
-        //      private SqlConnection oDataAccess = null;
-
-
+        private string m_tarnames = string.Empty;
+        private string m_initial_zoom = string.Empty;
+        
         public int InitalLoadData(SqlConnection oDataAccess, string ticket, string model, string versions, string sWResID, string sViewID)
         {
             try
             {
-
-                m_loadmsg = "";
+                m_loadmsg = string.Empty;
                 bShowFTEs = false;
                 bShowGantt = false;
                 bUseQTY = true;
                 bUseCosts = true;
-
-
-                bottomgridlayoutcache = "";
-                //      oDataAccess = oDataAccess;
+                bottomgridlayoutcache = string.Empty;
                 m_sTicket = ticket;
                 m_sModel = model;
-
                 m_WResID = sWResID;
 
                 GrabPidsFromTickect(oDataAccess, ticket, out m_sPids, out m_GotAllPIs, out m_PI_Count);
@@ -189,12 +179,20 @@ namespace ModelDataCache
 
                 m_bCTAMode = false;
 
-                if (sViewID != "")
+                if (sViewID != string.Empty)
                 {
-                    GrabCostViewInfo(oDataAccess, sViewID, out m_CB_ID, out m_sCostTypes, out m_sOtherCostTypes, out lFirstP, out lLastP);
+                    CostAnalyzerData.GrabCostViewInfo(
+                        oDataAccess,
+                        sViewID,
+                        ref m_sCalcCostTypes,
+                        out m_CB_ID,
+                        out m_sCostTypes,
+                        out m_sOtherCostTypes,
+                        out lFirstP,
+                        out lLastP);
+
                     m_SelFID = 0;
                     m_bCTAMode = true;
-
                     m_mode = 1001;
                 }
                 else
@@ -672,105 +670,7 @@ namespace ModelDataCache
             }
             return eStatus;
         }
-        private int GrabCostViewInfo(SqlConnection oDataAccess, string sCostView, out int lCB_ID, out string sCostTypes, out string sOtherCostTypes, out int lMinP, out int lMaxP)
-        {
 
-            int eStatus = 0;
-            string sCommand = "";
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-
-            int lCostView = 0;
-            lMinP = 0;
-            lMaxP = 0;
-
-
-
-            lCB_ID = 0;
-            sCostTypes = "";
-            sOtherCostTypes = "";
-
-
-            try
-            {
-                lCostView = Int32.Parse(sCostView);
-            }
-            catch
-            {
-                lCostView = 0;
-            }
-
-            if (lCostView == 0)
-                return 1;
-
-
-
-            sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + sCostView;
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-
-            while (reader.Read())
-            {
-                lCB_ID = DBAccess.ReadIntValue(reader["VIEW_COST_BREAKDOWN"]);
-                lMinP = DBAccess.ReadIntValue(reader["VIEW_FIRST_PERIOD"]);
-                lMaxP = DBAccess.ReadIntValue(reader["VIEW_LAST_PERIOD"]);
-
-
-            }
-            reader.Close();
-            reader = null;
-
-            if (lCB_ID == 0)
-                return 1;
-
-
-
-
-            sCommand = "SELECT  EPGT_COSTVIEW_COST_TYPES.CT_ID, EPGP_COST_TYPES.CT_EDIT_MODE FROM EPGT_COSTVIEW_COST_TYPES INNER JOIN EPGP_COST_TYPES ON EPGT_COSTVIEW_COST_TYPES.CT_ID = EPGP_COST_TYPES.CT_ID WHERE VIEW_UID = " + sCostView;
-
-            int lCTID = 0;
-            int lEMode = 0;
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                lCTID = DBAccess.ReadIntValue(reader["CT_ID"]);
-                lEMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
-
-                if (lEMode == 1)
-                {
-                    if (sCostTypes == "")
-                        sCostTypes = lCTID.ToString();
-                    else
-                        sCostTypes = sCostTypes + "," + lCTID.ToString();
-
-                }
-                else
-                {
-                    if (sOtherCostTypes == "")
-                        sOtherCostTypes = lCTID.ToString();
-                    else
-                        sOtherCostTypes = sOtherCostTypes + "," + lCTID.ToString();
-
-                    if (lEMode == 3)
-                    {
-                        if (m_sCalcCostTypes == "")
-                            m_sCalcCostTypes = lCTID.ToString();
-                        else
-                            m_sCalcCostTypes = m_sCalcCostTypes + "," + lCTID.ToString();
-                    }
-
-
-                }
-
-            }
-            reader.Close();
-            reader = null;
-
-            return eStatus;
-        }
         private void GrabViewsAndStatus(SqlConnection oDataAccess, string sWResID, int lMode)
         {
 
