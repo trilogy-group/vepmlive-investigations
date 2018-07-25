@@ -356,7 +356,7 @@ namespace RPADataCache
         }
 
         private CStruct InitializeGridLayoutCategoryColumn(
-            CStruct xLeftCols,
+            CStruct columns,
             string name,
             string type,
             bool? visible = null,
@@ -371,7 +371,7 @@ namespace RPADataCache
             bool canHide = false,
             bool canSelect = false)
         {
-            var categoryColumn = xLeftCols.CreateSubStruct("C");
+            var categoryColumn = columns.CreateSubStruct("C");
             categoryColumn.CreateStringAttr("Name", name);
             categoryColumn.CreateStringAttr("Type", type);
 
@@ -441,10 +441,11 @@ namespace RPADataCache
                         if (displayRow.bUse)
                         {
                             ++count;
+                            var prefix = "P" + periodId + "C" + count;
 
                             var xC = InitializeGridLayoutCategoryColumn(
                                 PeriodCols,
-                                "P" + periodId + "C" + count.ToString(),
+                                prefix,
                                 "Float",
                                 canMove: false);
 
@@ -469,27 +470,27 @@ namespace RPADataCache
                             if (_displayMode != 3)
                             {
                                 var sFunc = "(Row.id == 'Filter' ? '' : sum())";
-                                DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", sFunc);
+                                DefinitionRight.CreateStringAttr(prefix + "Formula", sFunc);
                                 
                                 if (_displayMode == 1)
                                 {
-                                    DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Format", ",0.###");
+                                    DefinitionRight.CreateStringAttr(prefix + "Format", ",0.###");
                                 }
                                 else
                                 {
-                                    DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Format", ",0.##");
+                                    DefinitionRight.CreateStringAttr(prefix + "Format", ",0.##");
                                 }
                             }
 
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "Formula", string.Empty);
-                            DefinitionLeaf.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
-                            DefinitionRight.CreateIntAttr("P" + periodId + "C" + count.ToString() + "CanDrag", _pmoAdmin);
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", string.Empty);
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "ClassInner", string.Empty);
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", string.Empty);
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPostfix", string.Empty);
-                            DefinitionLeaf.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", string.Empty);
-                            DefinitionRight.CreateStringAttr("P" + periodId + "C" + count.ToString() + "HtmlPrefix", string.Empty);
+                            DefinitionLeaf.CreateStringAttr(prefix + "Formula", string.Empty);
+                            DefinitionLeaf.CreateIntAttr(prefix + "CanDrag", _pmoAdmin);
+                            DefinitionRight.CreateIntAttr(prefix + "CanDrag", _pmoAdmin);
+                            DefinitionLeaf.CreateStringAttr(prefix + "ClassInner", string.Empty);
+                            DefinitionRight.CreateStringAttr(prefix + "ClassInner", string.Empty);
+                            DefinitionLeaf.CreateStringAttr(prefix + "HtmlPostfix", string.Empty);
+                            DefinitionRight.CreateStringAttr(prefix + "HtmlPostfix", string.Empty);
+                            DefinitionLeaf.CreateStringAttr(prefix + "HtmlPrefix", string.Empty);
+                            DefinitionRight.CreateStringAttr(prefix + "HtmlPrefix", string.Empty);
 
                             xC.CreateIntAttr("MinWidth", 45);
                             xC.CreateIntAttr("Width", 65);

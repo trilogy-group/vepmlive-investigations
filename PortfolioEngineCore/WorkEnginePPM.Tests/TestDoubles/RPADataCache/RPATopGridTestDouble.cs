@@ -28,11 +28,41 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
+
+            Header1 = Constructor.CreateSubStruct("Header");
+            base.PeriodCols = Constructor.CreateSubStruct("RightCols");
+            base.DefinitionRight = Constructor.CreateSubStruct("Right");
+            base.DefinitionLeaf = Constructor.CreateSubStruct("Leaf");
         }
 
         public new void InitializeGridLayout(GridRenderingTypes renderingType)
         {
             base.InitializeGridLayout(renderingType);
+        }
+
+        public new string ResolvePeriodId(CPeriod periodData, int index)
+        {
+            return base.ResolvePeriodId(periodData, index);
+        }
+
+        public new void AddPeriodColumns(IEnumerable<CPeriod> periods)
+        {
+            base.AddPeriodColumns(periods);
+        }
+
+        public new void InitializeGridData(GridRenderingTypes renderingType)
+        {
+            base.InitializeGridData(renderingType);
+        }
+
+        public new bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
+        {
+            return base.CheckIfDetailRowShouldBeAdded(detailRow);
+        }
+
+        public new void AddDetailRow(Tuple<clsResXData, clsPIData> detailRowDataTuple, int rowId)
+        {
+            base.AddDetailRow(detailRowDataTuple, rowId);
         }
 
         protected override string GetResourceAnalyzerView(string sXML)

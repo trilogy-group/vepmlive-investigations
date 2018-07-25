@@ -38,6 +38,8 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         private IDictionary<string, IDictionary<string, int>> _intAttributesCreated;
         private IDictionary<string, IDictionary<string, double>> _doubleAttributesCreated;
 
+        private IList<CPeriod> _periods;
+
         [TestInitialize]
         public void SetUp()
         {
@@ -52,7 +54,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             };
             _displayList = new[] 
             {
-                new RPATGRow { }
+                new RPATGRow { bUse = true }
             };
             _pmoAdmin = 0;
             _xmlString = string.Format("<Result><View><g_1 Cols='{0}'></g_1></View></Result>", 
@@ -60,6 +62,19 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             _displayMode = 0;
             _resourceValues = new clsResourceValues();
             _categoryLookupList = new clsLookupList();
+
+            _periods =  new[] {
+                new CPeriod
+                {
+                    PeriodID = 1,
+                    PeriodName = "test-1"
+                },
+                new CPeriod
+                {
+                    PeriodID = 2,
+                    PeriodName = "test-2"
+                }
+            };
 
             _testDouble = CreateTestDouble();
 
@@ -336,6 +351,115 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                     .Replace("\n", string.Empty)
                     .Replace("/n", string.Empty)
                 ));
+            }
+        }
+
+        [TestMethod]
+        public void ResolvePeriodId_Always_ReturnsPeriodId()
+        {
+            // Arrange
+            var periodData = new CPeriod
+            {
+                PeriodID = 2
+            };
+
+            // Act
+            var result = _testDouble.ResolvePeriodId(periodData, 10);
+
+            // Assert
+            Assert.AreEqual(periodData.PeriodID.ToString(), result);
+        }
+
+        [TestMethod]
+        public void AddPeriodColumns_DisplayRowsInUse_ProcessesEachPeriod()
+        {
+            // Arrange, Act
+            _testDouble.AddPeriodColumns(_periods);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                Assert.AreEqual(period.PeriodName, _stringAttributesCreated["Header"]["P" + period.PeriodID + "C1"]);
+            }
+        }
+
+        [TestMethod]
+        public void AddPeriodColumns_DisplayRowsInUse_HeaderAttributesSet()
+        {
+            // Arrange, Act
+            _testDouble.AddPeriodColumns(_periods);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                Assert.AreEqual(period.PeriodName, _stringAttributesCreated["Header"]["P" + period.PeriodID + "C1"]);
+            }
+        }
+
+        [TestMethod]
+        public void AddPeriodColumns_DisplayRowsInUse_CategoryColumnGeneratedForEachDisplayRow()
+        {
+            // Arrange
+            var nameAttributeValues = new HashSet<string>();
+            ShimCStruct.AllInstances.CreateStringAttrStringString = (element, name, value) =>
+            {
+                if (name == "Name")
+                {
+                    nameAttributeValues.Add(value);
+                }
+            };
+
+            // Act
+            _testDouble.AddPeriodColumns(_periods);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                for (var i = 1; i <= _displayList.Count; i++)
+                {
+                    Assert.IsTrue(nameAttributeValues.Contains(
+                        "P" + period.PeriodID + "C" + i
+                    ));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddPeriodColumns_DisplayRowsInUseDefaultSettings_SetsBasicContainerAttributes()
+        {
+            // Arrange, Act
+            _testDouble.AddPeriodColumns(_periods);
+
+            // Assert
+            Assert.AreEqual(_pmoAdmin, _intAttributesCreated["C"]["CanDrag"]);
+            Assert.AreEqual(",0.##", _stringAttributesCreated["C"]["Format"]);
+            Assert.AreEqual("Right", _stringAttributesCreated["C"]["Align"]);
+            Assert.AreEqual(45, _intAttributesCreated["C"]["MinWidth"]);
+            Assert.AreEqual(65, _intAttributesCreated["C"]["Width"]);
+        }
+
+        [TestMethod]
+        public void AddPeriodColumns_DisplayRowsInUseDefaultSettings_SetsDefinitionsAttributes()
+        {
+            // Arrange, Act
+            _testDouble.AddPeriodColumns(_periods);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                for (var i = 1; i <= _displayList.Count; i++)
+                {
+                    var prefix = "P" + period.PeriodID + "C" + i;
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Leaf"][prefix + "Formula"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Right"][prefix + "ClassInner"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Leaf"][prefix + "ClassInner"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Right"][prefix + "HtmlPostfix"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Leaf"][prefix + "HtmlPostfix"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Right"][prefix + "HtmlPrefix"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["Leaf"][prefix + "HtmlPrefix"]);
+                    Assert.AreEqual(_pmoAdmin, _intAttributesCreated["Right"][prefix + "CanDrag"]);
+                    Assert.AreEqual(_pmoAdmin, _intAttributesCreated["Leaf"][prefix + "CanDrag"]);
+                }
             }
         }
     }
