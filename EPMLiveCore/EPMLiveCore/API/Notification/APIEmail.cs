@@ -370,7 +370,6 @@ namespace EPMLiveCore.API
                             {
                                 string body = "";
                                 string subject = "";
-                                //string shortmessage = "";
 
                                 using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                                 {
@@ -382,7 +381,6 @@ namespace EPMLiveCore.API
                                     {
                                         body = body.Replace("{" + s + "}", additionalParams[s].ToString());
                                         subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
-                                        //shortmessage = shortmessage.Replace("{" + s + "}", additionalParams[s].ToString());
                                     }
 
                                     string itemurl = web.Url + "/" + li.ParentList.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + li.ID;

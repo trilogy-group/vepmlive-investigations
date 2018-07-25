@@ -20,7 +20,7 @@ namespace EPMLiveCore.Tests.API.Notification
     [TestClass]
     public class APIEmailTests
     {
-        private const int _listItemId = 711;
+        private const int ListItemId = 711;
         private static readonly Guid _listParentListId = new Guid("19EDE34A-5358-48B6-B468-E3FECA86E1E6");
 
         private IDisposable _shims;
@@ -167,7 +167,7 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreEqual("@itemid", _executeReaderCommandsCalled[0].Parameters[1].ParameterName);
             Assert.AreEqual("@type", _executeReaderCommandsCalled[0].Parameters[2].ParameterName);
 
-            AssertNonQueryComands(_listItemId, _listParentListId);
+            AssertNonQueryComands(ListItemId, _listParentListId);
             AssertDataSetCommand();
 
             Assert.AreEqual(7, _createdCommands.Count);
@@ -410,7 +410,7 @@ namespace EPMLiveCore.Tests.API.Notification
 
             return new ShimSPListItem
             {
-                IDGet = () => _listItemId,
+                IDGet = () => ListItemId,
                 ParentListGet = () =>
                 {
                     return new ShimSPList
