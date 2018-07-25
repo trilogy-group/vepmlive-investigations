@@ -70,6 +70,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
+    <Compile Include="OptimizerDataTest.cs" />
+    <Compile Include="Analyzers\CostAnalyzerDataTest.cs" />
     <Compile Include="Analyzers\BaseDetailRowDataTest.cs" />
     <Compile Include="PfeJobTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

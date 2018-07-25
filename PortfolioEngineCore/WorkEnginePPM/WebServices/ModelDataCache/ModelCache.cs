@@ -552,7 +552,7 @@ namespace ModelDataCache
                 string sfnam = "";
 
 
-                GetCFFieldName(lTid, lfit, out stab, out sfnam);
+                OptimizerData.GetCFFieldName(lTid, lfit, out stab, out sfnam);
                 m_Selected_Table = stab;
                 m_Select_FieldName = sfnam;
             }
@@ -1160,121 +1160,71 @@ namespace ModelDataCache
             reader.Close();
             reader = null;
         }
-        private void ReadExtraPifields(SqlConnection oDataAccess)
+        private void ReadExtraPifields(SqlConnection sqlConnection)
         {
+            var i = 0;
 
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-
-            string sCommand = "";
-            int i = 0;
-            int ftabextra = 0;
-            int fintabextra = 0;
-
-
-            //            sCommand = "Select rd.*,FIELD_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,at.FA_FORMAT, fl.FIELD_NAME_SQL, at.FA_NAME, fl.FIELD_NAME AS Expr1" +
-            //                       " From EPGP_RD_FIELDS rd  Left Join EPGT_FIELDS fl On fl.FIELD_ID=rd.FIELD_ID  Left Join EPGC_FIELD_ATTRIBS at On at.FA_FIELD_ID=rd.FIELD_ID Where CONTEXT_ID = 101";
-
-            sCommand =
-                "Select t.* From EPGT_FIELDS t Left Join  EPGP_RD_FIELDS r On t.FIELD_ID=r.FIELD_ID And CONTEXT_ID=101 " +
-                " Where t.FIELD_ID IN (9901,9902,9904,9911,9928,9950,9922,9925,9930)";
+            var sql = "Select t.* From EPGT_FIELDS t Left Join  EPGP_RD_FIELDS r On t.FIELD_ID=r.FIELD_ID And CONTEXT_ID=101 " +
+                     " Where t.FIELD_ID IN (9901,9902,9904,9911,9928,9950,9922,9925,9930)";
 
             // need to read these and munge them into the arrays that were used before
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection))
             {
-                ++i;
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        ++i;
 
-                m_fidextra[i] = DBAccess.ReadIntValue(reader["FIELD_ID"]);
+                        m_fidextra[i] = OptimizerData.ReadFieldDataFieldId(reader, "FIELD_ID");
+                        UpdateFieldsRelatedToFieldId(i);
 
-                if (m_PI_Group == m_fidextra[i])
-                    m_PI_Group_fid = i;
-
-                if (m_PI_Seq == m_fidextra[i])
-                    m_PI_Seq_fid = i;
-
-                m_ExtraFieldNames[i] = "";
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
-
-                m_ExtraFieldNames[i] = m_ExtraFieldNames[i].Replace("%", "Percent");
-
-                if (m_fidextra[i] == 9911)
-                    m_ExtraFieldTypes[i] = 9911;     //   ' change Stage from an integer (2) to a special text field (9911)
-                else if (m_ExtraFieldTypes[i] == 0)
-                    m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-
-
-                m_sextra[i] = DBAccess.ReadStringValue(reader["FIELD_NAME_SQL"]);
-
-
-
+                        m_ExtraFieldNames[i] = OptimizerData.ReadFieldDataFieldName(reader, "FIELD_NAME");
+                        m_ExtraFieldTypes[i] = OptimizerData.ReadFieldDataFieldFormat(reader, m_fidextra[i], "FIELD_FORMAT");
+                        m_sextra[i] = OptimizerData.ReadFieldDataSExtra(reader, "FIELD_NAME_SQL");
+                    }
+                }
             }
-            reader.Close();
-            reader = null;
 
-            sCommand = "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
+            sql = "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
                 "  at.FA_NAME, fl.FIELD_NAME AS Expr1 FROM  EPGC_FIELD_ATTRIBS AS at LEFT OUTER JOIN EPGP_RD_FIELDS AS rd ON rd.FIELD_ID = at.FA_FIELD_ID AND rd.CONTEXT_ID = 101 LEFT OUTER JOIN " +
                 " EPGT_FIELDS AS fl ON fl.FIELD_ID = rd.FIELD_ID WHERE     (at.FA_TABLE_ID = 201) AND (at.FA_FORMAT = 4 OR at.FA_FORMAT = 13 OR at.FA_FORMAT = 7) OR " +
                 " (at.FA_TABLE_ID = 202) OR (at.FA_TABLE_ID = 203) OR (at.FA_TABLE_ID = 205)";
 
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection))
             {
-                ++i;
-
-                m_fidextra[i] = DBAccess.ReadIntValue(reader["FIELD_ID"]);
-
-                if (m_PI_Group == m_fidextra[i])
-                    m_PI_Group_fid = i;
-
-                if (m_PI_Seq == m_fidextra[i])
-                    m_PI_Seq_fid = i;
-
-                m_ExtraFieldNames[i] = "";
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["FA_NAME"]);
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["Expr1"]);
-
-
-                m_ExtraFieldNames[i] = m_ExtraFieldNames[i].Replace("%", "Percent");
-
-                m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-
-                if (m_fidextra[i] == 9911)
-                    m_ExtraFieldTypes[i] = 9911;     //   ' change Stage from an integer (2) to a special text field (9911)
-                else if (m_ExtraFieldTypes[i] == 0)
-                    m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FA_FORMAT"]);
-
-
-                m_sextra[i] = DBAccess.ReadStringValue(reader["FIELD_NAME_SQL"]);
-
-                if (m_sextra[i] == "")
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    ftabextra = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                    fintabextra = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                    while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        ++i;
 
-                    string stab = "";
-                    string sfnam = "";
-
-                    GetCFFieldName(ftabextra, fintabextra, out stab, out sfnam);
-                    m_sextra[i] = sfnam;
+                        m_fidextra[i] = OptimizerData.ReadFieldDataFieldId(reader, "FIELD_ID");
+                        UpdateFieldsRelatedToFieldId(i);
+                        
+                        m_ExtraFieldNames[i] = OptimizerData.ReadFieldDataFieldName(reader, "FA_NAME", "Expr1");
+                        m_ExtraFieldTypes[i] = OptimizerData.ReadFieldDataFieldFormat(reader, m_fidextra[i], "FIELD_FORMAT", "FA_FORMAT");
+                        m_sextra[i] = OptimizerData.ReadFieldDataSExtra(reader, "FIELD_NAME_SQL", "FA_TABLE_ID", "FA_FIELD_IN_TABLE");
+                    }
                 }
-
             }
-            reader.Close();
-            reader = null;
 
             m_Use_extra = i;
         }
+
+        private void UpdateFieldsRelatedToFieldId(int fieldIndex)
+        {
+            if (m_PI_Group == m_fidextra[fieldIndex])
+            {
+                m_PI_Group_fid = fieldIndex;
+            }
+
+            if (m_PI_Seq == m_fidextra[fieldIndex])
+            {
+                m_PI_Seq_fid = fieldIndex;
+            }
+        }
+
         private int StripNum(ref string sin)
         {
             int i = 0;
@@ -3512,101 +3462,6 @@ namespace ModelDataCache
             return "";
         }
 
-        private void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
-        {
-            switch ((CustomFieldDBTable)lTableID)
-            {
-                case CustomFieldDBTable.ResourceINT:
-                    sTable = "EPGC_RESOURCE_INT_VALUES";
-                    sField = "RI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceTEXT:
-                    sTable = "EPGC_RESOURCE_TEXT_VALUES";
-                    sField = "RT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDEC:
-                    sTable = "EPGC_RESOURCE_DEC_VALUES";
-                    sField = "RC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceNTEXT:
-                    sTable = "EPGC_RESOURCE_NTEXT_VALUES";
-                    sField = "RN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDATE:
-                    sTable = "EPGC_RESOURCE_DATE_VALUES";
-                    sField = "RD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceMV:
-                    sTable = "EPGC_RESOURCE_MV_VALUES";
-                    sField = "MVR_UID";
-                    break;
-                case CustomFieldDBTable.PortfolioINT:
-                    sTable = "EPGP_PROJECT_INT_VALUES";
-                    sField = "PI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioTEXT:
-                    sTable = "EPGP_PROJECT_TEXT_VALUES";
-                    sField = "PT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDEC:
-                    sTable = "EPGP_PROJECT_DEC_VALUES";
-                    sField = "PC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioNTEXT:
-                    sTable = "EPGP_PROJECT_NTEXT_VALUES";
-                    sField = "PN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDATE:
-                    sTable = "EPGP_PROJECT_DATE_VALUES";
-                    sField = "PD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.Program:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_UID";
-                    break;
-                case CustomFieldDBTable.ProjectINT:
-                    sTable = "EPGX_PROJ_INT_VALUES";
-                    sField = "XI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectTEXT:
-                    sTable = "EPGX_PROJ_TEXT_VALUES";
-                    sField = "XT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDEC:
-                    sTable = "EPGX_PROJ_DEC_VALUES";
-                    sField = "XC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectNTEXT:
-                    sTable = "EPGX_PROJ_NTEXT_VALUES";
-                    sField = "XN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDATE:
-                    sTable = "EPGX_PROJ_DATE_VALUES";
-                    sField = "XD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProgramText:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_PI_TEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIINT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_FLAG" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWITEXT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_CTEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIDEC:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_NUMBER" + lFieldID.ToString("0");
-                    break;
-                default:
-                    sTable = "Unknown Table";
-                    sField = "";
-                    break;
-            }
-
-        }
         private void PerformCalcs(DetailRowData odet, bool bConvFtoQ)
         {
 
