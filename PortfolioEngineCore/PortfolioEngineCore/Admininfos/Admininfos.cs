@@ -10,7 +10,10 @@ namespace PortfolioEngineCore
     public class Admininfos : PFEBase
     {
         private const string MaxIdColumn = "MaxId";
+        private const string WresIdColumn = "WRES_ID";
         private const string CantCreateNewGroupRecordMessage = "Can't create new Group record";
+        private const string NoResourceMatchesSuppliedMessage = "No Resource matches supplied";
+        private const string PiNotFoundMessage = "PI not found";
 
         #region Fields (1) 
 
@@ -1114,48 +1117,7 @@ namespace PortfolioEngineCore
                 _sqlConnection.Open();
 
                 // check if the resource exists and pick up the WresId if necessary
-                string sErrorMessage = "";
-                if (ExtId.Length > 0)
-                {
-                    sCommand = "Select WRES_ID From EPG_RESOURCES Where WRES_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", ExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    int nMatchWresId = 0;
-                    if (SqlReader.Read())
-                    {
-                        nMatchWresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                    }
-                    SqlReader.Close();
-
-                    if (nMatchWresId <= 0)
-                    {
-                        sErrorMessage = "No Resource matches supplied ExtId";
-                    }
-                    else if (WresId > 0 && WresId != nMatchWresId)
-                    {
-                        sErrorMessage = "Supplied ExtId does not match supplied Id";
-                    }
-                    WresId = nMatchWresId;
-                }
-                else if (WresId > 0)
-                {
-                    sCommand = "Select WRES_EXT_UID From EPG_RESOURCES Where WRES_ID=@WresId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@WresId", WresId);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    if (SqlReader.Read() == false)
-                    {
-                        sErrorMessage = "No Resource matches supplied Id";
-                    }
-                    SqlReader.Close();
-                }
-                else
-                {
-                    sErrorMessage = "No Resource matches supplied Id";
-                }
+                var sErrorMessage = CheckIfResourceExists(ExtId, ref WresId);
 
                 if (sErrorMessage.Length > 0)
                 {
@@ -1215,6 +1177,61 @@ namespace PortfolioEngineCore
             {
                 throw new PFEException((int)PFEError.DeleteResourceTimeoff, exception.GetBaseMessage());
             }
+        }
+
+        private string CheckIfResourceExists(string extId, ref int WresId)
+        {
+            var sErrorMessage = string.Empty;
+
+            if (extId.Length > 0)
+            {
+                var nMatchWresId = 0;
+
+                using (var command = new SqlCommand("Select WRES_ID From EPG_RESOURCES Where WRES_EXT_UID=@ExtId", _sqlConnection))
+                {
+                    command.Parameters.AddWithValue("@ExtId", extId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            nMatchWresId = SqlDb.ReadIntValue(reader[WresIdColumn]);
+                        }
+                    }
+                }
+                
+                if (nMatchWresId <= 0)
+                {
+                    sErrorMessage = $"{NoResourceMatchesSuppliedMessage} ExtId";
+                }
+                else if (WresId > 0 && WresId != nMatchWresId)
+                {
+                    sErrorMessage = "Supplied ExtId does not match supplied Id";
+                }
+
+                WresId = nMatchWresId;
+            }
+            else if (WresId > 0)
+            {
+                using (var command = new SqlCommand("Select WRES_EXT_UID From EPG_RESOURCES Where WRES_ID=@WresId", _sqlConnection))
+                {
+                    command.Parameters.AddWithValue("@WresId", WresId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read() == false)
+                        {
+                            sErrorMessage = $"{NoResourceMatchesSuppliedMessage} Id";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                sErrorMessage = $"{NoResourceMatchesSuppliedMessage} Id";
+            }
+
+            return sErrorMessage;
         }
 
         /// <summary>
@@ -2032,32 +2049,7 @@ namespace PortfolioEngineCore
                     //  apply updates to dbs
                     if (bupdateOK)
                     {
-                        sCommand = @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid" +
-                            " Where LV_UID=@LV_uid";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.CommandType = CommandType.Text;
-
-                        SqlParameter pUID = SqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                        SqlParameter pLEVEL = SqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                        SqlParameter pID = SqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                        SqlParameter pVALUE = SqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                        SqlParameter pFULLVALUE = SqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                        SqlParameter pEXTID = SqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-
-                        foreach (DataRow row in dataTable.Rows)
-                        {
-                            if (row.RowState == DataRowState.Modified)
-                            {
-                                pUID.Value = row["LV_UID"];
-                                pLEVEL.Value = row["LV_LEVEL"];
-                                pID.Value = row["LV_ID"];
-                                pVALUE.Value = row["LV_VALUE"];
-                                pFULLVALUE.Value = row["LV_FULLVALUE"];
-                                pEXTID.Value = row["LV_EXT_UID"];
-                                SqlCommand.ExecuteNonQuery();
-                            }
-                        }
+                        ApplyUpdateOnEpgpLookupValues(transaction, dataTable);
                     }
 
                 }
@@ -2067,40 +2059,7 @@ namespace PortfolioEngineCore
                 //     note - if an item that doesn't exist is passed in, with or without an Id, it is created - so WE should always change or check its ExtId to the new ID passed back
                 if (bupdateOK)
                 {
-                    sCommand = @"SET NOCOUNT ON;"
-                               + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID)"
-                               + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid);"
-                               + "Select @@IDENTITY as NewID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.CommandType = CommandType.Text;
-
-                    SqlParameter pLookupUID = SqlCommand.Parameters.Add("@LV_lookupuid", SqlDbType.Int);
-                    SqlParameter pLEVEL = SqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                    SqlParameter pID = SqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                    SqlParameter pVALUE = SqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                    SqlParameter pFULLVALUE = SqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                    SqlParameter pEXTID = SqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-
-                    foreach (KeyValuePair<int, PFELookup> deptitem in dicDepts)
-                    {
-                        if (deptitem.Value.bflag == false)
-                        {
-                            pLookupUID.Value = nDeptLookupID;
-                            pLEVEL.Value = deptitem.Value.level;
-                            pID.Value = deptitem.Value.ID;
-                            pVALUE.Value = deptitem.Value.name;
-                            pFULLVALUE.Value = deptitem.Value.fullname;
-                            pEXTID.Value = deptitem.Value.ExtId;
-
-                            SqlReader = SqlCommand.ExecuteReader();
-                            if (SqlReader.Read())
-                            {
-                                deptitem.Value.UID = Convert.ToInt32(SqlReader["NewID"]);
-                            }
-                            SqlReader.Close();
-                        }
-                    }
+                    InsertOnEpgLookupValue(dicDepts, transaction, nDeptLookupID);
                 }
 
                 //  delete and readd entries in RES_MANAGERS
@@ -2209,6 +2168,101 @@ namespace PortfolioEngineCore
             catch (Exception exception)
             {
                 throw new PFEException((int)PFEError.UpdateDepartments, exception.GetBaseMessage());
+            }
+        }
+
+        private void InsertOnEpgLookupValue(Dictionary<int, PFELookup> dicDepts, SqlTransaction transaction, int nLookupId)
+        {
+            if (dicDepts == null)
+            {
+                throw new ArgumentNullException(nameof(dicDepts));
+            }
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            const string SCommand = @"SET NOCOUNT ON;"
+                       + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID)"
+                       + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid);"
+                       + "Select @@IDENTITY as NewID";
+
+            using (var command = new SqlCommand(SCommand, _sqlConnection))
+            {
+                command.Transaction = transaction;
+                command.CommandType = CommandType.Text;
+
+                var pLookupUid = command.Parameters.Add("@LV_lookupuid", SqlDbType.Int);
+                var pLevel = command.Parameters.Add("@LV_level", SqlDbType.Int);
+                var pId = command.Parameters.Add("@LV_id", SqlDbType.Int);
+                var pValue = command.Parameters.Add("@LV_value", SqlDbType.VarChar);
+                var pFullvalue = command.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
+                var pExtid = command.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+
+                foreach (var deptitem in dicDepts)
+                {
+                    if (deptitem.Value.bflag == false)
+                    {
+                        pLookupUid.Value = nLookupId;
+                        pLevel.Value = deptitem.Value.level;
+                        pId.Value = deptitem.Value.ID;
+                        pValue.Value = deptitem.Value.name;
+                        pFullvalue.Value = deptitem.Value.fullname;
+                        pExtid.Value = deptitem.Value.ExtId;
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                deptitem.Value.UID = Convert.ToInt32(reader["NewID"]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ApplyUpdateOnEpgpLookupValues(SqlTransaction transaction, DataTable dataTable)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            if (dataTable == null)
+            {
+                throw new ArgumentNullException(nameof(dataTable));
+            }
+
+            const string SCommand = 
+                @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid" +
+                " Where LV_UID=@LV_uid";
+
+            using (var command = new SqlCommand(SCommand, _sqlConnection))
+            {
+                command.Transaction = transaction;
+                command.CommandType = CommandType.Text;
+
+                var pUid = command.Parameters.Add("@LV_uid", SqlDbType.Int);
+                var pLevel = command.Parameters.Add("@LV_level", SqlDbType.Int);
+                var pId = command.Parameters.Add("@LV_id", SqlDbType.Int);
+                var pValue = command.Parameters.Add("@LV_value", SqlDbType.VarChar);
+                var pFullvalue = command.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
+                var pExtid = command.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Modified)
+                    {
+                        pUid.Value = row["LV_UID"];
+                        pLevel.Value = row["LV_LEVEL"];
+                        pId.Value = row["LV_ID"];
+                        pValue.Value = row["LV_VALUE"];
+                        pFullvalue.Value = row["LV_FULLVALUE"];
+                        pExtid.Value = row["LV_EXT_UID"];
+                        command.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
@@ -2572,39 +2626,15 @@ namespace PortfolioEngineCore
                     int PISourceId = xProject.GetIntAttr("Source");
                     int nProjectID = 0;
                     int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
 
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
-
-                    if (bupdateOK == true)
+                    if (IsBUpdateOk(PIExtId, ref sErrorMessage, ref nProjectID))
                     {
                         transaction = _sqlConnection.BeginTransaction();
 
                         // Delete work from table to avoid duplicate work hours in resource analyzer 
                         // since resource analyzer combines data from EPGP_PI_WORK1 & EPGP_PI_WORK2 tables
                         sCommand = "Delete from " + sdeleteWorkFromTable + " Where PROJECT_ID=@ProjectID";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        SqlCommand.CommandType = CommandType.Text;
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.ExecuteNonQuery();
+                        DeleteDuplicatedWork(transaction, sCommand, nProjectID);
 
                         List<CStruct> listWIs = xProject.GetList("Item");
                         foreach (CStruct xWI in listWIs)
@@ -2617,7 +2647,6 @@ namespace PortfolioEngineCore
                             //  now delete the item regardless of the PI - June 13th
                             sCommand = "Delete from " + stablename + " Where PW_ITEM_ID=@WIName";
                             SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            //SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
                             SqlCommand.Parameters.AddWithValue("@WIName", WIName);
                             SqlCommand.CommandType = CommandType.Text;
                             SqlCommand.Transaction = transaction;
@@ -2748,6 +2777,65 @@ namespace PortfolioEngineCore
             {
                 throw new PFEException((int)PFEError.UpdateListWork, exception.GetBaseMessage());
             }
+        }
+
+        private void DeleteDuplicatedWork(SqlTransaction transaction, string sCommand, int nProjectId)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            var sqlCommand = new SqlCommand(sCommand, _sqlConnection);
+            sqlCommand.Parameters.AddWithValue("@ProjectID", nProjectId);
+            sqlCommand.CommandType = CommandType.Text;
+            sqlCommand.Transaction = transaction;
+            sqlCommand.ExecuteNonQuery();
+        }
+
+        private bool IsBUpdateOk(string PIExtId, ref string sErrorMessage, ref int nProjectID)
+        {
+            using (var reader = GetEpgpProjects(PIExtId))
+            {
+                nProjectID = GetProjectId(reader, nProjectID);
+
+                if (nProjectID == 0)
+                {
+                    sErrorMessage = PiNotFoundMessage;
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        private SqlDataReader GetEpgpProjects(string piExtId)
+        {
+            if (string.IsNullOrWhiteSpace(piExtId))
+            {
+                throw new ArgumentException(nameof(piExtId));
+            }
+
+            const string SCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
+            var sqlCommand = new SqlCommand(SCommand, _sqlConnection);
+            sqlCommand.Parameters.AddWithValue("@ExtId", piExtId);
+
+            return sqlCommand.ExecuteReader();
+        }
+
+        private int GetProjectId(SqlDataReader sqlReader, int nProjectId)
+        {
+            if (sqlReader == null)
+            {
+                throw new ArgumentNullException(nameof(sqlReader));
+            }
+
+            if (sqlReader.Read())
+            {
+                nProjectId = SqlDb.ReadIntValue(sqlReader["PROJECT_ID"]);
+            }
+
+            return nProjectId;
         }
 
         /// <summary>
@@ -2982,48 +3070,7 @@ namespace PortfolioEngineCore
                 _sqlConnection.Open();
 
                 // check if the resource exists and pick up the WresId if necessary
-                string sErrorMessage = "";
-                if (ExtId.Length > 0)
-                {
-                    sCommand = "Select WRES_ID From EPG_RESOURCES Where WRES_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", ExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    int nMatchWresId = 0;
-                    if (SqlReader.Read())
-                    {
-                        nMatchWresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                    }
-                    SqlReader.Close();
-
-                    if (nMatchWresId <= 0)
-                    {
-                        sErrorMessage = "No Resource matches supplied ExtId";
-                    }
-                    else if (WresId > 0 && WresId != nMatchWresId)
-                    {
-                        sErrorMessage = "Supplied ExtId does not match supplied Id";
-                    }
-                    WresId = nMatchWresId;
-                }
-                else if (WresId > 0)
-                {
-                    sCommand = "Select WRES_EXT_UID From EPG_RESOURCES Where WRES_ID=@WresId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@WresId", WresId);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    if (SqlReader.Read() == false)
-                    {
-                        sErrorMessage = "No Resource matches supplied Id";
-                    }
-                    SqlReader.Close();
-                }
-                else
-                {
-                    sErrorMessage = "No Resource matches supplied Id";
-                }
+                var sErrorMessage = CheckIfResourceExists(ExtId, ref WresId);
 
                 if (sErrorMessage.Length > 0)
                 {
@@ -3198,49 +3245,17 @@ namespace PortfolioEngineCore
                 string sErrorMessage = "";
 
                 // first check that we have a Lookup Table defined for Roles
-                SqlTransaction transaction = _sqlConnection.BeginTransaction();
-                // read lookup id from ADMIN
-                sCommand = "SELECT ADM_ROLE_CODE FROM EPG_ADMIN";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlReader = SqlCommand.ExecuteReader();
-
-                if (SqlReader.Read())
-                {
-                    nLookupUID = (int)SqlReader.GetInt32Safely("ADM_ROLE_CODE");
-                }
-                SqlReader.Close();
+                var transaction = _sqlConnection.BeginTransaction();
+                nLookupUID = GetNLookupId(transaction);
 
                 if (nLookupUID <= 0)
                 {
                     // must be first time we've saved a Role Lookup
                     //   LOOKUP_UID is Identity so read it back at same time as insert
-                    string sLookupName = "Role Lookup";
-                    sCommand = "SET NOCOUNT ON;"
-                               + "INSERT Into EPGP_LOOKUP_TABLES "
-                               + " (LOOKUP_NAME)"
-                               + " Values(@Name);"
-                               + "Select @@IDENTITY as NewID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Name", sLookupName);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    int nNewId = 0;
-                    if (SqlReader.Read())
-                    {
-                        nNewId = Convert.ToInt32(SqlReader["NewID"]);
-                    }
-                    SqlReader.Close();
-                    nLookupUID = nNewId;
-
-                    // update ADMIN record to show Lookup Table just created
-                    sCommand = @"Update EPG_ADMIN SET ADM_ROLE_CODE = @LookupUID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@LookupUID", nLookupUID);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
+                    nLookupUID = GetNewLookupId(transaction);
+                    UpdateAdminRecord(transaction, nLookupUID);
                 }
+
                 if (nLookupUID <= 0)
                 {
                     throw new PFEException((int)PFEError.UD_NoLookupTable, "Can't Find/Create Lookup Table");
@@ -3369,6 +3384,73 @@ namespace PortfolioEngineCore
             }
         }
 
+        private int GetNLookupId(SqlTransaction transaction)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            var nLookupUid = 0;
+
+            using (var command = new SqlCommand("SELECT ADM_ROLE_CODE FROM EPG_ADMIN", _sqlConnection))
+            {
+                command.Transaction = transaction;
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        nLookupUid = (int)reader.GetInt32Safely("ADM_ROLE_CODE");
+                    }
+                }
+            }
+
+            return nLookupUid;
+        }
+
+        private int GetNewLookupId(SqlTransaction transaction)
+        {
+            const string SLookupName = "Role Lookup";
+            const string SCommand = "SET NOCOUNT ON;"
+                + "INSERT Into EPGP_LOOKUP_TABLES  (LOOKUP_NAME) Values(@Name);"
+                + "Select @@IDENTITY as NewID";
+
+            var newId = 0;
+
+            using (var command = new SqlCommand(SCommand, _sqlConnection))
+            {
+                command.Parameters.AddWithValue("@Name", SLookupName);
+                command.Transaction = transaction;
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        newId = Convert.ToInt32(reader["NewID"]);
+                    }
+                }
+            }
+
+            return newId;
+        }
+
+        private void UpdateAdminRecord(SqlTransaction transaction, int nLookupUid)
+        {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            using (var command = new SqlCommand(@"Update EPG_ADMIN SET ADM_ROLE_CODE = @LookupUID", _sqlConnection))
+            {
+                command.Parameters.AddWithValue("@LookupUID", nLookupUid);
+                command.CommandType = CommandType.Text;
+                command.Transaction = transaction;
+                command.ExecuteNonQuery();
+            }
+        }
+
         /// <summary>
         /// Updates the role lookup - old version.
         /// </summary>
@@ -3401,49 +3483,17 @@ namespace PortfolioEngineCore
                 if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
                 _sqlConnection.Open();
 
-                SqlTransaction transaction = _sqlConnection.BeginTransaction();
-                // read lookup id from ADMIN
-                sCommand = "SELECT ADM_ROLE_CODE FROM EPG_ADMIN";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlReader = SqlCommand.ExecuteReader();
-
-                if (SqlReader.Read())
-                {
-                    nLookupUID = (int)SqlReader.GetInt32Safely("ADM_ROLE_CODE");
-                }
-                SqlReader.Close();
+                var transaction = _sqlConnection.BeginTransaction();
+                nLookupUID = GetNLookupId(transaction);
 
                 if (nLookupUID <= 0)
                 {
                     // must be first time we've saved a Role Lookup
                     //   LOOKUP_UID is Identity so read it back at same time as insert
-                    string sLookupName = "Role Lookup";
-                    sCommand = "SET NOCOUNT ON;"
-                               + "INSERT Into EPGP_LOOKUP_TABLES "
-                               + " (LOOKUP_NAME)"
-                               + " Values(@Name);"
-                               + "Select @@IDENTITY as NewID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Name", sLookupName);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    int nNewId = 0;
-                    if (SqlReader.Read())
-                    {
-                        nNewId = Convert.ToInt32(SqlReader["NewID"]);
-                    }
-                    SqlReader.Close();
-                    nLookupUID = nNewId;
-
-                    // update ADMIN record to show Lookup Table just created
-                    sCommand = @"Update EPG_ADMIN SET ADM_ROLE_CODE = @LookupUID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@LookupUID", nLookupUID);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
+                    nLookupUID = GetNewLookupId(transaction);
+                    UpdateAdminRecord(transaction, nLookupUID);
                 }
+
                 if (nLookupUID <= 0)
                 {
                     throw new PFEException((int)PFEError.UD_NoLookupTable, "Can't Find/Create Lookup Table");
@@ -3530,33 +3580,7 @@ namespace PortfolioEngineCore
                     //  apply updates to dbs
                     if (bupdateOK)
                     {
-                        sCommand =
-                            @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid" +
-                            " Where LV_UID=@LV_uid";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.CommandType = CommandType.Text;
-
-                        SqlParameter pUID = SqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                        SqlParameter pLEVEL = SqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                        SqlParameter pID = SqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                        SqlParameter pVALUE = SqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                        SqlParameter pFULLVALUE = SqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                        SqlParameter pEXTID = SqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-
-                        foreach (DataRow row in dataTable.Rows)
-                        {
-                            if (row.RowState == DataRowState.Modified)
-                            {
-                                pUID.Value = row["LV_UID"];
-                                pLEVEL.Value = row["LV_LEVEL"];
-                                pID.Value = row["LV_ID"];
-                                pVALUE.Value = row["LV_VALUE"];
-                                pFULLVALUE.Value = row["LV_FULLVALUE"];
-                                pEXTID.Value = row["LV_EXT_UID"];
-                                SqlCommand.ExecuteNonQuery();
-                            }
-                        }
+                        ApplyUpdateOnEpgpLookupValues(transaction, dataTable);
                     }
 
                 }
@@ -3566,41 +3590,7 @@ namespace PortfolioEngineCore
                 //     note - if an item that doesn't exist is passed in, with or without an Id, it is created - so WE should always change or check its ExtId to the new ID passed back
                 if (bupdateOK)
                 {
-                    sCommand = @"SET NOCOUNT ON;"
-                               +
-                               "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID)"
-                               + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid);"
-                               + "Select @@IDENTITY as NewID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.CommandType = CommandType.Text;
-
-                    SqlParameter pLookupUID = SqlCommand.Parameters.Add("@LV_lookupuid", SqlDbType.Int);
-                    SqlParameter pLEVEL = SqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                    SqlParameter pID = SqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                    SqlParameter pVALUE = SqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                    SqlParameter pFULLVALUE = SqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                    SqlParameter pEXTID = SqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-
-                    foreach (KeyValuePair<int, PFELookup> lookupitem in dicItems)
-                    {
-                        if (lookupitem.Value.bflag == false)
-                        {
-                            pLookupUID.Value = nLookupUID;
-                            pLEVEL.Value = lookupitem.Value.level;
-                            pID.Value = lookupitem.Value.ID;
-                            pVALUE.Value = lookupitem.Value.name;
-                            pFULLVALUE.Value = lookupitem.Value.fullname;
-                            pEXTID.Value = lookupitem.Value.ExtId;
-
-                            SqlReader = SqlCommand.ExecuteReader();
-                            if (SqlReader.Read())
-                            {
-                                lookupitem.Value.UID_real = Convert.ToInt32(SqlReader["NewID"]);
-                            }
-                            SqlReader.Close();
-                        }
-                    }
+                    InsertOnEpgLookupValue(dicItems, transaction, nLookupUID);
 
                     // update the role names in the Cost Categories in case of any name changes
                     sCommand = "Update EPGP_CATEGORIES Set CA_NAME = EPGP_LOOKUP_VALUES.LV_VALUE" +
@@ -3742,38 +3732,15 @@ namespace PortfolioEngineCore
                     int PISourceId = xProject.GetIntAttr("Source");
                     int nProjectID = 0;
                     int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
 
-                    if (bupdateOK == true)
+                    if (IsBUpdateOk(PIExtId, ref sErrorMessage, ref nProjectID))
                     {
                         // start a transaction and delete all existing work
                         transaction = _sqlConnection.BeginTransaction();
                         // Delete work from table to avoid duplicate work hours in resource analyzer 
                         // since resource analyzer combines data from EPGP_PI_WORK1 & EPGP_PI_WORK2 tables
                         sCommand = "Delete from " + sdeleteWorkFromTable + " Where PROJECT_ID=@ProjectID";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        SqlCommand.CommandType = CommandType.Text;
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.ExecuteNonQuery();
+                        DeleteDuplicatedWork(transaction, sCommand, nProjectID);
 
                         sCommand = "Delete from " + stablename + " Where PROJECT_ID=@ProjectID";
                         SqlCommand = new SqlCommand(sCommand, _sqlConnection);
@@ -4417,7 +4384,7 @@ namespace PortfolioEngineCore
 
             #endregion Fields 
         }
-        private class PFELookup
+        public class PFELookup
         {
             #region Fields (13) 
 
