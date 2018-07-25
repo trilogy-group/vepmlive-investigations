@@ -54,13 +54,7 @@ namespace PortfolioEngineCore.PortfolioItems
         private const string DiscountRateXmlAttribute = "DiscountRate";
         private const string DiscountRatePreviousValueXmlAttribute = "DiscountRatePreviousValue";
 
-        #region Fields (1)
-
         private readonly SqlConnection _sqlConnection;
-
-        #endregion Fields
-
-        #region Constructors (1)
 
         public PortfolioItems(string basepath, string username, string pid, string company, string dbcnstring, bool bDebug = false)
             : base(basepath, username, pid, company, dbcnstring, SecurityLevels.EditPortfolioItems, bDebug)
@@ -68,8 +62,6 @@ namespace PortfolioEngineCore.PortfolioItems
             debug.AddMessage("Loading PortfolioItems Class");
             _sqlConnection = _PFECN;
         }
-
-        #endregion Constructors
 
         private const int CONST_PI_MANAGER_SURROGATE_CONTEXT = 4;
 
@@ -2171,7 +2163,7 @@ namespace PortfolioEngineCore.PortfolioItems
             }
             catch (Exception ex)
             {
-                dba.WriteImmTrace(LogKeyword, LogProjectDiscountRateFunction, LogProjectDiscountRateError, "PID: " + projectId + " Error: " + ex.Message);
+                dba.WriteImmTrace(LogKeyword, LogProjectDiscountRateFunction, LogProjectDiscountRateError, "PID: " + projectId + " Error: " + ex);
             }
         }
     }

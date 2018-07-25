@@ -1351,7 +1351,7 @@
         var sType = col.substring(0, 1);
         var sId = col.substring(1);
         var r = this.GetRate(grid, row, col);
-        if (sType == "Q" && r.Rate > 0) {
+        if (sType === "Q" && r.Rate > 0) {
             var v = row[col] * r.Rate * (1 - r.Discount);
             if (v != row["C" + sId]) {
                 row["C" + sId] = v;
@@ -1372,7 +1372,7 @@
                 row["D" + sId] = row[col] * r.Rate * r.Discount;
             }
         }
-        else if (sType == "C") {
+        else if (sType === "C") {
             this.CalculateRowTotals(grid, row);
             this.CalculateColCostTotals(grid, grid.GetFirst(null, 0), col, true);
             this.CalculateColCostTotals(grid, grid.GetFirst(null, 0), "TC", true);

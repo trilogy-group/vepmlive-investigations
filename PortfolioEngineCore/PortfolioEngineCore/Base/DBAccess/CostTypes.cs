@@ -42,6 +42,11 @@ namespace PortfolioEngineCore
         /// </returns>
         public static bool IsAutoPostEnabledOnRatePerProjectChange(DBAccess dba, int costTypeId)
         {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+
             DataTable results;
             using (var command = new SqlCommand(SelectAutoPostCountOnProjectRateChangeQuery, dba.Connection))
             {
@@ -745,6 +750,7 @@ namespace PortfolioEngineCore
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
+
         public static StatusEnum UpdatePostOptionsInfo(DBAccess dba, int nCTId, string sCalendars, bool autoPostOnRateChange, out string sReply)
         {
             string cmdText;

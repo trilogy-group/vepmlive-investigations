@@ -2,7 +2,7 @@
 
 namespace EPMLiveCore.API.ProjectDiscountRate
 {
-    public class ProjectDiscountRateService
+    public static class ProjectDiscountRateService
     {
         public static readonly string ProjectDiscountRateColumn = "EPMDiscountRate";
         public static readonly string ProjectDiscountRateColumnTitle = "Discount Rate";

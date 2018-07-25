@@ -47,7 +47,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             var siteId = Web.Site.ID;
             var rootWebId = Web.ID;
             
-            // ensure feature is installed in web
             _setupService.EnsureFeatureIsInstalledForWeb(siteId, rootWebId);
 
             if (!Web.IsRootWeb)

@@ -22,6 +22,11 @@ namespace PortfolioEngineCore
         private const StatusEnum UpdateCostValuesAfterDiscountChangedFailed = (StatusEnum)99974;
         private const StatusEnum SelectDiscountRateFailed = (StatusEnum)99975;
 
+        private const int CostValuePrecision = 25;
+        private const int CostValueScale = 6;
+        private const int DiscountRatePrecision = 6;
+        private const int DiscountRateScale = 5;
+
         public static StatusEnum SelectProjectIDByExtUID(DBAccess dba, string sExtUID, out int nProjectID)
         {
             string cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @PROJECT_EXT_UID";
@@ -429,14 +434,14 @@ namespace PortfolioEngineCore
                     var discountRateParameter = cmd.Parameters.Add(dbaCostValues.DetailValuesDiscountRateParameter, SqlDbType.Decimal);
                     var discountValueParameter = cmd.Parameters.Add(dbaCostValues.DetailValuesDiscountValueParameter, SqlDbType.Decimal);
 
-                    pBD_VALUE.Precision = 25;
-                    pBD_VALUE.Scale = 6;
-                    pBD_COST.Precision = 25;
-                    pBD_COST.Scale = 6;
-                    discountValueParameter.Precision = 25;
-                    discountValueParameter.Scale = 6;
-                    discountRateParameter.Precision = 6;
-                    discountRateParameter.Scale = 5;
+                    pBD_VALUE.Precision = CostValuePrecision;
+                    pBD_VALUE.Scale = CostValueScale;
+                    pBD_COST.Precision = CostValuePrecision;
+                    pBD_COST.Scale = CostValueScale;
+                    discountValueParameter.Precision = CostValuePrecision;
+                    discountValueParameter.Scale = CostValueScale;
+                    discountRateParameter.Precision = DiscountRatePrecision;
+                    discountRateParameter.Scale = DiscountRateScale;
 
                     foreach (DataRow row in dt.Rows)
                     {
