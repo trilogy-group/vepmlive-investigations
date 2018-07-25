@@ -11,12 +11,24 @@ namespace PortfolioEngineCore.Tests.Analyzers
     [TestClass]
     public class BaseDetailRowDataTest
     {
-        private const int _arraySize = 10;
+        private const int _arraySize = 1;
         private BaseDetailRowDataTestable _testable;
+
+        private IList<DateTime> _periodsStartDates;
+        private IList<DateTime> _periodsEndDates;
+        private IList<int> _periodsModes;
+        private int _minP;
+        private int _maxP;
 
         [TestInitialize]
         public void SetUp()
         {
+            _periodsStartDates = new List<DateTime> { new DateTime(2018, 01, 01), new DateTime(2018, 01, 06) };
+            _periodsEndDates = new List<DateTime> { new DateTime(2018, 01, 09), new DateTime(2018, 01, 12) };
+            _periodsModes = new List<int> { 1, 2 };
+            _minP = 0;
+            _maxP = _arraySize;
+
             _testable = new BaseDetailRowDataTestable(_arraySize)
             {
                 bCapture = true,
@@ -36,8 +48,10 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 CC_Name = "test-2",
                 CT_ID = 3,
                 CT_Name = "test-3",
-                Det_Finish = DateTime.UtcNow.AddDays(1),
-                Det_Start = DateTime.UtcNow,
+                Det_Finish = new DateTime(2018, 02, 01),
+                Det_Start = new DateTime(2018, 01, 01),
+                oDet_Finish = new DateTime(2018, 01, 05),
+                oDet_Start = new DateTime(2018, 01, 01),
                 FullCatName = "test-4",
                 FullCCName = "test-5",
                 HasValues = true,
@@ -244,5 +258,89 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 Assert.AreEqual(_testable.Budget[i], destination.Budget[i]);
             }
         }
+
+        [TestMethod]
+        public void DragBar_PeriodsInconsistent_Throws()
+        {
+            // Arrange
+            _periodsStartDates.Clear();
+
+            // Act
+            Action action = () => _testable.DragBar(_periodsStartDates, _periodsEndDates, _periodsModes, _minP, _maxP);
+
+            // Assert
+            try
+            {
+                action();
+            }
+            catch(ArgumentOutOfRangeException)
+            {
+                return;
+            }
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void DragBar_PeriodsNotTheSameLentghAsArrayCount_Throws()
+        {
+            // Arrange
+            _periodsStartDates.Clear();
+            _periodsEndDates.Clear();
+            _periodsModes.Clear();
+
+            // Act
+            Action action = () => _testable.DragBar(_periodsStartDates, _periodsEndDates, _periodsModes, _minP, _maxP);
+
+            // Assert
+            try
+            {
+                action();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return;
+            }
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void DragBar_PeriodNotSetForBudgetBurn_NotProcessed()
+        {
+            // Arrange
+            const int indexUnderTest = 1;
+
+            _testable.BurnDuration[indexUnderTest] = 3;
+            _testable.Burnrate[indexUnderTest] = 0.5;
+
+            _periodsModes[indexUnderTest] = 0;
+
+            // Act
+            _testable.DragBar(_periodsStartDates, _periodsEndDates, _periodsModes, _minP, _maxP);
+
+            // Assert
+            Assert.AreEqual(0, _testable.Budget[indexUnderTest]);
+        }
+
+        [TestMethod]
+        public void DragBar_PeriodtSetForBudgetBurn_BudgetCalculated()
+        {
+            // Arrange
+            const int indexUnderTest = 1;
+
+            _testable.zCost[indexUnderTest] = 10;
+            _testable.BurnDuration[indexUnderTest] = 3;
+            _testable.Burnrate[indexUnderTest] = 0.5;
+            _periodsModes[indexUnderTest] = 1;
+
+            // Act
+            _testable.DragBar(_periodsStartDates, _periodsEndDates, _periodsModes, _minP, _maxP);
+
+            // Assert
+            Assert.AreEqual(_testable.zCost[indexUnderTest], _testable.Budget[indexUnderTest]);
+        }
+
+        // (CC-77750, 2018-07-23) Sadly, the DragBar logic is very difficult to understand. 
+        // Not clear what it calculates and following which logic. 
+        // Therefore it's difficult to create meaningful comprehandable tests for it's calculations
     }
 }
