@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient.Fakes;
+using System.Linq;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,6 +29,15 @@ namespace PortfolioEngineCore.Tests.Analyzers
         private int _costTypeEditMode;
         private HashSet<string> _sqlCommandsRun;
 
+        private string _ticket;
+        private string _projectIdsStringOut;
+        private bool _projectsExistOut;
+        private int _projectsCountOut;
+        private IList<Guid> _projectGuids;
+        private int _projectIdDb;
+
+        private string ProjectGuidsString => string.Join(",", _projectGuids);
+
         [TestInitialize]
         public void SetUp()
         {
@@ -45,6 +55,10 @@ namespace PortfolioEngineCore.Tests.Analyzers
             _costTypeEditMode = 1;
             _sqlCommandsRun = new HashSet<string>();
 
+            _ticket = "test-ticket";
+            _projectGuids = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            _projectIdDb = 10;
+
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, sqlConnection) =>
             {
                 if (_sqlCommandsRun.Add(commandText))
@@ -61,6 +75,8 @@ namespace PortfolioEngineCore.Tests.Analyzers
                 },
 
                 ItemGetString = columnName =>
+                                    columnName == "DC_DATA" ? (object)ProjectGuidsString :
+                                    columnName == "PROJECT_ID" ? (object)_projectIdDb :
                                     columnName == "VIEW_UID" ? (object)_viewId :
                                     columnName == "VIEW_COST_BREAKDOWN" ? (object) _costBreakdownIdDb :
                                     columnName == "VIEW_FIRST_PERIOD" ? (object) _firstPeriodDb :
