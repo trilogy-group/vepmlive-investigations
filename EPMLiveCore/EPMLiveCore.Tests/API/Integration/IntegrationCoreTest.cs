@@ -8,6 +8,7 @@ using System.Data.SqlClient.Fakes;
 using System.Linq;
 using EPMLiveCore.API.Integration;
 using EPMLiveCore.API.Integration.Fakes;
+using EPMLiveCore.Fakes;
 using EPMLiveIntegration;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
@@ -39,6 +40,10 @@ namespace EPMLiveCore.Tests.API.Integration
         public void TestInitialize()
         {
             _shimsContext = ShimsContext.Create();
+
+            FakesForSpSecurity();
+            FakesForConstructor();
+
             var webApplicationId = Guid.NewGuid();
             var shimSPWeb = new ShimSPWeb();
             var shimSPWebApplication = new ShimSPWebApplication();
@@ -631,6 +636,33 @@ namespace EPMLiveCore.Tests.API.Integration
                 () => executeNonQueryCalled.ShouldBeTrue(),
                 () => parameterList.ShouldContain(param => param.ParameterName == string.Format("@{0}", paramKey) &&
                                                            param.Value.Equals(paramValue)));
+        }
+
+        private static void FakesForSpSecurity()
+        {
+            ShimSqlConnection.ConstructorString = (_, stringConn) => new ShimSqlConnection();
+
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (action) =>
+            {
+                action();
+            };
+        }
+
+        private static void FakesForConstructor()
+        {
+            ShimCoreFunctions.getConnectionStringGuid = _ => string.Empty;
+
+            ShimSPSite.ConstructorGuid = (instance, guid) => new ShimSPSite(instance)
+            {
+                Dispose = () => { },
+                WebApplicationGet = () => new ShimSPWebApplication(),
+                OpenWeb = () => new ShimSPWeb
+                {
+                    ServerRelativeUrlGet = () => "Dummy Url",
+                    NameGet = () => "Dummy Name",
+                    IDGet = () => Guid.NewGuid()
+                }
+            };
         }
     }
 }
