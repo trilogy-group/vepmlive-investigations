@@ -15,6 +15,8 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
         public new CStruct MiddleCols => base.MiddleCols;
         public new CStruct DefinitionRight => base.DefinitionRight;
         public new CStruct DefinitionLeaf => base.DefinitionLeaf;
+        public new CStruct[] Levels => base.Levels;
+        public new int Level => base.Level;
 
         public RPATopGridTestDouble(
             IList<clsRXDisp> columns,

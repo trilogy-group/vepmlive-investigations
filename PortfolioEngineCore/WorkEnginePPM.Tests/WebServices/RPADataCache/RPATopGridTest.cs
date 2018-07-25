@@ -462,5 +462,22 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                 }
             }
         }
+
+        [TestMethod]
+        public void InitializeGridData_Always_CreatesCorrectStructure()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridData(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Body"));
+            Assert.IsTrue(_substructsCreated.Contains("B"));
+            Assert.IsTrue(_substructsCreated.Contains("I"));
+            Assert.AreEqual("Totals", _stringAttributesCreated["I"]["Grouping"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
+
+            Assert.AreEqual(0, _testDouble.Level);
+            Assert.AreEqual("I", _testDouble.Levels[_testDouble.Level].Name);
+        }
     }
 }
