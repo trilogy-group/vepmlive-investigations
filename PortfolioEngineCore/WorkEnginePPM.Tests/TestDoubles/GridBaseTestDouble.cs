@@ -11,20 +11,18 @@ namespace WorkEnginePPM.Tests.TestDoubles
 {
     public class GridBaseTestDouble : GridBase<PeriodData, DetailRowData>
     {
-        public readonly IList<GridRenderingTypes> InitializeGridLayoutCalls = new List<GridRenderingTypes>();
-        public readonly IList<GridRenderingTypes> FinalizeGridLayoutCalls = new List<GridRenderingTypes>();
-        public readonly IList<IEnumerable<PeriodData>> AddPeriodColumnsCalls = new List<IEnumerable<PeriodData>>();
-        public readonly IList<GridRenderingTypes> InitializeGridDataCalls = new List<GridRenderingTypes>();
-        public readonly IList<Tuple<DetailRowData, int>> AddDetailRowCalls = new List<Tuple<DetailRowData, int>>();
-        public readonly IList<Tuple<string, string>> AddPeriodColumnCalls = new List<Tuple<string, string>>();
+        public IList<GridRenderingTypes> InitializeGridLayoutCalls { get; } = new List<GridRenderingTypes>();
+        public IList<GridRenderingTypes> FinalizeGridLayoutCalls { get; } = new List<GridRenderingTypes>();
+        public IList<IEnumerable<PeriodData>> AddPeriodColumnsCalls { get; } = new List<IEnumerable<PeriodData>>();
+        public IList<GridRenderingTypes> InitializeGridDataCalls { get; } = new List<GridRenderingTypes>();
+        public IList<Tuple<DetailRowData, int>> AddDetailRowCalls { get; } = new List<Tuple<DetailRowData, int>>();
+        public IList<Tuple<string, string>> AddPeriodColumnCalls { get; } = new List<Tuple<string, string>>();
 
         public GridBaseTestDouble(
             ShimCStruct header1Shim,
             ShimCStruct header2Shim,
-            ShimCStruct periodColsShim
-        )
+            ShimCStruct periodColsShim)
         {
-
             Header1 = header1Shim;
             Header2 = header2Shim;
             PeriodCols = periodColsShim;

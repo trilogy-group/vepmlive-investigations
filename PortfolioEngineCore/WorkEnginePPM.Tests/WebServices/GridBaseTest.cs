@@ -75,24 +75,17 @@ namespace WorkEnginePPM.Tests.WebServices
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
         public void RenderToXML_RenderingTypeInvalid_Throws()
         {
             // Arrange
             var grid = CreateGridBase();
 
             // Act
-            Action action = () => grid.RenderToXml(GridRenderingTypes.None);
+            grid.RenderToXml(GridRenderingTypes.None);
 
             // Assert
-            try
-            {
-                action();
-            }
-            catch (ArgumentException)
-            {
-                return;
-            }
-            Assert.Fail();
+            // ExpectedException - ArgumentException
         }
 
         [TestMethod]
@@ -106,7 +99,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 structNameUsed = name;
             };
 
-            ShimCStruct.AllInstances.XML = (element) =>
+            ShimCStruct.AllInstances.XML = element =>
             {
                 return string.Empty;
             };
