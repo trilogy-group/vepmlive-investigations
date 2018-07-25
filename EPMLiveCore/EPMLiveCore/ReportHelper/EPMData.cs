@@ -20,6 +20,31 @@ namespace EPMLiveCore.ReportHelper
         private readonly Guid _webAppId;
         private Guid _webId;
 
+        private const int RetentionDays = 1;
+        private const int MaxKilobytes = 32768;
+
+        private const int OpenEpmLiveConnectionEvent = 2010;
+        private const int GetMasterDbConnectionEvent = 2020;
+        private const int OpenMasterDbConnectionEvent = 2030;
+        private const int GetEpmLiveConnectionEvent = 2040;
+        private const int ExecuteScalarEvent = 2050;
+        private const int UpdateForeignKeyEvent = 4001;
+
+        private const string DotDelimiter = ".";
+        private const string EpmLiveKey = "EPM Live";
+        private const string EpmLiveReportingKey = "EPMLive Reporting";
+        private const string ExecuteScalarKey = "ExecuteScalar";
+        private const string ExecuteNonQueryKey = "ExecuteNonQuery";
+        private const string GetTableKey = "GetTable";
+        private const string GetClientReportingConnectionKey = "GetClientReportingConnection";
+        private const string GetClientReportingConnectionSiteIdKey = "GetClientReportingConnection(Guid siteId)";
+        private const string GetEpmLiveConnectionKey = "GetEPMLiveConnection";
+        private const string GetMasterDbConnectionKey = "GetMasterDbConnection";
+        private const string OpenEpmLiveConnectionKey = "OpenEPMLiveConnection";
+        private const string OpenClientReportingConnectionKey = "OpenClientReportingConnection";
+        private const string OpenMasterDbConnectionKey = "OpenMasterDbConnection";
+        private const string UpdateForeignKeysKey = "UpdateForeignKeys";
+
         private string _DefaultLists;
         private string _command;
         private CommandType _commandType = CommandType.Text;
@@ -298,14 +323,8 @@ namespace EPMLiveCore.ReportHelper
                     _epmLiveConOpen = false;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetEPMLiveConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetEPMLiveConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetEPMLiveConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, GetEpmLiveConnectionKey, eventMessage, false, GetEpmLiveConnectionEvent);
                     });
                 }
                 return _conEPMLive;
@@ -328,17 +347,70 @@ namespace EPMLiveCore.ReportHelper
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetClientReportingConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionKey, eventMessage, false, GetEpmLiveConnectionEvent);
                     });
                 }
                 return _conClientReporting;
+            }
+        }
+
+        private string CreateEventMessage(Exception exception)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            return $"Name: {_siteName} Url: {_siteUrl} ID: {_siteID} : {exception.Message}{exception.StackTrace}";
+        }
+
+        private string CreateEventMessageWithParams(Exception exception, string command, IEnumerable<SqlParameter> parameters)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            var cmdDetails = $"Command: {command}";
+            var cmdParams = " Params: ";
+
+            foreach (var param in parameters)
+            {
+                cmdParams = param.Value != DBNull.Value 
+                    ? $"{cmdParams}[Name:{param.ParameterName} Value:{param.Value}]," 
+                    : $"{cmdParams}[Name:{param.ParameterName} Value: Null],";
+            }
+
+            return $"Name: {_siteName} Url: {_siteUrl}  ID: {_siteID} : {exception.Message}{cmdDetails}{cmdParams}";
+        }
+
+        private void LogWindowsEvents(string logName, string source, string eventMessage, bool modifyOverflowPolicy, int eventId)
+        {
+            var fullSource = $"{EpmLiveReportingKey} - {source}";
+
+            if (!EventLog.SourceExists(fullSource))
+            {
+                EventLog.CreateEventSource(fullSource, logName);
+            }
+
+            using (var eventLog = new EventLog(logName))
+            {
+                eventLog.Source = $"{EpmLiveReportingKey} {source}";
+                eventLog.MaximumKilobytes = MaxKilobytes;
+                eventLog.MachineName = DotDelimiter;
+
+                if (modifyOverflowPolicy)
+                {
+                    eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, RetentionDays);
+                }
+
+                eventLog.WriteEntry(eventMessage, EventLogEntryType.Error, eventId);
             }
         }
 
@@ -359,14 +431,8 @@ namespace EPMLiveCore.ReportHelper
                     _sqlError = ex.Message;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetMasterDbConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetMasterDbConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetMasterDbConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2020);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, GetMasterDbConnectionKey, eventMessage, false, GetMasterDbConnectionEvent);
                     });
                 }
                 return _conMaster;
@@ -396,14 +462,8 @@ namespace EPMLiveCore.ReportHelper
                     _epmLiveConOpen = false;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (!EventLog.SourceExists("EPMLive Reporting - OpenEPMLiveConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - OpenEPMLiveConnection", "EPM Live");
-
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenEPMLiveConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(
-                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
+                        var eventMessage = CreateEventMessage(ex);
+                        LogWindowsEvents(EpmLiveKey, OpenEpmLiveConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
                     });
                 }
             }
@@ -445,15 +505,8 @@ namespace EPMLiveCore.ReportHelper
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            if (!EventLog.SourceExists("EPMLive Reporting - OpenClientReportingConnection"))
-                                EventLog.CreateEventSource("EPMLive Reporting - OpenClientReportingConnection",
-                                    "EPM Live");
-
-                            var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenClientReportingConnection");
-                            myLog.MaximumKilobytes = 32768;
-                            myLog.WriteEntry(
-                                "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                                ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
+                            var eventMessage = CreateEventMessage(ex);
+                            LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
                         });
                     }
                 }
@@ -494,14 +547,8 @@ namespace EPMLiveCore.ReportHelper
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            if (!EventLog.SourceExists("EPMLive Reporting - OpenMasterDbConnection"))
-                                EventLog.CreateEventSource("EPMLive Reporting - OpenMasterDbConnection", "EPM Live");
-
-                            var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenMasterDbConnection");
-                            myLog.MaximumKilobytes = 32768;
-                            myLog.WriteEntry(
-                                "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
-                                ex.Message + ex.StackTrace, EventLogEntryType.Error, 2030);
+                            var eventMessage = CreateEventMessage(ex);
+                            LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
                         });
                     }
                 }
@@ -612,18 +659,25 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                if (_sTextFilePath != null || _sTextFilePath != string.Empty)
-                {
-                    TextWriter tw = new StreamWriter(_sTextFilePath);
-
-                    // write a line of text to the file
-                    tw.WriteLine(sText);
-
-                    // close the stream
-                    tw.Close();
-                }
+                WriteTextFile(_sTextFilePath, sText);
             }
-            catch (Exception ex) { }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Exception suppressed: {0}", exception);
+            }
+        }
+
+        private void WriteTextFile(string path, string text)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            using (var writer = new StreamWriter(path))
+            {
+                writer.WriteLine(text);
+            }
         }
 
         public bool DeleteWork(Guid listid, int itemid)
@@ -752,15 +806,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
-                        EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                    myLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 1);
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 4001);
+                    var eventMessage = CreateEventMessage(ex);
+                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, UpdateForeignKeyEvent);
                 });
                 blnPassed = false;
             }
@@ -817,15 +864,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
-                        EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                    myLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 1);
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 4001);
+                    var eventMessage = CreateEventMessage(ex);
+                    LogWindowsEvents(EpmLiveKey, UpdateForeignKeysKey, eventMessage, true, UpdateForeignKeyEvent);
                 });
                 blnPassed = false;
             }
@@ -1013,21 +1053,28 @@ namespace EPMLiveCore.ReportHelper
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    var staticCn = new SqlConnection(cs);
-                    try
-                    {
-                        staticCn.Open();
-                    }
-                    catch (SqlException ex)
-                    {
-                        Trace.Write(ex.Message);
-                        success = false;
-                    }
-                    finally
-                    {
-                        staticCn.Close();
-                    }
+                    success = TryToConnect(cs);
                 });
+            return success;
+        }
+
+        public static bool TryToConnect(string connectionString)
+        {
+            var success = true;
+
+            using (var sqlConnection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    sqlConnection.Open();
+                }
+                catch (SqlException ex)
+                {
+                    Trace.Write(ex.Message);
+                    success = false;
+                }
+            }
+
             return success;
         }
 
@@ -1049,30 +1096,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - ExecuteScalar"))
-                        EventLog.CreateEventSource("EPMLive Reporting - ExecuteScalar", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteScalar");
-                    myLog.MaximumKilobytes = 32768;
-                    string cmdDetails = "Command: " + _command;
-                    string cmdParams = " Params: ";
-
-                    foreach (SqlParameter param in _params)
-                    {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
-
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    LogWindowsEvents(EpmLiveKey, ExecuteScalarKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1107,29 +1132,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
-                        EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
-                    string cmdDetails = "Command: " + _command;
-                    string cmdParams = " Params: ";
-
-                    foreach (SqlParameter param in _params)
-                    {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
-
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    LogWindowsEvents(EpmLiveKey, ExecuteNonQueryKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1268,30 +1272,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - GetTable"))
-                        EventLog.CreateEventSource("EPMLive Reporting - GetTable", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetTable");
-                    myLog.MaximumKilobytes = 32768;
-
-                    string cmdDetails = "Command: " + _command;
-                    string cmdParams = " Params: ";
-                    foreach (SqlParameter param in _params)
-                    {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
-
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, ExecuteScalarEvent);
                 });
 
                 _sqlErrorOccurred = true;
@@ -1402,26 +1384,22 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                var cmd = new SqlCommand();
-                var con = new SqlConnection(CoreFunctions.getConnectionString(webAppId));
-                con.Open();
-                //cmd.CommandText = "SELECT * FROM RPTDatabases WHERE WebApplicationId = @webAppId";
-                //cmd.Parameters.AddWithValue("@webAppId", webAppId);
-
-                cmd.CommandText = "SELECT * FROM RPTDatabases WHERE SiteId = @siteId";
-                cmd.Parameters.AddWithValue("@siteId", siteId);
-
-                cmd.Connection = con;
-                DataTable dt = GetTable(cmd);
-                con.Close();
-
-                if (dt != null && dt.Rows.Count > 0)
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(webAppId)))
                 {
-                    return dt.Rows[0];
-                }
-                else
-                {
-                    return null;
+                    connection.Open();
+
+                    using (var command = new SqlCommand("SELECT * FROM RPTDatabases WHERE SiteId = @siteId", connection))
+                    {
+                        command.Parameters.AddWithValue("@siteId", siteId);
+
+                        var dataTable = GetTable(command);
+                        if (dataTable != null && dataTable.Rows.Count > 0)
+                        {
+                            return dataTable.Rows[0];
+                        }
+
+                        return null;
+                    }
                 }
             }
             catch (Exception ex)
@@ -2104,16 +2082,8 @@ namespace EPMLiveCore.ReportHelper
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection(Guid siteId)"))
-                        EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection(Guid siteId)",
-                            "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".",
-                        "EPMLive Reporting GetClientReportingConnection(Guid siteId)");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 2040);
+                    var eventMessage = CreateEventMessage(ex);
+                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, GetEpmLiveConnectionEvent);
                 });
             }
             return _conClientReporting;
@@ -2911,21 +2881,28 @@ namespace EPMLiveCore.ReportHelper
         /// <summary>
         ///     Encrypts string value using the HASH MD5 cryptoservice provider.
         /// </summary>
-        /// <param name="Plaintext"></param>
+        /// <param name="plaintext"></param>
         /// <returns></returns>
-        public static string Encrypt(string Plaintext)
+        public static string Encrypt(string plaintext)
         {
-            var Buffer = new byte[0];
-            string Key = "EPMLIVE";
-            var DES = new TripleDESCryptoServiceProvider();
-            var hashMD5 = new MD5CryptoServiceProvider();
-            DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-            DES.Mode = CipherMode.ECB;
-            ICryptoTransform DESEncrypt = DES.CreateEncryptor();
-            Buffer = ASCIIEncoding.ASCII.GetBytes(Plaintext);
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
 
-            string TripleDES = Convert.ToBase64String(DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-            return TripleDES;
+            using (var cryptoProvider = new MD5CryptoServiceProvider())
+            {
+                using (var tdes = new TripleDESCryptoServiceProvider())
+                {
+                    tdes.Key = cryptoProvider.ComputeHash(Encoding.ASCII.GetBytes(Key));
+                    tdes.Mode = CipherMode.ECB;
+
+                    using (var transform = tdes.CreateEncryptor())
+                    {
+                        buffer = Encoding.ASCII.GetBytes(plaintext);
+
+                        return Convert.ToBase64String(transform.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -2935,20 +2912,24 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public static string Decrypt(string base64Text)
         {
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
+
             try
             {
-                var Buffer = new byte[0];
-                string Key = "EPMLIVE";
-                var DES = new TripleDESCryptoServiceProvider();
-                var hashMD5 = new MD5CryptoServiceProvider();
-                DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-                DES.Mode = CipherMode.ECB;
-                ICryptoTransform DESDecrypt = DES.CreateDecryptor();
-                Buffer = Convert.FromBase64String(base64Text);
+                using (var tDes = new TripleDESCryptoServiceProvider())
+                {
+                    using (var cryptoProvider = new MD5CryptoServiceProvider())
+                    {
+                        tDes.Key = cryptoProvider.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+                        tDes.Mode = CipherMode.ECB;
 
-                string DecTripleDES =
-                    ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-                return DecTripleDES;
+                        var DESDecrypt = tDes.CreateDecryptor();
+                        buffer = Convert.FromBase64String(base64Text);
+
+                        return ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
             }
             catch (Exception ex)
             {

@@ -42,9 +42,10 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
@@ -52,12 +53,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="SPEmulators, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d9b49c86e70cb3c6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
@@ -66,7 +65,6 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
@@ -91,15 +89,31 @@
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
+    <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
+    <Compile Include="RequestWorkspaceTest.cs" />
+    <Compile Include="NewProjectTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SPUtilities\SPListUtilityTest.cs" />
+    <Compile Include="Testables\InputFormSectionTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Testables\RequestWorkspaceTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Testables\NewProjectTestable.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="TestCheck.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
