@@ -88,13 +88,19 @@ namespace TimeSheets
 
                     //if (!tempJob)
                     {
-                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  3, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  @status, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
                         {
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             if (bErrors)
+                            {
                                 cmd.Parameters.AddWithValue("@result", "Errors");
+                                cmd.Parameters.AddWithValue("@status", 0);
+                            }
                             else
+                            {
                                 cmd.Parameters.AddWithValue("@result", "No Errors");
+                                cmd.Parameters.AddWithValue("@status", 3);
+                            }
                             cmd.Parameters.AddWithValue("@resulttext", sErrors);
                             cmd.ExecuteNonQuery();
                         }
