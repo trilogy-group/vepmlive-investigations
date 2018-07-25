@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Global.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
@@ -150,13 +151,192 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         }
 
         [TestMethod]
-        public void InitializeGridLayout_Always_InitializesLayoutConfig()
+        public void InitializeGridLayout_Always_InitializesLayoutConfigToolbar()
         {
             // Arrange, Act
             _testDouble.InitializeGridLayout(_renderingType);
 
             // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Toolbar"));
+            Assert.AreEqual(0, _intAttributesCreated["Toolbar"]["Visible"]);
+        }
 
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesLayoutConfigPanel()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Panel"));
+            Assert.AreEqual(0, _intAttributesCreated["Panel"]["Visible"]);
+            Assert.AreEqual(0, _intAttributesCreated["Panel"]["Select"]);
+            Assert.AreEqual(0, _intAttributesCreated["Panel"]["Delete"]);
+            Assert.AreEqual(0, _intAttributesCreated["Panel"]["CanHide"]);
+            Assert.AreEqual(0, _intAttributesCreated["Panel"]["CanSelect"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesLayoutConfigCfg()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Cfg"));
+            Assert.AreEqual("PortfolioItem", _stringAttributesCreated["Cfg"]["MainCol"]);
+            Assert.AreEqual("GTACCNPSQEBSLC", _stringAttributesCreated["Cfg"]["Code"]);
+            Assert.AreEqual(3, _intAttributesCreated["Cfg"]["SuppressCfg"]);
+            Assert.AreEqual(3, _intAttributesCreated["Cfg"]["SuppressMessage"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["PrintCols"]);
+            Assert.AreEqual(_pmoAdmin, _intAttributesCreated["Cfg"]["Dragging"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["Sorting"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ColsMoving"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ColsPosLap"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ColsLap"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["VisibleLap"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["SectionWidthLap"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["GroupLap"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["WideHScroll"]);
+            Assert.AreEqual(150, _intAttributesCreated["Cfg"]["LeftWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["Width"]);
+            Assert.AreEqual(800, _intAttributesCreated["Cfg"]["RightWidth"]);
+            Assert.AreEqual(50, _intAttributesCreated["Cfg"]["MinMidWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["MinRightWidth"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["LeftCanResize"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["RightCanResize"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["FocusWholeRow"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["MaxHeight"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["ShowDeleted"]);
+            Assert.AreEqual(true, _booleanAttributesCreated["Cfg"]["DateStrings"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["MaxWidth"]);
+            Assert.AreEqual(2, _intAttributesCreated["Cfg"]["MaxSort"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["AppendId"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["FullId"]);
+            Assert.AreEqual("0123456789", _stringAttributesCreated["Cfg"]["IdChars"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["NumberId"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["LastId"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["CaseSensitiveId"]);
+            Assert.AreEqual("GM", _stringAttributesCreated["Cfg"]["Style"]);
+            Assert.AreEqual("ResPlanAnalyzer", _stringAttributesCreated["Cfg"]["CSS"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["FastColumns"]);
+            Assert.AreEqual(3, _intAttributesCreated["Cfg"]["ExpandAllLevels"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["GroupSortMain"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["GroupRestoreSort"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["NoTreeLines"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ShowVScroll"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesColumns()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("LeftCols"));
+            Assert.IsTrue(_substructsCreated.Contains("Cols"));
+            Assert.IsTrue(_substructsCreated.Contains("RightCols"));
+            Assert.AreEqual("RightCols", _testDouble.PeriodCols.Name);
+            Assert.AreEqual("Cols", _testDouble.MiddleCols.Name);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesDefinitions()
+        {
+            // Arrange
+            var definitionsInitialized = new List<string>();
+            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionString = (instance, name) =>
+            {
+                definitionsInitialized.Add(name);
+                return new PortfolioEngineCore.CStruct();
+            };
+
+            // Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.AreEqual(2, definitionsInitialized.Count);
+            Assert.IsTrue(definitionsInitialized.Contains("R"));
+            Assert.IsTrue(definitionsInitialized.Contains("Leaf"));
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesHeaders()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Head"));
+            Assert.IsTrue(_substructsCreated.Contains("Filter"));
+            Assert.AreEqual("Filter", _stringAttributesCreated["Filter"]["id"]);
+            Assert.AreEqual(1, _intAttributesCreated["Header"]["PortfolioItemVisible"]);
+            Assert.AreEqual(1, _intAttributesCreated["Header"]["NoEscape"]);
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesCategoryColumns()
+        {
+            // Arrange
+            var nameAttributeValues = new HashSet<string>();
+            var typeAttributeValues = new HashSet<string>();
+            ShimCStruct.AllInstances.CreateStringAttrStringString = (element, name, value) =>
+            {
+                if (name == "Name")
+                {
+                    nameAttributeValues.Add(value);
+                }
+                if (name == "Type")
+                {
+                    typeAttributeValues.Add(value);
+                }
+            };
+
+            // Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(nameAttributeValues.Contains("RowSel"));
+            Assert.IsTrue(typeAttributeValues.Contains("Icon"));
+            Assert.IsTrue(nameAttributeValues.Contains("rowid"));
+            Assert.IsTrue(typeAttributeValues.Contains("Text"));
+            Assert.IsTrue(nameAttributeValues.Contains("Select"));
+            Assert.IsTrue(typeAttributeValues.Contains("Bool"));
+            Assert.IsTrue(nameAttributeValues.Contains("ChangedIcon"));
+            Assert.IsTrue(typeAttributeValues.Contains("Type"));
+            Assert.IsTrue(nameAttributeValues.Contains("RowDraggable"));
+            Assert.IsTrue(typeAttributeValues.Contains("Bool"));
+            Assert.IsTrue(nameAttributeValues.Contains("RowChanged"));
+            Assert.IsTrue(typeAttributeValues.Contains("Int"));
+        }
+
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesViewColumns()
+        {
+            // Arrange
+            var nameAttributeValues = new HashSet<string>();
+            ShimCStruct.AllInstances.CreateStringAttrStringString = (element, name, value) =>
+            {
+                if (name == "Name")
+                {
+                    nameAttributeValues.Add(value);
+                }
+            };
+
+            // Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            foreach (var column in _columns)
+            {
+                Assert.IsTrue(nameAttributeValues.Contains(column.m_realname
+                    .Replace(" ", string.Empty)
+                    .Replace("\r", string.Empty)
+                    .Replace("\n", string.Empty)
+                    .Replace("/n", string.Empty)
+                ));
+            }
         }
     }
 }

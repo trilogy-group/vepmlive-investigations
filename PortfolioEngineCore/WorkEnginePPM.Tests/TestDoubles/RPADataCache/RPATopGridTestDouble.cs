@@ -11,6 +11,11 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
 {
     internal class RPATopGridTestDouble : RPATopGrid
     {
+        public new CStruct PeriodCols => base.PeriodCols;
+        public new CStruct MiddleCols => base.MiddleCols;
+        public new CStruct DefinitionRight => base.DefinitionRight;
+        public new CStruct DefinitionLeaf => base.DefinitionLeaf;
+
         public RPATopGridTestDouble(
             IList<clsRXDisp> columns,
             int pmoAdmin,

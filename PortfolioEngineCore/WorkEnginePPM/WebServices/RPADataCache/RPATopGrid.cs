@@ -25,9 +25,9 @@ namespace RPADataCache
         private readonly clsResourceValues _resourceValues;
         private readonly clsLookupList _categoryLookupList;
 
-        private CStruct DefinitionRight;
-        private CStruct DefinitionLeaf;
-        private CStruct MiddleCols;
+        protected CStruct DefinitionRight;
+        protected CStruct DefinitionLeaf;
+        protected CStruct MiddleCols;
 
         public RPATopGrid(
             IList<clsRXDisp> columns, 
@@ -168,7 +168,7 @@ namespace RPADataCache
             {
                 // below code find columns which not matched with current saved view's column and that column hide on grid.
 
-                var SelViewCols = (from x in strCurrentViewCols
+                var viewColumn = (from x in strCurrentViewCols
                                    where x[0].ToString() == col.m_realname.Replace(" ", string.Empty)
                                    select x[0]).FirstOrDefault();
 
@@ -184,7 +184,7 @@ namespace RPADataCache
                 categoryColumn.CreateIntAttr("ShowHint", 0);
                 categoryColumn.CreateIntAttr("CaseSensitive", 0);
                 categoryColumn.CreateStringAttr("OnDragCell", "Focus,DragCell");
-                if (SelViewCols == null)
+                if (viewColumn == null)
                 {
                     categoryColumn.CreateIntAttr("Visible", 0);
                 }
@@ -196,36 +196,37 @@ namespace RPADataCache
                 DefinitionLeaf.CreateStringAttr(sn + "HtmlPrefix", string.Empty);
                 DefinitionLeaf.CreateStringAttr(sn + "HtmlPostfix", string.Empty);
 
-                if (col.m_type == 2)
+                switch (col.m_type)
                 {
-                    string format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                    categoryColumn.CreateStringAttr("Format", format);
-                    categoryColumn.CreateStringAttr("EditFormat", format);
-                    if (col.m_id == RPConstants.TGRID_SDATE)
-                    {
-                        categoryColumn.CreateStringAttr("Type", "Date");
-
-                        string sminFunc = "(Row.id == 'Filter' ? '' : min())";
-                        DefinitionRight.CreateStringAttr(sn + "Formula", sminFunc);
-                    }
-                    else if (col.m_id == RPConstants.TGRID_FDATE)
-                    {
-                        categoryColumn.CreateStringAttr("Type", "Date");
-
-                        string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
-                        DefinitionRight.CreateStringAttr(sn + "Formula", smaxFunc);
-                    }
+                    case 2:
+                        var format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                        categoryColumn.CreateStringAttr("Format", format);
+                        categoryColumn.CreateStringAttr("EditFormat", format);
+                        switch (col.m_id)
+                        {
+                            case RPConstants.TGRID_SDATE:
+                                const string sminFunc = "(Row.id == 'Filter' ? '' : min())";
+                                categoryColumn.CreateStringAttr("Type", "Date");
+                                DefinitionRight.CreateStringAttr(sn + "Formula", sminFunc);
+                                break;
+                            case RPConstants.TGRID_FDATE:
+                                const string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
+                                categoryColumn.CreateStringAttr("Type", "Date");
+                                DefinitionRight.CreateStringAttr(sn + "Formula", smaxFunc);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case 3:
+                        categoryColumn.CreateStringAttr("Type", "Float");
+                        categoryColumn.CreateStringAttr("Format", ",0.##");
+                        break;
+                    default:
+                        categoryColumn.CreateStringAttr("Type", "Text");
+                        break;
                 }
-                else if (col.m_type == 3)
-                {
-                    categoryColumn.CreateStringAttr("Type", "Float");
-                    categoryColumn.CreateStringAttr("Format", ",0.##");
-                }
-                else
-                {
-                    categoryColumn.CreateStringAttr("Type", "Text");
-                }
-
+                
                 if (sn.Equals(RPConstants.CONST_PRIORITY))
                 {
                     categoryColumn.CreateStringAttr("NumberSort", "1");
@@ -238,6 +239,7 @@ namespace RPADataCache
                 {
                     categoryColumn.CreateIntAttr("Width", 0);
                 }
+
                 Header1.CreateStringAttr(sn, snv);
 
                 string sMaxFunc = "(Row.id == 'Filter' ? '' : max())";
