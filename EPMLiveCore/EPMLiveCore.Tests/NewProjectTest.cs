@@ -48,7 +48,7 @@ namespace EPMLiveCore.Tests
             {
                 return _projectInfo;
             };
-            
+
             ShimPage.AllInstances.RequestGet = (instance) => new ShimHttpRequest
             {
                 ItemGetString = (name) => _requestParameters[name]
