@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PortfolioEngineCore;
 using ResourceValues;
 using RPADataCache;
 
@@ -20,6 +21,18 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             clsLookupList categoryLookupList) 
         : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
         {
+            Constructor = new CStruct();
+            Constructor.Initialize("Grid");
+        }
+
+        public new void InitializeGridLayout(GridRenderingTypes renderingType)
+        {
+            base.InitializeGridLayout(renderingType);
+        }
+
+        protected override string GetResourceAnalyzerView(string sXML)
+        {
+            return sXML;
         }
     }
 }

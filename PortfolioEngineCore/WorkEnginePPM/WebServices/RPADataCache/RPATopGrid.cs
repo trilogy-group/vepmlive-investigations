@@ -952,7 +952,7 @@ namespace RPADataCache
             return true;
         }
 
-        private string GetResourceAnalyzerView(string sXML)
+        protected virtual string GetResourceAnalyzerView(string sXML)
         {
             string basePath;
             string ppmId;
