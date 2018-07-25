@@ -214,89 +214,82 @@ namespace PortfolioEngineCore
             //return 2;
         }
 
-        private int GrabPidsFromTickect(SqlConnection oDataAccess, string ticket, out string sPids, out bool bNoneMissing, out int PICount)
+        public static int GrabPidsFromTickect(
+            SqlConnection sqlConnection,
+            string ticket,
+            out string projectIdsString,
+            out bool projectsExist,
+            out int projectsCount)
         {
+            var commandText = string.Empty;
+            var guidsString = string.Empty;
+            var eStatus = 0;
+            projectIdsString = string.Empty;
+            projectsExist = true;
+            projectsCount = 0;
+            int projectId;
 
-            string sCommand = "";
-            int eStatus = 0;
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            string sGuids = "";
-            string sGin = "";
-            sPids = "";
-            bNoneMissing = true;
-            PICount = 0;
-            int i = 0;
-            int lPid;
-
-             sCommand = "SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '" + ticket + "'";
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            commandText = string.Format("SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '{0}'", ticket);
+            using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
             {
-                sGuids = DBAccess.ReadStringValue(reader["DC_DATA"]);
-            }
-            reader.Close();
-            reader = null;
-
-
-            sGuids = sGuids.Replace(",", " ");
-            sGuids = sGuids.ToUpper();
-            sGuids = sGuids.Trim();
-
-
-            while (sGuids.Length != 0)
-            {
-                sGin = "";
-
-                i = sGuids.IndexOf(" ");
-
-                if (i == -1)
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    sGin = sGuids;
-                    sGuids = "";
-                }
-                else
-                {
-                    sGin = sGuids.Substring(0, i);
-                    sGuids = sGuids.Substring(i + 1);
-                }
-
-                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
-                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
-
-                    oCommand = new SqlCommand(sCommand, oDataAccess);
-                    reader = oCommand.ExecuteReader();
-                    lPid = 0;
                     while (reader.Read())
                     {
-                        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                        guidsString = DBAccess.ReadStringValue(reader["DC_DATA"]);
                     }
-                    reader.Close();
-                    reader = null;
-
-                    if (lPid == 0)
-                        bNoneMissing = false;
-                    else
-                    {
-                        ++PICount;
-                        if (sPids == "")
-                            sPids = lPid.ToString();
-                        else
-                            sPids = sPids + "," + lPid.ToString();
-                    }
-
                 }
-
             }
-            return eStatus;
 
+            guidsString = guidsString.Replace(",", " ");
+            guidsString = guidsString.ToUpper();
+            guidsString = guidsString.Trim();
+
+            if (!string.IsNullOrEmpty(guidsString))
+            {
+                var guids = guidsString.Split(' ');
+                foreach (var guid in guids)
+                {
+                    // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
+                    // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
+                    if (guid != string.Empty && !guid.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        commandText = string.Format("SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE {{ fn UCASE(PROJECT_EXT_UID) }}  = '{0}'", guid);
+                        using (var sqlCommand = new SqlCommand(commandText, sqlConnection))
+                        {
+                            using (var reader = sqlCommand.ExecuteReader())
+                            {
+                                projectId = 0;
+                                while (reader.Read())
+                                {
+                                    projectId = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                                }
+                            }
+                        }
+
+                        if (projectId == 0)
+                        {
+                            projectsExist = false;
+                        }
+                        else
+                        {
+                            ++projectsCount;
+                            if (projectIdsString == string.Empty)
+                            {
+                                projectIdsString = projectId.ToString();
+                            }
+                            else
+                            {
+                                projectIdsString = projectIdsString + "," + projectId.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return eStatus;
         }
+
 
         public static bool CheckIfCostViewsExist(SqlConnection sqlConnection)
         {

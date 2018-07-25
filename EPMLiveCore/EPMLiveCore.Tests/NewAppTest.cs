@@ -16,38 +16,50 @@ using static EPMLiveCore.SPUtilities.SPProjectUtility;
 namespace EPMLiveCore.Tests
 {
     [TestClass]
-    public class NewProjectTest
+    public class NewAppTest
     {
         private const string _webAtUrlSuffix = "@url";
-
         private IDisposable _shimsContext;
-        private NewProjectTestable _testable;
+        private NewAppTestable _testable;
         private ProjectInfoResult _projectInfo;
+        private WorkspaceInfoResult _workspaceInfo;
         private IDictionary<string, string> _requestParameters;
         private string _serverRelativeUrl;
         private string _redirectUrl;
         private bool _dbUpdateExecuted;
         private string _workspaceUrl;
+        private bool _listExists;
 
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
-            _testable = new NewProjectTestable();
-            _projectInfo = new ProjectInfoResult();
+            _testable = new NewAppTestable();
             _requestParameters = new Dictionary<string, string>
             {
-                { "hdnSelectedWorkspace", string.Empty }
+                { "hdnSelectedWorkspace", string.Empty },
+                { "List", Guid.NewGuid().ToString() },
+            };
+            _workspaceInfo = new WorkspaceInfoResult
+            {
+                ListName = "test-list",
+                WorkspaceName = "test-workspace"
+            };
+
+            _projectInfo = new ProjectInfoResult();
+            ShimSPProjectUtility.AllInstances.RequestProjectInfo = (instance) =>
+            {
+                return _projectInfo;
+            };
+            ShimSPProjectUtility.AllInstances.RequestWorkspaceInfoGuid = (instance, listId) =>
+            {
+                return _workspaceInfo;
             };
 
             _serverRelativeUrl = "http://test.test";
             _redirectUrl = null;
             _dbUpdateExecuted = false;
-
-            ShimSPProjectUtility.AllInstances.RequestProjectInfo = (instance) =>
-            {
-                return _projectInfo;
-            };
+            _listExists = true;
 
             ShimPage.AllInstances.RequestGet = (instance) => new ShimHttpRequest
             {
@@ -70,36 +82,44 @@ namespace EPMLiveCore.Tests
 
         private void ShimSPWebInternals()
         {
+            var spListShim = new ShimSPList
+            {
+                TitleGet = () => "test",
+                ItemsGet = () => new ShimSPListItemCollection
+                {
+                    Add = () => new ShimSPListItem
+                    {
+                        ItemSetStringObject = (liName, value) =>
+                        {
+                            if (liName == "URL")
+                            {
+                                _workspaceUrl = value.ToString();
+                            }
+                        },
+                        Update = () => _dbUpdateExecuted = true
+                    }
+                },
+                FormsGet = () => new ShimSPFormCollection
+                {
+                    ItemGetPAGETYPE = (pageType) => new ShimSPForm
+                    {
+                        ServerRelativeUrlGet = () => _serverRelativeUrl
+                    }
+                }
+            };
+
             var webShim = new ShimSPWeb
             {
                 CurrentUserGet = () => new ShimSPUser(),
                 ServerRelativeUrlGet = () => _serverRelativeUrl,
                 ListsGet = () => new ShimSPListCollection
                 {
-                    ItemGetString = (key) => new ShimSPList
-                    {
-                        ItemsGet = () => new ShimSPListItemCollection
-                        {
-                            Add = () => new ShimSPListItem
-                            {
-                                ItemSetStringObject = (liName, value) =>
-                                {
-                                    if (liName == "URL")
-                                    {
-                                        _workspaceUrl = value.ToString();
-                                    }
-                                },
-                                Update = () => _dbUpdateExecuted = true
-                            }
-                        },
-                        FormsGet = () => new ShimSPFormCollection
-                        {
-                            ItemGetPAGETYPE = (pageType) => new ShimSPForm
-                            {
-                                ServerRelativeUrlGet = () => _serverRelativeUrl
-                            }
-                        }
-                    }
+                    ItemGetString = (key) => _listExists ? spListShim : null, 
+                    ItemGetGuid = (key) => spListShim
+                },
+                WebsGet = () => new ShimSPWebCollection
+                {
+                    ItemGetGuid = (key) => new ShimSPWeb()
                 }
             };
 
@@ -143,9 +163,9 @@ namespace EPMLiveCore.Tests
                                 .Bind(new ShimSPListItem[] { })
                         }
                     };
-
                     return result;
-                }
+                },
+                ItemGetGuid = (key) => webShim
             };
 
             ShimSPContext.CurrentGet = () => new ShimSPContext
@@ -316,26 +336,11 @@ namespace EPMLiveCore.Tests
         }
 
         [TestMethod]
-        public void BtnOKClick_WorkspaceExistingUrlEmpty_ProjectCreatedAtWebAtUrl()
+        public void BtnOKClick_WorkspaceExistingListExists_ProjectCreated()
         {
             // Arrange
             _requestParameters["hdnWorkspaceType"] = "Existing";
-            _requestParameters["hdnSelectedWorkspace"] = "!test";
-
-            // Act
-            _testable.BtnOK_Click();
-
-            // Assert
-            Assert.IsTrue(_dbUpdateExecuted);
-            Assert.AreEqual(_serverRelativeUrl + _webAtUrlSuffix + "?ID=" + 0, _redirectUrl);
-        }
-
-        [TestMethod]
-        public void BtnOKClick_WorkspaceExistingUrlNotEmpty_ProjectCreatedAtWebAtUrl()
-        {
-            // Arrange
-            _requestParameters["hdnWorkspaceType"] = "Existing";
-            _requestParameters["hdnSelectedWorkspace"] = string.Empty;
+            _requestParameters["hdnSelectedWorkspace"] = Guid.NewGuid().ToString();
 
             // Act
             _testable.BtnOK_Click();
@@ -343,6 +348,24 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.IsTrue(_dbUpdateExecuted);
             Assert.AreEqual(_serverRelativeUrl + "?ID=" + 0, _redirectUrl);
+        }
+
+        [TestMethod]
+        public void BtnOKClick_WorkspaceExistingListNotExists_ErrorRendered()
+        {
+            // Arrange
+            _requestParameters["hdnWorkspaceType"] = "Existing";
+            _requestParameters["hdnSelectedWorkspace"] = Guid.NewGuid().ToString();
+            _listExists = false;
+
+            // Act
+            _testable.BtnOK_Click();
+
+            // Assert
+            Assert.IsFalse(_dbUpdateExecuted);
+            Assert.IsNull(_redirectUrl);
+            Assert.AreEqual("Error: The list " + "test" + " does not exist", _testable.label1.Text);
+            Assert.IsTrue(_testable.Panel2.Visible);
         }
 
         [TestMethod]
@@ -379,6 +402,20 @@ namespace EPMLiveCore.Tests
 
             // Assert
             Assert.IsTrue(websiteIsCreated);
+        }
+
+        [TestMethod]
+        public void BtnOKClick_WorkspaceNotExists_RedirectValid()
+        {
+            // Arrange
+            _requestParameters["hdnWorkspaceType"] = "test";
+
+            // Act
+            _testable.BtnOK_Click();
+
+            // Assert
+            Assert.IsTrue(!string.IsNullOrEmpty(_redirectUrl));
+            Assert.IsTrue(_redirectUrl.Contains("&rnd="));
         }
 
         [TestMethod]

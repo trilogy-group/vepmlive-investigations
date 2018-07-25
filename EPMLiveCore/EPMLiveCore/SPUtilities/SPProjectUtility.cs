@@ -102,6 +102,43 @@ namespace EPMLiveCore.SPUtilities
             return result;
         }
 
+        public WorkspaceInfoResult RequestWorkspaceInfo(Guid listId)
+        {
+            var result = new WorkspaceInfoResult();
+
+            var login = SPContext.Current.Web.CurrentUser.LoginName;
+            var url = SPContext.Current.Web.Url;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var mysite = new SPSite(url))
+                {
+                    using (var myweb = mysite.OpenWeb())
+                    {
+                        var list = myweb.Lists[listId];
+                        result.ListName = list.Title;
+                        result.WorkspaceName = string.Empty;
+
+                        try
+                        {
+                            GridGanttSettings gSettings = new GridGanttSettings(list);
+                            result.WorkspaceName = gSettings.NewMenuName;
+                        }
+                        catch (Exception ex)
+                        {
+                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.LayoutPage, TraceSeverity.VerboseEx, ex.ToString());
+                        }
+
+                        if (result.WorkspaceName == string.Empty)
+                        {
+                            result.WorkspaceName = result.ListName;
+                        }
+                    }
+                }
+            });
+
+            return result;
+        }
+
         private bool? ReadConfigWorkspaceFlag(SPWeb web)
         {
             bool? result;
