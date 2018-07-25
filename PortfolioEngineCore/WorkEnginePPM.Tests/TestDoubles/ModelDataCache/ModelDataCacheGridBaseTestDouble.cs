@@ -7,7 +7,7 @@ using ModelDataCache;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 
-namespace WorkEnginePPM.Tests.TestDoubles
+namespace WorkEnginePPM.Tests.TestDoubles.ModelDataCache
 {
     public class ModelDataCacheGridBaseTestDouble : ModelDataCacheGridBase
     {

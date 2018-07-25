@@ -7,14 +7,27 @@ using ModelDataCache;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 
-namespace WorkEnginePPM.Tests.TestDoubles
+namespace WorkEnginePPM.Tests.TestDoubles.ModelDataCache
 {
-    public class BottomGridTestDouble : BottomGrid
+    public class TopGridTestDouble : TopGrid
     {
         public new int Level => base.Level;
         public new CStruct[] Levels => base.Levels;
 
-        public BottomGridTestDouble(bool applyTarget, IList<DetailRowData> targetsSorted, IList<TargetColours> targetColors, bool showRemaining, bool useGrouping, bool showFTEs, bool showGantt, DateTime dateStart, DateTime dateEnd, IList<SortFieldDefn> sortFields, int detFreeze, bool useQuantity, bool useCost, bool showCostDetailed, int fromPeriodIndex, int toPeriodIndex) : base(applyTarget, targetsSorted, targetColors, showRemaining, useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, showCostDetailed, fromPeriodIndex, toPeriodIndex)
+        public TopGridTestDouble(
+            bool useGrouping, 
+            bool showFTEs, 
+            bool showGantt, 
+            DateTime dateStart, 
+            DateTime dateEnd, 
+            IList<SortFieldDefn> sortFields, 
+            int detFreeze, 
+            bool useQuantity, 
+            bool useCost, 
+            bool showCostDetailed, 
+            int fromPeriodIndex, 
+            int toPeriodIndex) 
+        : base(useGrouping, showFTEs, showGantt, dateStart, dateEnd, sortFields, detFreeze, useQuantity, useCost, showCostDetailed, fromPeriodIndex, toPeriodIndex)
         {
             for (var i = 0; i < Levels.Length; i++)
             {
@@ -23,6 +36,11 @@ namespace WorkEnginePPM.Tests.TestDoubles
 
             Constructor = new PortfolioEngineCore.CStruct();
             Constructor.Initialize("Grid");
+        }
+
+        public new string CleanUpString(string input)
+        {
+            return base.CleanUpString(input);
         }
 
         public new string ResolvePeriodId(PeriodData period, int index)

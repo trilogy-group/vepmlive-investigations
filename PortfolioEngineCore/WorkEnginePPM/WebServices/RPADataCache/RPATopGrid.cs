@@ -17,7 +17,7 @@ namespace RPADataCache
 {
     internal class RPATopGrid : RPADataCacheGridBase
     {
-        private readonly List<clsRXDisp> _columns;
+        private readonly IList<clsRXDisp> _columns;
         private readonly int _pmoAdmin;
         private readonly string _xmlString;
         private readonly int _displayMode;
@@ -30,7 +30,7 @@ namespace RPADataCache
         private CStruct MiddleCols;
 
         public RPATopGrid(
-            List<clsRXDisp> columns, 
+            IList<clsRXDisp> columns, 
             int pmoAdmin, 
             string xmlString, 
             int displayMode, 
