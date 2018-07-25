@@ -95,6 +95,8 @@
     <Compile Include="Base\DBAccess\Lookups.cs" />
     <Compile Include="Base\DBAccess\Models.cs" />
     <Compile Include="Base\DBAccess\PEClasses.cs" />
+    <Compile Include="Base\DBAccess\ProjectResourceRate.cs" />
+    <Compile Include="Base\DBAccess\ProjectResourceRates.cs" />
     <Compile Include="Base\DBAccess\QueueManager.cs" />
     <Compile Include="Base\DBAccess\Rates.cs" />
     <Compile Include="Base\DBAccess\ResourcePlanning.cs" />
