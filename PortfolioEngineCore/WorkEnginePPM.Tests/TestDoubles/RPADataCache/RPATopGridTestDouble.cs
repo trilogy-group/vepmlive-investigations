@@ -35,6 +35,8 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             base.PeriodCols = Constructor.CreateSubStruct("RightCols");
             base.DefinitionRight = Constructor.CreateSubStruct("Right");
             base.DefinitionLeaf = Constructor.CreateSubStruct("Leaf");
+
+            Levels[0] = Constructor.CreateSubStruct("Test");
         }
 
         public new void InitializeGridLayout(GridRenderingTypes renderingType)

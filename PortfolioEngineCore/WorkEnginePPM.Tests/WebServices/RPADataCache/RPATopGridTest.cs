@@ -39,6 +39,8 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         private IDictionary<string, IDictionary<string, double>> _doubleAttributesCreated;
 
         private IList<CPeriod> _periods;
+        private Tuple<clsResXData, clsPIData> _detailRow;
+        private int _rowId;
 
         [TestInitialize]
         public void SetUp()
@@ -56,14 +58,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             {
                 new RPATGRow { bUse = true }
             };
-            _pmoAdmin = 0;
-            _xmlString = string.Format("<Result><View><g_1 Cols='{0}'></g_1></View></Result>", 
-                string.Join(",", _columns.Select(pred => pred.m_id).ToArray()));
-            _displayMode = 0;
-            _resourceValues = new clsResourceValues();
-            _categoryLookupList = new clsLookupList();
-
-            _periods =  new[] {
+            _periods = new[] {
                 new CPeriod
                 {
                     PeriodID = 1,
@@ -75,6 +70,25 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                     PeriodName = "test-2"
                 }
             };
+
+            _pmoAdmin = 0;
+            _xmlString = string.Format("<Result><View><g_1 Cols='{0}'></g_1></View></Result>", 
+                string.Join(",", _columns.Select(pred => pred.m_id).ToArray()));
+            _displayMode = 0;
+            _resourceValues = new clsResourceValues
+            {
+                Periods = _periods.ToDictionary(pred => pred.PeriodID, pred => pred)
+            };
+            _categoryLookupList = new clsLookupList();
+
+            _detailRow = Tuple.Create(
+                new clsResXData
+                {
+                    WrkHours = Enumerable.Repeat(1d, 100).ToArray()
+                },
+                new clsPIData()
+            );
+            _rowId = 3;
 
             _testDouble = CreateTestDouble();
 
@@ -478,6 +492,79 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
             Assert.AreEqual(0, _testDouble.Level);
             Assert.AreEqual("I", _testDouble.Levels[_testDouble.Level].Name);
+        }
+
+        [TestMethod]
+        public void CheckIfDetailRowShouldBeAdded_Always_ReturnsTrue()
+        {
+            // Arrange
+            Tuple<clsResXData, clsPIData> detailRow = null;
+
+            // Act
+            var result = _testDouble.CheckIfDetailRowShouldBeAdded(detailRow);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_Always_CreatesCorrectStructure()
+        {
+            // Arrange, Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("I"));
+            Assert.AreEqual(_rowId.ToString(), _stringAttributesCreated["I"]["id"]);
+            Assert.AreEqual("white", _stringAttributesCreated["I"]["Color"]);
+            Assert.AreEqual("Leaf", _stringAttributesCreated["I"]["Def"]);
+            Assert.AreEqual(1, _intAttributesCreated["I"]["NoColorState"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
+            Assert.AreEqual(_detailRow.Item1.bTotalize ? "1" : "0", _stringAttributesCreated["I"]["Select"]);
+            Assert.AreEqual(_detailRow.Item1.bDraggable ? "1" : "0", _stringAttributesCreated["I"]["RowDraggable"]);
+            Assert.AreEqual(_detailRow.Item1.iDragCnt, _intAttributesCreated["I"]["RowChanged"]);
+            Assert.AreEqual(_detailRow.Item1.iDragCnt == 0 ? "/_layouts/ppm/images/Nogif.gif" : "/_layouts/ppm/images/Approve.gif",
+                _stringAttributesCreated["I"]["ChangedIcon"]);
+            Assert.AreEqual(true, _booleanAttributesCreated["I"]["SelectCanEdit"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
+            Assert.AreEqual("r" + _detailRow.Item1.rowid, _stringAttributesCreated["I"]["rowid"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["rowidCanEdit"]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_PeriodsProvided_ProcessesEachPeriod()
+        {
+            // Arrange, Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                for (var i = 1; i <= _displayList.Count; i++)
+                {
+                    var prefix = "P" + period.PeriodID + "C" + i;
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "ClassInner"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPostfix"]);
+                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPrefix"]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddDetailRow_PeriodsProvidedValueNotEmpty_SetsCellValueAttribute()
+        {
+            // Arrange, Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            foreach (var period in _periods)
+            {
+                for (var i = 1; i <= _displayList.Count; i++)
+                {
+                    var prefix = "P" + period.PeriodID + "C" + i;
+                    Assert.AreEqual(1d.ToString("0.##"), _stringAttributesCreated["I"][prefix]);
+                }
+            }
         }
     }
 }

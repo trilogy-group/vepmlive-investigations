@@ -532,8 +532,6 @@ namespace RPADataCache
 
             var xIParent = Levels[0];
             var xI = xIParent.CreateSubStruct("I");
-            clsResCap oRCap;
-            clsCatItem oc;
 
             Levels[1] = xI;
             xI.CreateStringAttr("id", rowId.ToString());
