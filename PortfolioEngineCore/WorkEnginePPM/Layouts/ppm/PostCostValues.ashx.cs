@@ -3,6 +3,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using PortfolioEngineCore;
@@ -12,6 +13,14 @@ namespace WorkEnginePPM
 
     public partial class PostCostValuesHandler : IHttpHandler, System.Web.SessionState.IRequiresSessionState
     {
+        private const string ReadCalendarsForCostTypeRequestName = "ReadCalendarsForCostType";
+        private const string PostCostValuesRequestName = "PostCostValues";
+        private const string PostOnProjectRateChangeRequestName = "PostOnProjectResourceRateChange";
+        private const string ProjectIdInAttribute = "ProjectId";
+        private const string PublishInAttribute = "Publish";
+        private const string PublishBaselineInAttribute = "PublishBaseline";
+        private const int UpdateOnProjectResourceRateChange = 101;
+
         #region IHttpHandler Members
 
         public bool IsReusable
@@ -60,46 +69,66 @@ namespace WorkEnginePPM
             context.Response.Write(CStruct.ConvertXMLToJSON(s));
         }
 
-        public static string PostCostValuesRequest(HttpContext Context, string sRequestContext, CStruct xData, string basePath)
+        /// <summary>
+        /// Based on the request name calls the proper method. 
+        /// </summary>
+        /// <param name="context">The HTTP Context.</param>
+        /// <param name="requestContext">The request name.
+        /// Supported values:
+        /// <see cref="ReadCalendarsForCostTypeRequestName"/>
+        /// <see cref="PostCostValuesRequestName"/>
+        /// <see cref="PostOnProjectRateChangeRequestName"/>
+        /// </param>
+        /// <param name="xmlData">Request data in XML format.</param>
+        /// <returns>The response received from called function or empty if request is not supported.</returns>
+        public static string PostCostValuesRequest(HttpContext context, string requestContext, CStruct xmlData)
         {
-            string sReply = "";
+            var reply = string.Empty;
+            var supportedRequests = new[] { ReadCalendarsForCostTypeRequestName, PostCostValuesRequestName, PostOnProjectRateChangeRequestName };
+
+            // return if request is not supported
+            if (string.IsNullOrWhiteSpace(requestContext) || !supportedRequests.Contains(requestContext))
+            {
+                return reply;
+            }
+
+            // process request
             try
             {
-                switch (sRequestContext)
+                var baseInfo = WebAdmin.BuildBaseInfo(context);
+                var dataAccess = new DataAccess(baseInfo);
+                var dbAccess = dataAccess.dba;
+
+                if (dbAccess.Open() == StatusEnum.rsSuccess)
                 {
-                    case "ReadCalendarsForCostType":
+                    try
+                    {
+                        switch (requestContext)
                         {
-                            int nFieldId = Int32.Parse(xData.InnerText);
-                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                            DataAccess da = new DataAccess(sBaseInfo);
-                            DBAccess dba = da.dba;
-                            if (dba.Open() == StatusEnum.rsSuccess)
-                            {
-                                sReply = ReadCalendarsForCostType(dba, nFieldId);
-                            }
-                            dba.Close();
-                            break;
+                            case ReadCalendarsForCostTypeRequestName:
+                                var fieldId = int.Parse(xmlData.InnerText);
+                                reply = ReadCalendarsForCostType(dbAccess, fieldId);
+                                break;
+                            case PostCostValuesRequestName:
+                                reply = PostCostValues(dbAccess, xmlData, dataAccess.BasePath);
+                                break;
+                            case PostOnProjectRateChangeRequestName:
+                                reply = PostOnProjectResourceRateChange(dbAccess, xmlData, dataAccess.BasePath);
+                                break;
                         }
-                    case "PostCostValues":
-                        {
-                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                            DataAccess da = new DataAccess(sBaseInfo);
-                            DBAccess dba = da.dba;
-                            if (dba.Open() == StatusEnum.rsSuccess)
-                            {
-                                sReply = PostCostValues(dba, xData, basePath);
-                            }
-                            dba.Close();
-                            break;
-                        }
+                    }
+                    finally
+                    {
+                        dbAccess.Close();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                sReply = WebAdmin.FormatError("exception", "CostTypeCustomFields.CustomfieldRequest", ex.Message);
+                reply = WebAdmin.FormatError("exception", "CostTypeCustomFields.CustomfieldRequest", ex.Message);
             }
 
-            return sReply;
+            return reply;
         }
 
         private static string ReadCalendarsForCostType(DBAccess dba, int nCTId)
@@ -134,6 +163,51 @@ namespace WorkEnginePPM
 
             sReply = xCalendars.XML();
             return sReply;
+        }
+
+        /// <summary>
+        /// Adds portfolio engine job for processing cost value updates after project resource rate change.
+        /// </summary>
+        /// <param name="dbAccess">The database access object.</param>
+        /// <param name="xmlData">Request data in XML format.
+        /// Must have XML attributes:
+        ///     ProjectId <see cref="ProjectIdInAttribute"/>
+        ///     Publish <see cref="PublishInAttribute"/>
+        ///     PublishBaseline <see cref="PublishBaselineInAttribute"/>
+        /// </param>
+        /// <param name="basePath">The base path for site.</param>
+        /// <returns>The string value "1" if succeed, "0" if no job created.</returns>
+        private static string PostOnProjectResourceRateChange(DBAccess dbAccess, CStruct xmlData, string basePath)
+        {
+            // parse request data
+            var projectId = xmlData.GetIntAttr(ProjectIdInAttribute).ToString("0");
+            var publish = xmlData.GetBooleanAttr(PublishInAttribute);
+            var publishBaseline = xmlData.GetBooleanAttr(PublishBaselineInAttribute);
+
+            // add job to Queue for immediate execution
+            var request = new CStruct();
+            request.Initialize("Request");
+            var epkSet = request.CreateSubStruct("EPKSet");
+            epkSet.CreateString("EPKAuth", "");
+            var process = epkSet.CreateSubStruct("EPKProcess");
+            process.CreateInt("RequestNo", UpdateOnProjectResourceRateChange);
+            process.CreateString("PIs", projectId);
+
+            if (publish)
+            {
+                process.CreateBoolean("Publish", true);
+            }
+
+            if (publishBaseline)
+            {
+                process.CreateBoolean("PublishBaseline", true);
+            }
+
+            int rowsAffected;
+            dbaQueueManager.PostCostValues(dbAccess, "ProjectResourceRateChange for ProjectID=" + projectId,
+                request.XML(), basePath, out rowsAffected);
+
+            return rowsAffected.ToString();
         }
 
         private static string PostCostValues(DBAccess dba, CStruct xData, string basePath)

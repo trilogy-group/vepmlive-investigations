@@ -602,6 +602,16 @@ namespace PortfolioEngineCore
             return DateTime.MinValue;
         }
 
+        public static DateTime? ReadNullableDateValue(object value)
+        {
+            if (!value.Equals(DBNull.Value))
+            {
+                return Convert.ToDateTime(value);
+            }
+
+            return null;
+        }
+
         static public string ReadStringValue(object obj)
         {
             return ReadStringValue(obj, "");
