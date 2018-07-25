@@ -113,13 +113,13 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void InitializeId_ShouldGetNextIdValue_CloseConnection()
         {
             // Arrange
-            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader
+            ShimSqlCommand.AllInstances.ExecuteReader = container => new ShimSqlDataReader
             {
                 Read = () => false,
                 Close = () => { }
             };
 
-            ShimAdmininfos.AllInstances.GetNextIdValueIDataReader = (_, reader) => SampleId;
+            ShimAdmininfos.AllInstances.GetNextIdValueIDataReader = (container, reader) => SampleId;
 
             var parameters = new object[]
             {
@@ -132,6 +132,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _privateObject.Invoke(InitializeIdMethod, parameters);
 
             // Assert
+            Assert.IsTrue(parameters.Length >= 3);
             Assert.AreEqual(SampleId, parameters[2]);
         }
 
@@ -154,13 +155,14 @@ namespace PortfolioEngineCore.Tests.Admininfos
         {
             // Arrange
             var sqlCommand = new SqlCommand();
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { sqlCommand = _; };
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { sqlCommand = container; };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = container => 0;
 
             // Act
             _privateObject.Invoke(InsertOrUpdateEpgGroupsMethod, _transaction, _sCommand, _sTitle, _id);
 
             // Assert
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 2);
             Assert.AreEqual("@Id", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual(_id, Convert.ToInt32(sqlCommand.Parameters[0].Value));
             Assert.AreEqual("@NewName", sqlCommand.Parameters[1].ParameterName);
@@ -182,7 +184,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => "0";
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => "0";
 
             var parameters = new object[]
             {
@@ -195,7 +197,8 @@ namespace PortfolioEngineCore.Tests.Admininfos
 
             // Assert
             Assert.AreEqual(resultMessage, errorMessage);
-            Assert.AreEqual(parameters[1], 0);
+            Assert.IsTrue(parameters.Length >= 2);
+            Assert.AreEqual(0, parameters[1]);
         }
 
         [TestMethod]
@@ -212,7 +215,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId.ToString();
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId.ToString();
 
             var parameters = new object[]
             {
@@ -225,7 +228,8 @@ namespace PortfolioEngineCore.Tests.Admininfos
 
             // Assert
             Assert.AreEqual(ResultMessage, errorMessage);
-            Assert.AreEqual(parameters[1], SampleId);
+            Assert.IsTrue(parameters.Length >= 2);
+            Assert.AreEqual(SampleId, parameters[1]);
         }
 
         [TestMethod]
@@ -338,10 +342,10 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
 
             var sqlCommand = new SqlCommand();
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { sqlCommand = _; };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { sqlCommand = container; };
 
             var parameters = new object[]
             {
@@ -352,6 +356,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _privateObject.Invoke(InsertOnEpgLookupValueMethod, parameters);
 
             // Assert
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 6);
             Assert.AreEqual("@LV_lookupuid", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual(_nLookupId, Convert.ToInt32(sqlCommand.Parameters[0].Value));
             Assert.AreEqual("@LV_level", sqlCommand.Parameters[1].ParameterName);
@@ -374,7 +379,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             dataTable.Rows[0]["LV_EXT_UID"] = 50;
 
             var sqlCommand = new SqlCommand();
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { sqlCommand = _; };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { sqlCommand = container; };
 
             var parameters = new object[]
             {
@@ -385,6 +390,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _privateObject.Invoke(ApplyUpdateOnEpgpLookupValuesMethod, parameters);
 
             // Assert
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 6);
             Assert.AreEqual("@LV_uid", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual("@LV_level", sqlCommand.Parameters[1].ParameterName);
             Assert.AreEqual("@LV_id", sqlCommand.Parameters[2].ParameterName);
@@ -417,8 +423,8 @@ namespace PortfolioEngineCore.Tests.Admininfos
         {
             // Arrange
             var sqlCommand = new SqlCommand();
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { sqlCommand = _; };
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { sqlCommand = container; };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = container => 1;
 
             var parameters = new object[]
             {
@@ -429,6 +435,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _privateObject.Invoke(DeleteDuplicatedWorkMethod, parameters);
 
             // Assert
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 1);
             Assert.AreEqual("@ProjectID", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual(SampleId, Convert.ToInt32(sqlCommand.Parameters[0].Value));
         }
@@ -440,7 +447,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _piExtId = "0";
             _nLookupId = 0;
 
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
 
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
             {
@@ -450,7 +457,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
 
             var parameters = new object[]
             {
@@ -462,7 +469,8 @@ namespace PortfolioEngineCore.Tests.Admininfos
 
             // Assert
             Assert.IsTrue(result);
-            Assert.AreEqual(parameters[1], DummyString);
+            Assert.IsTrue(parameters.Length >= 2);
+            Assert.AreEqual(DummyString, parameters[1]);
         }
 
         [TestMethod]
@@ -472,7 +480,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _piExtId = "0";
             _nLookupId = 0;
 
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
 
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
             {
@@ -482,7 +490,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
 
             var parameters = new object[]
             {
@@ -494,7 +502,8 @@ namespace PortfolioEngineCore.Tests.Admininfos
 
             // Assert
             Assert.IsFalse(result);
-            Assert.AreEqual(parameters[1], PiNotFoundMessage);
+            Assert.IsTrue(parameters.Length >= 2);
+            Assert.AreEqual(PiNotFoundMessage, parameters[1]);
         }
 
         [TestMethod]
@@ -520,12 +529,12 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void UpdateAdminRecord_ShouldCreateSqlCommand_ExecuteNonQuery()
         {
             // Arrange
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
 
             var sqlCommand = new SqlCommand();
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = container =>
             {
-                sqlCommand = _;
+                sqlCommand = container;
                 return 10;
             };
 
@@ -538,6 +547,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _privateObject.Invoke(UpdateAdminRecordMethod, parameters);
 
             // Assert
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 1);
             Assert.AreEqual("@LookupUID", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual(SampleId, Convert.ToInt32(sqlCommand.Parameters[0].Value));
         }
@@ -546,7 +556,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void GetNewLookupId_ShouldSetNewId_ReturnsInteger()
         {
             // Arrange
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
 
             var sqlCommand = new SqlCommand();
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
@@ -559,13 +569,14 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+            ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
 
             // Act
             var newId = (int)_privateObject.Invoke(GetNewLookupIdMethod, _transaction);
 
             // Assert
             Assert.AreEqual(SampleId, newId);
+            Assert.IsTrue(sqlCommand.Parameters.Count >= 1);
             Assert.AreEqual("@Name", sqlCommand.Parameters[0].ParameterName);
             Assert.AreEqual(SLookupName, sqlCommand.Parameters[0].Value);
         }
@@ -574,7 +585,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void GetNLookupId_ShouldSetLookupUid_ReturnsInteger()
         {
             // Arrange
-            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+            ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
 
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
             {
@@ -584,7 +595,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 }.Instance;
             };
 
-            ShimSqlDataReader.AllInstances.GetOrdinalString = (_, column) => SampleId;
+            ShimSqlDataReader.AllInstances.GetOrdinalString = (container, column) => SampleId;
 
             // Act
             var nLookupUid = (int)_privateObject.Invoke(GetNLookupIdMethod, _transaction);

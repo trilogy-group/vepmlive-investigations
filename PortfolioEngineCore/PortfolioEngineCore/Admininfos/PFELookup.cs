@@ -4,26 +4,22 @@ namespace PortfolioEngineCore
 {
     public class PFELookup
     {
-        #region Fields (13) 
-
-        public bool bflag;
-        public string ChargeNumber;
-        public string DataId;
+        public bool bflag { get; set; }
+        public string ChargeNumber { get; set; }
+        public string DataId { get; set; }
         // only exist for Dept lookup
-        public List<int> Executives;
-        public string ExtId;
-        public string fullname;
-        public int ID;
+        public List<int> Executives { get; set; }
+        public string ExtId { get; set; }
+        public string fullname { get; set; }
+        public int ID { get; set; }
         // only exist for Dept lookup
-        public bool IsSummary;
-        public int level;
-        public List<int> Managers;
-        public string name;
+        public bool IsSummary { get; set; }
+        public int level { get; set; }
+        public List<int> Managers { get; set; }
+        public string name { get; set; }
         // Personal Items
-        public int Status;
-        public int UID;
-        public int UID_real;
-
-        #endregion Fields 
+        public int Status { get; set; }
+        public int UID { get; set; }
+        public int UID_real { get; set; }
     }
 }
