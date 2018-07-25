@@ -475,39 +475,41 @@ namespace EPMLiveCore.ReportHelper
         {
             set
             {
-                _conClientReporting = new SqlConnection(value);
-                try
+                using (_conClientReporting = new SqlConnection(value))
                 {
-                    if (_databaseName != null && _databaseName != string.Empty)
+                    try
                     {
-                        if (!_useSAccount)
+                        if (!string.IsNullOrEmpty(_databaseName))
                         {
-                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            if (!_useSAccount)
+                            {
+                                SPSecurity.RunWithElevatedPrivileges(delegate
+                                {
+                                    if (_conClientReporting.State == ConnectionState.Closed)
+                                    {
+                                        _conClientReporting.Open();
+                                    }
+                                });
+                            }
+                            else
                             {
                                 if (_conClientReporting.State == ConnectionState.Closed)
                                 {
                                     _conClientReporting.Open();
                                 }
-                            });
-                        }
-                        else
-                        {
-                            if (_conClientReporting.State == ConnectionState.Closed)
-                            {
-                                _conClientReporting.Open();
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (_databaseName != null && _databaseName != string.Empty)
+                    catch (Exception ex)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        if (!string.IsNullOrEmpty(_databaseName))
                         {
-                            var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
-                        });
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            {
+                                var eventMessage = CreateEventMessage(ex);
+                                LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
+                            });
+                        }
                     }
                 }
             }
@@ -519,37 +521,40 @@ namespace EPMLiveCore.ReportHelper
         {
             set
             {
-                _conMaster = new SqlConnection(value);
-                try
+                using (_conMaster = new SqlConnection(value))
                 {
-                    if (!_useSAccount)
+                    try
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate
+                        if (!_useSAccount)
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            {
+                                if (_conMaster.State == ConnectionState.Closed)
+                                {
+                                    _conMaster.Open();
+                                }
+                            });
+                        }
+                        else
                         {
                             if (_conMaster.State == ConnectionState.Closed)
                             {
                                 _conMaster.Open();
                             }
-                        });
-                    }
-                    else
-                    {
-                        if (_conMaster.State == ConnectionState.Closed)
-                        {
-                            _conMaster.Open();
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _sqlError = ex.Message;
-                    if (_masterCs != null && _masterCs != string.Empty)
+                    catch (Exception ex)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        _sqlError = ex.Message;
+
+                        if (!string.IsNullOrEmpty(_masterCs))
                         {
-                            var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
-                        });
+                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            {
+                                var eventMessage = CreateEventMessage(ex);
+                                LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
+                            });
+                        }
                     }
                 }
             }
@@ -1200,30 +1205,8 @@ namespace EPMLiveCore.ReportHelper
                 //Add Error Handling HERE
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
-                        EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
-                    myLog.MaximumKilobytes = 32768;
-                    string cmdDetails = "Command: " + sql;
-                    string cmdParams = " Params: ";
-
-                    foreach (SqlParameter param in paramCollection)
-                    {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
-
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1408,20 +1391,22 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        private static DataTable GetTable(SqlCommand cmd)
+        private static DataTable GetTable(SqlCommand command)
         {
-            SqlDataAdapter da;
-            var dt = new DataTable();
-            try
+            if (command == null)
             {
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                da.Dispose();
+                throw new ArgumentNullException(nameof(command));
             }
-            catch (Exception ex) { }
-            finally { }
 
-            return dt;
+            using (var dataTable = new DataTable())
+            {
+                using (var dataAdapter = new SqlDataAdapter(command))
+                {
+                    dataAdapter.Fill(dataTable);
+                }
+
+                return dataTable;
+            }
         }
 
         /// <summary>
@@ -2074,9 +2059,11 @@ namespace EPMLiveCore.ReportHelper
                              dt.Rows[0]["DatabaseName"].ToString() + ";Integrated Security=SSPI;";
                 }
 
-                var con = new SqlConnection(conStr);
-                con.Open();
-                return con;
+                using (var con = new SqlConnection(conStr))
+                {
+                    con.Open();
+                    return con;
+                }
             }
             catch (Exception ex)
             {
@@ -2193,18 +2180,28 @@ namespace EPMLiveCore.ReportHelper
             return GetTable(GetClientReportingConnection);
         }
 
-        public bool TableExists(string tableName, SqlConnection cn)
+        public bool TableExists(string tableName, SqlConnection sqlConnection)
         {
-            bool exists = false;
-            try
+            if (sqlConnection == null)
             {
-                var cmd =
-                    new SqlCommand(
-                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
-                        tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
-                exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+                throw new ArgumentNullException(nameof(sqlConnection));
             }
-            catch { }
+
+            var exists = false;
+            var command = "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
+                              tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END";
+
+            using (var sqlCommand = new SqlCommand(command, sqlConnection))
+            {
+                try
+                {
+                    exists = Convert.ToInt32(sqlCommand.ExecuteScalar()) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception suppressed: {0}", ex);
+                }
+            }
 
             return exists;
         }
