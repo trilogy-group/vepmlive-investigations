@@ -43,7 +43,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
         private int _nProjectId;
 
         private int _nLookupId;
-        private Dictionary<int, AdmininfosCore.PFELookup> _dicDepts;
+        private Dictionary<int, PFELookup> _dicDepts;
 
         private string _basepath;
         private string _username;
@@ -316,9 +316,9 @@ namespace PortfolioEngineCore.Tests.Admininfos
         public void InsertOnEpgLookupValue_WhenBFlagIsFalse_ThrowsException()
         {
             // Arrange
-            _dicDepts = new Dictionary<int, AdmininfosCore.PFELookup>
+            _dicDepts = new Dictionary<int, PFELookup>
             {
-                { 1, new AdmininfosCore.PFELookup
+                { 1, new PFELookup
                     {
                         bflag = false,
                         ID = 10,

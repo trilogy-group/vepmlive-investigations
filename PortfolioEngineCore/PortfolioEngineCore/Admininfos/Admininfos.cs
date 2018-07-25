@@ -1179,7 +1179,7 @@ namespace PortfolioEngineCore
             }
         }
 
-        private string CheckIfResourceExists(string extId, ref int WresId)
+        private string CheckIfResourceExists(string extId, ref int wresId)
         {
             var sErrorMessage = string.Empty;
 
@@ -1204,22 +1204,22 @@ namespace PortfolioEngineCore
                 {
                     sErrorMessage = $"{NoResourceMatchesSuppliedMessage} ExtId";
                 }
-                else if (WresId > 0 && WresId != nMatchWresId)
+                else if (wresId > 0 && wresId != nMatchWresId)
                 {
                     sErrorMessage = "Supplied ExtId does not match supplied Id";
                 }
 
-                WresId = nMatchWresId;
+                wresId = nMatchWresId;
             }
-            else if (WresId > 0)
+            else if (wresId > 0)
             {
                 using (var command = new SqlCommand("Select WRES_EXT_UID From EPG_RESOURCES Where WRES_ID=@WresId", _sqlConnection))
                 {
-                    command.Parameters.AddWithValue("@WresId", WresId);
+                    command.Parameters.AddWithValue("@WresId", wresId);
 
                     using (var reader = command.ExecuteReader())
                     {
-                        if (reader.Read() == false)
+                        if (!reader.Read())
                         {
                             sErrorMessage = $"{NoResourceMatchesSuppliedMessage} Id";
                         }
@@ -4371,30 +4371,6 @@ namespace PortfolioEngineCore
             public int mc_Uid;
             public string ExtId;
             public string UOM;
-
-            #endregion Fields 
-        }
-        public class PFELookup
-        {
-            #region Fields (13) 
-
-            public bool bflag;
-            public string ChargeNumber;
-            public string DataId;
-            // only exist for Dept lookup
-            public List<int> Executives;
-            public string ExtId;
-            public string fullname;
-            public int ID;
-            // only exist for Dept lookup
-            public bool IsSummary;
-            public int level;
-            public List<int> Managers;
-            public string name;
-            // Personal Items
-            public int Status;
-            public int UID;
-            public int UID_real;
 
             #endregion Fields 
         }
