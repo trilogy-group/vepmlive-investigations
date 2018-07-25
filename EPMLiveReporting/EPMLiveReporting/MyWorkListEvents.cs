@@ -115,9 +115,9 @@ namespace EPMLiveReportsAdmin
         /// <summary>
         ///     Deletes the item.
         /// </summary>
-        private void DeleteItem()
+        private bool DeleteItem()
         {
-            _myWorkReportData.DeleteListItem(GetSql("DELETE"));
+           return _myWorkReportData.DeleteListItem(GetSql("DELETE"));
         }
 
         private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
@@ -467,8 +467,10 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         private void UpdateItem()
         {
-            DeleteItem();
-            InsertItem();
+            if (DeleteItem())
+            {
+                InsertItem();
+            }
         }
 
         #endregion Methods 
