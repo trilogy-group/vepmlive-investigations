@@ -2028,7 +2028,10 @@ exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadActualWork
 
 Public Enum ResCenterRequest (see also EPG_SP_ReadScheduledWork)
     ResourceValuesForPIs = 3  - for one or more PIs - all resources 
-    ResourceValuesForResources = 4  - for one or more resources - all PIs
+    ResourceValuesForResources = 4  - for one or more resources - all PIs except archived
+
+	Changes Log:
+		2018/07/10: Applied filter for archived items (EPMLCID-18197). Upgrade step marker: v6.4.0.2
 */
    @Mode INT,
    @FromPeriodID INT,
@@ -2039,11 +2042,12 @@ Public Enum ResCenterRequest (see also EPG_SP_ReadScheduledWork)
 AS 
 if (@Mode = 4) 
  Begin
- Select PROJECT_ID,WRES_ID,WEC_MAJORCATEGORY,PRD_ID,Sum(WEH_NORMALHOURS+WEH_OVERTIMEHOURS) As Hours
+ Select c.PROJECT_ID,WRES_ID,WEC_MAJORCATEGORY,PRD_ID,Sum(WEH_NORMALHOURS+WEH_OVERTIMEHOURS) As Hours
    From EPG_WE_CHARGES c
    INNER JOIN dbo.EPG_FN_ConvertListToTable(@sRList) LT2 on c.WRES_ID=LT2.TokenVal
    Join EPG_WE_ACTUALHOURS w On w.WEH_CHG_UID=c.WEC_CHG_UID
    JOIN EPG_PERIODS PRD on PRD.CB_ID=@CalID and (w.WEH_DATE >= PRD.PRD_START_DATE and w.WEH_DATE <= PRD.PRD_FINISH_DATE)
+   INNER JOIN EPGP_PROJECTS p ON c.PROJECT_ID = p.PROJECT_ID AND (p.PROJECT_ARCHIVED = 0 OR p.PROJECT_ARCHIVED IS NULL)
 	WHERE (PRD.PRD_ID >= @FromPeriodID And PRD.PRD_ID <= @ToPeriodID) AND WRES_ID > 0
 	GROUP BY c.PROJECT_ID,c.WRES_ID,c.WEC_MAJORCATEGORY,PRD.PRD_ID
 	ORDER BY c.PROJECT_ID,c.WRES_ID,c.WEC_MAJORCATEGORY,PRD.PRD_ID
@@ -6318,10 +6322,13 @@ end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadScheduledWork
 /*  Read work, both from Project Schedule AND WIs
 Public Enum ResCenterRequest
-    ResourceValuesForDepts = 1  - for one or more depts - but a list of resources passed in here - all PIs
+    ResourceValuesForDepts = 1  - for one or more depts - but a list of resources passed in here - all PIs except archived items
     ResourceValuesForPIsinDept = 2  - for one or more PIs, resources in one or more depts - but a list of resources passed in here
     ResourceValuesForPIs = 3  - for one or more PIs - all resources 
-    ResourceValuesForResources = 4  - for one or more resources - all PIs
+    ResourceValuesForResources = 4  - for one or more resources - all PIs except archived items
+
+	Changes Log:
+		2018/07/10: Applied filter for archived items (EPMLCID-18197). Upgrade step marker: v6.4.0.2
 */
    @Mode INT,
    @FromDate DATETIME,
@@ -6336,27 +6343,27 @@ if (@Mode = 1 Or @Mode = 4)
   Select ''TASK'' as SOURCE,v.PROJECT_ID,w.WRES_ID,TSWORK_MAJORCATEGORY,TSWORK_DATE,TSWORK_WORK,RES_IN_PLAN 
   From EPGX_PROJECT_TSWORK w
   Inner Join EPGX_PROJECT_VERSIONS v On v.WPROJ_ID=w.WPROJ_ID And VERSION_ID=@CurrentVersion
-  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = v.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0
+  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = v.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0 AND (p.PROJECT_ARCHIVED = 0 OR p.PROJECT_ARCHIVED IS NULL) 
   INNER JOIN EPGP_TEAMS t On t.PROJECT_ID = v.PROJECT_ID and t.WRES_ID=w.WRES_ID 
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sRList) LT2 on w.WRES_ID=LT2.TokenVal
   Where w.WRES_ID > 0 and TSWORK_DATE >= @FromDate And TSWORK_DATE <= @ToDate 
  UNION ALL
   Select ''WI'' as SOURCE,w.PROJECT_ID,w.WRES_ID,TSWORK_MAJORCATEGORY,TSWORK_DATE,TSWORK_WORK,RES_IN_PLAN 
   From EPGP_PI_WORKITEM_TSWORK w
-  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0
+  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0 AND (p.PROJECT_ARCHIVED = 0 OR p.PROJECT_ARCHIVED IS NULL) 
   INNER JOIN EPGP_TEAMS t On t.PROJECT_ID = p.PROJECT_ID and t.WRES_ID=w.WRES_ID 
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sRList) LT2 on w.WRES_ID=LT2.TokenVal
   Where TSWORK_DATE >= @FromDate And TSWORK_DATE <= @ToDate 
  UNION ALL
   Select ''W1'' as SOURCE,w.PROJECT_ID,w.WRES_ID,PW_MAJORCATEGORY,PW_DATE,PW_WORK,1 as RES_IN_PLAN 
   From EPGP_PI_WORK1 w
-  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0
+  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0 AND (p.PROJECT_ARCHIVED = 0 OR p.PROJECT_ARCHIVED IS NULL) 
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sRList) LT2 on w.WRES_ID=LT2.TokenVal
   Where PW_DATE >= @FromDate And PW_DATE <= @ToDate 
  UNION ALL
   Select ''W2'' as SOURCE,w.PROJECT_ID,w.WRES_ID,PW_MAJORCATEGORY,PW_DATE,PW_WORK,1 as RES_IN_PLAN 
   From EPGP_PI_WORK2 w
-  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0
+  Inner Join EPGP_PROJECTS p on p.PROJECT_ID = w.PROJECT_ID and p.PROJECT_MARKED_DELETION = 0 AND (p.PROJECT_ARCHIVED = 0 OR p.PROJECT_ARCHIVED IS NULL) 
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sRList) LT2 on w.WRES_ID=LT2.TokenVal
   Where PW_DATE >= @FromDate And PW_DATE <= @ToDate 
   Order by v.PROJECT_ID,w.WRES_ID,TSWORK_MAJORCATEGORY,TSWORK_DATE
