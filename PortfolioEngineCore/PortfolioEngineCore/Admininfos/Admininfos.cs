@@ -2786,18 +2786,23 @@ namespace PortfolioEngineCore
                 throw new ArgumentNullException(nameof(transaction));
             }
 
-            var sqlCommand = new SqlCommand(sCommand, _sqlConnection);
-            sqlCommand.Parameters.AddWithValue("@ProjectID", nProjectId);
-            sqlCommand.CommandType = CommandType.Text;
-            sqlCommand.Transaction = transaction;
-            sqlCommand.ExecuteNonQuery();
+            using (var command = new SqlCommand(sCommand, _sqlConnection))
+            {
+                command.Parameters.AddWithValue("@ProjectID", nProjectId);
+                command.CommandType = CommandType.Text;
+                command.Transaction = transaction;
+                command.ExecuteNonQuery();
+            }
         }
 
-        private bool IsBUpdateOk(string PIExtId, ref string sErrorMessage, ref int nProjectID)
+        private bool IsBUpdateOk(string piExtId, ref string sErrorMessage, ref int nProjectID)
         {
-            using (var reader = GetEpgpProjects(PIExtId))
+            using (var reader = GetEpgpProjects(piExtId))
             {
-                nProjectID = GetProjectId(reader, nProjectID);
+                if (reader.Read())
+                {
+                    nProjectID = SqlDb.ReadIntValue(reader["PROJECT_ID"]);
+                }
 
                 if (nProjectID == 0)
                 {
@@ -2821,21 +2826,6 @@ namespace PortfolioEngineCore
             sqlCommand.Parameters.AddWithValue("@ExtId", piExtId);
 
             return sqlCommand.ExecuteReader();
-        }
-
-        private int GetProjectId(SqlDataReader sqlReader, int nProjectId)
-        {
-            if (sqlReader == null)
-            {
-                throw new ArgumentNullException(nameof(sqlReader));
-            }
-
-            if (sqlReader.Read())
-            {
-                nProjectId = SqlDb.ReadIntValue(sqlReader["PROJECT_ID"]);
-            }
-
-            return nProjectId;
         }
 
         /// <summary>

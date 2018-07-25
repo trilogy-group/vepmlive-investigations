@@ -15,15 +15,21 @@ namespace PortfolioEngineCore.Tests.Admininfos
     {
         private const int SampleId = 100;
         private const string DummyString = "Dummy String";
-        private const string CheckIfResourceExistsMethod = "CheckIfResourceExists";
-        private const string InitializeIdMethod = "InitializeId";
-        private const string InsertOrUpdateEpgGroupsMethod = "InsertOrUpdateEpgGroups";
-        private const string InsertOnEpgLookupValueMethod = "InsertOnEpgLookupValue";
         private const string ApplyUpdateOnEpgpLookupValuesMethod = "ApplyUpdateOnEpgpLookupValues";
+        private const string CheckIfResourceExistsMethod = "CheckIfResourceExists";
+        private const string DeleteDuplicatedWorkMethod = "DeleteDuplicatedWork";
+        private const string InitializeIdMethod = "InitializeId";
+        private const string InsertOnEpgLookupValueMethod = "InsertOnEpgLookupValue";
+        private const string InsertOrUpdateEpgGroupsMethod = "InsertOrUpdateEpgGroups";
+        private const string IsBUpdateOkMethod = "IsBUpdateOk";
+        private const string GetNewLookupIdMethod = "GetNewLookupId";
+        private const string GetNLookupIdMethod = "GetNLookupId";
+        private const string UpdateAdminRecordMethod = "UpdateAdminRecord";
 
         private const string SampleCommand = "SELECT ADM_DEF_FTE_WH,ADM_DEF_FTE_HOL FROM EPG_ADMIN";
         private const string NoResourceMatchesSuppliedMessage = "No Resource matches supplied";
-        private const string WresIdColumn = "WRES_ID";
+        private const string PiNotFoundMessage = "PI not found";
+        private const string SLookupName = "Role Lookup";
 
         private int _id;
         private int _wresId;
@@ -31,6 +37,10 @@ namespace PortfolioEngineCore.Tests.Admininfos
         private string _sCommand;
         private string _sTitle;
         private SqlTransaction _transaction;
+
+        private string _piExtId;
+        private string _sErrorMessage;
+        private int _nProjectId;
 
         private int _nLookupId;
         private Dictionary<int, AdmininfosCore.PFELookup> _dicDepts;
@@ -58,6 +68,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
             _extId = DummyString;
             _sCommand = SampleCommand;
             _sTitle = DummyString;
+            _sErrorMessage = DummyString;
             _transaction = new ShimSqlTransaction
             {
                 Commit = () => { },
@@ -380,6 +391,206 @@ namespace PortfolioEngineCore.Tests.Admininfos
             Assert.AreEqual("@LV_value", sqlCommand.Parameters[3].ParameterName);
             Assert.AreEqual("@LV_fullvalue", sqlCommand.Parameters[4].ParameterName);
             Assert.AreEqual("@LV_extid", sqlCommand.Parameters[5].ParameterName);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void DeleteDuplicatedWork_WhenSqlTransactionIsNull_ThrowsException()
+        {
+            // Arrange
+            _transaction = null;
+
+            var parameters = new object[]
+            {
+                _transaction, _sCommand, SampleId
+            };
+
+            // Act
+            _privateObject.Invoke(DeleteDuplicatedWorkMethod, parameters);
+
+            // Assert
+            // Expected ArgumentNullException
+        }
+
+        [TestMethod]
+        public void DeleteDuplicatedWork_WhenSqlTransactionIsNotNull_ExecuteNonQuery()
+        {
+            // Arrange
+            var sqlCommand = new SqlCommand();
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { sqlCommand = _; };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+
+            var parameters = new object[]
+            {
+                _transaction, _sCommand, SampleId
+            };
+
+            // Act
+            _privateObject.Invoke(DeleteDuplicatedWorkMethod, parameters);
+
+            // Assert
+            Assert.AreEqual("@ProjectID", sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual(SampleId, Convert.ToInt32(sqlCommand.Parameters[0].Value));
+        }
+
+        [TestMethod]
+        public void IsBUpdateOk_WhenProjectIdGreaterThanZero_ReturnsTrue()
+        {
+            // Arrange
+            _piExtId = "0";
+            _nLookupId = 0;
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = command =>
+            {
+                return new ShimSqlDataReader
+                {
+                    Read = () => true
+                }.Instance;
+            };
+
+            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+
+            var parameters = new object[]
+            {
+                _piExtId, _sErrorMessage, _nProjectId
+            };
+
+            // Act
+            var result = (bool)_privateObject.Invoke(IsBUpdateOkMethod, parameters);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(parameters[1], DummyString);
+        }
+
+        [TestMethod]
+        public void IsBUpdateOk_WhenProjectIdIsZero_ReturnsFalse()
+        {
+            // Arrange
+            _piExtId = "0";
+            _nLookupId = 0;
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = command =>
+            {
+                return new ShimSqlDataReader
+                {
+                    Read = () => false
+                }.Instance;
+            };
+
+            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+
+            var parameters = new object[]
+            {
+                _piExtId, _sErrorMessage, _nProjectId
+            };
+
+            // Act
+            var result = (bool)_privateObject.Invoke(IsBUpdateOkMethod, parameters);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(parameters[1], PiNotFoundMessage);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void UpdateAdminRecord_WhenSqlTransactionIsNull_ThrowsException()
+        {
+            // Arrange
+            _transaction = null;
+
+            var parameters = new object[]
+            {
+                _transaction, SampleId
+            };
+
+            // Act
+            _privateObject.Invoke(UpdateAdminRecordMethod, parameters);
+
+            // Assert
+            // Expected ArgumentNullException
+        }
+
+        [TestMethod]
+        public void UpdateAdminRecord_ShouldCreateSqlCommand_ExecuteNonQuery()
+        {
+            // Arrange
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+
+            var sqlCommand = new SqlCommand();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                sqlCommand = _;
+                return 10;
+            };
+
+            var parameters = new object[]
+            {
+                _transaction, SampleId
+            };
+
+            // Act
+            _privateObject.Invoke(UpdateAdminRecordMethod, parameters);
+
+            // Assert
+            Assert.AreEqual("@LookupUID", sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual(SampleId, Convert.ToInt32(sqlCommand.Parameters[0].Value));
+        }
+
+        [TestMethod]
+        public void GetNewLookupId_ShouldSetNewId_ReturnsInteger()
+        {
+            // Arrange
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+
+            var sqlCommand = new SqlCommand();
+            ShimSqlCommand.AllInstances.ExecuteReader = command =>
+            {
+                sqlCommand = command;
+
+                return new ShimSqlDataReader
+                {
+                    Read = () => true
+                }.Instance;
+            };
+
+            ShimSqlDataReader.AllInstances.ItemGetString = (_, column) => SampleId;
+
+            // Act
+            var newId = (int)_privateObject.Invoke(GetNewLookupIdMethod, _transaction);
+
+            // Assert
+            Assert.AreEqual(SampleId, newId);
+            Assert.AreEqual("@Name", sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual(SLookupName, sqlCommand.Parameters[0].Value);
+        }
+
+        [TestMethod]
+        public void GetNLookupId_ShouldSetLookupUid_ReturnsInteger()
+        {
+            // Arrange
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, command, connString) => { };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = command =>
+            {
+                return new ShimSqlDataReader
+                {
+                    Read = () => true
+                }.Instance;
+            };
+
+            ShimSqlDataReader.AllInstances.GetOrdinalString = (_, column) => SampleId;
+
+            // Act
+            var nLookupUid = (int)_privateObject.Invoke(GetNLookupIdMethod, _transaction);
+
+            // Assert
+            Assert.AreEqual(0, nLookupUid);
         }
 
         private static DataTable GetDataTableForEpgpLookupValues()
