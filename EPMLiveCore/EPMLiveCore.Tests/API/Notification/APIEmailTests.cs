@@ -307,6 +307,7 @@ namespace EPMLiveCore.Tests.API.Notification
 
             string setHost = null;
             MailMessage sentMessage = null;
+            var clientDisposed = false;
             ShimSmtpClient.Constructor = client =>
             {
                 new ShimSmtpClient(client)
@@ -318,15 +319,25 @@ namespace EPMLiveCore.Tests.API.Notification
                     SendMailMessage = message =>
                     {
                         sentMessage = message;
+                    },
+                    DisposeBoolean = disposing =>
+                    {
+                        clientDisposed = true;
                     }
                 };
+            };
+
+            var messageDisposed = false;
+            ShimMailMessage.AllInstances.DisposeBoolean = (message, disposing) =>
+            {
+                messageDisposed = true;
             };
 
             // Act
             _apiEmailPrivate.Invoke("iSendEmail", BindingFlags.Static | BindingFlags.NonPublic, arguments);
 
             // Assert
-            //AssertConnection();
+            AssertConnection();
             if (hideFrom)
             {
                 Assert.AreEqual(outboundEmail, sentMessage.From.Address);
@@ -345,6 +356,8 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreEqual(user.Email, sentMessage.To[0].Address);
             Assert.AreEqual("64 house", sentMessage.Subject);
             Assert.AreEqual("goose live in 64 house", sentMessage.Body);
+            Assert.IsTrue(clientDisposed);
+            Assert.IsTrue(messageDisposed);
         }
 
 

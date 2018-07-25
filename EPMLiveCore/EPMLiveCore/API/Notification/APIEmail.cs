@@ -747,13 +747,12 @@ namespace EPMLiveCore.API
                                         string body = "";
                                         string subject = "";
 
-                                        SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
-                                        cn.Open();
-
-                                        GetCoreInformation(cn, templateid, out body, out subject, web, curUser);
-
-                                        
-                                        cn.Close();
+                                        using (var connection = new SqlConnection(
+                                            CoreFunctions.getConnectionString(site.WebApplication.Id)))
+                                        {
+                                            connection.Open();
+                                            GetCoreInformation(connection, templateid, out body, out subject, web, curUser);
+                                        }
 
                                         foreach(string s in additionalParams.Keys)
                                         {
@@ -764,41 +763,43 @@ namespace EPMLiveCore.API
                                         SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
                                         string sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Address;
 
-                                        System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                                        if(hidefrom)
+                                        using (var mailMsg = new MailMessage())
                                         {
-                                            mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
-                                        }
-                                        else
-                                        {
-                                            if(curUser.Email == "")
+                                            if (hidefrom)
                                             {
-                                                mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, curUser.Name);
+                                                mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
                                             }
                                             else
                                             {
-                                                mailMsg.From = new MailAddress(curUser.Email, curUser.Name);
+                                                if (curUser.Email == "")
+                                                {
+                                                    mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, curUser.Name);
+                                                }
+                                                else
+                                                {
+                                                    mailMsg.From = new MailAddress(curUser.Email, curUser.Name);
+                                                }
+                                            }
+
+                                            body = body.Replace("{ToUser_Name}", eUser.Name);
+                                            body = body.Replace("{ToUser_Email}", eUser.Email);
+                                            body = body.Replace("{ToUser_Username}", CoreFunctions.GetJustUsername(eUser.LoginName));
+
+                                            subject = subject.Replace("{ToUser_Name}", eUser.Name);
+                                            subject = subject.Replace("{ToUser_Email}", eUser.Email);
+                                            subject = subject.Replace("{ToUser_Username}", CoreFunctions.GetJustUsername(eUser.LoginName));
+
+                                            mailMsg.To.Add(new MailAddress(eUser.Email));
+                                            mailMsg.Subject = subject;
+                                            mailMsg.Body = body;
+                                            mailMsg.IsBodyHtml = true;
+
+                                            using (var smtpClient = new SmtpClient())
+                                            {
+                                                smtpClient.Host = sMailSvr;
+                                                smtpClient.Send(mailMsg);
                                             }
                                         }
-
-                                        body = body.Replace("{ToUser_Name}", eUser.Name);
-                                        body = body.Replace("{ToUser_Email}", eUser.Email);
-                                        body = body.Replace("{ToUser_Username}", CoreFunctions.GetJustUsername(eUser.LoginName));
-
-                                        subject = subject.Replace("{ToUser_Name}", eUser.Name);
-                                        subject = subject.Replace("{ToUser_Email}", eUser.Email);
-                                        subject = subject.Replace("{ToUser_Username}", CoreFunctions.GetJustUsername(eUser.LoginName));
-
-                                        mailMsg.To.Add(new MailAddress(eUser.Email));
-                                        mailMsg.Subject = subject;
-                                        mailMsg.Body = body;
-                                        mailMsg.IsBodyHtml = true;
-
-                                        SmtpClient smtpClient = new SmtpClient();
-
-                                        smtpClient.Host = sMailSvr;
-
-                                        smtpClient.Send(mailMsg);
                                     }
                                     catch(Exception Exception) { throw new Exception(Exception.Message); }
                                 }
