@@ -1,34 +1,38 @@
 ﻿using System;
 using System.Text;
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveWebParts.ReportFiltering.DomainModel;
 using Microsoft.SharePoint;
 
 namespace ReportFiltering.DomainServices
 {
-    public class ReportFilterQueryService 
+    public class ReportFilterQueryService
     {
-        public static string GetQueryForFiltering(ReportFilterSelection fieldSelection)
+        private const string FilterNonArchived = "<Neq><FieldRef Name=\"" + ProjectArchiverService.ArchivedColumn
+                                                                              + "\" /><Value Type=\"Boolean\">1</Value></Neq>";
+
+        public static string GetQueryForFiltering(ReportFilterSelection fieldSelection, bool applyNonArchivedFilter)
         {
             switch (fieldSelection.FieldType)
             {
                 case SPFieldType.Choice:
                 case SPFieldType.Lookup:
-                    return GetFilterForMultiSelect(fieldSelection);
+                    return GetFilterForMultiSelect(fieldSelection, applyNonArchivedFilter);
                 case SPFieldType.Currency:
                 case SPFieldType.Text:
                 case SPFieldType.Number:
                 case SPFieldType.Integer:
-                    return GetFilterForSingleSelect(fieldSelection);
+                    return GetFilterForSingleSelect(fieldSelection, applyNonArchivedFilter);
                 case SPFieldType.DateTime:
-                    return GetFilterForDateTime(fieldSelection);
+                    return GetFilterForDateTime(fieldSelection, applyNonArchivedFilter);
                 case SPFieldType.User:
-                    return GetFilterForUser(fieldSelection);
+                    return GetFilterForUser(fieldSelection, applyNonArchivedFilter);
             }
 
             return string.Empty;
         }
 
-        private static string GetFilterForMultiSelect(ReportFilterSelection fieldSelection)
+        private static string GetFilterForMultiSelect(ReportFilterSelection fieldSelection, bool applyNonArchivedFilter)
         {
             var returnQuery = new StringBuilder();
             returnQuery.AppendFormat("<Where><In><FieldRef Name='{0}' /><Values>", fieldSelection.InternalFieldName);
@@ -41,10 +45,10 @@ namespace ReportFiltering.DomainServices
             }
 
             returnQuery.Append("</Values></In></Where>");
-            return returnQuery.ToString();
+            return applyNonArchivedFilter ? AppendNonArchivedFilter(returnQuery.ToString()) : returnQuery.ToString();
         }
 
-        private static string GetFilterForSingleSelect(ReportFilterSelection fieldSelection)
+        private static string GetFilterForSingleSelect(ReportFilterSelection fieldSelection, bool applyNonArchivedFilter)
         {
             if (string.IsNullOrEmpty(fieldSelection.CamlComparisonOperator.Operator)) return string.Empty;
             
@@ -54,7 +58,7 @@ namespace ReportFiltering.DomainServices
 
             returnQuery.AppendFormat("<Where><{0}><FieldRef Name='{1}' /><Value Type='{3}'>{2}</Value></{0}></Where>", fieldSelection.CamlComparisonOperator.Operator, fieldSelection.InternalFieldName, fieldSelection.SelectedFields[0], fieldSelection.FieldType);
 
-            return returnQuery.ToString();
+            return applyNonArchivedFilter ? AppendNonArchivedFilter(returnQuery.ToString()) : returnQuery.ToString();
         }
 
         private static void HandlePercentageFieldIfApplicable(ReportFilterSelection fieldSelection)
@@ -69,7 +73,7 @@ namespace ReportFiltering.DomainServices
             fieldSelection.SelectedFields[0] = result.ToString();
         }
 
-        private static string GetFilterForDateTime(ReportFilterSelection fieldSelection)
+        private static string GetFilterForDateTime(ReportFilterSelection fieldSelection, bool applyNonArchivedFilter)
         {
             var returnQuery = new StringBuilder();
             //2012-10-01T02:48:44Z
@@ -87,10 +91,10 @@ namespace ReportFiltering.DomainServices
                 returnQuery.AppendFormat("<Where><And><Geq><FieldRef Name='{0}' /><Value Type='DateTime'>{1}</Value></Geq><Leq><FieldRef Name='{0}' /><Value Type='DateTime'>{2}</Value></Leq></And></Where>", fieldSelection.InternalFieldName, startDateFormatted, endDateFormatted);
             }
 
-            return returnQuery.ToString();
+            return applyNonArchivedFilter ? AppendNonArchivedFilter(returnQuery.ToString()) : returnQuery.ToString();
         }
 
-        private static string GetFilterForUser(ReportFilterSelection fieldSelection)
+        private static string GetFilterForUser(ReportFilterSelection fieldSelection, bool applyNonArchivedFilter)
         {
             var returnQuery = new StringBuilder();
             returnQuery.AppendFormat("<Where><In><FieldRef Name='{0}' /><Values>", fieldSelection.InternalFieldName);
@@ -101,7 +105,12 @@ namespace ReportFiltering.DomainServices
             }
 
             returnQuery.Append("</Values></In></Where>");
-            return returnQuery.ToString();
+            return applyNonArchivedFilter ? AppendNonArchivedFilter(returnQuery.ToString()) : returnQuery.ToString();
+        }
+
+        private static string AppendNonArchivedFilter(string query)
+        {
+            return query.Replace("<Where>", "<Where><And>").Replace("</Where>", FilterNonArchived + "</And></Where>");
         }
     }
 }

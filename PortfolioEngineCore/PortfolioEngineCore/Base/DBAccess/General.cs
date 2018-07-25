@@ -109,7 +109,10 @@ namespace PortfolioEngineCore
             bool bSuperPIM = Security.CheckUserGlobalPermission(dba, dba.UserWResID, GlobalPermissionsEnum.gpSuperPIM);
             bool bSuperRM = Security.CheckUserGlobalPermission(dba, dba.UserWResID, GlobalPermissionsEnum.gpSuperRM);
 
-            string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
+            string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS"
+                              + " WHERE (PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '')"
+                              + " AND (PROJECT_ARCHIVED IS NULL OR PROJECT_ARCHIVED = 0)"
+                              + " ORDER BY PROJECT_NAME";
             SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection);
             SqlDataReader reader = null;
             reader = oCommand.ExecuteReader();
