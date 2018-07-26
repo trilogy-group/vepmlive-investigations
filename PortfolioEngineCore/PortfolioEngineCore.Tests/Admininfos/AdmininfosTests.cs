@@ -181,7 +181,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => "0";
@@ -212,7 +212,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId.ToString();
@@ -243,7 +243,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => false
-                }.Instance;
+                };
             };
 
             var parameters = new object[]
@@ -339,7 +339,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
@@ -454,7 +454,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
@@ -487,7 +487,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => false
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
@@ -566,7 +566,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.ItemGetString = (container, column) => SampleId;
@@ -592,7 +592,7 @@ namespace PortfolioEngineCore.Tests.Admininfos
                 return new ShimSqlDataReader
                 {
                     Read = () => true
-                }.Instance;
+                };
             };
 
             ShimSqlDataReader.AllInstances.GetOrdinalString = (container, column) => SampleId;

@@ -2505,10 +2505,11 @@ namespace PortfolioEngineCore
             {
                 sqlCommand.Transaction = transaction;
 
-                var sqlReader = sqlCommand.ExecuteReader();
-                id = GetNextIdValue(sqlReader);
 
-                sqlReader.Close();
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    id = GetNextIdValue(sqlReader);
+                }
             }
         }
 
