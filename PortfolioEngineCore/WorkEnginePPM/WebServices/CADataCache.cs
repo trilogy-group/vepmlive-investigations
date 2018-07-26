@@ -743,48 +743,6 @@ namespace CADataCache
             return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
-        private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)
-        {
-            if (!hideRowsWithAllZeros)
-            {
-                return true;
-            }
-
-            var quantityValue = 0.0;
-            var costValue = 0.0;
-            var fteValue = 0.0;
-
-            var totalPeriods = details.zFTE.Length - 1;
-            for (var i = 1; i <= totalPeriods; i++)
-            {
-                costValue = 0;
-                quantityValue = 0;
-                fteValue = 0;
-
-                if (showQuantityColumn && details.zValue[i] != double.MinValue)
-                {
-                    quantityValue = details.zValue[i];
-                }
-
-                if (showFte && details.zFTE[i] != double.MinValue)
-                {
-                    fteValue = details.zFTE[i];
-                }
-
-                if (showCostColumn)
-                {
-                    costValue = showCostDecimals ? details.zCost[i] : Math.Round(details.zCost[i]);
-                }
-
-                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
-                {
-                    break;
-                }
-            }
-
-            return costValue + quantityValue + fteValue > 0;
-        }
-
         public string GetBottomGrid()
         {
 
