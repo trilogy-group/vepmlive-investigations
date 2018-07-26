@@ -10,11 +10,12 @@ using ModelDataCache.Fakes;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using WorkEnginePPM.Tests.TestDoubles;
+using WorkEnginePPM.Tests.TestDoubles.ModelDataCache;
 
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {
     [TestClass]
-    public class GridBaseTest
+    public class ModelDataCacheGridBaseTest
     {
         private IDisposable _shimsContext;
 
@@ -92,9 +93,9 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             ShimCStruct.AllInstances.CreateSubStructString = (instance, name) => new ShimCStruct();
         }
 
-        private GridBaseTestDouble CreateGridBase()
+        private ModelDataCacheGridBaseTestDouble CreateGridBase()
         {
-            return new GridBaseTestDouble(
+            return new ModelDataCacheGridBaseTestDouble(
                 _header1Shim, 
                 _header2Shim, 
                 _periodColsShim,
@@ -301,126 +302,6 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             // Assert
             Assert.IsTrue(result);
             Assert.AreEqual(_detailRowParameter.TXVal[3], value);
-        }
-
-        [TestMethod]
-        public void RenderToXML_RenderingTypeInvalid_Throws()
-        {
-            // Arrange
-            var grid = CreateGridBase();
-
-            // Act
-            Action action = () => grid.RenderToXml(GridBase.RenderingTypes.None);
-
-            // Assert
-            try
-            {
-                action();
-            }
-            catch (ArgumentException)
-            {
-                return;
-            }
-            Assert.Fail();
-        }
-
-        [TestMethod]
-        public void RenderToXML_Always_InitializesGridAndRendersIt()
-        {
-            // Arrange
-            var grid = CreateGridBase();
-            string structNameUsed = null;
-            ShimCStruct.AllInstances.InitializeString = (element, name) =>
-            {
-                structNameUsed = name;
-            };
-
-            ShimCStruct.AllInstances.XML = (element) =>
-            {
-                return string.Empty;
-            };
-
-            // Act
-            var xml = grid.RenderToXml(GridBase.RenderingTypes.Layout);
-
-            // Assert
-            Assert.AreEqual("Grid", structNameUsed);
-        }
-
-        [TestMethod]
-        public void RenderToXML_Layout_RendersGridLayout()
-        {
-            // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Layout;
-            var grid = CreateGridBase();
-
-            // Act
-            var xml = grid.RenderToXml(renderingType);
-
-            // Assert
-            Assert.AreEqual(1, grid.InitializeGridLayoutCalls.Count);
-            Assert.IsTrue(grid.InitializeGridLayoutCalls.Contains(renderingType));
-            Assert.AreEqual(1, grid.FinalizeGridLayoutCalls.Count);
-            Assert.IsTrue(grid.FinalizeGridLayoutCalls.Contains(renderingType));
-        }
-
-        [TestMethod]
-        public void RenderToXML_LayoutPeriodsNotNull_AddsPeriodColumns()
-        {
-            // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Layout;
-            var periodsData = Enumerable.Empty<PeriodData>();
-
-            var grid = CreateGridBase();
-            grid.AddPeriodsData(periodsData);
-
-            // Act
-            var xml = grid.RenderToXml(renderingType);
-
-            // Assert
-            Assert.AreEqual(1, grid.AddPeriodColumnsCalls.Count);
-            Assert.IsTrue(grid.AddPeriodColumnsCalls[0].SequenceEqual(periodsData));
-        }
-
-        [TestMethod]
-        public void RenderToXML_Data_GridDataInitialized()
-        {
-            // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Data;
-            var grid = CreateGridBase();
-
-            // Act
-            var xml = grid.RenderToXml(renderingType);
-
-            // Assert
-            Assert.AreEqual(1, grid.InitializeGridDataCalls.Count);
-            Assert.IsTrue(grid.InitializeGridDataCalls[0] == renderingType);
-        }
-
-        [TestMethod]
-        public void RenderToXML_DataDetailRowsNotNull_AddsDetailRows()
-        {
-            // Arrange
-            const GridBase.RenderingTypes renderingType = GridBase.RenderingTypes.Data;
-            var detailsRows = new DetailRowData[] 
-            {
-                new DetailRowData(10) { bRealone = true },
-                new DetailRowData(15) { bRealone = true }
-            };
-
-            var grid = CreateGridBase();
-            grid.AddDetailRowsData(detailsRows);
-
-            // Act
-            var xml = grid.RenderToXml(renderingType);
-
-            // Assert
-            Assert.AreEqual(detailsRows.Length, grid.AddDetailRowCalls.Count);
-            for (var i = 0; i < detailsRows.Length; i++)
-            {
-                Assert.IsTrue(grid.AddDetailRowCalls[i].Item1 == detailsRows[i]);
-                Assert.IsTrue(grid.AddDetailRowCalls[i].Item2 == i);
-            }
         }
     }
 }

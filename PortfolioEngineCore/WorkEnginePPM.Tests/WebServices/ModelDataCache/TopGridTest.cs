@@ -9,7 +9,7 @@ using ModelDataCache;
 using ModelDataCache.Fakes;
 using PortfolioEngineCore.Fakes;
 using WorkEnginePPM.Tests.TestDoubles;
-using static ModelDataCache.GridBase;
+using WorkEnginePPM.Tests.TestDoubles.ModelDataCache;
 
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {
@@ -318,7 +318,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            Action action = () => grid.InitializeGridLayout(GridBase.RenderingTypes.None);
+            Action action = () => grid.InitializeGridLayout(GridRenderingTypes.None);
 
             // Assert
             try
@@ -340,7 +340,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual(0, _intAttributesCreated["Toolbar"]["Visible"]);
@@ -354,7 +354,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["MaxHeight"]);
@@ -393,7 +393,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual("R", _stringAttributesCreated["D"]["Name"]);
@@ -411,7 +411,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridData(GridBase.RenderingTypes.Data);
+            grid.InitializeGridData(GridRenderingTypes.Data);
 
             // Assert
             Assert.IsTrue(_substructsCreated.Contains("Cfg"));
@@ -422,7 +422,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridData_InvalidRenderingType_Throws()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.None;
+            const GridRenderingTypes renderingType = GridRenderingTypes.None;
             var grid = CreateGridBase();
 
             // Act
@@ -444,7 +444,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridData_Always_ExpectedStructure()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             var grid = CreateGridBase();
 
             // Act
@@ -461,7 +461,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridData_Always_LevelSet()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             var grid = CreateGridBase();
 
             // Act
@@ -476,7 +476,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridData_RenderingTypeData_ExpectedStructure()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             var grid = CreateGridBase();
 
             // Act
@@ -491,7 +491,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridLayout_ShowGantt_CategoryColumnInitialized()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             _showGanttParameter = true;
             var grid = CreateGridBase();
 
@@ -524,7 +524,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
         public void InitializeGridLayout_ShowGantt_ZoomInitialized()
         {
             // Arrange
-            const RenderingTypes renderingType = RenderingTypes.Data;
+            const GridRenderingTypes renderingType = GridRenderingTypes.Data;
             _showGanttParameter = true;
             var grid = CreateGridBase();
 
