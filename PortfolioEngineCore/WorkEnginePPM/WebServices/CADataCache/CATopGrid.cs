@@ -451,7 +451,6 @@ namespace CADataCache
             xI.CreateBooleanAttr("CanEdit", false);
             xI.CreateStringAttr("Select", (detailRowData.bSelected ? "1" : "0"));
             xI.CreateBooleanAttr("SelectCanEdit", true);
-            xI.CreateBooleanAttr("CanEdit", false);
 
             foreach (var column in _columns)
             {

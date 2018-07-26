@@ -51,6 +51,13 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         {
             _shimsContext = ShimsContext.Create();
 
+            _hideRowsWithAllZeros = true;
+            _showFTEs = true;
+            _useQuantity = true;
+            _useCost = true;
+            _showCostDetailed = true;
+            _pmoAdmin = 0;
+
             _renderingType = GridRenderingTypes.Combined;
 
             _columns = new []
@@ -516,26 +523,19 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             Assert.AreEqual(1, _intAttributesCreated["I"]["NoColorState"]);
             Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
             Assert.AreEqual(true, _booleanAttributesCreated["I"]["SelectCanEdit"]);
-            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
-            Assert.AreEqual(false, _booleanAttributesCreated["I"]["rowidCanEdit"]);
+            Assert.AreEqual(_detailRow.bSelected ? "1" : "0", _stringAttributesCreated["I"]["Select"]);
         }
 
         [TestMethod]
-        public void AddDetailRow_PeriodsProvided_ProcessesEachPeriod()
+        public void AddDetailRow_ExpectedColumnsProvided_AddsAttributesForEachColumn()
         {
             // Arrange, Act
             _testDouble.AddDetailRow(_detailRow, _rowId);
 
             // Assert
-            foreach (var period in _periods)
-            {
-                for (var i = 1; i <= _displayList.Count; i++)
-                {
-                    var prefix = "P" + period.PeriodID + "C" + i;
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "ClassInner"]);
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPostfix"]);
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPrefix"]);
-                }
+            foreach(var column in _columns)
+            { 
+                Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey("zX" + column.m_realname));
             }
         }
 
