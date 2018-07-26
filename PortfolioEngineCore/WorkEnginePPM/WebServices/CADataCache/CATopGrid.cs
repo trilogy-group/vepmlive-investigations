@@ -54,120 +54,37 @@ namespace CADataCache
             column.CreateStringAttr("Class", string.Empty);
         }
 
-        protected override string ResolvePeriodId(clsPeriodData periodData, int index)
+        protected override int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter)
         {
-            return periodData.PeriodID.ToString();
-        }
-
-        protected override void AddPeriodColumns(IEnumerable<clsPeriodData> periods)
-        {
-            var index = 0;
-            foreach (var period in periods)
-            {
-                var periodId = ResolvePeriodId(period, index++);
-                var periodName = period.PeriodName;
-
-                var counter = _displayList.Where(pred => pred.bUse).Count();
-                if (counter == 0)
-                {
-                    return;
-                }
-
-                var span = (_useQuantity ? 1 : 0)
+            var span = (_useQuantity ? 1 : 0)
                         + (_showFTEs ? 1 : 0)
                         + (_useCost ? 1 : 0);
 
-                span *= counter;
-                counter = 0;
-
-                foreach (var displayRow in _displayList)
-                {
-                    try
-                    {
-                        if (displayRow.bUse)
-                        {
-                            ++counter;
-                            var attributePrefix = "P" + periodId + "C";
-
-                            if (counter == 1)
-                            {
-                                if (span > 1)
-                                {
-                                    Header1.CreateIntAttr(attributePrefix + counter + "Span", span);
-                                }
-                                Header1.CreateStringAttr(attributePrefix + counter, periodName);
-                            }
-                            else
-                            {
-                                Header1.CreateStringAttr(attributePrefix + counter, GlobalConstants.Whitespace);
-                            }
-
-                            if (_useQuantity)
-                            {
-                                Header2.CreateStringAttr(attributePrefix + counter, "Qty");
-                                DefinePeriodColumn(attributePrefix + counter, ",0.##", ",0.##");
-                                ++counter;
-                            }
-
-                            if (_showFTEs)
-                            {
-                                Header2.CreateStringAttr(attributePrefix + counter, "FTE");
-                                DefinePeriodColumn(attributePrefix + counter, ",0.###", ",0.##");
-                                ++counter;
-                            }
-
-                            if (_useCost)
-                            {
-                                Header2.CreateStringAttr(attributePrefix + counter, "Cost");
-                                DefinePeriodColumn(attributePrefix + counter, null, ",0.###");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LoggingService.WriteTrace(
-                          Area.EPMLiveWorkEnginePPM,
-                          Categories.EPMLiveWorkEnginePPM.Others,
-                          TraceSeverity.VerboseEx,
-                          ex.ToString());
-                    }
-                }
-            }
+            span *= counter;
+            return span;
         }
 
-        private CStruct DefinePeriodColumn(string attributePrefix, string columnFormat, string definitionFormat)
+        protected override void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow)
         {
-            var column = CreateColumn(PeriodCols, attributePrefix, "Float",
-                    canMove: false,
-                    canResize: null,
-                    canFilter: null);
-
-            if (columnFormat != null)
+            if (_useQuantity)
             {
-                column.CreateStringAttr("Format", columnFormat);
+                Header2.CreateStringAttr(GeneratePeriodAttributeName("P", periodId, counter), "Qty");
+                DefinePeriodColumn(GeneratePeriodAttributeName("P", periodId, counter), ",0.##", ",0.##");
+                ++counter;
             }
 
-            column.CreateIntAttr("CanDrag", _pmoAdmin);
-            column.CreateStringAttr("Align", "Right");
-
-            if (_pmoAdmin != 0)
+            if (_showFTEs)
             {
-                column.CreateStringAttr("OnDragCell", "Focus,DragCell");
+                Header2.CreateStringAttr(GeneratePeriodAttributeName("P", periodId, counter), "FTE");
+                DefinePeriodColumn(GeneratePeriodAttributeName("P", periodId, counter), ",0.###", ",0.##");
+                ++counter;
             }
 
-            column.CreateIntAttr("MinWidth", 45);
-            column.CreateIntAttr("Width", 65);
-
-            const string sFunc = "(Row.id == 'Filter' ? '' : sum())";
-            DefinitionRight.CreateStringAttr(attributePrefix + "Formula", sFunc);
-            DefinitionRight.CreateStringAttr(attributePrefix + "Format", definitionFormat);
-            DefinitionRight.CreateIntAttr(attributePrefix + "CanDrag", _pmoAdmin);
-            DefinitionRight.CreateStringAttr(attributePrefix + "ClassInner", string.Empty);
-
-            DefinitionLeaf.CreateStringAttr(attributePrefix + "Formula", string.Empty);
-            DefinitionLeaf.CreateIntAttr(attributePrefix + "CanDrag", _pmoAdmin);
-            DefinitionLeaf.CreateStringAttr(attributePrefix + "ClassInner", string.Empty);
-            return column;
+            if (_useCost)
+            {
+                Header2.CreateStringAttr(GeneratePeriodAttributeName("P", periodId, counter), "Cost");
+                DefinePeriodColumn(GeneratePeriodAttributeName("P", periodId, counter), null, ",0.###");
+            }
         }
 
         protected override bool CheckIfDetailRowShouldBeAdded(clsDetailRowData detailRow)

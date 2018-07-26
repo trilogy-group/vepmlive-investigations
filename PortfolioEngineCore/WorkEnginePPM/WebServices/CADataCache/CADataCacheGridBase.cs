@@ -48,8 +48,7 @@ namespace CADataCache
             _pmoAdmin = pmoAdmin;
             _respectColumnUnselectableProperty = respectColumnUnselectableProperty;
         }
-
-
+        
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
             if (renderingType == GridRenderingTypes.None)
@@ -115,8 +114,6 @@ namespace CADataCache
             }
         }
         
-        protected abstract void InitializeGridLayoutCategoryColumns(CStruct columnsContainer);
-
         private void InitializeGridLayoutConfig()
         {
             var xToolbar = Constructor.CreateSubStruct("Toolbar");
@@ -261,6 +258,46 @@ namespace CADataCache
         protected string CleanUpString(string input)
         {
             return RemoveCharacters(input, "!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\");
+        }
+        
+        protected CStruct DefinePeriodColumn(string attributePrefix, string columnFormat, string definitionFormat)
+        {
+            var column = CreateColumn(PeriodCols, attributePrefix, "Float",
+                    canMove: false,
+                    canResize: null,
+                    canFilter: null);
+
+            if (columnFormat != null)
+            {
+                column.CreateStringAttr("Format", columnFormat);
+            }
+
+            column.CreateIntAttr("CanDrag", _pmoAdmin);
+            column.CreateStringAttr("Align", "Right");
+
+            if (_pmoAdmin != 0)
+            {
+                column.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            }
+
+            column.CreateIntAttr("MinWidth", 45);
+            column.CreateIntAttr("Width", 65);
+
+            const string sFunc = "(Row.id == 'Filter' ? '' : sum())";
+            DefinitionRight.CreateStringAttr(attributePrefix + "Formula", sFunc);
+            DefinitionRight.CreateStringAttr(attributePrefix + "Format", definitionFormat);
+            DefinitionRight.CreateIntAttr(attributePrefix + "CanDrag", _pmoAdmin);
+            DefinitionRight.CreateStringAttr(attributePrefix + "ClassInner", string.Empty);
+
+            DefinitionLeaf.CreateStringAttr(attributePrefix + "Formula", string.Empty);
+            DefinitionLeaf.CreateIntAttr(attributePrefix + "CanDrag", _pmoAdmin);
+            DefinitionLeaf.CreateStringAttr(attributePrefix + "ClassInner", string.Empty);
+            return column;
+        }
+
+        protected static string GeneratePeriodAttributeName(string prefix, string periodId, int counter, string suffix = null)
+        {
+            return string.Join(string.Empty, prefix, periodId, "C", counter, suffix);
         }
 
         // (CC-76588, 2018-07-26) It's actually a copy of ModelDataCacheGridBase method, 
@@ -411,5 +448,69 @@ namespace CADataCache
 
             return 0;
         }
+
+        protected override string ResolvePeriodId(clsPeriodData periodData, int index)
+        {
+            return periodData.PeriodID.ToString();
+        }
+
+        protected override void AddPeriodColumns(IEnumerable<clsPeriodData> periods)
+        {
+            var index = 0;
+            foreach (var period in periods)
+            {
+                var periodId = ResolvePeriodId(period, index++);
+                var periodName = period.PeriodName;
+
+                var counter = _displayList.Where(pred => pred.bUse).Count();
+                if (counter == 0)
+                {
+                    return;
+                }
+
+                var span = CalculatePeriodColumnsSpan(periodId, periodName, counter);
+
+                counter = 0;
+                foreach (var displayRow in _displayList)
+                {
+                    try
+                    {
+                        if (displayRow.bUse)
+                        {
+                            ++counter;
+
+                            if (counter == 1)
+                            {
+                                if (span > 1)
+                                {
+                                    Header1.CreateIntAttr(GeneratePeriodAttributeName("P", periodId, counter, "Span"), span);
+                                }
+                                Header1.CreateStringAttr(GeneratePeriodAttributeName("P", periodId, counter), periodName);
+                            }
+                            else
+                            {
+                                Header1.CreateStringAttr(GeneratePeriodAttributeName("P", periodId, counter), GlobalConstants.Whitespace);
+                            }
+
+                            InitializePeriodDisplayRow(periodId, periodName, counter, displayRow);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.WriteTrace(
+                          Area.EPMLiveWorkEnginePPM,
+                          Categories.EPMLiveWorkEnginePPM.Others,
+                          TraceSeverity.VerboseEx,
+                          ex.ToString());
+                    }
+                }
+            }
+        }
+
+        protected abstract void InitializeGridLayoutCategoryColumns(CStruct columnsContainer);
+
+        protected abstract int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter);
+
+        protected abstract void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow);
     }
 }

@@ -81,5 +81,15 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
         {
             throw new NotImplementedException();
         }
+
+        protected override int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
