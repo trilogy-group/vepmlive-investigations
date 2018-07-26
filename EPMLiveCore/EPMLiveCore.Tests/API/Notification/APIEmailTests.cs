@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using System.Net.Mail;
+using System.Net.Mail.Fakes;
 using System.Reflection;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
@@ -14,8 +16,6 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Net.Mail.Fakes;
-using System.Net.Mail;
 
 namespace EPMLiveCore.Tests.API.Notification
 {
@@ -130,7 +130,7 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
-        public void IQueueItemMessage1_Called_Disposed()
+        public void IQueueItemMessageByListIteam_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
@@ -183,7 +183,7 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
-        public void IQueueItemMessage2_Called_Disposed()
+        public void IQueueItemMessageByWeb_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
