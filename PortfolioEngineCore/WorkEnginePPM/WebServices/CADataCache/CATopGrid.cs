@@ -32,6 +32,11 @@ namespace CADataCache
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
+            if (renderingType == GridRenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             InitializeGridLayoutConfig();
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
@@ -42,39 +47,20 @@ namespace CADataCache
 
             Definitions = Constructor.CreateSubStruct("Def");
 
-            DefinitionRight = Definitions.CreateSubStruct("D");
-            DefinitionRight.CreateStringAttr("Name", "R");
+            DefinitionRight = InitializeGridLayoutDefinition("R", Definitions);
             DefinitionRight.CreateStringAttr("Calculated", "1");
-            DefinitionRight.CreateStringAttr("Calculated", "1");
-            DefinitionRight.CreateStringAttr("HoverCell", "Color");
-            DefinitionRight.CreateStringAttr("HoverRow", "Color");
-            DefinitionRight.CreateStringAttr("FocusCell", string.Empty);
-            DefinitionRight.CreateStringAttr("HoverCell", "Color");
-            DefinitionRight.CreateIntAttr("NoColorState", 1);
-            DefinitionRight.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             DefinitionRight.CreateBooleanAttr("SelectCanEdit", true);
             DefinitionRight.CreateStringAttr("rowid", string.Empty);
 
-            DefinitionLeaf = Definitions.CreateSubStruct("D");
-            DefinitionLeaf.CreateStringAttr("Name", "Leaf");
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", Definitions);
             DefinitionLeaf.CreateStringAttr("Calculated", "0");
-            DefinitionLeaf.CreateStringAttr("HoverCell", "Color");
-            DefinitionLeaf.CreateStringAttr("HoverRow", "Color");
-            DefinitionLeaf.CreateStringAttr("FocusCell", string.Empty);
-            DefinitionLeaf.CreateStringAttr("HoverCell", "Color");
-            DefinitionLeaf.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-            DefinitionLeaf.CreateIntAttr("NoColorState", 1);
 
             var xHead = Constructor.CreateSubStruct("Head");
             var xFilter = xHead.CreateSubStruct("Filter");
             xFilter.CreateStringAttr("id", "Filter");
 
-            Header1 = Constructor.CreateSubStruct("Header");
+            InitializeGridLayoutHeader1(xHead, 1, 2);
             Header1.CreateIntAttr("PortfolioItemVisible", 1);
-            Header1.CreateIntAttr("Spanned", 1);
-            Header1.CreateIntAttr("SortIcons", 2);
-            Header1.CreateStringAttr("HoverCell", "Color");
-            Header1.CreateStringAttr("HoverRow", string.Empty);
             Header1.CreateStringAttr("RowSel", GlobalConstants.Whitespace);
             Header1.CreateStringAttr("Select", GlobalConstants.Whitespace);
 
@@ -192,7 +178,7 @@ namespace CADataCache
         {
             CStruct categoryColumn;
 
-            var realName = "zX" + CleanupString(column.m_realname);
+            var realName = "zX" + CleanUpString(column.m_realname);
             var displayName = column.m_dispname.Replace("/n", "\n");
 
             Header1.CreateStringAttr(realName, displayName);
@@ -300,7 +286,6 @@ namespace CADataCache
                 span *= counter;
                 counter = 0;
 
-                var prefix = string.Empty;
                 foreach (var displayRow in _displayList)
                 {
                     try
@@ -308,40 +293,39 @@ namespace CADataCache
                         if (displayRow.bUse)
                         {
                             ++counter;
-                            prefix = "C";
-                            var attributePrefix = "P" + periodId + prefix + counter;
+                            var attributePrefix = "P" + periodId + "C";
 
                             if (counter == 1)
                             {
                                 if (span > 1)
                                 {
-                                    Header1.CreateIntAttr(attributePrefix + "Span", span);
+                                    Header1.CreateIntAttr(attributePrefix + counter + "Span", span);
                                 }
-                                Header1.CreateStringAttr(attributePrefix, periodName);
+                                Header1.CreateStringAttr(attributePrefix + counter, periodName);
                             }
                             else
                             {
-                                Header1.CreateStringAttr(attributePrefix, GlobalConstants.Whitespace);
+                                Header1.CreateStringAttr(attributePrefix + counter, GlobalConstants.Whitespace);
                             }
-                            
+
                             if (_useQuantity)
                             {
-                                Header2.CreateStringAttr(attributePrefix, "Qty");
-                                DefinePeriodColumn(attributePrefix, ",0.##", ",0.##");
+                                Header2.CreateStringAttr(attributePrefix + counter, "Qty");
+                                DefinePeriodColumn(attributePrefix + counter, ",0.##", ",0.##");
                                 ++counter;
                             }
 
                             if (_showFTEs)
                             {
-                                Header2.CreateStringAttr(attributePrefix, "FTE");
-                                DefinePeriodColumn(attributePrefix, ",0.###", ",0.##");
+                                Header2.CreateStringAttr(attributePrefix + counter, "FTE");
+                                DefinePeriodColumn(attributePrefix + counter, ",0.###", ",0.##");
                                 ++counter;
                             }
 
                             if (_useCost)
                             {
-                                Header2.CreateStringAttr(attributePrefix, "Cost");
-                                DefinePeriodColumn(attributePrefix, null, ",0.###");
+                                Header2.CreateStringAttr(attributePrefix + counter, "Cost");
+                                DefinePeriodColumn(attributePrefix + counter, null, ",0.###");
                             }
                         }
                     }
@@ -454,7 +438,7 @@ namespace CADataCache
 
             foreach (var column in _columns)
             {
-                var attributeName = "zX" + CleanupString(column.m_realname);
+                var attributeName = "zX" + CleanUpString(column.m_realname);
 
                 string value;
                 if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
@@ -552,6 +536,11 @@ namespace CADataCache
 
         protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
+            if (renderingType == GridRenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
             var xBody = Constructor.CreateSubStruct("Body");
             var xB = xBody.CreateSubStruct("B");
             var xI = xBody.CreateSubStruct("I");

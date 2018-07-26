@@ -51,10 +51,12 @@ namespace RPADataCache
             PeriodCols = xRightCols;
             MiddleCols = xCols;
 
-            DefinitionRight = InitializeGridLayoutDefinition("R");
+            var m_xDef = Constructor.CreateSubStruct("Def");
+
+            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef);
             DefinitionRight.CreateStringAttr("Calculated", "1");
 
-            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf");
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef);
             DefinitionLeaf.CreateStringAttr("Calculated", "0");
             
             var xHead = Constructor.CreateSubStruct("Head");

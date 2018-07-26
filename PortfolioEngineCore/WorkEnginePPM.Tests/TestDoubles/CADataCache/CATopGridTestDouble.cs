@@ -33,14 +33,19 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
 
-            Header1 = Constructor.CreateSubStruct("Header");
-            Header2 = Constructor.CreateSubStruct("Header");
+            Header1 = Constructor.CreateSubStruct("Header1");
+            Header2 = Constructor.CreateSubStruct("Header2");
             base.PeriodCols = Constructor.CreateSubStruct("RightCols");
             base.MiddleCols = Constructor.CreateSubStruct("Cols");
             base.DefinitionRight = Constructor.CreateSubStruct("Right");
             base.DefinitionLeaf = Constructor.CreateSubStruct("Leaf");
 
             Levels[0] = Constructor.CreateSubStruct("Test");
+        }
+
+        public new string CleanUpString(string input)
+        {
+            return base.CleanUpString(input);
         }
 
         public new void InitializeGridLayout(GridRenderingTypes renderingType)

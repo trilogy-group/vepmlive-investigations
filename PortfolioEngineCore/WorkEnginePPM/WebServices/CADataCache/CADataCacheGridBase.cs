@@ -43,7 +43,7 @@ namespace CADataCache
             _pmoAdmin = pmoAdmin;
         }
 
-        protected string CleanupString(string input)
+        protected string CleanUpString(string input)
         {
             return RemoveCharacters(input, "!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\");
         }
