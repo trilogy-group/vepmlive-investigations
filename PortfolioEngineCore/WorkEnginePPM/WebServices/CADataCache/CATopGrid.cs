@@ -152,7 +152,7 @@ namespace CADataCache
 
         private void InitializeGridLayoutCategoryColumns(CStruct columnsContainer)
         {
-            CStruct column;
+            var column = columnsContainer.CreateSubStruct("C");
 
             column = CreateColumn(columnsContainer, "RowSel", "Icon",
                 width: 20,
