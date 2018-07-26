@@ -27,6 +27,13 @@ namespace EPMLiveCore.Tests.API.Integration
         private const int TwoCalls = 2;
         private const int ThreeCalls = 3;
         private const string FieldSqlConnection = "cn";
+        private const string MethodProcessItemOutgoing = "ProcessItemOutgoing";
+        private const string MethodPostCheckBit = "PostCheckBit";
+        private const string ColumnNameType = "TYPE";
+        private const string ColumnNameIntItemId = "INTITEM_ID";
+        private const string ColumnNameItemId = "ITEM_ID";
+        private const string ColumnNameListId = "LIST_ID";
+        private const string ColumnNameColId = "COL_ID";
         private static readonly Guid _siteId = Guid.NewGuid();
         private static readonly Guid _webId = Guid.NewGuid();
 
@@ -636,6 +643,366 @@ namespace EPMLiveCore.Tests.API.Integration
                 () => executeNonQueryCalled.ShouldBeTrue(),
                 () => parameterList.ShouldContain(param => param.ParameterName == string.Format("@{0}", paramKey) &&
                                                            param.Value.Equals(paramValue)));
+        }
+
+        [TestMethod]
+        public void UpdatePriorityNumbers_WhenCalled_UpdatesNumbers()
+        {
+            // Arrange
+            const string expectedSelectCommandText = "SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid order by priority";
+            const string expectedUpdateCommandText = "UPDATE INT_LISTS set Priority=@priority where INT_LIST_ID=@intlistid";
+            const string expectedSelectCommandParam = "@listid";
+            const string expectedUpdateCommandParam01 = "@intlistid";
+            const string expectedUpdateCommandParam02 = "@priority";
+            const string columnIntListId = "INT_LIST_ID";
+            const int row01ListId = 1;
+
+            var sqlCommandCtor01CommandText = string.Empty;
+            var sqlCommandCtor02CommandText = string.Empty;
+            var sqlCommandCtorCallCount = 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCallCount++;
+
+                if (sqlCommandCtorCallCount == OneCall)
+                {
+                    sqlCommandCtor01CommandText = commandText;
+                }
+                else if (sqlCommandCtorCallCount == TwoCalls)
+                {
+                    sqlCommandCtor02CommandText = commandText;
+                }
+            };
+
+            var sqlDataAdapterCtorCommandText = string.Empty;
+            var selectCommandParameters = new List<SqlParameter>();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (instance, sqlCommand) =>
+            {
+                if (sqlCommand == null)
+                {
+                    throw new ArgumentNullException("sqlCommand");
+                }
+
+                sqlDataAdapterCtorCommandText = sqlCommand.CommandText;
+                foreach (SqlParameter param in sqlCommand.Parameters)
+                {
+                    selectCommandParameters.Add(param);
+                }
+            };
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(columnIntListId);
+            var row01 = dataTable.NewRow();
+            row01[columnIntListId] = row01ListId;
+            dataTable.Rows.Add(row01);
+
+            var fillMethodCalled = false;
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                if (dataSet == null)
+                {
+                    throw new ArgumentNullException("dataSet");
+                }
+
+                dataSet.Tables.Add(dataTable);
+                fillMethodCalled = true;
+                return -1;
+            };
+
+            var updateCommandParameters = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) =>
+            {
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    updateCommandParameters.Add(param);
+                }
+
+                return -1;
+            };
+
+            var listId = Guid.NewGuid();
+
+            // Act
+            _testEntity.UpdatePriorityNumbers(listId);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtor01CommandText.ShouldBe(expectedSelectCommandText),
+                () => sqlCommandCtor02CommandText.ShouldBe(expectedUpdateCommandText),
+                () => fillMethodCalled.ShouldBeTrue(),
+                () => selectCommandParameters.ShouldContain(param => param.ParameterName == expectedSelectCommandParam &&
+                                                                     param.Value.Equals(listId)),
+                () => updateCommandParameters.ShouldContain(param => param.ParameterName == expectedUpdateCommandParam01 &&
+                                                                     param.Value.Equals(row01ListId.ToString())),
+                () => updateCommandParameters.ShouldContain(param => param.ParameterName == expectedUpdateCommandParam02 &&
+                                                                     param.Value.Equals(1)));
+        }
+
+        [TestMethod]
+        public void ProcessItemOutgoing_WhenTypeIs2_SelectsDataFromIntListToDelete()
+        {
+            // Arrange
+            const string expectedCommandText = "SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@intcolid";
+            const string expectedCommandParam01 = "@listid";
+            const string expectedCommandParam02 = "@intcolid";
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            const int fieldsCount = 1;
+            var expectedIntListId = Guid.NewGuid();
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.FieldCountGet = () => fieldsCount;
+            shimSqlDataReader.GetGuidInt32 = (columnIndex) => expectedIntListId;
+
+            var readMethodSwitcher = false;
+            shimSqlDataReader.Read = () => readMethodSwitcher = !readMethodSwitcher;
+
+            var executeReaderCalled = false;
+            var parameterList = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteReader = (instance) =>
+            {
+                executeReaderCalled = true;
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+
+                return shimSqlDataReader.Instance;
+            };
+
+            var dummyTable = new DataTable();
+            dummyTable.Columns.Add(ColumnNameType);
+            dummyTable.Columns.Add(ColumnNameIntItemId);
+            dummyTable.Columns.Add(ColumnNameItemId);
+            dummyTable.Columns.Add(ColumnNameListId);
+            dummyTable.Columns.Add(ColumnNameColId);
+            var dataRow = dummyTable.NewRow();
+
+            const string typeDelete = "2";
+            const int intItemId = 1;
+            const int itemId = 2;
+            const int listId = 3;
+            const int colId = 4;
+            dataRow[ColumnNameType] = typeDelete;
+            dataRow[ColumnNameIntItemId] = intItemId;
+            dataRow[ColumnNameItemId] = itemId;
+            dataRow[ColumnNameListId] = listId;
+            dataRow[ColumnNameColId] = colId;
+
+            var intListIdArg = Guid.Empty;
+            ShimIntegrationCore.AllInstances.GetPropertiesGuid = (instance, intListId) =>
+            {
+                intListIdArg = intListId;
+                return new Hashtable();
+            };
+            ShimIntegrationCore.AllInstances.PostIntegrationDeleteToExternalDataTableGuidGuid = (a, b, c, d) => { };
+            // Act
+            _testEntityPrivate.Invoke(MethodProcessItemOutgoing, dataRow);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => executeReaderCalled.ShouldBeTrue(),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam01 &&
+                                                           param.Value.Equals(listId.ToString())),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam02 &&
+                                                           param.Value.Equals(colId.ToString())),
+                () => intListIdArg.ShouldBe(expectedIntListId));
+        }
+
+        [TestMethod]
+        public void LogMessage_WhenCalled_InsertsLogMessage()
+        {
+            // Arrange
+            const string expectedCommandText = "INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @type, @text)";
+            const string expectedParamIntlistid = "@intlistid";
+            const string expectedParamListid = "@listid";
+            const string expectedParamMessage = "@text";
+            const string expectedParamType = "@type";
+            const string intListId = "1";
+            const string listId = "2";
+            const string message = "Message";
+            const int type = 1;
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            var executeNonQueryCalled = false;
+            var parameterList = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) =>
+            {
+                executeNonQueryCalled = true;
+
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+
+                return -1;
+            };
+
+            // Act
+            _testEntity.LogMessage(intListId, listId, message, type);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => executeNonQueryCalled.ShouldBeTrue(),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedParamIntlistid &&
+                                                           param.Value.Equals(intListId)),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedParamListid &&
+                                                           param.Value.Equals(listId)),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedParamMessage &&
+                                                           param.Value.Equals(message)),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedParamType &&
+                                                           param.Value.Equals(type)));
+        }
+
+        [TestMethod]
+        public void PostCheckBit_IfItemCheckExistsInDatabase_UpdatesCheckLog()
+        {
+            // Arrange
+            const string expectedSelectCommandText = "SELECT * FROM INT_CHECK WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid";
+            const string expectedUpdateCommandText = "UPDATE INT_CHECK SET CHECKBIT=@check, CHECKTIME=GETDATE() WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid";
+            const string expectedParamIntListId = "@intlistid";
+            const string expectedParamItemId = "@itemid";
+            const string expectedParamCheck = "@check";
+
+            var sqlCommandCtor01CommandText = string.Empty;
+            var sqlCommandCtor02CommandText = string.Empty;
+            var sqlCommandCtorCallCount = 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCallCount++;
+                if (sqlCommandCtorCallCount == OneCall)
+                {
+                    sqlCommandCtor01CommandText = commandText;
+                }
+                else if (sqlCommandCtorCallCount == TwoCalls)
+                {
+                    sqlCommandCtor02CommandText = commandText;
+                }
+            };
+
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.Read = () => true;
+
+            var executeReaderCalled = false;
+            var selectCommandParameters = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteReader = (instance) =>
+            {
+                executeReaderCalled = true;
+
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    selectCommandParameters.Add(param);
+                }
+
+                return shimSqlDataReader.Instance;
+            };
+
+            var executeNonQueryCalled = false;
+            var updateCommandParameters = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) =>
+            {
+                executeNonQueryCalled = true;
+
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    updateCommandParameters.Add(param);
+                }
+
+                return -1;
+            };
+
+            var intListId = Guid.NewGuid();
+            const string itemId = "1";
+            const bool check = true;
+
+            // Act
+            _testEntityPrivate.Invoke(MethodPostCheckBit, intListId, itemId, check);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtor01CommandText.ShouldBe(expectedSelectCommandText),
+                () => sqlCommandCtor02CommandText.ShouldBe(expectedUpdateCommandText),
+                () => executeReaderCalled.ShouldBeTrue(),
+                () => selectCommandParameters.ShouldContain(param => param.ParameterName == expectedParamIntListId &&
+                                                                     param.Value.Equals(intListId)),
+                () => selectCommandParameters.ShouldContain(param => param.ParameterName == expectedParamItemId &&
+                                                                     param.Value.Equals(itemId)),
+                () => executeNonQueryCalled.ShouldBeTrue(),
+                () => updateCommandParameters.ShouldContain(param => param.ParameterName == expectedParamIntListId &&
+                                                                     param.Value.Equals(intListId)),
+                () => updateCommandParameters.ShouldContain(param => param.ParameterName == expectedParamItemId &&
+                                                                     param.Value.Equals(itemId)),
+                () => updateCommandParameters.ShouldContain(param => param.ParameterName == expectedParamCheck &&
+                                                                     param.Value.Equals(check)));
+        }
+
+        [TestMethod]
+        public void PostCheckBit_IfItemCheckDoesNotExistInDatabase_InsertsCheckLog()
+        {
+            // Arrange
+            const string expectedInsertCommandText = "INSERT INTO INT_CHECK (INT_LIST_ID, ITEM_ID, CHECKBIT, CHECKTIME) VALUES (@intlistid, @itemid, @check, GETDATE())";
+            const string expectedParamIntListId = "@intlistid";
+            const string expectedParamItemId = "@itemid";
+            const string expectedParamCheck = "@check";
+
+            var sqlCommandCtor02CommandText = string.Empty;
+            var sqlCommandCtorCallCount = 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCallCount++;
+                if (sqlCommandCtorCallCount == TwoCalls)
+                {
+                    sqlCommandCtor02CommandText = commandText;
+                }
+            };
+
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.Read = () => false;
+
+            ShimSqlCommand.AllInstances.ExecuteReader = (instance) => shimSqlDataReader.Instance;
+
+            var executeNonQueryCalled = false;
+            var insertCommandParameters = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) =>
+            {
+                executeNonQueryCalled = true;
+
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    insertCommandParameters.Add(param);
+                }
+
+                return -1;
+            };
+
+            var intListId = Guid.NewGuid();
+            const string itemId = "1";
+            const bool check = true;
+
+            // Act
+            _testEntityPrivate.Invoke(MethodPostCheckBit, intListId, itemId, check);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtor02CommandText.ShouldBe(expectedInsertCommandText),
+                () => executeNonQueryCalled.ShouldBeTrue(),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamIntListId &&
+                                                                     param.Value.Equals(intListId)),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamItemId &&
+                                                                     param.Value.Equals(itemId)),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamCheck &&
+                                                                     param.Value.Equals(check)));
         }
 
         private static void FakesForSpSecurity()
