@@ -185,12 +185,12 @@ namespace CADataCache
             Header2.CreateStringAttr(realName, GlobalConstants.Whitespace);
 
             categoryColumn = CreateColumn(MiddleCols, realName,
-                visible: column.m_def_fld,
+                visible: !column.m_def_fld ? false : (bool?)null,
                 canEdit: false,
                 canMove: true,
                 canResize: null,
                 canFilter: null,
-                canHide: column.m_unselectable,
+                canHide: column.m_unselectable ? false : (bool?)null,
                 canSelect: null);
             categoryColumn.CreateStringAttr("Class", "GMCellMain");
             categoryColumn.CreateIntAttr("CanDrag", 0);
