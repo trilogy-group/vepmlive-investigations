@@ -439,7 +439,116 @@ namespace CADataCache
 
         protected override void AddDetailRow(clsDetailRowData detailRowData, int rowId)
         {
-            throw new NotImplementedException();
+            CStruct xIParent = Levels[0];
+            CStruct xI = xIParent.CreateSubStruct("I");
+
+            Levels[1] = xI;
+            xI.CreateStringAttr("id", rowId.ToString());
+            xI.CreateStringAttr("rowid", "r" + rowId.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "Leaf");
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateBooleanAttr("CanEdit", false);
+            xI.CreateStringAttr("Select", (detailRowData.bSelected ? "1" : "0"));
+            xI.CreateBooleanAttr("SelectCanEdit", true);
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            foreach (var column in _columns)
+            {
+                var attributeName = "zX" + CleanupString(column.m_realname);
+
+                string value;
+                if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
+                {
+                    // (CC-76681, 2018-07-13) Additional condition, specific to TopGrid
+                    if (value == GlobalConstants.Whitespace)
+                    {
+                        if (column.m_id >= (int)FieldIDs.PI_USE_EXTRA + 1 && column.m_id <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                        {
+                            if (detailRowData.m_PI_Format_Extra_data != null)
+                            {
+                                value = detailRowData.m_PI_Format_Extra_data[column.m_id - (int)FieldIDs.PI_USE_EXTRA];
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
+                    xI.CreateStringAttr(attributeName, value);
+                }
+            }
+
+            var periodTotal = detailRowData.zFTE.Length - 1;
+
+            var periodMin = CalculateInternalPeriodMin(detailRowData);
+            var periodMax = 0;
+            if (periodMin != 0)
+            {
+                periodMax = CalculateInternalPeriodMax(detailRowData);
+            }
+            else
+            {
+                periodMin = periodTotal + 1;
+            }
+            
+            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
+            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
+            xI.CreateIntAttr("xinterenalPeriodTotal", periodTotal);
+            
+            for (int i = 1; i <= periodTotal; i++)
+            {
+                UpdateDisplayRowsWithPeriodData(detailRowData, xI, i);
+            }
+        }
+
+        private void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)
+        {
+            var count = 0;
+            foreach (var displayRow in _displayList)
+            {
+                if (displayRow.bUse)
+                {
+                    ++count;
+                    var attributeName = "P" + i.ToString() + "C" + count;
+
+                    if (_useQuantity)
+                    {
+                        if (detailRowData.zValue[i] != double.MinValue)
+                        {
+                            xI.CreateDoubleAttr(attributeName, detailRowData.zValue[i]);
+                        }
+
+                        ++count;
+                    }
+
+                    if (_showFTEs)
+                    {
+                        if (detailRowData.zFTE[i] != double.MinValue)
+                        {
+                            xI.CreateDoubleAttr(attributeName, detailRowData.zFTE[i]);
+                        }
+
+                        ++count;
+                    }
+
+                    if (_useCost)
+                    {
+                        var cost = detailRowData.zCost[i];
+
+                        if (!_showCostDetailed == false)
+                        {
+                            cost = Math.Floor(cost);
+                        }
+
+                        if (detailRowData.zCost[i] != double.MinValue)
+                        {
+                            xI.CreateDoubleAttr(attributeName, cost);
+                        }
+                    }
+                }
+            }
         }
 
         protected override void InitializeGridData(GridRenderingTypes renderingType)

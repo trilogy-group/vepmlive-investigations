@@ -7,6 +7,10 @@ using PortfolioEngineCore;
 
 internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBase<TPeriodData, TDetailRowData>
 {
+    protected abstract int CalculateInternalPeriodMin(TDetailRowData resxData);
+
+    protected abstract int CalculateInternalPeriodMax(TDetailRowData resxData);
+
     protected CStruct CreateColumn(
         CStruct columns,
         string name,

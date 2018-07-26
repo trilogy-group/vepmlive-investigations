@@ -17,18 +17,6 @@ namespace RPADataCache
 {
     internal class RPATopGrid : RPADataCacheGridBase
     {
-        private readonly IList<clsRXDisp> _columns;
-        private readonly int _pmoAdmin;
-        private readonly string _xmlString;
-        private readonly int _displayMode;
-        private readonly IList<RPATGRow> _displayList;
-        private readonly clsResourceValues _resourceValues;
-        private readonly clsLookupList _categoryLookupList;
-
-        protected CStruct DefinitionRight;
-        protected CStruct DefinitionLeaf;
-        protected CStruct MiddleCols;
-
         public RPATopGrid(
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
@@ -37,15 +25,9 @@ namespace RPADataCache
             IList<RPATGRow> displayList, 
             clsResourceValues resourceValues,
             clsLookupList categoryLookupList)
+        : base (columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
         {
-            _columns = columns;
-            _pmoAdmin = pmoAdmin;
-            _xmlString = xmlString;
-            _displayMode = displayMode;
-            _displayList = displayList;
-            _resourceValues = resourceValues;
-            _categoryLookupList = categoryLookupList;
-        }        
+        }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
@@ -514,11 +496,11 @@ namespace RPADataCache
                 return;
             }
             
-            var periodMin = CalculateInternalPeriodMin(resxData);
+            var periodMin = CalculateInternalPeriodMin(detailRowDataTuple);
             var periodMax = 0;
             if (periodMin != 0)
             {
-                periodMax = CalculateInternalPeriodMax(resxData);
+                periodMax = CalculateInternalPeriodMax(detailRowDataTuple);
             }
 
             xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
@@ -584,58 +566,7 @@ namespace RPADataCache
                 }
             }
         }
-
-        private int CalculateInternalPeriodMax(clsResXData resxData)
-        {
-            for (int i = _resourceValues.Periods.Values.Count(); i > 1; i--)
-            {
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
-
-                        if (value != 0)
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        private int CalculateInternalPeriodMin(clsResXData resxData)
-        {
-            var i = 0;
-            var fp = 0;
-            foreach (var period in _resourceValues.Periods.Values)
-            {
-                ++i;
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
-
-                        if (value != 0)
-                        {
-                            fp = i;
-                            break;
-                        }
-                    }
-                }
-
-                if (fp != 0)
-                {
-                    break;
-                }
-            }
-
-            return fp;
-        }
-
+        
         private void ProcessDetailRowColumns(clsResXData resxData, clsPIData piData, CStruct xI)
         {
             clsEPKItem oItem;
@@ -976,67 +907,7 @@ namespace RPADataCache
         {
             return HandleError(sContext, nStatus, "Exception in RPAGrids.cs (" + sStage + "): '" + ex.Message.ToString() + "'");
         }
-
-        private double GetDetailRowValue(clsResXData detailRowData, int fieldId, int i)
-        {
-            double result = 0;
-
-            if (fieldId == 0)
-            {
-                switch (_displayMode)
-                {
-                    case 3:
-                        try
-                        {
-                            if (detailRowData.getftarr(i) == 0)
-                            {
-                                result = 0;
-                            }
-                            else
-                            {
-                                result = detailRowData.getvarr(i) * 100;
-                                result /= detailRowData.getftarr(i);
-                                result = (int)result;
-                            }
-                        }
-                        catch(Exception ex)
-                        {
-                            result = 0;
-
-                            LoggingService.WriteTrace(
-                                Area.EPMLiveWorkEnginePPM,
-                                Categories.EPMLiveWorkEnginePPM.Others,
-                                TraceSeverity.VerboseEx,
-                                ex.ToString());
-                        }
-                        break;
-                    case 0:
-                        result = detailRowData.getvarr(i);
-                        break;
-                    default:
-                        result = detailRowData.getftarr(i);
-                        break;
-                }
-            }
-
-            if (fieldId == 1)
-            {
-                if (detailRowData.bRealone)
-                {
-                    result = _displayMode == 0
-                        ? detailRowData.getvarr(i)
-                        : detailRowData.getftarr(i);
-                }
-            }
-
-            if (_displayMode == 1)
-            {
-                result /= 100;
-            }
-
-            return result;
-        }
-
+        
         private string GetStatusText(int stat)
         {
             switch (stat)
