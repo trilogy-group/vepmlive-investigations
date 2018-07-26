@@ -7,7 +7,7 @@ using PortfolioEngineCore;
 
 internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBase<TPeriodData, TDetailRowData>
 {
-    protected CStruct InitializeGridLayoutCategoryColumn(
+    protected CStruct CreateColumn(
         CStruct columns,
         string name,
         string type = null,

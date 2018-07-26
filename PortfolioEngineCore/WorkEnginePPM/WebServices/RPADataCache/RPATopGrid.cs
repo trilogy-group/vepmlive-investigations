@@ -311,7 +311,7 @@ namespace RPADataCache
 
         private IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
-            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowSel", "Icon",
+            var categoryColumn = CreateColumn(xLeftCols, "RowSel", "Icon",
                 width: 20,
                 canMove: false,
                 canExport: false,
@@ -320,12 +320,12 @@ namespace RPADataCache
             Header1.CreateStringAttr("RowSel", GlobalConstants.Whitespace);
             yield return categoryColumn;
             
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "rowid", "Text",
+            categoryColumn = CreateColumn(xLeftCols, "rowid", "Text",
                 visible: false,
                 canExport: false);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "Select", "Bool",
+            categoryColumn = CreateColumn(xLeftCols, "Select", "Bool",
                 width: 20,
                 canEdit: true,
                 canMove: false);
@@ -333,7 +333,7 @@ namespace RPADataCache
             Header1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "ChangedIcon", "Type",
+            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Type",
                 width: 20,
                 canEdit: false,
                 canMove: false,
@@ -341,13 +341,13 @@ namespace RPADataCache
             Header1.CreateStringAttr("ChangedIcon", GlobalConstants.Whitespace);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowDraggable", "Bool",
+            categoryColumn = CreateColumn(xLeftCols, "RowDraggable", "Bool",
                 visible: false,
                 canEdit: false,
                 canMove: false);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowChanged", "Int",
+            categoryColumn = CreateColumn(xLeftCols, "RowChanged", "Int",
                 visible: false,
                 canEdit: false,
                 canMove: false,
@@ -393,7 +393,7 @@ namespace RPADataCache
                             ++count;
                             var prefix = "P" + periodId + "C" + count;
 
-                            var xC = InitializeGridLayoutCategoryColumn(
+                            var xC = CreateColumn(
                                 PeriodCols,
                                 prefix,
                                 "Float",
