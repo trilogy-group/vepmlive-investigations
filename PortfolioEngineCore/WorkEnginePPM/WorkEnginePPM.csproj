@@ -77,10 +77,10 @@ iisreset</PostDeploymentCommand>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      </Reference>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      </Reference>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -835,6 +835,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>EditCosts.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebServices\GridRenderingTypes.cs" />
     <Compile Include="WebServices\Integration.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -854,17 +855,18 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\CustomFieldDbTable.cs" />
     <Compile Include="WebServices\ModelDataCache\CustomFieldsDefn.cs" />
     <Compile Include="WebServices\ModelDataCache\DataItem.cs" />
-    <Compile Include="WebServices\ModelDataCache\DetailRowData.cs" />
+    <Compile Include="WebServices\DetailRowData.cs" />
     <Compile Include="WebServices\ModelDataCache\FieldIDs.cs" />
     <Compile Include="WebServices\ModelDataCache\FilterGridCostsLayout.cs" />
     <Compile Include="WebServices\ModelDataCache\FilterGridCostsData.cs" />
-    <Compile Include="WebServices\ModelDataCache\GridBase.cs" />
+    <Compile Include="WebServices\GridBase.cs" />
     <Compile Include="WebServices\ModelDataCache\ItemDefn.cs" />
     <Compile Include="WebServices\ModelDataCache\ListItemData.cs" />
     <Compile Include="WebServices\ModelDataCache\ModelBarsChanged.cs" />
     <Compile Include="WebServices\ModelDataCache\ModelCache.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelDataCacheGridBase.cs" />
     <Compile Include="WebServices\ModelDataCache\ModelErrorHandling.cs" />
-    <Compile Include="WebServices\ModelDataCache\PeriodData.cs" />
+    <Compile Include="WebServices\PeriodData.cs" />
     <Compile Include="WebServices\ModelDataCache\PeriodsAndOptions.cs" />
     <Compile Include="WebServices\ModelDataCache\PIData.cs" />
     <Compile Include="WebServices\ModelDataCache\PortFieldData.cs" />
@@ -879,7 +881,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\TargetGridsData.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridData.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
-    <Compile Include="WebServices\ModelDataCache\TargetRowData.cs" />
+    <Compile Include="WebServices\TargetRowData.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
     <Compile Include="WebServices\OptGrids.cs" />
     <Compile Include="WebServices\Optimizer.asmx.cs">
@@ -897,6 +899,8 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="WebServices\Response.cs" />
     <Compile Include="WebServices\RPADataCache.cs" />
+    <Compile Include="WebServices\RPADataCache\RPADataCacheGridBase.cs" />
+    <Compile Include="WebServices\RPADataCache\RPATopGrid.cs" />
     <Compile Include="WebServices\RPAGrids.cs" />
     <Compile Include="WebServices\RPEditor.asmx.cs">
       <DependentUpon>RPEditor.asmx</DependentUpon>

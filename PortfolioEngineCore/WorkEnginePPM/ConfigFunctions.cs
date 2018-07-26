@@ -113,38 +113,14 @@ namespace WorkEnginePPM
                 username = "sharepoint\\system";
             else
                 username = web.CurrentUser.LoginName;
-            if (username.ToLower() == "sharepoint\\system")
-            {
-                username = web.Site.WebApplication.ApplicationPool.Username;
-            }
-            else
-            {
-                if (username.Contains("\\"))
-                    username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
-                else
-                    username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
-            }
 
-            return username;
+            return GetCleanUsername(web, username);
         }
 
         public static string GetCleanUsername(SPWeb web, string username)
         {
-            if (username.ToLower() == "sharepoint\\system")
-            {
-                username = web.Site.WebApplication.ApplicationPool.Username;
-            }
-            else
-            {
-                if (username.Contains("\\"))
-                    username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
-                else
-                    username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
-            }
-
-            return username;
+            return EPMLiveCore.CoreFunctions.GetCleanUserNameWithDomain(web, username);
         }
-
 
         private static string getDomain()
         {

@@ -2566,7 +2566,7 @@ namespace RPADataCache
             }
         }
 
-        private string GetPeriodName(string periodName, int disp_mode)
+        public static string GetPeriodName(string periodName, int disp_mode)
         {
             if (disp_mode == 2)
             {
@@ -2577,51 +2577,30 @@ namespace RPADataCache
 
         public string GetTopGrid(string sXML)
         {
+            var grid = new RPATopGrid(
+                m_detdispcln,
+                m_pmo_admin,
+                sXML,
+                m_DispMode,
+                TGStandard, 
+                m_cResVals,
+                m_maj_Cat_lookup);
 
-            RPATopGrid oGrid = new RPATopGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_detdispcln, m_pmo_admin, sXML);
-            int i = 0;
+            grid.AddPeriodsData(m_cResVals.Periods.Values);
 
-
-
-            List<RPATGRow> displist;
-
-            displist = TGStandard;
-
-
-            foreach (CPeriod period in m_cResVals.Periods.Values)
+            var i = 0;
+            grid.AddDetailRowsData(m_clnsort.Select(oDet =>
             {
-                i++;
-                oGrid.AddPeriodColumn(period.PeriodID.ToString(),GetPeriodName(period.PeriodName,m_DispMode), m_DispMode, displist, m_pmo_admin);
-            }
+                clsPIData piData;
+                oDet.rowid = i++;
 
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            clsPIData oPIData;
+                m_cln_pis.TryGetValue(oDet.ProjectID, out piData);
+                return Tuple.Create(oDet, piData);
+            }));
 
-            displist = TGStandard;
-
-            i = 0;
-
-            foreach (clsResXData oDet in m_clnsort)
-            {
-
-                oDet.rowid = i;
-
-
-                m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
-                oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
-            }
-
-            s = oGrid.GetString();
-
-            return s;
-
-
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
-
-
+        
         public int GetRawDataCount()
         {
 
