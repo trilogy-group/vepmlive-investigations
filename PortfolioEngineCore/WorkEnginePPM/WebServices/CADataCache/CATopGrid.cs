@@ -7,6 +7,7 @@ using CostDataValues;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure.Logging;
 using Microsoft.SharePoint.Administration;
+using PortfolioEngineCore;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
@@ -82,47 +83,7 @@ namespace CADataCache
             Header2.CreateStringAttr("RowSel", GlobalConstants.Whitespace);
             Header2.CreateStringAttr("Select", GlobalConstants.Whitespace);
 
-            var xC = xLeftCols.CreateSubStruct("C");
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "RowSel");
-            xC.CreateStringAttr("Type", "Icon");
-            xC.CreateBooleanAttr("CanEdit", false);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("CanExport", 0);
-            xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateStringAttr("Width", "20");
-            xC.CreateStringAttr("Color", "rgb(223, 227, 232)");
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "rowid");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("CanExport", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("Visible", 0);
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "Select");
-            xC.CreateStringAttr("Type", "Bool");
-            xC.CreateBooleanAttr("CanEdit", true);
-            xC.CreateIntAttr("CanMove", 0);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateStringAttr("Width", "20");
-            xC.CreateStringAttr("Class", string.Empty);
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);
+            InitializeGridLayoutCategoryColumns(xLeftCols);
 
             var xSolid = Constructor.CreateSubStruct("Solid");
             var xGroup = xSolid.CreateSubStruct("Group");
@@ -131,113 +92,7 @@ namespace CADataCache
             {
                 try
                 {
-                    var realName = "zX" + CleanupString(column.m_realname);
-                    var displayName = column.m_dispname.Replace("/n", "\n");
-
-                    xC = xCols.CreateSubStruct("C");
-
-                    xC.CreateStringAttr("Name", realName);
-                    xC.CreateStringAttr("Class", "GMCellMain");
-                    xC.CreateIntAttr("CanDrag", 0);
-                    xC.CreateIntAttr("ShowHint", 0);
-                    xC.CreateIntAttr("CaseSensitive", 0);
-                    xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-
-                    DefinitionRight.CreateIntAttr(realName + "CanDrag", 0);
-                    DefinitionRight.CreateStringAttr(realName + "HtmlPrefix", "<B>");
-                    DefinitionRight.CreateStringAttr(realName + "HtmlPostfix", "</B>");
-
-                    DefinitionLeaf.CreateIntAttr(realName + "CanDrag", 0);
-                    DefinitionLeaf.CreateStringAttr(realName + "HtmlPrefix", string.Empty);
-                    DefinitionLeaf.CreateStringAttr(realName + "HtmlPostfix", string.Empty);
-
-                    switch (column.m_type)
-                    {
-                        case 2:
-                            break;
-                        case 3:
-                            xC.CreateStringAttr("Type", "Float");
-                            xC.CreateStringAttr("Format", ",0.##");
-                            break;
-                        default:
-                            xC.CreateStringAttr("Type", "Text");
-                            break;
-                    }
-
-                    xC.CreateIntAttr("CanEdit", 0);
-                    xC.CreateIntAttr("CanMove", 1);
-
-                    if (column.m_unselectable == true)
-                    {
-                        xC.CreateIntAttr("CanHide", 0);
-                    }
-
-                    if (column.m_def_fld == false)
-                    {
-                        xC.CreateIntAttr("Visible", 0);
-                    }
-
-                    if (column.m_col_hidden == true)
-                    {
-                        xC.CreateIntAttr("Width", 0);
-                    }
-
-                    Header1.CreateStringAttr(realName, displayName);
-                    Header2.CreateStringAttr(realName, GlobalConstants.Whitespace);
-
-                    const string sMaxFunc = "(Row.id == 'Filter' ? '' : max())";
-                    const string sMinFunc = "(Row.id == 'Filter' ? '' : min())";
-
-                    xC = MiddleCols.CreateSubStruct("C");
-                    xC.CreateStringAttr("Name", "xinterenalPeriodMin");
-                    xC.CreateIntAttr("ShowHint", 0);
-                    xC.CreateStringAttr("Type", "Int");
-                    xC.CreateIntAttr("CanSort", 0);
-                    xC.CreateIntAttr("CanMove", 0);
-                    xC.CreateStringAttr("Align", "Right");
-                    xC.CreateIntAttr("Visible", 0);
-                    xC.CreateIntAttr("CanSelect", 0);
-                    xC.CreateIntAttr("CanHide", 0);
-                    xC.CreateIntAttr("CanDrag", 0);
-
-                    DefinitionRight.CreateStringAttr("xinterenalPeriodMin" + "Formula", sMinFunc);
-                    DefinitionRight.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
-
-                    DefinitionLeaf.CreateStringAttr("xinterenalPeriodMin" + "Formula", string.Empty);
-                    DefinitionLeaf.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
-
-                    xC = MiddleCols.CreateSubStruct("C");
-                    xC.CreateStringAttr("Name", "xinterenalPeriodMax");
-                    xC.CreateIntAttr("ShowHint", 0);
-                    xC.CreateStringAttr("Type", "Int");
-                    xC.CreateIntAttr("CanSort", 0);
-                    xC.CreateIntAttr("CanMove", 0);
-                    xC.CreateStringAttr("Align", "Right");
-                    xC.CreateIntAttr("Visible", 0);
-                    xC.CreateIntAttr("CanSelect", 0);
-                    xC.CreateIntAttr("CanHide", 0);
-                    xC.CreateIntAttr("CanDrag", 0);
-
-                    DefinitionRight.CreateStringAttr("xinterenalPeriodMax" + "Formula", sMaxFunc);
-                    DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
-
-                    DefinitionLeaf.CreateStringAttr("xinterenalPeriodMax" + "Formula", string.Empty);
-                    DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
-
-                    xC = MiddleCols.CreateSubStruct("C");
-                    xC.CreateStringAttr("Name", "xinterenalPeriodTotal");
-                    xC.CreateIntAttr("ShowHint", 0);
-                    xC.CreateStringAttr("Type", "Int");
-                    xC.CreateIntAttr("CanSort", 0);
-                    xC.CreateIntAttr("CanMove", 0);
-                    xC.CreateStringAttr("Align", "Right");
-                    xC.CreateIntAttr("Visible", 0);
-                    xC.CreateIntAttr("CanSelect", 0);
-                    xC.CreateIntAttr("CanHide", 0);
-                    xC.CreateIntAttr("CanDrag", 0);
-
-                    DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
-                    DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+                    InitializeDisplayColumn(column);
                 }
                 catch (Exception ex)
                 {
@@ -303,6 +158,113 @@ namespace CADataCache
             xCfg.CreateIntAttr("GroupRestoreSort", 1);
             xCfg.CreateIntAttr("NoTreeLines", 1);
             xCfg.CreateIntAttr("ShowVScroll", 1);
+        }
+
+        private void InitializeGridLayoutCategoryColumns(CStruct columnsContainer)
+        {
+            CStruct column;
+
+            column = InitializeGridLayoutCategoryColumn(columnsContainer, "RowSel", "Icon",
+                width: 20,
+                canEdit: false,
+                canMove: false,
+                canExport: false);
+            column.CreateStringAttr("Color", "rgb(223, 227, 232)");
+
+            column = InitializeGridLayoutCategoryColumn(columnsContainer, "rowid", "Text",
+                visible: false,
+                canExport: false);
+            column.CreateStringAttr("Color", "rgb(223, 227, 232)");
+
+            column = InitializeGridLayoutCategoryColumn(columnsContainer, "Select", "Bool",
+                width: 20,
+                canEdit: true,
+                canMove: false,
+                canExport: false);
+            column.CreateStringAttr("Class", string.Empty);
+        }
+
+        private void InitializeDisplayColumn(clsColDisp column)
+        {
+            CStruct categoryColumn;
+
+            var realName = "zX" + CleanupString(column.m_realname);
+            var displayName = column.m_dispname.Replace("/n", "\n");
+
+            Header1.CreateStringAttr(realName, displayName);
+            Header2.CreateStringAttr(realName, GlobalConstants.Whitespace);
+
+            categoryColumn = InitializeGridLayoutCategoryColumn(MiddleCols, realName,
+                visible: column.m_def_fld,
+                width: column.m_col_hidden ? 0 : (int?)null,
+                canEdit: false,
+                canMove: true,
+                canResize: null,
+                canFilter: null,
+                canHide: column.m_unselectable,
+                canSelect: null);
+            categoryColumn.CreateStringAttr("Class", "GMCellMain");
+            categoryColumn.CreateIntAttr("CanDrag", 0);
+            categoryColumn.CreateIntAttr("CaseSensitive", 0);
+            categoryColumn.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            switch (column.m_type)
+            {
+                case 2:
+                    break;
+                case 3:
+                    categoryColumn.CreateStringAttr("Type", "Float");
+                    categoryColumn.CreateStringAttr("Format", ",0.##");
+                    break;
+                default:
+                    categoryColumn.CreateStringAttr("Type", "Text");
+                    break;
+            }
+
+            DefinitionRight.CreateIntAttr(realName + "CanDrag", 0);
+            DefinitionRight.CreateStringAttr(realName + "HtmlPrefix", "<B>");
+            DefinitionRight.CreateStringAttr(realName + "HtmlPostfix", "</B>");
+            DefinitionLeaf.CreateIntAttr(realName + "CanDrag", 0);
+            DefinitionLeaf.CreateStringAttr(realName + "HtmlPrefix", string.Empty);
+            DefinitionLeaf.CreateStringAttr(realName + "HtmlPostfix", string.Empty);
+
+            const string sMaxFunc = "(Row.id == 'Filter' ? '' : max())";
+            const string sMinFunc = "(Row.id == 'Filter' ? '' : min())";
+
+            categoryColumn = InitializeGridLayoutCategoryColumn(MiddleCols, "xinterenalPeriodMin", "Int",
+                visible: false,
+                canMove: false,
+                canResize: null,
+                canFilter: null
+            );
+            categoryColumn.CreateIntAttr("CanDrag", 0);
+            DefinitionRight.CreateStringAttr("xinterenalPeriodMin" + "Formula", sMinFunc);
+            DefinitionRight.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
+            DefinitionLeaf.CreateStringAttr("xinterenalPeriodMin" + "Formula", string.Empty);
+            DefinitionLeaf.CreateIntAttr("xinterenalPeriodMin" + "CanDrag", 0);
+
+            categoryColumn = InitializeGridLayoutCategoryColumn(MiddleCols, "xinterenalPeriodMax", "Int",
+                visible: false,
+                canMove: false,
+                canResize: null,
+                canFilter: null
+            );
+            categoryColumn.CreateStringAttr("Align", "Right");
+            categoryColumn.CreateIntAttr("CanDrag", 0);
+            DefinitionRight.CreateStringAttr("xinterenalPeriodMax" + "Formula", sMaxFunc);
+            DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+            DefinitionLeaf.CreateStringAttr("xinterenalPeriodMax" + "Formula", string.Empty);
+            DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+
+            categoryColumn = InitializeGridLayoutCategoryColumn(MiddleCols, "xinterenalPeriodTotal", "Int",
+                visible: false,
+                canMove: false,
+                canResize: null,
+                canFilter: null
+            );
+            categoryColumn.CreateStringAttr("Align", "Right");
+            categoryColumn.CreateIntAttr("CanDrag", 0);
+            DefinitionLeaf.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
+            DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
         }
 
         protected override string ResolvePeriodId(clsPeriodData periodData, int index)

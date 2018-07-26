@@ -10,27 +10,27 @@ internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBa
     protected CStruct InitializeGridLayoutCategoryColumn(
         CStruct columns,
         string name,
-        string type,
+        string type = null,
         bool? visible = null,
         int? width = null,
         bool? canEdit = null,
         bool? canMove = null,
         bool? canExport = null,
-        bool canResize = false,
-        bool canFilter = false,
-        bool showHint = false,
-        bool canSort = false,
-        bool canHide = false,
-        bool canSelect = false)
+        bool? canResize = false,
+        bool? canFilter = false,
+        bool? showHint = false,
+        bool? canSort = false,
+        bool? canHide = false,
+        bool? canSelect = false)
     {
         var categoryColumn = columns.CreateSubStruct("C");
         categoryColumn.CreateStringAttr("Name", name);
-        categoryColumn.CreateStringAttr("Type", type);
 
-        if (visible != null)
+        if (type != null)
         {
-            categoryColumn.CreateIntAttr("Visible", visible.Value ? 1 : 0);
+            categoryColumn.CreateStringAttr("Type", type);
         }
+
         if (width != null)
         {
             categoryColumn.CreateStringAttr("Width", width.ToString());
@@ -39,21 +39,26 @@ internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBa
         {
             categoryColumn.CreateBooleanAttr("CanEdit", canEdit.Value);
         }
-        if (canMove != null)
-        {
-            categoryColumn.CreateIntAttr("CanMove", canMove.Value ? 1 : 0);
-        }
-        if (canExport != null)
-        {
-            categoryColumn.CreateIntAttr("CanExport", canExport.Value ? 1 : 0);
-        }
-        categoryColumn.CreateIntAttr("CanResize", canResize ? 1 : 0);
-        categoryColumn.CreateIntAttr("CanFilter", canFilter ? 1 : 0);
-        categoryColumn.CreateIntAttr("ShowHint", showHint ? 1 : 0);
-        categoryColumn.CreateIntAttr("CanSort", canSort ? 1 : 0);
-        categoryColumn.CreateIntAttr("CanHide", canHide ? 1 : 0);
-        categoryColumn.CreateIntAttr("CanSelect", canSelect ? 1 : 0);
+
+        CreateIntAttributeFromBoolNullable(categoryColumn, "Visible", visible);
+
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanMove", canMove);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanExport", canExport);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanFilter", canFilter);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanResize", canResize);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "ShowHint", showHint);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanSort", canSort);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanHide", canHide);
+        CreateIntAttributeFromBoolNullable(categoryColumn, "CanSelect", canSelect);
 
         return categoryColumn;
+    }
+
+    private void CreateIntAttributeFromBoolNullable(CStruct column, string attributeName, bool? value)
+    {
+        if (value != null)
+        {
+            column.CreateIntAttr(attributeName, value.Value ? 1 : 0);
+        }
     }
 }
