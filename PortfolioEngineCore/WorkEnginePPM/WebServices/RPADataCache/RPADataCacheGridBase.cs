@@ -8,7 +8,7 @@ using ResourceValues;
 
 namespace RPADataCache
 {
-    internal abstract class RPADataCacheGridBase : GridBase<CPeriod, Tuple<clsResXData, clsPIData>>
+    internal abstract class RPADataCacheGridBase : ADataCacheGridBase<CPeriod, Tuple<clsResXData, clsPIData>>
     {
         public RPADataCacheGridBase()
         {

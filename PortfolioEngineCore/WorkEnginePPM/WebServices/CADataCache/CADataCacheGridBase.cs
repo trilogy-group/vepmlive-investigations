@@ -8,7 +8,7 @@ using PortfolioEngineCore;
 
 namespace CADataCache
 {
-    internal abstract class CADataGridCacheBase : GridBase<clsPeriodData, clsDetailRowData>
+    internal abstract class CADataCacheGridBase : ADataCacheGridBase<clsPeriodData, clsDetailRowData>
     {
         protected readonly bool _showFTEs;
         protected readonly bool _useQuantity;
@@ -24,7 +24,7 @@ namespace CADataCache
         protected CStruct DefinitionRight;
         protected CStruct DefinitionLeaf;
 
-        public CADataGridCacheBase(
+        public CADataCacheGridBase(
             bool showFTEs, 
             bool useQuantity,
             bool useCost, 

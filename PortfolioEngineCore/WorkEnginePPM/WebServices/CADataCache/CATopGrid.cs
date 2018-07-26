@@ -11,7 +11,7 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal class CATopGridTemp : CADataGridCacheBase
+    internal class CATopGridTemp : CADataCacheGridBase
     {
         public CATopGridTemp(
             bool showFTEs, 
@@ -27,57 +27,7 @@ namespace CADataCache
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            var xToolbar = Constructor.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            var xPanel = Constructor.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Select", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            xPanel.CreateIntAttr("CanHide", 0);
-            xPanel.CreateIntAttr("CanSelect", 0);
-
-            var xCfg = Constructor.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("MainCol", "zXPortfolioItem");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("SuppressMessage", 3);
-            xCfg.CreateIntAttr("Dragging", _pmoAdmin);
-            xCfg.CreateIntAttr("Sorting", 1);
-            xCfg.CreateIntAttr("ColsMoving", 1);
-            xCfg.CreateIntAttr("ColsPosLap", 1);
-            xCfg.CreateIntAttr("ColsLap", 1);
-            xCfg.CreateIntAttr("VisibleLap", 1);
-            xCfg.CreateIntAttr("SectionWidthLap", 1);
-            xCfg.CreateIntAttr("GroupLap", 1);
-            xCfg.CreateIntAttr("WideHScroll", 0);
-            xCfg.CreateIntAttr("LeftWidth", 150);
-            xCfg.CreateIntAttr("Width", 400);
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 50);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 0);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("MaxSort", 2);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
-            xCfg.CreateIntAttr("FastColumns", 1);
-            xCfg.CreateIntAttr("ExpandAllLevels", 3);
-            xCfg.CreateIntAttr("GroupSortMain", 1);
-            xCfg.CreateIntAttr("GroupRestoreSort", 1);
-            xCfg.CreateIntAttr("NoTreeLines", 1);
-            xCfg.CreateIntAttr("ShowVScroll", 1);
+            InitializeGridLayoutConfig();
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");
@@ -298,6 +248,61 @@ namespace CADataCache
                        ex.ToString());
                 }
             }
+        }
+
+        private void InitializeGridLayoutConfig()
+        {
+            var xToolbar = Constructor.CreateSubStruct("Toolbar");
+            xToolbar.CreateIntAttr("Visible", 0);
+
+            var xPanel = Constructor.CreateSubStruct("Panel");
+            xPanel.CreateIntAttr("Visible", 0);
+            xPanel.CreateIntAttr("Select", 0);
+            xPanel.CreateIntAttr("Delete", 0);
+            xPanel.CreateIntAttr("CanHide", 0);
+            xPanel.CreateIntAttr("CanSelect", 0);
+
+            var xCfg = Constructor.CreateSubStruct("Cfg");
+            xCfg.CreateStringAttr("MainCol", "zXPortfolioItem");
+            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            xCfg.CreateIntAttr("SuppressCfg", 3);
+            xCfg.CreateIntAttr("SuppressMessage", 3);
+            xCfg.CreateIntAttr("Dragging", _pmoAdmin);
+            xCfg.CreateIntAttr("Sorting", 1);
+            xCfg.CreateIntAttr("ColsMoving", 1);
+            xCfg.CreateIntAttr("ColsPosLap", 1);
+            xCfg.CreateIntAttr("ColsLap", 1);
+            xCfg.CreateIntAttr("VisibleLap", 1);
+            xCfg.CreateIntAttr("SectionWidthLap", 1);
+            xCfg.CreateIntAttr("GroupLap", 1);
+            xCfg.CreateIntAttr("WideHScroll", 0);
+            xCfg.CreateIntAttr("LeftWidth", 150);
+            xCfg.CreateIntAttr("Width", 400);
+            xCfg.CreateIntAttr("RightWidth", 800);
+            xCfg.CreateIntAttr("MinMidWidth", 50);
+            xCfg.CreateIntAttr("MinRightWidth", 400);
+            xCfg.CreateIntAttr("LeftCanResize", 0);
+            xCfg.CreateIntAttr("RightCanResize", 1);
+            xCfg.CreateIntAttr("FocusWholeRow", 1);
+            xCfg.CreateIntAttr("MaxHeight", 0);
+            xCfg.CreateIntAttr("ShowDeleted", 0);
+            xCfg.CreateBooleanAttr("DateStrings", true);
+            xCfg.CreateIntAttr("MaxWidth", 1);
+            xCfg.CreateIntAttr("MaxSort", 2);
+            xCfg.CreateIntAttr("AppendId", 0);
+            xCfg.CreateIntAttr("FullId", 0);
+            xCfg.CreateStringAttr("IdChars", "0123456789");
+            xCfg.CreateIntAttr("NumberId", 1);
+            xCfg.CreateIntAttr("LastId", 1);
+            xCfg.CreateIntAttr("CaseSensitiveId", 0);
+            xCfg.CreateStringAttr("Style", "GM");
+            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
+            xCfg.CreateIntAttr("FastColumns", 1);
+            xCfg.CreateIntAttr("ExpandAllLevels", 3);
+            xCfg.CreateIntAttr("GroupSortMain", 1);
+            xCfg.CreateIntAttr("GroupRestoreSort", 1);
+            xCfg.CreateIntAttr("NoTreeLines", 1);
+            xCfg.CreateIntAttr("ShowVScroll", 1);
         }
 
         protected override string ResolvePeriodId(clsPeriodData periodData, int index)
