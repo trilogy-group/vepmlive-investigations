@@ -25,6 +25,6 @@
     <Add FullName="EPMLiveCore.SPUtilities.SPListUtility!"/>
     <Add FullName="EPMLiveCore.SPUtilities.SPProjectUtility!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourcePlan!"/>
-    <Add FullName="EPMLiveCore.API.Integration.IntegrationCore!"/>
+    <Add FullName="EPMLiveCore.API.APIEmail!"/>
   </ShimGeneration>
 </Fakes>
