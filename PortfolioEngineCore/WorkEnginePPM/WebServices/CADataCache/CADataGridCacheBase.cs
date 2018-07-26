@@ -4,32 +4,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CostDataValues;
+using PortfolioEngineCore;
 
 namespace CADataCache
 {
     internal abstract class CADataGridCacheBase : GridBase<clsPeriodData, clsDetailRowData>
     {
-        public readonly bool ShowFTEs;
-        public readonly bool UseQuantity;
-        public readonly bool UseCost;
-        public readonly bool ShowCostDetailed;
-        private readonly IList<CATGRow> _displayList;
-        private readonly IList<clsColDisp> _columns;
+        protected readonly bool _showFTEs;
+        protected readonly bool _useQuantity;
+        protected readonly bool _useCost;
+        protected readonly bool _showCostDetailed;
+        protected readonly int _pmoAdmin;
+        protected readonly IList<CATGRow> _displayList;
+        protected readonly IList<clsColDisp> _columns;
+
+        protected CStruct MiddleCols;
+
+        protected CStruct Definitions;
+        protected CStruct DefinitionRight;
+        protected CStruct DefinitionLeaf;
 
         public CADataGridCacheBase(
             bool showFTEs, 
             bool useQuantity,
             bool useCost, 
             bool showCostDetailed, 
+            int pmoAdmin,
             IList<CATGRow> displayList,
             IList<clsColDisp> columns)
         {
-            ShowFTEs = showFTEs;
-            UseQuantity = useQuantity;
-            UseCost = useCost;
-            ShowCostDetailed = showCostDetailed;
+            _showFTEs = showFTEs;
+            _useQuantity = useQuantity;
+            _useCost = useCost;
+            _showCostDetailed = showCostDetailed;
             _displayList = displayList;
             _columns = columns;
+            _pmoAdmin = pmoAdmin;
         }
 
         protected string CleanupString(string input)
