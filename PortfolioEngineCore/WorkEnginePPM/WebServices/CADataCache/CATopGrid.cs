@@ -269,12 +269,198 @@ namespace CADataCache
 
         protected override string ResolvePeriodId(clsPeriodData periodData, int index)
         {
-            throw new NotImplementedException();
+            return periodData.PeriodID.ToString();
         }
 
         protected override void AddPeriodColumns(IEnumerable<clsPeriodData> periods)
         {
-            throw new NotImplementedException();
+            foreach(var period in periods)
+            {
+                CStruct xC = null;
+            int cnt = 0;
+
+            foreach (CATGRow ot in disp)
+            {
+                if (ot.bUse)
+                    ++cnt;
+            }
+
+            if (cnt == 0)
+                return;
+
+            int spn = 0;
+
+            if (bUseQTY)
+                ++spn;
+
+            if (bUseFTE)
+                ++spn;
+
+            if (bUseCost)
+                ++spn;
+
+            spn *= cnt;
+
+            cnt = 0;
+
+            string cpref = "";
+
+            foreach (CATGRow ot in disp)
+            {
+                try
+                {
+                    if (ot.bUse)
+                    {
+                        ++cnt;
+
+
+                        cpref = "C";
+
+                        if (cnt == 1)
+                        {
+                            if (spn > 1)
+                                m_xHeader1.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "Span", spn);
+
+                            m_xHeader1.CreateStringAttr("P" + sId + cpref + cnt.ToString(), sName);
+                        }
+                        else
+                            m_xHeader1.CreateStringAttr("P" + sId + cpref + cnt.ToString(), " ");
+
+
+
+
+                        if (bUseQTY)
+                        {
+                            xC = m_xPeriodCols.CreateSubStruct("C");
+                            xC.CreateStringAttr("Name", "P" + sId + cpref + cnt.ToString());
+                            //                  xC.CreateStringAttr("Type", "Text");
+                            xC.CreateStringAttr("Type", "Float");
+                            m_xHeader2.CreateStringAttr("P" + sId + cpref + cnt.ToString(), "Qty");
+                            xC.CreateStringAttr("Format", ",0.##");
+
+                            xC.CreateIntAttr("ShowHint", 0);
+
+                            xC.CreateIntAttr("CanSort", 0);
+                            xC.CreateIntAttr("CanMove", 0);
+                            xC.CreateIntAttr("CanDrag", gpPMOAdmin);
+                            xC.CreateIntAttr("CanHide", 0);
+                            xC.CreateIntAttr("CanSelect", 0);
+
+
+                            if (gpPMOAdmin != 0)
+                                xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
+
+                            xC.CreateStringAttr("Align", "Right");
+
+                            string sFunc = "(Row.id == 'Filter' ? '' : sum())";
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", sFunc);
+                            //"sum()");
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Format", ",0.##");
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", "");
+
+                            m_xDefNode.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+                            m_xDefTree.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+
+                            xC.CreateIntAttr("MinWidth", 45);
+                            xC.CreateIntAttr("Width", 65);
+                            ++cnt;
+                        }
+                        if (bUseFTE)
+                        {
+                            xC = m_xPeriodCols.CreateSubStruct("C");
+                            xC.CreateStringAttr("Name", "P" + sId + cpref + cnt.ToString());
+                            //                  xC.CreateStringAttr("Type", "Text");
+                            xC.CreateStringAttr("Type", "Float");
+                            m_xHeader2.CreateStringAttr("P" + sId + cpref + cnt.ToString(), "FTE");
+
+                            xC.CreateStringAttr("Format", ",0.###");
+
+                            xC.CreateIntAttr("ShowHint", 0);
+
+                            xC.CreateIntAttr("CanSort", 0);
+                            xC.CreateIntAttr("CanMove", 0);
+                            xC.CreateIntAttr("CanDrag", gpPMOAdmin);
+                            xC.CreateIntAttr("CanHide", 0);
+                            xC.CreateIntAttr("CanSelect", 0);
+
+
+                            if (gpPMOAdmin != 0)
+                                xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
+
+                            xC.CreateStringAttr("Align", "Right");
+
+                            string sFunc = "(Row.id == 'Filter' ? '' : sum())";
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", sFunc);
+                            //"sum()");
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Format", ",0.##");
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", "");
+
+                            m_xDefNode.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+                            m_xDefTree.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+
+                            xC.CreateIntAttr("MinWidth", 45);
+                            xC.CreateIntAttr("Width", 65);
+                            ++cnt;
+                        }
+
+                        if (bUseCost)
+                        {
+                            xC = m_xPeriodCols.CreateSubStruct("C");
+                            xC.CreateStringAttr("Name", "P" + sId + cpref + cnt.ToString());
+                            //                  xC.CreateStringAttr("Type", "Text");
+                            xC.CreateStringAttr("Type", "Float");
+                            m_xHeader2.CreateStringAttr("P" + sId + cpref + cnt.ToString(), "Cost");
+
+
+                            xC.CreateIntAttr("ShowHint", 0);
+
+                            xC.CreateIntAttr("CanSort", 0);
+                            xC.CreateIntAttr("CanMove", 0);
+                            xC.CreateIntAttr("CanDrag", gpPMOAdmin);
+                            xC.CreateIntAttr("CanHide", 0);
+                            xC.CreateIntAttr("CanSelect", 0);
+
+
+                            if (gpPMOAdmin != 0)
+                                xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
+
+                            xC.CreateStringAttr("Align", "Right");
+
+                            string sFunc = "(Row.id == 'Filter' ? '' : sum())";
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", sFunc);
+                            //"sum()");
+
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Format", ",0.###");
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", "");
+
+                            m_xDefNode.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+                            m_xDefTree.CreateIntAttr("P" + sId + cpref + cnt.ToString() + "CanDrag", gpPMOAdmin);
+
+                            m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+                            m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+
+                            xC.CreateIntAttr("MinWidth", 45);
+                            xC.CreateIntAttr("Width", 65);
+                        }
+                    }
+
+                    //   m_xHeader2.CreateStringAttr("P" + sId + "C" + cnt.ToString(), ot.Name);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            }
         }
 
         protected override bool CheckIfDetailRowShouldBeAdded(clsDetailRowData detailRow)
