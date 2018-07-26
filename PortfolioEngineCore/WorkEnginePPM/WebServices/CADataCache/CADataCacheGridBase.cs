@@ -255,6 +255,23 @@ namespace CADataCache
             DefinitionRight.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
         }
 
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
+        {
+            if (renderingType == GridRenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
+            var xBody = Constructor.CreateSubStruct("Body");
+            var xB = xBody.CreateSubStruct("B");
+            var xI = xBody.CreateSubStruct("I");
+            xI.CreateStringAttr("Grouping", "Totals");
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            Level = 0;
+            Levels[Level] = xI;
+        }
+
         protected string CleanUpString(string input)
         {
             return RemoveCharacters(input, "!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\");
