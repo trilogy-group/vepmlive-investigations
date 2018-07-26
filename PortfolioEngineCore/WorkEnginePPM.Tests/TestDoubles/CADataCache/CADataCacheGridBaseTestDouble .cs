@@ -27,7 +27,7 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
             int pmoAdmin,
             IList<CATGRow> displayList,
             IList<clsColDisp> columns) 
-        : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns)
+        : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns, true)
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
@@ -73,6 +73,11 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
         }
 
         protected override void AddPeriodColumns(IEnumerable<clsPeriodData> periods)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void InitializeGridLayoutCategoryColumns(CStruct columnsContainer)
         {
             throw new NotImplementedException();
         }
