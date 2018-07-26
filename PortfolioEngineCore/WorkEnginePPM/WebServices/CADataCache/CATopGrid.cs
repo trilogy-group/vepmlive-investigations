@@ -14,7 +14,10 @@ namespace CADataCache
 {
     internal class CATopGridTemp : CADataCacheGridBase
     {
+        private readonly bool _hideRowsWithAllZeros;
+
         public CATopGridTemp(
+            bool hideRowsWithAllZeros,
             bool showFTEs, 
             bool useQuantity,
             bool useCost, 
@@ -24,6 +27,7 @@ namespace CADataCache
             IList<clsColDisp> columns) 
         : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns)
         {
+            _hideRowsWithAllZeros = hideRowsWithAllZeros;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -390,8 +394,49 @@ namespace CADataCache
 
         protected override bool CheckIfDetailRowShouldBeAdded(clsDetailRowData detailRow)
         {
-            throw new NotImplementedException();
+            if (!_hideRowsWithAllZeros)
+            {
+                return true;
+            }
+
+            var quantityValue = 0d;
+            var costValue = 0d;
+            var fteValue = 0d;
+
+            var totalPeriods = detailRow.zFTE.Length - 1;
+            for (var i = 1; i <= totalPeriods; i++)
+            {
+                costValue = 0;
+                quantityValue = 0;
+                fteValue = 0;
+
+                // (CC-76588, 2018-07-26) Could be simplified to 2-3 lines if we knew that values can not be negative.
+                // Without knowing the idea behind the code, it's better to avoid refactoring logic
+
+                if (_useQuantity && detailRow.zValue[i] != double.MinValue)
+                {
+                    quantityValue = detailRow.zValue[i];
+                }
+
+                if (_showFTEs && detailRow.zFTE[i] != double.MinValue)
+                {
+                    fteValue = detailRow.zFTE[i];
+                }
+
+                if (_useCost)
+                {
+                    costValue = _showCostDetailed ? detailRow.zCost[i] : Math.Round(detailRow.zCost[i]);
+                }
+
+                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
+                {
+                    break;
+                }
+            }
+
+            return costValue + quantityValue + fteValue > 0;
         }
+
         protected override void AddDetailRow(clsDetailRowData detailRowData, int rowId)
         {
             throw new NotImplementedException();
@@ -399,7 +444,14 @@ namespace CADataCache
 
         protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
-            throw new NotImplementedException();
+            var xBody = Constructor.CreateSubStruct("Body");
+            var xB = xBody.CreateSubStruct("B");
+            var xI = xBody.CreateSubStruct("I");
+            xI.CreateStringAttr("Grouping", "Totals");
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            Level = 0;
+            Levels[Level] = xI;
         }
     }
 }
