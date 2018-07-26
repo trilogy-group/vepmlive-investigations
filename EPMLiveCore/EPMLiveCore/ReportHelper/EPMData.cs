@@ -479,7 +479,7 @@ namespace EPMLiveCore.ReportHelper
                 {
                     try
                     {
-                        if (!string.IsNullOrEmpty(_databaseName))
+                        if (!string.IsNullOrWhiteSpace(_databaseName))
                         {
                             if (!_useSAccount)
                             {
@@ -502,7 +502,7 @@ namespace EPMLiveCore.ReportHelper
                     }
                     catch (Exception ex)
                     {
-                        if (!string.IsNullOrEmpty(_databaseName))
+                        if (!string.IsNullOrWhiteSpace(_databaseName))
                         {
                             SPSecurity.RunWithElevatedPrivileges(delegate ()
                             {
@@ -2059,11 +2059,9 @@ namespace EPMLiveCore.ReportHelper
                              dt.Rows[0]["DatabaseName"].ToString() + ";Integrated Security=SSPI;";
                 }
 
-                using (var con = new SqlConnection(conStr))
-                {
-                    con.Open();
-                    return con;
-                }
+                var con = new SqlConnection(conStr);
+                con.Open();
+                return con;
             }
             catch (Exception ex)
             {
@@ -2188,8 +2186,7 @@ namespace EPMLiveCore.ReportHelper
             }
 
             var exists = false;
-            var command = "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
-                              tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END";
+            var command = $"IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '{tableName}')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END";
 
             using (var sqlCommand = new SqlCommand(command, sqlConnection))
             {
