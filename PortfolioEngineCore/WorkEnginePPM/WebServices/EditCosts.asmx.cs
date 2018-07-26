@@ -21,6 +21,7 @@ namespace WorkEnginePPM
     [System.Web.Script.Services.ScriptService]
     public class EditCosts : System.Web.Services.WebService
     {
+        private const string DiscountXmlAttribute = "Discount";
 
         public class PI
         {
@@ -950,6 +951,7 @@ Status_Error:
             {
                 DataTable dt;
                 if (dbaEditCosts.SelectCostCategoryData(dba, nCalendarID, nCostTypeID, nProjectID, out dt) != StatusEnum.rsSuccess) goto Status_Error;
+                var projectDiscountRate = dbaEditCosts.GetDiscountRate(dba, nProjectID);
 
                 int prev_bcuid = 0;
                 foreach (DataRow row in dt.Rows)
@@ -965,6 +967,7 @@ Status_Error:
                         costCategory2.Name = DBAccess.ReadStringValue(row["BC_NAME"]);
                         costCategory2.Level = DBAccess.ReadIntValue(row["BC_LEVEL"]) + 1;
                         costCategory2.UoM = DBAccess.ReadStringValue(row["BC_UOM"]);
+                        costCategory2.Discount = projectDiscountRate;
                         costCategory2.HasData = true;
                         costCategories.Add(costCategory2);
                     }
@@ -975,6 +978,7 @@ Status_Error:
                     costCategory.Name = DBAccess.ReadStringValue(row["BC_NAME"]);
                     costCategory.Level = DBAccess.ReadIntValue(row["BC_LEVEL"]) + 1;
                     costCategory.UoM = DBAccess.ReadStringValue(row["BC_UOM"]);
+                    costCategory.Discount = projectDiscountRate;
                     //costCategory.HasData = (DBAccess.ReadIntValue(row["Used"]) > 0) ? true : false;
                     costCategory.HasData = (DBAccess.ReadIntValue(row["Used"]) > 0);
                     costCategory.Seq = seq;
@@ -1745,10 +1749,13 @@ Status_Error:
                             dt.Columns.Add("BD_PERIOD");
                             dt.Columns.Add("BD_VALUE");
                             dt.Columns.Add("BD_COST");
+                            dt.Columns.Add(dbaCostValues.DetailValuesDiscountRateColumn);
+                            dt.Columns.Add(dbaCostValues.DetailValuesDiscountValueColumn);
                             foreach (CStruct xI in listI)
                             {
                                 int id; int seq;
                                 string sId = xI.GetStringAttr("id", "");
+                                var discountRate = xI.GetDecimalAttr(DiscountXmlAttribute, 0);
 
                                 //if (xI.GetIntAttr("Visible", 0) == 1 && xI.GetStringAttr("Def", "") != "Summary")
                                 //if (xI.GetIntAttr("Visible", 0) == 1 && xI.GetBooleanAttr("IsSummary", false) == false)
@@ -1760,12 +1767,14 @@ Status_Error:
                                         {
                                             bool bCostTagFound;
                                             bool bQuantityTagFound;
+                                            var discountColumn = "D" + period.Id.ToString("0");
                                             string sQ = "Q" + period.Id.ToString("0");
                                             string sC = "C" + period.Id.ToString("0");
 
                                             double dblQuantity = xI.GetDoubleAttr(sQ, out bQuantityTagFound);
                                             double dblCost = 0;
                                             string costString = xI.GetStringAttr(sC, string.Empty, out bCostTagFound);
+                                            var discountValue = xI.GetDecimalAttr(discountColumn, 0);
                                             if (bCostTagFound && !string.IsNullOrEmpty(costString))
                                             {
                                                 dblCost = double.Parse(costString, CultureInfo.InvariantCulture);
@@ -1773,7 +1782,7 @@ Status_Error:
                                             
                                             if ((bQuantityTagFound == true && dblQuantity != 0) || (bCostTagFound == true && dblCost != 0))
                                             {
-                                                dt.Rows.Add(new object[] { id, seq, period.Id, dblQuantity, dblCost });
+                                                dt.Rows.Add(new object[] { id, seq, period.Id, dblQuantity, dblCost, discountRate, discountValue });
                                             }
                                         }
                                     }
@@ -2331,6 +2340,7 @@ Exit_Function:
             public bool HasData = false;
             public int Seq;
             public int NamedRateUID;
+            public decimal Discount;
             public string NamedRateName;
             public int[] CustomCodeValues = new int[5];
             public string[] CustomCodeTextValues = new string[5];
@@ -2398,6 +2408,7 @@ Exit_Function:
                 xI.CreateIntAttr("rowid", costCategory.Uid);
                 xI.CreateStringAttr("Category", costCategory.Name);
                 xI.CreateStringAttr("uom", costCategory.UoM);
+                xI.CreateDecimalAttr(DiscountXmlAttribute, costCategory.Discount);
                 //xI.CreateBooleanAttr("CanEdit", !costCategory.IsSummary);
                 xI.CreateIntAttr("CanEdit", 0);
                 //xI.CreateBooleanAttr("CanEdit", true);

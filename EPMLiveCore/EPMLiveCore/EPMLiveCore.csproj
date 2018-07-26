@@ -194,6 +194,7 @@
     <Compile Include="API\ProjectArchiver\IProjectArchiverSetupService.cs" />
     <Compile Include="API\ProjectArchiver\ProjectArchiverSetupService.cs" />
     <Compile Include="API\ProjectArchiver\ProjectArchiverSetupServiceLogEventArgs.cs" />
+    <Compile Include="API\ProjectDiscountRate\ProjectDiscountRateService.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -423,6 +424,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6404Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6403Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6402Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\6401Steps.cs" />
