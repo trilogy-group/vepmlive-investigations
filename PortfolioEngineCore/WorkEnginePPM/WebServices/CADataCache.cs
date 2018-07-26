@@ -721,33 +721,26 @@ namespace CADataCache
 
         public string GetTopGrid()
         {
+            var grid = new CATopGrid(
+                _hideRowsWithAllZeros,
+                bShowFTEs,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                0,
+                TGStandard,
+                m_topgridcln);
 
-            CATopGrid oGrid = new CATopGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_topgridcln, 0);
-            int i = 0;
+            grid.AddPeriodsData(m_clsda.m_Periods.Values);
 
-            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
-            {
-                i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TGStandard, 0, bUseQTY, bUseCosts);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            
-            i = 0;
-            foreach (clsDetailRowData oDet in m_clnsort)
+            var i = 0;
+            grid.AddDetailRowsData(m_clnsort.Select(oDet =>
             {
                 oDet.rowid = ++i;
-                if (IsRowVisible(oDet, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs, _hideRowsWithAllZeros))
-                {
-                    oGrid.AddDetailRow(oDet, i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
-            }
+                return oDet;
+            }));
 
-            s = oGrid.GetString();
-            return s;
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
         private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)

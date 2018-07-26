@@ -12,11 +12,11 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal class CATopGridTemp : CADataCacheGridBase
+    internal class CATopGrid : CADataCacheGridBase
     {
         private readonly bool _hideRowsWithAllZeros;
 
-        public CATopGridTemp(
+        public CATopGrid(
             bool hideRowsWithAllZeros,
             bool showFTEs, 
             bool useQuantity,
