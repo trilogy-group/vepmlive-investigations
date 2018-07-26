@@ -810,6 +810,8 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\CADataCache.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WebServices\CADataCache\CADataGridCacheBase.cs" />
+    <Compile Include="WebServices\CADataCache\CATopGrid.cs" />
     <Compile Include="WebServices\CAGrids.cs" />
     <Compile Include="WebServices\ClientPrioritization.asmx.cs">
       <DependentUpon>ClientPrioritization.asmx</DependentUpon>
