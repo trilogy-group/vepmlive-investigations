@@ -22,6 +22,8 @@ namespace CADataCache
         private readonly CATotRow _totalDetailRow;
         private readonly bool _doZeroRowCleverStuff;
 
+        protected override bool SkipDetailRowGenerationErrors => true;
+
         public CABottomGridTemp(
             bool useHeatMap,
             int heatMapIndex, 
@@ -131,7 +133,7 @@ namespace CADataCache
 
         protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsDetailRowData, clsDetailRowData> detailRow)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         protected override void AddDetailRow(Tuple<clsDetailRowData, clsDetailRowData> detailRowData, int rowId)

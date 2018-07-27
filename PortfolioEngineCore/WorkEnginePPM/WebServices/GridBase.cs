@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure.Logging;
+using Microsoft.SharePoint.Administration;
 using ModelDataCache;
 using PortfolioEngineCore;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 public abstract class GridBase<TPeriodData, TDetailRowData>
 {
@@ -18,7 +21,9 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected IList<TPeriodData> Periods;
     protected IList<TDetailRowData> DetailRows;
-    
+
+    protected virtual bool SkipDetailRowGenerationErrors => false;
+
     protected abstract bool CheckIfDetailRowShouldBeAdded(TDetailRowData detailRow);
 
     public void AddPeriodsData(IEnumerable<TPeriodData> periods)
@@ -69,9 +74,27 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
             if (DetailRows != null)
             {
-                for(var i = 0; i < DetailRows.Count; i++)
+                try
                 {
-                    AddDetailRow(DetailRows[i], i);
+                    for (var i = 0; i < DetailRows.Count; i++)
+                    {
+                        AddDetailRow(DetailRows[i], i);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    if (SkipDetailRowGenerationErrors)
+                    {
+                        LoggingService.WriteTrace(
+                           Area.EPMLiveWorkEnginePPM,
+                           Categories.EPMLiveWorkEnginePPM.Others,
+                           TraceSeverity.VerboseEx,
+                           ex.ToString());
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
         }

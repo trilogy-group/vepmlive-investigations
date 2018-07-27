@@ -10,7 +10,7 @@ using CostDataValues;
 
 namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
 {
-    internal class CADataCacheGridBaseTestDouble : CADataCacheGridBase
+    internal class CADataCacheGridBaseTestDouble : CADataCacheGridBase<clsDetailRowData>
     {
         public new CStruct PeriodCols => base.PeriodCols;
         public new CStruct MiddleCols => base.MiddleCols;
@@ -88,6 +88,11 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
         }
 
         protected override void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
         {
             throw new NotImplementedException();
         }
