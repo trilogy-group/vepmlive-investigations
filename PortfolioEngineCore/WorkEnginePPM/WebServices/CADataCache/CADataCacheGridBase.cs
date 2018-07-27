@@ -12,7 +12,7 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal abstract class CADataCacheGridBase : ADataCacheGridBase<clsPeriodData, clsDetailRowData>
+    internal abstract class CADataCacheGridBase<TDetailRowData> : ADataCacheGridBase<clsPeriodData, TDetailRowData>
     {
         protected readonly bool _showFTEs;
         protected readonly bool _useQuantity;
@@ -398,30 +398,32 @@ namespace CADataCache
             return result;
         }
 
-        protected override int CalculateInternalPeriodMin(clsDetailRowData detailRowData)
+        protected override int CalculateInternalPeriodMin(TDetailRowData detailRowData)
         {
-            for (int i = 1; i <= detailRowData.zFTE.Length - 1; i++)
+            var dataItem = GetDetailRowDataItem(detailRowData);
+
+            for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
             {
                 foreach (var displayRow in _displayList)
                 {
                     if (displayRow.bUse)
                     {
                         if (_useQuantity
-                            && detailRowData.zValue[i] != double.MinValue
-                            && detailRowData.zValue[i] != 0)
+                            && dataItem.zValue[i] != double.MinValue
+                            && dataItem.zValue[i] != 0)
                         {
                             return i;
                         }
 
                         if (_showFTEs
-                            && detailRowData.zFTE[i] != double.MinValue
-                            && detailRowData.zFTE[i] != 0)
+                            && dataItem.zFTE[i] != double.MinValue
+                            && dataItem.zFTE[i] != 0)
                         {
                             return i;
                         }
 
                         if (_useCost
-                            && detailRowData.zCost[i] != 0)
+                            && dataItem.zCost[i] != 0)
                         {
                             return i;
                         }
@@ -432,30 +434,32 @@ namespace CADataCache
             return 0;
         }
 
-        protected override int CalculateInternalPeriodMax(clsDetailRowData detailRowData)
+        protected override int CalculateInternalPeriodMax(TDetailRowData detailRowData)
         {
-            for (int i = detailRowData.zFTE.Length - 1; i > 1; i--)
+            var dataItem = GetDetailRowDataItem(detailRowData);
+
+            for (int i = dataItem.zFTE.Length - 1; i > 1; i--)
             {
                 foreach (var displayRow in _displayList)
                 {
                     if (displayRow.bUse)
                     {
                         if (_useQuantity
-                            && detailRowData.zValue[i] != double.MinValue
-                            && detailRowData.zValue[i] != 0)
+                            && dataItem.zValue[i] != double.MinValue
+                            && dataItem.zValue[i] != 0)
                         {
                             return i;
                         }
 
                         if (_showFTEs
-                            && detailRowData.zFTE[i] != double.MinValue
-                            && detailRowData.zFTE[i] != 0)
+                            && dataItem.zFTE[i] != double.MinValue
+                            && dataItem.zFTE[i] != 0)
                         {
                             return i;
                         }
 
                         if (_useCost
-                            && detailRowData.zCost[i] != 0)
+                            && dataItem.zCost[i] != 0)
                         {
                             return i;
                         }
@@ -529,5 +533,7 @@ namespace CADataCache
         protected abstract int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter);
 
         protected abstract void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow);
+
+        protected abstract clsDetailRowData GetDetailRowDataItem(TDetailRowData detailRowData);
     }
 }

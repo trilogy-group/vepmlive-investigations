@@ -12,7 +12,7 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal class CATopGrid : CADataCacheGridBase
+    internal class CATopGrid : CADataCacheGridBase<clsDetailRowData>
     {
         private readonly bool _hideRowsWithAllZeros;
 
@@ -195,6 +195,11 @@ namespace CADataCache
             {
                 UpdateDisplayRowsWithPeriodData(detailRowData, xI, i);
             }
+        }
+
+        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
+        {
+            return detailRowData;
         }
 
         private void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)

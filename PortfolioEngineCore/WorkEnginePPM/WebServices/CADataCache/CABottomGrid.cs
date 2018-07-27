@@ -12,12 +12,24 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal class CABottomGridTemp : CADataCacheGridBase
+    internal class CABottomGridTemp : CADataCacheGridBase<Tuple<clsDetailRowData, clsDetailRowData>>
     {
         private readonly bool _useHeatMap;
+        private readonly int _heatMapIndex;
+        private readonly int _heatMapColor;
+        private readonly IList<clsTargetColours> _targetColors;
+        private readonly bool _showRemainingDetailRows;
+        private readonly CATotRow _totalDetailRow;
+        private readonly bool _doZeroRowCleverStuff;
 
         public CABottomGridTemp(
             bool useHeatMap,
+            int heatMapIndex, 
+            int heatMapColor, 
+            IList<clsTargetColours> targetColors, 
+            bool showRemainingDetailRows, 
+            CATotRow totalDetailRow, 
+            bool doZeroRowCleverStuff,
             bool showFTEs,
             bool useQuantity,
             bool useCost,
@@ -28,8 +40,15 @@ namespace CADataCache
         : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns, false)
         {
             _useHeatMap = useHeatMap;
+            _useHeatMap = useHeatMap;
+            _heatMapIndex = heatMapIndex;
+            _heatMapColor = heatMapColor;
+            _targetColors = targetColors;
+            _showRemainingDetailRows = showRemainingDetailRows;
+            _totalDetailRow = totalDetailRow;
+            _doZeroRowCleverStuff = doZeroRowCleverStuff;
         }
-
+        
         protected override void InitializeGridLayoutCategoryColumns(CStruct columnsContainer)
         {
             var column = CreateColumn(columnsContainer, "rowid", "Text",
@@ -110,19 +129,22 @@ namespace CADataCache
             DefinitionLeaf.CreateStringAttr(GeneratePeriodAttributeName("Y", periodId, counter, "Formula"), string.Empty);
         }
 
-        protected override bool CheckIfDetailRowShouldBeAdded(clsDetailRowData detailRow)
+        protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsDetailRowData, clsDetailRowData> detailRow)
         {
             throw new NotImplementedException();
         }
 
-        protected override void AddDetailRow(clsDetailRowData detailRowData, int rowId)
+        protected override void AddDetailRow(Tuple<clsDetailRowData, clsDetailRowData> detailRowData, int rowId)
         {
             throw new NotImplementedException();
         }
 
-        protected override void InitializeGridData(GridRenderingTypes renderingType)
+        protected override clsDetailRowData GetDetailRowDataItem(Tuple<clsDetailRowData, clsDetailRowData> detailRowData)
         {
-            throw new NotImplementedException();
+            // (CC-76484, 2018-07-27) According to the initial design, CABottomGrid is the only one standing out from the others
+            // who bases it's DetailRow creation on several clsDetailRowData objects. 
+            // Since we can do nothing with original design, we have to adopt by introducing the best way we could find to support variations
+            return detailRowData.Item1;
         }
     }
 }
