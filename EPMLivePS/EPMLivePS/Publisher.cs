@@ -134,16 +134,17 @@ namespace EPMLiveEnterprise
 
                 if (dr.Read())
                 {
-                    int pubType = dr.GetInt32(0);
+                    var pubType = dr.GetInt32(0);
                     publishSiteUrl = System.Web.HttpUtility.UrlDecode(dr.GetString(1));
-
-
+                    
                     if (!dr.IsDBNull(2))
+                    {
                         lastTransUid = dr.GetGuid(2);
+                    }
 
                     dr.Close();
 
-                    if (publishSiteUrl == "")
+                    if (string.IsNullOrWhiteSpace(publishSiteUrl))
                     {
                         publishSiteUrl = getProjectWss(mySite.Url, eventArgs.ProjectGuid);
 
@@ -344,15 +345,24 @@ namespace EPMLiveEnterprise
             }
         }
 
-        public static void ExecuteNonQueryOnPublisherCheck(SqlConnection connection, ProjectEventArgs args, string pubtype, string wssUrl)
+        public static void ExecuteNonQueryOnPublisherCheck(SqlConnection connection, ProjectEventArgs args, string pubType, string wssUrl)
         {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
             const string InsertCommand =
                 "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,2,1,GETDATE())";
 
             using (var sqlCommand = new SqlCommand(InsertCommand, connection))
             {
                 sqlCommand.Parameters.AddWithValue(ProjectGuidParam, args.ProjectGuid);
-                sqlCommand.Parameters.AddWithValue(PubTypeParam, pubtype);
+                sqlCommand.Parameters.AddWithValue(PubTypeParam, pubType);
                 sqlCommand.Parameters.AddWithValue(WebUrlParam, wssUrl);
                 sqlCommand.Parameters.AddWithValue(ProjectNameParam, args.ProjectName);
                 sqlCommand.ExecuteNonQuery();
