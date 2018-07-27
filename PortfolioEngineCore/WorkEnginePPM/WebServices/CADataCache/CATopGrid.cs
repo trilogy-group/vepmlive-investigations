@@ -134,8 +134,8 @@ namespace CADataCache
 
         protected override void AddDetailRow(clsDetailRowData detailRowData, int rowId)
         {
-            CStruct xIParent = Levels[0];
-            CStruct xI = xIParent.CreateSubStruct("I");
+            var xIParent = Levels[0];
+            var xI = xIParent.CreateSubStruct("I");
 
             Levels[1] = xI;
             xI.CreateStringAttr("id", rowId.ToString());
@@ -154,22 +154,6 @@ namespace CADataCache
                 string value;
                 if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
                 {
-                    // (CC-76681, 2018-07-13) Additional condition, specific to TopGrid
-                    if (value == GlobalConstants.Whitespace)
-                    {
-                        if (column.m_id >= (int)FieldIDs.PI_USE_EXTRA + 1 && column.m_id <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                        {
-                            if (detailRowData.m_PI_Format_Extra_data != null)
-                            {
-                                value = detailRowData.m_PI_Format_Extra_data[column.m_id - (int)FieldIDs.PI_USE_EXTRA];
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                    }
-
                     xI.CreateStringAttr(attributeName, value);
                 }
             }
@@ -197,9 +181,76 @@ namespace CADataCache
             }
         }
 
-        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
+        protected override int CalculateInternalPeriodMin(clsDetailRowData detailRowData)
         {
-            return detailRowData;
+            var dataItem = GetDetailRowDataItem(detailRowData);
+
+            for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        if (_useQuantity
+                            && dataItem.zValue[i] != double.MinValue
+                            && dataItem.zValue[i] != 0)
+                        {
+                            return i;
+                        }
+
+                        if (_showFTEs
+                            && dataItem.zFTE[i] != double.MinValue
+                            && dataItem.zFTE[i] != 0)
+                        {
+                            return i;
+                        }
+
+                        if (_useCost
+                            && dataItem.zCost[i] != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        protected override int CalculateInternalPeriodMax(clsDetailRowData detailRowData)
+        {
+            var dataItem = GetDetailRowDataItem(detailRowData);
+
+            for (int i = dataItem.zFTE.Length - 1; i > 1; i--)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        if (_useQuantity
+                            && dataItem.zValue[i] != double.MinValue
+                            && dataItem.zValue[i] != 0)
+                        {
+                            return i;
+                        }
+
+                        if (_showFTEs
+                            && dataItem.zFTE[i] != double.MinValue
+                            && dataItem.zFTE[i] != 0)
+                        {
+                            return i;
+                        }
+
+                        if (_useCost
+                            && dataItem.zCost[i] != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
         }
 
         private void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)

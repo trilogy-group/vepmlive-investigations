@@ -388,6 +388,17 @@ namespace CADataCache
                     {
                         value = detailRowData.TXVal[fid - 11810];
                     }
+                    else if (fid >= (int)FieldIDs.PI_USE_EXTRA + 1 && fid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        if (detailRowData.m_PI_Format_Extra_data != null)
+                        {
+                            value = detailRowData.m_PI_Format_Extra_data[fid - (int)FieldIDs.PI_USE_EXTRA];
+                        }
+                        else
+                        {
+                            result = false;
+                        }
+                    }
                     else
                     {
                         value = GlobalConstants.Whitespace;
@@ -397,79 +408,7 @@ namespace CADataCache
 
             return result;
         }
-
-        protected override int CalculateInternalPeriodMin(TDetailRowData detailRowData)
-        {
-            var dataItem = GetDetailRowDataItem(detailRowData);
-
-            for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
-            {
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        if (_useQuantity
-                            && dataItem.zValue[i] != double.MinValue
-                            && dataItem.zValue[i] != 0)
-                        {
-                            return i;
-                        }
-
-                        if (_showFTEs
-                            && dataItem.zFTE[i] != double.MinValue
-                            && dataItem.zFTE[i] != 0)
-                        {
-                            return i;
-                        }
-
-                        if (_useCost
-                            && dataItem.zCost[i] != 0)
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        protected override int CalculateInternalPeriodMax(TDetailRowData detailRowData)
-        {
-            var dataItem = GetDetailRowDataItem(detailRowData);
-
-            for (int i = dataItem.zFTE.Length - 1; i > 1; i--)
-            {
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        if (_useQuantity
-                            && dataItem.zValue[i] != double.MinValue
-                            && dataItem.zValue[i] != 0)
-                        {
-                            return i;
-                        }
-
-                        if (_showFTEs
-                            && dataItem.zFTE[i] != double.MinValue
-                            && dataItem.zFTE[i] != 0)
-                        {
-                            return i;
-                        }
-
-                        if (_useCost
-                            && dataItem.zCost[i] != 0)
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return 0;
-        }
-
+        
         protected override string ResolvePeriodId(clsPeriodData periodData, int index)
         {
             return periodData.PeriodID.ToString();
@@ -533,7 +472,5 @@ namespace CADataCache
         protected abstract int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter);
 
         protected abstract void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow);
-
-        protected abstract clsDetailRowData GetDetailRowDataItem(TDetailRowData detailRowData);
     }
 }

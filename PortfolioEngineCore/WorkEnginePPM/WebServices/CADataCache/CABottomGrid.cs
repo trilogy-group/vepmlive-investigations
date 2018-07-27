@@ -131,22 +131,136 @@ namespace CADataCache
             DefinitionLeaf.CreateStringAttr(GeneratePeriodAttributeName("Y", periodId, counter, "Formula"), string.Empty);
         }
 
-        protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsDetailRowData, clsDetailRowData> detailRow)
+        protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
         {
+            var prefix = string.Empty;
+
+            var detailRowData = detailRowDataTuple.Item1;
+            var detailRowDataTarget = detailRowDataTuple.Item2;
+            
+            _totalDetailRow.bUsed = false;
+
+            if (_doZeroRowCleverStuff)
+            {
+                var detailRowDataSelected = GetDetailRowDataSelected(detailRowDataTuple);
+                return detailRowDataSelected != null;
+            }
+
             return true;
         }
 
-        protected override void AddDetailRow(Tuple<clsDetailRowData, clsDetailRowData> detailRowData, int rowId)
+        private clsDetailRowData GetDetailRowDataSelected(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
         {
-            throw new NotImplementedException();
+            var maxp = detailRowDataTuple.Item1.zFTE.Length - 1;
+            var counter = 0;
+
+            for (int i = 1; i <= maxp; i++)
+            {
+                try
+                {
+                    foreach (CATGRow displayRow in _displayList)
+                    {
+                        if (displayRow.bUse)
+                        {
+                            ++counter;
+
+                            var detailRowSelected = displayRow.index < 0
+                                ? _totalDetailRow.m_targets[-displayRow.index]
+                                : _totalDetailRow.m_totals[displayRow.index];
+
+                            if (detailRowSelected.zCost[i] != 0)
+                            {
+                                return detailRowSelected;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.WriteTrace(
+                       Area.EPMLiveWorkEnginePPM,
+                       Categories.EPMLiveWorkEnginePPM.Others,
+                       TraceSeverity.VerboseEx,
+                       ex.ToString());
+                }
+            }
+
+            return null;
         }
 
-        protected override clsDetailRowData GetDetailRowDataItem(Tuple<clsDetailRowData, clsDetailRowData> detailRowData)
+        protected override void AddDetailRow(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple, int rowId)
         {
-            // (CC-76484, 2018-07-27) According to the initial design, CABottomGrid is the only one standing out from the others
-            // who bases it's DetailRow creation on several clsDetailRowData objects. 
-            // Since we can do nothing with original design, we have to adopt by introducing the best way we could find to support variations
-            return detailRowData.Item1;
+            var detailRowData = detailRowDataTuple.Item1;
+            var detailRowDataTarget = detailRowDataTuple.Item2;
+            var detailRowDataSelected = GetDetailRowDataSelected(detailRowDataTuple);
+            // (CC-76484, 2018-07-27) According to the initial code, the code addressing detailRowDataSelected 
+            // will throw a NullReferencException if _doZeroCleverStuff == false
+
+            _totalDetailRow.bUsed = true;
+
+            var xIParent = Levels[0];
+            var xI = xIParent.CreateSubStruct("I");
+
+            Levels[1] = xI;
+            xI.CreateStringAttr("id", rowId.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "Leaf");
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            foreach (var column in _columns)
+            {
+                var attributeName = "zX" + CleanUpString(column.m_dispname);
+
+                string value;
+                if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
+                {
+                    xI.CreateStringAttr(attributeName, value);
+                }
+            }
+
+            var periodTotal = detailRowData.zFTE.Length - 1;
+
+            var periodMin = CalculateInternalPeriodMin(detailRowDataTuple);
+            var periodMax = 0;
+            if (periodMin != 0)
+            {
+                periodMax = CalculateInternalPeriodMax(detailRowDataTuple);
+            }
+            else
+            {
+                periodMin = periodTotal + 1;
+            }
+
+            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
+            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
+            xI.CreateIntAttr("xinterenalPeriodTotal", periodTotal);
+        }
+
+        protected override int CalculateInternalPeriodMin(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
+        {
+            var dataItem = detailRowDataTuple.Item1;
+
+            for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        if (dataItem.zCost[i] != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        protected override int CalculateInternalPeriodMax(Tuple<clsDetailRowData, clsDetailRowData> resxData)
+        {
+            return 0;
         }
     }
 }
