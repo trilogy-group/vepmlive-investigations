@@ -38,6 +38,9 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveEnterprise.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveTimerService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
     </Reference>

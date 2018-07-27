@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
+using ProjectEventArgs = Microsoft.Office.Project.Server.Events.ProjectPostPublishEventArgs;
+using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
 
 namespace EPMLiveEnterprise
 {
@@ -86,7 +88,7 @@ namespace EPMLiveEnterprise
             myLog.Close();
         }
 
-        private static EventLog CreateWindowsEvent(string logName, string source)
+        public static EventLog CreateWindowsEvent(string logName, string source)
         {
             using (var eventLog = new EventLog(logName))
             {
@@ -119,7 +121,7 @@ namespace EPMLiveEnterprise
                 ExecuteCommandWithProjectGuid(
                     cn, "UPDATE publishercheck set percentcomplete=2,laststatusdate=getdate() where projectguid=@projectguid", eventArgs.ProjectGuid);
 
-                InitializeTimesheetField();
+                InitializeTimesheetField(cn, ref strTimesheetField);
 
                 InsertPublisherCheck(cn, eventArgs.ProjectGuid, mySite.RootWeb, mySite.Url);
 
@@ -297,9 +299,9 @@ namespace EPMLiveEnterprise
             }
         }
 
-        private void InitializeTimesheetField()
+        public static void InitializeTimesheetField(SqlConnection connection, ref string strTimesheetField)
         {
-            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", cn))
+            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
@@ -311,8 +313,13 @@ namespace EPMLiveEnterprise
             }
         }
 
-        private void InsertPublisherCheck(SqlConnection connection, Guid guid, SPWeb rootWeb, string url)
+        public void InsertPublisherCheck(SqlConnection connection, Guid guid, SPWeb rootWeb, string url)
         {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
             using (var command = new SqlCommand("select pubType,weburl,transuid from publishercheck where projectguid=@projectguid", connection))
             {
                 command.Parameters.AddWithValue(ProjectGuidParam, guid);
@@ -321,7 +328,7 @@ namespace EPMLiveEnterprise
                 {
                     if (!reader.Read())
                     {
-                        var pubtype = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLivePub-Type");
+                        var pubtype = EpmCoreFunctions.getConfigSetting(rootWeb, "EPMLivePub-Type");
 
                         if (!string.IsNullOrWhiteSpace(pubtype))
                         {
@@ -329,7 +336,7 @@ namespace EPMLiveEnterprise
 
                             if (!string.IsNullOrWhiteSpace(wssUrl))
                             {
-                                ExecuteNonQueryOnPublisherCheck(cn, pubtype, wssUrl);
+                                ExecuteNonQueryOnPublisherCheck(cn, eventArgs, pubtype, wssUrl);
                             }
                         }
                     }
@@ -337,22 +344,22 @@ namespace EPMLiveEnterprise
             }
         }
 
-        private void ExecuteNonQueryOnPublisherCheck(SqlConnection connection, string pubtype, string wssUrl)
+        public static void ExecuteNonQueryOnPublisherCheck(SqlConnection connection, ProjectEventArgs args, string pubtype, string wssUrl)
         {
             const string InsertCommand =
                 "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,2,1,GETDATE())";
 
             using (var sqlCommand = new SqlCommand(InsertCommand, connection))
             {
-                sqlCommand.Parameters.AddWithValue(ProjectGuidParam, eventArgs.ProjectGuid);
+                sqlCommand.Parameters.AddWithValue(ProjectGuidParam, args.ProjectGuid);
                 sqlCommand.Parameters.AddWithValue(PubTypeParam, pubtype);
                 sqlCommand.Parameters.AddWithValue(WebUrlParam, wssUrl);
-                sqlCommand.Parameters.AddWithValue(ProjectNameParam, eventArgs.ProjectName);
+                sqlCommand.Parameters.AddWithValue(ProjectNameParam, args.ProjectName);
                 sqlCommand.ExecuteNonQuery();
             }
         }
 
-        private void ExecuteCommandWithProjectGuid(SqlConnection connection, string commandText, Guid guid)
+        public static void ExecuteCommandWithProjectGuid(SqlConnection connection, string commandText, Guid guid)
         {
             if (connection == null)
             {
@@ -371,12 +378,17 @@ namespace EPMLiveEnterprise
             }
         }
 
-        private void UpdatePublisherCheck(SqlConnection connection, Guid guid, string errorType, string message)
+        public static void UpdatePublisherCheck(SqlConnection connection, Guid guid, string errorType, string message)
         {
-            const string commandText =
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            const string CommandText =
                 "update publishercheck set logtext=@logtext, checkbit=0,status=4,percentcomplete=0,laststatusdate=getdate() where projectguid=@projectguid";
 
-            using (var command = new SqlCommand(commandText, connection))
+            using (var command = new SqlCommand(CommandText, connection))
             {
                 command.Parameters.AddWithValue(ProjectGuidParam, guid);
                 command.Parameters.AddWithValue(LogTextParam, $"{errorType}: {message}");
