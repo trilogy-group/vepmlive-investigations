@@ -14,6 +14,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace EPMLiveCore.Tests.API.Notification
 {
@@ -223,13 +224,17 @@ namespace EPMLiveCore.Tests.API.Notification
 
             Assert.AreEqual(7, _createdCommands.Count);
             Assert.AreEqual(7, _disposedCommands.Count);
-            Assert.AreSame(_createdCommands[0], _disposedCommands[0]);
-            Assert.AreSame(_createdCommands[1], _disposedCommands[1]);
-            Assert.AreSame(_createdCommands[2], _disposedCommands[2]);
-            Assert.AreSame(_createdCommands[3], _disposedCommands[3]);
-            Assert.AreSame(_createdCommands[4], _disposedCommands[4]);
-            Assert.AreSame(_createdCommands[5], _disposedCommands[5]);
-            Assert.AreSame(_createdCommands[6], _disposedCommands[6]);
+            AssertCreatedCommandsDisposed();
+        }
+
+        private void AssertCreatedCommandsDisposed()
+        {
+            Assert.AreEqual(_createdCommands.Count, _disposedCommands.Count);
+            foreach (var createdCommand in _createdCommands)
+            {
+                var disposed = _disposedCommands.Any(d => ReferenceEquals(d, createdCommand));
+                Assert.IsTrue(disposed, "Command '{0}' hasn't been disposed.", createdCommand.CommandText);
+            }
         }
 
         private void AssetConnection()

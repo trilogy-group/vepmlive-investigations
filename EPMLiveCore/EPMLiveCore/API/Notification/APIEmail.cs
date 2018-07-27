@@ -565,7 +565,7 @@ namespace EPMLiveCore.API
                                     id = Guid.NewGuid().ToString();
                                 }
 
-                                upsertNotificationCommand.CommandText = SelectNotificationCommand(forceNewEntry, id);
+                                upsertNotificationCommand.CommandText = GenerateUpsertSql(forceNewEntry, id);
 
                                 upsertNotificationCommand.Parameters.AddWithValue("@id", id);
                                 upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
@@ -593,13 +593,14 @@ namespace EPMLiveCore.API
                     }
                 }
             }
-            catch(Exception Exception)
+            catch (Exception exception)
             {
-                throw new Exception(Exception.Message);
+                Trace.TraceError("Exception details: {0}", exception);
+                throw new InvalidOperationException(exception.Message);
             }
         }
 
-        private static string SelectNotificationCommand(bool forceNewEntry, string id)
+        private static string GenerateUpsertSql(bool forceNewEntry, string id)
         {
             string commandText;
             if (id == null || forceNewEntry)
@@ -620,7 +621,7 @@ namespace EPMLiveCore.API
         }
 
         private static void GetSubjectAndBody(
-            int templateid, 
+            int templateId, 
             Hashtable additionalParams, 
             SPUser curUser, 
             SPWeb web, 
@@ -630,7 +631,7 @@ namespace EPMLiveCore.API
         {
             body = string.Empty;
             subject = string.Empty;
-            GetCoreInformation(connection, templateid, out body, out subject, web, curUser);
+            GetCoreInformation(connection, templateId, out body, out subject, web, curUser);
 
             foreach (var key in additionalParams.Keys)
             {
@@ -685,7 +686,7 @@ namespace EPMLiveCore.API
 
             foreach (var user in newUsers)
             {
-                if (!string.IsNullOrWhiteSpace(user))
+                if (user != string.Empty)
                 {
                     var found = false;
                     if (dataSet.Tables.Count > 0)
