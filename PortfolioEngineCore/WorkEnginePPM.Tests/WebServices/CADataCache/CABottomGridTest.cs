@@ -98,7 +98,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             _detailRowTotal = new CATotRow(1, 1, 1)
             {
                 bUsed = true,
-                m_targets = new [] { _detailRow }
+                m_totals = new [] { _detailRow }
             };
 
             _rowId = 3;
@@ -312,7 +312,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         {
             // Arrange
             var definitionsInitialized = new List<string>();
-            ShimGridBase<clsPeriodData, clsDetailRowData>.AllInstances.InitializeGridLayoutDefinitionStringCStruct = (instance, name, definitions) =>
+            ShimGridBase<clsPeriodData, CATotRow>.AllInstances.InitializeGridLayoutDefinitionStringCStruct = (instance, name, definitions) =>
             {
                 definitionsInitialized.Add(name);
                 return new PortfolioEngineCore.CStruct();
@@ -362,12 +362,8 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             _testDouble.InitializeGridLayout(_renderingType);
 
             // Assert
-            Assert.IsTrue(nameAttributeValues.Contains("RowSel"));
-            Assert.IsTrue(typeAttributeValues.Contains("Icon"));
             Assert.IsTrue(nameAttributeValues.Contains("rowid"));
             Assert.IsTrue(typeAttributeValues.Contains("Text"));
-            Assert.IsTrue(nameAttributeValues.Contains("Select"));
-            Assert.IsTrue(typeAttributeValues.Contains("Bool"));
         }
 
         [TestMethod]
@@ -415,69 +411,40 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         }
 
         [TestMethod]
-        public void AddPeriodColumns_DisplayRowsInUse_Header2AttributesNotSet()
+        public void AddPeriodColumns_DisplayRowsInUseNoHeatMap_Header2AttributeCostSet()
         {
             // Arrange, Act
             _testDouble.AddPeriodColumns(_periods);
 
             // Assert
-            Assert.IsFalse(_stringAttributesCreated.ContainsKey("Header2"));
-        }
-
-        [TestMethod]
-        public void AddPeriodColumns_DisplayRowsInUseUseCost_Header2AttributesSetToCost()
-        {
-            // Arrange
-            _useCost = true;
-            _testDouble = CreateTestDouble();
-
-            // Act
-            _testDouble.AddPeriodColumns(_periods);
-
-            // Assert
             Assert.AreEqual(_periods.Count, _stringAttributesCreated["Header2"].Count);
-
             foreach (var period in _periods)
             {
-                Assert.AreEqual("Cost", _stringAttributesCreated["Header2"]["P" + period.PeriodID + "C" + 1]);
+                Assert.AreEqual("Cost", _stringAttributesCreated["Header2"]["P" + period.PeriodID + "C1"]);
             }
         }
 
         [TestMethod]
-        public void AddPeriodColumns_DisplayRowsInUseUseQuantity_Header2AttributesSetToQty()
+        public void AddPeriodColumns_DisplayRowsInUseUseHeatMap_Header2AttributesSet()
         {
             // Arrange
-            _useQuantity = true;
+            _useHeatMap = true;
             _testDouble = CreateTestDouble();
 
             // Act
             _testDouble.AddPeriodColumns(_periods);
 
             // Assert
-            Assert.AreEqual(_periods.Count, _stringAttributesCreated["Header2"].Count);
+            Assert.AreEqual(_periods.Count * _displayList.Count * 3, _stringAttributesCreated["Header2"].Count);
 
             foreach (var period in _periods)
             {
-                Assert.AreEqual("Qty", _stringAttributesCreated["Header2"]["P" + period.PeriodID + "C" + 1]);
-            }
-        }
-
-        [TestMethod]
-        public void AddPeriodColumns_DisplayRowsInUseUseQuantity_Header2AttributesSetToFTE()
-        {
-            // Arrange
-            _showFTEs = true;
-            _testDouble = CreateTestDouble();
-
-            // Act
-            _testDouble.AddPeriodColumns(_periods);
-
-            // Assert
-            Assert.AreEqual(_periods.Count, _stringAttributesCreated["Header2"].Count);
-
-            foreach (var period in _periods)
-            {
-                Assert.AreEqual("FTE", _stringAttributesCreated["Header2"]["P" + period.PeriodID + "C" + 1]);
+                for(var i = 0; i < _displayList.Count; i++)
+                {
+                    Assert.AreEqual("Cost", _stringAttributesCreated["Header2"]["P" + period.PeriodID + "C" + (i + 1)]);
+                    Assert.AreEqual(period.PeriodName + _displayList[i].Name + "HeatMap", _stringAttributesCreated["Header2"]["X" + period.PeriodID + "C" + (i + 1)]);
+                    Assert.AreEqual(period.PeriodName + _displayList[i].Name + "HeatMap", _stringAttributesCreated["Header2"]["Y" + period.PeriodID + "C" + (i + 1)]);
+                }
             }
         }
 
@@ -499,13 +466,45 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         }
 
         [TestMethod]
-        public void CheckIfDetailRowShouldBeAdded_Always_ReturnsTrue()
+        public void CheckIfDetailRowShouldBeAdded_Always_SetsUsedFlagToFalse()
         {
             // Arrange
-            CATotRow detailRowTotal = null;
+            _detailRowTotal.bUsed = true;
 
             // Act
-            var result = _testDouble.CheckIfDetailRowShouldBeAdded(detailRowTotal);
+            var result = _testDouble.CheckIfDetailRowShouldBeAdded(_detailRowTotal);
+
+            // Assert
+            Assert.IsFalse(_detailRowTotal.bUsed);
+        }
+
+        [TestMethod]
+        public void CheckIfDetailRowShouldBeAdded_DisplayRowsUseFlagDisabled_ReturnsFalse()
+        {
+            // Arrange
+            foreach (var displayRow in _displayList)
+            {
+                displayRow.bUse = false;
+            }
+
+            // Act
+            var result = _testDouble.CheckIfDetailRowShouldBeAdded(_detailRowTotal);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CheckIfDetailRowShouldBeAdded_RowWithCostExists_ReturnsTrue()
+        {
+            // Arrange
+            foreach (var row in _detailRowTotal.m_totals)
+            {
+                row.zCost[10] = 1;
+            }
+
+            // Act
+            var result = _testDouble.CheckIfDetailRowShouldBeAdded(_detailRowTotal);
 
             // Assert
             Assert.IsTrue(result);
@@ -524,8 +523,6 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             Assert.AreEqual("Leaf", _stringAttributesCreated["I"]["Def"]);
             Assert.AreEqual(1, _intAttributesCreated["I"]["NoColorState"]);
             Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
-            Assert.AreEqual(true, _booleanAttributesCreated["I"]["SelectCanEdit"]);
-            Assert.AreEqual(_detailRow.bSelected ? "1" : "0", _stringAttributesCreated["I"]["Select"]);
         }
 
         [TestMethod]
@@ -558,7 +555,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         {
             // Arrange
             var minPeriod = 3;
-            var maxPeriod = 21;
+            var maxPeriod = 0;
 
             _useQuantity = true;
             _testDouble = CreateTestDouble();
@@ -567,8 +564,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             {
                 displayRow.bUse = true;
             }
-            _detailRow.zValue[minPeriod] = 1;
-            _detailRow.zValue[maxPeriod] = 1;
+            _detailRow.zCost[minPeriod] = 1;
 
             // Act
             _testDouble.AddDetailRow(_detailRowTotal, _rowId);
