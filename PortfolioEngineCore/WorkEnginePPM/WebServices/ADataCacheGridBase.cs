@@ -58,6 +58,8 @@ internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBa
         return categoryColumn;
     }
 
+    protected override int DetailRowIdBase => 1;
+
     private void CreateIntAttributeFromBoolNullable(CStruct column, string attributeName, bool? value)
     {
         if (value != null)

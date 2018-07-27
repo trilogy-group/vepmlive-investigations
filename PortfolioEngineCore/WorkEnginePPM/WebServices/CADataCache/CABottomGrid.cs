@@ -23,8 +23,6 @@ namespace CADataCache
 
         protected override bool SkipDetailRowGenerationErrors => true;
 
-        protected override int DetailRowIdBase => 1;
-
         public CABottomGrid(
             bool useHeatMap,
             int heatMapIndex, 
