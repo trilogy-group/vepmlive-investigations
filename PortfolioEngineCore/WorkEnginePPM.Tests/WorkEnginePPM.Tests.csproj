@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
@@ -95,12 +101,16 @@
     <Compile Include="Jobs\CleanupTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperFunctionsTests.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\ModelDataCacheGridBaseTestDouble.cs" />
     <Compile Include="TestDoubles\GridBaseTestDouble.cs" />
-    <Compile Include="TestDoubles\BottomGridTestDouble.cs" />
-    <Compile Include="TestDoubles\TopGridTestDouble.cs" />
-    <Compile Include="WebServices\ModelDataCache\GridBaseTest.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\BottomGridTestDouble.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\TopGridTestDouble.cs" />
+    <Compile Include="TestDoubles\RPADataCache\RPATopGridTestDouble.cs" />
+    <Compile Include="WebServices\GridBaseTest.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelDataCacheGridBaseTest.cs" />
     <Compile Include="WebServices\ModelDataCache\BottomGridTest.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGridTest.cs" />
+    <Compile Include="WebServices\RPADataCache\RPATopGridTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -115,6 +125,9 @@
       <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
       <Name>WorkEnginePPM</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="signature.snk" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

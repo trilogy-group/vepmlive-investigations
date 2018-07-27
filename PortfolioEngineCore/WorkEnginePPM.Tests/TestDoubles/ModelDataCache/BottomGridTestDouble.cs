@@ -7,7 +7,7 @@ using ModelDataCache;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 
-namespace WorkEnginePPM.Tests.TestDoubles
+namespace WorkEnginePPM.Tests.TestDoubles.ModelDataCache
 {
     public class BottomGridTestDouble : BottomGrid
     {
@@ -40,12 +40,12 @@ namespace WorkEnginePPM.Tests.TestDoubles
             base.AddDetailRow(detailRowData, rowId);
         }
 
-        public new void InitializeGridLayout(RenderingTypes renderingType)
+        public new void InitializeGridLayout(GridRenderingTypes renderingType)
         {
             base.InitializeGridLayout(renderingType);
         }
 
-        public new void InitializeGridData(RenderingTypes renderingType)
+        public new void InitializeGridData(GridRenderingTypes renderingType)
         {
             base.InitializeGridData(renderingType);
         }

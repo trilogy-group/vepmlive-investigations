@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using EPMLiveCore;
 using PortfolioEngineCore;
 
 namespace ModelDataCache
 {
-    public class TopGrid : GridBase
+    public class TopGrid : ModelDataCacheGridBase
     {
         public TopGrid(
             bool useGrouping,
@@ -26,9 +27,9 @@ namespace ModelDataCache
         {
         }
 
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
@@ -48,7 +49,7 @@ namespace ModelDataCache
             xCfg.CreateIntAttr("FilterEmpty", 1);
             xCfg.CreateIntAttr("ExportFormat", 1);
 
-            if (renderingType == RenderingTypes.Combined)
+            if (renderingType == GridRenderingTypes.Combined)
             {
                 xCfg.CreateIntAttr("Sorting", 0);
                 xCfg.CreateStringAttr("Filtering", "0");
@@ -93,14 +94,14 @@ namespace ModelDataCache
             }
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
 
-            if (renderingType == RenderingTypes.Data)
+            if (renderingType == GridRenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");
                 xCfg.CreateIntAttr("FilterEmpty", 1);
@@ -308,7 +309,7 @@ namespace ModelDataCache
             xZ.CreateStringAttr("GanttHeader2", "d#dd");
         }
 
-        protected override CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
+        protected CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
         {
             // Add category column
             var categoryColumn = xLeftCols.CreateSubStruct("C");

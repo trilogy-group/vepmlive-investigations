@@ -8,6 +8,7 @@ using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using Microsoft.SharePoint.Administration;
+using EPMLiveCore;
 
 namespace EPMLiveWorkPlanner
 {
@@ -198,7 +199,18 @@ namespace EPMLiveWorkPlanner
 
             publishTasks(doc, oTaskCenter, projectid, hshTaskCenterFields, taskCenterProjectField, sPrefix, props, plannerid);
 
-            oProject.Update();
+            try
+            {
+                    oProject.Update();
+            }
+            catch
+            {  
+                //If user do not have access then  this method will update the SPList Without triggering any event.
+                using (new DisabledItemEventScope())
+                {
+                    oProject.Update();
+                }
+            }
 
         }
 
