@@ -745,60 +745,38 @@ namespace CADataCache
 
         public string GetBottomGrid()
         {
-
-            CABottomGrid oGrid = new CABottomGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_bottomgridcln, 0);
-            int i = 0;
-
-
-            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
-            {
-                i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TotSelectedOrder, 0, bUseQTY, bUseCosts, m_use_heatmap);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            //clsPIData oPIData;
-
-
-            bool bsrem = m_showremaining;
+            var bsrem = m_showremaining;
 
             if (m_apply_target == 0)
                 bsrem = false;
 
-            //displist = TGStandard;
-            try
+            var grid = new CABottomGrid(
+                m_use_heatmap, 
+                m_heatmapcol, 
+                m_use_heatmapColour,
+                m_clsda.m_clsTargetColours,
+                bsrem,
+                true,
+                bShowFTEs,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                0,
+                TotSelectedOrder,
+                m_bottomgridcln);
+
+            grid.AddPeriodsData(m_clsda.m_Periods.Values);
+
+            var i = 0;
+            grid.AddDetailRowsData(m_total_rows.Values.Select(totalRow =>
             {
-                i = 0;
-                foreach (CATotRow xTot in m_total_rows.Values)
-                {
-                    clsDetailRowData oDet = xTot.m_totals[0];
-                    clsDetailRowData otDet = m_target_dets.ElementAt(i).Value;
+                var oDet = totalRow.m_totals[0];
 
-                    oDet.rowid = i;
+                oDet.rowid = i++;
+                return totalRow;
+            }));
 
-
-
-                    oGrid.AddDetailRow(oDet, otDet, m_clsda.m_clsTargetColours, ++i, bShowFTEs, m_bottomgridcln, TotSelectedOrder, bUseQTY, bUseCosts,
-                                       m_show_rhs_dec_costs, bsrem, xTot, m_use_heatmap, m_heatmapcol, m_use_heatmapColour, true);
-
-                    //    m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
-                    //    oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
-                }
-            }
-            catch (Exception ex)
-            {
-                string sx = ex.Message;
-            }
-
-            s = oGrid.GetString();
-
-            return s;
-
-
-
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
         public void SetCTStateData(CStruct xData)

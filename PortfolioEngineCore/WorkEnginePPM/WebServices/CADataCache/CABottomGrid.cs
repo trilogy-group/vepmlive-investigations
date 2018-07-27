@@ -12,25 +12,25 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace CADataCache
 {
-    internal class CABottomGridTemp : CADataCacheGridBase<Tuple<clsDetailRowData, clsDetailRowData>>
+    internal class CABottomGrid : CADataCacheGridBase<CATotRow>
     {
         private readonly bool _useHeatMap;
         private readonly int _heatMapIndex;
         private readonly int _heatMapColor;
         private readonly IList<clsTargetColours> _targetColors;
         private readonly bool _showRemainingDetailRows;
-        private readonly CATotRow _totalDetailRow;
         private readonly bool _doZeroRowCleverStuff;
 
         protected override bool SkipDetailRowGenerationErrors => true;
 
-        public CABottomGridTemp(
+        protected override int DetailRowIdBase => 1;
+
+        public CABottomGrid(
             bool useHeatMap,
             int heatMapIndex, 
             int heatMapColor, 
             IList<clsTargetColours> targetColors, 
-            bool showRemainingDetailRows, 
-            CATotRow totalDetailRow, 
+            bool showRemainingDetailRows,
             bool doZeroRowCleverStuff,
             bool showFTEs,
             bool useQuantity,
@@ -47,7 +47,6 @@ namespace CADataCache
             _heatMapColor = heatMapColor;
             _targetColors = targetColors;
             _showRemainingDetailRows = showRemainingDetailRows;
-            _totalDetailRow = totalDetailRow;
             _doZeroRowCleverStuff = doZeroRowCleverStuff;
         }
         
@@ -131,42 +130,39 @@ namespace CADataCache
             DefinitionLeaf.CreateStringAttr(GeneratePeriodAttributeName("Y", periodId, counter, "Formula"), string.Empty);
         }
 
-        protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
+        protected override bool CheckIfDetailRowShouldBeAdded(CATotRow detailRowTotal)
         {
             var prefix = string.Empty;
-
-            var detailRowData = detailRowDataTuple.Item1;
-            var detailRowDataTarget = detailRowDataTuple.Item2;
-            
-            _totalDetailRow.bUsed = false;
+            detailRowTotal.bUsed = false;
 
             if (_doZeroRowCleverStuff)
             {
-                var detailRowDataSelected = GetDetailRowDataSelected(detailRowDataTuple);
+                var detailRowDataSelected = GetDetailRowDataSelected(detailRowTotal);
                 return detailRowDataSelected != null;
             }
 
             return true;
         }
 
-        private clsDetailRowData GetDetailRowDataSelected(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
+        private clsDetailRowData GetDetailRowDataSelected(CATotRow detailRowTotal)
         {
-            var maxp = detailRowDataTuple.Item1.zFTE.Length - 1;
+            var detailRowData = GetDetailRowData(detailRowTotal);
+            var maxp = detailRowData.zFTE.Length - 1;
             var counter = 0;
 
             for (int i = 1; i <= maxp; i++)
             {
                 try
                 {
-                    foreach (CATGRow displayRow in _displayList)
+                    foreach (var displayRow in _displayList)
                     {
                         if (displayRow.bUse)
                         {
                             ++counter;
 
                             var detailRowSelected = displayRow.index < 0
-                                ? _totalDetailRow.m_targets[-displayRow.index]
-                                : _totalDetailRow.m_totals[displayRow.index];
+                                ? detailRowTotal.m_targets[-displayRow.index]
+                                : detailRowTotal.m_totals[displayRow.index];
 
                             if (detailRowSelected.zCost[i] != 0)
                             {
@@ -188,17 +184,17 @@ namespace CADataCache
             return null;
         }
         
-        protected override int CalculateInternalPeriodMin(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
+        protected override int CalculateInternalPeriodMin(CATotRow detailRowTotal)
         {
-            var dataItem = detailRowDataTuple.Item1;
+            var detailRowData = GetDetailRowData(detailRowTotal);
 
-            for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
+            for (int i = 1; i <= detailRowData.zFTE.Length - 1; i++)
             {
                 foreach (var displayRow in _displayList)
                 {
                     if (displayRow.bUse)
                     {
-                        if (dataItem.zCost[i] != 0)
+                        if (detailRowData.zCost[i] != 0)
                         {
                             return i;
                         }
@@ -209,22 +205,19 @@ namespace CADataCache
             return 0;
         }
 
-        protected override int CalculateInternalPeriodMax(Tuple<clsDetailRowData, clsDetailRowData> resxData)
+        protected override int CalculateInternalPeriodMax(CATotRow resxData)
         {
             return 0;
         }
 
-        protected override clsDetailRowData GetDetailRowDataItem(Tuple<clsDetailRowData, clsDetailRowData> detailRowData)
+        protected override clsDetailRowData GetDetailRowData(CATotRow detailRowTotal)
         {
-            // (CC-76484, 2018-07-27) According to the initial design, CABottomGrid is the only one standing out from the others
-            // who bases it's DetailRow creation on several clsDetailRowData objects. 
-            // Since we can do nothing with original design, we have to adopt by introducing the best way we could find to support variations
-            return detailRowData.Item1;
+            return detailRowTotal.m_totals[0];
         }
 
-        protected override CStruct InitializeDetailRowDataStructure(Tuple<clsDetailRowData, clsDetailRowData> detailRowData, int rowId)
+        protected override CStruct InitializeDetailRowDataStructure(CATotRow detailRowData, int rowId)
         {
-            _totalDetailRow.bUsed = true;
+            detailRowData.bUsed = true;
 
             var xIParent = Levels[0];
             var xI = xIParent.CreateSubStruct("I");
@@ -239,7 +232,7 @@ namespace CADataCache
             return xI;
         }
 
-        protected override void UpdateDisplayRowsWithPeriodData(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple, CStruct xI, int i)
+        protected override void UpdateDisplayRowsWithPeriodData(CATotRow detailRowTotal, CStruct xI, int i)
         {
             var p1 = 0d;
             var targetCost = 0d;
@@ -248,8 +241,8 @@ namespace CADataCache
             if (_useHeatMap)
             {
                 targetCost = _heatMapIndex < 0
-                    ? _totalDetailRow.m_targets[-_heatMapIndex].zCost[i]
-                    : _totalDetailRow.m_totals[_heatMapIndex].zCost[i];
+                    ? detailRowTotal.m_targets[-_heatMapIndex].zCost[i]
+                    : detailRowTotal.m_totals[_heatMapIndex].zCost[i];
 
                 xI.CreateDoubleAttr("P" + i.ToString() + "H", targetCost);
             }
@@ -262,8 +255,8 @@ namespace CADataCache
                     ++counter;
 
                     var detailRowDataSelected = displayRow.index < 0 
-                        ? _totalDetailRow.m_targets[-displayRow.index]
-                        : _totalDetailRow.m_totals[displayRow.index];
+                        ? detailRowTotal.m_targets[-displayRow.index]
+                        : detailRowTotal.m_totals[displayRow.index];
 
                     const string prefix = "C";
                     var attributeNameSuffix = i + prefix + counter;
@@ -275,8 +268,8 @@ namespace CADataCache
                         p1 = detailRowDataSelected.zCost[i];
 
                         targetCost = _heatMapIndex < 0
-                            ? _totalDetailRow.m_targets[-_heatMapIndex].zCost[i]
-                            : _totalDetailRow.m_totals[_heatMapIndex].zCost[i];
+                            ? detailRowTotal.m_targets[-_heatMapIndex].zCost[i]
+                            : detailRowTotal.m_totals[_heatMapIndex].zCost[i];
 
                         if (_showRemainingDetailRows)
                         {

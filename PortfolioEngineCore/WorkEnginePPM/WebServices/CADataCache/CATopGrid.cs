@@ -252,7 +252,7 @@ namespace CADataCache
             }
         }
 
-        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
+        protected override clsDetailRowData GetDetailRowData(clsDetailRowData detailRowData)
         {
             return detailRowData;
         }

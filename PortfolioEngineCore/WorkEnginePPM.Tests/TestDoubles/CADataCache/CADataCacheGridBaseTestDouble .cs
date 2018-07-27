@@ -88,7 +88,7 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
             throw new NotImplementedException();
         }
 
-        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
+        protected override clsDetailRowData GetDetailRowData(clsDetailRowData detailRowData)
         {
             throw new NotImplementedException();
         }

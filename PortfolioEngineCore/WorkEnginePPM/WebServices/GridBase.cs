@@ -24,6 +24,8 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected virtual bool SkipDetailRowGenerationErrors => false;
 
+    protected virtual int DetailRowIdBase => 0;
+
     protected abstract bool CheckIfDetailRowShouldBeAdded(TDetailRowData detailRow);
 
     public void AddPeriodsData(IEnumerable<TPeriodData> periods)
@@ -78,7 +80,7 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
                 {
                     for (var i = 0; i < DetailRows.Count; i++)
                     {
-                        AddDetailRow(DetailRows[i], i);
+                        AddDetailRow(DetailRows[i], i + DetailRowIdBase);
                     }
                 }
                 catch(Exception ex)

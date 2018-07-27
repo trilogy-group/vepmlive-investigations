@@ -477,7 +477,7 @@ namespace CADataCache
         {
             var xI = InitializeDetailRowDataStructure(detailRowData, rowId);
 
-            var detailRowDataItem = GetDetailRowDataItem(detailRowData);
+            var detailRowDataItem = GetDetailRowData(detailRowData);
 
             foreach (var column in _columns)
             {
@@ -515,7 +515,7 @@ namespace CADataCache
 
         protected abstract void UpdateDisplayRowsWithPeriodData(TDetailRowData detailRowData, CStruct xI, int i);
 
-        protected abstract clsDetailRowData GetDetailRowDataItem(TDetailRowData detailRowData);
+        protected abstract clsDetailRowData GetDetailRowData(TDetailRowData detailRowData);
 
         protected abstract CStruct InitializeDetailRowDataStructure(TDetailRowData detailRowData, int rowId);
     }
