@@ -736,7 +736,7 @@ namespace CADataCache
             var i = 0;
             grid.AddDetailRowsData(m_clnsort.Select(oDet =>
             {
-                oDet.rowid = ++i;
+                oDet.rowid = i++;
                 return oDet;
             }));
 
