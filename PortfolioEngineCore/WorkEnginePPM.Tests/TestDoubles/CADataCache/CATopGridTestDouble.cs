@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortfolioEngineCore;
-using ResourceValues;
+﻿using System.Collections.Generic;
 using CADataCache;
 using CostDataValues;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
 {

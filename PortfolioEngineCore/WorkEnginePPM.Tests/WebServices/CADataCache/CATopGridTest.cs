@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CADataCache;
+using CostDataValues;
 using Global.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint.Administration.Fakes;
-using Microsoft.SharePoint.Fakes;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.Fakes;
-using ResourceValues;
-using CADataCache;
 using WorkEnginePPM.Tests.TestDoubles.CADataCache;
-using CostDataValues;
 
 namespace WorkEnginePPM.Tests.WebServices.CADataCache
 {
@@ -60,12 +52,12 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
 
             _renderingType = GridRenderingTypes.Combined;
 
-            _columns = new []
+            _columns = new[]
             {
                 new clsColDisp { m_id = (int)FieldIDs.FTOT_FID, m_realname="test!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\", m_dispname = "test-display" },
                 new clsColDisp { m_id = (int)FieldIDs.PI_FID, m_realname="test!@#$%^&*()_+-={}[]|:;'?/~` '\r\n\"\\", m_dispname = "test-display" }
             };
-            _displayList = new[] 
+            _displayList = new[]
             {
                 new CATGRow { bUse = true }
             };
@@ -99,6 +91,11 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             _intAttributesCreated = new Dictionary<string, IDictionary<string, int>>();
             _doubleAttributesCreated = new Dictionary<string, IDictionary<string, double>>();
 
+            SetUpShims();
+        }
+
+        private void SetUpShims()
+        {
             ShimCStruct.AllInstances.CreateSubStructString = (instance, subStructName) =>
             {
                 _substructsCreated.Add(subStructName);
@@ -146,7 +143,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
                 _doubleAttributesCreated[element.Name][name] = value;
             };
         }
-        
+
         [TestCleanup]
         public void TearDown()
         {
@@ -255,6 +252,20 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["GroupRestoreSort"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["NoTreeLines"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ShowVScroll"]);
+        }
+        [TestMethod]
+        public void InitializeGridLayout_Always_InitializesLayoutConfigCfgWidths()
+        {
+            // Arrange, Act
+            _testDouble.InitializeGridLayout(_renderingType);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("Cfg"));
+            Assert.AreEqual(150, _intAttributesCreated["Cfg"]["LeftWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["Width"]);
+            Assert.AreEqual(800, _intAttributesCreated["Cfg"]["RightWidth"]);
+            Assert.AreEqual(50, _intAttributesCreated["Cfg"]["MinMidWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["MinRightWidth"]);
         }
 
         [TestMethod]
