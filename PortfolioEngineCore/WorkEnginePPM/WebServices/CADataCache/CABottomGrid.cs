@@ -187,56 +187,7 @@ namespace CADataCache
 
             return null;
         }
-
-        protected override void AddDetailRow(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple, int rowId)
-        {
-            var detailRowData = detailRowDataTuple.Item1;
-            var detailRowDataTarget = detailRowDataTuple.Item2;
-            var detailRowDataSelected = GetDetailRowDataSelected(detailRowDataTuple);
-            // (CC-76484, 2018-07-27) According to the initial code, the code addressing detailRowDataSelected 
-            // will throw a NullReferencException if _doZeroCleverStuff == false
-
-            _totalDetailRow.bUsed = true;
-
-            var xIParent = Levels[0];
-            var xI = xIParent.CreateSubStruct("I");
-
-            Levels[1] = xI;
-            xI.CreateStringAttr("id", rowId.ToString());
-            xI.CreateStringAttr("Color", "white");
-            xI.CreateStringAttr("Def", "Leaf");
-            xI.CreateIntAttr("NoColorState", 1);
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            foreach (var column in _columns)
-            {
-                var attributeName = "zX" + CleanUpString(column.m_dispname);
-
-                string value;
-                if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
-                {
-                    xI.CreateStringAttr(attributeName, value);
-                }
-            }
-
-            var periodTotal = detailRowData.zFTE.Length - 1;
-
-            var periodMin = CalculateInternalPeriodMin(detailRowDataTuple);
-            var periodMax = 0;
-            if (periodMin != 0)
-            {
-                periodMax = CalculateInternalPeriodMax(detailRowDataTuple);
-            }
-            else
-            {
-                periodMin = periodTotal + 1;
-            }
-
-            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
-            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
-            xI.CreateIntAttr("xinterenalPeriodTotal", periodTotal);
-        }
-
+        
         protected override int CalculateInternalPeriodMin(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple)
         {
             var dataItem = detailRowDataTuple.Item1;
@@ -261,6 +212,166 @@ namespace CADataCache
         protected override int CalculateInternalPeriodMax(Tuple<clsDetailRowData, clsDetailRowData> resxData)
         {
             return 0;
+        }
+
+        protected override clsDetailRowData GetDetailRowDataItem(Tuple<clsDetailRowData, clsDetailRowData> detailRowData)
+        {
+            // (CC-76484, 2018-07-27) According to the initial design, CABottomGrid is the only one standing out from the others
+            // who bases it's DetailRow creation on several clsDetailRowData objects. 
+            // Since we can do nothing with original design, we have to adopt by introducing the best way we could find to support variations
+            return detailRowData.Item1;
+        }
+
+        protected override CStruct InitializeDetailRowDataStructure(Tuple<clsDetailRowData, clsDetailRowData> detailRowData, int rowId)
+        {
+            _totalDetailRow.bUsed = true;
+
+            var xIParent = Levels[0];
+            var xI = xIParent.CreateSubStruct("I");
+
+            Levels[1] = xI;
+            xI.CreateStringAttr("id", rowId.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "Leaf");
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            return xI;
+        }
+
+        protected override void UpdateDisplayRowsWithPeriodData(Tuple<clsDetailRowData, clsDetailRowData> detailRowDataTuple, CStruct xI, int i)
+        {
+            var p1 = 0d;
+            var targetCost = 0d;
+            var rgb = string.Empty;
+
+            if (_useHeatMap)
+            {
+                targetCost = _heatMapIndex < 0
+                    ? _totalDetailRow.m_targets[-_heatMapIndex].zCost[i]
+                    : _totalDetailRow.m_totals[_heatMapIndex].zCost[i];
+
+                xI.CreateDoubleAttr("P" + i.ToString() + "H", targetCost);
+            }
+
+            var counter = 0;
+            foreach (var displayRow in _displayList)
+            {
+                if (displayRow.bUse)
+                {
+                    ++counter;
+
+                    var detailRowDataSelected = displayRow.index < 0 
+                        ? _totalDetailRow.m_targets[-displayRow.index]
+                        : _totalDetailRow.m_totals[displayRow.index];
+
+                    const string prefix = "C";
+                    var attributeNameSuffix = i + prefix + counter;
+
+                    var cost = detailRowDataSelected.zCost[i];
+
+                    if (displayRow.fid == 0 && _useHeatMap == true)
+                    {
+                        p1 = detailRowDataSelected.zCost[i];
+
+                        targetCost = _heatMapIndex < 0
+                            ? _totalDetailRow.m_targets[-_heatMapIndex].zCost[i]
+                            : _totalDetailRow.m_totals[_heatMapIndex].zCost[i];
+
+                        if (_showRemainingDetailRows)
+                        {
+                            cost = targetCost - p1;
+                        }
+                    }
+
+                    if (detailRowDataSelected.zCost[i] != double.MinValue)
+                    {
+                        xI.CreateDoubleAttr("P" + attributeNameSuffix, _showCostDetailed ? cost : Math.Floor(cost));
+                    }
+
+                    if (displayRow.fid == 0 && _useHeatMap)
+                    {
+                        int targetLevel = 0;
+                        if (targetCost == 0 && p1 == 0)
+                        {
+                            rgb = TargetBackground(targetCost, 1, out targetLevel);
+                        }
+                        else
+                        {
+                            rgb = TargetBackground(p1, targetCost, out targetLevel);
+                        }
+                        
+                        xI.CreateIntAttr("X" + attributeNameSuffix, targetLevel);
+                        xI.CreateIntAttr("Y" + attributeNameSuffix, targetLevel >= 0 ? targetLevel : 0);
+
+                        if (!string.IsNullOrEmpty(rgb))
+                        {
+                            xI.CreateStringAttr("P" + attributeNameSuffix + "Color", rgb);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // (CC-76484, 2018-07-27) Could not understand from the context what Tdbl and Pdbl are supposed to mean
+        // therefore restraining of renaming them
+        private string TargetBackground(double Tdbl, double Pdbl, out int targetlevel)
+        {
+            targetlevel = 0;
+            var result = "RGB(217, 255, 255)";
+            if (_targetColors == null || _targetColors.Count == 0)
+            {
+                return result;
+            }
+
+            var rgb = -4;
+            targetlevel = Tdbl == 0 && Pdbl == 0 ? -3 :
+                          Tdbl == 0 ? -2 :
+                          Pdbl == 0 ? -1 :
+                          0;
+
+            if (targetlevel > 0)
+            {
+                foreach (var color in _targetColors)
+                {
+                    if (color.ID == targetlevel)
+                    {
+                        rgb = color.rgb_val;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                var percent = (_heatMapColor == 2 
+                        ? (Pdbl / Tdbl) 
+                        : (Tdbl / Pdbl)
+                    ) * 100;
+
+                foreach (var color in _targetColors)
+                {
+                    if (color.ID > 0)
+                    {
+                        if ((percent >= color.low_val && percent <= color.high_val) 
+                            || (color.high_val == 0))
+                        {
+                            rgb = color.rgb_val;
+                            targetlevel = color.ID;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (rgb == -1)
+            {
+                return null;
+            }
+
+            return string.Format("RGB({0},{1},{2})",
+                (rgb & 0xFF).ToString(),
+                ((rgb & 0xFF00) >> 8).ToString(),
+                ((rgb & 0xFF0000) >> 16).ToString());
         }
     }
 }

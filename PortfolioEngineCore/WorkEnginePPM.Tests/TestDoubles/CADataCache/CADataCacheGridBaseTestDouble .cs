@@ -96,5 +96,25 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
         {
             throw new NotImplementedException();
         }
+
+        protected override void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override CStruct InitializeDetailRowDataStructure(clsDetailRowData detailRowData, int rowId)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMin(clsDetailRowData resxData)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMax(clsDetailRowData resxData)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

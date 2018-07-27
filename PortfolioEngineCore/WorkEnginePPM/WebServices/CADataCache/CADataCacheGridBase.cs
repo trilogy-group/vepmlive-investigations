@@ -472,5 +472,51 @@ namespace CADataCache
         protected abstract int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter);
 
         protected abstract void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow);
+
+        protected override void AddDetailRow(TDetailRowData detailRowData, int rowId)
+        {
+            var xI = InitializeDetailRowDataStructure(detailRowData, rowId);
+
+            var detailRowDataItem = GetDetailRowDataItem(detailRowData);
+
+            foreach (var column in _columns)
+            {
+                var attributeName = "zX" + CleanUpString(column.m_realname);
+
+                string value;
+                if (TryGetDataFromDetailRowDataField(detailRowDataItem, column.m_id, out value))
+                {
+                    xI.CreateStringAttr(attributeName, value);
+                }
+            }
+
+            var periodTotal = detailRowDataItem.zFTE.Length - 1;
+
+            var periodMin = CalculateInternalPeriodMin(detailRowData);
+            var periodMax = 0;
+            if (periodMin != 0)
+            {
+                periodMax = CalculateInternalPeriodMax(detailRowData);
+            }
+            else
+            {
+                periodMin = periodTotal + 1;
+            }
+
+            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
+            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
+            xI.CreateIntAttr("xinterenalPeriodTotal", periodTotal);
+
+            for (int i = 1; i <= periodTotal; i++)
+            {
+                UpdateDisplayRowsWithPeriodData(detailRowData, xI, i);
+            }
+        }
+
+        protected abstract void UpdateDisplayRowsWithPeriodData(TDetailRowData detailRowData, CStruct xI, int i);
+
+        protected abstract clsDetailRowData GetDetailRowDataItem(TDetailRowData detailRowData);
+
+        protected abstract CStruct InitializeDetailRowDataStructure(TDetailRowData detailRowData, int rowId);
     }
 }

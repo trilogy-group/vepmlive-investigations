@@ -132,58 +132,9 @@ namespace CADataCache
             return costValue + quantityValue + fteValue > 0;
         }
 
-        protected override void AddDetailRow(clsDetailRowData detailRowData, int rowId)
-        {
-            var xIParent = Levels[0];
-            var xI = xIParent.CreateSubStruct("I");
-
-            Levels[1] = xI;
-            xI.CreateStringAttr("id", rowId.ToString());
-            xI.CreateStringAttr("rowid", "r" + rowId.ToString());
-            xI.CreateStringAttr("Color", "white");
-            xI.CreateStringAttr("Def", "Leaf");
-            xI.CreateIntAttr("NoColorState", 1);
-            xI.CreateBooleanAttr("CanEdit", false);
-            xI.CreateStringAttr("Select", (detailRowData.bSelected ? "1" : "0"));
-            xI.CreateBooleanAttr("SelectCanEdit", true);
-
-            foreach (var column in _columns)
-            {
-                var attributeName = "zX" + CleanUpString(column.m_realname);
-
-                string value;
-                if (TryGetDataFromDetailRowDataField(detailRowData, column.m_id, out value))
-                {
-                    xI.CreateStringAttr(attributeName, value);
-                }
-            }
-
-            var periodTotal = detailRowData.zFTE.Length - 1;
-
-            var periodMin = CalculateInternalPeriodMin(detailRowData);
-            var periodMax = 0;
-            if (periodMin != 0)
-            {
-                periodMax = CalculateInternalPeriodMax(detailRowData);
-            }
-            else
-            {
-                periodMin = periodTotal + 1;
-            }
-            
-            xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
-            xI.CreateIntAttr("xinterenalPeriodMax", periodMax);
-            xI.CreateIntAttr("xinterenalPeriodTotal", periodTotal);
-            
-            for (int i = 1; i <= periodTotal; i++)
-            {
-                UpdateDisplayRowsWithPeriodData(detailRowData, xI, i);
-            }
-        }
-
         protected override int CalculateInternalPeriodMin(clsDetailRowData detailRowData)
         {
-            var dataItem = GetDetailRowDataItem(detailRowData);
+            var dataItem = detailRowData;
 
             for (int i = 1; i <= dataItem.zFTE.Length - 1; i++)
             {
@@ -219,7 +170,7 @@ namespace CADataCache
 
         protected override int CalculateInternalPeriodMax(clsDetailRowData detailRowData)
         {
-            var dataItem = GetDetailRowDataItem(detailRowData);
+            var dataItem = detailRowData;
 
             for (int i = dataItem.zFTE.Length - 1; i > 1; i--)
             {
@@ -253,7 +204,7 @@ namespace CADataCache
             return 0;
         }
 
-        private void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)
+        protected override void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)
         {
             var count = 0;
             foreach (var displayRow in _displayList)
@@ -299,6 +250,29 @@ namespace CADataCache
                     }
                 }
             }
+        }
+
+        protected override clsDetailRowData GetDetailRowDataItem(clsDetailRowData detailRowData)
+        {
+            return detailRowData;
+        }
+
+        protected override CStruct InitializeDetailRowDataStructure(clsDetailRowData detailRowData, int rowId)
+        {
+            var xIParent = Levels[0];
+            var xI = xIParent.CreateSubStruct("I");
+
+            Levels[1] = xI;
+            xI.CreateStringAttr("id", rowId.ToString());
+            xI.CreateStringAttr("rowid", "r" + rowId.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "Leaf");
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateBooleanAttr("CanEdit", false);
+            xI.CreateStringAttr("Select", (detailRowData.bSelected ? "1" : "0"));
+            xI.CreateBooleanAttr("SelectCanEdit", true);
+
+            return xI;
         }
     }
 }
