@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortfolioEngineCore;
-using ResourceValues;
 using CADataCache;
 using CostDataValues;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
 {
-    internal class CADataCacheGridBaseTestDouble : CADataCacheGridBase
+    internal class CADataCacheGridBaseTestDouble : CADataCacheGridBase<clsDetailRowData>
     {
         public new CStruct PeriodCols => base.PeriodCols;
         public new CStruct MiddleCols => base.MiddleCols;
@@ -27,7 +23,7 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
             int pmoAdmin,
             IList<CATGRow> displayList,
             IList<clsColDisp> columns) 
-        : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns)
+        : base(showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns, true)
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
@@ -73,6 +69,46 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
         }
 
         protected override void AddPeriodColumns(IEnumerable<clsPeriodData> periods)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void InitializeGridLayoutCategoryColumns(CStruct columnsContainer)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculatePeriodColumnsSpan(string periodId, string periodName, int counter)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void InitializePeriodDisplayRow(string periodId, string periodName, int counter, CATGRow displayRow)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override clsDetailRowData GetDetailRowData(clsDetailRowData detailRowData)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void UpdateDisplayRowsWithPeriodData(clsDetailRowData detailRowData, CStruct xI, int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override CStruct InitializeDetailRowDataStructure(clsDetailRowData detailRowData, int rowId)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMin(clsDetailRowData resxData)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMax(clsDetailRowData resxData)
         {
             throw new NotImplementedException();
         }

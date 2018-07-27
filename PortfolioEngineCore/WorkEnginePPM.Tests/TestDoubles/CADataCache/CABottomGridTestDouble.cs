@@ -5,25 +5,36 @@ using PortfolioEngineCore;
 
 namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
 {
-    internal class CATopGridTestDouble : CATopGrid
+    internal class CABottomGridTestDouble : CABottomGrid
     {
-        public new CStruct PeriodCols => base.PeriodCols;
-        public new CStruct MiddleCols => base.MiddleCols;
-        public new CStruct DefinitionRight => base.DefinitionRight;
-        public new CStruct DefinitionLeaf => base.DefinitionLeaf;
-        public new CStruct[] Levels => base.Levels;
-        public new int Level => base.Level;
-
-        public CATopGridTestDouble(
-            bool hideRowsWithAllZeros,
-            bool showFTEs,
-            bool useQuantity,
-            bool useCost,
-            bool showCostDetailed,
-            int pmoAdmin,
-            IList<CATGRow> displayList,
+        public CABottomGridTestDouble(
+            bool useHeatMap, 
+            int heatMapIndex, 
+            int heatMapColor, 
+            IList<clsTargetColours> targetColors, 
+            bool showRemainingDetailRows, 
+            bool doZeroRowCleverStuff, 
+            bool showFTEs, 
+            bool useQuantity, 
+            bool useCost, 
+            bool showCostDetailed, 
+            int pmoAdmin, 
+            IList<CATGRow> displayList, 
             IList<clsColDisp> columns) 
-        : base(hideRowsWithAllZeros, showFTEs, useQuantity, useCost, showCostDetailed, pmoAdmin, displayList, columns)
+        : base(
+              useHeatMap, 
+              heatMapIndex, 
+              heatMapColor,
+              targetColors,
+              showRemainingDetailRows,
+              doZeroRowCleverStuff,
+              showFTEs,
+              useQuantity,
+              useCost,
+              showCostDetailed,
+              pmoAdmin,
+              displayList,
+              columns)
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
@@ -37,6 +48,15 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
 
             Levels[0] = Constructor.CreateSubStruct("Test");
         }
+
+        public new CStruct PeriodCols => base.PeriodCols;
+        public new CStruct MiddleCols => base.MiddleCols;
+        public new CStruct DefinitionRight => base.DefinitionRight;
+        public new CStruct DefinitionLeaf => base.DefinitionLeaf;
+        public new CStruct[] Levels => base.Levels;
+        public new int Level => base.Level;
+
+        
 
         public new string CleanUpString(string input)
         {
@@ -63,14 +83,14 @@ namespace WorkEnginePPM.Tests.TestDoubles.CADataCache
             base.InitializeGridData(renderingType);
         }
 
-        public new bool CheckIfDetailRowShouldBeAdded(clsDetailRowData detailRow)
+        public new bool CheckIfDetailRowShouldBeAdded(CATotRow detailRowTotal)
         {
-            return base.CheckIfDetailRowShouldBeAdded(detailRow);
+            return base.CheckIfDetailRowShouldBeAdded(detailRowTotal);
         }
 
-        public new void AddDetailRow(clsDetailRowData detailRowData, int rowId)
+        public new void AddDetailRow(CATotRow detailRowTotal, int rowId)
         {
-            base.AddDetailRow(detailRowData, rowId);
+            base.AddDetailRow(detailRowTotal, rowId);
         }
     }
 }
