@@ -17,18 +17,6 @@ namespace RPADataCache
 {
     internal class RPATopGrid : RPADataCacheGridBase
     {
-        private readonly IList<clsRXDisp> _columns;
-        private readonly int _pmoAdmin;
-        private readonly string _xmlString;
-        private readonly int _displayMode;
-        private readonly IList<RPATGRow> _displayList;
-        private readonly clsResourceValues _resourceValues;
-        private readonly clsLookupList _categoryLookupList;
-
-        protected CStruct DefinitionRight;
-        protected CStruct DefinitionLeaf;
-        protected CStruct MiddleCols;
-
         public RPATopGrid(
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
@@ -37,15 +25,9 @@ namespace RPADataCache
             IList<RPATGRow> displayList, 
             clsResourceValues resourceValues,
             clsLookupList categoryLookupList)
+        : base (columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
         {
-            _columns = columns;
-            _pmoAdmin = pmoAdmin;
-            _xmlString = xmlString;
-            _displayMode = displayMode;
-            _displayList = displayList;
-            _resourceValues = resourceValues;
-            _categoryLookupList = categoryLookupList;
-        }        
+        }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
@@ -69,10 +51,12 @@ namespace RPADataCache
             PeriodCols = xRightCols;
             MiddleCols = xCols;
 
-            DefinitionRight = InitializeGridLayoutDefinition("R");
+            var m_xDef = Constructor.CreateSubStruct("Def");
+
+            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef);
             DefinitionRight.CreateStringAttr("Calculated", "1");
 
-            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf");
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef);
             DefinitionLeaf.CreateStringAttr("Calculated", "0");
             
             var xHead = Constructor.CreateSubStruct("Head");
@@ -311,7 +295,7 @@ namespace RPADataCache
 
         private IEnumerable<CStruct> InitializeGridLayoutCategoryColumns(CStruct xLeftCols)
         {
-            var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowSel", "Icon",
+            var categoryColumn = CreateColumn(xLeftCols, "RowSel", "Icon",
                 width: 20,
                 canMove: false,
                 canExport: false,
@@ -320,12 +304,12 @@ namespace RPADataCache
             Header1.CreateStringAttr("RowSel", GlobalConstants.Whitespace);
             yield return categoryColumn;
             
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "rowid", "Text",
+            categoryColumn = CreateColumn(xLeftCols, "rowid", "Text",
                 visible: false,
                 canExport: false);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "Select", "Bool",
+            categoryColumn = CreateColumn(xLeftCols, "Select", "Bool",
                 width: 20,
                 canEdit: true,
                 canMove: false);
@@ -333,7 +317,7 @@ namespace RPADataCache
             Header1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "ChangedIcon", "Type",
+            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Type",
                 width: 20,
                 canEdit: false,
                 canMove: false,
@@ -341,68 +325,18 @@ namespace RPADataCache
             Header1.CreateStringAttr("ChangedIcon", GlobalConstants.Whitespace);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowDraggable", "Bool",
+            categoryColumn = CreateColumn(xLeftCols, "RowDraggable", "Bool",
                 visible: false,
                 canEdit: false,
                 canMove: false);
             yield return categoryColumn;
 
-            categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols, "RowChanged", "Int",
+            categoryColumn = CreateColumn(xLeftCols, "RowChanged", "Int",
                 visible: false,
                 canEdit: false,
                 canMove: false,
                 canExport: false);
             yield return categoryColumn;
-        }
-
-        private CStruct InitializeGridLayoutCategoryColumn(
-            CStruct columns,
-            string name,
-            string type,
-            bool? visible = null,
-            int? width = null,
-            bool? canEdit = null,
-            bool? canMove = null,
-            bool? canExport = null,
-            bool canResize = false,
-            bool canFilter = false,
-            bool showHint = false,
-            bool canSort = false,
-            bool canHide = false,
-            bool canSelect = false)
-        {
-            var categoryColumn = columns.CreateSubStruct("C");
-            categoryColumn.CreateStringAttr("Name", name);
-            categoryColumn.CreateStringAttr("Type", type);
-
-            if (visible != null)
-            {
-                categoryColumn.CreateIntAttr("Visible", visible.Value ? 1 : 0);
-            }
-            if (width != null)
-            {
-                categoryColumn.CreateStringAttr("Width", width.ToString());
-            }
-            if (canEdit != null)
-            {
-                categoryColumn.CreateBooleanAttr("CanEdit", canEdit.Value);
-            }
-            if (canMove != null)
-            {
-                categoryColumn.CreateIntAttr("CanMove", canMove.Value ? 1 : 0);
-            }
-            if (canExport != null)
-            {
-                categoryColumn.CreateIntAttr("CanExport", canExport.Value ? 1 : 0);
-            }
-            categoryColumn.CreateIntAttr("CanResize", canResize ? 1 : 0);
-            categoryColumn.CreateIntAttr("CanFilter", canFilter ? 1 : 0);
-            categoryColumn.CreateIntAttr("ShowHint", showHint ? 1 : 0);
-            categoryColumn.CreateIntAttr("CanSort", canSort ? 1 : 0);
-            categoryColumn.CreateIntAttr("CanHide", canHide ? 1 : 0);
-            categoryColumn.CreateIntAttr("CanSelect", canSelect ? 1 : 0);
-
-            return categoryColumn;
         }
 
         protected override string ResolvePeriodId(CPeriod periodData, int index)
@@ -443,7 +377,7 @@ namespace RPADataCache
                             ++count;
                             var prefix = "P" + periodId + "C" + count;
 
-                            var xC = InitializeGridLayoutCategoryColumn(
+                            var xC = CreateColumn(
                                 PeriodCols,
                                 prefix,
                                 "Float",
@@ -564,11 +498,11 @@ namespace RPADataCache
                 return;
             }
             
-            var periodMin = CalculateInternalPeriodMin(resxData);
+            var periodMin = CalculateInternalPeriodMin(detailRowDataTuple);
             var periodMax = 0;
             if (periodMin != 0)
             {
-                periodMax = CalculateInternalPeriodMax(resxData);
+                periodMax = CalculateInternalPeriodMax(detailRowDataTuple);
             }
 
             xI.CreateIntAttr("xinterenalPeriodMin", periodMin);
@@ -634,58 +568,7 @@ namespace RPADataCache
                 }
             }
         }
-
-        private int CalculateInternalPeriodMax(clsResXData resxData)
-        {
-            for (int i = _resourceValues.Periods.Values.Count(); i > 1; i--)
-            {
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
-
-                        if (value != 0)
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        private int CalculateInternalPeriodMin(clsResXData resxData)
-        {
-            var i = 0;
-            var fp = 0;
-            foreach (var period in _resourceValues.Periods.Values)
-            {
-                ++i;
-                foreach (var displayRow in _displayList)
-                {
-                    if (displayRow.bUse)
-                    {
-                        var value = GetDetailRowValue(resxData, displayRow.fid, i);
-
-                        if (value != 0)
-                        {
-                            fp = i;
-                            break;
-                        }
-                    }
-                }
-
-                if (fp != 0)
-                {
-                    break;
-                }
-            }
-
-            return fp;
-        }
-
+        
         private void ProcessDetailRowColumns(clsResXData resxData, clsPIData piData, CStruct xI)
         {
             clsEPKItem oItem;
@@ -1026,67 +909,7 @@ namespace RPADataCache
         {
             return HandleError(sContext, nStatus, "Exception in RPAGrids.cs (" + sStage + "): '" + ex.Message.ToString() + "'");
         }
-
-        private double GetDetailRowValue(clsResXData detailRowData, int fieldId, int i)
-        {
-            double result = 0;
-
-            if (fieldId == 0)
-            {
-                switch (_displayMode)
-                {
-                    case 3:
-                        try
-                        {
-                            if (detailRowData.getftarr(i) == 0)
-                            {
-                                result = 0;
-                            }
-                            else
-                            {
-                                result = detailRowData.getvarr(i) * 100;
-                                result /= detailRowData.getftarr(i);
-                                result = (int)result;
-                            }
-                        }
-                        catch(Exception ex)
-                        {
-                            result = 0;
-
-                            LoggingService.WriteTrace(
-                                Area.EPMLiveWorkEnginePPM,
-                                Categories.EPMLiveWorkEnginePPM.Others,
-                                TraceSeverity.VerboseEx,
-                                ex.ToString());
-                        }
-                        break;
-                    case 0:
-                        result = detailRowData.getvarr(i);
-                        break;
-                    default:
-                        result = detailRowData.getftarr(i);
-                        break;
-                }
-            }
-
-            if (fieldId == 1)
-            {
-                if (detailRowData.bRealone)
-                {
-                    result = _displayMode == 0
-                        ? detailRowData.getvarr(i)
-                        : detailRowData.getftarr(i);
-                }
-            }
-
-            if (_displayMode == 1)
-            {
-                result /= 100;
-            }
-
-            return result;
-        }
-
+        
         private string GetStatusText(int stat)
         {
             switch (stat)

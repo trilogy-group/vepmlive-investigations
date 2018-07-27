@@ -65,7 +65,8 @@ namespace ModelDataCache
                 xCfg.CreateStringAttr("ScrollLeft", "0");
             }
 
-            InitializeGridLayoutDefinition();
+            var m_xDef = Constructor.CreateSubStruct("Def");
+            InitializeGridLayoutDefinition("R", m_xDef);
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");

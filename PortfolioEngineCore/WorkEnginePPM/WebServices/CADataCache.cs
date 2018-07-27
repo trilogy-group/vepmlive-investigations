@@ -721,75 +721,26 @@ namespace CADataCache
 
         public string GetTopGrid()
         {
+            var grid = new CATopGrid(
+                _hideRowsWithAllZeros,
+                bShowFTEs,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                0,
+                TGStandard,
+                m_topgridcln);
 
-            CATopGrid oGrid = new CATopGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_topgridcln, 0);
-            int i = 0;
+            grid.AddPeriodsData(m_clsda.m_Periods.Values);
 
-            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
-            {
-                i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TGStandard, 0, bUseQTY, bUseCosts);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            
-            i = 0;
-            foreach (clsDetailRowData oDet in m_clnsort)
+            var i = 0;
+            grid.AddDetailRowsData(m_clnsort.Select(oDet =>
             {
                 oDet.rowid = ++i;
-                if (IsRowVisible(oDet, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs, _hideRowsWithAllZeros))
-                {
-                    oGrid.AddDetailRow(oDet, i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
-            }
+                return oDet;
+            }));
 
-            s = oGrid.GetString();
-            return s;
-        }
-
-        private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)
-        {
-            if (!hideRowsWithAllZeros)
-            {
-                return true;
-            }
-
-            var quantityValue = 0.0;
-            var costValue = 0.0;
-            var fteValue = 0.0;
-
-            var totalPeriods = details.zFTE.Length - 1;
-            for (var i = 1; i <= totalPeriods; i++)
-            {
-                costValue = 0;
-                quantityValue = 0;
-                fteValue = 0;
-
-                if (showQuantityColumn && details.zValue[i] != double.MinValue)
-                {
-                    quantityValue = details.zValue[i];
-                }
-
-                if (showFte && details.zFTE[i] != double.MinValue)
-                {
-                    fteValue = details.zFTE[i];
-                }
-
-                if (showCostColumn)
-                {
-                    costValue = showCostDecimals ? details.zCost[i] : Math.Round(details.zCost[i]);
-                }
-
-                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
-                {
-                    break;
-                }
-            }
-
-            return costValue + quantityValue + fteValue > 0;
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
         public string GetBottomGrid()
