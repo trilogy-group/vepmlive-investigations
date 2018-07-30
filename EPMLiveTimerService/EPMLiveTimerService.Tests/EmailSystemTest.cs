@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimerService;
 
@@ -30,11 +29,53 @@ namespace EPMLiveTimerService.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void SendFullEmail_WhenHideFromIsTrue_ThrowsException()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SendFullEmail_WhenBodyIsEmpty_ThrowsException()
         {
             // Arrange
-            ShimSPAdministrationWebApplication.LocalGet = () => new ShimSPAdministrationWebApplication();
+            _body = string.Empty;
+
+            // Act
+            EmailSystem.SendFullEmail(_body, _subject, _hideFrom, _fromUser, _toUser);
+
+            // Assert
+            // Expected ArgumentNullException
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SendFullEmail_WhenSubjectIsEmpty_ThrowsException()
+        {
+            // Arrange
+            _subject = string.Empty;
+
+            // Act
+            EmailSystem.SendFullEmail(_body, _subject, _hideFrom, _fromUser, _toUser);
+
+            // Assert
+            // Expected ArgumentNullException
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SendFullEmail_WhenFromUserIsNull_ThrowsException()
+        {
+            // Arrange
+            _fromUser = null;
+
+            // Act
+            EmailSystem.SendFullEmail(_body, _subject, _hideFrom, _fromUser, _toUser);
+
+            // Assert
+            // Expected ArgumentNullException
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SendFullEmail_WhenToUserIsNull_ThrowsException()
+        {
+            // Arrange
+            _toUser = null;
 
             // Act
             EmailSystem.SendFullEmail(_body, _subject, _hideFrom, _fromUser, _toUser);

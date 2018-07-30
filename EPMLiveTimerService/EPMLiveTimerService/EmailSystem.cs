@@ -14,47 +14,60 @@ namespace TimerService
 
         public static void SendFullEmail(string body, string subject, bool hideFrom, SPUser fromUser, SPUser toUser)
         {
-            try
+            if (string.IsNullOrWhiteSpace(body))
             {
-                var spWebAdmin = SPAdministrationWebApplication.Local;
-                var sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Address;
-
-                using (var mailMsg = new MailMessage())
-                {
-                    if (hideFrom)
-                    {
-                        mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
-                    }
-                    else
-                    {
-                        mailMsg.From = fromUser.Email == string.Empty
-                            ? new MailAddress(spWebAdmin.OutboundMailSenderAddress, fromUser.Name)
-                            : new MailAddress(fromUser.Email, fromUser.Name);
-                    }
-
-                    body = body.Replace(NameKey, toUser.Name);
-                    body = body.Replace(EmailKey, toUser.Email);
-                    body = body.Replace(UsernameKey, EpmCoreFunctions.GetJustUsername(toUser.LoginName));
-
-                    subject = subject.Replace(NameKey, toUser.Name);
-                    subject = subject.Replace(EmailKey, toUser.Email);
-                    subject = subject.Replace(UsernameKey, EpmCoreFunctions.GetJustUsername(toUser.LoginName));
-
-                    mailMsg.To.Add(new MailAddress(toUser.Email));
-                    mailMsg.Subject = subject;
-                    mailMsg.Body = body;
-                    mailMsg.IsBodyHtml = true;
-                    
-                    using (var smtpClient = new SmtpClient())
-                    {
-                        smtpClient.Host = sMailSvr;
-                        smtpClient.Send(mailMsg);
-                    }
-                }
+                throw new ArgumentNullException(nameof(body));
             }
-            catch (Exception ex)
+
+            if (string.IsNullOrWhiteSpace(subject))
             {
-                throw new Exception(ex.Message);
+                throw new ArgumentNullException(nameof(subject));
+            }
+
+            if (fromUser == null)
+            {
+                throw new ArgumentNullException(nameof(fromUser));
+            }
+
+            if (toUser == null)
+            {
+                throw new ArgumentNullException(nameof(toUser));
+            }
+
+            var spWebAdmin = SPAdministrationWebApplication.Local;
+            var sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Address;
+
+            using (var mailMsg = new MailMessage())
+            {
+                if (hideFrom)
+                {
+                    mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress);
+                }
+                else
+                {
+                    mailMsg.From = fromUser.Email == string.Empty
+                        ? new MailAddress(spWebAdmin.OutboundMailSenderAddress, fromUser.Name)
+                        : new MailAddress(fromUser.Email, fromUser.Name);
+                }
+
+                body = body.Replace(NameKey, toUser.Name)
+                    .Replace(EmailKey, toUser.Email)
+                    .Replace(UsernameKey, EpmCoreFunctions.GetJustUsername(toUser.LoginName));
+
+                subject = subject.Replace(NameKey, toUser.Name)
+                    .Replace(EmailKey, toUser.Email)
+                    .Replace(UsernameKey, EpmCoreFunctions.GetJustUsername(toUser.LoginName));
+
+                mailMsg.To.Add(new MailAddress(toUser.Email));
+                mailMsg.Subject = subject;
+                mailMsg.Body = body;
+                mailMsg.IsBodyHtml = true;
+                
+                using (var smtpClient = new SmtpClient())
+                {
+                    smtpClient.Host = sMailSvr;
+                    smtpClient.Send(mailMsg);
+                }
             }
         }
     }
