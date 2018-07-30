@@ -120,15 +120,16 @@ export class MyWorkPage {
         };
     }
 
-    static get saveViewPopup(){
-        const label = MyWorkPageConstants.saveViewPopUp;
+    static get viewsPopup(){
+        const label = MyWorkPageConstants.viewsPopUp;
         return{
             title: AnchorHelper.getItemById(label.title),
-            name: element(By.xpath(`//div[@class='ms-dlgBorder']//input[@id="MWG_ViewName"]`)),
+            name: this.saveViewElements(label.name),
             defaultView: this.saveViewElements(label.defaultView),
             personalView: this.saveViewElements(label.personalView),
             ok: this.saveViewElements(label.ok),
-            cancel: this.saveViewElements(label.cancel)
+            cancel: this.saveViewElements(label.cancel),
+            newName: this.saveViewElements(label.newName),
         };
     }
 

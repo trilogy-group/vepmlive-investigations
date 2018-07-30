@@ -77,14 +77,15 @@ export class MyWorkPageConstants {
         };
     }
 
-    static get saveViewPopUp(){
+    static get viewsPopUp(){
         return{
             title: 'dialogTitleSpan',
             name: 'MWG_ViewName',
             defaultView: 'MWG_DefaultView',
             personalView: 'MWG_PersonalView',
             ok: 'OK',
-            cancel: 'Cancel'
+            cancel: 'Cancel',
+            newName: 'MWG_ViewNewName'
         };
     }
 }

@@ -139,12 +139,12 @@ export class MyWorkPageHelper {
     }
 
     static async fillAndSubmitSaveView(viewName: string) {
-        const label = MyWorkPage.saveViewPopup;
+        const label = MyWorkPage.viewsPopup;
         await PageHelper.click(label.name);
         // await label.name.clear();
         await TextboxHelper.sendKeys(label.name, viewName);
         // await PageHelper.sendKeysToInputField(label.name, viewName);
-        if (label.defaultView.isSelected()) {
+        if (!(label.defaultView.isSelected())) {
             label.defaultView.click();
         }
         if (!(label.personalView.isSelected())) {
