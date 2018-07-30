@@ -148,7 +148,7 @@ namespace CostDataValues
         public string[] TXVal { get; set; }
     }
     [Serializable()]
-    public class clsDetailRowData : BaseDetailRowData
+    public class clsDetailRowData : BaseDetailRowData<clsTargetRowData>
     {
         public int CT_ind;
         public bool bFiltered;
@@ -172,47 +172,6 @@ namespace CostDataValues
         public void CopyData(clsDetailRowData src)
         {
             base.CopyData(src);
-        }
-
-        public void CopyToTargetData(ref clsTargetRowData dest)
-        {
-
-            dest.CT_ID = CT_ID;
-
-            dest.BC_UID = BC_UID;
-            dest.BC_ROLE_UID = BC_ROLE_UID;
-            dest.BC_SEQ = BC_SEQ;
-            dest.MC_Val = MC_Val;
-            dest.CAT_UID = CAT_UID;
-            dest.CT_Name = CT_Name;
-            dest.Cat_Name = Cat_Name;
-            dest.Role_Name = Role_Name;
-            dest.MC_Name = MC_Name;
-            dest.FullCatName = FullCatName;
-            dest.CC_Name = CC_Name;
-            dest.FullCCName = FullCCName;
-
-            dest.bGroupRow = false;
-            dest.Grouping = "";
-
-            dest.OCVal = OCVal;
-            dest.Text_OCVal = Text_OCVal;
-            dest.TXVal = TXVal;
-
-            dest.zCost = new double[mxdim + 1];
-            dest.zValue = new double[mxdim + 1];
-            dest.zFTE = new double[mxdim + 1];
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                dest.zCost[i] = zCost[i];
-                dest.zValue[i] = zValue[i];
-                dest.zFTE[i] = zFTE[i];
-
-            }
-
         }
 
         public void AddToTargetData(ref clsTargetRowData dest)
