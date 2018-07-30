@@ -22,6 +22,15 @@ namespace EPMLiveCore.Tests.API.Notification
     {
         private const int ListItemId = 711;
         private static readonly Guid _listParentListId = new Guid("19EDE34A-5358-48B6-B468-E3FECA86E1E6");
+        private static readonly Guid _webId = new Guid("8EB90CFE-34EA-4383-89DF-B04F8A2C29A9");
+        private static readonly Guid _oWebId = new Guid("C93098C4-2B5A-4ABC-9D7A-080DCF4A55A7");
+        private const int _itemId = 229;
+        private const string _listId = "9BDC6F65-7849-49D7-946D-9B5C1D3B83B3";
+        private const string _listName = "Goose";
+        private static readonly Guid _webAppGuid1 = new Guid("B9298FFB-0304-4A82-A8F0-D9983ED6B869");
+        private static readonly Guid _webAppGuid2 = new Guid("B7B3D541-D097-4940-A69E-A1302BFBB350");
+        private static readonly Guid _webAppGuid3 = new Guid("8BD93B95-2847-4EF6-97EE-136E08905304");
+        private static readonly Guid _webAppGuid4 = new Guid("F1235BCE-3F68-4805-B730-21F82120B75A");
 
         private IDisposable _shims;
         private APIEmail _apiEmail;
@@ -36,10 +45,12 @@ namespace EPMLiveCore.Tests.API.Notification
         private List<SqlCommand> _executeNonQueryCommands;
         private List<SqlCommand> _disposedCommands;
         private List<SqlCommand> _dataSetCommands;
+        private SPListItem _spListItemCalledXml;
 
         [TestInitialize]
         public void TestInitialize()
         {
+            _spListItemCalledXml = null;
             _shims = ShimsContext.Create();
             ShimAPIEmail.Constructor = apiEmail =>
             {
@@ -66,7 +77,7 @@ namespace EPMLiveCore.Tests.API.Notification
         public void ClearNotificationItem_Called_ObjectDisposed()
         {
             // Arrange
-            var spListItem = CreateShimSpListItem();
+            var spListItem = CreateShimSpListItem(_webAppGuid1);
 
             SqlConnection createdConnection = null;
             ShimSqlConnection.ConstructorString = (connection, _) =>
@@ -145,7 +156,7 @@ namespace EPMLiveCore.Tests.API.Notification
                 new string[] { "919" },
                 true,
                 true,
-                (SPListItem)CreateShimSpListItem(),
+                (SPListItem)CreateShimSpListItem(_webAppGuid1),
                 (SPUser)shimUser,
                 false
             };
@@ -229,6 +240,132 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreSame(_createdCommands[5], _disposedCommands[3]);
         }
 
+        [TestMethod]
+        public void QueueItemMessageXml_ListIdEmpty_OkReturned()
+        {
+            QueueItemMessageXml_Called_OkReturned(
+                _listName, 
+                string.Empty, 
+                _itemId, 
+                _webId.ToString(), 
+                _oWebId, 
+                _webAppGuid4);
+        }
+
+        [TestMethod]
+        public void QueueItemMessageXml_ListIdNotEmpty_OkReturned()
+        {
+            QueueItemMessageXml_Called_OkReturned(
+                _listName, 
+                _listId, 
+                _itemId, 
+                _webId.ToString(), 
+                _oWebId,
+                _webAppGuid3);
+        }
+
+        [TestMethod]
+        public void QueueItemMessageXml_ListIdEmptyWebIdEmpty_OkReturned()
+        {
+            QueueItemMessageXml_Called_OkReturned(
+                _listName, 
+                string.Empty, 
+                _itemId, 
+                string.Empty, 
+                _oWebId, 
+                _webAppGuid2);
+        }
+
+        [TestMethod]
+        public void QueueItemMessageXml_ListIdNotEmptyWebIdEmpty_OkReturned()
+        {
+            QueueItemMessageXml_Called_OkReturned(
+                _listName, 
+                _listId,
+                _itemId, 
+                string.Empty, 
+                _oWebId, 
+                _webAppGuid1);
+        }
+
+        private void QueueItemMessageXml_Called_OkReturned(
+            string listName, 
+            string listId, 
+            int itemId, 
+            string webId, 
+            Guid oWebId, 
+            Guid expectedWebApplicationId)
+        {
+            // Arrange
+            var data = GetXml(listName, listId, itemId, webId);
+            var shimSpWeb = new ShimSPWeb
+            {
+                IDGet = () => oWebId,
+                SiteGet = () => new ShimSPSite
+                {
+                    IDGet = () => Guid.NewGuid()
+                }
+            };
+
+            ShimAPITeam.GetResourcePoolStringSPWeb = (xml, web) =>
+            {
+                var table = new DataTable();
+                table.Columns.Add("user");
+                table.Columns.Add("SPID");
+                var row = table.NewRow();
+                row["user"] = "valera";
+                row["SPID"] = "1122";
+                table.Rows.Add(row);
+                return table;
+            };
+
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action =>
+            {
+                action();
+            };
+
+            ShimQueueItemMessage();
+
+            // Act
+            var result = APIEmail.QueueItemMessageXml(data, shimSpWeb);
+
+            // Assert
+            Assert.AreEqual(expectedWebApplicationId, _spListItemCalledXml.ParentList.ParentWeb.Site.WebApplication.Id);
+        }
+
+        private void ShimQueueItemMessage()
+        {
+            ShimAPIEmail
+                .QueueItemMessageInt32BooleanHashtableStringArrayStringArrayBooleanBooleanSPListItemSPUserBoolean
+                    = (int templateid,
+                        bool hideFromUser,
+                        Hashtable additionalParams,
+                        string[] newusers,
+                        string[] delusers,
+                        bool doNotEmail,
+                        bool unmarkread,
+                        SPListItem listItem,
+                        SPUser curUser,
+                        bool forceNewEntry) =>
+                    {
+                        _spListItemCalledXml = listItem;
+                    };
+        }
+
+        private static string GetXml(string listName, string listId, int itemId, string webId)
+        {
+            return "<Template " +
+                            $"TemplateID=\"17\" ListName=\"{listName}\" ListID=\"{listId}\" ItemID=\"{itemId}\" WebID=\"{webId}\" " +
+                            "HideFromUser=\"True\" DoNotEmail=\"True\" UnMarkRead=\"True\" ForceNewEntry=\"True\" " +
+                            "NewUsers=\"valera,george\" " +
+                            "RemoveUsers=\"vladislav,vitaliy\" " +
+                            "ExternalColumn=\"user\" >" +
+                            "<Params>" +
+                            "<Param Name=\"Building\">64b</Param>" +
+                            "</Params>" +
+                            "</Template>";
+        }
+
         private void AssetConnection()
         {
             Assert.AreSame(_createdConnection, _openedConnection);
@@ -268,14 +405,118 @@ namespace EPMLiveCore.Tests.API.Notification
                 {
                     OpenWebGuid = webGuid =>
                     {
-                        return new ShimSPWeb
+                        if (webGuid == _oWebId)
                         {
-                            IDGet = () => Guid.NewGuid(),
-                            SiteGet = () => new ShimSPSite
+                            return new ShimSPWeb
                             {
-                                IDGet = () => Guid.NewGuid()
-                            }
-                        };
+                                IDGet = () => Guid.NewGuid(),
+                                SiteGet = () => new ShimSPSite
+                                {
+                                    IDGet = () => Guid.NewGuid()
+                                },
+                                ListsGet = () => new ShimSPListCollection
+                                {
+                                    ItemGetGuid = key =>
+                                    {
+                                        if (key == new Guid(_listId))
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == _itemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid1);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    },
+                                    TryGetListString = key => 
+                                    {
+                                        if (key == _listName)
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == _itemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid2);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    }
+                                }
+                            };
+                        }
+                        else
+                        {
+                            return new ShimSPWeb
+                            {
+                                IDGet = () => Guid.NewGuid(),
+                                SiteGet = () => new ShimSPSite
+                                {
+                                    IDGet = () => Guid.NewGuid()
+                                },
+                                ListsGet = () => new ShimSPListCollection
+                                {
+                                    ItemGetGuid = key =>
+                                    {
+                                        if (key == new Guid(_listId))
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == _itemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid3);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    },
+                                    TryGetListString = key =>
+                                    {
+                                        if (key == _listName)
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == _itemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid4);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    }
+                                }
+                            };
+                        }
                     },
                     WebApplicationGet = () =>
                     {
@@ -401,12 +642,11 @@ namespace EPMLiveCore.Tests.API.Notification
             };
         }
 
-        private static ShimSPListItem CreateShimSpListItem()
+        private static ShimSPListItem CreateShimSpListItem(Guid webApplicationId)
         {
-            var id = new Guid("B9298FFB-0304-4A82-A8F0-D9983ED6B869");
             var webAppShim = new ShimSPWebApplication();
             var persistentObject = new ShimSPPersistedObject(webAppShim);
-            persistentObject.IdGet = () => id;
+            persistentObject.IdGet = () => webApplicationId;
 
             return new ShimSPListItem
             {
