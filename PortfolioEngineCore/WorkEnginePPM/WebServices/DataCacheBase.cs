@@ -148,7 +148,7 @@ public abstract class DataCacheBase<TDataItem, TCustomFieldData, TListItemData>
 
                         if (nextListItem.Level > listItemData.Level)
                         {
-                            resultBuilder.AppendFormat(",{Name:'Level{0}',Expanded:-1,Level:{1}, Items:[ {2} ]}",
+                            resultBuilder.AppendFormat(",{{Name:'Level{0}',Expanded:-1,Level:{1}, Items:[ {2} ]}}",
                                 listItemData.ID,
                                 listItemData.Level,
                                 BuildCustFieldJSon(customFieldData, i + 1, maxListItemIndex));
