@@ -137,4 +137,19 @@ export class MyWorkPageHelper {
         await expect(tabDisplayed).toBe(true, ValidationsHelper.getDisplayedValidation(
             CommonPageConstants.ribbonMenuTitles.page));
     }
+
+    static async fillAndSubmitSaveView(viewName: string) {
+        const label = MyWorkPage.saveViewPopup;
+        await PageHelper.click(label.name);
+        // await label.name.clear();
+        await TextboxHelper.sendKeys(label.name, viewName);
+        // await PageHelper.sendKeysToInputField(label.name, viewName);
+        if (label.defaultView.isSelected()) {
+            label.defaultView.click();
+        }
+        if (!(label.personalView.isSelected())) {
+            label.defaultView.click();
+        }
+        await PageHelper.click(label.ok);
+    }
 }
