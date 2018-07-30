@@ -3,6 +3,8 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.Fakes;
 using EPMLiveEnterprise;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -69,6 +71,59 @@ namespace EPMLivePS.Tests
             Assert.AreEqual(string.Empty, result);
         }
 
+        [TestMethod]
+        public void GetSiteTemplates_ValidConnection_OpenConnectionAndExecuteReader()
+        {
+            // Arrange
+            SetupShims();
+            Exception exception = null;
+
+            // Act
+            try
+            {
+                _publisher.getSiteTemplates();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+
+            // Assert
+            Assert.IsInstanceOfType(exception, typeof(NullReferenceException));
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.IsTrue(_isExecuteReaderCalled);
+            Assert.IsFalse(_isWriteEntryCalled);
+        }
+
+        [TestMethod]
+        public void GetSiteTemplates_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlConnection.AllInstances.Open = _ =>
+            {
+                throw new InvalidOperationException();
+            };
+            Exception exception = null;
+
+            // Act
+            try
+            {
+                _publisher.getSiteTemplates();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            // Assert
+            Assert.IsInstanceOfType(exception, typeof(NullReferenceException));
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.IsFalse(_isExecuteReaderCalled);
+            Assert.IsTrue(_isWriteEntryCalled);
+        }
+
         private void SetupShims()
         {
             ShimSPContext.CurrentGet = () => new ShimSPContext()
@@ -76,9 +131,13 @@ namespace EPMLivePS.Tests
                 SiteGet = () => new ShimSPSite()
                 {
                     IDGet = () => Guid.Empty,
-                    WebApplicationGet = () => new Microsoft.SharePoint.Administration.SPWebApplication()
+                    WebApplicationGet = () => new SPWebApplication()
                     {
                         Id = Guid.Empty
+                    },
+                    RootWebGet = () => new ShimSPWeb()
+                    {
+                        GetAvailableWebTemplatesUInt32 = _ => null
                     }
                 },
             };

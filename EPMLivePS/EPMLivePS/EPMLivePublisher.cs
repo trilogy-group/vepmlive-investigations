@@ -1449,6 +1449,7 @@ namespace EPMLiveEnterprise
             }
             return templates;
         }
+
         [WebMethod]
         public string getEnterpriseSetting(string setting)
         {
