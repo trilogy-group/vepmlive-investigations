@@ -10,7 +10,7 @@ using WorkEnginePPM.WebServices.ModelDataCache;
 namespace ModelDataCache
 {
     [Serializable()]
-    public class ModelCache : DataCacheBase<DataItem>
+    public class ModelCache : DataCacheBase<DataItem, CustomFieldData, ListItemData>
     {
         private const int EPK_FTYPE_DATE = 1;
         private const int EPK_FTYPE_INTEGER = 2;
@@ -100,8 +100,8 @@ namespace ModelDataCache
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private CustomFieldData[] m_cust_ocf = null;
-        private Dictionary<int, ListItemData>[] m_cust_lk = null;
-        private Dictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
+        private IDictionary<int, ListItemData>[] m_cust_lk = null;
+        private IDictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
         private bool m_allow_grouping = false;
         private bool m_grouping_enabled = true;
         private List<ListItemData> m_CT_List = null;
@@ -6601,62 +6601,7 @@ namespace ModelDataCache
 
 
         }
-
-
-
-        private string BuildCustFieldJSon(CustomFieldData oc, int index, int max)
-        {
-            ListItemData ce, ne, initial;
-            string sRet = "";
-
-            if (max < 0)
-                return "";
-
-            initial = oc.ListItems.ElementAt(index).Value;
-
-            for (int i = index; i <= max; i++)
-            {
-
-                ce = oc.ListItems.ElementAt(i).Value;
-
-                if (initial.Level == ce.Level)
-                {
-
-                    if (sRet != "")
-                        sRet = sRet + ",";
-
-                    if (oc.UseFullName == 1)
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
-                    else
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
-
-
-                    if (i != max)
-                    {
-                        ne = oc.ListItems.ElementAt(i + 1).Value;
-
-                        if (ne.Level > ce.Level)
-                        {
-                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
-                            //"{Items:[{Name:'Name1',Text:'Text1',Value:'Value1'},{Name:'Level2',Expanded:-1,Level:1,Items:[ {Name:'Name1.1',Text:'Text1.1',Value:'Value1.1'}, {Name:'Name1.2',Text:'Text1.2',Value:'Value1.2'}]}]}"
-
-                        }
-                        else if (ne.Level < ce.Level)
-                            return sRet;
-
-                    }
-                }
-                //else if (index != 0)
-                //    return sRet;
-            }
-
-
-            return sRet;
-
-
-
-        }
-
+        
         public void RatesAndCategory(ref CSRatesAndCategory rdata)
         {
             // targets do not have named rates Yet!
