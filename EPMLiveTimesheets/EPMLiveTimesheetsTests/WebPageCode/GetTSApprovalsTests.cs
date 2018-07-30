@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Reflection;
@@ -42,7 +43,20 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             ArrangeShims();
             var docXml = new XmlDocument();
-            docXml.LoadXml("<root><head><settings></settings><column width='0' type=''></column></head><rows><row id=''></row></rows></root>");
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type=''></column>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+
             var approval = new gettsapprovals();
             SetFieldValue(approval, "docXml", docXml);
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
@@ -63,6 +77,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             var approval = new gettsapprovals();
             SetFieldValue(approval, "arrGroupFields", new[]{ "field"});
             SetFieldValue(approval, "list", new ShimSPList().Instance);
+            SetFieldValue(approval, "view", new ShimSPView().Instance);
 
             // Act
             InvokeMethod(approval, "addTSItem", new object[] {new ShimSPListItem().Instance, new SortedList(), "userName", "resource"});
@@ -97,6 +112,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
                 }
                 return true;
             };
+            ShimSqlDataReader.AllInstances.GetBooleanInt32 = (reader, i) => true;
 
             ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = (a, b, c) => new SqlParameter();
 
@@ -120,6 +136,12 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             ShimSPList.AllInstances.ParentWebGet = list => new ShimSPWeb();
 
             ShimSPWeb.AllInstances.IDGet = web => Guid.Empty;
+
+            ShimSqlDataAdapter.ConstructorSqlCommand = (adapter, command) => { };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, set) => 0;
+
+            ShimSPView.AllInstances.ViewFieldsGet = view => new ShimSPViewFieldCollection();
+            ShimSPViewFieldCollection.AllInstances.CountGet = collection => 0;
         }
 
         public static void SetFieldValue(object obj, string fieldName, object fieldValue)

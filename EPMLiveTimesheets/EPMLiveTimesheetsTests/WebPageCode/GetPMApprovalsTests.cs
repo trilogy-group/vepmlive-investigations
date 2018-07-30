@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Specialized;
+using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Reflection;
@@ -40,10 +42,25 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             ArrangeShims();
             var docXml = new XmlDocument();
-            docXml.LoadXml("<root><head><settings></settings><column width='0' type=''></column></head><rows><row id=''></row></rows></root>");
+            docXml.LoadXml(@"<root>
+<head>
+    <settings></settings>
+    <column width='0' type='' id='Project'></column>
+    <column width='0' type='' id='Boo'></column>
+</head>
+<rows>
+    <row id='                                                                           . .'>
+        <userdata name='listid'></userdata>
+        <userdata name='itemid'></userdata>
+        <userdata name='Work'></userdata>
+    </row>
+</rows>
+</root>");
+
             var approval = new getpmapprovals();
             SetFieldValue(approval, "docXml", docXml);
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
+            SetFieldValue(approval, "view", new ShimSPView().Instance);
 
             // Act
             InvokeMethod(approval, "outputXml");
@@ -78,6 +95,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
                 }
                 return true;
             };
+            ShimSqlDataReader.AllInstances.GetBooleanInt32 = (reader, i) => true;
 
             ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = (a, b, c) => new SqlParameter();
 
@@ -87,8 +105,13 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             };
             ShimHttpRequest.AllInstances.QueryStringGet = _ => valueCollection;
 
+            ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "width=1");
 
-            ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "width=1");// new ShimHttpRequest();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (adapter, command) => { };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, set) => 0;
+
+            ShimSPView.AllInstances.ViewFieldsGet = view => new ShimSPViewFieldCollection();
+            ShimSPViewFieldCollection.AllInstances.CountGet = collection => 0;
         }
 
         public static void SetFieldValue(object obj, string fieldName, object fieldValue)

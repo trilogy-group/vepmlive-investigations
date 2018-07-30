@@ -692,7 +692,7 @@ namespace TimeSheets
                         XmlNode ndWork = nd.SelectSingleNode("userdata[@name='Work']");
 
                         newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                        if (dsTotalHours.Tables[0].Rows.Count > 0)
+                        if (dsTotalHours.Tables.Count > 0 && dsTotalHours.Tables[0].Rows.Count > 0)
                             newCol.InnerText = ndWork.InnerText + "|" + double.Parse(dsTotalHours.Tables[0].Rows[0][0].ToString()).ToString();
                         else
                             newCol.InnerText = ndWork.InnerText + "|0";
