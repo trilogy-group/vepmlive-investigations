@@ -73,25 +73,39 @@ public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
             case 23:
                 return FormatDuration(doubleInput);
             case 4:
+                if (codesDictionary == null)
+                {
+                    throw new ArgumentNullException(nameof(codesDictionary));
+                }
+
                 if (codesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
                 }
                 break;
             case 7:
+                if (resesDictionary == null)
+                {
+                    throw new ArgumentNullException(nameof(resesDictionary));
+                }
+
                 if (resesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
                 }
                 break;
             case 9911:
+                if (stagesDictionary == null)
+                {
+                    throw new ArgumentNullException(nameof(stagesDictionary));
+                }
+
                 if (stagesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
                 }
                 break;
         }
-
         return string.Empty;
     }
 
