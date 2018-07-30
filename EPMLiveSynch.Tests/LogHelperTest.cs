@@ -21,7 +21,7 @@ namespace EPMLiveSynch.Tests
         private string _actionString;
         private string _resultString;
         private string _sourceString;
-
+        private SqlCommand _sqlCommand;
         private IDisposable _context;
 
         [TestInitialize]
@@ -30,6 +30,7 @@ namespace EPMLiveSynch.Tests
             _context = ShimsContext.Create();
             _connectionString = DummyString;
             _sourceGuid = Guid.NewGuid();
+            _sqlCommand = new SqlCommand();
 
             _actionString = "Action String";
             _sourceString = "Source String";
@@ -86,10 +87,9 @@ namespace EPMLiveSynch.Tests
 
             SetupFakesForData();
 
-            var sqlCommand = new SqlCommand();
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
             {
-                sqlCommand = command;
+                _sqlCommand = command;
 
                 return new ShimSqlDataReader
                 {
@@ -108,9 +108,9 @@ namespace EPMLiveSynch.Tests
             var resultString = LogHelper.InitializeResults(_dataTable, _connectionString, _resultString, _sourceGuid) as string;
 
             // Assert
-            Assert.IsTrue(sqlCommand.Parameters.Count >= 1);
-            Assert.AreEqual("@listguid", sqlCommand.Parameters[0].ParameterName);
-            Assert.AreEqual(_sourceGuid, sqlCommand.Parameters[0].Value);
+            Assert.IsTrue(_sqlCommand.Parameters.Count >= 1);
+            Assert.AreEqual("@listguid", _sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual(_sourceGuid, _sqlCommand.Parameters[0].Value);
 
             var expectedResult = GetResultsMessage(_dataTable);
             Assert.AreEqual(expectedResult, resultString);
@@ -152,10 +152,9 @@ namespace EPMLiveSynch.Tests
 
             SetupFakesForData();
 
-            var sqlCommand = new SqlCommand();
             ShimSqlCommand.AllInstances.ExecuteReader = command =>
             {
-                sqlCommand = command;
+                _sqlCommand = command;
 
                 return new ShimSqlDataReader
                 {
@@ -174,9 +173,9 @@ namespace EPMLiveSynch.Tests
             var resultString = LogHelper.InitializeResultText(_dataTable, _connectionString, _resultString, _sourceGuid) as string;
 
             // Assert
-            Assert.IsTrue(sqlCommand.Parameters.Count >= 1);
-            Assert.AreEqual("@listguid", sqlCommand.Parameters[0].ParameterName);
-            Assert.AreEqual(_sourceGuid, sqlCommand.Parameters[0].Value);
+            Assert.IsTrue(_sqlCommand.Parameters.Count >= 1);
+            Assert.AreEqual("@listguid", _sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual(_sourceGuid, _sqlCommand.Parameters[0].Value);
 
             var expectedResult = GetResultsTextMessage(_dataTable);
             Assert.AreEqual(expectedResult, resultString);
@@ -258,7 +257,7 @@ namespace EPMLiveSynch.Tests
             return $"Delete From EPMLive_Log Where source = '{source}' And UPPER(action) = '{action}'";
         }
 
-        private void SetupFakesForData()
+        private static void SetupFakesForData()
         {
             ShimSqlConnection.ConstructorString = (instance, _string) => { };
             ShimSqlConnection.AllInstances.Open = connection => new ShimSqlConnection(connection);
