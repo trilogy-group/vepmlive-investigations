@@ -10,6 +10,11 @@ using EPMLiveCore.Fakes;
 using System.Collections.Generic;
 using Microsoft.QualityTools.Testing.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
+using System.Data.SqlClient.Fakes;
+using System.Data.Common.Fakes;
+using System.Data.SqlClient;
+using System.ComponentModel.Fakes;
+using System.Linq;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -20,6 +25,10 @@ namespace EPMLiveCore.API.Tests
         private ShimSPWeb _webShim;
         private PrivateType _apiTeamPrivateType;
         private PrivateObject _apiTeamPrivateObject;
+
+        private IList<string> _sqlConnectionsDisposed;
+        private IList<string> _sqlCommandsDisposed;
+        private int _sqlDataReadersDisposed;
 
         [TestInitialize]
         public void SetUp()
@@ -37,7 +46,33 @@ namespace EPMLiveCore.API.Tests
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
+            ShimEPMData.ConstructorGuid = (instance, siteId) => { };
+
+            ShimSqlCommand.AllInstances.ExecuteReader = instance => new ShimSqlDataReader();
             ShimCoreFunctions.getConfigSettingSPWebString = (web, name) => string.Empty;
+
+            ShimComponent.AllInstances.Dispose = instance =>
+            {
+                if (instance is SqlConnection)
+                {
+                    _sqlConnectionsDisposed.Add((instance as SqlConnection).ConnectionString);
+                }
+                if (instance is SqlCommand)
+                {
+                    _sqlCommandsDisposed.Add((instance as SqlCommand).CommandText);
+                }
+            };
+            ShimDbDataReader.AllInstances.Dispose = instance =>
+            {
+                if (instance is SqlDataReader)
+                {
+                    _sqlDataReadersDisposed++;
+                }
+            };
+
+            _sqlConnectionsDisposed = new List<string>();
+            _sqlCommandsDisposed = new List<string>();
+            _sqlDataReadersDisposed = 0;
         }
 
         [TestCleanup]
@@ -288,7 +323,11 @@ namespace EPMLiveCore.API.Tests
             XmlNodeList nodeTeam = null;
 
             ShimReportBiz.AllInstances.SiteExists = (instance) => true;
-
+            ShimAPITeam.iGetResourceFromRPTSqlConnectionSPListDataTableSPWebStringStringBooleanBooleanArrayListSPListItemXmlNodeList =
+                (a, b, c, d, e, f, g, h, i, j, k) => null;
+            ShimAPITeam.iGetResourcesFromlistSPListDataTableSPWebStringStringBooleanArrayListSPListItem =
+                (a, b, c, d, e, f, g, h) => null;
+            
             // Act
             _apiTeamPrivateType.InvokeStatic("getResources",
                 _webShim.Instance,
@@ -300,6 +339,9 @@ namespace EPMLiveCore.API.Tests
                 nodeTeam);
 
             // Assert
+            Assert.AreEqual(2, _sqlConnectionsDisposed.Count);
+            Assert.AreEqual(1, _sqlCommandsDisposed.Count);
+            Assert.AreEqual(1, _sqlDataReadersDisposed);
         }
     }
     public class TestGroupEnumerator : IEnumerator
