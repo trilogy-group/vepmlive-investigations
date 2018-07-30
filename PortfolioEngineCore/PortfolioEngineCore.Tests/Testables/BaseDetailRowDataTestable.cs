@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CostDataValues;
 using PortfolioEngineCore.Analyzers;
 
 namespace PortfolioEngineCore.Tests.Testables
@@ -112,6 +113,16 @@ namespace PortfolioEngineCore.Tests.Testables
         public void CopyData(BaseDetailRowDataTestable source)
         {
             base.CopyData(source);
+        }
+
+        public new void CaptureBurnRates(IEnumerable<IPeriodData> periods)
+        {
+            base.CaptureBurnRates(periods);
+        }
+
+        public new int CalculateOverlapLocal(DateTime barStart, DateTime barFinish, DateTime periodStart, DateTime periodFinish)
+        {
+            return base.CalculateOverlapLocal(barStart, barFinish, periodStart, periodFinish);
         }
     }
 }
