@@ -55,12 +55,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      
     </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -148,6 +146,7 @@
     <Compile Include="TimesheetsAssemblyInfo.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
+    <Compile Include="WebPageCode\ApprovalHelper.cs" />
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
