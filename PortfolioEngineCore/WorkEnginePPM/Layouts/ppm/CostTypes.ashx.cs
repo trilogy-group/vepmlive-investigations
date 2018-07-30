@@ -645,6 +645,8 @@ namespace WorkEnginePPM
                             xItem.CreateIntAttr("used", DBAccess.ReadIntValue(row["used"]));
                         }
                     }
+
+                    xPostOptions.CreateBooleanAttr("autoPostOnRateChange", dbaCostTypes.IsAutoPostEnabledOnRatePerProjectChange(dba, nCTId));
                     sReply = xPostOptions.XML();
 
                 }
@@ -670,8 +672,9 @@ namespace WorkEnginePPM
                 {
                     // pick up comma separated list of calendars 
                     string sCalendars = xData.GetStringAttr("calendars");
+                    var autoPostOnRateChange = xData.GetBooleanAttr("autoPostOnRateChange", false);
 
-                    if (dbaCostTypes.UpdatePostOptionsInfo(dba, nCTID, sCalendars, out sReply) != StatusEnum.rsSuccess)
+                    if (dbaCostTypes.UpdatePostOptionsInfo(dba, nCTID, sCalendars, autoPostOnRateChange, out sReply) != StatusEnum.rsSuccess)
                     {
                         if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostTypes.UpdatePostOptionsInfo", dba.StatusText);
                     }
