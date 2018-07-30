@@ -371,7 +371,7 @@ namespace TimeSheets
 
                 try
                 {
-                    InsertColumns(docXml, "<![CDATA[Notes]]>", "tsnotes", "50", ndCols);
+                    InsertColumns("<![CDATA[Notes]]>", "tsnotes", "50", ndCols);
 
                     var newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
                     newCol.InnerXml = "<![CDATA[TM]]>";
@@ -857,7 +857,7 @@ namespace TimeSheets
 
             group[0] = resource;
 
-            ProcessGroupFields(arrGroupFields, li, group, list, arrGTemp);
+            ProcessGroupFields(arrGroupFields, li, group, arrGTemp);
             
             AddItemType it = new AddItemType();
             it.indexer = li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID + "." + username;

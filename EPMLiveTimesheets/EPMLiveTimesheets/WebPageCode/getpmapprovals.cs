@@ -157,7 +157,7 @@ namespace TimeSheets
 
                 try
                 {
-                    InsertColumns(docXml, "<![CDATA[&nbsp;]]>", "ro", "25", ndCols);
+                    InsertColumns("<![CDATA[&nbsp;]]>", "ro", "25", ndCols);
                     
                     SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn);
                     cmd.Parameters.AddWithValue("@siteid", site.ID);
@@ -591,7 +591,7 @@ namespace TimeSheets
         private void addTSItem(SPListItem li, SortedList arrGTemp, string username, string resource)
         {
             string[] group = new string[1] { null };
-            ProcessGroupFields(arrGroupFields, li, group, list, arrGTemp);
+            ProcessGroupFields(arrGroupFields, li, group, arrGTemp);
             for (int i = 0; i < group.Length; i++)
             {
                 if (group[i] == null)
