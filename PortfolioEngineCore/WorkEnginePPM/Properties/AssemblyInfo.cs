@@ -34,6 +34,7 @@ using System;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
+[assembly: InternalsVisibleTo("WorkEnginePPM.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100b3a27f0bcd65bc516322a2bf7151e4670e28620ea568e56b671de8a8b43de3b3d2844ff7b2ff3b0f38f8381dfa7b64873c65f18b80194a80041e81dcaa44b3c2a7ad0823b691f66dc9fdbb957b683b1e4111c019ff17299ed698d1d14cb6e68e9aaaefed1f17e380a33f841772a350e5f38986654274befcf5ab26ffefd435ec")]
 
 namespace PPM
 {

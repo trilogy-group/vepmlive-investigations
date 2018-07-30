@@ -721,133 +721,62 @@ namespace CADataCache
 
         public string GetTopGrid()
         {
+            var grid = new CATopGrid(
+                _hideRowsWithAllZeros,
+                bShowFTEs,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                0,
+                TGStandard,
+                m_topgridcln);
 
-            CATopGrid oGrid = new CATopGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_topgridcln, 0);
-            int i = 0;
+            grid.AddPeriodsData(m_clsda.m_Periods.Values);
 
-            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
+            var i = 0;
+            grid.AddDetailRowsData(m_clnsort.Select(oDet =>
             {
-                i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TGStandard, 0, bUseQTY, bUseCosts);
-            }
+                oDet.rowid = i++;
+                return oDet;
+            }));
 
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            
-            i = 0;
-            foreach (clsDetailRowData oDet in m_clnsort)
-            {
-                oDet.rowid = ++i;
-                if (IsRowVisible(oDet, bShowFTEs, bUseQTY, bUseCosts, m_show_rhs_dec_costs, _hideRowsWithAllZeros))
-                {
-                    oGrid.AddDetailRow(oDet, i, bShowFTEs, m_topgridcln, TGStandard, bUseQTY, bUseCosts, m_show_rhs_dec_costs);
-                }
-            }
-
-            s = oGrid.GetString();
-            return s;
-        }
-
-        private bool IsRowVisible(clsDetailRowData details, bool showFte, bool showQuantityColumn, bool showCostColumn, bool showCostDecimals, bool hideRowsWithAllZeros)
-        {
-            if (!hideRowsWithAllZeros)
-            {
-                return true;
-            }
-
-            var quantityValue = 0.0;
-            var costValue = 0.0;
-            var fteValue = 0.0;
-
-            var totalPeriods = details.zFTE.Length - 1;
-            for (var i = 1; i <= totalPeriods; i++)
-            {
-                costValue = 0;
-                quantityValue = 0;
-                fteValue = 0;
-
-                if (showQuantityColumn && details.zValue[i] != double.MinValue)
-                {
-                    quantityValue = details.zValue[i];
-                }
-
-                if (showFte && details.zFTE[i] != double.MinValue)
-                {
-                    fteValue = details.zFTE[i];
-                }
-
-                if (showCostColumn)
-                {
-                    costValue = showCostDecimals ? details.zCost[i] : Math.Round(details.zCost[i]);
-                }
-
-                if (costValue != 0 || quantityValue != 0 || fteValue != 0)
-                {
-                    break;
-                }
-            }
-
-            return costValue + quantityValue + fteValue > 0;
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
         public string GetBottomGrid()
         {
-
-            CABottomGrid oGrid = new CABottomGrid();
-            string s;
-            oGrid.InitializeGridLayout(m_bottomgridcln, 0);
-            int i = 0;
-
-
-            foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
-            {
-                i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TotSelectedOrder, 0, bUseQTY, bUseCosts, m_use_heatmap);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            //clsPIData oPIData;
-
-
-            bool bsrem = m_showremaining;
+            var bsrem = m_showremaining;
 
             if (m_apply_target == 0)
                 bsrem = false;
 
-            //displist = TGStandard;
-            try
+            var grid = new CABottomGrid(
+                m_use_heatmap, 
+                m_heatmapcol, 
+                m_use_heatmapColour,
+                m_clsda.m_clsTargetColours,
+                bsrem,
+                true,
+                bShowFTEs,
+                bUseQTY,
+                bUseCosts,
+                m_show_rhs_dec_costs,
+                0,
+                TotSelectedOrder,
+                m_bottomgridcln);
+
+            grid.AddPeriodsData(m_clsda.m_Periods.Values);
+
+            var i = 0;
+            grid.AddDetailRowsData(m_total_rows.Values.Select(totalRow =>
             {
-                i = 0;
-                foreach (CATotRow xTot in m_total_rows.Values)
-                {
-                    clsDetailRowData oDet = xTot.m_totals[0];
-                    clsDetailRowData otDet = m_target_dets.ElementAt(i).Value;
+                var oDet = totalRow.m_totals[0];
 
-                    oDet.rowid = i;
+                oDet.rowid = i++;
+                return totalRow;
+            }));
 
-
-
-                    oGrid.AddDetailRow(oDet, otDet, m_clsda.m_clsTargetColours, ++i, bShowFTEs, m_bottomgridcln, TotSelectedOrder, bUseQTY, bUseCosts,
-                                       m_show_rhs_dec_costs, bsrem, xTot, m_use_heatmap, m_heatmapcol, m_use_heatmapColour, true);
-
-                    //    m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
-                    //    oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
-                }
-            }
-            catch (Exception ex)
-            {
-                string sx = ex.Message;
-            }
-
-            s = oGrid.GetString();
-
-            return s;
-
-
-
+            return grid.RenderToXml(GridRenderingTypes.Combined);
         }
 
         public void SetCTStateData(CStruct xData)

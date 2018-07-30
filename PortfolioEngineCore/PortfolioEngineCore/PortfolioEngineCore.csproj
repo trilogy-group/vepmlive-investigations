@@ -60,9 +60,11 @@
     <Compile Include="Admininfos\AdminFunctions.cs" />
     <Compile Include="Admininfos\Admininfos.cs" />
     <Compile Include="Admininfos\AllWorkhours.cs" />
+    <Compile Include="Admininfos\PFELookup.cs" />
     <Compile Include="Admininfos\Workhours.cs" />
     <Compile Include="Analyzers\AnalyzerDataCache.cs" />
     <Compile Include="Analyzers\BaseAnalyzer.cs" />
+    <Compile Include="Analyzers\BaseDetailRowData.cs" />
     <Compile Include="Analyzers\clsCostData.cs" />
     <Compile Include="Analyzers\CostAnalyzerData.cs" />
     <Compile Include="Analyzers\ModSupport.cs" />
