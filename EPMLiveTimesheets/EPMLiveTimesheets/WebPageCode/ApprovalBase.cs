@@ -198,5 +198,44 @@ namespace TimeSheets.WebPageCode
 
             return dsTotalHours;
         }
+
+        protected void InsertColumns(XmlDocument docXml, string innerXml, string typeValue, string widthValue, XmlNodeList ndCols)
+        {
+            XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+            newCol.InnerXml = "<![CDATA[#master_checkbox]]>";
+            XmlAttribute attrType = docXml.CreateAttribute("type");
+            attrType.Value = "ch";
+            XmlAttribute attrWidth = docXml.CreateAttribute("width");
+            attrWidth.Value = "25";
+            XmlAttribute attrAlign = docXml.CreateAttribute("align");
+            attrAlign.Value = "center";
+            XmlAttribute attrColor = docXml.CreateAttribute("color");
+            attrColor.Value = "#F0F0F0";
+
+            newCol.Attributes.Append(attrType);
+            newCol.Attributes.Append(attrWidth);
+            newCol.Attributes.Append(attrAlign);
+            newCol.Attributes.Append(attrColor);
+
+            docXml.SelectSingleNode("//head").InsertBefore(newCol, ndCols[0]);
+
+            newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+            newCol.InnerXml = innerXml;
+            attrType = docXml.CreateAttribute("type");
+            attrType.Value = typeValue;
+            attrWidth = docXml.CreateAttribute("width");
+            attrWidth.Value = widthValue;
+            attrAlign = docXml.CreateAttribute("align");
+            attrAlign.Value = "center";
+            attrColor = docXml.CreateAttribute("color");
+            attrColor.Value = "#F0F0F0";
+
+            newCol.Attributes.Append(attrType);
+            newCol.Attributes.Append(attrWidth);
+            newCol.Attributes.Append(attrAlign);
+            newCol.Attributes.Append(attrColor);
+
+            docXml.SelectSingleNode("//head").InsertBefore(newCol, ndCols[0]);
+        }
     }
 }

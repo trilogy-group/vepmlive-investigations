@@ -157,46 +157,8 @@ namespace TimeSheets
 
                 try
                 {
-
-                    //ndCols[0].Attributes["width"].Value = "25";
-
-                    XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                    newCol.InnerXml = "<![CDATA[#master_checkbox]]>";
-                    XmlAttribute attrType = docXml.CreateAttribute("type");
-                    attrType.Value = "ch";
-                    XmlAttribute attrWidth = docXml.CreateAttribute("width");
-                    attrWidth.Value = "25";
-                    XmlAttribute attrAlign = docXml.CreateAttribute("align");
-                    attrAlign.Value = "center";
-                    XmlAttribute attrColor = docXml.CreateAttribute("color");
-                    attrColor.Value = "#F0F0F0";
-
-                    newCol.Attributes.Append(attrType);
-                    newCol.Attributes.Append(attrWidth);
-                    newCol.Attributes.Append(attrAlign);
-                    newCol.Attributes.Append(attrColor);
-
-                    docXml.SelectSingleNode("//head").InsertBefore(newCol, ndCols[0]);
-
-                    newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                    newCol.InnerXml = "<![CDATA[&nbsp;]]>";
-                    attrType = docXml.CreateAttribute("type");
-                    attrType.Value = "ro";
-                    attrWidth = docXml.CreateAttribute("width");
-                    attrWidth.Value = "25";
-                    attrAlign = docXml.CreateAttribute("align");
-                    attrAlign.Value = "center";
-                    attrColor = docXml.CreateAttribute("color");
-                    attrColor.Value = "#F0F0F0";
-
-                    newCol.Attributes.Append(attrType);
-                    newCol.Attributes.Append(attrWidth);
-                    newCol.Attributes.Append(attrAlign);
-                    newCol.Attributes.Append(attrColor);
-
-                    docXml.SelectSingleNode("//head").InsertBefore(newCol, ndCols[0]);
+                    InsertColumns(docXml, "<![CDATA[&nbsp;]]>", "ro", "25", ndCols);
                     
-
                     SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn);
                     cmd.Parameters.AddWithValue("@siteid", site.ID);
                     SqlDataReader dr = cmd.ExecuteReader();
