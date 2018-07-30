@@ -10,6 +10,11 @@ namespace PortfolioEngineCore
 {
     public class dbaCostValues
     {
+        public static readonly string DetailValuesDiscountRateColumn = "BD_DISCOUNT_RATE";
+        public static readonly string DetailValuesDiscountValueColumn = "BD_DISCOUNT_VALUE";
+        public static readonly string DetailValuesDiscountRateParameter = "@BD_DISCOUNT_RATE";
+        public static readonly string DetailValuesDiscountValueParameter = "@BD_DISCOUNT_VALUE";
+
         public static bool PostCostValues(DBAccess dba, string data, out string sResult, out string sPostInstruction)
         {
             try
@@ -261,6 +266,8 @@ namespace PortfolioEngineCore
                 {
                     dba.BeginTransaction();
 
+                    var discountPercentValue = ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID);
+
                     // clear existing COST VALUES
                     cmdText = "DELETE FROM  EPGP_COST_VALUES WHERE CB_ID=@CalID And CT_ID=@CTID And PROJECT_ID=@ProjectID";
                     oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
@@ -326,7 +333,7 @@ namespace PortfolioEngineCore
                     dt.Load(oCommand.ExecuteReader());
 
                     // set up the INSERT I need to add new records
-                    cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST)";
+                    cmdText = "INSERT INTO EPGP_DETAIL_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID,BC_SEQ,BD_PERIOD,BD_VALUE,BD_COST,BD_DISCOUNT_RATE,BD_DISCOUNT_VALUE) VALUES(@CalID,@CTID,@ProjectID,@BC_UID,@BC_SEQ,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_DISCOUNT_RATE,@BD_DISCOUNT_VALUE)";
                     oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
                     oCommand.Parameters.AddWithValue("@CalID", nCB_ID);
                     oCommand.Parameters.AddWithValue("@CTID", nCT_ID);
@@ -337,16 +344,24 @@ namespace PortfolioEngineCore
                     SqlParameter pBD_PERIOD = oCommand.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
                     SqlParameter pBD_VALUE = oCommand.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
                     SqlParameter pBD_COST = oCommand.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+                    var discountRateParameter = oCommand.Parameters.Add(DetailValuesDiscountRateParameter, SqlDbType.Decimal);
+                    var discountValueParameter = oCommand.Parameters.Add(DetailValuesDiscountValueParameter, SqlDbType.Decimal);
                     pBD_VALUE.Precision = 25;
                     pBD_VALUE.Scale = 6;
                     pBD_COST.Precision = 25;
                     pBD_COST.Scale = 6;
+                    discountValueParameter.Precision = 25;
+                    discountValueParameter.Scale = 6;
+                    discountRateParameter.Precision = 6;
+                    discountRateParameter.Scale = 5;
 
                     int lCat; int lSeq; int lPeriodID; int lNewPeriodID=0;
                     int lPrevCat=0; int lPrevSeq=0; int lPrevNewPeriodID=0;
                     DateTime dtStartDate;
                     double dHours; double dCost;
                     double dTotalHours=0; double dTotalCost=0;
+                    var discountValueTotal = 0m;
+                    var discountValue = 0m;
 
                     if (dt != null)
                     {
@@ -359,12 +374,13 @@ namespace PortfolioEngineCore
                             lSeq = DBAccess.ReadIntValue(row["BC_SEQ"]);
                             dHours = DBAccess.ReadDoubleValue(row["BD_VALUE"]);
                             dCost = DBAccess.ReadDoubleValue(row["BD_COST"]);
+                            discountValue = SqlDb.ReadDecimalValue(row[DetailValuesDiscountValueColumn]);
 
                             lNewPeriodID = MapToPeriod(dtStartDate, periods);
                                 
                             if (lPrevNewPeriodID != lNewPeriodID || lPrevCat != lCat || lPrevSeq != lSeq)
                             {
-                                if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0))
+                                if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0 || discountValueTotal != 0))
                                 {
                                     // write out the record for this cat/seq for this period
                                     pBC_UID.Value = lPrevCat;
@@ -372,20 +388,24 @@ namespace PortfolioEngineCore
                                     pBD_PERIOD.Value = lPrevNewPeriodID;
                                     pBD_VALUE.Value = dTotalHours;
                                     pBD_COST.Value = dTotalCost;
+                                    discountValueParameter.Value = discountValueTotal;
+                                    discountRateParameter.Value = discountPercentValue;
                                     oCommand.ExecuteNonQuery();
                                 }
                                 dTotalHours = 0;
                                 dTotalCost = 0;
+                                discountValueTotal = 0;
                             }
         
                             dTotalHours = dTotalHours + dHours;
                             dTotalCost = dTotalCost + dCost;
+                            discountValueTotal = discountValueTotal + discountValue;
                             lPrevNewPeriodID = lNewPeriodID;
                             lPrevCat = lCat;
                             lPrevSeq = lSeq;                   
                         }
                     }
-                    if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0))
+                    if (lPrevCat >= 0 && lPrevNewPeriodID > 0 && (dTotalHours != 0 || dTotalCost != 0 || discountValueTotal != 0))
                     {
                         // write out possible final record
                         pBC_UID.Value = lPrevCat;
@@ -393,6 +413,8 @@ namespace PortfolioEngineCore
                         pBD_PERIOD.Value = lPrevNewPeriodID;
                         pBD_VALUE.Value = dTotalHours;
                         pBD_COST.Value = dTotalCost;
+                        discountValueParameter.Value = discountValueTotal;
+                        discountRateParameter.Value = discountPercentValue;
                         oCommand.ExecuteNonQuery();
                     }
                     dba.CommitTransaction();
@@ -456,6 +478,7 @@ namespace PortfolioEngineCore
                     }
 
                     var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+                    var discountRate = Convert.ToDouble(1 - ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID));
 
                     oCommand = new SqlCommand("EPG_SP_PCTReadWEActuals", dba.Connection);
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -489,7 +512,7 @@ namespace PortfolioEngineCore
                                 // tabulate quantity and cost
                                 quantity[costcategory.ID, periodid] += hours;
                                 quantity[costcategory.ID, periodid] += overtimehours;
-                                cost[costcategory.ID, periodid] += hours * dblRate;
+                                cost[costcategory.ID, periodid] += hours * dblRate * discountRate;
                                 cost[costcategory.ID, periodid] += overtimehours * dblOvertimeRate;
                             }
                         }
@@ -571,6 +594,7 @@ namespace PortfolioEngineCore
                     }
 
                     var projectRates = ProjectResourceRates.GetRates(dba, ProjectID);
+                    var discountRate = Convert.ToDouble(1 - ProjectDiscountRates.GetProjectDiscountRate(dba, ProjectID));
 
                     int lReadCustomFields = 0;
                     oCommand = new SqlCommand("EPG_SP_PCTReadCommitments", dba.Connection);
@@ -615,7 +639,7 @@ namespace PortfolioEngineCore
                                     // in the old system here we checked the editmode for: Commitments, Forecast Commitments, Revenue, or Forecast Revenue
                                     //    right now we only have Commitments
                                     quantity[costcategory.ID, periodid] += hours;
-                                    cost[costcategory.ID, periodid] += hours * dblRate;
+                                    cost[costcategory.ID, periodid] += hours * dblRate * discountRate;
                                 }
                             }
                         }
