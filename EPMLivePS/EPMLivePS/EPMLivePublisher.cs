@@ -1395,6 +1395,7 @@ namespace EPMLiveEnterprise
             });
             return bRet;
         }
+
         [WebMethod]
         public string[] getSiteTemplates()
         {
@@ -1403,25 +1404,28 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-
                     try
                     {
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", cn);
-                        SqlDataReader dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
-                            string[] strValidtemplates = dReader.GetString(0).Split('|');
-                            foreach (string template in strValidtemplates)
+                            connection.Open();
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", connection))
                             {
-                                arrValidTemplates.Add(template);
+                                using (var dataReader = command.ExecuteReader())
+                                {
+                                    if (dataReader.Read())
+                                    {
+                                        string[] strValidtemplates = dataReader.GetString(0).Split('|');
+                                        foreach (string template in strValidtemplates)
+                                        {
+                                            arrValidTemplates.Add(template);
+                                        }
+                                    }
+                                    dataReader.Close();
+                                }
                             }
+                            connection.Close();
                         }
-                        dReader.Close();
-
-                        cn.Close();
                     }
                     catch (Exception ex1)
                     {

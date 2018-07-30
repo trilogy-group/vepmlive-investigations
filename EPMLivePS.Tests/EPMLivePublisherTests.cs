@@ -3,7 +3,6 @@ using System.Data.SqlClient.Fakes;
 using System.Diagnostics.Fakes;
 using EPMLiveEnterprise;
 using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
