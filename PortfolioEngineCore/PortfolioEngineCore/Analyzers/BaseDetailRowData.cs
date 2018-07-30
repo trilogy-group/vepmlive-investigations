@@ -398,7 +398,7 @@ namespace PortfolioEngineCore.Analyzers
             return double.Parse(f.ToString("0.00"));
         }
 
-        public void CopyToTargetData(ref TTargetRowData dest)
+        public void CopyToTargetData(TTargetRowData dest)
         {
             if (dest == null)
             {

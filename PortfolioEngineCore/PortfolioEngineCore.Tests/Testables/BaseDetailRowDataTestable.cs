@@ -8,7 +8,7 @@ using PortfolioEngineCore.Analyzers;
 
 namespace PortfolioEngineCore.Tests.Testables
 {
-    public class BaseDetailRowDataTestable : BaseDetailRowData<ITargetRowData>
+    public class BaseDetailRowDataTestable : BaseDetailRowData<clsTargetRowData>
     {
         public new double[] oCosts
         {
