@@ -14,6 +14,7 @@ namespace EPMLiveCore.API
     public class APIEmail
     {
         private const int _defaultUserId = 1073741823;
+        private const string _successReponse = "Success";
 
         public static void InstallAssignedToEvent(SPList list)
         {
@@ -176,174 +177,100 @@ namespace EPMLiveCore.API
 
         public static string QueueItemMessageXml(string data, SPWeb oWeb)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(data);
-            int templateid = int.Parse(doc.FirstChild.Attributes["TemplateID"].Value);
-            bool hideFromUser = false;
-            bool doNotEmail = false;
-            bool unMarkRead = true;
-            bool forceNewEntry = false;
-            string listName = "";
-            string listId = "";
-            string itemid = "";
-            string webid = "";
-            string sExternalColumn = "";
-             
-            try
-            {
-                listName = doc.FirstChild.Attributes["ListName"].Value;
-            }catch{}
-            try
-            {
-                listId = doc.FirstChild.Attributes["ListID"].Value;
-            }catch{}
-            try
-            {
-                itemid = doc.FirstChild.Attributes["ItemID"].Value;
-            }catch{}
-            try
-            {
-                webid = doc.FirstChild.Attributes["WebID"].Value;
-            }catch{}
+            var document = new XmlDocument();
+            document.LoadXml(data);
+            var itemMessage = new ItemMessage(document, oWeb);
 
-            try 
+            var ret = Response.Failure(30010, "Error: No Item Id specificied");
+            if(itemMessage.ItemId != "" && (itemMessage.ListId != "" || itemMessage.ListName != ""))
             {
-                hideFromUser = bool.Parse(doc.FirstChild.Attributes["HideFromUser"].Value);
-            }catch{}
-            try
-            {
-                doNotEmail = bool.Parse(doc.FirstChild.Attributes["DoNotEmail"].Value);
-            }catch{}
-            try
-            {
-                unMarkRead = bool.Parse(doc.FirstChild.Attributes["UnMarkRead"].Value);
-            }catch{}
-            try
-            {
-                forceNewEntry = bool.Parse(doc.FirstChild.Attributes["ForceNewEntry"].Value);
-            }catch{}
-
-            Hashtable hshParams = new Hashtable();
-
-            XmlNode nd = doc.FirstChild.SelectSingleNode("Params");
-            foreach(XmlNode ndParam in nd.SelectNodes("Param"))
-            {
-                hshParams.Add(ndParam.Attributes["Name"].Value, ndParam.InnerText);
-            }
-
-            ArrayList ArrNew = new ArrayList();
-            ArrayList ArrDel = new ArrayList();
-
-            try
-            {
-                ArrNew = new ArrayList(doc.FirstChild.Attributes["NewUsers"].Value.Split(','));
-            }
-            catch { }
-            try
-            {
-                ArrDel = new ArrayList(doc.FirstChild.Attributes["RemoveUsers"].Value.Split(','));
-            }
-            catch { }
-            try
-            {
-                sExternalColumn = doc.FirstChild.Attributes["ExternalColumn"].Value;
-            }
-            catch { }
-
-            if(sExternalColumn != "")
-            {
-                DataTable dtResources = API.APITeam.GetResourcePool("<Get><Columns>" + sExternalColumn + "</Columns></Get>", oWeb);
-
-                ArrayList ArrNewTemp = new ArrayList();
-
-                foreach(string s in ArrNew)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    DataRow[] dr = dtResources.Select(sExternalColumn + " ='" + s + "'");
-                    if(dr.Length > 0)
-                    {
-                        ArrNewTemp.Add(dr[0]["SPID"].ToString());
-                    }
-                }
-
-                ArrNew = ArrNewTemp;
-            }
-
-            string ret = Response.Failure(30010, "Error: No Item Id specificied");
-            if(itemid != "" && (listId != "" || listName != ""))
-            {
-                SPSecurity.RunWithElevatedPrivileges(delegate(){
-
                     SPList oList = null;
                     try
                     {
                         using(SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            if(webid != "")
+                            if(itemMessage.WebId != "")
                             {
-                                using(SPWeb tWeb = site.OpenWeb(new Guid(webid)))
-                                {
-                                    if(listId != "")
-                                    {
-                                        oList = tWeb.Lists[new Guid(listId)];
-                                    }
-                                    else
-                                    {
-                                        oList = tWeb.Lists.TryGetList(listName);
-                                    }
-
-                                    if(oList != null)
-                                    {
-                                        SPListItem li = oList.GetItemById(int.Parse(itemid));
-
-                                        API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, li, oWeb.CurrentUser, forceNewEntry);
-
-                                        ret = Response.Success("Success");
-                                    }
-                                }
+                                oList = QueueItemMessageFromXml(
+                                    new Guid(itemMessage.WebId), 
+                                    oWeb.CurrentUser, 
+                                    itemMessage, 
+                                    ref ret, 
+                                    site);
                             }
                             else
                             {
-                                using(SPWeb web = site.OpenWeb(oWeb.ID))
-                                {
-                                    if(listId != "")
-                                    {
-                                        oList = web.Lists[new Guid(listId)];
-                                    }
-                                    else
-                                    {
-                                        oList = web.Lists.TryGetList(listName);
-                                    }
-
-                                    if(oList != null)
-                                    {
-                                        SPListItem li = oList.GetItemById(int.Parse(itemid));
-
-                                        API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, li, oWeb.CurrentUser, forceNewEntry);
-
-                                        ret = Response.Success("Success");
-                                    }
-                                }
+                                oList = QueueItemMessageFromXml(oWeb.ID, oWeb.CurrentUser, itemMessage, ref ret, site);
                             }
-
-                            
                         }
-                    }catch{}
-
-                    
+                    }
+                    catch(Exception exception)
+                    {
+                        Trace.TraceError(exception.ToString());
+                    }
                 });
 
                 return ret;
-                
             }
             else
             {
+                QueueItemMessage(
+                    itemMessage.TemplatedId,
+                    itemMessage.HideFromUser,
+                    itemMessage.ParamsTable, 
+                    (string[])itemMessage.NewUsers.ToArray(typeof(string)), 
+                    (string[])itemMessage.RemovedUsers.ToArray(typeof(string)),
+                    itemMessage.DoNotEmail,
+                    itemMessage.UnMarkRead, 
+                    oWeb, 
+                    oWeb.CurrentUser,
+                    itemMessage.ForceNewEntry);
+                return Response.Success(_successReponse);
+            }
+        }
 
-                API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, oWeb, oWeb.CurrentUser, forceNewEntry);
+        private static SPList QueueItemMessageFromXml(
+            Guid webId, 
+            SPUser currentUser, 
+            ItemMessage itemMessage, 
+            ref string response, 
+            SPSite site)
+        {
+            SPList oList;
+            using (SPWeb web = site.OpenWeb(webId))
+            {
+                if (itemMessage.ListId != "")
+                {
+                    oList = web.Lists[new Guid(itemMessage.ListId)];
+                }
+                else
+                {
+                    oList = web.Lists.TryGetList(itemMessage.ListName);
+                }
 
-                return Response.Success("Success");
+                if (oList != null)
+                {
+                    SPListItem li = oList.GetItemById(int.Parse(itemMessage.ItemId));
+
+                    QueueItemMessage(
+                        itemMessage.TemplatedId,
+                        itemMessage.HideFromUser,
+                        itemMessage.ParamsTable,
+                        (string[])itemMessage.NewUsers.ToArray(typeof(string)),
+                        (string[])itemMessage.RemovedUsers.ToArray(typeof(string)),
+                        itemMessage.DoNotEmail,
+                        itemMessage.UnMarkRead,
+                        li,
+                        currentUser,
+                        itemMessage.ForceNewEntry);
+
+                    response = Response.Success(_successReponse);
+                }
             }
 
-            return Response.Failure(30010, "Error: No Item Id specificied");
+            return oList;
         }
 
         private static void iQueueItemMessage(
