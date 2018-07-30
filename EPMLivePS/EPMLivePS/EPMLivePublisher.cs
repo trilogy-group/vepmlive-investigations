@@ -1452,34 +1452,48 @@ namespace EPMLiveEnterprise
         [WebMethod]
         public string getEnterpriseSetting(string setting)
         {
-            string ret = "";
-            Guid siteId = SPContext.Current.Site.ID;
+            var returnValue = string.Empty;
+            var siteId = SPContext.Current.Site.ID;
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='" + setting + "'", cn);
-                    SqlDataReader dReader = cmd.ExecuteReader();
-                    if (dReader.Read())
+                    using (var connection = new SqlConnection(
+                        EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        ret = dReader.GetString(0);
+                        connection.Open();
+                        using (var command = new SqlCommand(
+                            string.Format("SELECT config_value FROM ECONFIG where config_name='{0}'", setting),
+                            connection))
+                        {
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    returnValue = dataReader.GetString(0);
+                                }
+                                dataReader.Close();
+                            }
+                        }
+
+                        connection.Close();
                     }
-                    dReader.Close();
-                    cn.Close();
                 });
             }
             catch (Exception ex)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getEnterpriseSetting(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getEnterpriseSetting(): {0}{1}", ex.Message, ex.StackTrace), 
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
-            return ret;
+            return returnValue;
         }
     }
 }
