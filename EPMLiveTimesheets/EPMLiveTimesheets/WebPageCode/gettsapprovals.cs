@@ -525,38 +525,12 @@ namespace TimeSheets
                     XmlNode ndItemId = nd.SelectSingleNode("userdata[@name='itemid']");
                     XmlNode ndTsuid = nd.SelectSingleNode("userdata[@name='tsuid']");
 
-                    if (ndTsuid != null)
+                    if (ndListId != null && ndItemId != null)
                     {
-                        
-                    }
-                    else if (ndListId != null && ndItemId != null)
-                    {
-                        
-                        string rowId = nd.Attributes["id"].Value;
-                        string curUser = "";
-                        int firstDot = rowId.IndexOf(".", 75);
-                        curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
+                        string curUser;
+                        var dsTotalHours = FillTotalHours(dsTSHours, nd, ndListId, ndItemId, site, cn, period, out curUser);
 
-                        SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@username", curUser);
-                        cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                        cmd.Parameters.AddWithValue("@period_id", period);
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dsTSHours);
-
-                        DataSet dsTotalHours = new DataSet();
-
-                        cmd = new SqlCommand("spTSGetTotalHoursForItem", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
-                        cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                        cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
-                        da = new SqlDataAdapter(cmd);
-                        da.Fill(dsTotalHours);
-                        
-
-                        cmd = new SqlCommand("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", cn);
+                        var cmd = new SqlCommand("select ts_item_uid,submitted,approval_status,project from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", cn);
                         cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
                         cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
                         cmd.Parameters.AddWithValue("@username", curUser);

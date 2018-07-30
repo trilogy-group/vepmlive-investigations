@@ -272,39 +272,8 @@ namespace TimeSheets
 
                     if (ndListId != null && ndItemId != null)
                     {
-                        
-
-                        
-
-                        //        //foreach (XmlNode ndCell in nd.SelectNodes("cell"))
-                        //        //{
-                        //        //    XmlAttribute attrStyle = docXml.CreateAttribute("style");
-                        //        //    attrStyle.Value = "background: #" + bgcolor;
-                        //        //    ndCell.Attributes.Append(attrStyle);
-                        //        //}
-
-                        string rowId = nd.Attributes["id"].Value;
-                        string curUser = "";
-                        int firstDot = rowId.IndexOf(".", 75);
-                        curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
-
-                        SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@username", curUser);
-                        cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                        cmd.Parameters.AddWithValue("@period_id", period);
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dsTSHours);
-
-                        DataSet dsTotalHours = new DataSet();
-
-                        cmd = new SqlCommand("spTSGetTotalHoursForItem", cn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
-                        cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                        cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
-                        da = new SqlDataAdapter(cmd);
-                        da.Fill(dsTotalHours);
+                        string curUser;
+                        var dsTotalHours = FillTotalHours(dsTSHours, nd, ndListId, ndItemId, site, cn, period, out curUser);
 
                         XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                         newCol.InnerText = view.ViewFields.Count.ToString();
@@ -327,7 +296,7 @@ namespace TimeSheets
                         newCol.Attributes.Append(attrName);
                         nd.AppendChild(newCol);
 
-                        cmd = new SqlCommand("select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", cn);
+                        var cmd = new SqlCommand("select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id", cn);
                         cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
                         cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
                         cmd.Parameters.AddWithValue("@username", curUser);
@@ -651,6 +620,8 @@ namespace TimeSheets
 
             data = docXml.OuterXml;
         }
+
+        
 
         private void addTSItem(SPListItem li, SortedList arrGTemp, string username, string resource)
         {

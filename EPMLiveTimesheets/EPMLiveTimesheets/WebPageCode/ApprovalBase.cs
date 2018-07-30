@@ -171,5 +171,32 @@ namespace TimeSheets.WebPageCode
                 }
             }
         }
+
+        protected DataSet FillTotalHours(DataSet dsTSHours, XmlNode nd, XmlNode ndListId, XmlNode ndItemId, SPSite site, SqlConnection cn, int period, out string curUser)
+        {
+            string rowId = nd.Attributes["id"].Value;
+            int firstDot = rowId.IndexOf(".", 75);
+            curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
+
+            SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@username", curUser);
+            cmd.Parameters.AddWithValue("@siteguid", site.ID);
+            cmd.Parameters.AddWithValue("@period_id", period);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(dsTSHours);
+
+            DataSet dsTotalHours = new DataSet();
+
+            cmd = new SqlCommand("spTSGetTotalHoursForItem", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
+            cmd.Parameters.AddWithValue("@siteguid", site.ID);
+            cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(dsTotalHours);
+
+            return dsTotalHours;
+        }
     }
 }
