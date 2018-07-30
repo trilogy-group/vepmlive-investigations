@@ -197,6 +197,10 @@ html, body {
 					<select name="FrmFieldsIn" size="7" id="idCalendarsIn" style="width: 150px; padding: 3px;" ondblclick="javascript:postOptionsDlg_event('exclude');" >
 					</select>
                 </td>
+                <tr>
+                    <td colspan="3" class="descriptioncell"><input type="checkbox" id="autoPostOnRateChangeCheckBox"/>
+                        <label for="autoPostOnRateChangeCheckBox">Post cost values on project discount / resource rates change</label></td>
+                </tr>
             </tr>
         </table>
     </div>
@@ -420,6 +424,7 @@ html, body {
                 var postOptions = json.reply.postOptions;
                 var idCalendarsOut = document.getElementById('idCalendarsOut');
                 var idCalendarsIn = document.getElementById('idCalendarsIn');
+                var autoPostOnRateChangeCheckBox = document.getElementById('autoPostOnRateChangeCheckBox');
                 idCalendarsOut.options.length = 0;
                 idCalendarsIn.options.length = 0;
                 var item = json.reply.postOptions.calendars.item;
@@ -429,6 +434,7 @@ html, body {
                     else
                         idCalendarsIn.options[idCalendarsIn.options.length] = new Option(item[i].name, item[i].id);
                 }
+                autoPostOnRateChangeCheckBox.checked = json.reply.postOptions.autoPostOnRateChange === "1";
                 dgrid1.grid.clearSelection();
                 DisplayDialog(350, 270, "Post Options for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winPostOptionsDlg", "idPostOptionsDlg", true, false);
                 break;
@@ -828,12 +834,14 @@ html, body {
                 sb.append(' CT_ID="' + sRowId + '"');
                 var sCBs = "";
                 var idCalendarsIn = document.getElementById('idCalendarsIn');
+                var autoPostOnRateChangeCheckBox = document.getElementById('autoPostOnRateChangeCheckBox');
                 for (var i = 0; i < idCalendarsIn.options.length; i++) {
                     if (i > 0)
                         sCBs += ",";
                     sCBs += idCalendarsIn.options[i].value;
                 }
                 sb.append(' calendars="' + jsf_xml(sCBs) + '"');
+                sb.append(' autoPostOnRateChange="' + (autoPostOnRateChangeCheckBox.checked ? "1" : "0") + '"');
                 sb.append('>');
                 sb.append('</data>');
                 sb.append('</request>'); 
