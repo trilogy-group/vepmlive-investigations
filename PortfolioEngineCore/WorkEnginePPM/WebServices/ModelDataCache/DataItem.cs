@@ -4,10 +4,10 @@ using CostDataValues;
 namespace ModelDataCache
 {
     [Serializable()]
-    class DataItem : IDataItem
+    public class DataItem : IDataItem
     {
-        public string Name { get; set; } = "";
-        public string Desc { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
+        public string Desc { get; set; } = string.Empty;
         public int ID { get; set; } = 0;
         public int UID { get; set; } = 0;
         public int level { get; set; } = 0;

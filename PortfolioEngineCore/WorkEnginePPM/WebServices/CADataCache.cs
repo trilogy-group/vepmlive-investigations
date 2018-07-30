@@ -77,7 +77,7 @@ namespace CADataCache
         }
     }
     [Serializable()]
-    public class CostAnalyzerDataCache : DataCacheBase
+    public class CostAnalyzerDataCache : DataCacheBase<clsDataItem>
     {
         private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
         private const string HideRowsWithAllZerosXmlValueAttribute = "Value";

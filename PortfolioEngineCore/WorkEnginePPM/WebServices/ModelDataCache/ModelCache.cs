@@ -10,7 +10,7 @@ using WorkEnginePPM.WebServices.ModelDataCache;
 namespace ModelDataCache
 {
     [Serializable()]
-    public class ModelCache : DataCacheBase
+    public class ModelCache : DataCacheBase<DataItem>
     {
         private const int EPK_FTYPE_DATE = 1;
         private const int EPK_FTYPE_INTEGER = 2;

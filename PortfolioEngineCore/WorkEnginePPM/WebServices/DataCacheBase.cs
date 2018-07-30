@@ -6,18 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using CostDataValues;
 
-public abstract class DataCacheBase
+public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
 {
-    protected delegate bool DataItemAccessorDelegate(int key, out IDataItem value);
-
-    protected static string FormatExtraDisplay<TDataItem>(
+    protected static string FormatExtraDisplay(
         string input, 
         int inputType,
         IDictionary<int, TDataItem> codesDictionary,
         IDictionary<int, TDataItem> resesDictionary,
         IDictionary<int, TDataItem> stagesDictionary) 
-        
-        where TDataItem : IDataItem
     {
         DateTime dateTimeInput;
         int intInput = 0;
@@ -31,13 +27,13 @@ public abstract class DataCacheBase
         {
             case 1:
                 dateTimeInput = DateTime.MinValue;
-
                 if (DateTime.TryParseExact(input, "yyyyMMdd", null, DateTimeStyles.None, out dateTimeInput)
-                    || DateTime.TryParseExact(input, "yyyyMMddHHmm", null, DateTimeStyles.None, out dateTimeInput)
-                    )
+                    || DateTime.TryParseExact(input, "yyyyMMddHHmm", null, DateTimeStyles.None, out dateTimeInput))
                 {
                     if (dateTimeInput > DateTime.MinValue)
+                    {
                         return dateTimeInput.ToString("MM/dd/yyyy");
+                    }
                 }
                 break;
             case 2:
