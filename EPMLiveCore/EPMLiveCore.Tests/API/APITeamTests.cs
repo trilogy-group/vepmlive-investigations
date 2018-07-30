@@ -8,12 +8,44 @@ using System.Reflection;
 using System.Collections;
 using EPMLiveCore.Fakes;
 using System.Collections.Generic;
+using Microsoft.QualityTools.Testing.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
 
 namespace EPMLiveCore.API.Tests
 {
     [TestClass()]
     public class APITeamTests
     {
+        private IDisposable _shimsContext;
+        private ShimSPWeb _webShim;
+        private PrivateType _apiTeamPrivateType;
+        private PrivateObject _apiTeamPrivateObject;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _shimsContext = ShimsContext.Create();
+
+            _webShim = new ShimSPWeb
+            {
+                SiteGet = () => new ShimSPSite(),
+                ListsGet = () => new ShimSPListCollection
+                {
+                    ItemGetString = key => new ShimSPList()
+                }
+            };
+            _apiTeamPrivateType = new PrivateType(typeof(APITeam));
+            _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
+
+            ShimCoreFunctions.getConfigSettingSPWebString = (web, name) => string.Empty;
+        }
+
+        [TestCleanup]
+        public void TearDown()
+        {
+            _shimsContext.Dispose();
+        }
+
         [TestMethod()]
         public void GetTeamGridLayoutTest()
         {
@@ -244,7 +276,31 @@ namespace EPMLiveCore.API.Tests
             }
         }
 
+        [TestMethod]
+        public void getResources_SiteExists_AdoObjectsDisposed()
+        {
+            // Arrange
+            var filterField = "test-field";
+            var filterValue = "test-filter-value";
+            var hasPerms = false;
+            var arrColumns = new ArrayList();
+            var shimListItem = new ShimSPListItem();
+            XmlNodeList nodeTeam = null;
 
+            ShimReportBiz.AllInstances.SiteExists = (instance) => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("getResources",
+                _webShim.Instance,
+                filterField,
+                filterValue,
+                hasPerms,
+                arrColumns,
+                shimListItem.Instance,
+                nodeTeam);
+
+            // Assert
+        }
     }
     public class TestGroupEnumerator : IEnumerator
     {
