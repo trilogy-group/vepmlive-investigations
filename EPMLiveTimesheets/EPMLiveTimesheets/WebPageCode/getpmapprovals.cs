@@ -217,7 +217,7 @@ namespace TimeSheets
                         timeeditor = true;
                     }
 
-                    ApprovalHelper.AddPeriods(docXml, site, arr, period, ref filterHead);
+                    ApprovalHelper.AddPeriods(docXml, site, arr, period, ref filterHead, cn);
                 }
                 catch { }
 

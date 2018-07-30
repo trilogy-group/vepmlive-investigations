@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
@@ -9,6 +10,7 @@ using System.Web.UI.Fakes;
 using System.Xml;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeSheets;
@@ -46,11 +48,28 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
 
             // Act
-            InvokeMethod(approval, "outputXml");
+            InvokeMethod(approval, "outputXml", new object[] {});
             var actual = GetFieldValue<string>(approval, "data");
 
             // Assert
             Assert.IsFalse(string.IsNullOrWhiteSpace(actual));
+        }
+
+        [TestMethod]
+        public void addTSItem()
+        {
+            // Arrange
+            ArrangeShims();
+            var approval = new gettsapprovals();
+            SetFieldValue(approval, "arrGroupFields", new[]{ "field"});
+            SetFieldValue(approval, "list", new ShimSPList().Instance);
+
+            // Act
+            InvokeMethod(approval, "addTSItem", new object[] {new ShimSPListItem().Instance, new SortedList(), "userName", "resource"});
+            var actual = GetFieldValue<Queue>(approval, "queueAllItems");
+
+            // Assert
+            Assert.IsTrue(actual.Count > 0);
         }
 
         private void ArrangeShims()
@@ -87,8 +106,20 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             };
             ShimHttpRequest.AllInstances.QueryStringGet = _ => valueCollection;
 
+            ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "width=1");
 
-            ShimPage.AllInstances.RequestGet = page => new HttpRequest(string.Empty, "http://site.com", "width=1");// new ShimHttpRequest();
+            ShimSPList.AllInstances.FieldsGet = list => new ShimSPFieldCollection();
+
+            ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (collection, s) => new ShimSPField();
+            ShimSPField.AllInstances.TypeGet = field => SPFieldType.User;
+
+            ShimSPListItem.AllInstances.IDGet = item => 0;
+            ShimSPListItem.AllInstances.ParentListGet = item => new ShimSPList();
+
+            ShimSPList.AllInstances.IDGet = list => Guid.Empty;
+            ShimSPList.AllInstances.ParentWebGet = list => new ShimSPWeb();
+
+            ShimSPWeb.AllInstances.IDGet = web => Guid.Empty;
         }
 
         public static void SetFieldValue(object obj, string fieldName, object fieldValue)
@@ -103,11 +134,10 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             return (T)fieldInfo?.GetValue(obj);
         }
 
-        public static void InvokeMethod(object obj, string methodName)
+        public static void InvokeMethod(object obj, string methodName, object[] parameters)
         {
             var dynMethod = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            dynMethod?.Invoke(obj, new object[] { });
-
+            dynMethod?.Invoke(obj, parameters);
         }
     }
 }

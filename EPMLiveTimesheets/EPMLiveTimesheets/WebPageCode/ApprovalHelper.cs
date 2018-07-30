@@ -13,7 +13,7 @@ namespace TimeSheets.WebPageCode
 {
     public class ApprovalHelper
     {
-        public static void AddPeriods(XmlDocument docXml, SPSite site, ArrayList arr, int period, ref string filterHead)
+        public static void AddPeriods(XmlDocument docXml, SPSite site, ArrayList arr, int period, ref string filterHead, SqlConnection cn)
         {
             string[] dayDefs = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveDaySettings").Split('|');
 
