@@ -99,7 +99,7 @@ public class DetailRowData : BaseDetailRowData
         bUseCosts = (sUoM == string.Empty);
 
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
 
     public void RestoreInitialData(Dictionary<int, PeriodData> clnPer)
@@ -115,57 +115,9 @@ public class DetailRowData : BaseDetailRowData
             zFTE[i] = oFTE[i];
         }
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
-
-    private void CaptureBurnRates(IDictionary<int, PeriodData> clnPer)
-    {
-        int i = 0;
-        int lPerSpan = 0;
-
-        foreach (PeriodData oPer in clnPer.Values)
-        {
-            ++i;
-            lPerSpan = CalculateOverlapLocal(Det_Start, Det_Finish, oPer.StartDate, oPer.FinishDate);
-            BurnDuration[i] = lPerSpan;
-
-            if (bUseCosts)
-                Burnrate[i] = zCost[i];
-            else
-                Burnrate[i] = zValue[i];
-
-            if (Burnrate[i] != 0)
-            {
-                if (lPerSpan == 0)
-                    Burnrate[i] = 0;
-                else
-                    Burnrate[i] = Burnrate[i] / (double)lPerSpan;
-            }
-        }
-
-    }
-
-    private int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
-    {
-
-        if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)
-            return 0;
-
-        if (dtBarStart <= dtPeriodStart && dtBarFinish >= dtPeriodFinish)
-            return dtPeriodFinish.Subtract(dtPeriodStart).Days + 1;
-
-        DateTime dt1;
-        DateTime dt2;
-
-        dt1 = (dtBarStart < dtPeriodStart ? dtPeriodStart : dtBarStart);     //' take the max of the two start dates
-        dt2 = (dtBarFinish < dtPeriodFinish ? dtBarFinish : dtPeriodFinish);  //    ' take the min of the two finish dates dates
-
-        if (dt1 > dt2)
-            return 0;
-
-        return dt2.Subtract(dt1).Days + 1;
-    }
-
+    
     private double AFiddler(double f)
     {
         return double.Parse(f.ToString("0.00"));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CostDataValues;
 
 namespace PortfolioEngineCore.Analyzers
 {
@@ -364,6 +365,30 @@ namespace PortfolioEngineCore.Analyzers
                             }
                         }
                     }
+                }
+            }
+        }
+
+        protected void CaptureBurnRates(IEnumerable<IPeriodData> periods)
+        {
+            int i = 0;
+            int periodOverlap = 0;
+
+            foreach (var period in periods)
+            {
+                ++i;
+                periodOverlap = CalculateOverlapLocal(Det_Start, Det_Finish, period.StartDate, period.FinishDate);
+
+                BurnDuration[i] = periodOverlap;
+                Burnrate[i] = bUseCosts
+                    ? zCost[i]
+                    : zValue[i];
+
+                if (Burnrate[i] != 0)
+                {
+                    Burnrate[i] = periodOverlap == 0 
+                        ? 0
+                        : Burnrate[i] / (double)periodOverlap;
                 }
             }
         }

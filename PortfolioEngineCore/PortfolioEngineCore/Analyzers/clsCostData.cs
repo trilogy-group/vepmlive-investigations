@@ -27,13 +27,16 @@ namespace CostDataValues
         PI_USE_EXTRA = 100,
         MAX_PI_EXTRA = 256
     }
+    // (CC-76706, 2018-07-30) Properties, that implement both getter and setter, behave in the same way as fields for the purpose of serialization)
     [Serializable()]
-    public class clsPeriodData
+    public class clsPeriodData : IPeriodData
     {
-        public string PeriodName;
-        public int PeriodID;
-        public DateTime StartDate;
-        public DateTime FinishDate;
+        public DateTime FinishDate { get; set; }
+        public int PeriodID { get; set; }
+
+        public string PeriodName { get; set; }
+
+        public DateTime StartDate { get; set; }
     };
     [Serializable()]
     public class clsCatItemData
@@ -234,7 +237,7 @@ namespace CostDataValues
             bUseCosts = (sUoM == "");
 
 
-            CaptureBurnRates(clnPer);
+            CaptureBurnRates(clnPer.Values);
         }
 
         public void RestoreInitialData(Dictionary<int, clsPeriodData> clnPer)
@@ -250,34 +253,7 @@ namespace CostDataValues
                 zFTE[i] = oFTE[i];
             }
 
-            CaptureBurnRates(clnPer);
-        }
-
-        private void CaptureBurnRates(Dictionary<int, clsPeriodData> clnPer)
-        {
-            int i = 0;
-            int lPerSpan = 0;
-
-            foreach (clsPeriodData oPer in clnPer.Values)
-            {
-                ++i;
-                lPerSpan = CalculateOverlapLocal(Det_Start, Det_Finish, oPer.StartDate, oPer.FinishDate);
-                BurnDuration[i] = lPerSpan;
-
-                if (bUseCosts)
-                    Burnrate[i] = zCost[i];
-                else
-                    Burnrate[i] = zValue[i];
-
-                if (Burnrate[i] != 0)
-                {
-                    if (lPerSpan == 0)
-                        Burnrate[i] = 0;
-                    else
-                        Burnrate[i] = Burnrate[i] / (double)lPerSpan;
-                }
-            }
-
+            CaptureBurnRates(clnPer.Values);
         }
     }
 
