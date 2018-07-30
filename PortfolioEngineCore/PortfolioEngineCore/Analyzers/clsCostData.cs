@@ -80,14 +80,14 @@ namespace CostDataValues
         public string jsonMenu;
     }
     [Serializable()]
-    public class clsDataItem
+    public class clsDataItem : IDataItem
     {
-        public string Name = "";
-        public string Desc = "";
-        public int UID = 0;
-        public int ID = 0;
-        public bool bEditiable = false;
-        public bool bSelected = true;
+        public string Name { get; set; } = "";
+        public string Desc { get; set; } = "";
+        public int UID { get; set; } = 0;
+        public int ID { get; set; } = 0;
+        public bool bEditiable { get; set; } = false;
+        public bool bSelected { get; set; } = true;
     };
     [Serializable()]
     public class clsPIData : IComparable<clsPIData>

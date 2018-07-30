@@ -1,19 +1,21 @@
 ﻿using System;
+using CostDataValues;
 
 namespace ModelDataCache
 {
     [Serializable()]
-    class DataItem
+    class DataItem : IDataItem
     {
-        public string Name = "";
-        public string Desc = "";
-        public int ID = 0;
-        public int UID = 0;
-        public int level = 0, group = 0;
-        public bool bLoaded = false;
-        public bool bEditiable = false;
-        public bool bSelected = false;
-        public bool bAllSelected = false;
-        public int filterpos = 0;
+        public string Name { get; set; } = "";
+        public string Desc { get; set; } = "";
+        public int ID { get; set; } = 0;
+        public int UID { get; set; } = 0;
+        public int level { get; set; } = 0;
+        public int group { get; set; } = 0;
+        public bool bLoaded { get; set; } = false;
+        public bool bEditiable { get; set; } = false;
+        public bool bSelected { get; set; } = false;
+        public bool bAllSelected { get; set; } = false;
+        public int filterpos { get; set; } = 0;
     };
 }
