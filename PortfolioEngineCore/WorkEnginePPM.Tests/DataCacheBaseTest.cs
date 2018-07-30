@@ -27,6 +27,8 @@ namespace WorkEnginePPM.Tests
 
         private int _formatExtraDisplayType;
 
+        private CustomFieldData _customFieldData;
+
         [TestInitialize]
         public void SetUp()
         {
@@ -45,6 +47,23 @@ namespace WorkEnginePPM.Tests
             {
                 { _formatExtraDisplayInputInt, new DataItem { Name = _dataItemName } }
             };
+
+            _customFieldData = new CustomFieldData
+            {
+                ListItems = new Dictionary<int, ListItemData>()
+            };
+            for (var i = 0; i < 5; i++)
+            {
+                _customFieldData.ListItems.Add(i, new ListItemData
+                {
+                    ID = i,
+                    UID = 10 + i,
+                    FullName = "test-fullname-" + i,
+                    Name = "test-name-" + i,
+                    InActive = true,
+                    Level = 1
+                });
+            }
 
             _testable = new DataCacheBaseTestable(_codesDictionary, _resesDictionary, _stagesDictionary);
         }
@@ -203,6 +222,20 @@ namespace WorkEnginePPM.Tests
 
             // Assert
             Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void BuildCustFieldJSon_NullCustomFieldData_Throws()
+        {
+            // Arrange
+            _customFieldData = null;
+
+            // Act
+            _testable.BuildCustFieldJSon(_customFieldData, 0, 0);
+
+            // Assert
+            // ExpectedException - ArgumentNullException
         }
     }
 }

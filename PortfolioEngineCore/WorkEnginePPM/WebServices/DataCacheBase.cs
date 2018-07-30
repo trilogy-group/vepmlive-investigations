@@ -80,7 +80,6 @@ public abstract class DataCacheBase<TDataItem, TCustomFieldData, TListItemData>
                 {
                     throw new ArgumentNullException(nameof(codesDictionary));
                 }
-
                 if (codesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
@@ -91,7 +90,6 @@ public abstract class DataCacheBase<TDataItem, TCustomFieldData, TListItemData>
                 {
                     throw new ArgumentNullException(nameof(resesDictionary));
                 }
-
                 if (resesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
@@ -102,17 +100,17 @@ public abstract class DataCacheBase<TDataItem, TCustomFieldData, TListItemData>
                 {
                     throw new ArgumentNullException(nameof(stagesDictionary));
                 }
-
                 if (stagesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
                 }
                 break;
         }
+
         return string.Empty;
     }
     
-    protected string BuildCustFieldJSon(TCustomFieldData customFieldData, int index, int maxListItemIndex)
+    protected static string BuildCustFieldJSon(TCustomFieldData customFieldData, int index, int maxListItemIndex)
     {
         if (customFieldData == null)
         {

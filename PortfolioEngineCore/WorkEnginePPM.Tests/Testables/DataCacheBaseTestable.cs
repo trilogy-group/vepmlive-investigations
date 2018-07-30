@@ -32,5 +32,11 @@ namespace WorkEnginePPM.Tests.Testables
                 _resesDictionary,
                 _stagesDictionary);
         }
+
+        public new string BuildCustFieldJSon(CustomFieldData customFieldData, int index, int maxListItemIndex)
+        {
+            return DataCacheBase<DataItem, CustomFieldData, ListItemData>
+                .BuildCustFieldJSon(customFieldData, index, maxListItemIndex);
+        }
     }
 }
