@@ -146,7 +146,9 @@
     <Compile Include="TimesheetsAssemblyInfo.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
-    <Compile Include="WebPageCode\ApprovalHelper.cs" />
+    <Compile Include="WebPageCode\ApprovalBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

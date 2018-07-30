@@ -7,13 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using EPMLiveWebParts;
 using Microsoft.SharePoint;
 
 namespace TimeSheets.WebPageCode
 {
-    public class ApprovalHelper
+    public abstract partial class ApprovalBase : getgriditems
     {
-        public static void AddPeriods(XmlDocument docXml, SPSite site, ArrayList arr, int period, ref string filterHead, SqlConnection cn)
+        protected void AddPeriods(XmlDocument docXml, SPSite site, ArrayList arr, int period, ref string filterHead, SqlConnection cn)
         {
             string[] dayDefs = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveDaySettings").Split('|');
 
@@ -114,6 +115,61 @@ namespace TimeSheets.WebPageCode
                 //docXml.SelectSingleNode("//head/beforeInit").AppendChild(callNode);
             }
             dr.Close();
+        }
+
+        protected void ProcessGroupFields(string[] arrGroupFields, SPListItem li, string[] @group, SPList list, SortedList arrGTemp)
+        {
+            if (arrGroupFields != null)
+            {
+                foreach (string groupby in arrGroupFields)
+                {
+                    SPField field = list.Fields.GetFieldByInternalName(groupby);
+                    string newgroup = getField(li, groupby, true);
+                    try
+                    {
+                        newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
+                    }
+                    catch { }
+                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
+                    {
+                        string[] sGroups = newgroup.Split('\n');
+                        string[] tmpGroups = new string[group.Length * sGroups.Length];
+
+                        int tmpCounter = 0;
+                        foreach (string g in group)
+                        {
+                            foreach (string sGroup in sGroups)
+                            {
+                                if (g == null)
+                                    tmpGroups[tmpCounter] = sGroup.Trim();
+                                else
+                                    tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
+
+                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
+                                {
+                                    arrGTemp.Add(tmpGroups[tmpCounter], "");
+                                }
+                                tmpCounter++;
+                            }
+                        }
+                        group = tmpGroups;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < group.Length; i++)
+                        {
+                            if (group[i] == null)
+                                group[i] = newgroup;
+                            else
+                                group[i] += "\n" + newgroup;
+                            if (!arrGTemp.Contains(group[i]))
+                            {
+                                arrGTemp.Add(group[i], "");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

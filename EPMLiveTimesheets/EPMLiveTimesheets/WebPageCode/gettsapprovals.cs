@@ -16,7 +16,7 @@ using TimeSheets.WebPageCode;
 
 namespace TimeSheets
 {
-    public partial class gettsapprovals : EPMLiveWebParts.getgriditems
+    public partial class gettsapprovals : ApprovalBase
     {
         SPSite site = SPContext.Current.Site;
         int period;
@@ -469,7 +469,7 @@ namespace TimeSheets
                         timeeditor = true;
                     }
 
-                    ApprovalHelper.AddPeriods(docXml, site, arr, period, ref filterHead, cn);
+                    AddPeriods(docXml, site, arr, period, ref filterHead, cn);
                 }
                 catch { }
 
@@ -919,73 +919,9 @@ namespace TimeSheets
         {
             string[] group = new string[1] { null };
 
-            //for (int i = 0; i < group.Length; i++)
-            //{
-            //    if (group[i] == null)
-            //        group[i] = resource;
-            //    else
-            //        group[i] += "\n" + resource;
-            //    if (!arrGTemp.Contains(group[i]))
-            //    {
-            //        arrGTemp.Add(group[i], "");
-            //    }
-            //}
-
             group[0] = resource;
-            
 
-            if (arrGroupFields != null)
-            {
-                foreach (string groupby in arrGroupFields)
-                {
-                    SPField field = list.Fields.GetFieldByInternalName(groupby);
-                    string newgroup = getField(li, groupby, true);
-                    try
-                    {
-                        newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
-                    }
-                    catch { }
-                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                    {
-                        string[] sGroups = newgroup.Split('\n');
-                        string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                        //group = new string[sGroups.Length];
-                        int tmpCounter = 0;
-                        foreach (string g in group)
-                        {
-                            foreach (string sGroup in sGroups)
-                            {
-                                if (g == null)
-                                    tmpGroups[tmpCounter] = sGroup.Trim();
-                                else
-                                    tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                {
-                                    arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                }
-                                tmpCounter++;
-                            }
-                        }
-                        group = tmpGroups;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < group.Length; i++)
-                        {
-                            if (group[i] == null)
-                                group[i] = newgroup;
-                            else
-                                group[i] += "\n" + newgroup;
-                            if (!arrGTemp.Contains(group[i]))
-                            {
-                                arrGTemp.Add(group[i], "");
-                            }
-                        }
-                    }
-                }
-            }
+            ProcessGroupFields(arrGroupFields, li, group, list, arrGTemp);
             
             AddItemType it = new AddItemType();
             it.indexer = li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID + "." + username;
@@ -993,6 +929,8 @@ namespace TimeSheets
             arrItems.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID + "." + username, group);
             queueAllItems.Enqueue(it);
         }
+
+        
     }
 
 }
