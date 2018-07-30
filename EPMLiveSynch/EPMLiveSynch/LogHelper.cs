@@ -14,6 +14,7 @@ namespace EPMLiveSynch
     {
         private const string DtLoggedColumn = "dtLogged";
         private const string ResultColumn = "result";
+        private const string ResultTextColumn = "resulttext";
 
         private const string ListGuidParam = "@listguid";
 
@@ -155,7 +156,7 @@ namespace EPMLiveSynch
             }
         }
 
-        private static string InitializeResults(DataTable dataTable, string connectionString, string resultString, object source)
+        public string InitializeResults(DataTable dataTable, string connectionString, string resultString, object source)
         {
             if (dataTable == null)
             {
@@ -238,7 +239,7 @@ namespace EPMLiveSynch
             }
         }
 
-        private static string InitializeResultText(DataTable dataTable, string connectionString, string resultString, object source)
+        public string InitializeResultText(DataTable dataTable, string connectionString, string resultString, object source)
         {
             if (dataTable == null)
             {
@@ -264,7 +265,7 @@ namespace EPMLiveSynch
                         {
                             while (reader.Read())
                             {
-                                dataTable.Rows.Add(reader["resulttext"].ToString());
+                                dataTable.Rows.Add(reader[ResultTextColumn].ToString());
                             }
 
                             resultString = dataTable.Rows[0].ItemArray[0].ToString();
@@ -312,7 +313,7 @@ namespace EPMLiveSynch
             return sRet;
         }
 
-        private static void DeleteLogBySourceAndAction(string connectionString, string source, string action)
+        public void DeleteLogBySourceAndAction(string connectionString, string source, string action)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
