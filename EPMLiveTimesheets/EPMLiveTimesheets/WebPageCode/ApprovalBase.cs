@@ -331,5 +331,64 @@ namespace TimeSheets
         {
             // empty default implementation
         }
+
+        protected void AddCells(XmlNode nd, string bgcolor, ArrayList arr)
+        {
+            XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCell.InnerText = "";
+            XmlAttribute attrType = docXml.CreateAttribute("type");
+            attrType.Value = "ro";
+            newCell.Attributes.Append(attrType);
+
+            nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
+
+            InsertCell1(nd);
+
+            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCell.InnerText = "";
+            attrType = docXml.CreateAttribute("type");
+            attrType.Value = "ro";
+            newCell.Attributes.Append(attrType);
+
+            nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
+
+            foreach (XmlNode ndCell in nd.SelectNodes("cell"))
+            {
+                XmlAttribute attrStyle = docXml.CreateAttribute("style");
+                attrStyle.Value = "background: #" + bgcolor + "; font-weight: bold;";
+                ndCell.Attributes.Append(attrStyle);
+            }
+
+            foreach (DateTime dt in arr)
+            {
+                XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                newCol.InnerText = "";
+                XmlAttribute attrStyle = docXml.CreateAttribute("style");
+                attrStyle.Value = "background: #" + bgcolor;
+                newCol.Attributes.Append(attrStyle);
+
+                nd.InsertAfter(newCol, nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
+            }
+
+            XmlNode newCol2 = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCol2.InnerText = "";
+            XmlAttribute attrStyle2 = docXml.CreateAttribute("style");
+            attrStyle2.Value = "background: #" + bgcolor + ";font-weight: bold;";
+            newCol2.Attributes.Append(attrStyle2);
+
+            nd.InsertAfter(newCol2, nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
+
+            InsertCell2(nd);
+        }
+
+        protected virtual void InsertCell1(XmlNode nd)
+        {
+            // empty default implementation
+        }
+
+        protected virtual void InsertCell2(XmlNode nd)
+        {
+            // empty default implementation
+        }
     }
 }

@@ -224,76 +224,27 @@ namespace TimeSheets
 
                     if (ndListId != null && ndItemId != null)
                     {
-                    AddCells(
-                        nd,
-                        site,
-                        ndListId,
-                        ndItemId,
-                        period,
-                        dsTSHours,
-                        arr,
-                        bgcolor,
-                        usecurrent,
-                        strColumns,
-                        dsTimesheetTasks,
-                        dsTimesheetMeta,
-                        timeeditor,
-                        strworktypes,
-                        timenotes,
-                        cn);
-                }
+                        AddCells(
+                            nd,
+                            site,
+                            ndListId,
+                            ndItemId,
+                            period,
+                            dsTSHours,
+                            arr,
+                            bgcolor,
+                            usecurrent,
+                            strColumns,
+                            dsTimesheetTasks,
+                            dsTimesheetMeta,
+                            timeeditor,
+                            strworktypes,
+                            timenotes,
+                            cn);
+                    }
                     else
                     {
-                        XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                        newCell.InnerText = "";
-                        XmlAttribute attrType = docXml.CreateAttribute("type");
-                        attrType.Value = "ro";
-                        newCell.Attributes.Append(attrType);
-
-                        nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
-
-                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                        newCell.InnerText = "";
-                        attrType = docXml.CreateAttribute("type");
-                        attrType.Value = "ro";
-                        newCell.Attributes.Append(attrType);
-
-                        nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
-
-                        foreach (XmlNode ndCell in nd.SelectNodes("cell"))
-                        {
-                            XmlAttribute attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #" + bgcolor + "; font-weight: bold;";
-                            ndCell.Attributes.Append(attrStyle);
-                        }
-
-                        foreach (DateTime dt in arr)
-                        {
-                            XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCol.InnerText = "";
-                            XmlAttribute attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #" + bgcolor;
-                            newCol.Attributes.Append(attrStyle);
-
-                            //attrType = docXml.CreateAttribute("type");
-                            //attrType.Value = "ro";
-                            //newCol.Attributes.Append(attrType);
-
-                            //nd.AppendChild(newCol);
-                            nd.InsertAfter(newCol, nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
-                        }
-
-                        XmlNode newCol2 = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                        newCol2.InnerText = "";
-                        XmlAttribute attrStyle2 = docXml.CreateAttribute("style");
-                        attrStyle2.Value = "background: #" + bgcolor + ";font-weight: bold;";
-                        newCol2.Attributes.Append(attrStyle2);
-
-                        //XmlAttribute attrType2 = docXml.CreateAttribute("type");
-                        //attrType2.Value = "ro";
-                        //newCol2.Attributes.Append(attrType2);
-
-                        nd.InsertAfter(newCol2,nd.SelectNodes("cell")[nd.SelectNodes("cell").Count - 1]);
+                        AddCells(nd, bgcolor, arr);
                     }
                     nd.Attributes["id"].Value = rowCounter.ToString();
                     rowCounter++;
