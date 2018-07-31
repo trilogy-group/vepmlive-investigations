@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CostDataValues;
 using PortfolioEngineCore.Analyzers;
 
 namespace PortfolioEngineCore.Tests.Testables
 {
-    public class BaseDetailRowDataTestable : BaseDetailRowData
+    public class BaseDetailRowDataTestable : BaseDetailRowData<clsTargetRowData>
     {
         public new double[] oCosts
         {

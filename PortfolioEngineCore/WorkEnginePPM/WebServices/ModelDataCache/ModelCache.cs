@@ -6839,7 +6839,7 @@ namespace ModelDataCache
                 foreach (DetailRowData oDet in m_editTargetList)
                 {
                     targetData.targetRows[cnt] = new TargetRowData();
-                    oDet.CopyToTargetData(ref targetData.targetRows[cnt++]);
+                    oDet.CopyToTargetData(targetData.targetRows[cnt++]);
                 }
 
             }
@@ -6907,7 +6907,7 @@ namespace ModelDataCache
                     {
                         tdata = new TargetRowData();
                         targetData.targetRows[cnt++] = tdata;
-                        odet.CopyToTargetData(ref tdata);
+                        odet.CopyToTargetData(tdata);
                         aggr.Add(sKey, tdata);
                     }
                     else
