@@ -12,7 +12,6 @@ import {browser} from 'protractor';
 import {MyWorkPageConstants} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.constants';
 import {MyWorkPageHelper} from '../../../page-objects/pages/my-workplace/my-work/my-work-page.helper';
 import {ValidationsHelper} from '../../../components/misc-utils/validation-helper';
-import {TextboxHelper} from '../../../components/html/textbox-helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
     let loginPage: LoginPage;
@@ -36,7 +35,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         const item = CommonPage.recordWithoutGreenTicket;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
-        browser.sleep(PageHelper.timeout.s);
+        browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
         stepLogger.stepId(4);
         stepLogger.step('Click on Save View button.');
@@ -56,7 +55,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.verification('Saved View name displayed in the Current View drop down box.');
     });
 
-    it('Verify that View should be saved - [744288]', async () => {
+    it('Verify that View should be renamed - [744291]', async () => {
         const stepLogger = new StepLogger(855540);
         // Step 1 are inside below function
         stepLogger.stepId(1);
@@ -70,17 +69,14 @@ describe(SuiteNames.regressionTestSuite, () => {
         const item = CommonPage.recordWithoutGreenTicket;
         await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
-        browser.sleep(PageHelper.timeout.s);
+        browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
         stepLogger.stepId(3);
         stepLogger.step('Click on rename View button.');
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
         stepLogger.stepId(4);
         stepLogger.step('Enter the Title of the new view name. > Click on "OK" button');
-        const uniqueId = PageHelper.getUniqueId();
-        const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
-        await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewNewName);
-        await PageHelper.click(MyWorkPage.viewsPopup.ok);
+        const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
         stepLogger.stepId(5);
         stepLogger.step('Click on Ok in the pop-up.');
         await PageHelper.acceptAlert();
@@ -88,5 +84,36 @@ describe(SuiteNames.regressionTestSuite, () => {
         await expect(MyWorkPage.getCurrentView().getText())
             .toBe(viewNewName, ValidationsHelper.getFieldShouldHaveValueValidation(MyWorkPageConstants.currentView, viewNewName));
         stepLogger.verification('Saved View name displayed in the Current View drop down box.');
+    });
+
+    it('Message while renaming the default view - [744293]', async () => {
+        const stepLogger = new StepLogger(855540);
+        // Step 1 are inside below function
+        stepLogger.step('Precondition - click on My Workplace>> Click on My Work >> Views tab');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
+            MyWorkplacePage.navigation.myWork,
+            CommonPage.pageHeaders.myWorkplace.myWork,
+            CommonPageConstants.pageHeaders.myWorkplace.myWork,
+            stepLogger);
+        const item = CommonPage.recordWithoutGreenTicket;
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await PageHelper.click(item);
+        browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(MyWorkPage.selectRibbonTabs.views);
+        stepLogger.stepId(1);
+        stepLogger.step('Verify the default view name get display in "Current View" drop down');
+        await expect(await PageHelper.isElementDisplayed(MyWorkPage.getCurrentView()))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(MyWorkPageConstants.currentView));
+        const currentViewName = await MyWorkPage.getCurrentView().getText();
+        stepLogger.verification('Default view displayed');
+        stepLogger.stepId(2);
+        stepLogger.step('Click on rename View button.> provide new name >click on ok');
+        await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
+        const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
+        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
+        await browser.sleep(PageHelper.timeout.xs);
+        await expect(MyWorkPage.getCurrentView().getText())
+            .toBe(viewNewName, ValidationsHelper.getFieldShouldHaveValueValidation(MyWorkPageConstants.currentView, viewNewName));
+        stepLogger.verification('popup closed and user is view is renamed.');
     });
 });

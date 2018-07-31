@@ -10,6 +10,7 @@ import {MyWorkPage} from './my-work.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
+import {browser} from 'protractor';
 
 export class MyWorkPageHelper {
 
@@ -151,5 +152,19 @@ export class MyWorkPageHelper {
             label.defaultView.click();
         }
         await PageHelper.click(label.ok);
+    }
+
+    static async fillAndSubmitRenameView() {
+        const uniqueId = PageHelper.getUniqueId();
+        const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
+        await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewNewName);
+        await PageHelper.click(MyWorkPage.viewsPopup.ok);
+        return viewNewName;
+    }
+    static async verifyAndAcceptRenameConfirmationPopup(viewName: string) {
+       await  browser.switchTo().alert().getText().then(function (popUpText) {
+           expect(popUpText).toBe(`Would you like to rename the "${viewName}" view?`);
+       });
+       await PageHelper.acceptAlert();
     }
 }
