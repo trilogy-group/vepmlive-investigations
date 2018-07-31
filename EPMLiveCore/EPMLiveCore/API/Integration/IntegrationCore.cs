@@ -2196,40 +2196,40 @@ namespace EPMLiveCore.API.Integration
                     string colid = "";
                     Guid intlistid = Guid.Empty;
 
-                    using (var cmd = new SqlCommand(selectCommandText, cn))
+                    using (var sqlCommand = new SqlCommand(selectCommandText, cn))
                     {
-                        cmd.Parameters.AddWithValue(paramListId, li.ParentList.ID);
+                        sqlCommand.Parameters.AddWithValue(paramListId, li.ParentList.ID);
 
                         const int indexOfColId = 0;
                         const int indexOfIntListId = 1;
 
-                        using (var dr = cmd.ExecuteReader())
+                        using (var dataReader = sqlCommand.ExecuteReader())
                         {
                             string fieldIntUid;
-                            while (dr.Read() && dr.FieldCount > indexOfIntListId)
+                            while (dataReader.Read() && dataReader.FieldCount > indexOfIntListId)
                             {
-                                fieldIntUid = string.Concat(TextIntUid, dr.GetInt32(indexOfColId));
+                                fieldIntUid = string.Concat(TextIntUid, dataReader.GetInt32(indexOfColId));
                                 if (AfterProperties[fieldIntUid] != null &&
                                     !string.IsNullOrWhiteSpace(AfterProperties[fieldIntUid].ToString()))
                                 {
-                                    intlistid = dr.GetGuid(indexOfIntListId);
-                                    colid = dr.GetInt32(indexOfColId).ToString();
+                                    intlistid = dataReader.GetGuid(indexOfIntListId);
+                                    colid = dataReader.GetInt32(indexOfColId).ToString();
                                     break;
                                 }
                             }
-                            dr.Close();
+                            dataReader.Close();
                         }
                     }
 
                     if (colid == string.Empty || bCheckBit(intlistid, li.ID, colid))
                     {
-                        using (var cmd = new SqlCommand(insertCommandText, cn))
+                        using (var sqlCommand = new SqlCommand(insertCommandText, cn))
                         {
-                            cmd.Parameters.AddWithValue(paramListId, li.ParentList.ID);
-                            cmd.Parameters.AddWithValue(paramItemId, li.ID);
-                            cmd.Parameters.AddWithValue(paramColId, colid);
-                            cmd.Parameters.AddWithValue(paramType, eventType);
-                            cmd.ExecuteNonQuery();
+                            sqlCommand.Parameters.AddWithValue(paramListId, li.ParentList.ID);
+                            sqlCommand.Parameters.AddWithValue(paramItemId, li.ID);
+                            sqlCommand.Parameters.AddWithValue(paramColId, colid);
+                            sqlCommand.Parameters.AddWithValue(paramType, eventType);
+                            sqlCommand.ExecuteNonQuery();
                         }
                     }
 

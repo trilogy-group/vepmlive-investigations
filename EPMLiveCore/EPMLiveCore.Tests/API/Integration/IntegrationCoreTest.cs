@@ -1677,7 +1677,6 @@ namespace EPMLiveCore.Tests.API.Integration
                                                            param.Value.Equals(itemId)),
                 () => parameterList.ShouldContain(param => param.ParameterName == expectedParamColId &&
                                                            param.Value.Equals(colId)));
-
         }
 
         [TestMethod]
@@ -1690,7 +1689,6 @@ namespace EPMLiveCore.Tests.API.Integration
             const string expectedParamPriority = "@priority";
             
             const int intColId = 3;
-            const string eventFromId = "";
             var intListId = Guid.Empty;
 
             var spListId = Guid.NewGuid();
@@ -1759,7 +1757,7 @@ namespace EPMLiveCore.Tests.API.Integration
             };
 
             // Act
-            _testEntity.GetDataSet(shimSpList.Instance, eventFromId, intListId);
+            _testEntity.GetDataSet(shimSpList.Instance, string.Empty, intListId);
 
             // Assert
             _testEntity.ShouldSatisfyAllConditions(
@@ -1840,7 +1838,6 @@ namespace EPMLiveCore.Tests.API.Integration
         {
             // Arrange
             const int intColId = 3;
-            const string eventFromId = "";
             var shimSpList = new ShimSPList();
             var intListId = Guid.NewGuid();
 
@@ -1881,7 +1878,7 @@ namespace EPMLiveCore.Tests.API.Integration
             };
 
             // Act
-            var result = _testEntity.GetDataSet(shimSpList.Instance, eventFromId, intListId);
+            var result = _testEntity.GetDataSet(shimSpList.Instance, string.Empty, intListId);
 
             // Assert
             result.ShouldSatisfyAllConditions(
