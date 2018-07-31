@@ -1339,62 +1339,70 @@ namespace EPMLiveEnterprise
             Guid siteid = SPContext.Current.Site.ID;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = null;
                 try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    WebSvcProject.Project svcProject = new WebSvcProject.Project();
-                    svcProject.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/project.asmx";
-                    svcProject.UseDefaultCredentials = true;
-
-                    WebSvcProject.ProjectDataSet pds = svcProject.ReadProject(projectUid, WebSvcProject.DataStoreEnum.WorkingStore);
-                    string projectname = pds.Project[0].PROJ_NAME;
-
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM publishercheck where projectguid=@projectguid", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                    SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                    if (drPubCheck.Read())
+                    using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        drPubCheck.Close();
-                        cmd = new SqlCommand("UPDATE publishercheck set checkbit=1,pubType=@pubType,weburl=@weburl,projectname=@projectname,percentcomplete=1,status=1,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                        cmd.Parameters.AddWithValue("@pubtype", pubType);
-                        cmd.Parameters.AddWithValue("@weburl", url);
-                        cmd.Parameters.AddWithValue("@projectname", projectname);
-                        cmd.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        drPubCheck.Close();
-                        cmd = new SqlCommand("INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,1,1,GETDATE())", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                        cmd.Parameters.AddWithValue("@pubtype", pubType);
-                        cmd.Parameters.AddWithValue("@weburl", url);
-                        cmd.Parameters.AddWithValue("@projectname", projectname);
-                        cmd.ExecuteNonQuery();
-                    }
+                        connection.Open();
 
-                    cn.Close();
-                    bRet = true;
+                        WebSvcProject.Project svcProject = new WebSvcProject.Project();
+                        svcProject.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/project.asmx";
+                        svcProject.UseDefaultCredentials = true;
+
+                        WebSvcProject.ProjectDataSet pds = svcProject.ReadProject(projectUid, WebSvcProject.DataStoreEnum.WorkingStore);
+                        string projectname = pds.Project[0].PROJ_NAME;
+
+                        using (var command = new SqlCommand("SELECT * FROM publishercheck where projectguid=@projectguid", connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", projectUid);
+                            using (var drPubCheck = command.ExecuteReader())
+                            {
+                                if (drPubCheck.Read())
+                                {
+                                    using (var updateCommand = new SqlCommand(
+                                        "UPDATE publishercheck set " + 
+                                        "checkbit=1,pubType=@pubType,weburl=@weburl,projectname=@projectname,percentcomplete=1,status=1,laststatusdate=getdate() " +
+                                        "where projectguid=@projectguid", 
+                                        connection))
+                                    {
+                                        updateCommand.Parameters.AddWithValue("@projectguid", projectUid);
+                                        updateCommand.Parameters.AddWithValue("@pubtype", pubType);
+                                        updateCommand.Parameters.AddWithValue("@weburl", url);
+                                        updateCommand.Parameters.AddWithValue("@projectname", projectname);
+                                        updateCommand.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    using (var insertCommand = new SqlCommand(
+                                        "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) " + 
+                                        "VALUES (@projectguid,1,@pubtype,@weburl,@projectname,1,1,GETDATE())", 
+                                        connection))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@projectguid", projectUid);
+                                        insertCommand.Parameters.AddWithValue("@pubtype", pubType);
+                                        insertCommand.Parameters.AddWithValue("@weburl", url);
+                                        insertCommand.Parameters.AddWithValue("@projectname", projectname);
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                            bRet = true;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher Check WS");
-                    myLog.WriteEntry("Error: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                    try
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher Check WS"))
                     {
-                        cn.Close();
+                        myLog.WriteEntry("Error: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                        bRet = false;
                     }
-                    catch { }
-                    bRet = false;
                 }
             });
             return bRet;
         }
+
         [WebMethod]
         public string[] getSiteTemplates()
         {
@@ -1403,30 +1411,33 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-
                     try
                     {
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", cn);
-                        SqlDataReader dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
-                            string[] strValidtemplates = dReader.GetString(0).Split('|');
-                            foreach (string template in strValidtemplates)
+                            connection.Open();
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", connection))
                             {
-                                arrValidTemplates.Add(template);
+                                using (var dataReader = command.ExecuteReader())
+                                {
+                                    if (dataReader.Read())
+                                    {
+                                        string[] strValidtemplates = dataReader.GetString(0).Split('|');
+                                        foreach (string template in strValidtemplates)
+                                        {
+                                            arrValidTemplates.Add(template);
+                                        }
+                                    }
+                                }
                             }
                         }
-                        dReader.Close();
-
-                        cn.Close();
                     }
                     catch (Exception ex1)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                        myLog.WriteEntry("Error getting valid templates(): " + ex1.Message, EventLogEntryType.Error, 1000);
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                        {
+                            myLog.WriteEntry("Error getting valid templates(): " + ex1.Message, EventLogEntryType.Error, 1000);
+                        }
                     }
                 });
             }
@@ -1449,37 +1460,49 @@ namespace EPMLiveEnterprise
             }
             return templates;
         }
+
         [WebMethod]
         public string getEnterpriseSetting(string setting)
         {
-            string ret = "";
-            Guid siteId = SPContext.Current.Site.ID;
+            var returnValue = string.Empty;
+            var siteId = SPContext.Current.Site.ID;
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='" + setting + "'", cn);
-                    SqlDataReader dReader = cmd.ExecuteReader();
-                    if (dReader.Read())
+                    using (var connection = new SqlConnection(
+                        EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        ret = dReader.GetString(0);
+                        connection.Open();
+                        using (var command = new SqlCommand(
+                            string.Format("SELECT config_value FROM ECONFIG where config_name='{0}'", setting),
+                            connection))
+                        {
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    returnValue = dataReader.GetString(0);
+                                }
+                            }
+                        }
                     }
-                    dReader.Close();
-                    cn.Close();
                 });
             }
             catch (Exception ex)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getEnterpriseSetting(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getEnterpriseSetting(): {0}{1}", ex.Message, ex.StackTrace), 
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
-            return ret;
+            return returnValue;
         }
     }
 }

@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure.Logging;
+using Microsoft.SharePoint.Administration;
 using ModelDataCache;
 using PortfolioEngineCore;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 public abstract class GridBase<TPeriodData, TDetailRowData>
 {
@@ -18,7 +21,11 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected IList<TPeriodData> Periods;
     protected IList<TDetailRowData> DetailRows;
-    
+
+    protected virtual bool SkipDetailRowGenerationErrors => false;
+
+    protected virtual int DetailRowIdBase => 0;
+
     protected abstract bool CheckIfDetailRowShouldBeAdded(TDetailRowData detailRow);
 
     public void AddPeriodsData(IEnumerable<TPeriodData> periods)
@@ -69,9 +76,27 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
             if (DetailRows != null)
             {
-                for(var i = 0; i < DetailRows.Count; i++)
+                try
                 {
-                    AddDetailRow(DetailRows[i], i);
+                    for (var i = 0; i < DetailRows.Count; i++)
+                    {
+                        AddDetailRow(DetailRows[i], i + DetailRowIdBase);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    if (SkipDetailRowGenerationErrors)
+                    {
+                        LoggingService.WriteTrace(
+                           Area.EPMLiveWorkEnginePPM,
+                           Categories.EPMLiveWorkEnginePPM.Others,
+                           TraceSeverity.VerboseEx,
+                           ex.ToString());
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
         }
@@ -112,14 +137,13 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected abstract void AddPeriodColumns(IEnumerable<TPeriodData> periods);
 
-    protected CStruct InitializeGridLayoutDefinition(string name = "R")
+    protected CStruct InitializeGridLayoutDefinition(string name, CStruct m_xDef)
     {
-        var m_xDef = Constructor.CreateSubStruct("Def");
         var m_xDefTree = m_xDef.CreateSubStruct("D");
         m_xDefTree.CreateStringAttr("Name", name);
         m_xDefTree.CreateStringAttr("HoverCell", "Color");
         m_xDefTree.CreateStringAttr("HoverRow", "Color");
-        m_xDefTree.CreateStringAttr("FocusCell", "");
+        m_xDefTree.CreateStringAttr("FocusCell", string.Empty);
         m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
         m_xDefTree.CreateIntAttr("NoColorState", 1);
 

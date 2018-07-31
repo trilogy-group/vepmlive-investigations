@@ -12,6 +12,7 @@
     <Add FullName="EPMLiveCore.Infrastructure.Setup.ActivateFeatureKey!"/>
     <Add FullName="EPMLiveCore.Infrastructure.Setup.CreateEPMLiveDB!"/>
     <Add FullName="EPMLiveCore.ReportHelper.EPMData!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.ReportBiz!"/>
     <Add FullName="EPMLiveCore.API.APITeam!"/>
     <Add FullName="EPMLiveCore.Utilities!"/>
     <Add FullName="EPMLiveCore.Jobs.ResourceImportJob!"/>

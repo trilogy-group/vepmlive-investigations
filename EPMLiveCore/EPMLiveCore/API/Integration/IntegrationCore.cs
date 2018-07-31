@@ -15,7 +15,10 @@ namespace EPMLiveCore.API.Integration
 {
     public class IntegrationCore
     {
-        SPSite _site;
+        private const string ColNameIntListId = "INT_LIST_ID";
+        private const string ColNameListId = "LIST_ID";
+        private const string ColNameColId = "COL_ID";
+        private SPSite _site;
         SPWeb _web = null;
         SqlConnection cn;
         private bool WasOpen = false;
@@ -1022,27 +1025,50 @@ namespace EPMLiveCore.API.Integration
 
         internal void UpdatePriorityNumbers(Guid listid)
         {
-            OpenConnection();
+            const string selectCommandText = "SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid order by priority";
+            const string updateCommandText = "UPDATE INT_LISTS set Priority=@priority where INT_LIST_ID=@intlistid";
+            const string paramListId = "@listid";
+            const string paramIntListId = "@intlistid";
+            const string paramPriority = "@priority";
 
-            SqlCommand cmd = new SqlCommand("SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid order by priority", cn);
-            cmd.Parameters.AddWithValue("@listid", listid);
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-
-            int counter = 1;
-
-            foreach (DataRow dr in ds.Tables[0].Rows)
+            try
             {
-                cmd = new SqlCommand("UPDATE INT_LISTS set Priority=@priority where INT_LIST_ID=@intlistid", cn);
-                cmd.Parameters.AddWithValue("@intlistid", dr["INT_LIST_ID"].ToString());
-                cmd.Parameters.AddWithValue("@priority", counter);
-                cmd.ExecuteNonQuery();
+                OpenConnection();
 
-                counter++;
+                using (var selectCommand = new SqlCommand(selectCommandText, cn))
+                {
+                    selectCommand.Parameters.AddWithValue(paramListId, listid);
+
+                    using (var dataSet = new DataSet())
+                    {
+                        using (var dataAdapter = new SqlDataAdapter(selectCommand))
+                        {
+                            dataAdapter.Fill(dataSet);
+                        }
+
+                        if (dataSet.Tables.Count > 0)
+                        {
+                            var priorityCounter = 1;
+
+                            foreach (DataRow dataRow in dataSet.Tables[0].Rows)
+                            {
+                                using (var updateCommand = new SqlCommand(updateCommandText, cn))
+                                {
+                                    updateCommand.Parameters.AddWithValue(paramIntListId, dataRow[ColNameIntListId].ToString());
+                                    updateCommand.Parameters.AddWithValue(paramPriority, priorityCounter);
+                                    updateCommand.ExecuteNonQuery();
+                                }
+
+                                priorityCounter++;
+                            }
+                        }
+                    }
+                }
             }
-
-            CloseConnection(false);
+            finally
+            {
+                CloseConnection(false);
+            }
         }
 
         private void ProcessItemOutgoing(DataRow dr)
@@ -1076,18 +1102,28 @@ namespace EPMLiveCore.API.Integration
 
                     OpenConnection();
 
-                    SqlCommand cmd = new SqlCommand("SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@intcolid", cn);
-                    cmd.Parameters.AddWithValue("@listid", dr["LIST_ID"].ToString());
-                    cmd.Parameters.AddWithValue("@intcolid", dr["COL_ID"].ToString());
-                    Guid intlistid = Guid.Empty;
-                    SqlDataReader drintlistid = cmd.ExecuteReader();
-                    if (drintlistid.Read())
+                    const string selectIntListCommandText = "SELECT INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@intcolid";
+                    var intListId = Guid.Empty;
+                    using (var selectCommand = new SqlCommand(selectIntListCommandText, cn))
                     {
-                        intlistid = drintlistid.GetGuid(0);
-                    }
-                    drintlistid.Close();
+                        const string paramListId = "@listid";
+                        const string paramIntColId = "@intcolid";
+                        selectCommand.Parameters.AddWithValue(paramListId, dr[ColNameListId].ToString());
+                        selectCommand.Parameters.AddWithValue(paramIntColId, dr[ColNameColId].ToString());
 
-                    Hashtable props = GetProperties(intlistid);
+                        using (var dataReader = selectCommand.ExecuteReader())
+                        {
+                            if (dataReader.Read() && dataReader.FieldCount > 0)
+                            {
+                                const int firstColIndex = 0;
+                                intListId = dataReader.GetGuid(firstColIndex);
+                            }
+
+                            dataReader.Close();
+                        }
+                    }
+
+                    var props = GetProperties(intListId);
 
                     bool CanDelete = false;
                     try
@@ -1098,7 +1134,7 @@ namespace EPMLiveCore.API.Integration
 
                     if (CanDelete)
                     {
-                        PostIntegrationDeleteToExternal(dtItems, intlistid, new Guid(dr["LIST_ID"].ToString()));
+                        PostIntegrationDeleteToExternal(dtItems, intListId, new Guid(dr["LIST_ID"].ToString()));
                     }
 
 
@@ -1112,19 +1148,37 @@ namespace EPMLiveCore.API.Integration
 
         internal void LogMessage(string intlistid, string listid, string message, int type)
         {
-            OpenConnection();
+            const string insertCommandText = "INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @type, @text)";
+            const string paramIntListId = "@intlistid";
+            const string paramListId = "@listid";
+            const string paramText = "@text";
+            const string paramType = "@type";
 
-            SqlCommand cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @type, @text)", cn);
-            if (intlistid != "")
-                cmdError.Parameters.AddWithValue("@intlistid", intlistid);
-            else
-                cmdError.Parameters.AddWithValue("@intlistid", DBNull.Value);
-            cmdError.Parameters.AddWithValue("@listid", listid);
-            cmdError.Parameters.AddWithValue("@text", message);
-            cmdError.Parameters.AddWithValue("@type", type);
-            cmdError.ExecuteNonQuery();
+            try
+            {
+                OpenConnection();
 
-            CloseConnection(false);
+                using (var logCommand = new SqlCommand(insertCommandText, cn))
+                {
+                    if (!string.IsNullOrWhiteSpace(intlistid))
+                    {
+                        logCommand.Parameters.AddWithValue(paramIntListId, intlistid);
+                    }
+                    else
+                    {
+                        logCommand.Parameters.AddWithValue(paramIntListId, DBNull.Value);
+                    }
+                    
+                    logCommand.Parameters.AddWithValue(paramListId, listid);
+                    logCommand.Parameters.AddWithValue(paramText, message);
+                    logCommand.Parameters.AddWithValue(paramType, type);
+                    logCommand.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                CloseConnection(false);
+            }
         }
 
         internal Hashtable GetUserMap(string integrationlistid, bool reverse)
@@ -1394,31 +1448,45 @@ namespace EPMLiveCore.API.Integration
 
         private void PostCheckBit(Guid intlistid, string itemid, bool bCheck)
         {
+            const string selectCommandText = "SELECT * FROM INT_CHECK WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid";
+            const string insertCommandText = "INSERT INTO INT_CHECK (INT_LIST_ID, ITEM_ID, CHECKBIT, CHECKTIME) VALUES (@intlistid, @itemid, @check, GETDATE())";
+            const string updateCommandText = "UPDATE INT_CHECK SET CHECKBIT=@check, CHECKTIME=GETDATE() WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid";
+            const string paramIntListId = "@intlistid";
+            const string paramItemId = "@itemid";
+            const string paramCheck = "@check";
 
-            SqlCommand cmd = new SqlCommand("SELECT * FROM INT_CHECK WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid", cn);
-            cmd.Parameters.AddWithValue("@intlistid", intlistid);
-            cmd.Parameters.AddWithValue("@itemid", itemid);
-            SqlDataReader drRead = cmd.ExecuteReader();
-            bool bFound = false;
-            if (drRead.Read())
-                bFound = true;
-            drRead.Close();
-
-            if (bFound)
+            var checkLogFound = false;
+            using (var selectCommand = new SqlCommand(selectCommandText, cn))
             {
-                cmd = new SqlCommand("UPDATE INT_CHECK SET CHECKBIT=@check, CHECKTIME=GETDATE() WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid", cn);
-                cmd.Parameters.AddWithValue("@intlistid", intlistid);
-                cmd.Parameters.AddWithValue("@itemid", itemid);
-                cmd.Parameters.AddWithValue("@check", bCheck);
-                cmd.ExecuteNonQuery();
+                selectCommand.Parameters.AddWithValue(paramIntListId, intlistid);
+                selectCommand.Parameters.AddWithValue(paramItemId, itemid);
+
+                using (var dataReader = selectCommand.ExecuteReader())
+                {
+                    checkLogFound = dataReader.Read();
+                    dataReader.Close();
+                }
+            }
+
+            if (checkLogFound)
+            {
+                using (var updateCommand = new SqlCommand(updateCommandText, cn))
+                {
+                    updateCommand.Parameters.AddWithValue(paramIntListId, intlistid);
+                    updateCommand.Parameters.AddWithValue(paramItemId, itemid);
+                    updateCommand.Parameters.AddWithValue(paramCheck, bCheck);
+                    updateCommand.ExecuteNonQuery();
+                }
             }
             else
             {
-                cmd = new SqlCommand("INSERT INTO INT_CHECK (INT_LIST_ID, ITEM_ID, CHECKBIT, CHECKTIME) VALUES (@intlistid, @itemid, @check, GETDATE())", cn);
-                cmd.Parameters.AddWithValue("@intlistid", intlistid);
-                cmd.Parameters.AddWithValue("@itemid", itemid);
-                cmd.Parameters.AddWithValue("@check", bCheck);
-                cmd.ExecuteNonQuery();
+                using (var insertCommand = new SqlCommand(insertCommandText, cn))
+                {
+                    insertCommand.Parameters.AddWithValue(paramIntListId, intlistid);
+                    insertCommand.Parameters.AddWithValue(paramItemId, itemid);
+                    insertCommand.Parameters.AddWithValue(paramCheck, bCheck);
+                    insertCommand.ExecuteNonQuery();
+                }
             }
         }
 
@@ -1458,6 +1526,9 @@ namespace EPMLiveCore.API.Integration
 
         public List<IntegrationControl> GetItemButtons(Guid listid, SPListItem li, out string Errors)
         {
+            const string selectCommandText = "SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE,  dbo.INT_CONTROLS.WINDOWSTYLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0";
+            const string paramListId = "@listid";
+
             List<IntegrationControl> ics = new List<IntegrationControl>();
             Errors = "";
             try
@@ -1468,10 +1539,15 @@ namespace EPMLiveCore.API.Integration
 
                     DataSet ds = new DataSet();
 
-                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE,  dbo.INT_CONTROLS.WINDOWSTYLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0", cn);
-                    cmd.Parameters.AddWithValue("@listid", listid);
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(ds);
+                    using (var command = new SqlCommand(selectCommandText, cn))
+                    {
+                        command.Parameters.AddWithValue(paramListId, listid);
+
+                        using (var dataAdapter = new SqlDataAdapter(command))
+                        {
+                            dataAdapter.Fill(ds);
+                        }
+                    }
 
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
@@ -1501,6 +1577,9 @@ namespace EPMLiveCore.API.Integration
 
         public List<IntegrationControl> GetGlobalButtons(Guid listid, SPListItem li, out string Errors)
         {
+            const string selectCommandText = "SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0";
+            const string paramListId = "@listid";
+
             List<IntegrationControl> ics = new List<IntegrationControl>();
             Errors = "";
             try
@@ -1511,10 +1590,15 @@ namespace EPMLiveCore.API.Integration
 
                     DataSet ds = new DataSet();
 
-                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0", cn);
-                    cmd.Parameters.AddWithValue("@listid", listid);
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(ds);
+                    using (var command = new SqlCommand(selectCommandText, cn))
+                    {
+                        command.Parameters.AddWithValue(paramListId, listid);
+
+                        using (var dataAdapter = new SqlDataAdapter(command))
+                        {
+                            dataAdapter.Fill(ds);
+                        }
+                    }
 
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
@@ -1758,63 +1842,111 @@ namespace EPMLiveCore.API.Integration
 
         internal Hashtable GetProperties(Guid intlistid)
         {
+            const string selectCommandText01 = "SELECT     dbo.INT_MODULES.CustomProps FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid";
+            const string selectCommandText02 = "SELECT     Property, Value FROM INT_PROPS WHERE INT_LIST_ID=@intlistid";
+            const string paramIntListId = "@intlistid";
 
-            OpenConnection();
-
-            Hashtable hshProps = new Hashtable();
-
-
-            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_MODULES.CustomProps FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid", cn);
-            cmd.Parameters.AddWithValue("@intlistid", intlistid);
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            string propxml = "";
-
-            if (dr.Read())
-            {
-                propxml = dr.GetString(0);
-            }
-            dr.Close();
-
-            XmlDocument doc = new XmlDocument();
+            var properties = new Hashtable();
 
             try
             {
-                doc.LoadXml(propxml);
-            }
-            catch { doc.LoadXml("<props/>"); }
+                OpenConnection();
 
-            cmd = new SqlCommand("SELECT     Property, Value FROM INT_PROPS WHERE INT_LIST_ID=@intlistid", cn);
-            cmd.Parameters.AddWithValue("@intlistid", intlistid);
-            dr = cmd.ExecuteReader();
+                var propertyXml = string.Empty;
 
+                using (var cmd = new SqlCommand(selectCommandText01, cn))
+                {
+                    cmd.Parameters.AddWithValue(paramIntListId, intlistid);
 
+                    using (var dataReader = cmd.ExecuteReader())
+                    {
+                        if (dataReader.Read() && dataReader.FieldCount > 0)
+                        {
+                            propertyXml = dataReader.GetString(0);
+                        }
 
-            while (dr.Read())
-            {
-                bool bPass = false;
+                        dataReader.Close();
+                    }
+                }
+
+                var xmlDoc = new XmlDocument();
+
                 try
                 {
-                    XmlNode nd = doc.FirstChild.SelectSingleNode("//Input[@Property='" + dr.GetString(0) + "']");
-                    if (nd != null && nd.Attributes["Type"].Value == "Password")
-                        bPass = true;
-
+                    xmlDoc.LoadXml(propertyXml);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.ToString());
+                    xmlDoc.LoadXml("<props/>");
+                }
 
-                if (bPass)
-                    hshProps.Add(dr.GetString(0), CoreFunctions.Decrypt(dr.GetString(1), "kKGBJ768d3q78^#&^dsas"));
-                else
-                    hshProps.Add(dr.GetString(0), dr.GetString(1));
+                using (var command = new SqlCommand(selectCommandText02, cn))
+                {
+                    command.Parameters.AddWithValue(paramIntListId, intlistid);
+
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        const int firstFieldIndex = 0;
+                        const int secondFieldIndex = 1;
+
+                        while (dataReader.Read() && dataReader.FieldCount > secondFieldIndex)
+                        {
+                            var pass = false;
+                            try
+                            {
+                                const string attrType = "Type";
+                                const string valuePassword = "Password";
+
+                                var xmlNode = xmlDoc.FirstChild.SelectSingleNode(string.Format("//Input[@Property='{0}']",
+                                                                                               dataReader.GetString(firstFieldIndex)));
+                                if (xmlNode != null && xmlNode.Attributes[attrType].Value == valuePassword)
+                                {
+                                    pass = true;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError(ex.ToString());
+                            }
+
+                            if (pass)
+                            {
+                                const string passPhrase = "kKGBJ768d3q78^#&^dsas";
+                                properties.Add(dataReader.GetString(firstFieldIndex),
+                                               CoreFunctions.Decrypt(dataReader.GetString(secondFieldIndex), passPhrase));
+                            }
+                            else
+                            {
+                                properties.Add(dataReader.GetString(firstFieldIndex), dataReader.GetString(secondFieldIndex));
+                            }
+                        }
+
+                        dataReader.Close();
+                    }
+                }
             }
-            dr.Close();
-            CloseConnection(false);
+            finally
+            {
+                CloseConnection(false);
+            }
 
-            return hshProps;
+            return properties;
         }
 
         private IntegratorDef GetIntegrator(Guid intlistid)
         {
+            const string selectCommandText = "SELECT     dbo.INT_MODULES.MODULE_ID, dbo.INT_MODULES.NetAssembly, dbo.INT_MODULES.NetClass,Title,INT_KEY,LIST_ID,INT_COLID,INT_LIST_ID FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid";
+            const string paramIntListId = "@intlistid";
+            const string intColPrefix = "INTUID";
+            const int indexOfAssemblyName = 1;
+            const int indexOfTypeName = 2;
+            const int indexOfTitle = 3;
+            const int indexOfIntKey = 4;
+            const int indexOfListId = 5;
+            const int indexOfColId = 6;
+            const int indexOfIntListId = 7;
+
             OpenConnection();
 
             IntegratorDef def = new IntegratorDef();
@@ -1822,20 +1954,25 @@ namespace EPMLiveCore.API.Integration
             string netAssembly = "";
             string netClass = "";
 
-            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_MODULES.MODULE_ID, dbo.INT_MODULES.NetAssembly, dbo.INT_MODULES.NetClass,Title,INT_KEY,LIST_ID,INT_COLID,INT_LIST_ID FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid", cn);
-            cmd.Parameters.AddWithValue("@intlistid", intlistid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            using (var command = new SqlCommand(selectCommandText, cn))
             {
-                netAssembly = dr.GetString(1);
-                netClass = dr.GetString(2);
-                def.Title = dr.GetString(3);
-                def.IntKey = dr.GetString(4);
-                def.ListId = dr.GetGuid(5);
-                def.intcol = "INTUID" + dr.GetInt32(6);
-                def.intlistid = dr.GetGuid(7);
+                command.Parameters.AddWithValue(paramIntListId, intlistid);
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.Read() && dataReader.FieldCount > indexOfIntListId)
+                    {
+                        netAssembly = dataReader.GetString(indexOfAssemblyName);
+                        netClass = dataReader.GetString(indexOfTypeName);
+                        def.Title = dataReader.GetString(indexOfTitle);
+                        def.IntKey = dataReader.GetString(indexOfIntKey);
+                        def.ListId = dataReader.GetGuid(indexOfListId);
+                        def.intcol = string.Concat(intColPrefix, dataReader.GetInt32(indexOfColId));
+                        def.intlistid = dataReader.GetGuid(indexOfIntListId);
+                    }
+                    dataReader.Close();
+                }
             }
-            dr.Close();
 
             Assembly assemblyInstance = Assembly.Load(netAssembly);
             Type thisClass = assemblyInstance.GetType(netClass);
@@ -1850,6 +1987,11 @@ namespace EPMLiveCore.API.Integration
 
         private IIntegrator GetIntegratorFromModule(Guid moduleid, out string title)
         {
+            const string selectCommandText = "SELECT NetAssembly, NetClass,Title FROM INT_MODULES WHERE MODULE_ID=@moduleid";
+            const string paramModuleId = "@moduleid";
+            const int indexOfAssemblyName = 0;
+            const int indexOfTypeName = 1;
+            const int indexOfTitle = 2;
 
             OpenConnection();
 
@@ -1857,16 +1999,23 @@ namespace EPMLiveCore.API.Integration
             string netClass = "";
             title = "";
 
-            SqlCommand cmd = new SqlCommand("SELECT NetAssembly, NetClass,Title FROM INT_MODULES WHERE MODULE_ID=@moduleid", cn);
-            cmd.Parameters.AddWithValue("@moduleid", moduleid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            using (var command = new SqlCommand(selectCommandText, cn))
             {
-                netAssembly = dr.GetString(0);
-                netClass = dr.GetString(1);
-                title = dr.GetString(2);
+                command.Parameters.AddWithValue(paramModuleId, moduleid);
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        netAssembly = dataReader.GetString(indexOfAssemblyName);
+                        netClass = dataReader.GetString(indexOfTypeName);
+                        title = dataReader.GetString(indexOfTitle);
+                    }
+
+                    dataReader.Close();
+                }
             }
-            dr.Close();
+
             CloseConnection(true);
 
             Assembly assemblyInstance = Assembly.Load(netAssembly.Trim());
@@ -1944,36 +2093,71 @@ namespace EPMLiveCore.API.Integration
 
         internal void SubmitDeleteListEvent(SPListItem li, SPItemEventDataCollection AfterProperties)
         {
-            OpenConnection();
-
-            SqlCommand cmd = new SqlCommand("SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid", cn);
-            cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
-            DataSet dsInts = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(dsInts);
-
-            foreach (DataRow dr in dsInts.Tables[0].Rows)
+            if (li == null)
             {
-                string intitemid = "";
-
-                try
-                {
-                    intitemid = li["INTUID" + dr["INT_COLID"].ToString()].ToString();
-                }
-                catch { }
-                if (intitemid != "")
-                {
-                    cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, ITEM_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @itemid, @intitemid, @colid, 0, 1, @type)", cn);
-                    cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                    cmd.Parameters.AddWithValue("@itemid", li.ID);
-                    cmd.Parameters.AddWithValue("@intitemid", intitemid);
-                    cmd.Parameters.AddWithValue("@colid", dr["INT_COLID"].ToString());
-                    cmd.Parameters.AddWithValue("@type", 2);
-                    cmd.ExecuteNonQuery();
-                }
+                throw new ArgumentNullException("li");
             }
 
-            CloseConnection(true);
+            const string selectCommandText = "SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid";
+            const string insertCommandText = "INSERT INTO INT_EVENTS (LIST_ID, ITEM_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @itemid, @intitemid, @colid, 0, 1, @type)";
+            const string colNameIntColId = "INT_COLID";
+            const string fieldNameIntUniqueId = "INTUID";
+            const string paramListId = "@listid";
+            const string paramItemId = "@itemid";
+            const string paramIntItemId = "@intitemid";
+            const string paramColId = "@colid";
+            const string paramType = "@type";
+            const int eventType = 2;
+
+            try
+            {
+                OpenConnection();
+
+                using (var selectCommand = new SqlCommand(selectCommandText, cn))
+                {
+                    selectCommand.Parameters.AddWithValue(paramListId, li.ParentList.ID);
+
+                    using (var dataSet = new DataSet())
+                    using (var dataAdapter = new SqlDataAdapter(selectCommand))
+                    {
+                        dataAdapter.Fill(dataSet);
+
+                        if (dataSet.Tables.Count > 0)
+                        {
+                            foreach (DataRow dataRow in dataSet.Tables[0].Rows)
+                            {
+                                var intItemId = string.Empty;
+
+                                try
+                                {
+                                    intItemId = li[string.Concat(fieldNameIntUniqueId, dataRow[colNameIntColId])].ToString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.TraceError(ex.ToString());
+                                }
+
+                                if (!string.IsNullOrWhiteSpace(intItemId))
+                                {
+                                    using (var insertCommand = new SqlCommand(insertCommandText, cn))
+                                    {
+                                        insertCommand.Parameters.AddWithValue(paramListId, li.ParentList.ID);
+                                        insertCommand.Parameters.AddWithValue(paramItemId, li.ID);
+                                        insertCommand.Parameters.AddWithValue(paramIntItemId, intItemId);
+                                        insertCommand.Parameters.AddWithValue(paramColId, dataRow[colNameIntColId].ToString());
+                                        insertCommand.Parameters.AddWithValue(paramType, eventType);
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                CloseConnection(true);
+            }
         }
 
         internal void SubmitListEvent(SPListItem li, int eventType, SPItemEventDataCollection AfterProperties)

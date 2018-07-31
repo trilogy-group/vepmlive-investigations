@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
+using System.Net.Mail;
+using System.Net.Mail.Fakes;
 using System.Reflection;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
@@ -148,7 +150,7 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
-        public void iQueueItemMessage1_Called_Disposed()
+        public void IQueueItemMessageByListIteam_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
@@ -174,7 +176,7 @@ namespace EPMLiveCore.Tests.API.Notification
             _apiEmailPrivate.Invoke("iQueueItemMessage", BindingFlags.Static | BindingFlags.NonPublic, arguments);
 
             // Assert
-            AssetConnection();
+            AssertConnection();
 
             Assert.AreEqual(1, _executeReaderCommandsCalled.Count);
             Assert.AreSame(_createdConnection, _executeReaderCommandsCalled[0].Connection);
@@ -191,17 +193,12 @@ namespace EPMLiveCore.Tests.API.Notification
             AssertDataSetCommand();
 
             Assert.AreEqual(7, _createdCommands.Count);
-            Assert.AreEqual(6, _disposedCommands.Count);
-            Assert.AreSame(_createdCommands[1], _disposedCommands[0]);
-            Assert.AreSame(_createdCommands[2], _disposedCommands[1]);
-            Assert.AreSame(_createdCommands[3], _disposedCommands[2]);
-            Assert.AreSame(_createdCommands[4], _disposedCommands[3]);
-            Assert.AreSame(_createdCommands[5], _disposedCommands[4]);
-            Assert.AreSame(_createdCommands[6], _disposedCommands[5]);
+            Assert.AreEqual(7, _disposedCommands.Count);
+            AssertCreatedCommandsDisposed();
         }
 
         [TestMethod]
-        public void iQueueItemMessage2_Called_Disposed()
+        public void IQueueItemMessageByWeb_Called_Disposed()
         {
             // Arrange
             var shimUser = new ShimSPUser();
@@ -226,7 +223,7 @@ namespace EPMLiveCore.Tests.API.Notification
             _apiEmailPrivate.Invoke("iQueueItemMessage", BindingFlags.Static | BindingFlags.NonPublic, arguments);
 
             // Assert
-            AssetConnection();
+            AssertConnection();
 
             Assert.AreEqual(1, _executeReaderCommandsCalled.Count);
             Assert.AreSame(_createdConnection, _executeReaderCommandsCalled[0].Connection);
@@ -242,22 +239,19 @@ namespace EPMLiveCore.Tests.API.Notification
             AssertDataSetCommand();
 
             Assert.AreEqual(7, _createdCommands.Count);
-            Assert.AreEqual(4, _disposedCommands.Count);
-            Assert.AreSame(_createdCommands[1], _disposedCommands[0]);
-            Assert.AreSame(_createdCommands[2], _disposedCommands[1]);
-            Assert.AreSame(_createdCommands[3], _disposedCommands[2]);
-            Assert.AreSame(_createdCommands[5], _disposedCommands[3]);
+            Assert.AreEqual(7, _disposedCommands.Count);
+            AssertCreatedCommandsDisposed();
         }
 
         [TestMethod]
         public void QueueItemMessageXml_ListIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                ListName, 
-                string.Empty, 
-                ItemId, 
-                _webId.ToString(), 
-                _oWebId, 
+                ListName,
+                string.Empty,
+                ItemId,
+                _webId.ToString(),
+                _oWebId,
                 _webAppGuid4);
         }
 
@@ -265,10 +259,10 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdNotEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                ListName, 
-                ListId, 
-                ItemId, 
-                _webId.ToString(), 
+                ListName,
+                ListId,
+                ItemId,
+                _webId.ToString(),
                 _oWebId,
                 _webAppGuid3);
         }
@@ -277,11 +271,11 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdEmptyWebIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                ListName, 
-                string.Empty, 
-                ItemId, 
-                string.Empty, 
-                _oWebId, 
+                ListName,
+                string.Empty,
+                ItemId,
+                string.Empty,
+                _oWebId,
                 _webAppGuid2);
         }
 
@@ -289,20 +283,20 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdNotEmptyWebIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                ListName, 
+                ListName,
                 ListId,
-                ItemId, 
-                string.Empty, 
-                _oWebId, 
+                ItemId,
+                string.Empty,
+                _oWebId,
                 _webAppGuid1);
         }
 
         private void QueueItemMessageXml_Called_OkReturned(
-            string listName, 
-            string listId, 
-            int itemId, 
-            string webId, 
-            Guid oWebId, 
+            string listName,
+            string listId,
+            int itemId,
+            string webId,
+            Guid oWebId,
             Guid expectedWebApplicationId)
         {
             // Arrange
@@ -342,7 +336,7 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreEqual(expectedWebApplicationId, _spListItemCalledXml.ParentList.ParentWeb.Site.WebApplication.Id);
             Assert.AreEqual(_calledTemplateId, 17);
             Assert.AreEqual(_calledAdditionalParams["Building"], "64b");
-            Assert.IsTrue(new [] { SpId }.SequenceEqual(_calledNewUsers));
+            Assert.IsTrue(new[] { SpId }.SequenceEqual(_calledNewUsers));
             Assert.IsTrue(new[] { "vladislav", "vitaliy" }.SequenceEqual(_calledDelUsers));
             Assert.IsTrue(_calledDoNotEmail);
             Assert.IsTrue(_calledUnmarkread);
@@ -388,332 +382,472 @@ namespace EPMLiveCore.Tests.API.Notification
                             "</Template>";
         }
 
-        private void AssetConnection()
+        private void AssertCreatedCommandsDisposed()
+        {
+            Assert.AreEqual(_createdCommands.Count, _disposedCommands.Count);
+            foreach (var createdCommand in _createdCommands)
+            {
+                var disposed = _disposedCommands.Any(d => ReferenceEquals(d, createdCommand));
+                Assert.IsTrue(disposed, "Command '{0}' hasn't been disposed.", createdCommand.CommandText);
+            }
+        }
+
+        [TestMethod]
+        public void ISendEmail_Hidefrom_Disposed()
+        {
+            ISendEmail_Called_Disposed(true, "curuser@fake.com");
+        }
+
+        [TestMethod]
+        public void ISendEmail_DontHidefromCurEmailEmpty_Disposed()
+        {
+            ISendEmail_Called_Disposed(false, string.Empty);
+        }
+
+        [TestMethod]
+        public void ISendEmail_DontHidefromCurEmailSet_Disposed()
+        {
+            ISendEmail_Called_Disposed(false, "curuser@fake.com");
+        }
+
+        private void ISendEmail_Called_Disposed(bool hideFrom, string curUserEmail)
+        {
+            // Arrange
+            const string outboundEmail = "outbound@fake.com";
+            var siteId = new Guid("0E2FCE32-4507-452C-A8BF-D28C867DF0E9");
+            var webId = new Guid("4008FE64-56A8-4DDF-99C7-AF3C45AEBDDA");
+
+            var shimCurrentUser = new ShimSPUser
+            {
+                NameGet = () => "CurUserName",
+                EmailGet = () => curUserEmail
+            };
+            var currentUser = (SPUser)shimCurrentUser;
+            var shimUser = new ShimSPUser
+            {
+                NameGet = () => "EUserName",
+                EmailGet = () => "euser@fake.com"
+            };
+            var user = (SPUser)shimUser;
+
+            var arguments = new object[]
+            {
+                1,
+                hideFrom,
+                siteId,
+                webId,
+                (SPUser)shimCurrentUser,
+                (SPUser)shimUser,
+                new Hashtable()
+                {
+                    { "building", "64" }
+                }
+            };
+
+            ShimSPAdministrationWebApplication.LocalGet = () =>
+            {
+                var spAdministrationWebApplication = new ShimSPAdministrationWebApplication();
+                var spWebApplication = new ShimSPWebApplication(spAdministrationWebApplication)
+                {
+                    OutboundMailServiceInstanceGet = () =>
+                    {
+                        var spOutboundMailServiceInstance = new ShimSPOutboundMailServiceInstance();
+                        var spServiceInstance = new ShimSPServiceInstance(spOutboundMailServiceInstance)
+                        {
+                            ServerGet = () => new ShimSPServer
+                            {
+                                AddressGet = () => "15th ave"
+                            }
+                        };
+                        return spOutboundMailServiceInstance;
+                    },
+                    OutboundMailSenderAddressGet = () => outboundEmail
+                };
+                return spAdministrationWebApplication;
+            };
+
+            string setHost = null;
+            MailMessage sentMessage = null;
+            var clientDisposed = false;
+            ShimSmtpClient.Constructor = client =>
+            {
+                new ShimSmtpClient(client)
+                {
+                    HostSetString = host =>
+                    {
+                        setHost = host;
+                    },
+                    SendMailMessage = message =>
+                    {
+                        sentMessage = message;
+                    },
+                    DisposeBoolean = disposing =>
+                    {
+                        clientDisposed = true;
+                    }
+                };
+            };
+
+            var messageDisposed = false;
+            ShimMailMessage.AllInstances.DisposeBoolean = (message, disposing) =>
+            {
+                messageDisposed = true;
+            };
+
+            // Act
+            _apiEmailPrivate.Invoke("iSendEmail", BindingFlags.Static | BindingFlags.NonPublic, arguments);
+
+            // Assert
+            AssertConnection();
+            if (hideFrom)
+            {
+                Assert.AreEqual(outboundEmail, sentMessage.From.Address);
+                Assert.IsTrue(string.IsNullOrWhiteSpace(sentMessage.From.DisplayName));
+            }
+            else if (string.IsNullOrWhiteSpace(curUserEmail))
+            {
+                Assert.AreEqual(outboundEmail, sentMessage.From.Address);
+                Assert.AreEqual(currentUser.Name, sentMessage.From.DisplayName);
+            }
+            else
+            {
+                Assert.AreEqual(currentUser.Email, sentMessage.From.Address);
+                Assert.AreEqual(currentUser.Name, sentMessage.From.DisplayName);
+            }
+            Assert.AreEqual(user.Email, sentMessage.To[0].Address);
+            Assert.AreEqual("64 house", sentMessage.Subject);
+            Assert.AreEqual("goose live in 64 house", sentMessage.Body);
+            Assert.IsTrue(clientDisposed);
+            Assert.IsTrue(messageDisposed);
+        }
+
+
+        private void AssertConnection()
         {
             Assert.AreSame(_createdConnection, _openedConnection);
             Assert.AreSame(_openedConnection, _disposedConnection);
         }
 
-        private void AssertNonQueryComands(object listItemId, object listParentListId)
-        {
-            Assert.AreEqual(5, _executeNonQueryCommands.Count);
-            Assert.AreSame(_createdConnection, _executeNonQueryCommands[0].Connection);
-            Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
-            Assert.IsTrue(_executeNonQueryCommands[0].CommandText.StartsWith("update", StringComparison.OrdinalIgnoreCase));
-            Assert.AreEqual(listParentListId, _executeNonQueryCommands[0].Parameters["@listid"].Value);
-            Assert.AreEqual(listItemId, _executeNonQueryCommands[0].Parameters["@itemid"].Value);
-            Assert.IsTrue(_executeNonQueryCommands[1].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(_executeNonQueryCommands[2].CommandText.StartsWith("insert", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(_executeNonQueryCommands[3].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(_executeNonQueryCommands[4].CommandText.StartsWith("delete", StringComparison.OrdinalIgnoreCase));
-        }
-
-        private void AssertDataSetCommand()
-        {
-            Assert.AreEqual(1, _dataSetCommands.Count);
-            Assert.AreSame(_createdConnection, _dataSetCommands[0].Connection);
-            Assert.AreEqual(CommandType.Text, _dataSetCommands[0].CommandType);
-            Assert.IsTrue(
-                "select * from personalizations where FK=@id"
-                .Equals(_dataSetCommands[0].CommandText, StringComparison.OrdinalIgnoreCase));
-            Assert.AreEqual(1, _dataSetCommands[0].Parameters.Count);
-        }
-
-        private void ShimIQueueItemMessage()
-        {
-            ShimSPSite.ConstructorGuid = (site, _) =>
-            {
-                var shimSite = new ShimSPSite(site)
-                {
-                    OpenWebGuid = webGuid =>
-                    {
-                        if (webGuid == _oWebId)
-                        {
-                            return new ShimSPWeb
-                            {
-                                IDGet = () => Guid.NewGuid(),
-                                SiteGet = () => new ShimSPSite
-                                {
-                                    IDGet = () => Guid.NewGuid()
-                                },
-                                ListsGet = () => new ShimSPListCollection
-                                {
-                                    ItemGetGuid = key =>
-                                    {
-                                        if (key == new Guid(ListId))
-                                        {
-                                            return new ShimSPList
-                                            {
-                                                GetItemByIdInt32 = id =>
-                                                {
-                                                    if (id == ItemId)
-                                                    {
-                                                        return CreateShimSpListItem(_webAppGuid1);
-                                                    }
-                                                    return null;
-                                                }
-                                            };
-                                        }
-                                        else
-                                        {
-                                            return null;
-                                        }
-                                    },
-                                    TryGetListString = key => 
-                                    {
-                                        if (key == ListName)
-                                        {
-                                            return new ShimSPList
-                                            {
-                                                GetItemByIdInt32 = id =>
-                                                {
-                                                    if (id == ItemId)
-                                                    {
-                                                        return CreateShimSpListItem(_webAppGuid2);
-                                                    }
-                                                    return null;
-                                                }
-                                            };
-                                        }
-                                        else
-                                        {
-                                            return null;
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else
-                        {
-                            return new ShimSPWeb
-                            {
-                                IDGet = () => Guid.NewGuid(),
-                                SiteGet = () => new ShimSPSite
-                                {
-                                    IDGet = () => Guid.NewGuid()
-                                },
-                                ListsGet = () => new ShimSPListCollection
-                                {
-                                    ItemGetGuid = key =>
-                                    {
-                                        if (key == new Guid(ListId))
-                                        {
-                                            return new ShimSPList
-                                            {
-                                                GetItemByIdInt32 = id =>
-                                                {
-                                                    if (id == ItemId)
-                                                    {
-                                                        return CreateShimSpListItem(_webAppGuid3);
-                                                    }
-                                                    return null;
-                                                }
-                                            };
-                                        }
-                                        else
-                                        {
-                                            return null;
-                                        }
-                                    },
-                                    TryGetListString = key =>
-                                    {
-                                        if (key == ListName)
-                                        {
-                                            return new ShimSPList
-                                            {
-                                                GetItemByIdInt32 = id =>
-                                                {
-                                                    if (id == ItemId)
-                                                    {
-                                                        return CreateShimSpListItem(_webAppGuid4);
-                                                    }
-                                                    return null;
-                                                }
-                                            };
-                                        }
-                                        else
-                                        {
-                                            return null;
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                    },
-                    WebApplicationGet = () =>
-                    {
-                        var shimSPWebApplication = new ShimSPWebApplication();
-                        var shimSPWebApplicationPersistedObject = new ShimSPPersistedObject(shimSPWebApplication)
-                        {
-                            IdGet = () => Guid.NewGuid()
-                        };
-                        return shimSPWebApplication;
-                    }
-                };
-            };
-
-            _createdConnection = null;
-            ShimSqlConnection.ConstructorString = (connection, _) =>
-            {
-                _createdConnection = connection;
-            };
-
-            ShimGetCoreInformation();
-
-            _openedConnection = null;
-            ShimSqlConnection.AllInstances.Open = connection =>
-            {
-                _openedConnection = connection;
-            };
-
-            _closedConnection = null;
-            ShimSqlConnection.AllInstances.Close = (connection) =>
-            {
-                _closedConnection = connection;
-            };
-
-            _disposedConnection = null;
-            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, disposing) =>
-            {
-                _disposedConnection = connection;
-            };
-
-            _createdCommands = new List<SqlCommand>();
-            ShimSqlCommand.ConstructorStringSqlConnection = (command, text, conn) =>
-            {
-                command.Connection = conn;
-                command.CommandText = text;
-                _createdCommands.Add(command);
-            };
-            ShimSqlCommand.Constructor = command =>
-            {
-                _createdCommands.Add(command);
-            };
-
-            _executeReaderCommandsCalled = new List<SqlCommand>();
-            ShimSqlCommand.AllInstances.ExecuteReader = command =>
-            {
-                _executeReaderCommandsCalled.Add(command);
-
-                var shimReader = new ShimSqlDataReader
-                {
-                    Read = () =>
-                    {
-                        return true;
-                    },
-                    GetGuidInt32 = _ =>
-                    {
-                        var readerGuid = new Guid("E2954076-F6FD-4FFE-9B10-642C9D08368F");
-                        return readerGuid;
-                    }
-                };
-                return shimReader;
-            };
-
-            _executeNonQueryCommands = new List<SqlCommand>();
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
-            {
-                _executeNonQueryCommands.Add(command);
-                return 0;
-            };
-
-            _disposedCommands = new List<SqlCommand>();
-            ShimSqlCommand.AllInstances.DisposeBoolean = (command, disposing) =>
-            {
-                _disposedCommands.Add(command);
-            };
-
-            _dataSetCommands = new List<SqlCommand>();
-            ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, dataSet) =>
-            {
-                var command = (SqlCommand)adapter.SelectCommand;
-                _dataSetCommands.Add(command);
-
-                var userTable = new DataTable();
-                userTable.Columns.Add("userid", typeof(string));
-                var userRow = userTable.NewRow();
-                userRow["userid"] = "177";
-                userTable.Rows.Add(userRow);
-                dataSet.Tables.Add(userTable);
-                return 0;
-            };
-        }
-
-        private static void ShimGetCoreInformation()
-        {
-            ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser =
-                (SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser) =>
-                {
-                    body = "goose live in {building} house";
-                    subject = string.Empty;
-                };
-        }
-
-        private static ShimSPWeb CreateSPWeb()
-        {
-            return new ShimSPWeb
-            {
-                IDGet = () => Guid.NewGuid(),
-                SiteGet = () =>
-                {
-                    return new ShimSPSite
-                    {
-                        IDGet = () => Guid.NewGuid()
-                    };
-                }
-            };
-        }
-
-        private static ShimSPListItem CreateShimSpListItem(Guid webApplicationId)
-        {
-            var webAppShim = new ShimSPWebApplication();
-            var persistentObject = new ShimSPPersistedObject(webAppShim);
-            persistentObject.IdGet = () => webApplicationId;
-
-            return new ShimSPListItem
-            {
-                IDGet = () => ListItemId,
-                ParentListGet = () =>
-                {
-                    return new ShimSPList
-                    {
-                        IDGet = () => _listParentListId,
-                        ParentWebGet = () =>
-                        {
-                            return new ShimSPWeb
-                            {
-                                SiteGet = () =>
-                                {
-                                    return new ShimSPSite
-                                    {
-                                        WebApplicationGet = () =>
-                                        {
-                                            return webAppShim;
-                                        }
-                                    };
-                                }
-                            };
-                        },
-                        FormsGet = () =>
-                        {
-                            var formCollection = new ShimSPFormCollection
-                            {
-                                ItemGetPAGETYPE = formId =>
-                                {
-                                    return new ShimSPForm
-                                    {
-                                        UrlGet = () =>
-                                        {
-                                            return "valera.com";
-                                        }
-                                    };
-                                }
-                            };
-                            return formCollection;
-                        }
-                    };
-                }
-            };
-        }
+    private void AssertNonQueryComands(object listItemId, object listParentListId)
+    {
+        Assert.AreEqual(5, _executeNonQueryCommands.Count);
+        Assert.AreSame(_createdConnection, _executeNonQueryCommands[0].Connection);
+        Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
+        Assert.IsTrue(_executeNonQueryCommands[0].CommandText.StartsWith("update", StringComparison.OrdinalIgnoreCase));
+        Assert.AreEqual(listParentListId, _executeNonQueryCommands[0].Parameters["@listid"].Value);
+        Assert.AreEqual(listItemId, _executeNonQueryCommands[0].Parameters["@itemid"].Value);
+        Assert.IsTrue(_executeNonQueryCommands[1].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(_executeNonQueryCommands[2].CommandText.StartsWith("insert", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(_executeNonQueryCommands[3].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(_executeNonQueryCommands[4].CommandText.StartsWith("delete", StringComparison.OrdinalIgnoreCase));
     }
+
+    private void AssertDataSetCommand()
+    {
+        Assert.AreEqual(1, _dataSetCommands.Count);
+        Assert.AreSame(_createdConnection, _dataSetCommands[0].Connection);
+        Assert.AreEqual(CommandType.Text, _dataSetCommands[0].CommandType);
+        Assert.IsTrue(
+            "select * from personalizations where FK=@id"
+            .Equals(_dataSetCommands[0].CommandText, StringComparison.OrdinalIgnoreCase));
+        Assert.AreEqual(1, _dataSetCommands[0].Parameters.Count);
+    }
+
+    private void ShimIQueueItemMessage()
+    {
+        ShimSPSite.ConstructorGuid = (site, _) =>
+        {
+            var shimSite = new ShimSPSite(site)
+            {
+                OpenWebGuid = webGuid =>
+                {
+                    if (webGuid == _oWebId)
+                    {
+                        return new ShimSPWeb
+                        {
+                            IDGet = () => Guid.NewGuid(),
+                            SiteGet = () => new ShimSPSite
+                            {
+                                IDGet = () => Guid.NewGuid()
+                            },
+                            ListsGet = () => new ShimSPListCollection
+                            {
+                                ItemGetGuid = key =>
+                                {
+                                    if (key == new Guid(ListId))
+                                    {
+                                        return new ShimSPList
+                                        {
+                                            GetItemByIdInt32 = id =>
+                                            {
+                                                if (id == ItemId)
+                                                {
+                                                    return CreateShimSpListItem(_webAppGuid1);
+                                                }
+                                                return null;
+                                            }
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                },
+                                TryGetListString = key =>
+                                {
+                                    if (key == ListName)
+                                    {
+                                        return new ShimSPList
+                                        {
+                                            GetItemByIdInt32 = id =>
+                                            {
+                                                if (id == ItemId)
+                                                {
+                                                    return CreateShimSpListItem(_webAppGuid2);
+                                                }
+                                                return null;
+                                            }
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ShimSPWeb
+                        {
+                            IDGet = () => Guid.NewGuid(),
+                            SiteGet = () => new ShimSPSite
+                            {
+                                IDGet = () => Guid.NewGuid()
+                            },
+                            ListsGet = () => new ShimSPListCollection
+                            {
+                                ItemGetGuid = key =>
+                                {
+                                    if (key == new Guid(ListId))
+                                    {
+                                        return new ShimSPList
+                                        {
+                                            GetItemByIdInt32 = id =>
+                                            {
+                                                if (id == ItemId)
+                                                {
+                                                    return CreateShimSpListItem(_webAppGuid3);
+                                                }
+                                                return null;
+                                            }
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                },
+                                TryGetListString = key =>
+                                {
+                                    if (key == ListName)
+                                    {
+                                        return new ShimSPList
+                                        {
+                                            GetItemByIdInt32 = id =>
+                                            {
+                                                if (id == ItemId)
+                                                {
+                                                    return CreateShimSpListItem(_webAppGuid4);
+                                                }
+                                                return null;
+                                            }
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                }
+                            }
+                        };
+                    }
+                },
+                WebApplicationGet = () =>
+                {
+                    var shimSPWebApplication = new ShimSPWebApplication();
+                    var shimSPWebApplicationPersistedObject = new ShimSPPersistedObject(shimSPWebApplication)
+                    {
+                        IdGet = () => Guid.NewGuid()
+                    };
+                    return shimSPWebApplication;
+                }
+            };
+        };
+
+        _createdConnection = null;
+        ShimSqlConnection.ConstructorString = (connection, _) =>
+        {
+            _createdConnection = connection;
+        };
+
+        ShimGetCoreInformation();
+
+        _openedConnection = null;
+        ShimSqlConnection.AllInstances.Open = connection =>
+        {
+            _openedConnection = connection;
+        };
+
+        _closedConnection = null;
+        ShimSqlConnection.AllInstances.Close = (connection) =>
+        {
+            _closedConnection = connection;
+        };
+
+        _disposedConnection = null;
+        ShimSqlConnection.AllInstances.DisposeBoolean = (connection, disposing) =>
+        {
+            _disposedConnection = connection;
+        };
+
+        _createdCommands = new List<SqlCommand>();
+        ShimSqlCommand.ConstructorStringSqlConnection = (command, text, conn) =>
+        {
+            command.Connection = conn;
+            command.CommandText = text;
+            _createdCommands.Add(command);
+        };
+        ShimSqlCommand.Constructor = command =>
+        {
+            _createdCommands.Add(command);
+        };
+
+        _executeReaderCommandsCalled = new List<SqlCommand>();
+        ShimSqlCommand.AllInstances.ExecuteReader = command =>
+        {
+            _executeReaderCommandsCalled.Add(command);
+
+            var shimReader = new ShimSqlDataReader
+            {
+                Read = () =>
+                {
+                    return true;
+                },
+                GetGuidInt32 = _ =>
+                {
+                    var readerGuid = new Guid("E2954076-F6FD-4FFE-9B10-642C9D08368F");
+                    return readerGuid;
+                }
+            };
+            return shimReader;
+        };
+
+        _executeNonQueryCommands = new List<SqlCommand>();
+        ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+        {
+            _executeNonQueryCommands.Add(command);
+            return 0;
+        };
+
+        _disposedCommands = new List<SqlCommand>();
+        ShimSqlCommand.AllInstances.DisposeBoolean = (command, disposing) =>
+        {
+            _disposedCommands.Add(command);
+        };
+
+        _dataSetCommands = new List<SqlCommand>();
+        ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, dataSet) =>
+        {
+            var command = (SqlCommand)adapter.SelectCommand;
+            _dataSetCommands.Add(command);
+
+            var userTable = new DataTable();
+            userTable.Columns.Add("userid", typeof(string));
+            var userRow = userTable.NewRow();
+            userRow["userid"] = "177";
+            userTable.Rows.Add(userRow);
+            dataSet.Tables.Add(userTable);
+            return 0;
+        };
+    }
+
+    private static void ShimGetCoreInformation()
+    {
+        ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser =
+            (SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser) =>
+            {
+                body = "goose live in {building} house";
+                subject = "{building} house";
+            };
+    }
+
+    private static ShimSPWeb CreateSPWeb()
+    {
+        return new ShimSPWeb
+        {
+            IDGet = () => Guid.NewGuid(),
+            SiteGet = () =>
+            {
+                return new ShimSPSite
+                {
+                    IDGet = () => Guid.NewGuid()
+                };
+            }
+        };
+    }
+
+    private static ShimSPListItem CreateShimSpListItem(Guid webApplicationId)
+    {
+        var webAppShim = new ShimSPWebApplication();
+        var persistentObject = new ShimSPPersistedObject(webAppShim);
+        persistentObject.IdGet = () => webApplicationId;
+
+        return new ShimSPListItem
+        {
+            IDGet = () => ListItemId,
+            ParentListGet = () =>
+            {
+                return new ShimSPList
+                {
+                    IDGet = () => _listParentListId,
+                    ParentWebGet = () =>
+                    {
+                        return new ShimSPWeb
+                        {
+                            SiteGet = () =>
+                            {
+                                return new ShimSPSite
+                                {
+                                    WebApplicationGet = () =>
+                                    {
+                                        return webAppShim;
+                                    }
+                                };
+                            }
+                        };
+                    },
+                    FormsGet = () =>
+                    {
+                        var formCollection = new ShimSPFormCollection
+                        {
+                            ItemGetPAGETYPE = formId =>
+                            {
+                                return new ShimSPForm
+                                {
+                                    UrlGet = () =>
+                                    {
+                                        return "valera.com";
+                                    }
+                                };
+                            }
+                        };
+                        return formCollection;
+                    }
+                };
+            }
+        };
+    }
+}
 }

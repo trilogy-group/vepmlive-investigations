@@ -65,7 +65,8 @@ namespace ModelDataCache
 
             xCfg.CreateIntAttr("FocusWholeRow", 1);
 
-            InitializeGridLayoutDefinition();
+            var m_xDef = Constructor.CreateSubStruct("Def");
+            InitializeGridLayoutDefinition("R", m_xDef);
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");

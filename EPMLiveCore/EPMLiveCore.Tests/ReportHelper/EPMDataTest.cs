@@ -33,6 +33,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         private string _source;
         private string _eventMessage;
         private Exception _exception;
+        private SqlConnection _sqlConnection;
         private PrivateObject _privateObject;
 
         [TestMethod]
@@ -423,6 +424,52 @@ namespace EPMLiveCore.Tests.ReportHelper
 
             // Assert
             Assert.AreEqual(resultString, decryptedString);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TableExists_WhenSqlConnectionIsNull_ThrowsException()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+
+                var epmData = new EPMData(Guid.NewGuid());
+                _privateObject = new PrivateObject(epmData);
+                _sqlConnection = null;
+
+                // Act
+                epmData.TableExists(DummyName, _sqlConnection);
+
+                // Assert - Expects exception
+            };
+        }
+
+        [TestMethod]
+        public void TableExists_WhenSqlConnectionIsNotNull_ReturnsTrue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+
+                var epmData = new EPMData(Guid.NewGuid());
+                _privateObject = new PrivateObject(epmData);
+                _sqlConnection = new SqlConnection();
+
+                ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
+
+                ShimSqlCommand.AllInstances.ExecuteScalar = command => 1;
+
+                // Act
+                var result = epmData.TableExists(DummyName, _sqlConnection);
+
+                // Assert
+                Assert.IsTrue(result);
+            };
         }
 
         private void SetupParameters()

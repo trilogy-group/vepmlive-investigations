@@ -275,7 +275,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         {
             // Arrange
             var definitionsInitialized = new List<string>();
-            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionString = (instance, name) =>
+            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionStringCStruct = (instance, name, definitions) =>
             {
                 definitionsInitialized.Add(name);
                 return new PortfolioEngineCore.CStruct();

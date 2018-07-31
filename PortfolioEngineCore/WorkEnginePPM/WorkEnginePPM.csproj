@@ -807,9 +807,13 @@ iisreset</PostDeploymentCommand>
     <Compile Include="SPFields\PFEResourcePermissionsField.cs" />
     <Compile Include="SPFields\PFEResourcePermissionsFieldControl.cs" />
     <Compile Include="WebAdminFunctions.cs" />
+    <Compile Include="WebServices\ADataCacheGridBase.cs" />
     <Compile Include="WebServices\CADataCache.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WebServices\CADataCache\CABottomGrid.cs" />
+    <Compile Include="WebServices\CADataCache\CADataCacheGridBase.cs" />
+    <Compile Include="WebServices\CADataCache\CATopGrid.cs" />
     <Compile Include="WebServices\CAGrids.cs" />
     <Compile Include="WebServices\ClientPrioritization.asmx.cs">
       <DependentUpon>ClientPrioritization.asmx</DependentUpon>
@@ -827,6 +831,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>CostAnalyzer.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebServices\DataCacheBase.cs" />
     <Compile Include="WebServices\EditCalendar.asmx.cs">
       <DependentUpon>EditCalendar.asmx</DependentUpon>
       <SubType>Component</SubType>
