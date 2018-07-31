@@ -6,7 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using CostDataValues;
 
-public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
+public abstract class DataCacheBase<TDataItem, TCustomFieldData, TListItemData> 
+    where TDataItem : IDataItem
+    where TCustomFieldData : ICustomFieldData<TListItemData>
+    where TListItemData : IListItemData
 {
     protected static string FormatExtraDisplay(
         string input, 
@@ -77,7 +80,6 @@ public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
                 {
                     throw new ArgumentNullException(nameof(codesDictionary));
                 }
-
                 if (codesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
@@ -88,7 +90,6 @@ public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
                 {
                     throw new ArgumentNullException(nameof(resesDictionary));
                 }
-
                 if (resesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
@@ -99,14 +100,69 @@ public abstract class DataCacheBase<TDataItem> where TDataItem : IDataItem
                 {
                     throw new ArgumentNullException(nameof(stagesDictionary));
                 }
-
                 if (stagesDictionary.TryGetValue(intInput, out dataItem))
                 {
                     return dataItem.Name;
                 }
                 break;
         }
+
         return string.Empty;
+    }
+    
+    protected static string BuildCustFieldJSon(TCustomFieldData customFieldData, int index, int maxListItemIndex)
+    {
+        if (customFieldData == null)
+        {
+            throw new ArgumentNullException(nameof(customFieldData));
+        }
+
+        var resultBuilder = new StringBuilder(string.Empty);
+        IListItemData listItemData, nextListItem, initial;
+
+        if (maxListItemIndex >= 0)
+        {
+            initial = customFieldData.ListItems.ElementAt(index).Value;
+
+            for (var i = index; i <= maxListItemIndex; i++)
+            {
+                listItemData = customFieldData.ListItems.ElementAt(i).Value;
+
+                if (initial.Level == listItemData.Level)
+                {
+                    if (resultBuilder.Length > 0)
+                    {
+                        resultBuilder.Append(",");
+                    }
+
+                    resultBuilder.AppendFormat("{{Name:'{0}',Text:'{1}',Value:'{2}'}}",
+                        listItemData.ID,
+                        customFieldData.UseFullName == 1 
+                            ? listItemData.FullName 
+                            : listItemData.Name,
+                        listItemData.UID);
+
+                    if (i != maxListItemIndex)
+                    {
+                        nextListItem = customFieldData.ListItems.ElementAt(i + 1).Value;
+
+                        if (nextListItem.Level > listItemData.Level)
+                        {
+                            resultBuilder.AppendFormat(",{{Name:'Level{0}',Expanded:-1,Level:{1}, Items:[ {2} ]}}",
+                                listItemData.ID,
+                                listItemData.Level,
+                                BuildCustFieldJSon(customFieldData, i + 1, maxListItemIndex));
+                        }
+                        else if (nextListItem.Level < listItemData.Level)
+                        {
+                            return resultBuilder.ToString();
+                        }
+                    }
+                }
+            }
+        }
+
+        return resultBuilder.ToString();
     }
 
     private static string FormatWork(double hours)

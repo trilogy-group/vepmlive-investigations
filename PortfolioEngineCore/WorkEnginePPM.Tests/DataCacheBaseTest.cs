@@ -27,6 +27,8 @@ namespace WorkEnginePPM.Tests
 
         private int _formatExtraDisplayType;
 
+        private CustomFieldData _customFieldData;
+
         [TestInitialize]
         public void SetUp()
         {
@@ -45,6 +47,23 @@ namespace WorkEnginePPM.Tests
             {
                 { _formatExtraDisplayInputInt, new DataItem { Name = _dataItemName } }
             };
+
+            _customFieldData = new CustomFieldData
+            {
+                ListItems = new Dictionary<int, ListItemData>()
+            };
+            for (var i = 0; i < 5; i++)
+            {
+                _customFieldData.ListItems.Add(i, new ListItemData
+                {
+                    ID = i,
+                    UID = 10 + i,
+                    FullName = "test-fullname-" + i,
+                    Name = "test-name-" + i,
+                    InActive = true,
+                    Level = 1
+                });
+            }
 
             _testable = new DataCacheBaseTestable(_codesDictionary, _resesDictionary, _stagesDictionary);
         }
@@ -203,6 +222,130 @@ namespace WorkEnginePPM.Tests
 
             // Assert
             Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void BuildCustFieldJSon_NullCustomFieldData_Throws()
+        {
+            // Arrange
+            _customFieldData = null;
+
+            // Act
+            _testable.BuildCustFieldJSon(_customFieldData, 0, 0);
+
+            // Assert
+            // ExpectedException - ArgumentNullException
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_MaxIndexLessThan0_ReturnsEmptyString()
+        {
+            // Arrange
+            const int index = 0;
+            const int maxIndex = -1;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_IndexGreaterThanMaxIndex_ReturnsEmptyString()
+        {
+            // Arrange
+            const int index = 2;
+            const int maxIndex = 1;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_MultipleRecordsAffected_SeparatedByComma()
+        {
+            // Arrange
+            const int index = 1;
+            const int maxIndex = 2;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.IsTrue(result.Contains("},{"));
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_SingleRecordAffected_NoSeparationByComma()
+        {
+            // Arrange
+            const int index = 1;
+            const int maxIndex = 1;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.IsFalse(result.Contains("},{"));
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_SingleRecordAffectedUseFullName_GeneratesJSONBasedOnRightData()
+        {
+            // Arrange
+            const int index = 1;
+            const int maxIndex = 1;
+            _customFieldData.UseFullName = 1;
+            var listItemData = _customFieldData.ListItems.ElementAt(index).Value;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.AreEqual(string.Format("{{Name:'{0}',Text:'{1}',Value:'{2}'}}",
+                listItemData.ID,
+                listItemData.FullName,
+                listItemData.UID), result);
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_SingleRecordAffectedNotUseFullName_GeneratesJSONBasedOnRightData()
+        {
+            // Arrange
+            const int index = 1;
+            const int maxIndex = 1;
+            _customFieldData.UseFullName = 0;
+            var listItemData = _customFieldData.ListItems.ElementAt(index).Value;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.AreEqual(string.Format("{{Name:'{0}',Text:'{1}',Value:'{2}'}}",
+                listItemData.ID,
+                listItemData.Name,
+                listItemData.UID), result);
+        }
+
+        [TestMethod]
+        public void BuildCustFieldJSon_NextItemLevelGreaterThenPrev_AppendsBranchRecord()
+        {
+            // Arrange
+            const int index = 1;
+            const int maxIndex = 2;
+            _customFieldData.ListItems[1].Level = 1;
+            _customFieldData.ListItems[2].Level = 2;
+
+            // Act
+            var result = _testable.BuildCustFieldJSon(_customFieldData, index, maxIndex);
+
+            // Assert
+            Assert.IsTrue(result.Contains("Expanded:-1,"));
         }
     }
 }

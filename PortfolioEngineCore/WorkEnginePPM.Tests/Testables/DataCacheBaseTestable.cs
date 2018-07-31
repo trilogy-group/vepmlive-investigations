@@ -7,7 +7,7 @@ using ModelDataCache;
 
 namespace WorkEnginePPM.Tests.Testables
 {
-    public class DataCacheBaseTestable : DataCacheBase<DataItem> 
+    public class DataCacheBaseTestable : DataCacheBase<DataItem, CustomFieldData, ListItemData> 
     {
         private IDictionary<int, DataItem> _codesDictionary;
         private IDictionary<int, DataItem> _resesDictionary;
@@ -31,6 +31,12 @@ namespace WorkEnginePPM.Tests.Testables
                 _codesDictionary,
                 _resesDictionary,
                 _stagesDictionary);
+        }
+
+        public new string BuildCustFieldJSon(CustomFieldData customFieldData, int index, int maxListItemIndex)
+        {
+            return DataCacheBase<DataItem, CustomFieldData, ListItemData>
+                .BuildCustFieldJSon(customFieldData, index, maxListItemIndex);
         }
     }
 }

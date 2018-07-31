@@ -57,11 +57,14 @@ namespace CostDataValues
 
     }
     [Serializable()]
-    public class clsListItemData
+    public class clsListItemData : IListItemData
     {
-        public int UID, ID, Level;
-        public string Name, FullName;
-        public bool InActive;
+        public int UID { get; set; }
+        public int ID { get; set; }
+        public int Level { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public bool InActive { get; set; }
     }
     [Serializable()]
     public class clsPortFieldData
@@ -70,14 +73,17 @@ namespace CostDataValues
         public string Name, GivenName;
     }
     [Serializable()]
-    public class clsCustomFieldData
+    public class clsCustomFieldData : ICustomFieldData<clsListItemData>
     {
-        public int FieldID;
-        public string Name;
-        public string DisplayName;
-        public int LookupOnly, LookupID, LeafOnly, UseFullName;
-        public Dictionary<int, clsListItemData> ListItems;
-        public string jsonMenu;
+        public int FieldID { get; set; }
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public int LookupOnly { get; set; }
+        public int LookupID { get; set; }
+        public int LeafOnly { get; set; }
+        public int UseFullName { get; set; }
+        public IDictionary<int, clsListItemData> ListItems { get; set; }
+        public string jsonMenu { get; set; }
     }
     [Serializable()]
     public class clsDataItem : IDataItem

@@ -77,22 +77,21 @@ namespace CADataCache
         }
     }
     [Serializable()]
-    public class CostAnalyzerDataCache : DataCacheBase<clsDataItem>
+    public class CostAnalyzerDataCache : DataCacheBase<clsDataItem, clsCustomFieldData, clsListItemData>
     {
         private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
         private const string HideRowsWithAllZerosXmlValueAttribute = "Value";
 
         clsCostData m_clsda = null;
-        private List<clsColDisp> m_topgridcln = null;
-        private List<clsColDisp> m_bottomgridcln = null;
+        private IList<clsColDisp> m_topgridcln = null;
+        private IList<clsColDisp> m_bottomgridcln = null;
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private clsCustomFieldData[] m_cust_ocf = null;
-        private Dictionary<int, clsListItemData>[] m_cust_lk = null;
-        private List<CATGRow> TGStandard = null;
-        private List<CATGRow> BGStandard = null;
-
-        private List<clsDetailRowData> m_clnsort = null;
+        private IDictionary<int, clsListItemData>[] m_cust_lk = null;
+        private IList<CATGRow> TGStandard = null;
+        private IList<CATGRow> BGStandard = null;
+        private IList<clsDetailRowData> m_clnsort = null;
 
         private int m_DispMode = 1;
 
@@ -1894,55 +1893,6 @@ namespace CADataCache
             return sRet;
 
         }
-
-        private string BuildCustFieldJSon(clsCustomFieldData oc, int index, int max)
-        {
-            clsListItemData ce, ne, initial;
-            string sRet = "";
-
-            if (max < 0)
-                return "";
-
-            initial = oc.ListItems.ElementAt(index).Value;
-
-            for (int i = index; i <= max; i++)
-            {
-
-                ce = oc.ListItems.ElementAt(i).Value;
-
-                if (initial.Level == ce.Level)
-                {
-
-                    if (sRet != "")
-                        sRet = sRet + ",";
-
-                    if (oc.UseFullName == 1)
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
-                    else
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
-
-
-                    if (i != max)
-                    {
-                        ne = oc.ListItems.ElementAt(i + 1).Value;
-
-                        if (ne.Level > ce.Level)
-                        {
-                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
-                        }
-                        else if (ne.Level < ce.Level)
-                            return sRet;
-
-                    }
-                }
-
-            }
-
-
-            return sRet;
-
-        }
-
 
         public string RatesAndCategory()
         {
