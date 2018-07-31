@@ -17,6 +17,7 @@ using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 using EPMLive.TestFakes;
+using EPMLive.TestFakes.Utility;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -24,13 +25,12 @@ namespace EPMLiveCore.API.Tests
     public class APITeamTests
     {
         private IDisposable _shimsContext;
-        private ShimSPWeb _webShim;
         private PrivateType _apiTeamPrivateType;
         private PrivateObject _apiTeamPrivateObject;
 
         private AdoShims _adoShims;
+        private SharepointShims _sharepointShims;
 
-        private ShimSPList _spListShim;
         private DataTable _dataTable;
         private string _filterField;
         private string _filterValue;
@@ -39,6 +39,9 @@ namespace EPMLiveCore.API.Tests
         private ArrayList _arrColumns;
         private ShimSPListItem _shimListItem;
         private XmlNodeList _nodeTeam;
+
+        private string _resourcePoolXml;
+        private bool _resourcePoolEnsureFilterValueSafe;
 
         [TestInitialize]
         public void SetUp()
@@ -53,22 +56,14 @@ namespace EPMLiveCore.API.Tests
             _shimListItem = new ShimSPListItem();
             _nodeTeam = null;
 
-            _spListShim = new ShimSPList();
-            _webShim = new ShimSPWeb
-            {
-                SiteGet = () => new ShimSPSite(),
-                ListsGet = () => new ShimSPListCollection
-                {
-                    ItemGetString = key => _spListShim
-                },
-                CurrentUserGet = () => new ShimSPUser()
-            };
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
             _dataTable = new DataTable();
+            _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
 
             _adoShims = AdoShims.ShimAdoNetCalls();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
         }
 
         [TestCleanup]
@@ -319,7 +314,7 @@ namespace EPMLiveCore.API.Tests
             
             // Act
             _apiTeamPrivateType.InvokeStatic("getResources",
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _hasPerms,
@@ -343,9 +338,9 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
                 _adoShims.ConnectionShim.Instance,
-                _spListShim.Instance,
+                _sharepointShims.ListShim.Instance,
                 _dataTable,
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _filterIsLookup,
@@ -369,9 +364,9 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
                 _adoShims.ConnectionShim.Instance,
-                _spListShim.Instance,
+                _sharepointShims.ListShim.Instance,
                 _dataTable,
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _filterIsLookup,
@@ -395,9 +390,9 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
                 _adoShims.ConnectionShim.Instance,
-                _spListShim.Instance,
+                _sharepointShims.ListShim.Instance,
                 _dataTable,
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _filterIsLookup,
@@ -421,9 +416,9 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
                 _adoShims.ConnectionShim.Instance,
-                _spListShim.Instance,
+                _sharepointShims.ListShim.Instance,
                 _dataTable,
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _filterIsLookup,
@@ -447,9 +442,9 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
                 _adoShims.ConnectionShim.Instance,
-                _spListShim.Instance,
+                _sharepointShims.ListShim.Instance,
                 _dataTable,
-                _webShim.Instance,
+                _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
                 _filterIsLookup,
@@ -467,12 +462,12 @@ namespace EPMLiveCore.API.Tests
         public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_CommandCreatedAndDisposed()
         {
             // Arrange
-            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_webShim.Instance.ID}'";
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_sharepointShims.WebShim.Instance.ID}'";
             int itemId;
             Guid listId;
 
             // Act
-            APITeam.VerifyProjectTeamWorkspace(_webShim, out itemId, out listId);
+            APITeam.VerifyProjectTeamWorkspace(_sharepointShims.WebShim, out itemId, out listId);
 
             // Assert
             Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
@@ -483,16 +478,31 @@ namespace EPMLiveCore.API.Tests
         public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_DataAdapterCreatedAndDisposed()
         {
             // Arrange
-            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_webShim.Instance.ID}'";
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_sharepointShims.WebShim.Instance.ID}'";
             int itemId;
             Guid listId;
 
             // Act
-            APITeam.VerifyProjectTeamWorkspace(_webShim, out itemId, out listId);
+            APITeam.VerifyProjectTeamWorkspace(_sharepointShims.WebShim, out itemId, out listId);
 
             // Assert
             Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
             Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void GetResourcePool_EmptyXml_UsesDefaultValuesForFiltersAndColumns()
+        {
+            // Arrange
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
         }
     }
 

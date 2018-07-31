@@ -2496,58 +2496,6 @@ namespace EPMLiveCore.API
             return GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
         }
 
-        private static DataTable GetResourceData(XmlNodeList nodeTeam, ArrayList arrColumns, string filterValue, string filterField, string resourceUrl)
-        {
-            DataTable result;
-            try
-            {
-                using (SPSite rsite = new SPSite(resourceUrl))
-                {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        result = getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.ToLower().Contains("access is denied"))
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (var resourceSite = new SPSite(resourceUrl))
-                        {
-                            using (var resourceWeb = resourceSite.OpenWeb())
-                            {
-                                result = getResources(resourceWeb, filterField, filterValue, false, arrColumns, null, nodeTeam);
-                            }
-                        }
-                    });
-                }
-
-                throw;
-            }
-
-            return result;
-        }
-
-        private static string GetResourceUrl(SPWeb web)
-        {
-            var resourceUrl = string.Empty;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (var site = new SPSite(web.Site.ID))
-                {
-                    using (var siteWeb = site.OpenWeb(web.ID))
-                    {
-                        resourceUrl = CoreFunctions.getConfigSetting(siteWeb, "EPMLiveResourceURL", true, false);
-                    }
-                }
-            });
-            return resourceUrl;
-        }
-
         private static void ReadFilterInfoFromXml(
             string xml, 
             bool ensureFilterValueSafe, 
@@ -2605,6 +2553,58 @@ namespace EPMLiveCore.API
             {
                 WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
             }
+        }
+
+        private static string GetResourceUrl(SPWeb web)
+        {
+            var resourceUrl = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(web.Site.ID))
+                {
+                    using (var siteWeb = site.OpenWeb(web.ID))
+                    {
+                        resourceUrl = CoreFunctions.getConfigSetting(siteWeb, "EPMLiveResourceURL", true, false);
+                    }
+                }
+            });
+            return resourceUrl;
+        }
+
+        private static DataTable GetResourceData(XmlNodeList nodeTeam, ArrayList arrColumns, string filterValue, string filterField, string resourceUrl)
+        {
+            DataTable result;
+            try
+            {
+                using (SPSite rsite = new SPSite(resourceUrl))
+                {
+                    rsite.CatchAccessDeniedException = false;
+                    using (SPWeb rweb = rsite.OpenWeb())
+                    {
+                        result = getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.ToLower().Contains("access is denied"))
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        using (var resourceSite = new SPSite(resourceUrl))
+                        {
+                            using (var resourceWeb = resourceSite.OpenWeb())
+                            {
+                                result = getResources(resourceWeb, filterField, filterValue, false, arrColumns, null, nodeTeam);
+                            }
+                        }
+                    });
+                }
+
+                throw;
+            }
+
+            return result;
         }
 
         public static List<SPGroup> GetWebGroups(SPWeb spWeb)
