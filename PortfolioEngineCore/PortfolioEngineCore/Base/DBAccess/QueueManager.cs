@@ -6,6 +6,8 @@ namespace PortfolioEngineCore
 {
     public class dbaQueueManager
     {
+        private const int UpdateOnProjectRatesChange = 101;
+
         public static StatusEnum SelectQueue(DBAccess dba, DateTime dtFrom, DateTime dtTo, string sStatusList, out DataTable dt)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
@@ -52,6 +54,38 @@ namespace PortfolioEngineCore
             }
             return eStatus;
 
+        }
+
+        public static string PostCostValuesOnProjectRatesChange(DBAccess dba, string basePath, string projectIdCsv, bool publish, bool publishBaseline)
+        {
+            // add job to Queue for immediate execution
+            var request = new CStruct();
+            request.Initialize("Request");
+            var epkSet = request.CreateSubStruct("EPKSet");
+            epkSet.CreateString("EPKAuth", string.Empty);
+            var process = epkSet.CreateSubStruct("EPKProcess");
+            process.CreateInt("RequestNo", UpdateOnProjectRatesChange);
+            process.CreateString("PIs", projectIdCsv);
+
+            if (publish)
+            {
+                process.CreateBoolean("Publish", true);
+            }
+
+            if (publishBaseline)
+            {
+                process.CreateBoolean("PublishBaseline", true);
+            }
+
+            int rowsAffected;
+            PostCostValues(
+                dba,
+                "Post Cost Values for ProjectID=" + projectIdCsv,
+                request.XML(),
+                basePath,
+                out rowsAffected);
+
+            return rowsAffected.ToString();
         }
 
         public static StatusEnum PostCostValues(DBAccess databaseAccess, string jobComment, string jobContextData, string basePath, out int rowsAffected)
