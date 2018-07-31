@@ -85,6 +85,8 @@ $referencePath = $referencePath -replace ";","%3B"
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projSSRSPath = Join-Path $SourcesDirectory "\EPMLiveNativeSSRSComponents\EPMLiveNativeSSRSComponents.sln"
+$projAUTPath = Join-Path $SourcesDirectory "EPMLive.AUT.Tests.sln"
+
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 $OutputDirectory = Join-Path $SourcesDirectory "output"
@@ -149,6 +151,22 @@ If ($CleanBuild -eq $true) {
 	Log-SubSection "Cleaning SSRS Injector"
 	    
 	& $MSBuildExec "$projSSRSPath"  `
+	    /t:Clean `
+	    /p:SkipInvalidConfigurations=true `
+	    /p:Configuration="$ConfigurationToBuild" `
+	    /p:Platform="$PlatformToBuild" `
+        /m:4 `
+        /p:WarningLevel=0 `
+        $ToolsVersion `
+	    $DfMsBuildArgs `
+	    $MsBuildArguments
+	if ($LastExitCode -ne 0) {
+		throw "Project clean-up failed with exit code: $LastExitCode."
+	}
+	
+	Log-SubSection "Cleaning AUT"
+	    
+	& $MSBuildExec "$projAUTPath"  `
 	    /t:Clean `
 	    /p:SkipInvalidConfigurations=true `
 	    /p:Configuration="$ConfigurationToBuild" `
@@ -298,6 +316,29 @@ Log-SubSection "Building SSRS Injector"
 if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
+
+
+Log-SubSection "Building AUT"
+    
+# Run MSBuild
+& $MSBuildExec $projAUTPath `
+    /p:PreBuildEvent= `
+    /p:PostBuildEvent= `
+    /p:Configuration="$ConfigurationToBuild" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath=$referencePath `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+    throw "Project build failed with exit code: $LastExitCode."
+}
+
 
 }
 
