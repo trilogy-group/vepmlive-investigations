@@ -16,6 +16,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
+using EPMLive.TestFakes;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -27,15 +28,8 @@ namespace EPMLiveCore.API.Tests
         private PrivateType _apiTeamPrivateType;
         private PrivateObject _apiTeamPrivateObject;
 
-        private IList<SqlConnection> _sqlConnectionsDisposed;
-        private IList<SqlCommand> _sqlCommandsCreated;
-        private IList<SqlCommand> _sqlCommandsDisposed;
-        private IDictionary<SqlCommand, SqlDataReader> _sqlDataReadersCreated;
-        private IDictionary<SqlCommand, SqlDataReader> _sqlDataReadersDisposed;
-        private IDictionary<SqlCommand, SqlDataAdapter> _sqlDataAdaptersCreated;
-        private IDictionary<SqlCommand, SqlDataAdapter> _sqlDataAdaptersDisposed;
+        private AdoShims _adoShims;
 
-        private ShimSqlConnection _sqlConnectionShim;
         private ShimSPList _spListShim;
         private DataTable _dataTable;
         private string _filterField;
@@ -72,72 +66,9 @@ namespace EPMLiveCore.API.Tests
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
-            _sqlConnectionShim = new ShimSqlConnection();
             _dataTable = new DataTable();
 
-            _sqlConnectionsDisposed = new List<SqlConnection>();
-            _sqlCommandsCreated = new List<SqlCommand>();
-            _sqlCommandsDisposed = new List<SqlCommand>();
-            _sqlDataReadersCreated = new Dictionary<SqlCommand, SqlDataReader>();
-            _sqlDataReadersDisposed = new Dictionary<SqlCommand, SqlDataReader>();
-            _sqlDataAdaptersCreated = new Dictionary<SqlCommand, SqlDataAdapter>();
-            _sqlDataAdaptersDisposed = new Dictionary<SqlCommand, SqlDataAdapter>();
-
-            ShimAdoObjects();
-        }
-
-        private void ShimAdoObjects()
-        {
-            ShimEPMData.ConstructorGuid = (instance, siteId) => { };
-            ShimCoreFunctions.getConfigSettingSPWebString = (web, name) => string.Empty;
-
-            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
-            {
-                var result = new ShimSqlDataReader();
-
-                _sqlDataReadersCreated.Add(instance, result.Instance);
-                return result;
-            };
-            ShimDbDataReader.AllInstances.Dispose = instance =>
-            {
-                if (instance is SqlDataReader)
-                {
-                    _sqlDataReadersDisposed.Add(_sqlDataReadersCreated.Single(pred => pred.Value == instance as SqlDataReader));
-                }
-            };
-            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
-            {
-                instance.CommandText = commandText;
-                instance.Connection = connection;
-                _sqlCommandsCreated.Add(instance);
-            };
-            ShimSqlDataAdapter.ConstructorSqlCommand = (instance, command) =>
-            {
-                instance.SelectCommand = command;
-                _sqlDataAdaptersCreated.Add(command, instance);
-            };
-            ShimComponent.AllInstances.Dispose = instance =>
-            {
-                if (instance is SqlConnection)
-                {
-                    _sqlConnectionsDisposed.Add((instance as SqlConnection));
-                }
-                if (instance is SqlCommand)
-                {
-                    _sqlCommandsDisposed.Add((instance as SqlCommand));
-                }
-                if (instance is SqlDataAdapter)
-                {
-                    _sqlDataAdaptersDisposed.Add(
-                        _sqlDataAdaptersCreated.Single(pred => pred.Value == instance as SqlDataAdapter));
-                }
-            };
-
-            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
-            {
-                dataSet.Tables.Add();
-                return 1;
-            };
+            _adoShims = AdoShims.ShimAdoNetCalls();
         }
 
         [TestCleanup]
@@ -397,9 +328,9 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.AreEqual(2, _sqlConnectionsDisposed.Count);
-            Assert.AreEqual(1, _sqlCommandsDisposed.Count);
-            Assert.AreEqual(1, _sqlDataReadersDisposed.Count);
+            Assert.AreEqual(2, _adoShims.ConnectionsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
         }
 
         [TestMethod]
@@ -411,7 +342,7 @@ namespace EPMLiveCore.API.Tests
 
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
-                _sqlConnectionShim.Instance,
+                _adoShims.ConnectionShim.Instance,
                 _spListShim.Instance,
                 _dataTable,
                 _webShim.Instance,
@@ -424,8 +355,8 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlCommandsCreated.Any(pred => pred.CommandText == sql));
-            Assert.IsTrue(_sqlCommandsDisposed.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
         }
 
         [TestMethod]
@@ -437,7 +368,7 @@ namespace EPMLiveCore.API.Tests
 
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
-                _sqlConnectionShim.Instance,
+                _adoShims.ConnectionShim.Instance,
                 _spListShim.Instance,
                 _dataTable,
                 _webShim.Instance,
@@ -450,8 +381,8 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlDataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
-            Assert.IsTrue(_sqlDataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
         }
 
         [TestMethod]
@@ -463,7 +394,7 @@ namespace EPMLiveCore.API.Tests
 
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
-                _sqlConnectionShim.Instance,
+                _adoShims.ConnectionShim.Instance,
                 _spListShim.Instance,
                 _dataTable,
                 _webShim.Instance,
@@ -476,8 +407,8 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlCommandsCreated.Any(pred => pred.CommandText == sql));
-            Assert.IsTrue(_sqlCommandsDisposed.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
         }
 
         [TestMethod]
@@ -489,7 +420,7 @@ namespace EPMLiveCore.API.Tests
 
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
-                _sqlConnectionShim.Instance,
+                _adoShims.ConnectionShim.Instance,
                 _spListShim.Instance,
                 _dataTable,
                 _webShim.Instance,
@@ -502,8 +433,8 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlDataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
-            Assert.IsTrue(_sqlDataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
         }
 
         [TestMethod]
@@ -515,7 +446,7 @@ namespace EPMLiveCore.API.Tests
 
             // Act
             _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
-                _sqlConnectionShim.Instance,
+                _adoShims.ConnectionShim.Instance,
                 _spListShim.Instance,
                 _dataTable,
                 _webShim.Instance,
@@ -528,8 +459,8 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlCommandsCreated.Any(pred => pred.CommandText == sql));
-            Assert.IsTrue(_sqlCommandsDisposed.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
         }
     }
 
