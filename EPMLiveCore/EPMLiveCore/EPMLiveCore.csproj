@@ -89,24 +89,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+       </Reference>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -125,8 +117,10 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.SharePoint" />
-    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
@@ -190,6 +184,11 @@
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
     <Compile Include="API\PlatformIntegration.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverService.cs" />
+    <Compile Include="API\ProjectArchiver\IProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupService.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverSetupServiceLogEventArgs.cs" />
+    <Compile Include="API\ProjectDiscountRate\ProjectDiscountRateService.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -421,6 +420,10 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\631Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\633Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\634Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6404Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6403Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6402Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\6401Steps.cs" />
     <Compile Include="Jobs\SSRS\ExtensionMethods.cs" />
     <Compile Include="Jobs\SSRS\IReportingService.cs" />
     <Compile Include="Jobs\SSRS\SSRSSyncQueueAgent.cs" />
@@ -1293,7 +1296,17 @@
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
+    <Compile Include="PfeData\ConnectionProvider.cs" />
+    <Compile Include="PfeData\IConnectionProvider.cs" />
+    <Compile Include="PfeData\IProjectRepository.cs" />
+    <Compile Include="PfeData\IProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\IResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectRepository.cs" />
+    <Compile Include="PfeData\ResourceRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRateRepository.cs" />
+    <Compile Include="PfeData\ProjectResourceRate.cs" />
     <Compile Include="PlatformIntegrationEvent.cs" />
+    <Compile Include="API\ProjectArchiver\ProjectArchiverService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -3557,6 +3570,7 @@
     <Content Include="Layouts\epmlive\images\dragger.png" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.png" />
+    <Content Include="Layouts\epmlive\images\editrate16.gif" />
     <Content Include="Layouts\epmlive\images\epmlive-header.png" />
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\epmlivelogo-white.png" />

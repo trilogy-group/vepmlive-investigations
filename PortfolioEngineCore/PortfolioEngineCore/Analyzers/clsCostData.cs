@@ -4,7 +4,7 @@ using System.Web;
 using System.Xml;
 using PortfolioEngineCore;
 using System.Globalization;
-
+using PortfolioEngineCore.Analyzers;
 
 namespace CostDataValues
 {
@@ -57,11 +57,14 @@ namespace CostDataValues
 
     }
     [Serializable()]
-    public class clsListItemData
+    public class clsListItemData : IListItemData
     {
-        public int UID, ID, Level;
-        public string Name, FullName;
-        public bool InActive;
+        public int UID { get; set; }
+        public int ID { get; set; }
+        public int Level { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public bool InActive { get; set; }
     }
     [Serializable()]
     public class clsPortFieldData
@@ -70,24 +73,27 @@ namespace CostDataValues
         public string Name, GivenName;
     }
     [Serializable()]
-    public class clsCustomFieldData
+    public class clsCustomFieldData : ICustomFieldData<clsListItemData>
     {
-        public int FieldID;
-        public string Name;
-        public string DisplayName;
-        public int LookupOnly, LookupID, LeafOnly, UseFullName;
-        public Dictionary<int, clsListItemData> ListItems;
-        public string jsonMenu;
+        public int FieldID { get; set; }
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public int LookupOnly { get; set; }
+        public int LookupID { get; set; }
+        public int LeafOnly { get; set; }
+        public int UseFullName { get; set; }
+        public IDictionary<int, clsListItemData> ListItems { get; set; }
+        public string jsonMenu { get; set; }
     }
     [Serializable()]
-    public class clsDataItem
+    public class clsDataItem : IDataItem
     {
-        public string Name = "";
-        public string Desc = "";
-        public int UID = 0;
-        public int ID = 0;
-        public bool bEditiable = false;
-        public bool bSelected = true;
+        public string Name { get; set; } = "";
+        public string Desc { get; set; } = "";
+        public int UID { get; set; } = 0;
+        public int ID { get; set; } = 0;
+        public bool bEditiable { get; set; } = false;
+        public bool bSelected { get; set; } = true;
     };
     [Serializable()]
     public class clsPIData : IComparable<clsPIData>
@@ -114,262 +120,58 @@ namespace CostDataValues
         }
     }
     [Serializable()]
-    public class clsTargetRowData
+    public class clsTargetRowData : ITargetRowData
     {
-        public int CT_ID;
-        public int BC_UID;
-        public int BC_ROLE_UID;
-        public int BC_SEQ;
-        public string MC_Val;
-        public int CAT_UID;
-        public string CT_Name, Cat_Name, Role_Name, MC_Name, FullCatName, CC_Name, FullCCName, Grouping;
-        public bool bGroupRow;
-
-        public int m_rt;
-        public string m_rt_name;
-
-
-        public string sUoM;
-        public double[] zCost, zValue, zFTE;
-        public int[] OCVal;
-        public string[] Text_OCVal;
-        public string[] TXVal;
+        public int CT_ID { get; set; }
+        public int BC_UID { get; set; }
+        public int BC_ROLE_UID { get; set; }
+        public int BC_SEQ { get; set; }
+        public string MC_Val { get; set; }
+        public int CAT_UID { get; set; }
+        public string CT_Name { get; set; }
+        public string Cat_Name { get; set; }
+        public string Role_Name { get; set; }
+        public string MC_Name { get; set; }
+        public string FullCatName { get; set; }
+        public string CC_Name { get; set; }
+        public string FullCCName { get; set; }
+        public string Grouping { get; set; }
+        public bool bGroupRow { get; set; }
+        public int m_rt { get; set; }
+        public string m_rt_name { get; set; }
+        public string sUoM { get; set; }
+        public double[] zCost { get; set; }
+        public double[] zValue { get; set; }
+        public double[] zFTE { get; set; }
+        public int[] OCVal { get; set; }
+        public string[] Text_OCVal { get; set; }
+        public string[] TXVal { get; set; }
     }
     [Serializable()]
-    public class clsDetailRowData
+    public class clsDetailRowData : BaseDetailRowData<clsTargetRowData>
     {
-        public int CB_ID;
-        public int CT_ID;
         public int CT_ind;
-        public int PROJECT_ID;
-        public int Internal_ID;
-        public int BC_UID;
-        public int BC_ROLE_UID;
-        public int BC_SEQ;
-        public string MC_Val;
-        public int CAT_UID;
-        public DateTime Det_Start;
-        public DateTime Det_Finish;
-        public DateTime oDet_Start;
-        public DateTime oDet_Finish;
-        public bool bHadPData;
-        public string PI_Name, CT_Name, Scen_Name, Cat_Name, Role_Name, MC_Name, FullCatName, CC_Name, FullCCName;
-        public int Scenario_ID;
-        public bool b_PIOver;
-        public bool LinkedToPI;
-        public int m_mode;   //' bitwise field 1 = no edit - data cannot move be changed
-        //   '               2 = can move it but not save it...
-        //   '               4 = Don't recalc the values for cost here
-
-
-        public double m_tot1;
-        public double m_tot2;
-        public double m_tot3;
-
-        public int m_rt;
-        public string m_rt_name;
-
-        public bool bSelected;
         public bool bFiltered;
-
-        public int m_uid;
-        public int m_total_to;
-
         public int rowid;
-        public int m_par;
-        public bool bRealone;
-        public bool bGotChildren;
-        public string sName;
-        public string sUoM;
-        public bool bRollupTouched;
-
-        public int m_sort_id;
-        public int lUoM;
-        public bool HasValues;
-        public int m_lev, m_index;
-
-        public bool bUseCosts;
-        public double[] zCost, zValue, zFTE;
-
-        private double[] oCosts, oUnits, oFTE;
-
-        private int[] BurnDuration;
-        private double[] Burnrate;
-        private double[] UseBurnrate;
-        private double[] OutsideAdj;
-        private double[] Budget;
-        public bool bCapture;
-
-
-
-
-        public int mxdim;
-        public int[] OCVal;
-        public string[] Text_OCVal;
-        public string[] TXVal;
-
-
-        public string[] m_PI_Format_Extra_data;
-
-        public string m_dict_key = "";
-
+        public string m_dict_key = string.Empty;
 
         public clsDetailRowData(int arraysize)
+            : base (arraysize)
         {
-            PI_Name = "";
-            CT_Name = "";
-            Scen_Name = "";
-            Cat_Name = "";
-            Role_Name = "";
-            MC_Name = "";
-            FullCatName = "";
-            FullCCName = "";
-            CC_Name = "";
-            m_rt_name = "";
-            HasValues = false;
-            LinkedToPI = false;
             bFiltered = false;
 
-            mxdim = arraysize;
-            zCost = new double[arraysize + 1];
-            zValue = new double[arraysize + 1];
-            zFTE = new double[arraysize + 1];
-            oCosts = new double[arraysize + 1];
-            oUnits = new double[arraysize + 1];
-            oFTE = new double[arraysize + 1];
             for (int i = 0; i <= mxdim; i++)
             {
-                zCost[i] = 0;
-                zValue[i] = 0;
                 zFTE[i] = 0;
                 oCosts[i] = 0;
                 oUnits[i] = 0;
                 oFTE[i] = 0;
             }
-
-            BurnDuration = new int[arraysize + 1];
-            Burnrate = new double[arraysize + 1];
-            UseBurnrate = new double[arraysize + 1];
-            OutsideAdj = new double[arraysize + 1];
-            Budget = new double[arraysize + 1];
-
-            OCVal = new int[6];
-            Text_OCVal = new string[6];
-            TXVal = new string[6];
         }
 
         public void CopyData(clsDetailRowData src)
         {
-
-            CB_ID = src.CB_ID;
-            CT_ID = src.CT_ID;
-
-            PROJECT_ID = src.PROJECT_ID;
-            BC_UID = src.BC_UID;
-            BC_ROLE_UID = src.BC_ROLE_UID;
-            BC_SEQ = src.BC_SEQ;
-            MC_Val = src.MC_Val;
-            CAT_UID = src.CAT_UID;
-            Det_Start = src.Det_Start;
-            Det_Finish = src.Det_Finish;
-            oDet_Start = src.oDet_Start;
-            oDet_Finish = src.oDet_Finish;
-            bHadPData = src.bHadPData;
-            PI_Name = src.PI_Name;
-            CT_Name = src.CT_Name;
-            Scen_Name = src.Scen_Name;
-            Cat_Name = src.Cat_Name;
-            Role_Name = src.Role_Name;
-            MC_Name = src.MC_Name;
-            FullCatName = src.FullCatName;
-            Scenario_ID = src.Scenario_ID;
-            b_PIOver = src.b_PIOver;
-            LinkedToPI = src.LinkedToPI;
-            m_mode = src.m_mode;
-            CC_Name = src.CC_Name;
-            FullCCName = src.FullCCName;
-
-            OCVal = src.OCVal;
-            Text_OCVal = src.Text_OCVal;
-            TXVal = src.TXVal;
-            m_PI_Format_Extra_data = src.m_PI_Format_Extra_data;
-
-
-            m_tot1 = src.m_tot1;
-            m_tot2 = src.m_tot2;
-            m_tot3 = src.m_tot3;
-
-            m_rt = src.m_rt;
-            m_rt_name = src.m_rt_name;
-
-            bSelected = src.bSelected;
-
-            bRealone = src.bRealone;
-            lUoM = src.lUoM;
-            HasValues = src.HasValues;
-
-            bUseCosts = src.bUseCosts;
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                zCost[i] = src.zCost[i];
-                zValue[i] = src.zValue[i];
-                zFTE[i] = src.zFTE[i];
-
-                oCosts[i] = src.oCosts[i];
-                oUnits[i] = src.oUnits[i];
-                zFTE[i] = src.oFTE[i];
-
-                BurnDuration[i] = src.BurnDuration[i];
-                Burnrate[i] = src.Burnrate[i];
-                UseBurnrate[i] = src.UseBurnrate[i];
-
-                OutsideAdj[i] = src.OutsideAdj[i];
-                oUnits[i] = src.oUnits[i];
-                Budget[i] = src.Budget[i];
-            }
-
-        }
-        public void CopyToTargetData(ref clsTargetRowData dest)
-        {
-
-            dest.CT_ID = CT_ID;
-
-            dest.BC_UID = BC_UID;
-            dest.BC_ROLE_UID = BC_ROLE_UID;
-            dest.BC_SEQ = BC_SEQ;
-            dest.MC_Val = MC_Val;
-            dest.CAT_UID = CAT_UID;
-            dest.CT_Name = CT_Name;
-            dest.Cat_Name = Cat_Name;
-            dest.Role_Name = Role_Name;
-            dest.MC_Name = MC_Name;
-            dest.FullCatName = FullCatName;
-            dest.CC_Name = CC_Name;
-            dest.FullCCName = FullCCName;
-
-            dest.bGroupRow = false;
-            dest.Grouping = "";
-
-            dest.OCVal = OCVal;
-            dest.Text_OCVal = Text_OCVal;
-            dest.TXVal = TXVal;
-
-            dest.zCost = new double[mxdim + 1];
-            dest.zValue = new double[mxdim + 1];
-            dest.zFTE = new double[mxdim + 1];
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                dest.zCost[i] = zCost[i];
-                dest.zValue[i] = zValue[i];
-                dest.zFTE[i] = zFTE[i];
-
-            }
-
+            base.CopyData(src);
         }
 
         public void AddToTargetData(ref clsTargetRowData dest)
@@ -448,227 +250,8 @@ namespace CostDataValues
             }
 
         }
-
-        private int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
-        {
-
-            if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)
-                return 0;
-
-            if (dtBarStart <= dtPeriodStart && dtBarFinish >= dtPeriodFinish)
-                return dtPeriodFinish.Subtract(dtPeriodStart).Days + 1;
-
-            DateTime dt1;
-            DateTime dt2;
-
-            dt1 = (dtBarStart < dtPeriodStart ? dtPeriodStart : dtBarStart);     //' take the max of the two start dates
-            dt2 = (dtBarFinish < dtPeriodFinish ? dtBarFinish : dtPeriodFinish);  //    ' take the min of the two finish dates dates
-
-            if (dt1 > dt2)
-                return 0;
-
-            return dt2.Subtract(dt1).Days + 1;
-        }
-
-        private double AFiddler(double f)
-        {
-            return double.Parse(f.ToString("0.00"));
-        }
-
-
-        public void DragBar(DateTime[] dtPeriodStart, DateTime[] dtPeriodFinish, int[] PeriodMode, int minp, int maxp)
-        {
-            //  Input data
-            // dtPeriodStart(num_periods)  - start date of each period
-            // dtPeriodFinish(num_periods)  - finish date of each period
-            // PeriodMode(num_periods)  - true if this period should be included in the calc.
-
-            double per_span;
-            double per_offset;
-            int xtraburn;
-            int amt;
-            double useamt;
-
-            double useadj;
-            double mvtotal;
-
-            double span1, span2;
-
-            // useadj is used to apportion the burn rate - handling the expand and compress affect
-
-            span1 = oDet_Finish.Subtract(oDet_Start).Days;
-            span2 = Det_Finish.Subtract(Det_Start).Days;
-
-            if (span1 <= 0)
-                useadj = 1;
-            else
-                useadj = span2 / span1;
-
-
-            if (useadj == 0)
-                useadj = 0.00001;
-
-            mvtotal = 0;
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                // only perform these calculations if this period "visible" in the Analyzer view.
-
-                if (PeriodMode[per] != 0)
-                {
-                    mvtotal = mvtotal + (bUseCosts ? zCost[per] : zValue[per]);
-                    Budget[per] = 0;
-                    OutsideAdj[per] = 0;
-                    UseBurnrate[per] = Burnrate[per];
-
-                }
-                else
-                {
-                    OutsideAdj[per] = (bUseCosts ? zCost[per] : zValue[per]);
-                    Budget[per] = 0;
-                    UseBurnrate[per] = 0;
-                }
-            }
-
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                // only perform these calculations if this period "visible" in the Analyzer view.
-
-                if (PeriodMode[per] != 0)
-                {
-
-                    // For each period - calculate the overlap (in days) between the period and the new start and finish dates
-
-
-                    if (per == 6)
-                        per_span = 1;
-
-                    per_span = CalculateOverlapLocal(Det_Start, Det_Finish, dtPeriodStart[per], dtPeriodFinish[per]);
-
-                    // we should never get a -ve value but its always worth checking.....
-
-                    if (per_span < 0)
-                        per_span = 0;
-
-
-                    // map this span into expanded or compressed amount
-
-                    per_span = per_span / useadj;
-
-                    if (per_span != 0)
-                    {
-
-                        // OK there is some overlap - so now calculate where this overlap starts wrt the new startdate
-
-                        per_offset = dtPeriodStart[per].Subtract(Det_Start).Days;
-
-                        if (per_offset < 0)
-                            // well the new start is after the period start - so the offest must be 0
-                            per_offset = 0;
-
-
-                        // so now find where this offset starts in the burn duration list....
-
-                        // and map the period offest into expanded/compressed offsets as well
-
-                        per_offset = per_offset / useadj;
-
-                        for (int burn = 1; burn <= mxdim; burn++)
-                        {
-                            if (per_offset - BurnDuration[burn] < 0)
-                            {
-
-                                // OK this offset starts in this burn period - so calc how many days left in this burn
-
-                                amt = BurnDuration[burn] - (int)(per_offset + 0.5);
-
-
-                                xtraburn = 0;
-
-                                while (per_span > 0)
-                                {
-
-                                    if (amt > per_span)
-                                        useamt = per_span;
-                                    else
-                                        useamt = amt;
-
-
-                                    // apply this amts burn to this period
-
-                                    Budget[per] = Budget[per] + AFiddler(useamt * UseBurnrate[burn + xtraburn]);
-
-
-                                    per_span = per_span - useamt;
-
-                                    if (per_span > 0)
-                                    {
-
-                                        // step onto the next burn .... if not off the end - other wise use the last periods burn...
-                                        if (burn + xtraburn < mxdim)
-                                            xtraburn = xtraburn + 1;
-                                        else
-                                            break;
-
-
-                                        amt = BurnDuration[burn + xtraburn];
-                                    }
-                                }
-
-                            }
-
-                            else
-                                per_offset = per_offset - BurnDuration[burn];
-
-                        }
-
-
-
-                    }
-                }
-            }
-
-            //     dump overflow into start or end buckets
-
-            for (int per = 1; per < minp; per++)
-            {
-                Budget[minp] = Budget[minp] + Budget[per];
-                Budget[per] = 0;
-            }
-
-            for (int per = maxp + 1; per < mxdim; per++)
-            {
-                Budget[maxp] = Budget[maxp] + Budget[per];
-                Budget[per] = 0;
-            }
-
-
-            double fnTot = 0;
-
-            for (int per = minp; per <= maxp; per++)
-            {
-                fnTot += Budget[per];
-            }
-
-
-            mvtotal = mvtotal - fnTot;
-
-            if (Det_Start < oDet_Start)
-                Budget[minp] = Budget[minp] + mvtotal;
-            else
-                Budget[maxp] = Budget[maxp] + mvtotal;
-
-            for (int per = 1; per <= mxdim; per++)
-            {
-                if (bUseCosts)
-                    zCost[per] = Budget[per] + OutsideAdj[per];
-                else
-                    zValue[per] = Budget[per] + OutsideAdj[per];
-            }
-        }
-
     }
+
     [Serializable()]
     public class clsTargetColours
     {

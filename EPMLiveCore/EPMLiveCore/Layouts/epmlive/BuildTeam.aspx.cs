@@ -30,6 +30,8 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected string sResGrid = "";
 
+        protected int projectIdInPfe = 0;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             SPWeb web = SPContext.Current.Web;
@@ -143,6 +145,13 @@ namespace EPMLiveCore.Layouts.epmlive
                         bCanEditTeam = "true";
                     }
                 }
+            }
+
+            if (itemid > 0 && listid != Guid.Empty && PfeData.ConnectionProvider.AllowDatabaseConnections(web))
+            {
+                // collect pfe database project id for processing in UI part
+                var repository = new PfeData.ProjectRepository();
+                projectIdInPfe = repository.FindProjectId(web, listid, itemid);
             }
 
             if (web.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null && !bUseTeam)

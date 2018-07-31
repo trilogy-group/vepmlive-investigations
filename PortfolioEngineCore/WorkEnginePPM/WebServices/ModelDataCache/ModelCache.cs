@@ -10,7 +10,7 @@ using WorkEnginePPM.WebServices.ModelDataCache;
 namespace ModelDataCache
 {
     [Serializable()]
-    public class ModelCache
+    public class ModelCache : DataCacheBase<DataItem, CustomFieldData, ListItemData>
     {
         private const int EPK_FTYPE_DATE = 1;
         private const int EPK_FTYPE_INTEGER = 2;
@@ -100,8 +100,8 @@ namespace ModelDataCache
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private CustomFieldData[] m_cust_ocf = null;
-        private Dictionary<int, ListItemData>[] m_cust_lk = null;
-        private Dictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
+        private IDictionary<int, ListItemData>[] m_cust_lk = null;
+        private IDictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
         private bool m_allow_grouping = false;
         private bool m_grouping_enabled = true;
         private List<ListItemData> m_CT_List = null;
@@ -141,8 +141,8 @@ namespace ModelDataCache
 
         private int m_detShowToLevel, m_totShowToLevel;
 
-        string m_CostCatjsonMenu = "";
-        string m_CostTypejsonMenu = "";
+        string m_CostCatjsonMenu = string.Empty;
+        string m_CostTypejsonMenu = string.Empty;
 
         List<DetailRowData> m_editTargetList = null;
 
@@ -150,51 +150,49 @@ namespace ModelDataCache
         private int m_mode = 0;
 
         private bool m_ShowRemaining = false;
-        private string m_WResID = "";
+        private string m_WResID = string.Empty;
         private bool m_show_rhs_dec_costs = false;
         private DataItem m_init_def_view = null;
         private int m_init_def_view_pos = -1;
 
-        private string m_tarnames = "";
-        private string m_initial_zoom = "";
-
-
-
-        //      private SqlConnection oDataAccess = null;
-
-
+        private string m_tarnames = string.Empty;
+        private string m_initial_zoom = string.Empty;
+        
         public int InitalLoadData(SqlConnection oDataAccess, string ticket, string model, string versions, string sWResID, string sViewID)
         {
             try
             {
-
-                m_loadmsg = "";
+                m_loadmsg = string.Empty;
                 bShowFTEs = false;
                 bShowGantt = false;
                 bUseQTY = true;
-                bUseCosts = true;
-
-
-                bottomgridlayoutcache = "";
-                //      oDataAccess = oDataAccess;
+                bUseCosts = true;                
+                bottomgridlayoutcache = string.Empty;
                 m_sTicket = ticket;
                 m_sModel = model;
-
                 m_WResID = sWResID;
 
-                GrabPidsFromTickect(oDataAccess, ticket, out m_sPids, out m_GotAllPIs, out m_PI_Count);
+                CostAnalyzerData.GrabPidsFromTickect(oDataAccess, ticket, out m_sPids, out m_GotAllPIs, out m_PI_Count);
 
                 int lFirstP = 0;
                 int lLastP = 0;
 
                 m_bCTAMode = false;
 
-                if (sViewID != "")
+                if (sViewID != string.Empty)
                 {
-                    GrabCostViewInfo(oDataAccess, sViewID, out m_CB_ID, out m_sCostTypes, out m_sOtherCostTypes, out lFirstP, out lLastP);
+                    CostAnalyzerData.GrabCostViewInfo(
+                        oDataAccess,
+                        sViewID,
+                        ref m_sCalcCostTypes,
+                        out m_CB_ID,
+                        out m_sCostTypes,
+                        out m_sOtherCostTypes,
+                        out lFirstP,
+                        out lLastP);
+
                     m_SelFID = 0;
                     m_bCTAMode = true;
-
                     m_mode = 1001;
                 }
                 else
@@ -445,114 +443,7 @@ namespace ModelDataCache
 
 
         }
-        private int GrabPidsFromTickect(SqlConnection oDataAccess, string ticket, out string sPids, out bool bNoneMissing, out int PICount)
-        {
 
-            string sCommand = "";
-            int eStatus = 0;
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-            string sGuids = "";
-            string sGin = "";
-            sPids = "";
-            bNoneMissing = true;
-            PICount = 0;
-            int i = 0;
-            int lPid;
-
-            //if (ticket == "debug")
-            //{
-            //    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS";
-
-            //    oCommand = new SqlCommand(sCommand, oDataAccess);
-            //    reader = oCommand.ExecuteReader();
-            //    lPid = 0;
-            //    while (reader.Read())
-            //    {
-            //        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-
-
-            //        ++PICount;
-            //        if (sPids == "")
-            //            sPids = lPid.ToString();
-            //        else
-            //            sPids = sPids + "," + lPid.ToString();
-            //    }
-            //    reader.Close();
-            //    reader = null;
-
-
-            //    return eStatus;
-            //}
-
-            sCommand = "SELECT DC_DATA FROM EPG_DATA_CACHE WHERE DC_TICKET = '" + ticket + "'";
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                sGuids = DBAccess.ReadStringValue(reader["DC_DATA"]);
-            }
-            reader.Close();
-            reader = null;
-
-
-            sGuids = sGuids.Replace(",", " ");
-            sGuids = sGuids.ToUpper();
-            sGuids = sGuids.Trim();
-
-
-            while (sGuids.Length != 0)
-            {
-                sGin = "";
-
-                i = sGuids.IndexOf(" ");
-
-                if (i == -1)
-                {
-                    sGin = sGuids;
-                    sGuids = "";
-                }
-                else
-                {
-                    sGin = sGuids.Substring(0, i);
-                    sGuids = sGuids.Substring(i + 1);
-                }
-
-                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
-                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
-                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                    sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
-
-                    oCommand = new SqlCommand(sCommand, oDataAccess);
-                    reader = oCommand.ExecuteReader();
-                    lPid = 0;
-                    while (reader.Read())
-                    {
-                        lPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                    }
-                    reader.Close();
-                    reader = null;
-
-                    if (lPid == 0)
-                        bNoneMissing = false;
-                    else
-                    {
-                        ++PICount;
-                        if (sPids == "")
-                            sPids = lPid.ToString();
-                        else
-                            sPids = sPids + "," + lPid.ToString();
-                    }
-
-                }
-
-            }
-            return eStatus;
-
-        }
         private int GrabModelInfo(SqlConnection oDataAccess, string sModel, out int lCB_ID, out int lSelFID, out string sCostTypes, out string sOtherCostTypes)
         {
 
@@ -661,7 +552,7 @@ namespace ModelDataCache
                 string sfnam = "";
 
 
-                GetCFFieldName(lTid, lfit, out stab, out sfnam);
+                OptimizerData.GetCFFieldName(lTid, lfit, out stab, out sfnam);
                 m_Selected_Table = stab;
                 m_Select_FieldName = sfnam;
             }
@@ -672,105 +563,7 @@ namespace ModelDataCache
             }
             return eStatus;
         }
-        private int GrabCostViewInfo(SqlConnection oDataAccess, string sCostView, out int lCB_ID, out string sCostTypes, out string sOtherCostTypes, out int lMinP, out int lMaxP)
-        {
 
-            int eStatus = 0;
-            string sCommand = "";
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-
-            int lCostView = 0;
-            lMinP = 0;
-            lMaxP = 0;
-
-
-
-            lCB_ID = 0;
-            sCostTypes = "";
-            sOtherCostTypes = "";
-
-
-            try
-            {
-                lCostView = Int32.Parse(sCostView);
-            }
-            catch
-            {
-                lCostView = 0;
-            }
-
-            if (lCostView == 0)
-                return 1;
-
-
-
-            sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + sCostView;
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-
-            while (reader.Read())
-            {
-                lCB_ID = DBAccess.ReadIntValue(reader["VIEW_COST_BREAKDOWN"]);
-                lMinP = DBAccess.ReadIntValue(reader["VIEW_FIRST_PERIOD"]);
-                lMaxP = DBAccess.ReadIntValue(reader["VIEW_LAST_PERIOD"]);
-
-
-            }
-            reader.Close();
-            reader = null;
-
-            if (lCB_ID == 0)
-                return 1;
-
-
-
-
-            sCommand = "SELECT  EPGT_COSTVIEW_COST_TYPES.CT_ID, EPGP_COST_TYPES.CT_EDIT_MODE FROM EPGT_COSTVIEW_COST_TYPES INNER JOIN EPGP_COST_TYPES ON EPGT_COSTVIEW_COST_TYPES.CT_ID = EPGP_COST_TYPES.CT_ID WHERE VIEW_UID = " + sCostView;
-
-            int lCTID = 0;
-            int lEMode = 0;
-
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-            while (reader.Read())
-            {
-                lCTID = DBAccess.ReadIntValue(reader["CT_ID"]);
-                lEMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
-
-                if (lEMode == 1)
-                {
-                    if (sCostTypes == "")
-                        sCostTypes = lCTID.ToString();
-                    else
-                        sCostTypes = sCostTypes + "," + lCTID.ToString();
-
-                }
-                else
-                {
-                    if (sOtherCostTypes == "")
-                        sOtherCostTypes = lCTID.ToString();
-                    else
-                        sOtherCostTypes = sOtherCostTypes + "," + lCTID.ToString();
-
-                    if (lEMode == 3)
-                    {
-                        if (m_sCalcCostTypes == "")
-                            m_sCalcCostTypes = lCTID.ToString();
-                        else
-                            m_sCalcCostTypes = m_sCalcCostTypes + "," + lCTID.ToString();
-                    }
-
-
-                }
-
-            }
-            reader.Close();
-            reader = null;
-
-            return eStatus;
-        }
         private void GrabViewsAndStatus(SqlConnection oDataAccess, string sWResID, int lMode)
         {
 
@@ -1367,121 +1160,71 @@ namespace ModelDataCache
             reader.Close();
             reader = null;
         }
-        private void ReadExtraPifields(SqlConnection oDataAccess)
+        private void ReadExtraPifields(SqlConnection sqlConnection)
         {
+            var i = 0;
 
-            SqlCommand oCommand = null;
-            SqlDataReader reader = null;
-
-            string sCommand = "";
-            int i = 0;
-            int ftabextra = 0;
-            int fintabextra = 0;
-
-
-            //            sCommand = "Select rd.*,FIELD_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,at.FA_FORMAT, fl.FIELD_NAME_SQL, at.FA_NAME, fl.FIELD_NAME AS Expr1" +
-            //                       " From EPGP_RD_FIELDS rd  Left Join EPGT_FIELDS fl On fl.FIELD_ID=rd.FIELD_ID  Left Join EPGC_FIELD_ATTRIBS at On at.FA_FIELD_ID=rd.FIELD_ID Where CONTEXT_ID = 101";
-
-            sCommand =
-                "Select t.* From EPGT_FIELDS t Left Join  EPGP_RD_FIELDS r On t.FIELD_ID=r.FIELD_ID And CONTEXT_ID=101 " +
-                " Where t.FIELD_ID IN (9901,9902,9904,9911,9928,9950,9922,9925,9930)";
+            var sql = "Select t.* From EPGT_FIELDS t Left Join  EPGP_RD_FIELDS r On t.FIELD_ID=r.FIELD_ID And CONTEXT_ID=101 " +
+                     " Where t.FIELD_ID IN (9901,9902,9904,9911,9928,9950,9922,9925,9930)";
 
             // need to read these and munge them into the arrays that were used before
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection))
             {
-                ++i;
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        ++i;
 
-                m_fidextra[i] = DBAccess.ReadIntValue(reader["FIELD_ID"]);
+                        m_fidextra[i] = OptimizerData.ReadFieldDataFieldId(reader, "FIELD_ID");
+                        UpdateFieldsRelatedToFieldId(i);
 
-                if (m_PI_Group == m_fidextra[i])
-                    m_PI_Group_fid = i;
-
-                if (m_PI_Seq == m_fidextra[i])
-                    m_PI_Seq_fid = i;
-
-                m_ExtraFieldNames[i] = "";
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
-
-                m_ExtraFieldNames[i] = m_ExtraFieldNames[i].Replace("%", "Percent");
-
-                if (m_fidextra[i] == 9911)
-                    m_ExtraFieldTypes[i] = 9911;     //   ' change Stage from an integer (2) to a special text field (9911)
-                else if (m_ExtraFieldTypes[i] == 0)
-                    m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-
-
-                m_sextra[i] = DBAccess.ReadStringValue(reader["FIELD_NAME_SQL"]);
-
-
-
+                        m_ExtraFieldNames[i] = OptimizerData.ReadFieldDataFieldName(reader, "FIELD_NAME");
+                        m_ExtraFieldTypes[i] = OptimizerData.ReadFieldDataFieldFormat(reader, m_fidextra[i], "FIELD_FORMAT");
+                        m_sextra[i] = OptimizerData.ReadFieldDataSExtra(reader, "FIELD_NAME_SQL");
+                    }
+                }
             }
-            reader.Close();
-            reader = null;
 
-            sCommand = "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
+            sql = "SELECT     rd.CONTEXT_ID, rd.FIELD_ID, rd.FIELD_NAME, rd.FIELD_SELECT, fl.FIELD_FORMAT, at.FA_TABLE_ID, at.FA_FIELD_IN_TABLE, at.FA_FORMAT, fl.FIELD_NAME_SQL,  " +
                 "  at.FA_NAME, fl.FIELD_NAME AS Expr1 FROM  EPGC_FIELD_ATTRIBS AS at LEFT OUTER JOIN EPGP_RD_FIELDS AS rd ON rd.FIELD_ID = at.FA_FIELD_ID AND rd.CONTEXT_ID = 101 LEFT OUTER JOIN " +
                 " EPGT_FIELDS AS fl ON fl.FIELD_ID = rd.FIELD_ID WHERE     (at.FA_TABLE_ID = 201) AND (at.FA_FORMAT = 4 OR at.FA_FORMAT = 13 OR at.FA_FORMAT = 7) OR " +
                 " (at.FA_TABLE_ID = 202) OR (at.FA_TABLE_ID = 203) OR (at.FA_TABLE_ID = 205)";
 
-            oCommand = new SqlCommand(sCommand, oDataAccess);
-            reader = oCommand.ExecuteReader();
-
-            while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection))
             {
-                ++i;
-
-                m_fidextra[i] = DBAccess.ReadIntValue(reader["FIELD_ID"]);
-
-                if (m_PI_Group == m_fidextra[i])
-                    m_PI_Group_fid = i;
-
-                if (m_PI_Seq == m_fidextra[i])
-                    m_PI_Seq_fid = i;
-
-                m_ExtraFieldNames[i] = "";
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["FA_NAME"]);
-
-                if (m_ExtraFieldNames[i] == "")
-                    m_ExtraFieldNames[i] = DBAccess.ReadStringValue(reader["Expr1"]);
-
-
-                m_ExtraFieldNames[i] = m_ExtraFieldNames[i].Replace("%", "Percent");
-
-                m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-
-                if (m_fidextra[i] == 9911)
-                    m_ExtraFieldTypes[i] = 9911;     //   ' change Stage from an integer (2) to a special text field (9911)
-                else if (m_ExtraFieldTypes[i] == 0)
-                    m_ExtraFieldTypes[i] = DBAccess.ReadIntValue(reader["FA_FORMAT"]);
-
-
-                m_sextra[i] = DBAccess.ReadStringValue(reader["FIELD_NAME_SQL"]);
-
-                if (m_sextra[i] == "")
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    ftabextra = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                    fintabextra = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                    while (reader.Read() && i <= (int)FieldIDs.MAX_PI_EXTRA)
+                    {
+                        ++i;
 
-                    string stab = "";
-                    string sfnam = "";
-
-                    GetCFFieldName(ftabextra, fintabextra, out stab, out sfnam);
-                    m_sextra[i] = sfnam;
+                        m_fidextra[i] = OptimizerData.ReadFieldDataFieldId(reader, "FIELD_ID");
+                        UpdateFieldsRelatedToFieldId(i);
+                        
+                        m_ExtraFieldNames[i] = OptimizerData.ReadFieldDataFieldName(reader, "FA_NAME", "Expr1");
+                        m_ExtraFieldTypes[i] = OptimizerData.ReadFieldDataFieldFormat(reader, m_fidextra[i], "FIELD_FORMAT", "FA_FORMAT");
+                        m_sextra[i] = OptimizerData.ReadFieldDataSExtra(reader, "FIELD_NAME_SQL", "FA_TABLE_ID", "FA_FIELD_IN_TABLE");
+                    }
                 }
-
             }
-            reader.Close();
-            reader = null;
 
             m_Use_extra = i;
         }
+
+        private void UpdateFieldsRelatedToFieldId(int fieldIndex)
+        {
+            if (m_PI_Group == m_fidextra[fieldIndex])
+            {
+                m_PI_Group_fid = fieldIndex;
+            }
+
+            if (m_PI_Seq == m_fidextra[fieldIndex])
+            {
+                m_PI_Seq_fid = fieldIndex;
+            }
+        }
+
         private int StripNum(ref string sin)
         {
             int i = 0;
@@ -3719,101 +3462,6 @@ namespace ModelDataCache
             return "";
         }
 
-        private void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
-        {
-            switch ((CustomFieldDBTable)lTableID)
-            {
-                case CustomFieldDBTable.ResourceINT:
-                    sTable = "EPGC_RESOURCE_INT_VALUES";
-                    sField = "RI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceTEXT:
-                    sTable = "EPGC_RESOURCE_TEXT_VALUES";
-                    sField = "RT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDEC:
-                    sTable = "EPGC_RESOURCE_DEC_VALUES";
-                    sField = "RC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceNTEXT:
-                    sTable = "EPGC_RESOURCE_NTEXT_VALUES";
-                    sField = "RN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceDATE:
-                    sTable = "EPGC_RESOURCE_DATE_VALUES";
-                    sField = "RD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ResourceMV:
-                    sTable = "EPGC_RESOURCE_MV_VALUES";
-                    sField = "MVR_UID";
-                    break;
-                case CustomFieldDBTable.PortfolioINT:
-                    sTable = "EPGP_PROJECT_INT_VALUES";
-                    sField = "PI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioTEXT:
-                    sTable = "EPGP_PROJECT_TEXT_VALUES";
-                    sField = "PT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDEC:
-                    sTable = "EPGP_PROJECT_DEC_VALUES";
-                    sField = "PC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioNTEXT:
-                    sTable = "EPGP_PROJECT_NTEXT_VALUES";
-                    sField = "PN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.PortfolioDATE:
-                    sTable = "EPGP_PROJECT_DATE_VALUES";
-                    sField = "PD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.Program:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_UID";
-                    break;
-                case CustomFieldDBTable.ProjectINT:
-                    sTable = "EPGX_PROJ_INT_VALUES";
-                    sField = "XI_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectTEXT:
-                    sTable = "EPGX_PROJ_TEXT_VALUES";
-                    sField = "XT_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDEC:
-                    sTable = "EPGX_PROJ_DEC_VALUES";
-                    sField = "XC_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectNTEXT:
-                    sTable = "EPGX_PROJ_NTEXT_VALUES";
-                    sField = "XN_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProjectDATE:
-                    sTable = "EPGX_PROJ_DATE_VALUES";
-                    sField = "XD_" + lFieldID.ToString("000");
-                    break;
-                case CustomFieldDBTable.ProgramText:
-                    sTable = "EPGP_PI_PROGS";
-                    sField = "PROG_PI_TEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIINT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_FLAG" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWITEXT:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_CTEXT" + lFieldID.ToString("0");
-                    break;
-                case CustomFieldDBTable.TaskWIDEC:
-                    sTable = "EPGP_PI_WORKITEMS";
-                    sField = "WORKITEM_NUMBER" + lFieldID.ToString("0");
-                    break;
-                default:
-                    sTable = "Unknown Table";
-                    sField = "";
-                    break;
-            }
-
-        }
         private void PerformCalcs(DetailRowData odet, bool bConvFtoQ)
         {
 
@@ -5073,7 +4721,7 @@ namespace ModelDataCache
 
             m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
+            return oGrid.RenderToXml(GridRenderingTypes.Combined);
         }
         
         public string GetTopGridLayout()
@@ -5098,7 +4746,7 @@ namespace ModelDataCache
                 oGrid.AddPeriodsData(m_Periods.Values);
             }
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
+            return oGrid.RenderToXml(GridRenderingTypes.Layout);
         }
 
         public string GetTopGridData()
@@ -5119,7 +4767,7 @@ namespace ModelDataCache
             
             m_tgrid_displayed = oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
+            return oGrid.RenderToXml(GridRenderingTypes.Data);
         }
 
         public string GetBottomGrid()
@@ -5145,7 +4793,7 @@ namespace ModelDataCache
             oGrid.AddPeriodsData(m_Periods.Values);
             oGrid.AddDetailRowsData(m_tgrid_sorted);
 
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Combined);
+            return oGrid.RenderToXml(GridRenderingTypes.Combined);
         }
 
 
@@ -5175,7 +4823,7 @@ namespace ModelDataCache
 
             oGrid.AddPeriodsData(m_Periods.Values);
 
-            bottomgridlayoutcache = oGrid.RenderToXml(GridBase.RenderingTypes.Layout);
+            bottomgridlayoutcache = oGrid.RenderToXml(GridRenderingTypes.Layout);
             return bottomgridlayoutcache;
         }
 
@@ -5200,7 +4848,7 @@ namespace ModelDataCache
                 m_display_maxp);
 
             oGrid.AddDetailRowsData(m_tgrid_sorted);
-            return oGrid.RenderToXml(GridBase.RenderingTypes.Data);
+            return oGrid.RenderToXml(GridRenderingTypes.Data);
         }
 
         public void SetFTEMode(int FTEMode)
@@ -6227,206 +5875,12 @@ namespace ModelDataCache
 
         private string FormatExtraDisplay(string sIn, int lt)
         {
-            DateTime dt;
-            int l;
-            double d;
-            DataItem oi;
-
-
-            switch (lt)
-            {
-                case 1:
-                    dt = DateTime.MinValue;
-
-                    try
-                    {
-                        dt = DateTime.ParseExact(sIn, "yyyyMMdd", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        if (dt == DateTime.MinValue)
-                            dt = DateTime.ParseExact(sIn, "yyyyMMddHHmm", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    if (dt > DateTime.MinValue)
-                        return dt.ToString("MM/dd/yyyy");
-
-                    return "";
-
-                case 2:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-
-
-                    if (l != 0)
-                        return l.ToString();
-
-                    return "";
-
-
-                case 3:
-
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    if (d != 0)
-                        return d.ToString();
-
-                    return "";
-
-                case 11:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (l != 0)
-                        return l.ToString("0%");
-
-                    return "";
-
-                case 13:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    return (l == 0 ? "No" : "Yes");
-
-                case 6:
-                case 9:
-                case 19:
-                    return sIn;
-
-
-                case 8:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    if (d != 0)
-                        return d.ToString("$#,##0.00");
-
-                    return "";
-
-                case 20:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    return FormatWork(d);
-
-                case 23:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    return FormatDuration(d);
-
-                case 4:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_codes.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 7:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_reses.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 9911:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_stages.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-            }
-
-            return "";
+            return FormatExtraDisplay(
+                sIn,
+                lt,
+                m_codes,
+                m_reses,
+                m_stages);
         }
 
         private string FormatWork(double Hours)
@@ -7147,62 +6601,7 @@ namespace ModelDataCache
 
 
         }
-
-
-
-        private string BuildCustFieldJSon(CustomFieldData oc, int index, int max)
-        {
-            ListItemData ce, ne, initial;
-            string sRet = "";
-
-            if (max < 0)
-                return "";
-
-            initial = oc.ListItems.ElementAt(index).Value;
-
-            for (int i = index; i <= max; i++)
-            {
-
-                ce = oc.ListItems.ElementAt(i).Value;
-
-                if (initial.Level == ce.Level)
-                {
-
-                    if (sRet != "")
-                        sRet = sRet + ",";
-
-                    if (oc.UseFullName == 1)
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
-                    else
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
-
-
-                    if (i != max)
-                    {
-                        ne = oc.ListItems.ElementAt(i + 1).Value;
-
-                        if (ne.Level > ce.Level)
-                        {
-                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
-                            //"{Items:[{Name:'Name1',Text:'Text1',Value:'Value1'},{Name:'Level2',Expanded:-1,Level:1,Items:[ {Name:'Name1.1',Text:'Text1.1',Value:'Value1.1'}, {Name:'Name1.2',Text:'Text1.2',Value:'Value1.2'}]}]}"
-
-                        }
-                        else if (ne.Level < ce.Level)
-                            return sRet;
-
-                    }
-                }
-                //else if (index != 0)
-                //    return sRet;
-            }
-
-
-            return sRet;
-
-
-
-        }
-
+        
         public void RatesAndCategory(ref CSRatesAndCategory rdata)
         {
             // targets do not have named rates Yet!
@@ -7440,7 +6839,7 @@ namespace ModelDataCache
                 foreach (DetailRowData oDet in m_editTargetList)
                 {
                     targetData.targetRows[cnt] = new TargetRowData();
-                    oDet.CopyToTargetData(ref targetData.targetRows[cnt++]);
+                    oDet.CopyToTargetData(targetData.targetRows[cnt++]);
                 }
 
             }
@@ -7508,7 +6907,7 @@ namespace ModelDataCache
                     {
                         tdata = new TargetRowData();
                         targetData.targetRows[cnt++] = tdata;
-                        odet.CopyToTargetData(ref tdata);
+                        odet.CopyToTargetData(tdata);
                         aggr.Add(sKey, tdata);
                     }
                     else

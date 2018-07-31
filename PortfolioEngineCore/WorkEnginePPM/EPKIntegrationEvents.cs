@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,10 @@ namespace WorkEnginePPM
 {
     public class EPKIntegrationEvents : SPItemEventReceiver
     {
-
+        
+        private const string ProjectGroupVisitor = "Visitor";
+        private const string ProjectGroupMember = "Member";
+        private const string ProjectGroupOwner = "Owner";
         public override void ItemAdded(SPItemEventProperties properties)
         {
             processItem(properties);
@@ -182,12 +185,12 @@ namespace WorkEnginePPM
                 if (role != null && role.Member != null &&
                     role.Member is SPGroup && role.Member.Name != null)
                 {
-                    if (role.Member.Name.ToUpper().Contains("VISITOR"))
-                        role.Member.Name = projectNameNew + " Visitor";
-                    else if (role.Member.Name.ToUpper().Contains("OWNER"))
-                        role.Member.Name = projectNameNew + " Owner";
-                    else if (role.Member.Name.ToUpper().Contains("MEMBER"))
-                        role.Member.Name = projectNameNew + " Member";
+                    if (role.Member.Name.IndexOf($"{projectNameDB} {ProjectGroupVisitor}", StringComparison.OrdinalIgnoreCase) != -1)
+                        role.Member.Name = $"{projectNameNew} {ProjectGroupVisitor}";
+                    else if (role.Member.Name.IndexOf($"{projectNameDB} {ProjectGroupOwner}", StringComparison.OrdinalIgnoreCase) != -1)
+                        role.Member.Name = $"{projectNameNew} {ProjectGroupOwner}";
+                    else if (role.Member.Name.IndexOf($"{projectNameDB} {ProjectGroupMember}", StringComparison.OrdinalIgnoreCase) != -1)
+                        role.Member.Name = $"{projectNameNew} {ProjectGroupMember}";
                     else
                         role.Member.Name = role.Member.Name.Replace(projectNameDB, projectNameNew);
 

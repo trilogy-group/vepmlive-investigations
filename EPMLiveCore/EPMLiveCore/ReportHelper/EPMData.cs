@@ -475,39 +475,41 @@ namespace EPMLiveCore.ReportHelper
         {
             set
             {
-                _conClientReporting = new SqlConnection(value);
-                try
+                using (_conClientReporting = new SqlConnection(value))
                 {
-                    if (_databaseName != null && _databaseName != string.Empty)
+                    try
                     {
-                        if (!_useSAccount)
+                        if (!string.IsNullOrWhiteSpace(_databaseName))
                         {
-                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            if (!_useSAccount)
+                            {
+                                SPSecurity.RunWithElevatedPrivileges(delegate
+                                {
+                                    if (_conClientReporting.State == ConnectionState.Closed)
+                                    {
+                                        _conClientReporting.Open();
+                                    }
+                                });
+                            }
+                            else
                             {
                                 if (_conClientReporting.State == ConnectionState.Closed)
                                 {
                                     _conClientReporting.Open();
                                 }
-                            });
-                        }
-                        else
-                        {
-                            if (_conClientReporting.State == ConnectionState.Closed)
-                            {
-                                _conClientReporting.Open();
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (_databaseName != null && _databaseName != string.Empty)
+                    catch (Exception ex)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        if (!string.IsNullOrWhiteSpace(_databaseName))
                         {
-                            var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
-                        });
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            {
+                                var eventMessage = CreateEventMessage(ex);
+                                LogWindowsEvents(EpmLiveKey, OpenClientReportingConnectionKey, eventMessage, false, OpenEpmLiveConnectionEvent);
+                            });
+                        }
                     }
                 }
             }
@@ -519,37 +521,40 @@ namespace EPMLiveCore.ReportHelper
         {
             set
             {
-                _conMaster = new SqlConnection(value);
-                try
+                using (_conMaster = new SqlConnection(value))
                 {
-                    if (!_useSAccount)
+                    try
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate
+                        if (!_useSAccount)
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            {
+                                if (_conMaster.State == ConnectionState.Closed)
+                                {
+                                    _conMaster.Open();
+                                }
+                            });
+                        }
+                        else
                         {
                             if (_conMaster.State == ConnectionState.Closed)
                             {
                                 _conMaster.Open();
                             }
-                        });
-                    }
-                    else
-                    {
-                        if (_conMaster.State == ConnectionState.Closed)
-                        {
-                            _conMaster.Open();
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _sqlError = ex.Message;
-                    if (_masterCs != null && _masterCs != string.Empty)
+                    catch (Exception ex)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        _sqlError = ex.Message;
+
+                        if (!string.IsNullOrEmpty(_masterCs))
                         {
-                            var eventMessage = CreateEventMessage(ex);
-                            LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
-                        });
+                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            {
+                                var eventMessage = CreateEventMessage(ex);
+                                LogWindowsEvents(EpmLiveKey, OpenMasterDbConnectionKey, eventMessage, false, OpenMasterDbConnectionEvent);
+                            });
+                        }
                     }
                 }
             }
@@ -659,18 +664,25 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                if (_sTextFilePath != null || _sTextFilePath != string.Empty)
-                {
-                    TextWriter tw = new StreamWriter(_sTextFilePath);
-
-                    // write a line of text to the file
-                    tw.WriteLine(sText);
-
-                    // close the stream
-                    tw.Close();
-                }
+                WriteTextFile(_sTextFilePath, sText);
             }
-            catch (Exception ex) { }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Exception suppressed: {0}", exception);
+            }
+        }
+
+        private void WriteTextFile(string path, string text)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            using (var writer = new StreamWriter(path))
+            {
+                writer.WriteLine(text);
+            }
         }
 
         public bool DeleteWork(Guid listid, int itemid)
@@ -1046,21 +1058,28 @@ namespace EPMLiveCore.ReportHelper
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    var staticCn = new SqlConnection(cs);
-                    try
-                    {
-                        staticCn.Open();
-                    }
-                    catch (SqlException ex)
-                    {
-                        Trace.Write(ex.Message);
-                        success = false;
-                    }
-                    finally
-                    {
-                        staticCn.Close();
-                    }
+                    success = TryToConnect(cs);
                 });
+            return success;
+        }
+
+        public static bool TryToConnect(string connectionString)
+        {
+            var success = true;
+
+            using (var sqlConnection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    sqlConnection.Open();
+                }
+                catch (SqlException ex)
+                {
+                    Trace.Write(ex.Message);
+                    success = false;
+                }
+            }
+
             return success;
         }
 
@@ -1186,30 +1205,8 @@ namespace EPMLiveCore.ReportHelper
                 //Add Error Handling HERE
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
-                        EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
-
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
-                    myLog.MaximumKilobytes = 32768;
-                    string cmdDetails = "Command: " + sql;
-                    string cmdParams = " Params: ";
-
-                    foreach (SqlParameter param in paramCollection)
-                    {
-                        if (param.Value != DBNull.Value)
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
-                                        "],";
-                        }
-                        else
-                        {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value: Null],";
-                        }
-                    }
-
-                    myLog.WriteEntry(
-                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
-                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    var eventMessage = CreateEventMessageWithParams(ex, _command, _params);
+                    LogWindowsEvents(EpmLiveKey, GetClientReportingConnectionSiteIdKey, eventMessage, false, ExecuteScalarEvent);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -1370,26 +1367,22 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
-                var cmd = new SqlCommand();
-                var con = new SqlConnection(CoreFunctions.getConnectionString(webAppId));
-                con.Open();
-                //cmd.CommandText = "SELECT * FROM RPTDatabases WHERE WebApplicationId = @webAppId";
-                //cmd.Parameters.AddWithValue("@webAppId", webAppId);
-
-                cmd.CommandText = "SELECT * FROM RPTDatabases WHERE SiteId = @siteId";
-                cmd.Parameters.AddWithValue("@siteId", siteId);
-
-                cmd.Connection = con;
-                DataTable dt = GetTable(cmd);
-                con.Close();
-
-                if (dt != null && dt.Rows.Count > 0)
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(webAppId)))
                 {
-                    return dt.Rows[0];
-                }
-                else
-                {
-                    return null;
+                    connection.Open();
+
+                    using (var command = new SqlCommand("SELECT * FROM RPTDatabases WHERE SiteId = @siteId", connection))
+                    {
+                        command.Parameters.AddWithValue("@siteId", siteId);
+
+                        var dataTable = GetTable(command);
+                        if (dataTable != null && dataTable.Rows.Count > 0)
+                        {
+                            return dataTable.Rows[0];
+                        }
+
+                        return null;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1398,20 +1391,22 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        private static DataTable GetTable(SqlCommand cmd)
+        private static DataTable GetTable(SqlCommand command)
         {
-            SqlDataAdapter da;
-            var dt = new DataTable();
-            try
+            if (command == null)
             {
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                da.Dispose();
+                throw new ArgumentNullException(nameof(command));
             }
-            catch (Exception ex) { }
-            finally { }
 
-            return dt;
+            using (var dataTable = new DataTable())
+            {
+                using (var dataAdapter = new SqlDataAdapter(command))
+                {
+                    dataAdapter.Fill(dataTable);
+                }
+
+                return dataTable;
+            }
         }
 
         /// <summary>
@@ -2183,18 +2178,27 @@ namespace EPMLiveCore.ReportHelper
             return GetTable(GetClientReportingConnection);
         }
 
-        public bool TableExists(string tableName, SqlConnection cn)
+        public bool TableExists(string tableName, SqlConnection sqlConnection)
         {
-            bool exists = false;
-            try
+            if (sqlConnection == null)
             {
-                var cmd =
-                    new SqlCommand(
-                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
-                        tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
-                exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+                throw new ArgumentNullException(nameof(sqlConnection));
             }
-            catch { }
+
+            var exists = false;
+            var command = $"IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '{tableName}')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END";
+
+            using (var sqlCommand = new SqlCommand(command, sqlConnection))
+            {
+                try
+                {
+                    exists = Convert.ToInt32(sqlCommand.ExecuteScalar()) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception suppressed: {0}", ex);
+                }
+            }
 
             return exists;
         }
@@ -2871,21 +2875,28 @@ namespace EPMLiveCore.ReportHelper
         /// <summary>
         ///     Encrypts string value using the HASH MD5 cryptoservice provider.
         /// </summary>
-        /// <param name="Plaintext"></param>
+        /// <param name="plaintext"></param>
         /// <returns></returns>
-        public static string Encrypt(string Plaintext)
+        public static string Encrypt(string plaintext)
         {
-            var Buffer = new byte[0];
-            string Key = "EPMLIVE";
-            var DES = new TripleDESCryptoServiceProvider();
-            var hashMD5 = new MD5CryptoServiceProvider();
-            DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-            DES.Mode = CipherMode.ECB;
-            ICryptoTransform DESEncrypt = DES.CreateEncryptor();
-            Buffer = ASCIIEncoding.ASCII.GetBytes(Plaintext);
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
 
-            string TripleDES = Convert.ToBase64String(DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-            return TripleDES;
+            using (var cryptoProvider = new MD5CryptoServiceProvider())
+            {
+                using (var tdes = new TripleDESCryptoServiceProvider())
+                {
+                    tdes.Key = cryptoProvider.ComputeHash(Encoding.ASCII.GetBytes(Key));
+                    tdes.Mode = CipherMode.ECB;
+
+                    using (var transform = tdes.CreateEncryptor())
+                    {
+                        buffer = Encoding.ASCII.GetBytes(plaintext);
+
+                        return Convert.ToBase64String(transform.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -2895,20 +2906,24 @@ namespace EPMLiveCore.ReportHelper
         /// <returns></returns>
         public static string Decrypt(string base64Text)
         {
+            const string Key = "EPMLIVE";
+            var buffer = new byte[0];
+
             try
             {
-                var Buffer = new byte[0];
-                string Key = "EPMLIVE";
-                var DES = new TripleDESCryptoServiceProvider();
-                var hashMD5 = new MD5CryptoServiceProvider();
-                DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-                DES.Mode = CipherMode.ECB;
-                ICryptoTransform DESDecrypt = DES.CreateDecryptor();
-                Buffer = Convert.FromBase64String(base64Text);
+                using (var tDes = new TripleDESCryptoServiceProvider())
+                {
+                    using (var cryptoProvider = new MD5CryptoServiceProvider())
+                    {
+                        tDes.Key = cryptoProvider.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+                        tDes.Mode = CipherMode.ECB;
 
-                string DecTripleDES =
-                    ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-                return DecTripleDES;
+                        var DESDecrypt = tDes.CreateDecryptor();
+                        buffer = Convert.FromBase64String(base64Text);
+
+                        return ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
+                    }
+                }
             }
             catch (Exception ex)
             {

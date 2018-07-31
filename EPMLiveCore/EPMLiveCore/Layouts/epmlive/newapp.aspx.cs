@@ -16,14 +16,19 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using EPMLiveCore.SPUtilities;
+using System.Net;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
 {
     public partial class newapp : LayoutsPageBase
     {
-        protected string baseURL = "";
-        protected string metaDataString = "";
-        protected string processString = "";
+        private SPProjectUtility _spProjectUtility = new SPProjectUtility();
+
+        protected string baseURL = string.Empty;
+        protected string metaDataString = string.Empty;
+        protected string processString = string.Empty;
         protected bool requiredOK = true;
         protected Button btnOK;
         protected DropDownList DdlGroup;
@@ -34,7 +39,7 @@ namespace EPMLiveCore
         protected TextBox txtTitle;
         protected Label label1;
         protected Panel Panel2;
-        protected string URL = "";
+        protected string URL = string.Empty;
         protected RadioButton rdoTopLinkYes;
         protected RadioButton rdoTopLinkNo;
         protected RadioButton rdoUnique;
@@ -46,352 +51,115 @@ namespace EPMLiveCore
         protected string listName;
         protected string strName;
 
-        protected Microsoft.SharePoint.WebControls.InputFormSection inpName;
+        protected InputFormSection inpName;
 
         ArrayList validTemplates = new ArrayList();
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-
-            btnOK.Attributes.Add("onclick", "javascript:" + btnOK.ClientID + ".disabled=true;");
+            btnOK.Attributes.Add("onclick", string.Format("javascript:{0}.disabled=true;", btnOK.ClientID));
 
             if (!IsPostBack)
             {
-                string login = SPContext.Current.Web.CurrentUser.LoginName;
-                string url = SPContext.Current.Web.Url;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                var projectInfo = _spProjectUtility.RequestProjectInfo();
+
+                switch (projectInfo.StatusCode)
                 {
-                    using(SPSite mysite = new SPSite(url))
-                    {
-                        using(SPWeb myweb = mysite.OpenWeb())
+                    case HttpStatusCode.Forbidden:
+                        SPUtility.Redirect("accessdenied.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                        break;
+                    default:
+                        var workspaceInfo = _spProjectUtility.RequestWorkspaceInfo(new Guid(Request["List"]));
+
+                        listName = workspaceInfo.ListName;
+                        strName = workspaceInfo.WorkspaceName;
+
+                        URL = projectInfo.ServerRelativeUrl;
+                        baseURL = projectInfo.BaseUrl;
+
+                        foreach (DictionaryEntry dictionaryEntry in projectInfo.PopulatedTemplates)
                         {
-                            myweb.Site.CatchAccessDeniedException = false;
-                            try
-                            {
-                                if (!myweb.DoesUserHavePermissions(login, SPBasePermissions.ManageSubwebs))
-                                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            catch
-                            {
-                                Microsoft.SharePoint.Utilities.SPUtility.Redirect("accessdenied.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                            }
-                            URL = myweb.ServerRelativeUrl;
-
-                            SPList list = myweb.Lists[new Guid(Request["List"])];
-                            listName = list.Title;
-                            strName = "";
-
-                            try
-                            {
-                                GridGanttSettings gSettings = new GridGanttSettings(list);
-                                strName = gSettings.NewMenuName;
-                            }
-                            catch { }
-                            if (strName == "")
-                                strName = listName;
-
-                            inpName.Title = strName + " Name";
-                            btnOK.Text = "Create " + strName;
-
-                            baseURL = myweb.Url + "/";
-                            Guid lockweb = CoreFunctions.getLockedWeb(myweb);
-                            if (lockweb != Guid.Empty)
-                            {
-                                using (SPWeb web = myweb.Site.AllWebs[lockweb])
-                                {
-                                    string wsType = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-                                    string nav = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectNavigation");
-                                    string perms = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectPermissions");
-
-                                    string sTemplates = CoreFunctions.getConfigSetting(web, "EPMLiveValidTemplates");
-
-                                    if (sTemplates != "")
-                                    {
-                                        string[] ssTemplates = sTemplates.Split('|');
-                                        foreach (string sTemplate in ssTemplates)
-                                        {
-                                            validTemplates.Add(sTemplate);
-                                        }
-                                    }
-
-
-                                    if (nav == "True")
-                                    {
-                                        rdoTopLinkYes.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-                                    else if (nav == "False")
-                                    {
-                                        rdoTopLinkNo.Checked = true;
-                                        rdoTopLinkNo.Enabled = false;
-                                        rdoTopLinkYes.Enabled = false;
-                                    }
-
-                                    if (perms == "Unique")
-                                    {
-                                        rdoInherit.Checked = false;
-                                        rdoUnique.Checked = true;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                    }
-                                    else if (perms == "Same")
-                                    {
-                                        rdoUnique.Checked = false;
-                                        rdoUnique.Enabled = false;
-                                        rdoInherit.Enabled = false;
-                                        rdoInherit.Checked = true;
-                                    }
-
-                                    if (wsType == "New")
-                                    {
-                                        wsTypeNew = "checked disabled=\"true\"";
-                                        wsTypeExisting = " disabled=\"true\"";
-
-                                    }
-                                    else if (wsType == "Existing")
-                                    {
-                                        wsTypeNew = " disabled=\"true\"";
-                                        wsTypeExisting = "checked disabled=\"true\"";
-                                        Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
-                                    }
-                                }
-                            }
-                            populateTemplates(myweb);
+                            var li = new ListItem(dictionaryEntry.Key.ToString(), dictionaryEntry.Value.ToString());
+                            DdlGroup.Items.Add(li);
                         }
-                    }
-                });
-            }
-        }
 
-        private void populateTemplates(SPWeb site)
-        {
-            SortedList sl = new SortedList();
-            string version = getMajorVersion(site);
-            foreach (SPWebTemplate template in site.GetAvailableWebTemplates(site.Language))
-            {
-                if (!template.IsHidden)
-                {
-                    if (!template.Title.Contains("EPM Live"))
-                    {
-                        if (validTemplates.Count == 0)
+                        inpName.Title = strName + " Name";
+                        btnOK.Text = "Create " + strName;
+
+                        if (projectInfo.IsNavigationEnabled.HasValue)
                         {
-                            if (template.IsCustomTemplate && isValidTemplate(template.Title, version, site))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
+                            rdoTopLinkYes.Checked = projectInfo.IsNavigationEnabled == true;
+                            rdoTopLinkNo.Checked = projectInfo.IsNavigationEnabled == false;
+                            rdoTopLinkNo.Enabled = false;
+                            rdoTopLinkYes.Enabled = false;
                         }
-                        else
+
+                        if (projectInfo.IsUnique.HasValue)
                         {
-                            if (validTemplates.Contains(template.Title))
-                            {
-                                sl.Add(template.Title, template.Name);
-                            }
+                            rdoUnique.Checked = projectInfo.IsUnique == true;
+                            rdoInherit.Checked = projectInfo.IsUnique == false;
+                            rdoUnique.Enabled = false;
+                            rdoInherit.Enabled = false;
                         }
-                    }
+
+                        if (projectInfo.IsWorkspaceExisting == false)
+                        {
+                            wsTypeNew = "checked disabled=\"true\"";
+                            wsTypeExisting = " disabled=\"true\"";
+                        }
+                        else if (projectInfo.IsWorkspaceExisting == true)
+                        {
+                            wsTypeNew = " disabled=\"true\"";
+                            wsTypeExisting = "checked disabled=\"true\"";
+                            Page.RegisterStartupScript("existingws", "<script>existingWorkspace();</script>");
+                        }
+                        break;
                 }
             }
-
-            foreach (DictionaryEntry de in sl)
-            {
-                ListItem li = new ListItem(de.Key.ToString(), de.Value.ToString());
-                DdlGroup.Items.Add(li);
-            }
         }
-
-        private bool isValidTemplate(string template, string version, SPWeb web)
-        {
-            if (version == "2")
-            {
-                switch (template)
-                {
-                    case "Basic Project Workspace":
-                    case "Enterprise Project Management Workgroup":
-                        return false;
-                };
-            }
-            else if (version == "1")
-            {
-                switch (template)
-                {
-                    case "Project Workspace":
-                        return false;
-                }
-            }
-            return true;
-        }
-
-
-        private string getMajorVersion(SPWeb web)
-        {
-            try
-            {
-                string[] fullversion = web.Properties["TemplateVersion"].Split('.');
-                return fullversion[0];
-            }
-            catch { }
-            return "1";
-        }
-
+        
         protected void BtnOK_Click(object sender, EventArgs e)
         {
-            string wType = Request["hdnWorkspaceType"];
-            string selectedWorkspace = Request["hdnSelectedWorkspace"];
-            string retURL = "";
-            if (wType == "Existing")
+            var web = SPContext.Current.Web;
+            var workspaceType = Request["hdnWorkspaceType"];
+            var selectedWorkspace = Request["hdnSelectedWorkspace"];
+            var listId = new Guid(Request["List"]);
+            var currentList = web.Lists[listId];
+
+            if (workspaceType == "Existing")
             {
-                SPWeb web = SPContext.Current.Web;
-                SPList curList = web.Lists[new Guid(Request["List"])];
-
-                try
+                var workspaceId = new Guid(selectedWorkspace);
+                var redirectUrl = UpdateList(web, currentList, workspaceId);
+                if (!string.IsNullOrEmpty(redirectUrl))
                 {
-                    //string url = selectedWorkspace.Replace(web.ServerRelativeUrl, "");
-                    //if(url != "")
-                    //    url = url.Substring(1);
-
-                    //SPWeb w = web;
-                    //if(url != "")
-                    using (SPWeb w = web.Webs[new Guid(Request["hdnSelectedWorkspace"])])
-                    {
-
-                        SPList list = null;
-
-                        try
-                        {
-                            list = w.Lists[curList.Title];
-                        }
-                        catch { }
-                        if (list != null)
-                        {
-                            SPListItem li = list.Items.Add();
-                            li["Title"] = txtTitle.Text;
-                            li.Update();
-
-                            retURL = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID;
-
-                        }
-                        else
-                        {
-                            label1.Text = "Error: The list " + curList.Title + " does not exist";
-                            Panel2.Visible = true;
-                        }
-                    }
+                    Response.Redirect(redirectUrl);
                 }
-                catch (Exception ex)
-                {
-                    label1.Text = "Error: " + ex.Message;
-                    Panel2.Visible = true;
-                }
-
-                //web.Close();
-                if (retURL != "")
-                    Response.Redirect(retURL);
             }
             else
             {
                 try
                 {
-                    SPWeb mySite = SPContext.Current.Web;
-                    SPList curList = mySite.Lists[new Guid(Request["List"])];
-
                     pnlTitle.Visible = false;
                     pnlURL.Visible = false;
                     pnlURLBad.Visible = false;
 
-                    string url = txtURL.Text;
-                    string title = txtTitle.Text;
-                    string group = DdlGroup.SelectedItem.Value;
+                    var url = txtURL.Text;
+                    var title = txtTitle.Text;
+                    var group = DdlGroup.SelectedItem.Value;
 
                     if (requiredOK)
                     {
-                        if (IsAlphaNumeric(title))
+                        if (CoreFunctions.IsAlphaNumeric(title))
                         {
-                            string err = CoreFunctions.createSite(title, url, group, mySite.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, mySite);
+                            var err = CoreFunctions.createSite(title, url, group, web.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, web);
 
                             if (err.Substring(0, 1) == "0")
                             {
-                                SPListItem li = null;
-                                try
+                                var redirectUrl = CoreFunctions.CreateProjectInNewWorkspace(web, currentList.Title, baseURL + url, title);
+                                if (!string.IsNullOrEmpty(redirectUrl))
                                 {
-                                    SPList workspacelist = mySite.Lists["Workspace Center"];
-                                    li = workspacelist.Items.Add();
-                                    li["URL"] = baseURL + url + ", " + title;
-                                    li.Update();
-
-                                    int workspaceID = li.ID;
-                                    string listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
+                                    Response.Redirect(redirectUrl + "&rnd=" + Guid.NewGuid());
                                 }
-                                catch { }
-                                using (SPWeb w = mySite.Webs[url])
-                                {
-                                    //==========
-                                    SPList list = null;
-
-                                    try
-                                    {
-                                        list = w.Lists[curList.Title];
-                                    }
-                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                                    if (list != null)
-                                    {
-                                        SPField f = null;
-                                        try
-                                        {
-                                            f = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
-                                        }
-                                        catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                                        if (f == null)
-                                        {
-                                            if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
-                                            {
-                                                try
-                                                {
-                                                    list.ParentWeb.AllowUnsafeUpdates = true;
-                                                    f = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
-                                                    f.Hidden = true;
-                                                    list.Fields.Add(f);
-                                                    f.Update();
-                                                    list.Update();
-                                                }
-                                                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                                            }
-                                        }
-
-                                        SPQuery query = new SPQuery();
-                                        query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
-
-                                        li = null;
-
-                                        foreach (SPListItem l in list.GetItems(query))
-                                        {
-                                            li = l;
-                                            l["Title"] = txtTitle.Text;
-                                            l.SystemUpdate();
-                                            break;
-                                        }
-
-                                        if (li == null)
-                                        {
-                                            li = list.Items.Add();
-                                            li["Title"] = txtTitle.Text;
-                                            li.Update();
-                                        }
-
-                                        retURL = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&rnd=" + Guid.NewGuid();
-
-                                        //Response.Redirect(listUrl + "?ID=" + workspaceID + "&Source=" + retURL);
-                                        //Response.Redirect(retURL);
-                                        Microsoft.SharePoint.Utilities.SPUtility.Redirect(retURL, Microsoft.SharePoint.Utilities.SPRedirectFlags.Default, HttpContext.Current);
-                                    }
-                                    else
-                                    {
-                                        label1.Text = "Error: The list " + curList.Title + " does not exist";
-                                        Panel2.Visible = true;
-                                    }
-                                }
-                                //w.Close();
-
                             }
                             else
                             {
@@ -413,10 +181,48 @@ namespace EPMLiveCore
                 }
             }
         }
-        public bool IsAlphaNumeric(String strToCheck)
+
+        private string UpdateList(SPWeb web, SPList currentList, Guid workspaceId)
         {
-            Regex objAlphaNumericPattern = new Regex(@"[^a-zA-Z0-9\s]");
-            return !objAlphaNumericPattern.IsMatch(strToCheck);
+            var result = string.Empty;
+            try
+            {
+                using (var webWorkspace = web.Webs[workspaceId])
+                {
+                    SPList list = null;
+                    try
+                    {
+                        list = webWorkspace.Lists[currentList.Title];
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+
+                    if (list != null)
+                    {
+                        var listItem = list.Items.Add();
+                        listItem["Title"] = txtTitle.Text;
+                        listItem.Update();
+
+                        result = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + listItem.ID;
+                    }
+                    else
+                    {
+                        label1.Text = "Error: The list " + currentList.Title + " does not exist";
+                        Panel2.Visible = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                label1.Text = "Error: " + ex.Message;
+                Panel2.Visible = true;
+
+                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+
+            return result;
         }
     }
 }

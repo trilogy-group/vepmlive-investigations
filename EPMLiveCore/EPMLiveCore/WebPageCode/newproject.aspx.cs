@@ -109,127 +109,43 @@ namespace EPMLiveCore
 
         protected void BtnOK_Click(object sender, EventArgs e)
         {
-            string wType = Request["hdnWorkspaceType"];
-            string selectedWorkspace = Request["hdnSelectedWorkspace"];
-            string retURL = "";
-            if (wType == "Existing")
+            var workspaceType = Request["hdnWorkspaceType"];
+            var selectedWorkspace = Request["hdnSelectedWorkspace"];
+
+            if (workspaceType == "Existing")
             {
-                SPWeb web = SPContext.Current.Web;
-
-                try
+                var redirectUrl = CreateProjectInExistingWorkspace(selectedWorkspace);
+                if (!string.IsNullOrEmpty(redirectUrl))
                 {
-                    string url = selectedWorkspace.Replace(web.ServerRelativeUrl, "");
-                    if(url != "")
-                        url = url.Substring(1);
-
-                    if(url != "")
-                    {  
-                        using(SPWeb w = web.Webs[url])
-                        {
-                            retURL = createProject(w);
-                        }
-                    }
-                    else
-                        retURL = createProject(web);
+                    Response.Redirect(redirectUrl);
                 }
-                catch(Exception ex)
-                {
-                    label1.Text = "Error: " + ex.Message;
-                    Panel2.Visible = true;
-                }
-
-                //web.Close();
-                if(retURL != "")
-                    Response.Redirect(retURL);
             }
             else
             {
                 try
                 {
-                    SPWeb mySite = SPContext.Current.Web;
-
                     pnlTitle.Visible = false;
                     pnlURL.Visible = false;
                     pnlURLBad.Visible = false;
 
-                    string url = txtURL.Text;
-                    string title = txtTitle.Text;
-                    string group = DdlGroup.SelectedItem.Value;
+                    var url = txtURL.Text;
+                    var title = txtTitle.Text;
+                    var group = DdlGroup.SelectedItem.Value;
 
                     if (requiredOK)
                     {
-                        if (IsAlphaNumeric(title))
+                        if (CoreFunctions.IsAlphaNumeric(title))
                         {
-                            string err = CoreFunctions.createSite(title, url, group, mySite.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, mySite);
+                            var web = SPContext.Current.Web;
+                            var err = CoreFunctions.createSite(title, url, group, web.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, web);
 
                             if (err.Substring(0, 1) == "0")
                             {
-                                SPListItem li = null;
-                                try
+                                var redirectUrl = CoreFunctions.CreateProjectInNewWorkspace(web, "Project Center", baseURL + url, title);
+                                if (!string.IsNullOrEmpty(redirectUrl))
                                 {
-                                    SPList workspacelist = mySite.Lists["Workspace Center"];
-                                    li = workspacelist.Items.Add();
-                                    li["URL"] = baseURL + url + ", " + title;
-                                    li.Update();
-
-                                    int workspaceID = li.ID;
-                                    string listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
+                                    Response.Redirect(redirectUrl);
                                 }
-                                catch { }
-                                using (SPWeb w = mySite.Webs[url])
-                                {
-                                    SPList list = w.Lists["Project Center"];
-
-                                    SPField f = null;
-                                    try
-                                    {
-                                        f = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
-                                    }
-                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                                    if (f == null)
-                                    {
-                                        if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
-                                        {
-                                            try
-                                            {
-                                                list.ParentWeb.AllowUnsafeUpdates = true;
-                                                f = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
-                                                f.Hidden = true;
-                                                list.Fields.Add(f);
-                                                f.Update();
-                                                list.Update();
-                                            }
-                                            catch(Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                                        }
-                                    }
-
-                                    SPQuery query = new SPQuery();
-                                    query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
-
-                                    li = null;
-
-                                    foreach (SPListItem l in list.GetItems(query))
-                                    {
-                                        li = l;
-                                        l["Title"] = txtTitle.Text;
-                                        l.SystemUpdate();
-                                        break;
-                                    }
-
-                                    if (li == null)
-                                    {
-                                        li = list.Items.Add();
-                                        li["Title"] = txtTitle.Text;
-                                        li.Update();
-                                    }
-                                    //w.Close();
-
-                                    retURL = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID;
-
-                                    //Response.Redirect(listUrl + "?ID=" + workspaceID + "&Source=" + retURL);
-                                    
-                                }
-                                Response.Redirect(retURL);
                             }
                             else
                             {
@@ -251,10 +167,39 @@ namespace EPMLiveCore
                 }
             }
         }
-        public bool IsAlphaNumeric(String strToCheck)
+
+        private string CreateProjectInExistingWorkspace(string selectedWorkspace)
         {
-            Regex objAlphaNumericPattern = new Regex(@"[^a-zA-Z0-9\s]");
-            return !objAlphaNumericPattern.IsMatch(strToCheck);
+            var redirectUrl = string.Empty;
+            var web = SPContext.Current.Web;
+
+            try
+            {
+                var url = selectedWorkspace.Replace(web.ServerRelativeUrl, string.Empty);
+                if (url != string.Empty)
+                {
+                    url = url.Substring(1);
+                }
+
+                if (url != string.Empty)
+                {
+                    using (SPWeb webAtUrl = web.Webs[url])
+                    {
+                        redirectUrl = createProject(webAtUrl);
+                    }
+                }
+                else
+                {
+                    redirectUrl = createProject(web);
+                }
+            }
+            catch (Exception ex)
+            {
+                label1.Text = "Error: " + ex.Message;
+                Panel2.Visible = true;
+            }
+
+            return redirectUrl;
         }
     }
 }

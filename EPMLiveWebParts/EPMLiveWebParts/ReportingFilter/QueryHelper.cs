@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using EPMLiveCore;
+using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveWebParts.ReportFiltering.DomainModel;
 using Microsoft.SharePoint;
-using ReportFiltering;
 using ReportFiltering.DomainServices;
 
 namespace EPMLiveWebParts
@@ -15,8 +15,9 @@ namespace EPMLiveWebParts
         public static List<string> GetFilteredTitles(SPWeb web, ReportFilterSelection fieldSelection)
         {
             var list = web.Lists[fieldSelection.ListToFilterOn];
+            var applyNonArchivedFilter = list.Fields.ContainsField(ProjectArchiverService.ArchivedColumn);
 
-            var query = new SPQuery { Query = ReportFilterQueryService.GetQueryForFiltering(fieldSelection) };
+            var query = new SPQuery { Query = ReportFilterQueryService.GetQueryForFiltering(fieldSelection, applyNonArchivedFilter) };
 
             if (fieldSelection.HasErrors) return null;
 

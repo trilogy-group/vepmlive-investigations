@@ -20,6 +20,8 @@ using Microsoft.SharePoint.Utilities;
 
 using System.DirectoryServices;
 
+using EPMLiveCore.API.ProjectDiscountRate;
+
 namespace WorkEnginePPM
 {
 
@@ -113,38 +115,14 @@ namespace WorkEnginePPM
                 username = "sharepoint\\system";
             else
                 username = web.CurrentUser.LoginName;
-            if (username.ToLower() == "sharepoint\\system")
-            {
-                username = web.Site.WebApplication.ApplicationPool.Username;
-            }
-            else
-            {
-                if (username.Contains("\\"))
-                    username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
-                else
-                    username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
-            }
 
-            return username;
+            return GetCleanUsername(web, username);
         }
 
         public static string GetCleanUsername(SPWeb web, string username)
         {
-            if (username.ToLower() == "sharepoint\\system")
-            {
-                username = web.Site.WebApplication.ApplicationPool.Username;
-            }
-            else
-            {
-                if (username.Contains("\\"))
-                    username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
-                else
-                    username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
-            }
-
-            return username;
+            return EPMLiveCore.CoreFunctions.GetCleanUserNameWithDomain(web, username);
         }
-
 
         private static string getDomain()
         {
@@ -479,9 +457,18 @@ namespace WorkEnginePPM
         public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web, DataTable dtResources = null)
         {
             SPList list = li.ParentList;
+            var discountRateXml = string.Empty;
 
-            string xml = "<Item EXTID=\"" + list.ParentWeb.ID + "." + list.ID + "." + li.ID + "\" ListID=\"" + li.ParentList.Title + "\">";
-            string title = li.Title;
+            if (li.Fields.ContainsField(ProjectDiscountRateService.ProjectDiscountRateColumn))
+            {
+                var oldRate = li[ProjectDiscountRateService.ProjectDiscountRateColumn]?.ToString() ?? "0";
+                var newRate = properties[ProjectDiscountRateService.ProjectDiscountRateColumn]?.ToString() ?? oldRate;
+                discountRateXml = $"DiscountRate=\"{newRate}\" DiscountRatePreviousValue=\"{oldRate}\"";
+            }
+
+            var xml = "<Item EXTID=\"" + list.ParentWeb.ID + "." + list.ID + "." + li.ID + "\" ListID=\""
+                         + li.ParentList.Title + "\" " + discountRateXml + ">";
+            var title = li.Title;
             try
             {
                 if (properties["Title"] != null)

@@ -251,7 +251,7 @@ namespace EPMLiveCore
 
                     if (url != string.Empty)
                     {
-                        using (SPWeb newWeb = web.Webs[url])
+                        using (var newWeb = web.Webs[url])
                         {
                             retURL = createProject(newWeb, curList);
                         }
@@ -275,23 +275,31 @@ namespace EPMLiveCore
                     pnlURL.Visible = false;
                     pnlURLBad.Visible = false;
 
-                    var url = txtURL.Text;
-                    var title = txtTitle.Text;
-                    var group = DdlGroup.SelectedItem.Value;
+                    var inputUrl = txtURL.Text;
+                    var inputTitle = txtTitle.Text;
+                    var inputGroup = DdlGroup.SelectedItem.Value;
 
                     if (requiredOK)
                     {
-                        if (IsAlphaNumeric(title))
+                        if (IsAlphaNumeric(inputTitle))
                         {
-                            var err = CoreFunctions.createSite(title, url, group, SPContext.Current.Web.CurrentUser.LoginName, rdoUnique.Checked, rdoTopLinkYes.Checked, web);
-                            if (err.Substring(0, 1) == "0")
+                            var errorCode = CoreFunctions.createSite(
+                                inputTitle, 
+                                inputUrl, 
+                                inputGroup, 
+                                SPContext.Current.Web.CurrentUser.LoginName, 
+                                rdoUnique.Checked, 
+                                rdoTopLinkYes.Checked, 
+                                web);
+
+                            if (errorCode[0] == '0')
                             {
                                 SPListItem li = null;
                                 try
                                 {
                                     var workspacelist = web.Lists["Workspace Center"];
                                     li = workspacelist.Items.Add();
-                                    li["URL"] = baseURL + url + ", " + title;
+                                    li["URL"] = baseURL + inputUrl + ", " + inputTitle;
                                     li.Update();
 
                                     int workspaceID = li.ID;
@@ -302,14 +310,14 @@ namespace EPMLiveCore
                                     WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.LayoutPage, TraceSeverity.VerboseEx, ex.ToString());
                                 }
 
-                                using (var newWeb = web.Webs[url])
+                                using (var newWeb = web.Webs[inputUrl])
                                 {
                                     retURL = createProject(newWeb, curList);
                                 }
                             }
                             else
                             {
-                                label1.Text = err;
+                                label1.Text = errorCode;
                                 Panel2.Visible = true;
                             }
                         }
@@ -319,7 +327,6 @@ namespace EPMLiveCore
                             Panel2.Visible = true;
                         }
                     }
-                    
                 }
                 catch (Exception ex)
                 {

@@ -6,7 +6,7 @@ using PortfolioEngineCore;
 
 namespace ModelDataCache
 {
-    public class BottomGrid : GridBase
+    public class BottomGrid : ModelDataCacheGridBase
     {
         public readonly bool ApplyTarget;
         public readonly IList<DetailRowData> TargetsSorted;
@@ -40,9 +40,9 @@ namespace ModelDataCache
             ShowRemaining = showRemaining;
         }
         
-        protected override void InitializeGridLayout(RenderingTypes renderingType)
+        protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
@@ -65,7 +65,8 @@ namespace ModelDataCache
 
             xCfg.CreateIntAttr("FocusWholeRow", 1);
 
-            InitializeGridLayoutDefinition();
+            var m_xDef = Constructor.CreateSubStruct("Def");
+            InitializeGridLayoutDefinition("R", m_xDef);
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");
@@ -84,18 +85,17 @@ namespace ModelDataCache
             }
 
             var categoryColumn = InitializeGridLayoutCategoryColumn(xLeftCols);
-
             useCols |= AddSortFieldsToColumns(xLeftCols, xCols, ref categoryColumn);
         }
 
-        protected override void InitializeGridData(RenderingTypes renderingType)
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
-            if (renderingType == RenderingTypes.None)
+            if (renderingType == GridRenderingTypes.None)
             {
                 throw new ArgumentException("renderingType");
             }
 
-            if (renderingType == RenderingTypes.Data)
+            if (renderingType == GridRenderingTypes.Data)
             {
                 var xCfg = Constructor.CreateSubStruct("Cfg");
             }
@@ -285,7 +285,7 @@ namespace ModelDataCache
             return result;
         }
 
-        protected override CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
+        protected CStruct InitializeGridLayoutCategoryColumn(CStruct xLeftCols)
         {
             var categoryColumn = xLeftCols.CreateSubStruct("C");
 

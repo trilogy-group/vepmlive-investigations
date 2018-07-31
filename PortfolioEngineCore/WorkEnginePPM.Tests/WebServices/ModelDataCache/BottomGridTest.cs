@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Global.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ModelDataCache;
 using ModelDataCache.Fakes;
 using PortfolioEngineCore.Fakes;
 using WorkEnginePPM.Tests.TestDoubles;
+using WorkEnginePPM.Tests.TestDoubles.ModelDataCache;
 
 namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
 {
@@ -204,7 +206,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var gridBase = CreateGridBase();
             var fieldIdsUsed = new HashSet<int>();
             
-            ShimGridBase.AllInstances.TryGetDataFromDetailRowDataFieldDetailRowDataInt32StringOut = (GridBase grid, DetailRowData detailRow, int fieldId, out string value) =>
+            ShimModelDataCacheGridBase.AllInstances.TryGetDataFromDetailRowDataFieldDetailRowDataInt32StringOut = (ModelDataCacheGridBase grid, DetailRowData detailRow, int fieldId, out string value) =>
             {
                 value = null;
                 fieldIdsUsed.Add(fieldId);
@@ -242,7 +244,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            Action action = () => grid.InitializeGridLayout(GridBase.RenderingTypes.None);
+            Action action = () => grid.InitializeGridLayout(GridRenderingTypes.None);
 
             // Assert
             try
@@ -264,7 +266,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual(0, _intAttributesCreated["Toolbar"]["Visible"]);
@@ -278,7 +280,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["MaxHeight"]);
@@ -317,7 +319,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual("R", _stringAttributesCreated["D"]["Name"]);
@@ -336,7 +338,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridLayout(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridLayout(GridRenderingTypes.Combined);
 
             // Assert
             Assert.AreEqual("Grouping", _stringAttributesCreated["Cfg"]["MainCol"]);
@@ -355,7 +357,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            Action action = () => grid.InitializeGridData(GridBase.RenderingTypes.None);
+            Action action = () => grid.InitializeGridData(GridRenderingTypes.None);
 
             // Assert
             try
@@ -377,7 +379,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridData(GridBase.RenderingTypes.Combined);
+            grid.InitializeGridData(GridRenderingTypes.Combined);
 
             // Assert
             Assert.IsTrue(_substructsCreated.Contains("Body"));
@@ -398,7 +400,7 @@ namespace WorkEnginePPM.Tests.WebServices.ModelDataCache
             var grid = CreateGridBase();
 
             // Act
-            grid.InitializeGridData(GridBase.RenderingTypes.Data);
+            grid.InitializeGridData(GridRenderingTypes.Data);
 
             // Assert
             Assert.IsTrue(_substructsCreated.Contains("Cfg"));

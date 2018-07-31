@@ -33,6 +33,7 @@ namespace EPMLiveCore.Tests.ReportHelper
         private string _source;
         private string _eventMessage;
         private Exception _exception;
+        private SqlConnection _sqlConnection;
         private PrivateObject _privateObject;
 
         [TestMethod]
@@ -312,6 +313,162 @@ namespace EPMLiveCore.Tests.ReportHelper
                 Assert.AreEqual(eventMessageResult, _eventMessage);
                 Assert.AreEqual(entryTypeResult, EventLogEntryType.Error);
                 Assert.AreEqual(eventIdResult, _eventId);
+            };
+        }
+
+        [TestMethod]
+        public void WriteToFile_WhenPathIsNotNullOrWhiteSpace_WriteTextFile()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+                SetupParameters();
+
+                var guid = Guid.NewGuid();
+                var epmData = new EPMData(guid);
+                _privateObject = new PrivateObject(epmData);
+
+                var testResult = string.Empty;
+                ShimEPMData.AllInstances.WriteToFileString = (path, text) => { testResult = text; };
+
+                // Act
+                epmData.WriteToFile(DummyCommand);
+
+                // Assert
+                Assert.AreEqual(testResult, DummyCommand);
+            }
+        }
+
+        [TestMethod]
+        public void TryToConnect_WhenConnectionIsSuccess_ReturnsTrue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+                SetupParameters();
+
+                var guid = Guid.NewGuid();
+                var epmData = new EPMData(guid);
+                _privateObject = new PrivateObject(epmData);
+
+                ShimSqlConnection.ConstructorString = (connection, s) => new ShimSqlConnection();
+                ShimSqlConnection.AllInstances.Open = connection => { };
+                ShimSqlConnection.AllInstances.Close = connection => { };
+                
+                // Act
+                var result = EPMData.TryToConnect(DummyString);
+
+                // Assert
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void SAccountInfo_WhenConnectionIsSuccess_ReturnsNull()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+                SetupParameters();
+
+                var guid = Guid.NewGuid();
+                var epmData = new EPMData(guid);
+                _privateObject = new PrivateObject(epmData);
+
+                var siteId = Guid.NewGuid();
+                var webAppId = Guid.NewGuid();
+
+                ShimCoreFunctions.getConnectionStringGuid = guid1 => DummyString;
+                ShimSqlConnection.ConstructorString = (connection, s) => new ShimSqlConnection();
+                ShimSqlConnection.AllInstances.Open = connection => { };
+                ShimSqlConnection.AllInstances.Close = connection => { };
+                ShimSqlCommand.ConstructorStringSqlConnection = (command, s, arg3) => new ShimSqlCommand();
+
+                // Act
+                var result = EPMData.SAccountInfo(siteId, webAppId);
+
+                // Assert
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Encrypt_ShouldEncryptPlainText_ReturnsString()
+        {
+            // Arrange
+            const string resultKey = "RbOehAehsS7MYbKpbCbvepBVjtlsFbNU";
+            var text = "This is a test string";
+
+            // Act
+            var encryptedString = EPMData.Encrypt(text);
+
+            // Assert
+            Assert.AreEqual(resultKey, encryptedString);
+        }
+
+        [TestMethod]
+        public void Decrypt_ShouldDecryptEncryptedString_ReturnsString()
+        {
+            // Arrange
+            const string encryptedKey = "RbOehAehsS7MYbKpbCbvepBVjtlsFbNU";
+            const string resultString = "This is a test string";
+
+            // Act
+            var decryptedString = EPMData.Decrypt(encryptedKey);
+
+            // Assert
+            Assert.AreEqual(resultString, decryptedString);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TableExists_WhenSqlConnectionIsNull_ThrowsException()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+
+                var epmData = new EPMData(Guid.NewGuid());
+                _privateObject = new PrivateObject(epmData);
+                _sqlConnection = null;
+
+                // Act
+                epmData.TableExists(DummyName, _sqlConnection);
+
+                // Assert - Expects exception
+            };
+        }
+
+        [TestMethod]
+        public void TableExists_WhenSqlConnectionIsNotNull_ReturnsTrue()
+        {
+            using (ShimsContext.Create())
+            {
+                // Arrange
+                FakesForSpSecurity();
+                FakesForConstructor();
+
+                var epmData = new EPMData(Guid.NewGuid());
+                _privateObject = new PrivateObject(epmData);
+                _sqlConnection = new SqlConnection();
+
+                ShimSqlCommand.ConstructorStringSqlConnection = (container, command, connString) => { };
+
+                ShimSqlCommand.AllInstances.ExecuteScalar = command => 1;
+
+                // Act
+                var result = epmData.TableExists(DummyName, _sqlConnection);
+
+                // Assert
+                Assert.IsTrue(result);
             };
         }
 
