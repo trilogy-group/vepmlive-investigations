@@ -230,31 +230,30 @@ namespace EPMLiveIntegrationService
             return ui;
         }
 
-        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection cn)
+        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection connection)
         {
-            Guid intlistid = Guid.Empty;
-            int attempts = 0;
+            var attempts = 0;
             dsIntegration = new DataSet();
-            string ip = HttpContext.Current.Request.UserHostAddress;
+            var ip = HttpContext.Current.Request.UserHostAddress;
 
-            using (var cmd = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", cn))
+            using (var command = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", connection))
             {
-                cmd.Parameters.AddWithValue("@ip", ip);
-                SqlDataReader dr = cmd.ExecuteReader();
-                dr.Read();
-                attempts = dr.GetInt32(0);
-                dr.Close();
+                command.Parameters.AddWithValue("@ip", ip);
+                var dataReader = command.ExecuteReader();
+                dataReader.Read();
+                attempts = dataReader.GetInt32(0);
+                dataReader.Close();
             }
 
             if (attempts < 5)
             {
-                using (var cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn))
+                using (var command = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", connection))
                 {
-                    cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
+                    command.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                    using (var da = new SqlDataAdapter(cmd))
+                    using (var adapter = new SqlDataAdapter(command))
                     {
-                        da.Fill(dsIntegration);
+                        adapter.Fill(dsIntegration);
                     }
                 }
 
@@ -263,28 +262,28 @@ namespace EPMLiveIntegrationService
                     ret = "";
                     return true;
                 }
-                else
+
+                ret = "<Error>Invalid Key</Error>";
+
+                var commmand = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", connection);
+                commmand.Parameters.AddWithValue("@ip", ip);
+                commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+
+                var found = false;
+
+                var reader = commmand.ExecuteReader();
+                if (reader.Read())
                 {
-                    ret = "<Error>Invalid Key</Error>";
+                    found = true;
+                }
+                reader.Close();
 
-                    var cmd = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", cn);
-                    cmd.Parameters.AddWithValue("@ip", ip);
-                    cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-
-                    bool found = false;
-
-                    var dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                        found = true;
-                    dr.Close();
-
-                    if (!found)
-                    {
-                        cmd = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", cn);
-                        cmd.Parameters.AddWithValue("@ip", ip);
-                        cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-                        cmd.ExecuteNonQuery();
-                    }
+                if (!found)
+                {
+                    commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection);
+                    commmand.Parameters.AddWithValue("@ip", ip);
+                    commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+                    commmand.ExecuteNonQuery();
                 }
             }
             else
