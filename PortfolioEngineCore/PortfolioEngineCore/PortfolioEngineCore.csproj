@@ -132,6 +132,7 @@
     <Compile Include="Infrastructure\Fields\PFEFieldType.cs" />
     <Compile Include="Infrastructure\Fields\TextField.cs" />
     <Compile Include="Infrastructure\IRepository.cs" />
+    <Compile Include="Interfaces\CostDataValues\IPeriodData.cs" />
     <Compile Include="Interfaces\CostDataValues\ICustomFieldData.cs" />
     <Compile Include="Interfaces\CostDataValues\IDataItem.cs" />
     <Compile Include="Interfaces\CostDataValues\IListItemData.cs" />
