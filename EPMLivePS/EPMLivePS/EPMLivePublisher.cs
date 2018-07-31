@@ -1286,6 +1286,7 @@ namespace EPMLiveEnterprise
 
             return ret;
         }
+
         [WebMethod]
         public string[] getAllProjectEnterpriseFieldList()
         {
@@ -1326,12 +1327,18 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllProjectEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllProjectEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
             return ret;
         }
+
         [WebMethod]
         public bool publish(Guid projectUid, int pubType, string url)
         {
