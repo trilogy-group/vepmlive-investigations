@@ -371,6 +371,11 @@ namespace PortfolioEngineCore.Analyzers
 
         protected void CaptureBurnRates(IEnumerable<IPeriodData> periods)
         {
+            if (periods == null)
+            {
+                throw new ArgumentNullException("periods");
+            }
+
             int i = 0;
             int periodOverlap = 0;
 
