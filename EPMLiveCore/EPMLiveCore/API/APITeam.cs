@@ -162,12 +162,17 @@ namespace EPMLiveCore.API
                     query = filterfield + " like '%" + filtervalue + "%'";
             }
 
-            SqlCommand cmd = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn);
-            bool borderby = false;
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-                borderby = true;
-            dr.Close();
+            var isOrderingEnabled = false;
+            using (var sqlCommand = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn))
+            {
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        isOrderingEnabled = true;
+                    }
+                }
+            }
 
             string filterOnID = "";
             string iDs = "";
@@ -236,35 +241,48 @@ namespace EPMLiveCore.API
                 }
             }
 
-            cmd = new SqlCommand("spGetReportListData", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@webid", web.ID);
-            cmd.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
-            cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-            cmd.Parameters.AddWithValue("@rollup", false);
-            cmd.Parameters.AddWithValue("@list", "Resourcepool");
-            cmd.Parameters.AddWithValue("@query", query != "" ? query : filterOnID);
-            if (borderby)
-                cmd.Parameters.AddWithValue("@orderby", "Title");
+            var reportListDataSet = new DataSet();
+            using (var sqlCommand = new SqlCommand("spGetReportListData", cn))
+            {
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                sqlCommand.Parameters.AddWithValue("@webid", web.ID);
+                sqlCommand.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
+                sqlCommand.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
+                sqlCommand.Parameters.AddWithValue("@rollup", false);
+                sqlCommand.Parameters.AddWithValue("@list", "Resourcepool");
+                sqlCommand.Parameters.AddWithValue("@query", !string.IsNullOrEmpty(query) ? query : filterOnID);
 
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
+                if (isOrderingEnabled)
+                {
+                    sqlCommand.Parameters.AddWithValue("@orderby", "Title");
+                }
 
-            DataSet dsUserInfo = new DataSet();
+                using (var dataAdapter = new SqlDataAdapter(sqlCommand))
+                {
+                    dataAdapter.Fill(reportListDataSet);
+                }
+            }
+
+            var dsUserInfo = new DataSet();
             DataTable dtUserInfo = null;
-            cmd = new SqlCommand("SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid", cn);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@webid", web.ID);
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsUserInfo);
+            using (var sqlCommand = new SqlCommand("SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid", cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                sqlCommand.Parameters.AddWithValue("@webid", web.ID);
+
+                using (var dataAdapter = new SqlDataAdapter(sqlCommand))
+                {
+                    dataAdapter.Fill(dsUserInfo);
+                }
+            }
+
             if (dsUserInfo.Tables.Count > 0)
             {
                 dtUserInfo = dsUserInfo.Tables[0];
             }
 
-            foreach (DataRow dRow in ds.Tables[0].Rows)
+            foreach (DataRow dRow in reportListDataSet.Tables[0].Rows)
             {
                 ArrayList item = new ArrayList();
 
