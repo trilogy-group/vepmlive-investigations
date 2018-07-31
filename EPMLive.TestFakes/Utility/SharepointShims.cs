@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 
 namespace EPMLive.TestFakes.Utility
@@ -14,6 +15,7 @@ namespace EPMLive.TestFakes.Utility
         public ShimSPList ListShim { get; private set; }
         public ShimSPListCollection ListsShim { get; private set; }
         public ShimSPUser UserShim { get; private set; }
+        public ShimSPWebApplication ApplicationShim { get; private set; }
 
         public string ServerRelativeUrl { get; private set; }
         public string WorkspaceUrl { get; private set; }
@@ -26,11 +28,17 @@ namespace EPMLive.TestFakes.Utility
             ServerRelativeUrl = serverRelativeUrl;
             WorkspaceUrl = workspaceUrl;
 
+            ApplicationShim = InitializeSPApplicationShim();
             UserShim = new ShimSPUser();
             SiteShim = InitializeSPSiteShim();
             ListShim = InitializeSPListShim();
             ListsShim = InitializeSPListCollectionShim();
             WebShim = InitializeSPWebShim();
+        }
+
+        private ShimSPWebApplication InitializeSPApplicationShim()
+        {
+            return new ShimSPWebApplication();
         }
 
         public static SharepointShims ShimSharepointCalls()
@@ -43,10 +51,21 @@ namespace EPMLive.TestFakes.Utility
 
         private void InitializeStaticShims()
         {
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action =>
+            {
+                action();
+            };
+
             ShimSPContext.CurrentGet = () => new ShimSPContext
             {
                 WebGet = () => WebShim
             };
+
+            ShimSPSite.ConstructorGuid = (instance, guid) => new ShimSPSite(SiteShim);
+            ShimSPSite.ConstructorString = (instance, url) => new ShimSPSite(SiteShim);
+
+            ShimSPSite.AllInstances.OpenWeb = instance => WebShim;
+            ShimSPSite.AllInstances.OpenWebGuid = (instance, webId) => WebShim;
         }
 
         private ShimSPWeb InitializeSPWebShim()

@@ -62,6 +62,11 @@ namespace EPMLiveCore.API.Tests
             _dataTable = new DataTable();
             _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
 
+            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) =>
+            {
+                return string.Empty;
+            };
+
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
         }
@@ -494,6 +499,7 @@ namespace EPMLiveCore.API.Tests
         public void GetResourcePool_EmptyXml_UsesDefaultValuesForFiltersAndColumns()
         {
             // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
 
             // Act
             var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
