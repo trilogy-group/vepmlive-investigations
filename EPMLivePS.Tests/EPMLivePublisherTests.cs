@@ -18,6 +18,7 @@ namespace EPMLivePS.Tests
     {
         private const string ProjectIdColumn = "Proj_ID";
         private const string ValidUrl = "http://epmlive.com";
+        private const string GetCustomFieldsMethod = "getCustomFields";
 
         private EPMLivePublisher _publisher;
         private PrivateObject _privateObject;
@@ -228,7 +229,7 @@ namespace EPMLivePS.Tests
 
             // Act
             var parameters = new object[] { string.Empty, 0, string.Empty };
-            var result = _privateObject.Invoke("getCustomFields", parameters) as CustomField[];
+            var result = _privateObject.Invoke(GetCustomFieldsMethod, parameters) as CustomField[];
 
             // Assert
             Assert.IsNotNull(result);
@@ -246,7 +247,7 @@ namespace EPMLivePS.Tests
 
             // Act
             var parameters = new object[] { string.Empty, 0, ValidUrl };
-            var result = _privateObject.Invoke("getCustomFields", parameters) as CustomField[];
+            var result = _privateObject.Invoke(GetCustomFieldsMethod, parameters) as CustomField[];
 
             // Assert
             Assert.IsTrue(_isConnectionOpenedCalled);
