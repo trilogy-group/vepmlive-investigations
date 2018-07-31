@@ -1359,7 +1359,6 @@ namespace EPMLiveEnterprise
                             {
                                 if (drPubCheck.Read())
                                 {
-                                    drPubCheck.Close();
                                     using (var updateCommand = new SqlCommand(
                                         "UPDATE publishercheck set " + 
                                         "checkbit=1,pubType=@pubType,weburl=@weburl,projectname=@projectname,percentcomplete=1,status=1,laststatusdate=getdate() " +
@@ -1375,7 +1374,6 @@ namespace EPMLiveEnterprise
                                 }
                                 else
                                 {
-                                    drPubCheck.Close();
                                     using (var insertCommand = new SqlCommand(
                                         "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) " + 
                                         "VALUES (@projectguid,1,@pubtype,@weburl,@projectname,1,1,GETDATE())", 
@@ -1389,7 +1387,6 @@ namespace EPMLiveEnterprise
                                     }
                                 }
                             }
-                            connection.Close();
                             bRet = true;
                         }
                     }
@@ -1431,10 +1428,8 @@ namespace EPMLiveEnterprise
                                             arrValidTemplates.Add(template);
                                         }
                                     }
-                                    dataReader.Close();
                                 }
                             }
-                            connection.Close();
                         }
                     }
                     catch (Exception ex1)
@@ -1489,11 +1484,8 @@ namespace EPMLiveEnterprise
                                 {
                                     returnValue = dataReader.GetString(0);
                                 }
-                                dataReader.Close();
                             }
                         }
-
-                        connection.Close();
                     }
                 });
             }

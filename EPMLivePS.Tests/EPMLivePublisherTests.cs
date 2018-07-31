@@ -22,6 +22,10 @@ namespace EPMLivePS.Tests
         private bool _isExecuteReaderCalled;
         private bool _isWriteEntryCalled;
         private bool _isExecuteNonQueryCalled;
+        private bool _isConnectionDisposeCalled;
+        private bool _isEventLogDisposeCalled;
+        private bool _isSqlCommandDisposeCalled;
+        private bool _isDataReaderDisposeCalled;
 
         [TestInitialize]
         public void Setup()
@@ -30,6 +34,11 @@ namespace EPMLivePS.Tests
             _isExecuteReaderCalled = false;
             _isWriteEntryCalled = false;
             _isExecuteNonQueryCalled = false;
+            _isConnectionDisposeCalled = false;
+            _isEventLogDisposeCalled = false;
+            _isSqlCommandDisposeCalled = false;
+            _isDataReaderDisposeCalled = false;
+
             _context = ShimsContext.Create();
             _publisher = new EPMLivePublisher();
         }
@@ -54,6 +63,7 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isExecuteReaderCalled);
             Assert.IsFalse(_isWriteEntryCalled);
             Assert.AreEqual(string.Empty, result);
+            AssertThatObjectsAreDisposed();
         }
 
         [TestMethod]
@@ -74,6 +84,7 @@ namespace EPMLivePS.Tests
             Assert.IsFalse(_isExecuteReaderCalled);
             Assert.IsTrue(_isWriteEntryCalled);
             Assert.AreEqual(string.Empty, result);
+            Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
         [TestMethod]
@@ -99,6 +110,7 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isConnectionOpenedCalled);
             Assert.IsTrue(_isExecuteReaderCalled);
             Assert.IsFalse(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
         }
 
         [TestMethod]
@@ -127,6 +139,7 @@ namespace EPMLivePS.Tests
             Assert.IsFalse(_isConnectionOpenedCalled);
             Assert.IsFalse(_isExecuteReaderCalled);
             Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
         [TestMethod]
@@ -144,6 +157,7 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isExecuteNonQueryCalled);
             Assert.IsFalse(_isWriteEntryCalled);
             Assert.IsTrue(result);
+            AssertThatObjectsAreDisposed();
         }
 
         [TestMethod]
@@ -165,6 +179,14 @@ namespace EPMLivePS.Tests
             Assert.IsFalse(_isExecuteNonQueryCalled);
             Assert.IsTrue(_isWriteEntryCalled);
             Assert.IsFalse(result);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        private void AssertThatObjectsAreDisposed()
+        {
+            Assert.IsTrue(_isConnectionDisposeCalled);
+            Assert.IsTrue(_isSqlCommandDisposeCalled);
+            Assert.IsTrue(_isDataReaderDisposeCalled);
         }
 
         private void SetupShims()
@@ -212,6 +234,22 @@ namespace EPMLivePS.Tests
             ShimProject.AllInstances.ReadProjectGuidDataStoreEnum = (_, __, ___) => new ShimProjectDataSet()
             {
                 ProjectGet = () => projectDataTable
+            };
+            ShimSqlConnection.AllInstances.DisposeBoolean = (_, __) =>
+            {
+                _isConnectionDisposeCalled = true;
+            };
+            ShimSqlDataReader.AllInstances.Close = _ =>
+            {
+                _isDataReaderDisposeCalled = true;
+            };
+            ShimSqlCommand.AllInstances.DisposeBoolean = (_, __) =>
+            {
+                _isSqlCommandDisposeCalled = true;
+            };
+            ShimEventLog.AllInstances.DisposeBoolean = (_, __) =>
+            {
+                _isEventLogDisposeCalled = true;
             };
         }
 
