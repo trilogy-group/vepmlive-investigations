@@ -831,6 +831,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>CostAnalyzer.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebServices\DataCacheBase.cs" />
     <Compile Include="WebServices\EditCalendar.asmx.cs">
       <DependentUpon>EditCalendar.asmx</DependentUpon>
       <SubType>Component</SubType>

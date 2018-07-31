@@ -421,5 +421,82 @@ namespace PortfolioEngineCore.Tests.Analyzers
             // Assert
             Assert.AreEqual(_testable.zValue[1] / _periodOverlapForDefaultValues, _testable.Burnrate[1]);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyToTargetData_DestinationNull_Throws()
+        {
+            // Arrange
+            clsTargetRowData destination = null;
+
+            // Act
+            _testable.CopyToTargetData(destination);
+
+            // Assert
+            // ExpectedException - ArgumentNullException
+        }
+
+        [TestMethod]
+        public void CopyToTargetData_DestinationNotNull_ShallowCoppiesFields()
+        {
+            // Arrange
+            var destination = new clsTargetRowData();
+            _testable.CT_ID = 1;
+            _testable.BC_UID = 2;
+            _testable.BC_ROLE_UID = 3;
+            _testable.BC_SEQ = 4;
+            _testable.MC_Val = "5";
+            _testable.CAT_UID = 6;
+            _testable.CT_Name = "6-1";
+            _testable.Cat_Name = "6-2";
+            _testable.Role_Name = "7";
+            _testable.MC_Name = "5-1";
+            _testable.FullCatName = "6-3";
+            _testable.OCVal = new[] { 1, 2, 3};
+            _testable.Text_OCVal = new[] { "11", "12", "13" };
+            _testable.TXVal = new[] { "21", "22", "23" };
+
+            // Act
+            _testable.CopyToTargetData(destination);
+
+            // Assert
+            Assert.AreEqual(_testable.CT_ID, destination.CT_ID);
+            Assert.AreEqual(_testable.BC_UID, destination.BC_UID);
+            Assert.AreEqual(_testable.BC_ROLE_UID, destination.BC_ROLE_UID);
+            Assert.AreEqual(_testable.BC_SEQ, destination.BC_SEQ);
+            Assert.AreEqual(_testable.MC_Val, destination.MC_Val);
+            Assert.AreEqual(_testable.CAT_UID, destination.CAT_UID);
+            Assert.AreEqual(_testable.CT_Name, destination.CT_Name);
+            Assert.AreEqual(_testable.Cat_Name, destination.Cat_Name);
+            Assert.AreEqual(_testable.Role_Name, destination.Role_Name);
+            Assert.AreEqual(_testable.MC_Name, destination.MC_Name);
+            Assert.AreEqual(_testable.FullCatName, destination.FullCatName);
+            Assert.AreEqual(_testable.CC_Name, destination.CC_Name);
+            Assert.AreEqual(_testable.FullCCName, destination.FullCCName);
+            Assert.AreEqual(false, destination.bGroupRow);
+            Assert.AreEqual(string.Empty, destination.Grouping);
+            Assert.AreEqual(_testable.OCVal, destination.OCVal);
+            Assert.AreEqual(_testable.Text_OCVal, destination.Text_OCVal);
+            Assert.AreEqual(_testable.TXVal, destination.TXVal);
+        }
+
+
+        [TestMethod]
+        public void CopyToTargetData_DestinationNotNull_DeepCoppiesFields()
+        {
+            // Arrange
+            var destination = new clsTargetRowData();
+            _testable.zCost[0] = 18;
+            _testable.zValue[1] = 24;
+            _testable.zFTE[1] = 11;
+
+            // Act
+            _testable.CopyToTargetData(destination);
+
+            // Assert
+            Assert.AreNotSame(_testable.zCost, destination.zCost);
+            Assert.AreNotSame(_testable.zValue, destination.zValue);
+            Assert.AreNotSame(_testable.zFTE, destination.zFTE);
+        }
     }
 }
