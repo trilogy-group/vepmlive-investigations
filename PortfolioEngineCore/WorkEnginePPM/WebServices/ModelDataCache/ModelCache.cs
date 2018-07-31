@@ -10,7 +10,7 @@ using WorkEnginePPM.WebServices.ModelDataCache;
 namespace ModelDataCache
 {
     [Serializable()]
-    public class ModelCache
+    public class ModelCache : DataCacheBase<DataItem, CustomFieldData, ListItemData>
     {
         private const int EPK_FTYPE_DATE = 1;
         private const int EPK_FTYPE_INTEGER = 2;
@@ -100,8 +100,8 @@ namespace ModelDataCache
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private CustomFieldData[] m_cust_ocf = null;
-        private Dictionary<int, ListItemData>[] m_cust_lk = null;
-        private Dictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
+        private IDictionary<int, ListItemData>[] m_cust_lk = null;
+        private IDictionary<int, DataItem>[] m_filter_sel = new Dictionary<int, DataItem>[31];
         private bool m_allow_grouping = false;
         private bool m_grouping_enabled = true;
         private List<ListItemData> m_CT_List = null;
@@ -5875,206 +5875,12 @@ namespace ModelDataCache
 
         private string FormatExtraDisplay(string sIn, int lt)
         {
-            DateTime dt;
-            int l;
-            double d;
-            DataItem oi;
-
-
-            switch (lt)
-            {
-                case 1:
-                    dt = DateTime.MinValue;
-
-                    try
-                    {
-                        dt = DateTime.ParseExact(sIn, "yyyyMMdd", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        if (dt == DateTime.MinValue)
-                            dt = DateTime.ParseExact(sIn, "yyyyMMddHHmm", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    if (dt > DateTime.MinValue)
-                        return dt.ToString("MM/dd/yyyy");
-
-                    return "";
-
-                case 2:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-
-
-                    if (l != 0)
-                        return l.ToString();
-
-                    return "";
-
-
-                case 3:
-
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    if (d != 0)
-                        return d.ToString();
-
-                    return "";
-
-                case 11:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (l != 0)
-                        return l.ToString("0%");
-
-                    return "";
-
-                case 13:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    return (l == 0 ? "No" : "Yes");
-
-                case 6:
-                case 9:
-                case 19:
-                    return sIn;
-
-
-                case 8:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    if (d != 0)
-                        return d.ToString("$#,##0.00");
-
-                    return "";
-
-                case 20:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    return FormatWork(d);
-
-                case 23:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    return FormatDuration(d);
-
-                case 4:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_codes.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 7:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_reses.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 9911:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_stages.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-            }
-
-            return "";
+            return FormatExtraDisplay(
+                sIn,
+                lt,
+                m_codes,
+                m_reses,
+                m_stages);
         }
 
         private string FormatWork(double Hours)
@@ -6795,62 +6601,7 @@ namespace ModelDataCache
 
 
         }
-
-
-
-        private string BuildCustFieldJSon(CustomFieldData oc, int index, int max)
-        {
-            ListItemData ce, ne, initial;
-            string sRet = "";
-
-            if (max < 0)
-                return "";
-
-            initial = oc.ListItems.ElementAt(index).Value;
-
-            for (int i = index; i <= max; i++)
-            {
-
-                ce = oc.ListItems.ElementAt(i).Value;
-
-                if (initial.Level == ce.Level)
-                {
-
-                    if (sRet != "")
-                        sRet = sRet + ",";
-
-                    if (oc.UseFullName == 1)
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
-                    else
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
-
-
-                    if (i != max)
-                    {
-                        ne = oc.ListItems.ElementAt(i + 1).Value;
-
-                        if (ne.Level > ce.Level)
-                        {
-                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
-                            //"{Items:[{Name:'Name1',Text:'Text1',Value:'Value1'},{Name:'Level2',Expanded:-1,Level:1,Items:[ {Name:'Name1.1',Text:'Text1.1',Value:'Value1.1'}, {Name:'Name1.2',Text:'Text1.2',Value:'Value1.2'}]}]}"
-
-                        }
-                        else if (ne.Level < ce.Level)
-                            return sRet;
-
-                    }
-                }
-                //else if (index != 0)
-                //    return sRet;
-            }
-
-
-            return sRet;
-
-
-
-        }
-
+        
         public void RatesAndCategory(ref CSRatesAndCategory rdata)
         {
             // targets do not have named rates Yet!
@@ -7088,7 +6839,7 @@ namespace ModelDataCache
                 foreach (DetailRowData oDet in m_editTargetList)
                 {
                     targetData.targetRows[cnt] = new TargetRowData();
-                    oDet.CopyToTargetData(ref targetData.targetRows[cnt++]);
+                    oDet.CopyToTargetData(targetData.targetRows[cnt++]);
                 }
 
             }
@@ -7156,7 +6907,7 @@ namespace ModelDataCache
                     {
                         tdata = new TargetRowData();
                         targetData.targetRows[cnt++] = tdata;
-                        odet.CopyToTargetData(ref tdata);
+                        odet.CopyToTargetData(tdata);
                         aggr.Add(sKey, tdata);
                     }
                     else

@@ -317,65 +317,11 @@ namespace TimeSheets
 
             data = docXml.OuterXml;
         }
-        
+
         private void addTSItem(SPListItem li, SortedList arrGTemp, string username, string resource)
         {
             string[] group = new string[1] { null };
-            if (arrGroupFields != null)
-            {
-                foreach (string groupby in arrGroupFields)
-                {
-                    SPField field = list.Fields.GetFieldByInternalName(groupby);
-                    string newgroup = getField(li, groupby, true);
-                    try
-                    {
-                        newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-                    }
-                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                    {
-                        string[] sGroups = newgroup.Split('\n');
-                        string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                        //group = new string[sGroups.Length];
-                        int tmpCounter = 0;
-                        foreach (string g in group)
-                        {
-                            foreach (string sGroup in sGroups)
-                            {
-                                if (g == null)
-                                    tmpGroups[tmpCounter] = sGroup.Trim();
-                                else
-                                    tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                {
-                                    arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
-                                }
-                                tmpCounter++;
-                            }
-                        }
-                        group = tmpGroups;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < group.Length; i++)
-                        {
-                            if (group[i] == null)
-                                group[i] = newgroup;
-                            else
-                                group[i] += "\n" + newgroup;
-                            if (!arrGTemp.Contains(group[i]))
-                            {
-                                arrGTemp.Add(group[i], string.Empty);
-                            }
-                        }
-                    }
-                }
-            }
+            ProcessGroupFields(arrGroupFields, li, group, arrGTemp);
             for (int i = 0; i < group.Length; i++)
             {
                 if (group[i] == null)
@@ -384,7 +330,7 @@ namespace TimeSheets
                     group[i] += "\n" + resource;
                 if (!arrGTemp.Contains(group[i]))
                 {
-                    arrGTemp.Add(group[i], string.Empty);
+                    arrGTemp.Add(group[i], "");
                 }
             }
             AddItemType it = new AddItemType();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data.Common.Fakes;
@@ -62,7 +62,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
 
             // Act
-            InvokeMethod(approval, "outputXml", new object[] { });
+            InvokeMethod(approval, "outputXml", new object[] {});
             var actual = GetFieldValue<string>(approval, "data");
 
             // Assert
@@ -75,12 +75,12 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             ArrangeShims();
             var approval = new GetTsApprovals();
-            SetFieldValue(approval, "arrGroupFields", new[] { "field" });
+            SetFieldValue(approval, "arrGroupFields", new[] {"field"});
             SetFieldValue(approval, "list", new ShimSPList().Instance);
             SetFieldValue(approval, "view", new ShimSPView().Instance);
 
             // Act
-            InvokeMethod(approval, "addTSItem", new object[] { new ShimSPListItem().Instance, new SortedList(), "userName", "resource" });
+            InvokeMethod(approval, "addTSItem", new object[] {new ShimSPListItem().Instance, new SortedList(), "userName", "resource"});
             var actual = GetFieldValue<Queue>(approval, "queueAllItems");
 
             // Assert

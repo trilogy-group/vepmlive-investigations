@@ -4,7 +4,7 @@ using PortfolioEngineCore.Analyzers;
 
 // (CC-76813, 2018-07-11) Had to make the class public in order to be able to test dependent methods. Test assembly is not strongly signed, therefore can not be used with InternalsVisibleTo attribute
 [Serializable()]
-public class DetailRowData : BaseDetailRowData
+public class DetailRowData : BaseDetailRowData<TargetRowData>
 {
     public int g1, g2, g3;
     public string sKey;
@@ -18,42 +18,6 @@ public class DetailRowData : BaseDetailRowData
     {
         base.CopyData(src);
         sKey = src.sKey;
-    }
-
-    public void CopyToTargetData(ref TargetRowData dest)
-    {
-        dest.CT_ID = CT_ID;
-
-        dest.BC_UID = BC_UID;
-        dest.BC_ROLE_UID = BC_ROLE_UID;
-        dest.BC_SEQ = BC_SEQ;
-        dest.MC_Val = MC_Val;
-        dest.CAT_UID = CAT_UID;
-        dest.CT_Name = CT_Name;
-        dest.Cat_Name = Cat_Name;
-        dest.Role_Name = Role_Name;
-        dest.MC_Name = MC_Name;
-        dest.FullCatName = FullCatName;
-        dest.CC_Name = CC_Name;
-        dest.FullCCName = FullCCName;
-
-        dest.bGroupRow = false;
-        dest.Grouping = string.Empty;
-
-        dest.OCVal = OCVal;
-        dest.Text_OCVal = Text_OCVal;
-        dest.TXVal = TXVal;
-
-        dest.zCost = new double[mxdim + 1];
-        dest.zValue = new double[mxdim + 1];
-        dest.zFTE = new double[mxdim + 1];
-
-        for (var i = 1; i <= mxdim; i++)
-        {
-            dest.zCost[i] = zCost[i];
-            dest.zValue[i] = zValue[i];
-            dest.zFTE[i] = zFTE[i];
-        }
     }
 
     public void AddToTargetData(ref TargetRowData dest)
@@ -99,7 +63,7 @@ public class DetailRowData : BaseDetailRowData
         bUseCosts = (sUoM == string.Empty);
 
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
 
     public void RestoreInitialData(Dictionary<int, PeriodData> clnPer)
@@ -115,7 +79,7 @@ public class DetailRowData : BaseDetailRowData
             zFTE[i] = oFTE[i];
         }
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
 
     private void CaptureBurnRates(IDictionary<int, PeriodData> clnPer)
@@ -145,32 +109,11 @@ public class DetailRowData : BaseDetailRowData
 
     }
 
-    private int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
-    {
-
-        if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)
-            return 0;
-
-        if (dtBarStart <= dtPeriodStart && dtBarFinish >= dtPeriodFinish)
-            return dtPeriodFinish.Subtract(dtPeriodStart).Days + 1;
-
-        DateTime dt1;
-        DateTime dt2;
-
-        dt1 = (dtBarStart < dtPeriodStart ? dtPeriodStart : dtBarStart);     //' take the max of the two start dates
-        dt2 = (dtBarFinish < dtPeriodFinish ? dtBarFinish : dtPeriodFinish);  //    ' take the min of the two finish dates dates
-
-        if (dt1 > dt2)
-            return 0;
-
-        return dt2.Subtract(dt1).Days + 1;
-    }
-
     private double AFiddler(double f)
     {
         return double.Parse(f.ToString("0.00"));
     }
-        
+
     public void DragBar(DateTime[] dtPeriodStart, DateTime[] dtPeriodFinish, int[] PeriodMode, int minp, int maxp)
     {
         //  Input data
