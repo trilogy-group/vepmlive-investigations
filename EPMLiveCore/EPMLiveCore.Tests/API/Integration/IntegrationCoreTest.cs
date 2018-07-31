@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
-using System.Linq;
+using System.Reflection;
 using EPMLiveCore.API.Integration;
 using EPMLiveCore.API.Integration.Fakes;
 using EPMLiveCore.Fakes;
@@ -29,6 +29,8 @@ namespace EPMLiveCore.Tests.API.Integration
         private const string FieldSqlConnection = "cn";
         private const string MethodProcessItemOutgoing = "ProcessItemOutgoing";
         private const string MethodPostCheckBit = "PostCheckBit";
+        private const string MethodGetIntegrator = "GetIntegrator";
+        private const string MethodGetIntegratorFromModule = "GetIntegratorFromModule";
         private const string ColumnNameType = "TYPE";
         private const string ColumnNameIntItemId = "INTITEM_ID";
         private const string ColumnNameItemId = "ITEM_ID";
@@ -78,6 +80,11 @@ namespace EPMLiveCore.Tests.API.Integration
         [TestCleanup]
         public void TestCleanup()
         {
+            if (_shimsContext != null)
+            {
+                _shimsContext.Dispose();
+            }
+
             if (_sqlConnection != null)
             {
                 _sqlConnection.Dispose();
@@ -1005,6 +1012,521 @@ namespace EPMLiveCore.Tests.API.Integration
                                                                      param.Value.Equals(check)));
         }
 
+        [TestMethod]
+        public void GetItemButtons_WhenCalled_SelectsDataAndReturnsItemButtons()
+        {
+            // Arrange
+            const string expectedCommandText = "SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE,  dbo.INT_CONTROLS.WINDOWSTYLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0";
+            const string expectedCommandParam = "@listid";
+            const string colNameControl = "CONTROL";
+            const string colNameImage = "IMAGE";
+            const string colNameTitle = "TITLE";
+            const string colNameWindowStyle = "WINDOWSTYLE";
+            const string control = "control";
+            const string image = "image";
+            const string title = "title";
+            var windowStyleValue = (int)IntegrationControlWindowStyle.FullDialog;
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                instance.CommandText = commandText;
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            var dataAdapterCtorCommandText = string.Empty;
+            var parameterList = new List<SqlParameter>();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (instance, sqlCommand) =>
+            {
+                if (sqlCommand == null)
+                {
+                    throw new ArgumentNullException("sqlCommand");
+                }
+
+                dataAdapterCtorCommandText = sqlCommand.CommandText;
+
+                foreach (SqlParameter param in sqlCommand.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+            };
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(colNameControl);
+            dataTable.Columns.Add(colNameImage);
+            dataTable.Columns.Add(colNameTitle);
+            dataTable.Columns.Add(colNameWindowStyle);
+
+            var row01 = dataTable.NewRow();
+            row01[colNameControl] = control;
+            row01[colNameImage] = image;
+            row01[colNameTitle] = title;
+            row01[colNameWindowStyle] = windowStyleValue;
+
+            dataTable.Rows.Add(row01);
+
+            var fillMethodCalled = false;
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                if (dataSet == null)
+                {
+                    throw new ArgumentNullException("dataSet");
+                }
+
+                fillMethodCalled = true;
+                dataSet.Tables.Add(dataTable);
+                return -1;
+            };
+
+            var listid = Guid.NewGuid();
+            var li = new ShimSPListItem();
+            string errors;
+
+            // Act
+            var result = _testEntity.GetItemButtons(listid, li, out errors) as List<IntegrationControl>;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => dataAdapterCtorCommandText.ShouldBe(expectedCommandText),
+                () => fillMethodCalled.ShouldBeTrue(),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam &&
+                                                           param.Value.Equals(listid)),
+                () => result.ShouldNotBeNull(),
+                () => result.Count.ShouldBe(1),
+                () => result.ShouldContain(item => item.Control == control &&
+                                                   item.Image == image &&
+                                                   item.Title == title &&
+                                                   item.Window == IntegrationControlWindowStyle.FullDialog));
+        }
+
+        [TestMethod]
+        public void GetGlobalButtons_WhenCalled_SelectsDataAndReturnsGlobalButtons()
+        {
+            // Arrange
+            const string expectedCommandText = "SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0";
+            const string expectedCommandParam = "@listid";
+            const string colNameControl = "CONTROL";
+            const string colNameImage = "IMAGE";
+            const string colNameTitle = "TITLE";
+            const string control = "control";
+            const string image = "image";
+            const string title = "title";
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                instance.CommandText = commandText;
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            var dataAdapterCtorCommandText = string.Empty;
+            var parameterList = new List<SqlParameter>();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (instance, sqlCommand) =>
+            {
+                if (sqlCommand == null)
+                {
+                    throw new ArgumentNullException("sqlCommand");
+                }
+
+                dataAdapterCtorCommandText = sqlCommand.CommandText;
+
+                foreach (SqlParameter param in sqlCommand.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+            };
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(colNameControl);
+            dataTable.Columns.Add(colNameImage);
+            dataTable.Columns.Add(colNameTitle);
+
+            var row01 = dataTable.NewRow();
+            row01[colNameControl] = control;
+            row01[colNameImage] = image;
+            row01[colNameTitle] = title;
+
+            dataTable.Rows.Add(row01);
+
+            var fillMethodCalled = false;
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                if (dataSet == null)
+                {
+                    throw new ArgumentNullException("dataSet");
+                }
+
+                fillMethodCalled = true;
+                dataSet.Tables.Add(dataTable);
+                return -1;
+            };
+
+            var listid = Guid.NewGuid();
+            var li = new ShimSPListItem();
+            string errors;
+
+            // Act
+            var result = _testEntity.GetGlobalButtons(listid, li, out errors);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => dataAdapterCtorCommandText.ShouldBe(expectedCommandText),
+                () => fillMethodCalled.ShouldBeTrue(),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam &&
+                                                           param.Value.Equals(listid)),
+                () => result.ShouldNotBeNull(),
+                () => result.Count.ShouldBe(1),
+                () => result.ShouldContain(item => item.Control == control &&
+                                                   item.Image == image &&
+                                                   item.Title == title));
+        }
+
+        [TestMethod]
+        public void GetProperties_IfDataReaderReturnsNoResult_ReturnsEmptyHastable()
+        {
+            // Arrange
+            const string expectedCommand01Text = "SELECT     dbo.INT_MODULES.CustomProps FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid";
+            const string expectedCommand02Text = "SELECT     Property, Value FROM INT_PROPS WHERE INT_LIST_ID=@intlistid";
+            const string expectedCommandParam = "@intlistid";
+
+            var sqlCommandCtor01CommandText = string.Empty;
+            var sqlCommandCtor02CommandText = string.Empty;
+            var sqlCommandCtorCallCount = 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, sqlCommand) =>
+            {
+                sqlCommandCtorCallCount++;
+
+                if (sqlCommandCtorCallCount == OneCall)
+                {
+                    sqlCommandCtor01CommandText = commandText;
+                }
+                else if (sqlCommandCtorCallCount == TwoCalls)
+                {
+                    sqlCommandCtor02CommandText = commandText;
+                }
+            };
+
+            const int totalFieldsCount = 2;
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.Read = () => false;
+            shimSqlDataReader.FieldCountGet = () => totalFieldsCount;
+            
+            var executeReaderCallCount = 0;
+            var parameterList = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                executeReaderCallCount++;
+
+                if (executeReaderCallCount == OneCall)
+                {
+                    foreach (SqlParameter param in instance.Parameters)
+                    {
+                        parameterList.Add(param);
+                    }
+                }
+
+                return shimSqlDataReader.Instance;
+            };
+
+            var intListId = Guid.NewGuid();
+
+            // Act
+            var propsTable = _testEntity.GetProperties(intListId);
+
+            // Assert
+            propsTable.ShouldSatisfyAllConditions(
+                () => propsTable.ShouldNotBeNull(),
+                () => propsTable.Values.Count.ShouldBe(0),
+                () => sqlCommandCtor01CommandText.ShouldBe(expectedCommand01Text),
+                () => sqlCommandCtor02CommandText.ShouldBe(expectedCommand02Text),
+                () => executeReaderCallCount.ShouldBe(2),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam &&
+                                                           param.Value.Equals(intListId)));
+        }
+
+        [TestMethod]
+        public void GetIntegrator_WhenCalled_ReturnsIntegrator()
+        {
+            // Arrange
+            const string expectedCommandText = "SELECT     dbo.INT_MODULES.MODULE_ID, dbo.INT_MODULES.NetAssembly, dbo.INT_MODULES.NetClass,Title,INT_KEY,LIST_ID,INT_COLID,INT_LIST_ID FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid";
+            const string expectedCommandParam = "@intlistid";
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            const int indexOfAssemblyName = 1;
+            const int indexOfTypeName = 2;
+            const int indexOfTitle = 3;
+            const int indexOfIntKey = 4;
+            const int indexOfListId = 5;
+            const int indexOfColId = 6;
+            const int indexOfIntListId = 7;
+            var readMethodResult = false;
+
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.Read = () => readMethodResult = !readMethodResult;
+            shimSqlDataReader.FieldCountGet = () => indexOfIntListId + 1;
+
+            var parameterList = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+
+                return shimSqlDataReader.Instance;
+            };
+
+            const string typeName = "EPMLiveCore.Tests.API.Integration.TestIntegrator";
+            const string title = "title";
+            const string intKey = "key";
+            var listId = Guid.NewGuid();
+            var intListId = Guid.NewGuid();
+            var colId = 1;
+
+            shimSqlDataReader.GetStringInt32 = (fieldIndex) =>
+            {
+                switch (fieldIndex)
+                {
+                    case indexOfAssemblyName:
+                        return Assembly.GetAssembly(typeof(IntegrationCoreTest)).FullName;
+                    case indexOfTypeName:
+                        return typeName;
+                    case indexOfTitle:
+                        return title;
+                    case indexOfIntKey:
+                        return intKey;
+                    default:
+                        throw new ArgumentOutOfRangeException("fieldIndex");
+                }
+            };
+
+            shimSqlDataReader.GetGuidInt32 = (fieldIndex) =>
+            {
+                switch (fieldIndex)
+                {
+                    case indexOfListId:
+                        return listId;
+                    case indexOfIntListId:
+                        return intListId;
+                    default:
+                        throw new ArgumentOutOfRangeException("fieldIndex");
+                }
+            };
+
+            shimSqlDataReader.GetInt32Int32 = (fieldIndex) =>
+            {
+                if (fieldIndex == indexOfColId)
+                {
+                    return colId;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("fieldIndex");
+                }
+            };
+
+            // Act
+            var result = _testEntityPrivate.Invoke(MethodGetIntegrator, intListId) as IntegratorDef;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam &&
+                                                           param.Value.Equals(intListId)),
+                () => result.ShouldNotBeNull(),
+                () => result.Title.ShouldBe(title),
+                () => result.IntKey.ShouldBe(intKey),
+                () => result.ListId.ShouldBe(listId),
+                () => result.intlistid.ShouldBe(intListId),
+                () => result.intcol.ShouldBe(string.Concat("INTUID", colId)),
+                () => result.iIntegrator.ShouldNotBeNull(),
+                () => result.iIntegrator.ShouldBeOfType<TestIntegrator>());
+        }
+
+        [TestMethod]
+        public void GetIntegratorFromModule_WhenCalled_ReturnsIntegrator()
+        {
+            // Arrange
+            const string expectedCommandText = "SELECT NetAssembly, NetClass,Title FROM INT_MODULES WHERE MODULE_ID=@moduleid";
+            const string expectedCommandParam = "@moduleid";
+
+            var sqlCommandCtorCommandText = string.Empty;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCommandText = commandText;
+            };
+
+            var readMethodResult = false;
+            var shimSqlDataReader = new ShimSqlDataReader();
+            shimSqlDataReader.Read = () => readMethodResult = !readMethodResult;
+
+            var parameterList = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteReader = instance =>
+            {
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    parameterList.Add(param);
+                }
+
+                return shimSqlDataReader.Instance;
+            };
+
+            const int indexOfAssemblyName = 0;
+            const int indexOfTypeName = 1;
+            const int indexOfTitle = 2;
+            const string typeName = "EPMLiveCore.Tests.API.Integration.TestIntegrator";
+            var listId = Guid.NewGuid();
+            var moduleId = Guid.NewGuid();
+
+            shimSqlDataReader.GetStringInt32 = (fieldIndex) =>
+            {
+                switch (fieldIndex)
+                {
+                    case indexOfAssemblyName:
+                        return Assembly.GetAssembly(typeof(IntegrationCoreTest)).FullName;
+                    case indexOfTypeName:
+                        return typeName;
+                    case indexOfTitle:
+                        return string.Empty;
+                    default:
+                        throw new ArgumentOutOfRangeException("fieldIndex");
+                }
+            };
+
+            var title = string.Empty;
+
+            // Act
+            var result = _testEntityPrivate.Invoke(MethodGetIntegratorFromModule, moduleId, title) as IIntegrator;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => sqlCommandCtorCommandText.ShouldBe(expectedCommandText),
+                () => parameterList.ShouldContain(param => param.ParameterName == expectedCommandParam &&
+                                                           param.Value.Equals(moduleId)),
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBeOfType<TestIntegrator>());
+        }
+
+        [TestMethod]
+        public void SubmitDeleteListEvent()
+        {
+            // Arrange
+            const string expectedSelectCommandText = "SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid";
+            const string expectedInsertCommandText = "INSERT INTO INT_EVENTS (LIST_ID, ITEM_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @itemid, @intitemid, @colid, 0, 1, @type)";
+            const string expectedParamListId = "@listid";
+            const string expectedParamItemId = "@itemid";
+            const string expectedParamIntItemId = "@intitemid";
+            const string expectedParamColId = "@colid";
+            const string expectedParamType = "@type";
+            const string colNameIntColId = "INT_COLID";
+            const int colId = 2;
+
+            var sqlCommandCtor01CommandText = string.Empty;
+            var sqlCommandCtor02CommandText = string.Empty;
+            var sqlCommandCtorCallCount = 0;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                sqlCommandCtorCallCount++;
+                instance.CommandText = commandText;
+
+                if (sqlCommandCtorCallCount == OneCall)
+                {
+                    sqlCommandCtor01CommandText = commandText;
+                }
+                else if (sqlCommandCtorCallCount == TwoCalls)
+                {
+                    sqlCommandCtor02CommandText = commandText;
+                }
+            };
+
+            var selectCommandParameters = new List<SqlParameter>();
+            ShimSqlDataAdapter.ConstructorSqlCommand = (instance, sqlCommand) =>
+            {
+                if (sqlCommand == null)
+                {
+                    throw new ArgumentNullException("sqlCommand");
+                }
+
+                foreach (SqlParameter param in sqlCommand.Parameters)
+                {
+                    selectCommandParameters.Add(param);
+                }
+            };
+            
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(colNameIntColId);
+
+            var row01 = dataTable.NewRow();
+            row01[colNameIntColId] = colId;
+            dataTable.Rows.Add(row01);
+            
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                if (dataSet == null)
+                {
+                    throw new ArgumentNullException("dataSet");
+                }
+
+                dataSet.Tables.Add(dataTable);
+
+                return -1;
+            };
+
+            var insertCommandParameters = new List<SqlParameter>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance =>
+            {
+                foreach (SqlParameter param in instance.Parameters)
+                {
+                    insertCommandParameters.Add(param);
+                }
+
+                return -1;
+            };
+
+            var listId = Guid.NewGuid();
+            const int itemId = 1;
+            const int expectedType = 2;
+            var intUniqueId = Guid.NewGuid();
+
+            var shimSpList = new ShimSPList();
+            shimSpList.IDGet = () => listId;
+
+            var shimSpListItem = new ShimSPListItem();
+            shimSpListItem.ParentListGet = () => shimSpList.Instance;
+            shimSpListItem.IDGet = () => itemId;
+            shimSpListItem.ItemGetString = (fieldName) =>
+            {
+                return fieldName == string.Concat("INTUID", colId)
+                       ? intUniqueId
+                       : Guid.NewGuid();
+            };
+
+            // Act
+            _testEntity.SubmitDeleteListEvent(shimSpListItem.Instance, null);
+
+            // Assert
+            _testEntity.ShouldSatisfyAllConditions(
+                () => sqlCommandCtor01CommandText.ShouldBe(expectedSelectCommandText),
+                () => sqlCommandCtor02CommandText.ShouldBe(expectedInsertCommandText),
+                () => selectCommandParameters.ShouldContain(param => param.ParameterName == expectedParamListId &&
+                                                                     param.Value.Equals(listId)),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamItemId &&
+                                                                     param.Value.Equals(itemId)),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamIntItemId &&
+                                                                     param.Value.Equals(intUniqueId.ToString())),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamColId &&
+                                                                     param.Value.Equals(colId.ToString())),
+                () => insertCommandParameters.ShouldContain(param => param.ParameterName == expectedParamType &&
+                                                                     param.Value.Equals(expectedType)));
+        }
+
         private static void FakesForSpSecurity()
         {
             ShimSqlConnection.ConstructorString = (_, stringConn) => new ShimSqlConnection();
@@ -1030,6 +1552,54 @@ namespace EPMLiveCore.Tests.API.Integration
                     IDGet = () => Guid.NewGuid()
                 }
             };
+        }
+    }
+
+    public class TestIntegrator : IIntegrator
+    {
+        public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ColumnProperty> GetColumns(WebProperties WebProps, IntegrationLog Log, string ListName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<string, string> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetItem(WebProperties WebProps, IntegrationLog log, string ItemID, DataTable Items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool InstallIntegration(WebProperties WebProps, IntegrationLog Log, out string Message, string IntegrationKey, string APIUrl)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable PullData(WebProperties WebProps, IntegrationLog log, DataTable Items, DateTime LastSynchDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RemoveIntegration(WebProperties WebProps, IntegrationLog Log, out string Message, string IntegrationKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TestConnection(WebProperties WebProps, IntegrationLog Log, out string Message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TransactionTable UpdateItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
+        {
+            throw new NotImplementedException();
         }
     }
 }

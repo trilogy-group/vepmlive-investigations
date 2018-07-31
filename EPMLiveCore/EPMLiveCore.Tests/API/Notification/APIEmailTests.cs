@@ -174,13 +174,8 @@ namespace EPMLiveCore.Tests.API.Notification
             AssertDataSetCommand();
 
             Assert.AreEqual(7, _createdCommands.Count);
-            Assert.AreEqual(6, _disposedCommands.Count);
-            Assert.AreSame(_createdCommands[1], _disposedCommands[0]);
-            Assert.AreSame(_createdCommands[2], _disposedCommands[1]);
-            Assert.AreSame(_createdCommands[3], _disposedCommands[2]);
-            Assert.AreSame(_createdCommands[4], _disposedCommands[3]);
-            Assert.AreSame(_createdCommands[5], _disposedCommands[4]);
-            Assert.AreSame(_createdCommands[6], _disposedCommands[5]);
+            Assert.AreEqual(7, _disposedCommands.Count);
+            AssertCreatedCommandsDisposed();
         }
 
         [TestMethod]
