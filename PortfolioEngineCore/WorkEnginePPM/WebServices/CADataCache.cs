@@ -77,22 +77,21 @@ namespace CADataCache
         }
     }
     [Serializable()]
-    public class CostAnalyzerDataCache
+    public class CostAnalyzerDataCache : DataCacheBase<clsDataItem, clsCustomFieldData, clsListItemData>
     {
         private const string HideRowsWithAllZerosXmlNode = "HideRowsWithAllZeros";
         private const string HideRowsWithAllZerosXmlValueAttribute = "Value";
 
         clsCostData m_clsda = null;
-        private List<clsColDisp> m_topgridcln = null;
-        private List<clsColDisp> m_bottomgridcln = null;
+        private IList<clsColDisp> m_topgridcln = null;
+        private IList<clsColDisp> m_bottomgridcln = null;
         private bool[] m_cust_Defn = null;
         private int[] m_cust_full = null;
         private clsCustomFieldData[] m_cust_ocf = null;
-        private Dictionary<int, clsListItemData>[] m_cust_lk = null;
-        private List<CATGRow> TGStandard = null;
-        private List<CATGRow> BGStandard = null;
-
-        private List<clsDetailRowData> m_clnsort = null;
+        private IDictionary<int, clsListItemData>[] m_cust_lk = null;
+        private IList<CATGRow> TGStandard = null;
+        private IList<CATGRow> BGStandard = null;
+        private IList<clsDetailRowData> m_clnsort = null;
 
         private int m_DispMode = 1;
 
@@ -947,206 +946,12 @@ namespace CADataCache
 
         private string FormatExtraDisplay(string sIn, int lt)
         {
-            DateTime dt;
-            int l;
-            double d;
-            clsDataItem oi;
-
-
-            switch (lt)
-            {
-                case 1:
-                    dt = DateTime.MinValue;
-
-                    try
-                    {
-                        dt = DateTime.ParseExact(sIn, "yyyyMMdd", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        if (dt == DateTime.MinValue)
-                            dt = DateTime.ParseExact(sIn, "yyyyMMddHHmm", null);
-                    }
-
-                    catch
-                    {
-                    }
-
-                    if (dt > DateTime.MinValue)
-                        return dt.ToString("MM/dd/yyyy");
-
-                    return "";
-
-                case 2:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-
-
-                    if (l != 0)
-                        return l.ToString();
-
-                    return "";
-
-
-                case 3:
-
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    if (d != 0)
-                        return d.ToString();
-
-                    return "";
-
-                case 11:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (l != 0)
-                        return l.ToString("0%");
-
-                    return "";
-
-                case 13:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    return (l == 0 ? "No" : "Yes");
-
-                case 6:
-                case 9:
-                case 19:
-                    return sIn;
-
-
-                case 8:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    if (d != 0)
-                        return d.ToString("$#,##0.00");
-
-                    return "";
-
-                case 20:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-
-                    return FormatWork(d);
-
-                case 23:
-                    try
-                    {
-                        d = Double.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        d = 0;
-                    }
-
-                    return FormatDuration(d);
-
-                case 4:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_clsda.m_codes.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 7:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_clsda.m_reses.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-
-                case 9911:
-                    try
-                    {
-                        l = int.Parse(sIn);
-                    }
-
-                    catch
-                    {
-                        l = 0;
-                    }
-
-                    if (m_clsda.m_stages.TryGetValue(l, out oi))
-                        return oi.Name;
-
-                    return "";
-            }
-
-            return "";
+            return FormatExtraDisplay(
+                sIn, 
+                lt, 
+                m_clsda.m_codes, 
+                m_clsda.m_reses,
+                m_clsda.m_stages);
         }
 
         private string FormatWork(double Hours)
@@ -2088,55 +1893,6 @@ namespace CADataCache
             return sRet;
 
         }
-
-        private string BuildCustFieldJSon(clsCustomFieldData oc, int index, int max)
-        {
-            clsListItemData ce, ne, initial;
-            string sRet = "";
-
-            if (max < 0)
-                return "";
-
-            initial = oc.ListItems.ElementAt(index).Value;
-
-            for (int i = index; i <= max; i++)
-            {
-
-                ce = oc.ListItems.ElementAt(i).Value;
-
-                if (initial.Level == ce.Level)
-                {
-
-                    if (sRet != "")
-                        sRet = sRet + ",";
-
-                    if (oc.UseFullName == 1)
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.FullName + "',Value:'" + ce.UID.ToString() + "'}";
-                    else
-                        sRet += "{Name:'" + ce.ID.ToString() + "',Text:'" + ce.Name + "',Value:'" + ce.UID.ToString() + "'}";
-
-
-                    if (i != max)
-                    {
-                        ne = oc.ListItems.ElementAt(i + 1).Value;
-
-                        if (ne.Level > ce.Level)
-                        {
-                            sRet += ",{Name:'Level" + ce.ID.ToString() + "',Expanded:-1,Level:" + ce.Level.ToString() + ", Items:[ " + BuildCustFieldJSon(oc, i + 1, max) + "]}";
-                        }
-                        else if (ne.Level < ce.Level)
-                            return sRet;
-
-                    }
-                }
-
-            }
-
-
-            return sRet;
-
-        }
-
 
         public string RatesAndCategory()
         {
