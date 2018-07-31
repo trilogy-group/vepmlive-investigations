@@ -52,7 +52,7 @@ namespace EPMLiveCore.API
 
             ExternalColumn = GetXmlAttributeValueAsString(document, "ExternalColumn", string.Empty);
 
-            if (ExternalColumn != "")
+            if (ExternalColumn != string.Empty)
             {
                 FillNewFromResource(oWeb);
             }
@@ -114,23 +114,28 @@ namespace EPMLiveCore.API
 
         private static int GetXmlAttributeValueAsInt(XmlDocument document, string attributeName)
         {
+            string attributeString = null;
             try
             {
-                var attributeString = GetXmlAttributeValueAsString(document, attributeName, string.Empty);
-                int attributeInt;
-                if (!int.TryParse(attributeString, out attributeInt))
-                {
-                    throw new InvalidOperationException(
-                        string.Format("'{0}' couldn't be parsed into int.", attributeString));
-                }
-                return attributeInt;
+                attributeString = GetXmlAttributeValueAsString(document, attributeName, string.Empty);
             }
             catch (Exception exception)
             {
                 Trace.TraceError(exception.ToString());
+
                 throw new InvalidOperationException(
-                        string.Format("couldn't parse int.", exception));
+                        string.Format("Unable to retrieve attribute {0} value. {1}",
+                            attributeName,
+                            exception));
             }
+
+            int attributeInt;
+            if (!int.TryParse(attributeString, out attributeInt))
+            {
+                throw new InvalidOperationException(
+                    string.Format("'{0}' couldn't be parsed into int.", attributeString));
+            }
+            return attributeInt;
         }
 
         private static string GetXmlAttributeValueAsString(

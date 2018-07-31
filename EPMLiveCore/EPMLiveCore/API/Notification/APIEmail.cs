@@ -182,7 +182,8 @@ namespace EPMLiveCore.API
             var itemMessage = new ItemMessage(document, oWeb);
 
             var ret = Response.Failure(30010, "Error: No Item Id specificied");
-            if(itemMessage.ItemId != "" && (itemMessage.ListId != "" || itemMessage.ListName != ""))
+            if(itemMessage.ItemId != string.Empty && 
+                (itemMessage.ListId != string.Empty || itemMessage.ListName != string.Empty))
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -191,7 +192,7 @@ namespace EPMLiveCore.API
                     {
                         using(SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            if(itemMessage.WebId != "")
+                            if(itemMessage.WebId != string.Empty)
                             {
                                 oList = QueueItemMessageFromXml(
                                     new Guid(itemMessage.WebId), 
@@ -241,7 +242,7 @@ namespace EPMLiveCore.API
             SPList oList;
             using (SPWeb web = site.OpenWeb(webId))
             {
-                if (itemMessage.ListId != "")
+                if (itemMessage.ListId != string.Empty)
                 {
                     oList = web.Lists[new Guid(itemMessage.ListId)];
                 }

@@ -14,6 +14,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace EPMLiveCore.Tests.API.Notification
 {
@@ -24,13 +25,14 @@ namespace EPMLiveCore.Tests.API.Notification
         private static readonly Guid _listParentListId = new Guid("19EDE34A-5358-48B6-B468-E3FECA86E1E6");
         private static readonly Guid _webId = new Guid("8EB90CFE-34EA-4383-89DF-B04F8A2C29A9");
         private static readonly Guid _oWebId = new Guid("C93098C4-2B5A-4ABC-9D7A-080DCF4A55A7");
-        private const int _itemId = 229;
-        private const string _listId = "9BDC6F65-7849-49D7-946D-9B5C1D3B83B3";
-        private const string _listName = "Goose";
+        private const int ItemId = 229;
+        private const string ListId = "9BDC6F65-7849-49D7-946D-9B5C1D3B83B3";
+        private const string ListName = "Goose";
         private static readonly Guid _webAppGuid1 = new Guid("B9298FFB-0304-4A82-A8F0-D9983ED6B869");
         private static readonly Guid _webAppGuid2 = new Guid("B7B3D541-D097-4940-A69E-A1302BFBB350");
         private static readonly Guid _webAppGuid3 = new Guid("8BD93B95-2847-4EF6-97EE-136E08905304");
         private static readonly Guid _webAppGuid4 = new Guid("F1235BCE-3F68-4805-B730-21F82120B75A");
+        private static readonly string SpId = "1122";
 
         private IDisposable _shims;
         private APIEmail _apiEmail;
@@ -46,6 +48,13 @@ namespace EPMLiveCore.Tests.API.Notification
         private List<SqlCommand> _disposedCommands;
         private List<SqlCommand> _dataSetCommands;
         private SPListItem _spListItemCalledXml;
+        private int _calledTemplateId;
+        private bool _calledHideFromUser;
+        private Hashtable _calledAdditionalParams;
+        private string[] _calledNewUsers;
+        private string[] _calledDelUsers;
+        private bool _calledDoNotEmail;
+        private bool _calledUnmarkread;
 
         [TestInitialize]
         public void TestInitialize()
@@ -244,9 +253,9 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                _listName, 
+                ListName, 
                 string.Empty, 
-                _itemId, 
+                ItemId, 
                 _webId.ToString(), 
                 _oWebId, 
                 _webAppGuid4);
@@ -256,9 +265,9 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdNotEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                _listName, 
-                _listId, 
-                _itemId, 
+                ListName, 
+                ListId, 
+                ItemId, 
                 _webId.ToString(), 
                 _oWebId,
                 _webAppGuid3);
@@ -268,9 +277,9 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdEmptyWebIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                _listName, 
+                ListName, 
                 string.Empty, 
-                _itemId, 
+                ItemId, 
                 string.Empty, 
                 _oWebId, 
                 _webAppGuid2);
@@ -280,9 +289,9 @@ namespace EPMLiveCore.Tests.API.Notification
         public void QueueItemMessageXml_ListIdNotEmptyWebIdEmpty_OkReturned()
         {
             QueueItemMessageXml_Called_OkReturned(
-                _listName, 
-                _listId,
-                _itemId, 
+                ListName, 
+                ListId,
+                ItemId, 
                 string.Empty, 
                 _oWebId, 
                 _webAppGuid1);
@@ -314,7 +323,7 @@ namespace EPMLiveCore.Tests.API.Notification
                 table.Columns.Add("SPID");
                 var row = table.NewRow();
                 row["user"] = "valera";
-                row["SPID"] = "1122";
+                row["SPID"] = SpId;
                 table.Rows.Add(row);
                 return table;
             };
@@ -331,6 +340,12 @@ namespace EPMLiveCore.Tests.API.Notification
 
             // Assert
             Assert.AreEqual(expectedWebApplicationId, _spListItemCalledXml.ParentList.ParentWeb.Site.WebApplication.Id);
+            Assert.AreEqual(_calledTemplateId, 17);
+            Assert.AreEqual(_calledAdditionalParams["Building"], "64b");
+            Assert.IsTrue(new [] { SpId }.SequenceEqual(_calledNewUsers));
+            Assert.IsTrue(new[] { "vladislav", "vitaliy" }.SequenceEqual(_calledDelUsers));
+            Assert.IsTrue(_calledDoNotEmail);
+            Assert.IsTrue(_calledUnmarkread);
         }
 
         private void ShimQueueItemMessage()
@@ -348,6 +363,13 @@ namespace EPMLiveCore.Tests.API.Notification
                         SPUser curUser,
                         bool forceNewEntry) =>
                     {
+                        _calledTemplateId = templateid;
+                        _calledHideFromUser = hideFromUser;
+                        _calledAdditionalParams = additionalParams;
+                        _calledNewUsers = newusers;
+                        _calledDelUsers = delusers;
+                        _calledDoNotEmail = doNotEmail;
+                        _calledUnmarkread = unmarkread;
                         _spListItemCalledXml = listItem;
                     };
         }
@@ -418,13 +440,13 @@ namespace EPMLiveCore.Tests.API.Notification
                                 {
                                     ItemGetGuid = key =>
                                     {
-                                        if (key == new Guid(_listId))
+                                        if (key == new Guid(ListId))
                                         {
                                             return new ShimSPList
                                             {
                                                 GetItemByIdInt32 = id =>
                                                 {
-                                                    if (id == _itemId)
+                                                    if (id == ItemId)
                                                     {
                                                         return CreateShimSpListItem(_webAppGuid1);
                                                     }
@@ -439,13 +461,13 @@ namespace EPMLiveCore.Tests.API.Notification
                                     },
                                     TryGetListString = key => 
                                     {
-                                        if (key == _listName)
+                                        if (key == ListName)
                                         {
                                             return new ShimSPList
                                             {
                                                 GetItemByIdInt32 = id =>
                                                 {
-                                                    if (id == _itemId)
+                                                    if (id == ItemId)
                                                     {
                                                         return CreateShimSpListItem(_webAppGuid2);
                                                     }
@@ -474,13 +496,13 @@ namespace EPMLiveCore.Tests.API.Notification
                                 {
                                     ItemGetGuid = key =>
                                     {
-                                        if (key == new Guid(_listId))
+                                        if (key == new Guid(ListId))
                                         {
                                             return new ShimSPList
                                             {
                                                 GetItemByIdInt32 = id =>
                                                 {
-                                                    if (id == _itemId)
+                                                    if (id == ItemId)
                                                     {
                                                         return CreateShimSpListItem(_webAppGuid3);
                                                     }
@@ -495,13 +517,13 @@ namespace EPMLiveCore.Tests.API.Notification
                                     },
                                     TryGetListString = key =>
                                     {
-                                        if (key == _listName)
+                                        if (key == ListName)
                                         {
                                             return new ShimSPList
                                             {
                                                 GetItemByIdInt32 = id =>
                                                 {
-                                                    if (id == _itemId)
+                                                    if (id == ItemId)
                                                     {
                                                         return CreateShimSpListItem(_webAppGuid4);
                                                     }
