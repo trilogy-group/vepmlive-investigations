@@ -1062,10 +1062,15 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getCustomFields(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getCustomFields(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
 

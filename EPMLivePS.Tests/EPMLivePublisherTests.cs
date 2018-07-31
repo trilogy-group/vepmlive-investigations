@@ -19,6 +19,7 @@ namespace EPMLivePS.Tests
         private const string ProjectIdColumn = "Proj_ID";
         private const string ValidUrl = "http://epmlive.com";
         private const string GetCustomFieldsMethod = "getCustomFields";
+        private const string SaveFieldsMethod = "saveFields";
 
         private EPMLivePublisher _publisher;
         private PrivateObject _privateObject;
@@ -257,6 +258,23 @@ namespace EPMLivePS.Tests
             Assert.AreEqual(0, result.Length);
             Assert.IsFalse(_isWriteEntryCalled);
             AssertThatObjectsAreDisposed();
+        }
+
+        [TestMethod]
+        public void SaveFields_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPWeb.AllInstances.ListsGet = _ => { throw new InvalidOperationException(); };
+            SetupPrivateObject();
+
+            // Act
+            var parameters = new object[] { string.Empty, null, null };
+            _privateObject.Invoke(SaveFieldsMethod, parameters);
+
+            // Assert
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
         private void SetupPrivateObject()
