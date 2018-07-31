@@ -71,7 +71,7 @@ namespace EPMLiveEnterprise
         void myLog_EntryWritten(object sender, EntryWrittenEventArgs e)
         {
             string message = e.Entry.Message;
-            sbErrors.Append(message.Replace("\r\n", "<br>") + "<br><br><br><br>");
+            sbErrors.Append(message.Replace("\r\n","<br>") + "<br><br><br><br>");
         }
 
         ~Publisher()
@@ -148,8 +148,8 @@ namespace EPMLiveEnterprise
                     int pubType = dr.GetInt32(0);
                     publishSiteUrl = System.Web.HttpUtility.UrlDecode(dr.GetString(1));
 
-
-                    if (!dr.IsDBNull(2))
+                    
+                    if(!dr.IsDBNull(2))
                         lastTransUid = dr.GetGuid(2);
 
                     dr.Close();
@@ -232,7 +232,7 @@ namespace EPMLiveEnterprise
                             dtFieldsToPublish = ds.Tables[0];
 
                             WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
-                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            SPSecurity.RunWithElevatedPrivileges(delegate()
                             {
                                 pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                                 rDs = pResource.ReadResources("", false);
@@ -310,7 +310,7 @@ namespace EPMLiveEnterprise
         private void linkProjectWss()
         {
             WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = new WebSvcWssInterop.WssSettingsDataSet();
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 dsCurrentWssInfo = pWssInterop.ReadWssSettings();
             });
@@ -330,7 +330,7 @@ namespace EPMLiveEnterprise
                 }
                 catch
                 {
-
+                    
                     SqlConnection cn = new SqlConnection(EPMLiveHelperClasses.getProjectServerPublishedConnectionString(mySiteGuid));
                     cn.Open();
 
@@ -364,7 +364,7 @@ namespace EPMLiveEnterprise
 
                 WebSvcWssInterop.ProjectWSSInfoDataSet ds = new WebSvcWssInterop.ProjectWSSInfoDataSet();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     ds = wssInterop.ReadWssData(projectUID);
                 });
@@ -403,12 +403,12 @@ namespace EPMLiveEnterprise
 
         private void publishTasks(int projectId, int pubType, Guid newTransUid, Guid lastTransUid)
         {
-
+            
             try
             {
                 WebSvcProject.ProjectDataSet pDs = null;
 
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                 });
@@ -483,7 +483,7 @@ namespace EPMLiveEnterprise
                                     //sbBatch.Append("<Method ID='" + counter + "' Cmd='New'>");
                                     listItem = taskCenter.Items.Add();
                                 }
-
+                                
 
                                 listItem["Project"] = projectId;
                                 if (pubType == 1)
@@ -510,7 +510,7 @@ namespace EPMLiveEnterprise
                                     {
                                         resources += ", " + getResourceName(assn.RES_UID, pDs);
                                         int resId = getResourceWssId(assn.RES_UID_OWNER);
-                                        if (resId != 0)
+                                        if(resId != 0)
                                             assns = assns + ";#" + resId + ";#" + getResourceName(assn.RES_UID_OWNER, pDs);
                                     }
                                     if (assns.Length > 2)
@@ -531,7 +531,7 @@ namespace EPMLiveEnterprise
                                     else
                                         listItem["AssignedTo"] = "";
                                 }
-
+                                
                                 bool process = true;
 
                                 try
@@ -548,7 +548,7 @@ namespace EPMLiveEnterprise
                                     listItem[listItem.Fields.GetFieldByInternalName("IsAssignment").Id] = "0";
                                     listItem["transuid"] = newTransUid.ToString();
                                     listItem[taskCenter.Fields.GetFieldByInternalName("Title").Id] = tr.TASK_NAME;
-                                    if (!tr.IsTASK_WBSNull())
+                                    if(!tr.IsTASK_WBSNull())
                                         listItem[taskCenter.Fields.GetFieldByInternalName("WBS").Id] = tr.TASK_WBS;
                                     listItem[taskCenter.Fields.GetFieldByInternalName("taskuid").Id] = tr.TASK_UID;
                                     listItem[taskCenter.Fields.GetFieldByInternalName("taskorder").Id] = tr.TASK_ID;
@@ -607,10 +607,9 @@ namespace EPMLiveEnterprise
                     {
                         if (listItem["IsProjectServer"].ToString() != "True")
                         {
-                            return 0;
+                            return 0;                                                        
                         }
-                    }
-                    catch { }
+                    }catch{}
                 }
                 else
                 {
@@ -656,7 +655,7 @@ namespace EPMLiveEnterprise
                 WebSvcProject.ProjectDataSet pDs = null;
                 string lstName = "Project Center";
 
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                 });
@@ -691,7 +690,7 @@ namespace EPMLiveEnterprise
                 str += "</Project></Data></UpdateScheduledWork>";
 
                 //calling portfolioengineAPI
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     EPMLivePortfolioEngine.PortfolioEngineAPI pfe = new EPMLivePortfolioEngine.PortfolioEngineAPI();
                     pfe.Url = mySiteToPublish.Url + "/_vti_bin/portfolioengine.asmx";
@@ -699,7 +698,7 @@ namespace EPMLiveEnterprise
                     string ret = pfe.Execute("UpdateScheduledWork", str);
                 });
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 //Need to change event number accordingly.
                 myLog.WriteEntry("Error in ProcessPFEWork " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 305);
@@ -708,7 +707,7 @@ namespace EPMLiveEnterprise
 
         private void AssignGroupsToTasks(int projectId, int pubType, WebSvcProject.ProjectDataSet pDs)
         {
-            SPGroup addMemGrp = null; SPGroup addVisitGrp = null;
+            SPGroup addMemGrp = null; SPGroup addVisitGrp = null;            
             string strProjAssignTo = string.Empty;
 
             try
@@ -716,7 +715,7 @@ namespace EPMLiveEnterprise
 
                 mySiteToPublish.AllowUnsafeUpdates = true;
                 SPList lstPC = mySiteToPublish.Lists["Project Center"];
-                SPListItem lstPCItem;
+                SPListItem lstPCItem;                
                 lstPCItem = lstPC.GetItemById(projectId);
 
                 strProjAssignTo = (Convert.ToString(lstPCItem["AssignedTo"]) != string.Empty ? Convert.ToString(lstPCItem["AssignedTo"]) : "");
@@ -743,11 +742,11 @@ namespace EPMLiveEnterprise
                             }
                         }
                         catch { }
-                    }
+                    }    
                     foreach (WebSvcProject.ProjectDataSet.ProjectResourceRow pr in pDs.ProjectResource)
                     {
                         try
-                        {
+                        {                                
                             if (!pr.IsWRES_ACCOUNTNull())
                             {
                                 string email = "";
@@ -762,17 +761,17 @@ namespace EPMLiveEnterprise
                                                 select assgRow;
 
                                 if (assignRes.Count() > 0)
-                                    addMemGrp.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");
+                                    addMemGrp.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");                                        
                                 else
                                     addVisitGrp.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");
 
                                 if (!strProjAssignTo.Contains(";#" + (mySiteToPublish.AllUsers[pr.WRES_ACCOUNT].ID + ";#" + getResourceName(pr.RES_UID, pDs))))
                                     strProjAssignTo += ";#" + (mySiteToPublish.AllUsers[pr.WRES_ACCOUNT].ID + ";#" + getResourceName(pr.RES_UID, pDs));
-
-                            }
+                                                                         
+                            }                                
                         }
                         catch { }
-                    }
+                    }                    
                     addVisitGrp.Update();
                     addMemGrp.Update();
                     lstPCItem["AssignedTo"] = strProjAssignTo;
@@ -791,7 +790,7 @@ namespace EPMLiveEnterprise
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
                         cfDs = pCf.ReadCustomFieldsByEntity(taskEntity);
                     });
@@ -833,13 +832,13 @@ namespace EPMLiveEnterprise
                             {
                                 string fieldName = spField.InternalName.Substring(3);
                                 int temp = 0;
-                                if (int.TryParse(fieldName, out temp))
+                                if (int.TryParse(fieldName,out temp))
                                 {
                                     WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
                                     if (dr.Length > 0)
                                     {
-                                        if (dr[0].IsMD_LOOKUP_TABLE_UIDNull())
-                                            arrFieldsToPublish.Add(dr[0].MD_PROP_ID + "#" + spField.InternalName + "#" + dr[0].MD_PROP_UID_SECONDARY + "#3#" + getType(((PSLibrary.PropertyType)dr[0].MD_PROP_TYPE_ENUM).ToString()) + "#1#" + spField.Id + "#" + rolldown);
+                                        if(dr[0].IsMD_LOOKUP_TABLE_UIDNull())
+                                            arrFieldsToPublish.Add(dr[0].MD_PROP_ID + "#" + spField.InternalName + "#" + dr[0].MD_PROP_UID_SECONDARY + "#3#" + getType(((PSLibrary.PropertyType)dr[0].MD_PROP_TYPE_ENUM).ToString()) + "#1#" + spField.Id + "#" + rolldown); 
                                         else
                                             arrFieldsToPublish.Add(dr[0].MD_PROP_ID + "#" + spField.InternalName + "#" + dr[0].MD_PROP_UID_SECONDARY + "#3#CHOICE#1#" + spField.Id + "#" + rolldown);
                                     }
@@ -1011,7 +1010,7 @@ namespace EPMLiveEnterprise
 
         private void processAssignment(WebSvcProject.ProjectDataSet.AssignmentRow assn, WebSvcProject.ProjectDataSet pDs, SPListItem listItem)
         {
-
+            
 
             //StringBuilder sb = new StringBuilder();
             WebSvcProject.ProjectDataSet.TaskRow taskRow = (WebSvcProject.ProjectDataSet.TaskRow)pDs.Task.Select("TASK_UID='" + assn.TASK_UID + "'")[0];
@@ -1036,15 +1035,15 @@ namespace EPMLiveEnterprise
 
                 foreach (string sField in arrFieldsToPublish)
                 {
-
-                    string[] sFieldSplit = sField.Split('#');
-                    string fieldName = sFieldSplit[0];
-                    string wssFieldName = sFieldSplit[1];
-                    string assnFieldName = sFieldSplit[2];
-                    string fieldCategory = sFieldSplit[3];
-                    string fieldType = sFieldSplit[4];
-                    string multiplier = sFieldSplit[5];
-                    string rolldown = sFieldSplit[7];
+                    
+                        string[] sFieldSplit = sField.Split('#');
+                        string fieldName = sFieldSplit[0];
+                        string wssFieldName = sFieldSplit[1];
+                        string assnFieldName = sFieldSplit[2];
+                        string fieldCategory = sFieldSplit[3];
+                        string fieldType = sFieldSplit[4];
+                        string multiplier = sFieldSplit[5];
+                        string rolldown = sFieldSplit[7];
                     try
                     {
                         if (fieldName == "TASK_RESNAMES")
@@ -1360,7 +1359,7 @@ namespace EPMLiveEnterprise
                 return hshTaskHierarchy[taskuid].ToString();
 
             WebSvcProject.ProjectDataSet.TaskRow taskRow = (WebSvcProject.ProjectDataSet.TaskRow)pDs.Task.Select("TASK_UID='" + taskuid + "'")[0];
-
+            
             string hierarchy = getHierarchy(pDs, taskRow.TASK_PARENT_UID) + " > " + taskRow.TASK_NAME;
 
             if (hierarchy[1] == '>')
@@ -1585,7 +1584,7 @@ namespace EPMLiveEnterprise
             {
                 myLog.WriteEntry("Error processing Task (" + taskRow.TASK_NAME + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
             }
-
+            
             //return sb.ToString();
         }
 
@@ -1678,11 +1677,11 @@ namespace EPMLiveEnterprise
             try
             {
 
-                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] ds = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])dsFields.CustomFields.Select("MD_PROP_ID=" + fieldName);
+                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow []ds = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow [])dsFields.CustomFields.Select("MD_PROP_ID=" + fieldName);
 
                 if (ds.Length <= 0)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
                         dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
                     });
