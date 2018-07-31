@@ -237,16 +237,18 @@ namespace EPMLiveIntegrationService
             dsIntegration = new DataSet();
             string ip = HttpContext.Current.Request.UserHostAddress;
 
-            SqlCommand cmd = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", cn);
-            cmd.Parameters.AddWithValue("@ip", ip);
-            SqlDataReader dr = cmd.ExecuteReader();
-            dr.Read();
-            attempts = dr.GetInt32(0);
-            dr.Close();
+            using (var cmd = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", cn))
+            {
+                cmd.Parameters.AddWithValue("@ip", ip);
+                SqlDataReader dr = cmd.ExecuteReader();
+                dr.Read();
+                attempts = dr.GetInt32(0);
+                dr.Close();
+            }
 
             if (attempts < 5)
             {
-                cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn);
+                var cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn);
                 cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -267,7 +269,7 @@ namespace EPMLiveIntegrationService
 
                     bool found = false;
 
-                    dr = cmd.ExecuteReader();
+                    var dr = cmd.ExecuteReader();
                     if (dr.Read())
                         found = true;
                     dr.Close();

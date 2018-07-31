@@ -49,8 +49,8 @@ namespace EPMLiveIntegrationService.Tests
             InvokeMethod(service, "iAuthenticate", new object[] {string.Empty, ret, dsIntegration, new ShimSqlConnection().Instance} );
 
             //Assert
-            Assert.AreEqual(3, disposeCommandWasCalled);
-            Assert.AreEqual(1, disposeAdapterWasCalled);
+            Assert.AreEqual(1, disposeCommandWasCalled);
+            Assert.AreEqual(0, disposeAdapterWasCalled);
         }
 
         private void ArrangeShims()
