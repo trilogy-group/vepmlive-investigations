@@ -12,11 +12,12 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using TimeSheets.WebPageCode;
 
 namespace TimeSheets
 {
-    public partial class getpmapprovals : ApprovalBase
+    public partial class GetPmApprovals : ApprovalBase
     {
         SPSite site = SPContext.Current.Site;
         int period;
@@ -94,7 +95,10 @@ namespace TimeSheets
                     da = new SqlDataAdapter(cmd);
                     da.Fill(dsTimesheetTasks);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
             });
 
             Guid webGuid = new Guid();
@@ -129,7 +133,10 @@ namespace TimeSheets
 
                     addTSItem(li, arrGTemp, dr[3].ToString(), dr[4].ToString());
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
             }
         }
 
@@ -181,7 +188,10 @@ namespace TimeSheets
 
                     AddPeriods(docXml, site, arr, period, ref filterHead, cn);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
 
                 XmlNode ndHead = docXml.SelectSingleNode("//head");
                 if (!usecurrent)
@@ -193,8 +203,11 @@ namespace TimeSheets
                         {
                             id = nd.Attributes["id"].Value;
                         }
-                        catch { }
-                        strColumns += "," + id;
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
+                    strColumns += "," + id;
                     }
                     strColumns = strColumns.Substring(1);
                 }
@@ -367,9 +380,12 @@ namespace TimeSheets
                                             bIsIndicator = true;
                                         }
                                     }
-                                    catch { }
+                                    catch (Exception ex)
+                                    {
+                                        Debug.WriteLine(ex);
+                                    }
 
-                                    if (bIsIndicator)
+                                if (bIsIndicator)
                                         ndList[i].InnerText = "<img src=\"/_layouts/images/" + colval + "\">";
                                     else
                                         ndList[i].InnerText = colval;
@@ -454,9 +470,13 @@ namespace TimeSheets
 
                         newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                         if (dsTotalHours.Tables.Count > 0 && dsTotalHours.Tables[0].Rows.Count > 0)
+                        {
                             newCol.InnerText = ndWork.InnerText + "|" + double.Parse(dsTotalHours.Tables[0].Rows[0][0].ToString()).ToString();
+                        }
                         else
+                        {
                             newCol.InnerText = ndWork.InnerText + "|0";
+                        }
 
                         attrStyle1 = docXml.CreateAttribute("style");
                         attrStyle1.Value = "background: #" + bgcolor + "; font-weight: bold";
@@ -539,8 +559,11 @@ namespace TimeSheets
                         string w = ndNewCols[i].Attributes["width"].Value;
                         reservedWidth += double.Parse(w);
                     }
-                    catch { }
-                }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
+            }
                 reservedWidth += 30;
 
                 fullWidth -= reservedWidth;
@@ -556,8 +579,11 @@ namespace TimeSheets
                     {
                         id = ndNewCols[i].Attributes["type"].Value;
                     }
-                    catch { }
-                    if (id == "tree")
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
+                if (id == "tree")
                         ndNewCols[i].Attributes["width"].Value = (fullWidth * 2 - 10).ToString();
                     else
                     {

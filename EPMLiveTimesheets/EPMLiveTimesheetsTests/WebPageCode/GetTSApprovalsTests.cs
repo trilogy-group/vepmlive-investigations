@@ -19,7 +19,7 @@ using TimeSheets;
 namespace EPMLiveTimesheets.Tests.WebPageCode
 {
     [TestClass]
-    public class GetTSApprovalsTests
+    public class GetTsApprovalsTests
     {
         private IDisposable _shimContext;
         private bool _readFirstCall;
@@ -57,7 +57,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
 </rows>
 </root>");
 
-            var approval = new gettsapprovals();
+            var approval = new GetTsApprovals();
             SetFieldValue(approval, "docXml", docXml);
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
 
@@ -74,7 +74,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
         {
             // Arrange
             ArrangeShims();
-            var approval = new gettsapprovals();
+            var approval = new GetTsApprovals();
             SetFieldValue(approval, "arrGroupFields", new[]{ "field"});
             SetFieldValue(approval, "list", new ShimSPList().Instance);
             SetFieldValue(approval, "view", new ShimSPView().Instance);

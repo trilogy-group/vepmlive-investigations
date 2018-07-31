@@ -18,7 +18,7 @@ using TimeSheets;
 namespace EPMLiveTimesheets.Tests.WebPageCode
 {
     [TestClass]
-    public class GetPMApprovalsTests
+    public class GetPmApprovalsTests
     {
         private IDisposable _shimContext;
         private bool _readFirstCall;
@@ -57,7 +57,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
 </rows>
 </root>");
 
-            var approval = new getpmapprovals();
+            var approval = new GetPmApprovals();
             SetFieldValue(approval, "docXml", docXml);
             SetFieldValue(approval, "cn", new ShimSqlConnection().Instance);
             SetFieldValue(approval, "view", new ShimSPView().Instance);
