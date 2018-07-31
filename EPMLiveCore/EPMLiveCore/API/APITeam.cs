@@ -2493,7 +2493,28 @@ namespace EPMLiveCore.API
             ReadFilterInfoFromXml(xml, ensureFilterValueSafe, out arrColumns, out filterValue, out filterField);
 
             var resourceUrl = GetResourceUrl(web);
-            return GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
+            
+            DataTable result;
+            try
+            {
+                result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.ToLower().Contains("access is denied"))
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
+                    });
+                }
+                
+                // (CC-76569, 2018-07-31) Original code always re-throws the exception even in case when call with elevated priveleges successfully completed
+                // It's most likely a mistake, but we are not allowed to fix it in scope of CC
+                throw;
+            }
+
+            return result;
         }
 
         private static void ReadFilterInfoFromXml(
@@ -2573,38 +2594,14 @@ namespace EPMLiveCore.API
 
         private static DataTable GetResourceData(XmlNodeList nodeTeam, ArrayList arrColumns, string filterValue, string filterField, string resourceUrl)
         {
-            DataTable result;
-            try
+            using (SPSite rsite = new SPSite(resourceUrl))
             {
-                using (SPSite rsite = new SPSite(resourceUrl))
+                rsite.CatchAccessDeniedException = false;
+                using (SPWeb rweb = rsite.OpenWeb())
                 {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        result = getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
-                    }
+                    return getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
                 }
             }
-            catch (Exception ex)
-            {
-                if (ex.Message.ToLower().Contains("access is denied"))
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (var resourceSite = new SPSite(resourceUrl))
-                        {
-                            using (var resourceWeb = resourceSite.OpenWeb())
-                            {
-                                result = getResources(resourceWeb, filterField, filterValue, false, arrColumns, null, nodeTeam);
-                            }
-                        }
-                    });
-                }
-
-                throw;
-            }
-
-            return result;
         }
 
         public static List<SPGroup> GetWebGroups(SPWeb spWeb)

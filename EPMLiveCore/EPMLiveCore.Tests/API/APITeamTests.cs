@@ -499,7 +499,17 @@ namespace EPMLiveCore.API.Tests
         public void GetResourcePool_EmptyXml_UsesDefaultValuesForFiltersAndColumns()
         {
             // Arrange
-            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            _resourcePoolXml = null;
+
+            string filterFieldUsed = null;
+            string filterValueUsed = null;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList =
+                (a, filterField, filterValue, d, e, f, g) =>
+                {
+                    filterFieldUsed = filterField;
+                    filterValueUsed = filterValue;
+                    return new DataTable();
+                };
 
             // Act
             var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
@@ -509,6 +519,69 @@ namespace EPMLiveCore.API.Tests
                 _resourcePoolEnsureFilterValueSafe);
 
             // Assert
+            Assert.AreEqual(string.Empty, filterFieldUsed);
+            Assert.AreEqual(string.Empty, filterValueUsed);
+        }
+
+        [TestMethod]
+        public void GetResourcePool_ValidXml_UsesXmlValuesForFiltersAndColumns()
+        {
+            // Arrange
+            string filterFieldUsed = null;
+            string filterValueUsed = null;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList =
+                (a, filterField, filterValue, d, e, f, g) =>
+                {
+                    filterFieldUsed = filterField;
+                    filterValueUsed = filterValue;
+                    return new DataTable();
+                };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
+            Assert.AreEqual("Field1", filterFieldUsed);
+            Assert.AreEqual("Field1Value", filterValueUsed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "access is denied")]
+        public void GetResourcePool_GetResourceDataThrowsAccessDenied_RetriesWithElevatedPrivelege()
+        {
+            // Arrange
+            var retries = 0;
+            var isPrivelegesElevated = false;
+            ShimAPITeam.GetResourceDataXmlNodeListArrayListStringStringString = (a, b, c, d, e) =>
+            {
+                if (retries++ == 0)
+                {
+                    ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action =>
+                    {
+                        isPrivelegesElevated = true;
+                        action();
+                    };
+
+                    throw new Exception("access is denied");
+                }
+
+                return new DataTable();
+            };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
+            Assert.AreEqual(2, retries);
+            Assert.IsTrue(isPrivelegesElevated);
         }
     }
 
