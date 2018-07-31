@@ -1279,8 +1279,13 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllTaskEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllTaskEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
 

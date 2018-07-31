@@ -197,6 +197,23 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
+        [TestMethod]
+        public void GetAllTaskEnterpriseFieldList_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPContext.CurrentGet = () => null;
+
+            // Act
+            var result = _publisher.getAllTaskEnterpriseFieldList();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
         private void AssertThatObjectsAreDisposed()
         {
             Assert.IsTrue(_isConnectionDisposeCalled);
