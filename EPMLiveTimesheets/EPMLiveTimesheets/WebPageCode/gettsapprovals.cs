@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace TimeSheets
 {
@@ -53,7 +54,7 @@ namespace TimeSheets
             string strPeriod = Request["period"];
             period = int.Parse(strPeriod);
             base.inEditMode = false;
-            string resUrl = "";
+            string resUrl = string.Empty;
 
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -63,13 +64,13 @@ namespace TimeSheets
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(curWeb.Site.WebApplication.Id));
                     cn.Open();
                 }
-                catch { }
+                catch(Exception ex) { Debug.WriteLine(ex); }
                 resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb, "EPMLiveResourceURL", true, false); 
             });
 
             try
             {
-                if (resUrl != "")
+                if (resUrl != string.Empty)
                 {
                     if (resUrl.ToLower() != curWeb.Url.ToLower())
                     {
@@ -87,7 +88,7 @@ namespace TimeSheets
                         resWeb = curWeb;
                 }
             }
-            catch { }
+            catch(Exception ex) { Debug.WriteLine(ex); }
 
             SqlCommand cmd = new SqlCommand("select ts_uid,username,submitted,approval_status,approval_notes,resourcename,jobstatus,jobtype_id from vwTSTimesheetWQueue where period_id=@period_id and site_uid=@siteid", cn);
             cmd.CommandType = CommandType.Text;
@@ -173,15 +174,15 @@ namespace TimeSheets
                             DataRow[] drts = dsTimesheets.Tables[0].Select("username = '" + uv.User.LoginName + "'");
 
                             if (!arrGTemp.Contains(li.Title))
-                                arrGTemp.Add(li.Title, "");
+                                arrGTemp.Add(li.Title, string.Empty);
 
                             XmlNode newNode = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
                             XmlAttribute attrId = docXml.CreateAttribute("id");
                             attrId.InnerText = li.Title;
                             newNode.Attributes.Append(attrId);
 
-                            string status = "";//<![CDATA[<img src=\"_layouts/epmlive/images/tsflagnone.gif\" alt=\"No Timesheet\">]]>";
-                            string notes = "";
+                            string status = string.Empty;//<![CDATA[<img src=\"_layouts/epmlive/images/tsflagnone.gif\" alt=\"No Timesheet\">]]>";
+                            string notes = string.Empty;
 
                             if (drts.Length > 0)
                             {
@@ -251,7 +252,7 @@ namespace TimeSheets
                             else
                             {
                                 XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                newCol.InnerText = "";
+                                newCol.InnerText = string.Empty;
                                 XmlAttribute attrName = docXml.CreateAttribute("name");
                                 attrName.Value = "tsuid";
                                 newCol.Attributes.Append(attrName);
@@ -266,7 +267,7 @@ namespace TimeSheets
                             }
 
                             XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = "";
+                            newCell.InnerText = string.Empty;
                             XmlAttribute attrStyle = docXml.CreateAttribute("style");
                             attrStyle.Value = "background: #DFE7F7; font-weight:bold";
                             newCell.Attributes.Append(attrStyle);
@@ -287,7 +288,7 @@ namespace TimeSheets
                             newNode.AppendChild(newCell);
 
                             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = "";
+                            newCell.InnerText = string.Empty;
                             attrStyle = docXml.CreateAttribute("style");
                             attrStyle.Value = "background: #DFE7F7; font-weight:bold";
                             newCell.Attributes.Append(attrStyle);
@@ -319,7 +320,7 @@ namespace TimeSheets
                 SPWeb iWeb = null;
                 SPList iList = null;
 
-                foreach (DataRow dr in dtItems.Select("", "WebId, ListId"))
+                foreach (DataRow dr in dtItems.Select(string.Empty, "WebId, ListId"))
                 {
                     try
                     {
@@ -346,7 +347,7 @@ namespace TimeSheets
 
                         addTSItem(li, arrGTemp, dr[3].ToString(), dr[4].ToString());
                     }
-                    catch { }
+                    catch(Exception ex) { Debug.WriteLine(ex); }
                 }
             }
         }
@@ -354,14 +355,14 @@ namespace TimeSheets
         protected override void outputXml()
         {
             ArrayList arr = new ArrayList();
-            string worktypes = "";
+            string worktypes = string.Empty;
             bool timeeditor = false;
             bool timenotes = false;
-            string filterHead = "";
+            string filterHead = string.Empty;
             XmlNodeList ndCols = docXml.SelectNodes("//head/column");
 
             int columnCount = ndCols.Count;
-            string strColumns = "";
+            string strColumns = string.Empty;
 
             SPWeb web = site.RootWeb;
             {
@@ -384,7 +385,7 @@ namespace TimeSheets
                         ref timeeditor,
                         ref timenotes);
                 }
-                catch { }
+                catch(Exception ex) { Debug.WriteLine(ex); }
 
 
                 XmlNode ndHead = docXml.SelectSingleNode("//head");
@@ -393,12 +394,12 @@ namespace TimeSheets
                 {
                     foreach (XmlNode nd in ndHead.SelectNodes("column"))
                     {
-                        string id = "";
+                        string id = string.Empty;
                         try
                         {
                             id = nd.Attributes["id"].Value;
                         }
-                        catch { }
+                        catch(Exception ex) { Debug.WriteLine(ex); }
                         strColumns += "," + id;
                     }
                     strColumns = strColumns.Substring(1);
@@ -485,7 +486,7 @@ namespace TimeSheets
                         string w = ndNewCols[i].Attributes["width"].Value;
                         reservedWidth += double.Parse(w);
                     }
-                    catch { }
+                    catch(Exception ex) { Debug.WriteLine(ex); }
                 }
                 reservedWidth += 125;
 
@@ -497,12 +498,12 @@ namespace TimeSheets
 
                 for (int i = 4; i <= columnCount+3; i++)
                 {
-                    string id = "";
+                    string id = string.Empty;
                     try
                     {
                         id = ndNewCols[i].Attributes["type"].Value;
                     }
-                    catch { }
+                    catch(Exception ex) { Debug.WriteLine(ex); }
                     if (id == "tree")
                         ndNewCols[i].Attributes["width"].Value = (fullWidth * 2 - 10).ToString();
                     else
@@ -544,7 +545,7 @@ namespace TimeSheets
             //        group[i] += "\n" + resource;
             //    if (!arrGTemp.Contains(group[i]))
             //    {
-            //        arrGTemp.Add(group[i], "");
+            //        arrGTemp.Add(group[i], string.Empty);
             //    }
             //}
 
@@ -561,7 +562,7 @@ namespace TimeSheets
                     {
                         newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
                     }
-                    catch { }
+                    catch(Exception ex) { Debug.WriteLine(ex); }
                     if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
                     {
                         string[] sGroups = newgroup.Split('\n');
@@ -580,7 +581,7 @@ namespace TimeSheets
 
                                 if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
                                 {
-                                    arrGTemp.Add(tmpGroups[tmpCounter], "");
+                                    arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
                                 }
                                 tmpCounter++;
                             }
@@ -597,7 +598,7 @@ namespace TimeSheets
                                 group[i] += "\n" + newgroup;
                             if (!arrGTemp.Contains(group[i]))
                             {
-                                arrGTemp.Add(group[i], "");
+                                arrGTemp.Add(group[i], string.Empty);
                             }
                         }
                     }
@@ -617,7 +618,7 @@ namespace TimeSheets
             XmlAttribute attrStyle2;
 
             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCell.InnerText = "";
+            newCell.InnerText = string.Empty;
             XmlAttribute attrType = docXml.CreateAttribute("type");
             attrType.Value = "ro";
             newCell.Attributes.Append(attrType);
@@ -627,7 +628,7 @@ namespace TimeSheets
             nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
 
             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCell.InnerText = "";
+            newCell.InnerText = string.Empty;
             attrType = docXml.CreateAttribute("type");
             attrType.Value = "ro";
             newCell.Attributes.Append(attrType);
@@ -637,7 +638,7 @@ namespace TimeSheets
             nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
 
             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCell.InnerText = "";
+            newCell.InnerText = string.Empty;
             attrType = docXml.CreateAttribute("type");
             attrType.Value = "ro";
             newCell.Attributes.Append(attrType);
@@ -680,9 +681,7 @@ namespace TimeSheets
             newCol.Attributes.Append(attrType);
             foreach (string strWorkType in strworktypes)
             {
-
-                //DataRow[] drs = dsTSHours.Tables[0].Select("list_uid='" + ndListId.InnerText + "' and item_id=" + ndItemId.InnerText + " and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "# and tstype_id='" + strWorkType + "'");
-                DataRow[] drs = dsTSHours.Tables[0].Select("ts_item_uid = '" + ts_item_uid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "# and tstype_id='" + strWorkType + "'");
+                var drs = dsTSHours.Tables[0].Select("ts_item_uid = '" + ts_item_uid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "# and tstype_id='" + strWorkType + "'");
                 if (drs.Length > 0)
                 {
                     total += double.Parse(drs[0]["TS_ITEM_HOURS"].ToString());
@@ -740,7 +739,7 @@ namespace TimeSheets
         protected override void InsertCell1(XmlNode nd)
         {
             var newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCell.InnerText = "";
+            newCell.InnerText = string.Empty;
             var attrType = docXml.CreateAttribute("type");
             attrType.Value = "ro";
             newCell.Attributes.Append(attrType);
@@ -748,7 +747,7 @@ namespace TimeSheets
             nd.InsertBefore(newCell, nd.SelectSingleNode("cell"));
 
             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCell.InnerText = "";
+            newCell.InnerText = string.Empty;
             attrType = docXml.CreateAttribute("type");
             attrType.Value = "ro";
             newCell.Attributes.Append(attrType);
@@ -759,7 +758,7 @@ namespace TimeSheets
         protected override void InsertCell2(XmlNode nd)
         {
             var newCol2 = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-            newCol2.InnerText = "";
+            newCol2.InnerText = string.Empty;
             var attrStyle2 = docXml.CreateAttribute("style");
             attrStyle2.Value = "background: #" + bgcolor + ";font-weight: bold;";
             newCol2.Attributes.Append(attrStyle2);
@@ -770,4 +769,3 @@ namespace TimeSheets
         }
     }
 }
-
