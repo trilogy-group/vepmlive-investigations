@@ -50,7 +50,7 @@ namespace EPMLiveIntegrationService.Tests
 
             //Assert
             Assert.AreEqual(2, disposeCommandWasCalled);
-            Assert.AreEqual(0, disposeAdapterWasCalled);
+            Assert.AreEqual(1, disposeAdapterWasCalled);
         }
 
         private void ArrangeShims()

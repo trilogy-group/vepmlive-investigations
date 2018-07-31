@@ -252,8 +252,10 @@ namespace EPMLiveIntegrationService
                 {
                     cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsIntegration);
+                    using (var da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dsIntegration);
+                    }
                 }
 
                 if (dsIntegration.Tables.Count >0 && dsIntegration.Tables[0].Rows.Count > 0)
