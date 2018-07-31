@@ -28,7 +28,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [TOSET_MAINKEY],[CB_ID],[CT_ID],[CV_TIMESTAMP])
     SELECT 101, CT_CB_ID, CT_ID, GETDATE() 
     FROM EPGP_COST_TYPES 
-    WHERE CT_EDIT_MODE IN (9, 41)";
+    WHERE CT_EDIT_MODE IN (9, 41) AND CT_CB_ID > 0";
 
         public ProjectResourceRateFirstInstall64(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {

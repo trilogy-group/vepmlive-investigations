@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CostDataValues;
 
 namespace PortfolioEngineCore.Analyzers
 {
     // (CC-76855, 2018-07-23) Field names should be refactored on extraction, but I have no idea what most of them mean.
     // Because of this and for the sake of naming consistency across the project, not changing
-    public abstract class BaseDetailRowData
+    public abstract class BaseDetailRowData<TTargetRowData>
+        where TTargetRowData : ITargetRowData
     {
         public int CB_ID;
         public int CT_ID;
@@ -106,7 +108,7 @@ namespace PortfolioEngineCore.Analyzers
             TXVal = new string[6];
         }
 
-        protected void CopyData(BaseDetailRowData source)
+        protected void CopyData(BaseDetailRowData<TTargetRowData> source)
         {
             if (source == null)
             {
@@ -394,6 +396,43 @@ namespace PortfolioEngineCore.Analyzers
         private double AFiddler(double f)
         {
             return double.Parse(f.ToString("0.00"));
+        }
+
+        public void CopyToTargetData(TTargetRowData dest)
+        {
+            if (dest == null)
+            {
+                throw new ArgumentNullException(nameof(dest));
+            }
+
+            dest.CT_ID = CT_ID;
+            dest.BC_UID = BC_UID;
+            dest.BC_ROLE_UID = BC_ROLE_UID;
+            dest.BC_SEQ = BC_SEQ;
+            dest.MC_Val = MC_Val;
+            dest.CAT_UID = CAT_UID;
+            dest.CT_Name = CT_Name;
+            dest.Cat_Name = Cat_Name;
+            dest.Role_Name = Role_Name;
+            dest.MC_Name = MC_Name;
+            dest.FullCatName = FullCatName;
+            dest.CC_Name = CC_Name;
+            dest.FullCCName = FullCCName;
+            dest.bGroupRow = false;
+            dest.Grouping = string.Empty;
+            dest.OCVal = OCVal;
+            dest.Text_OCVal = Text_OCVal;
+            dest.TXVal = TXVal;
+            dest.zCost = new double[mxdim + 1];
+            dest.zValue = new double[mxdim + 1];
+            dest.zFTE = new double[mxdim + 1];
+
+            for (var i = 1; i <= mxdim; i++)
+            {
+                dest.zCost[i] = zCost[i];
+                dest.zValue[i] = zValue[i];
+                dest.zFTE[i] = zFTE[i];
+            }
         }
     }
 }

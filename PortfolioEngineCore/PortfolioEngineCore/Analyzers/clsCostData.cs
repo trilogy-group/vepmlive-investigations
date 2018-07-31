@@ -57,11 +57,14 @@ namespace CostDataValues
 
     }
     [Serializable()]
-    public class clsListItemData
+    public class clsListItemData : IListItemData
     {
-        public int UID, ID, Level;
-        public string Name, FullName;
-        public bool InActive;
+        public int UID { get; set; }
+        public int ID { get; set; }
+        public int Level { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public bool InActive { get; set; }
     }
     [Serializable()]
     public class clsPortFieldData
@@ -70,24 +73,27 @@ namespace CostDataValues
         public string Name, GivenName;
     }
     [Serializable()]
-    public class clsCustomFieldData
+    public class clsCustomFieldData : ICustomFieldData<clsListItemData>
     {
-        public int FieldID;
-        public string Name;
-        public string DisplayName;
-        public int LookupOnly, LookupID, LeafOnly, UseFullName;
-        public Dictionary<int, clsListItemData> ListItems;
-        public string jsonMenu;
+        public int FieldID { get; set; }
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public int LookupOnly { get; set; }
+        public int LookupID { get; set; }
+        public int LeafOnly { get; set; }
+        public int UseFullName { get; set; }
+        public IDictionary<int, clsListItemData> ListItems { get; set; }
+        public string jsonMenu { get; set; }
     }
     [Serializable()]
-    public class clsDataItem
+    public class clsDataItem : IDataItem
     {
-        public string Name = "";
-        public string Desc = "";
-        public int UID = 0;
-        public int ID = 0;
-        public bool bEditiable = false;
-        public bool bSelected = true;
+        public string Name { get; set; } = "";
+        public string Desc { get; set; } = "";
+        public int UID { get; set; } = 0;
+        public int ID { get; set; } = 0;
+        public bool bEditiable { get; set; } = false;
+        public bool bSelected { get; set; } = true;
     };
     [Serializable()]
     public class clsPIData : IComparable<clsPIData>
@@ -114,29 +120,35 @@ namespace CostDataValues
         }
     }
     [Serializable()]
-    public class clsTargetRowData
+    public class clsTargetRowData : ITargetRowData
     {
-        public int CT_ID;
-        public int BC_UID;
-        public int BC_ROLE_UID;
-        public int BC_SEQ;
-        public string MC_Val;
-        public int CAT_UID;
-        public string CT_Name, Cat_Name, Role_Name, MC_Name, FullCatName, CC_Name, FullCCName, Grouping;
-        public bool bGroupRow;
-
-        public int m_rt;
-        public string m_rt_name;
-
-
-        public string sUoM;
-        public double[] zCost, zValue, zFTE;
-        public int[] OCVal;
-        public string[] Text_OCVal;
-        public string[] TXVal;
+        public int CT_ID { get; set; }
+        public int BC_UID { get; set; }
+        public int BC_ROLE_UID { get; set; }
+        public int BC_SEQ { get; set; }
+        public string MC_Val { get; set; }
+        public int CAT_UID { get; set; }
+        public string CT_Name { get; set; }
+        public string Cat_Name { get; set; }
+        public string Role_Name { get; set; }
+        public string MC_Name { get; set; }
+        public string FullCatName { get; set; }
+        public string CC_Name { get; set; }
+        public string FullCCName { get; set; }
+        public string Grouping { get; set; }
+        public bool bGroupRow { get; set; }
+        public int m_rt { get; set; }
+        public string m_rt_name { get; set; }
+        public string sUoM { get; set; }
+        public double[] zCost { get; set; }
+        public double[] zValue { get; set; }
+        public double[] zFTE { get; set; }
+        public int[] OCVal { get; set; }
+        public string[] Text_OCVal { get; set; }
+        public string[] TXVal { get; set; }
     }
     [Serializable()]
-    public class clsDetailRowData : BaseDetailRowData
+    public class clsDetailRowData : BaseDetailRowData<clsTargetRowData>
     {
         public int CT_ind;
         public bool bFiltered;
@@ -160,47 +172,6 @@ namespace CostDataValues
         public void CopyData(clsDetailRowData src)
         {
             base.CopyData(src);
-        }
-
-        public void CopyToTargetData(ref clsTargetRowData dest)
-        {
-
-            dest.CT_ID = CT_ID;
-
-            dest.BC_UID = BC_UID;
-            dest.BC_ROLE_UID = BC_ROLE_UID;
-            dest.BC_SEQ = BC_SEQ;
-            dest.MC_Val = MC_Val;
-            dest.CAT_UID = CAT_UID;
-            dest.CT_Name = CT_Name;
-            dest.Cat_Name = Cat_Name;
-            dest.Role_Name = Role_Name;
-            dest.MC_Name = MC_Name;
-            dest.FullCatName = FullCatName;
-            dest.CC_Name = CC_Name;
-            dest.FullCCName = FullCCName;
-
-            dest.bGroupRow = false;
-            dest.Grouping = "";
-
-            dest.OCVal = OCVal;
-            dest.Text_OCVal = Text_OCVal;
-            dest.TXVal = TXVal;
-
-            dest.zCost = new double[mxdim + 1];
-            dest.zValue = new double[mxdim + 1];
-            dest.zFTE = new double[mxdim + 1];
-
-
-            for (int i = 1; i <= mxdim; i++)
-            {
-
-                dest.zCost[i] = zCost[i];
-                dest.zValue[i] = zValue[i];
-                dest.zFTE[i] = zFTE[i];
-
-            }
-
         }
 
         public void AddToTargetData(ref clsTargetRowData dest)

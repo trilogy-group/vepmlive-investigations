@@ -20,6 +20,8 @@ using Microsoft.SharePoint.Utilities;
 
 using System.DirectoryServices;
 
+using EPMLiveCore.API.ProjectDiscountRate;
+
 namespace WorkEnginePPM
 {
 
@@ -455,9 +457,18 @@ namespace WorkEnginePPM
         public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web, DataTable dtResources = null)
         {
             SPList list = li.ParentList;
+            var discountRateXml = string.Empty;
 
-            string xml = "<Item EXTID=\"" + list.ParentWeb.ID + "." + list.ID + "." + li.ID + "\" ListID=\"" + li.ParentList.Title + "\">";
-            string title = li.Title;
+            if (li.Fields.ContainsField(ProjectDiscountRateService.ProjectDiscountRateColumn))
+            {
+                var oldRate = li[ProjectDiscountRateService.ProjectDiscountRateColumn]?.ToString() ?? "0";
+                var newRate = properties[ProjectDiscountRateService.ProjectDiscountRateColumn]?.ToString() ?? oldRate;
+                discountRateXml = $"DiscountRate=\"{newRate}\" DiscountRatePreviousValue=\"{oldRate}\"";
+            }
+
+            var xml = "<Item EXTID=\"" + list.ParentWeb.ID + "." + list.ID + "." + li.ID + "\" ListID=\""
+                         + li.ParentList.Title + "\" " + discountRateXml + ">";
+            var title = li.Title;
             try
             {
                 if (properties["Title"] != null)
