@@ -252,7 +252,7 @@ namespace EPMLiveIntegrationService
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dsIntegration);
 
-                if (dsIntegration.Tables[0].Rows.Count > 0)
+                if (dsIntegration.Tables.Count >0 && dsIntegration.Tables[0].Rows.Count > 0)
                 {
                     ret = "";
                     return true;
