@@ -25,7 +25,6 @@ namespace EPMLivePS.Tests
         private bool _isConnectionDisposeCalled;
         private bool _isEventLogDisposeCalled;
         private bool _isSqlCommandDisposeCalled;
-        private bool _isDataReaderDisposeCalled;
 
         [TestInitialize]
         public void Setup()
@@ -37,7 +36,6 @@ namespace EPMLivePS.Tests
             _isConnectionDisposeCalled = false;
             _isEventLogDisposeCalled = false;
             _isSqlCommandDisposeCalled = false;
-            _isDataReaderDisposeCalled = false;
 
             _context = ShimsContext.Create();
             _publisher = new EPMLivePublisher();
@@ -186,7 +184,6 @@ namespace EPMLivePS.Tests
         {
             Assert.IsTrue(_isConnectionDisposeCalled);
             Assert.IsTrue(_isSqlCommandDisposeCalled);
-            Assert.IsTrue(_isDataReaderDisposeCalled);
         }
 
         private void SetupShims()
@@ -238,10 +235,6 @@ namespace EPMLivePS.Tests
             ShimSqlConnection.AllInstances.DisposeBoolean = (_, __) =>
             {
                 _isConnectionDisposeCalled = true;
-            };
-            ShimSqlDataReader.AllInstances.Close = _ =>
-            {
-                _isDataReaderDisposeCalled = true;
             };
             ShimSqlCommand.AllInstances.DisposeBoolean = (_, __) =>
             {
