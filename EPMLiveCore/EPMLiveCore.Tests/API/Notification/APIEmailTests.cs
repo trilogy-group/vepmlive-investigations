@@ -528,326 +528,326 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.AreSame(_openedConnection, _disposedConnection);
         }
 
-    private void AssertNonQueryComands(object listItemId, object listParentListId)
-    {
-        Assert.AreEqual(5, _executeNonQueryCommands.Count);
-        Assert.AreSame(_createdConnection, _executeNonQueryCommands[0].Connection);
-        Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
-        Assert.IsTrue(_executeNonQueryCommands[0].CommandText.StartsWith("update", StringComparison.OrdinalIgnoreCase));
-        Assert.AreEqual(listParentListId, _executeNonQueryCommands[0].Parameters["@listid"].Value);
-        Assert.AreEqual(listItemId, _executeNonQueryCommands[0].Parameters["@itemid"].Value);
-        Assert.IsTrue(_executeNonQueryCommands[1].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
-        Assert.IsTrue(_executeNonQueryCommands[2].CommandText.StartsWith("insert", StringComparison.OrdinalIgnoreCase));
-        Assert.IsTrue(_executeNonQueryCommands[3].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
-        Assert.IsTrue(_executeNonQueryCommands[4].CommandText.StartsWith("delete", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private void AssertDataSetCommand()
-    {
-        Assert.AreEqual(1, _dataSetCommands.Count);
-        Assert.AreSame(_createdConnection, _dataSetCommands[0].Connection);
-        Assert.AreEqual(CommandType.Text, _dataSetCommands[0].CommandType);
-        Assert.IsTrue(
-            "select * from personalizations where FK=@id"
-            .Equals(_dataSetCommands[0].CommandText, StringComparison.OrdinalIgnoreCase));
-        Assert.AreEqual(1, _dataSetCommands[0].Parameters.Count);
-    }
-
-    private void ShimIQueueItemMessage()
-    {
-        ShimSPSite.ConstructorGuid = (site, _) =>
+        private void AssertNonQueryComands(object listItemId, object listParentListId)
         {
-            var shimSite = new ShimSPSite(site)
+            Assert.AreEqual(5, _executeNonQueryCommands.Count);
+            Assert.AreSame(_createdConnection, _executeNonQueryCommands[0].Connection);
+            Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
+            Assert.IsTrue(_executeNonQueryCommands[0].CommandText.StartsWith("update", StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(listParentListId, _executeNonQueryCommands[0].Parameters["@listid"].Value);
+            Assert.AreEqual(listItemId, _executeNonQueryCommands[0].Parameters["@itemid"].Value);
+            Assert.IsTrue(_executeNonQueryCommands[1].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(_executeNonQueryCommands[2].CommandText.StartsWith("insert", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(_executeNonQueryCommands[3].CommandText.StartsWith("spNSetBit", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(_executeNonQueryCommands[4].CommandText.StartsWith("delete", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void AssertDataSetCommand()
+        {
+            Assert.AreEqual(1, _dataSetCommands.Count);
+            Assert.AreSame(_createdConnection, _dataSetCommands[0].Connection);
+            Assert.AreEqual(CommandType.Text, _dataSetCommands[0].CommandType);
+            Assert.IsTrue(
+                "select * from personalizations where FK=@id"
+                .Equals(_dataSetCommands[0].CommandText, StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(1, _dataSetCommands[0].Parameters.Count);
+        }
+
+        private void ShimIQueueItemMessage()
+        {
+            ShimSPSite.ConstructorGuid = (site, _) =>
             {
-                OpenWebGuid = webGuid =>
+                var shimSite = new ShimSPSite(site)
                 {
-                    if (webGuid == _oWebId)
+                    OpenWebGuid = webGuid =>
                     {
-                        return new ShimSPWeb
+                        if (webGuid == _oWebId)
                         {
-                            IDGet = () => Guid.NewGuid(),
-                            SiteGet = () => new ShimSPSite
+                            return new ShimSPWeb
                             {
-                                IDGet = () => Guid.NewGuid()
-                            },
-                            ListsGet = () => new ShimSPListCollection
-                            {
-                                ItemGetGuid = key =>
+                                IDGet = () => Guid.NewGuid(),
+                                SiteGet = () => new ShimSPSite
                                 {
-                                    if (key == new Guid(ListId))
-                                    {
-                                        return new ShimSPList
-                                        {
-                                            GetItemByIdInt32 = id =>
-                                            {
-                                                if (id == ItemId)
-                                                {
-                                                    return CreateShimSpListItem(_webAppGuid1);
-                                                }
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
+                                    IDGet = () => Guid.NewGuid()
                                 },
-                                TryGetListString = key =>
+                                ListsGet = () => new ShimSPListCollection
                                 {
-                                    if (key == ListName)
+                                    ItemGetGuid = key =>
                                     {
-                                        return new ShimSPList
+                                        if (key == new Guid(ListId))
                                         {
-                                            GetItemByIdInt32 = id =>
+                                            return new ShimSPList
                                             {
-                                                if (id == ItemId)
+                                                GetItemByIdInt32 = id =>
                                                 {
-                                                    return CreateShimSpListItem(_webAppGuid2);
+                                                    if (id == ItemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid1);
+                                                    }
+                                                    return null;
                                                 }
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                    else
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    },
+                                    TryGetListString = key =>
                                     {
-                                        return null;
+                                        if (key == ListName)
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == ItemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid2);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
                                     }
                                 }
-                            }
-                        };
-                    }
-                    else
-                    {
-                        return new ShimSPWeb
+                            };
+                        }
+                        else
                         {
-                            IDGet = () => Guid.NewGuid(),
-                            SiteGet = () => new ShimSPSite
+                            return new ShimSPWeb
                             {
-                                IDGet = () => Guid.NewGuid()
-                            },
-                            ListsGet = () => new ShimSPListCollection
-                            {
-                                ItemGetGuid = key =>
+                                IDGet = () => Guid.NewGuid(),
+                                SiteGet = () => new ShimSPSite
                                 {
-                                    if (key == new Guid(ListId))
-                                    {
-                                        return new ShimSPList
-                                        {
-                                            GetItemByIdInt32 = id =>
-                                            {
-                                                if (id == ItemId)
-                                                {
-                                                    return CreateShimSpListItem(_webAppGuid3);
-                                                }
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
+                                    IDGet = () => Guid.NewGuid()
                                 },
-                                TryGetListString = key =>
+                                ListsGet = () => new ShimSPListCollection
                                 {
-                                    if (key == ListName)
+                                    ItemGetGuid = key =>
                                     {
-                                        return new ShimSPList
+                                        if (key == new Guid(ListId))
                                         {
-                                            GetItemByIdInt32 = id =>
+                                            return new ShimSPList
                                             {
-                                                if (id == ItemId)
+                                                GetItemByIdInt32 = id =>
                                                 {
-                                                    return CreateShimSpListItem(_webAppGuid4);
+                                                    if (id == ItemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid3);
+                                                    }
+                                                    return null;
                                                 }
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                    else
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    },
+                                    TryGetListString = key =>
                                     {
-                                        return null;
+                                        if (key == ListName)
+                                        {
+                                            return new ShimSPList
+                                            {
+                                                GetItemByIdInt32 = id =>
+                                                {
+                                                    if (id == ItemId)
+                                                    {
+                                                        return CreateShimSpListItem(_webAppGuid4);
+                                                    }
+                                                    return null;
+                                                }
+                                            };
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
                                     }
                                 }
-                            }
-                        };
-                    }
-                },
-                WebApplicationGet = () =>
-                {
-                    var shimSPWebApplication = new ShimSPWebApplication();
-                    var shimSPWebApplicationPersistedObject = new ShimSPPersistedObject(shimSPWebApplication)
-                    {
-                        IdGet = () => Guid.NewGuid()
-                    };
-                    return shimSPWebApplication;
-                }
-            };
-        };
-
-        _createdConnection = null;
-        ShimSqlConnection.ConstructorString = (connection, _) =>
-        {
-            _createdConnection = connection;
-        };
-
-        ShimGetCoreInformation();
-
-        _openedConnection = null;
-        ShimSqlConnection.AllInstances.Open = connection =>
-        {
-            _openedConnection = connection;
-        };
-
-        _closedConnection = null;
-        ShimSqlConnection.AllInstances.Close = (connection) =>
-        {
-            _closedConnection = connection;
-        };
-
-        _disposedConnection = null;
-        ShimSqlConnection.AllInstances.DisposeBoolean = (connection, disposing) =>
-        {
-            _disposedConnection = connection;
-        };
-
-        _createdCommands = new List<SqlCommand>();
-        ShimSqlCommand.ConstructorStringSqlConnection = (command, text, conn) =>
-        {
-            command.Connection = conn;
-            command.CommandText = text;
-            _createdCommands.Add(command);
-        };
-        ShimSqlCommand.Constructor = command =>
-        {
-            _createdCommands.Add(command);
-        };
-
-        _executeReaderCommandsCalled = new List<SqlCommand>();
-        ShimSqlCommand.AllInstances.ExecuteReader = command =>
-        {
-            _executeReaderCommandsCalled.Add(command);
-
-            var shimReader = new ShimSqlDataReader
-            {
-                Read = () =>
-                {
-                    return true;
-                },
-                GetGuidInt32 = _ =>
-                {
-                    var readerGuid = new Guid("E2954076-F6FD-4FFE-9B10-642C9D08368F");
-                    return readerGuid;
-                }
-            };
-            return shimReader;
-        };
-
-        _executeNonQueryCommands = new List<SqlCommand>();
-        ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
-        {
-            _executeNonQueryCommands.Add(command);
-            return 0;
-        };
-
-        _disposedCommands = new List<SqlCommand>();
-        ShimSqlCommand.AllInstances.DisposeBoolean = (command, disposing) =>
-        {
-            _disposedCommands.Add(command);
-        };
-
-        _dataSetCommands = new List<SqlCommand>();
-        ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, dataSet) =>
-        {
-            var command = (SqlCommand)adapter.SelectCommand;
-            _dataSetCommands.Add(command);
-
-            var userTable = new DataTable();
-            userTable.Columns.Add("userid", typeof(string));
-            var userRow = userTable.NewRow();
-            userRow["userid"] = "177";
-            userTable.Rows.Add(userRow);
-            dataSet.Tables.Add(userTable);
-            return 0;
-        };
-    }
-
-    private static void ShimGetCoreInformation()
-    {
-        ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser =
-            (SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser) =>
-            {
-                body = "goose live in {building} house";
-                subject = "{building} house";
-            };
-    }
-
-    private static ShimSPWeb CreateSPWeb()
-    {
-        return new ShimSPWeb
-        {
-            IDGet = () => Guid.NewGuid(),
-            SiteGet = () =>
-            {
-                return new ShimSPSite
-                {
-                    IDGet = () => Guid.NewGuid()
-                };
-            }
-        };
-    }
-
-    private static ShimSPListItem CreateShimSpListItem(Guid webApplicationId)
-    {
-        var webAppShim = new ShimSPWebApplication();
-        var persistentObject = new ShimSPPersistedObject(webAppShim);
-        persistentObject.IdGet = () => webApplicationId;
-
-        return new ShimSPListItem
-        {
-            IDGet = () => ListItemId,
-            ParentListGet = () =>
-            {
-                return new ShimSPList
-                {
-                    IDGet = () => _listParentListId,
-                    ParentWebGet = () =>
-                    {
-                        return new ShimSPWeb
-                        {
-                            SiteGet = () =>
-                            {
-                                return new ShimSPSite
-                                {
-                                    WebApplicationGet = () =>
-                                    {
-                                        return webAppShim;
-                                    }
-                                };
-                            }
-                        };
+                            };
+                        }
                     },
-                    FormsGet = () =>
+                    WebApplicationGet = () =>
                     {
-                        var formCollection = new ShimSPFormCollection
+                        var shimSPWebApplication = new ShimSPWebApplication();
+                        var shimSPWebApplicationPersistedObject = new ShimSPPersistedObject(shimSPWebApplication)
                         {
-                            ItemGetPAGETYPE = formId =>
-                            {
-                                return new ShimSPForm
-                                {
-                                    UrlGet = () =>
-                                    {
-                                        return "valera.com";
-                                    }
-                                };
-                            }
+                            IdGet = () => Guid.NewGuid()
                         };
-                        return formCollection;
+                        return shimSPWebApplication;
                     }
                 };
-            }
-        };
+            };
+
+            _createdConnection = null;
+            ShimSqlConnection.ConstructorString = (connection, _) =>
+            {
+                _createdConnection = connection;
+            };
+
+            ShimGetCoreInformation();
+
+            _openedConnection = null;
+            ShimSqlConnection.AllInstances.Open = connection =>
+            {
+                _openedConnection = connection;
+            };
+
+            _closedConnection = null;
+            ShimSqlConnection.AllInstances.Close = (connection) =>
+            {
+                _closedConnection = connection;
+            };
+
+            _disposedConnection = null;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, disposing) =>
+            {
+                _disposedConnection = connection;
+            };
+
+            _createdCommands = new List<SqlCommand>();
+            ShimSqlCommand.ConstructorStringSqlConnection = (command, text, conn) =>
+            {
+                command.Connection = conn;
+                command.CommandText = text;
+                _createdCommands.Add(command);
+            };
+            ShimSqlCommand.Constructor = command =>
+            {
+                _createdCommands.Add(command);
+            };
+
+            _executeReaderCommandsCalled = new List<SqlCommand>();
+            ShimSqlCommand.AllInstances.ExecuteReader = command =>
+            {
+                _executeReaderCommandsCalled.Add(command);
+
+                var shimReader = new ShimSqlDataReader
+                {
+                    Read = () =>
+                    {
+                        return true;
+                    },
+                    GetGuidInt32 = _ =>
+                    {
+                        var readerGuid = new Guid("E2954076-F6FD-4FFE-9B10-642C9D08368F");
+                        return readerGuid;
+                    }
+                };
+                return shimReader;
+            };
+
+            _executeNonQueryCommands = new List<SqlCommand>();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
+            {
+                _executeNonQueryCommands.Add(command);
+                return 0;
+            };
+
+            _disposedCommands = new List<SqlCommand>();
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, disposing) =>
+            {
+                _disposedCommands.Add(command);
+            };
+
+            _dataSetCommands = new List<SqlCommand>();
+            ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, dataSet) =>
+            {
+                var command = (SqlCommand)adapter.SelectCommand;
+                _dataSetCommands.Add(command);
+
+                var userTable = new DataTable();
+                userTable.Columns.Add("userid", typeof(string));
+                var userRow = userTable.NewRow();
+                userRow["userid"] = "177";
+                userTable.Rows.Add(userRow);
+                dataSet.Tables.Add(userTable);
+                return 0;
+            };
+        }
+
+        private static void ShimGetCoreInformation()
+        {
+            ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser =
+                (SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser) =>
+                {
+                    body = "goose live in {building} house";
+                    subject = "{building} house";
+                };
+        }
+
+        private static ShimSPWeb CreateSPWeb()
+        {
+            return new ShimSPWeb
+            {
+                IDGet = () => Guid.NewGuid(),
+                SiteGet = () =>
+                {
+                    return new ShimSPSite
+                    {
+                        IDGet = () => Guid.NewGuid()
+                    };
+                }
+            };
+        }
+
+        private static ShimSPListItem CreateShimSpListItem(Guid webApplicationId)
+        {
+            var webAppShim = new ShimSPWebApplication();
+            var persistentObject = new ShimSPPersistedObject(webAppShim);
+            persistentObject.IdGet = () => webApplicationId;
+
+            return new ShimSPListItem
+            {
+                IDGet = () => ListItemId,
+                ParentListGet = () =>
+                {
+                    return new ShimSPList
+                    {
+                        IDGet = () => _listParentListId,
+                        ParentWebGet = () =>
+                        {
+                            return new ShimSPWeb
+                            {
+                                SiteGet = () =>
+                                {
+                                    return new ShimSPSite
+                                    {
+                                        WebApplicationGet = () =>
+                                        {
+                                            return webAppShim;
+                                        }
+                                    };
+                                }
+                            };
+                        },
+                        FormsGet = () =>
+                        {
+                            var formCollection = new ShimSPFormCollection
+                            {
+                                ItemGetPAGETYPE = formId =>
+                                {
+                                    return new ShimSPForm
+                                    {
+                                        UrlGet = () =>
+                                        {
+                                            return "valera.com";
+                                        }
+                                    };
+                                }
+                            };
+                            return formCollection;
+                        }
+                    };
+                }
+            };
+        }
     }
-}
 }
