@@ -40,8 +40,11 @@ namespace TimeSheets
         public override void Dispose()
         {
             if (resWeb != null)
+            {
                 if (resWeb.ID != SPContext.Current.Web.ID)
+                {
                     resWeb.Close();
+                }}
             
             base.Dispose();
         }
@@ -56,7 +59,6 @@ namespace TimeSheets
             base.inEditMode = false;
             string resUrl = string.Empty;
 
-
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 try
@@ -64,7 +66,10 @@ namespace TimeSheets
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(curWeb.Site.WebApplication.Id));
                     cn.Open();
                 }
-                catch(Exception ex) { Debug.WriteLine(ex); }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
                 resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(curWeb, "EPMLiveResourceURL", true, false); 
             });
 
@@ -85,10 +90,15 @@ namespace TimeSheets
                         }
                     }
                     else
+                    {
                         resWeb = curWeb;
+                    }
                 }
             }
-            catch(Exception ex) { Debug.WriteLine(ex); }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
 
             SqlCommand cmd = new SqlCommand("select ts_uid,username,submitted,approval_status,approval_notes,resourcename,jobstatus,jobtype_id from vwTSTimesheetWQueue where period_id=@period_id and site_uid=@siteid", cn);
             cmd.CommandType = CommandType.Text;
@@ -174,7 +184,9 @@ namespace TimeSheets
                             DataRow[] drts = dsTimesheets.Tables[0].Select("username = '" + uv.User.LoginName + "'");
 
                             if (!arrGTemp.Contains(li.Title))
+                            {
                                 arrGTemp.Add(li.Title, string.Empty);
+                            }
 
                             XmlNode newNode = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
                             XmlAttribute attrId = docXml.CreateAttribute("id");
@@ -194,7 +206,6 @@ namespace TimeSheets
                                 newNode.AppendChild(newCol);
 
                                 string locked = "0";
-
 
                                 if(drts[0]["jobstatus"].ToString().ToLower() == "1")
                                 {
@@ -236,7 +247,6 @@ namespace TimeSheets
                                 }
                                 else
                                 {
-                                    //status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsflagwhite.gif\" alt=\"Saved\">]]>";
                                     locked = "1";
                                 }
 
@@ -335,7 +345,9 @@ namespace TimeSheets
                                 iWeb = site.OpenWeb(wGuid);
                             }
                             else
+                            {
                                 iWeb = site.OpenWeb(wGuid);
+                            }
                             webGuid = iWeb.ID;
                         }
                         if (listGuid != lGuid)
@@ -347,7 +359,10 @@ namespace TimeSheets
 
                         addTSItem(li, arrGTemp, dr[3].ToString(), dr[4].ToString());
                     }
-                    catch(Exception ex) { Debug.WriteLine(ex); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
                 }
             }
         }
@@ -369,23 +384,26 @@ namespace TimeSheets
                 usecurrent = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveTSUseCurrent"));
             }
 
-                try
-                {
-                    AddNodes(
-                        ndCols, 
-                        site, 
-                        cn,
-                        "<![CDATA[Notes]]>", 
-                        "tsnotes", 
-                        "50", 
-                        period,
-                        arr,
-                        ref filterHead,
-                        ref worktypes, 
-                        ref timeeditor,
-                        ref timenotes);
-                }
-                catch(Exception ex) { Debug.WriteLine(ex); }
+            try
+            {
+                AddNodes(
+                    ndCols,
+                    site,
+                    cn,
+                    "<![CDATA[Notes]]>",
+                    "tsnotes",
+                    "50",
+                    period,
+                    arr,
+                    ref filterHead,
+                    ref worktypes,
+                    ref timeeditor,
+                    ref timenotes);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
 
 
                 XmlNode ndHead = docXml.SelectSingleNode("//head");
@@ -399,7 +417,10 @@ namespace TimeSheets
                         {
                             id = nd.Attributes["id"].Value;
                         }
-                        catch(Exception ex) { Debug.WriteLine(ex); }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                        }
                         strColumns += "," + id;
                     }
                     strColumns = strColumns.Substring(1);
@@ -486,7 +507,10 @@ namespace TimeSheets
                         string w = ndNewCols[i].Attributes["width"].Value;
                         reservedWidth += double.Parse(w);
                     }
-                    catch(Exception ex) { Debug.WriteLine(ex); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
                 }
                 reservedWidth += 125;
 
@@ -503,7 +527,10 @@ namespace TimeSheets
                     {
                         id = ndNewCols[i].Attributes["type"].Value;
                     }
-                    catch(Exception ex) { Debug.WriteLine(ex); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
                     if (id == "tree")
                         ndNewCols[i].Attributes["width"].Value = (fullWidth * 2 - 10).ToString();
                     else
@@ -513,21 +540,6 @@ namespace TimeSheets
                     }
                 }
 
-                //XmlNode ndAfterInit = docXml.SelectSingleNode("//head/afterInit");
-                //if (ndAfterInit != null)
-                //{
-                //    XmlNode nd = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
-                //    nd.InnerXml = "<param>3</param>";
-                //    XmlAttribute attrCommand = docXml.CreateAttribute("command");
-                //    attrCommand.Value = "splitAt";
-                //    nd.Attributes.Append(attrCommand);
-                //    ndAfterInit.AppendChild(nd);
-                //}
-                //XmlNode ndBeforeInit = docXml.SelectSingleNode("//head/beforeInit");
-                //XmlNode ndfooter = ndBeforeInit.SelectSingleNode("call[@command='attachFooter']");
-                //ndBeforeInit.RemoveChild(ndfooter); 
-
-
             cn.Close();
 
             data = docXml.OuterXml;
@@ -536,18 +548,6 @@ namespace TimeSheets
         private void addTSItem(SPListItem li, SortedList arrGTemp, string username, string resource)
         {
             string[] group = new string[1] { null };
-
-            //for (int i = 0; i < group.Length; i++)
-            //{
-            //    if (group[i] == null)
-            //        group[i] = resource;
-            //    else
-            //        group[i] += "\n" + resource;
-            //    if (!arrGTemp.Contains(group[i]))
-            //    {
-            //        arrGTemp.Add(group[i], string.Empty);
-            //    }
-            //}
 
             group[0] = resource;
             
@@ -562,13 +562,15 @@ namespace TimeSheets
                     {
                         newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
                     }
-                    catch(Exception ex) { Debug.WriteLine(ex); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
                     if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
                     {
                         string[] sGroups = newgroup.Split('\n');
                         string[] tmpGroups = new string[group.Length * sGroups.Length];
 
-                        //group = new string[sGroups.Length];
                         int tmpCounter = 0;
                         foreach (string g in group)
                         {
@@ -593,9 +595,13 @@ namespace TimeSheets
                         for (int i = 0; i < group.Length; i++)
                         {
                             if (group[i] == null)
+                            {
                                 group[i] = newgroup;
+                            }
                             else
+                            {
                                 group[i] += "\n" + newgroup;
+                            }
                             if (!arrGTemp.Contains(group[i]))
                             {
                                 arrGTemp.Add(group[i], string.Empty);

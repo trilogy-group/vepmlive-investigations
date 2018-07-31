@@ -146,18 +146,33 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
 
         public static void SetFieldValue(object obj, string fieldName, object fieldValue)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             var fieldInfo = obj.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             fieldInfo?.SetValue(obj, fieldValue);
         }
 
         public static T GetFieldValue<T>(object obj, string fieldName)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             var fieldInfo = obj.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             return (T)fieldInfo?.GetValue(obj);
         }
 
         public static void InvokeMethod(object obj, string methodName, object[] parameters)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             var dynMethod = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
             dynMethod?.Invoke(obj, parameters);
         }

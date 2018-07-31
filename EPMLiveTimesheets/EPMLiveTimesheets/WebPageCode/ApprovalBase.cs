@@ -3,6 +3,7 @@ using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Text;
 using System.Xml;
 using EPMLiveCore;
 using EPMLiveWebParts;
@@ -12,6 +13,9 @@ namespace TimeSheets
 {
     public abstract class ApprovalBase : getgriditems
     {
+        private const string Dot = ".";
+        private const int Position = 75;
+
         protected void AddCells(
             XmlNode xmlNode,
             SPSite site,
@@ -32,8 +36,8 @@ namespace TimeSheets
         {
             var rowId = xmlNode.Attributes["id"].Value;
             var curUser = string.Empty;
-            var firstDot = rowId.IndexOf(".", 75);
-            curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
+            var firstDot = rowId.IndexOf(Dot, Position);
+            curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(Dot) - firstDot - 1);
 
             using (var command = new SqlCommand("spTSgetTSHours", connection))
             {
@@ -63,7 +67,7 @@ namespace TimeSheets
 
             AddColumn1(xmlNode, arrayList);
 
-            var ts_item_uid = Guid.Empty.ToString();
+            var tsItemUid = Guid.Empty.ToString();
 
             using (var command =
                 new SqlCommand(
@@ -81,7 +85,7 @@ namespace TimeSheets
 
                 if (drItem.Read())
                 {
-                    ts_item_uid = drItem.GetGuid(0).ToString();
+                    tsItemUid = drItem.GetGuid(0).ToString();
 
                     AddCell1(drItem, xmlNode);
                 }
@@ -99,15 +103,15 @@ namespace TimeSheets
                         var colid = arrCols[i].Replace("<![CDATA[", string.Empty).Replace("]]>", string.Empty);
                         if (colid == "Project")
                         {
-                            var drs = dsTimesheetTasks.Tables[0].Select("ts_item_uid ='" + ts_item_uid + "'");
-                            if (drs.Length > 0)
+                            var dataRows = dsTimesheetTasks.Tables[0].Select("ts_item_uid ='" + tsItemUid + "'");
+                            if (dataRows.Length > 0)
                             {
-                                ndList[i].InnerText = drs[0]["project"].ToString();
+                                ndList[i].InnerText = dataRows[0]["project"].ToString();
                             }
                         }
                         else if (colid != "Title" && colid != "List" && colid != "Site" && colid != string.Empty)
                         {
-                            var drs = dsTimesheetMeta.Tables[0].Select("ts_item_uid='" + ts_item_uid + "' and columnname='" + colid + "'");
+                            var drs = dsTimesheetMeta.Tables[0].Select("ts_item_uid='" + tsItemUid + "' and columnname='" + colid + "'");
                             var colval = string.Empty;
                             if (drs.Length > 0)
                             {
@@ -147,11 +151,11 @@ namespace TimeSheets
             {
                 if (timeeditor)
                 {
-                    newCol = CreateCell(dsTSHours, ts_item_uid, strworktypes, dt, ref total);
+                    newCol = CreateCell(dsTSHours, tsItemUid, strworktypes, dt, ref total);
 
                     if (timenotes)
                     {
-                        var drs = dsTSHours.Tables[1].Select("ts_item_uid = '" + ts_item_uid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyy") + "#");
+                        var drs = dsTSHours.Tables[1].Select("ts_item_uid = '" + tsItemUid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyy") + "#");
                         if (drs.Length > 0)
                         {
                             newCol.InnerText += "|N|" + drs[0]["TS_ITEM_NOTES"];
@@ -175,7 +179,7 @@ namespace TimeSheets
                     var attr = docXml.CreateAttribute("type");
                     attr.InnerText = "ro";
                     newCol.Attributes.Append(attr);
-                    var drs = dsTSHours.Tables[0].Select("ts_item_uid = '" + ts_item_uid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "#");
+                    var drs = dsTSHours.Tables[0].Select("ts_item_uid = '" + tsItemUid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "#");
                     if (drs.Length > 0)
                     {
                         newCol.InnerText = double.Parse(drs[0]["TS_ITEM_HOURS"].ToString()).ToString();
@@ -290,16 +294,20 @@ namespace TimeSheets
             {
                 command.Parameters.AddWithValue("@siteid", site.ID);
                 var dataReader = command.ExecuteReader();
+                var typesBuilder = new StringBuilder();
+                typesBuilder.Append(worktypes);
                 while (dataReader.Read())
                 {
                     timeeditor = true;
-                    worktypes += "|" + dataReader.GetInt32(0);
+                    typesBuilder.Append("|").Append(dataReader.GetInt32(0));
                 }
+                worktypes = typesBuilder.ToString();
                 worktypes = worktypes != string.Empty ? worktypes.Substring(1) : "0";
                 dataReader.Close();
             }
 
-            if (CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowNotes").ToLower() == "true")
+            var config = CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowNotes");
+            if (bool.TrueString.Equals(config, StringComparison.OrdinalIgnoreCase))
             {
                 timenotes = true;
                 timeeditor = true;
