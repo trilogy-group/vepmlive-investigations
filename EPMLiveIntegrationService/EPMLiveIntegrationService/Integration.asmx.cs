@@ -248,11 +248,13 @@ namespace EPMLiveIntegrationService
 
             if (attempts < 5)
             {
-                var cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn);
-                cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
+                using (var cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn))
+                {
+                    cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsIntegration);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(dsIntegration);
+                }
 
                 if (dsIntegration.Tables.Count >0 && dsIntegration.Tables[0].Rows.Count > 0)
                 {
@@ -263,7 +265,7 @@ namespace EPMLiveIntegrationService
                 {
                     ret = "<Error>Invalid Key</Error>";
 
-                    cmd = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", cn);
+                    var cmd = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", cn);
                     cmd.Parameters.AddWithValue("@ip", ip);
                     cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
 
