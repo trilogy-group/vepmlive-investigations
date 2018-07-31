@@ -82,6 +82,8 @@
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
+    <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -91,6 +93,10 @@
     <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
+      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
+      <Name>EPMLiveWebParts</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
       <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>

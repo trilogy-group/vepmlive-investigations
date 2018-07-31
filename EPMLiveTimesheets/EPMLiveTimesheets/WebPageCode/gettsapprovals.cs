@@ -15,7 +15,7 @@ using System.Data.SqlClient;
 
 namespace TimeSheets
 {
-    public partial class gettsapprovals : EPMLiveWebParts.getgriditems
+    public partial class GetTsApprovals : EPMLiveWebParts.getgriditems
     {
         SPSite site = SPContext.Current.Site;
         int period;
@@ -853,10 +853,14 @@ namespace TimeSheets
                         XmlNode ndWork = nd.SelectSingleNode("userdata[@name='Work']");
 
                         newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                        if (dsTotalHours.Tables[0].Rows.Count > 0)
+                        if (dsTotalHours.Tables.Count > 0 && dsTotalHours.Tables[0].Rows.Count > 0)
+                        {
                             newCol.InnerText = ndWork.InnerText + "|" + double.Parse(dsTotalHours.Tables[0].Rows[0][0].ToString()).ToString();
+                        }
                         else
+                        {
                             newCol.InnerText = ndWork.InnerText + "|0";
+                        }
 
                         attrStyle1 = docXml.CreateAttribute("style");
                         attrStyle1.Value = "background: #" + bgcolor + "; font-weight: bold";
