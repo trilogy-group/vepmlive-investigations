@@ -182,9 +182,10 @@ If ($CleanBuild -eq $true) {
 }
 
 Log-Section "Downloading Nuget . . ."
-$nugetPath = $SourcesDirectory + "\nuget.exe"
-Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetPath
 
+$nugetPath = $SourcesDirectory + "\nuget.exe"
+$NUVersion = '3.5.0'
+Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v$NUVersion/nuget.exe" -OutFile $nugetPath
 
 Log-Section "Restoring missing packages . . ."
 & $nugetPath `
