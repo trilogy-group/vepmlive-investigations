@@ -594,7 +594,7 @@ namespace EPMLiveEnterprise
         {
             SPWeb psweb = SPContext.Current.Web;
 
-            SqlConnection cn = null;
+            SqlConnection connection = null;
 
             string url = getProjectSite(projectGuid);
 
@@ -603,65 +603,83 @@ namespace EPMLiveEnterprise
 
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var command = new SqlCommand(
+                    "SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid",
+                    connection))
                 {
-                    Guid transuid = dr.GetGuid(0);
-                    dr.Close();
-
-                    SPList list = web.Lists["Task Center"];
-
-                    foreach (TaskApprovalItem ta in taskItems)
+                    command.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        try
+                        if (dataReader.Read())
                         {
-                            SPListItem li = list.GetItemById(ta.listItemId);
-                            if(ta.approvalStatus == 2)
-                                li["Publisher_x0020_Approval_x0020_S"] = "Approved";
-                            else
-                                li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
-                            li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
-                            try
+                            Guid transuid = dataReader.GetGuid(0);
+                            dataReader.Close();
+
+                            SPList list = web.Lists["Task Center"];
+
+                            foreach (TaskApprovalItem ta in taskItems)
                             {
-                                li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                try
+                                {
+                                    SPListItem li = list.GetItemById(ta.listItemId);
+                                    if (ta.approvalStatus == 2)
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Approved";
+                                    else
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
+                                    li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
+                                    try
+                                    {
+                                        li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                    }
+                                    catch { }
+                                    li["transuid"] = transuid.ToString();
+                                    li.Update();
+                                }
+                                catch (Exception ex)
+                                {
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                    {
+                                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                                        {
+                                            myLog.WriteEntry(
+                                                string.Format("Error in setApprovedTasks() updating list item: {0}{1}", ex.Message, ex.StackTrace),
+                                                EventLogEntryType.Error,
+                                                1000);
+                                        }
+                                    });
+                                }
                             }
-                            catch { }
-                            li["transuid"] = transuid.ToString();
-                            li.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                            {
-                                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                                myLog.WriteEntry("Error in setApprovedTasks() updating list item: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-                            });
                         }
                     }
-
                 }
-                else
-                    dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            psweb.Close();
-            web.Close();
+            finally
+            {
+                connection.Close();
+                psweb.Close();
+                web.Close();
+
+                connection.Dispose();
+            }
         }
         [WebMethod]
         public UpdateTaskItem[] getUpdates(string projectGuid)
