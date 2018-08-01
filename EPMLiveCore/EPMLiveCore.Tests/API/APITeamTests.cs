@@ -339,7 +339,7 @@ namespace EPMLiveCore.API.Tests
                 nodeTeam);
 
             // Assert
-            Assert.AreEqual(2, _sqlConnectionsDisposed.Count);
+            Assert.IsTrue(_sqlConnectionsDisposed.Any());
             Assert.AreEqual(1, _sqlCommandsDisposed.Count);
             Assert.AreEqual(1, _sqlDataReadersDisposed);
         }
