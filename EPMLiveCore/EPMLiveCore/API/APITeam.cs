@@ -1635,7 +1635,10 @@ namespace EPMLiveCore.API
                                                 perms = "";
 
                                         }
-                                        catch { }
+                                        catch (Exception ex)
+                                        {
+                                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                        }
 
                                         XmlAttribute attr = doc.CreateAttribute("Permissions");
                                         attr.Value = perms.Trim(';');
@@ -1651,7 +1654,10 @@ namespace EPMLiveCore.API
                                 }
 
                             }
-                            catch { }
+                            catch(Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                            }
                         }
                     }
                 });

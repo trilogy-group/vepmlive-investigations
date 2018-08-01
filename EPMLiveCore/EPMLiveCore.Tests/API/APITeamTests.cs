@@ -37,8 +37,9 @@ namespace EPMLiveCore.API.Tests
         private bool _filterIsLookup;
         private bool _hasPerms;
         private ArrayList _arrColumns;
-        private ShimSPListItem _shimListItem;
         private XmlNodeList _nodeTeam;
+        private Guid _listId;
+        private int _itemId;
 
         private string _resourcePoolXml;
         private bool _resourcePoolEnsureFilterValueSafe;
@@ -55,8 +56,9 @@ namespace EPMLiveCore.API.Tests
             _filterIsLookup = false;
             _hasPerms = false;
             _arrColumns = new ArrayList();
-            _shimListItem = new ShimSPListItem();
             _nodeTeam = null;
+            _listId = Guid.NewGuid();
+            _itemId = 10;
 
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
@@ -67,10 +69,7 @@ namespace EPMLiveCore.API.Tests
             _setItemPermissionsUser = "test-user";
             _setItemPermissionsPermissions = "permission1;permission2";
 
-            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) =>
-            {
-                return string.Empty;
-            };
+            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) => string.Empty;
 
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
@@ -79,6 +78,8 @@ namespace EPMLiveCore.API.Tests
             {
                 Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
             };
+
+            _sharepointShims.ListItemShim.ItemGetString = key => "test";
         }
 
         [TestCleanup]
@@ -334,7 +335,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _hasPerms,
                 _arrColumns,
-                _shimListItem.Instance,
+                _sharepointShims.ListItemShim.Instance,
                 _nodeTeam);
 
             // Assert
@@ -723,6 +724,68 @@ namespace EPMLiveCore.API.Tests
 
             // Assert
             Assert.IsTrue(isUserRemovedFromGroup);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(APIException))]
+        public void GetTeamFromListItem_UnexpectedException_ApiExceptionThrown()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => 
+            {
+                throw new Exception("Unexpected exception");
+            };
+            
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            // ExpectedException - APIException
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_NoFieldUserValues_EmptyDocumentReturned()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            _sharepointShims.FieldUserValuesShim.Instance.Clear();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.AreEqual(0, result.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_HasUserValues_AddedToDocument()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.AreEqual(0, result.FirstChild.ChildNodes.Count);
         }
     }
 

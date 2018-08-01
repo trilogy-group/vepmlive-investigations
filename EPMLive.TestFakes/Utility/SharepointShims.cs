@@ -21,6 +21,7 @@ namespace EPMLive.TestFakes.Utility
         public ShimSPUserCollection UsersShim { get; private set; }
         public ShimSPWebApplication ApplicationShim { get; private set; }
         public ShimSPFieldUserValue FieldUserValueShim { get; private set; }
+        public ShimSPFieldUserValueCollection FieldUserValuesShim { get; private set; }
         public ShimSPRoleAssignment RoleAssignmentShim { get; private set; }
         public ShimSPRoleAssignmentCollection RoleAssignmentsShim { get; private set; }
         public ShimSPPrincipal PrincipalShim { get; private set; }
@@ -46,6 +47,7 @@ namespace EPMLive.TestFakes.Utility
             UserShim = InitializeSPUserShim();
             UsersShim = InitializeSPUsersShim();
             FieldUserValueShim = InitializeSPFieldUserValueShim();
+            FieldUserValuesShim = InitializeSPFieldUserValuesShim();
             RoleAssignmentShim = InitializeSPRoleAssignmentShim();
             RoleAssignmentsShim = InitializeSPRoleAssignmentsShim();
             ApplicationShim = InitializeSPApplicationShim();
@@ -214,6 +216,13 @@ namespace EPMLive.TestFakes.Utility
             {
                 UserGet = () => UserShim
             };
+        }
+        private ShimSPFieldUserValueCollection InitializeSPFieldUserValuesShim()
+        {
+            var result = new SPFieldUserValueCollection();
+
+            result.Add(FieldUserValueShim);
+            return new ShimSPFieldUserValueCollection(result);
         }
 
         private ShimSPWebApplication InitializeSPApplicationShim()
