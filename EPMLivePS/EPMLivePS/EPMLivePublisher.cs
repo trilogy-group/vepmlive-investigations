@@ -507,48 +507,60 @@ namespace EPMLiveEnterprise
                     pds = pSvc.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                     string projectname = pds.Project[0].PROJ_NAME;
 
-                    SqlConnection cn = null;
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT transuid FROM publishercheck where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                        SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                        if (drPubCheck.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                            .getConnectionString(web.Site.WebApplication.Id)))
                         {
-                            Guid transuid = drPubCheck.GetGuid(0);
-                            drPubCheck.Close();
+                            connection.Open();
 
-                            SPList list = web.Lists["Task Center"];
+                            using (var command = new SqlCommand(
+                                "SELECT transuid FROM publishercheck where projectguid=@projectguid",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@projectguid", projectGuid);
+                                using (var drPubCheck = command.ExecuteReader())
+                                {
+                                    if (drPubCheck.Read())
+                                    {
+                                        Guid transuid = drPubCheck.GetGuid(0);
+                                        drPubCheck.Close();
 
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
+                                        SPList list = web.Lists["Task Center"];
 
-                            if (list.GetItems(query).Count > 0)
-                                isUpdates = true;
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
 
+                                        if (list.GetItems(query).Count > 0)
+                                        {
+                                            isUpdates = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                        myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                        try
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
                         {
-                            cn.Close();
+                            myLog.WriteEntry(
+                                string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                                EventLogEntryType.Error,
+                                1000);
                         }
-                        catch { }
                     }
                 });
             }
             catch (Exception ex)
             {
-                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                {
+                    myLog.WriteEntry(
+                        string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        1000);
+                }
             }
             web.Close();
             return isUpdates;

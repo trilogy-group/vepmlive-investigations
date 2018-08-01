@@ -410,6 +410,43 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
+        [TestMethod]
+        public void IsTaskUpdates_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlDataReader.AllInstances.Read = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.isTaskUpdates(Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void IsTaskUpdates_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPWeb.AllInstances.SiteGet = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.isTaskUpdates(Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.AreEqual(0, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
         private void SetupDataReaderShims(int readCount)
         {
             _sqlReaderReadCount = readCount;
