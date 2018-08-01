@@ -57,43 +57,50 @@ namespace TimeSheets
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(curWeb.Site.WebApplication.Id));
                     cn.Open();
 
-                    SqlCommand cmd =
-                        new SqlCommand("select ts_item_uid,columnname,columnvalue from vwTSItemMeta where period_id=@period_id and site_uid=@siteid",
-                            cn);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@period_id", period);
-                    cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-                    dsTimesheetMeta = new DataSet();
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsTimesheetMeta);
+                    var sql = "select ts_item_uid,columnname,columnvalue from vwTSItemMeta where period_id=@period_id and site_uid=@siteid";
+                    using (var cmd = new SqlCommand(sql, cn))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.AddWithValue("@period_id", period);
+                        cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
+                        dsTimesheetMeta = new DataSet();
+                        using (var da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dsTimesheetMeta);
+                        }
+                    }
 
                     foreach (DataRow drProjects in dtData.Rows)
                     {
-                        cmd =
-                            new SqlCommand(
-                                "select web_uid, list_uid,item_id,username,resourcename from vwTSTasks where web_uid=@webuid and (project=@project or (title=@project and list_uid=@listid)) and period_id=@period_id and totalhours > 0",
-                                cn);
-                        cmd.Parameters.AddWithValue("@webuid", drProjects["WebId"].ToString());
-                        cmd.Parameters.AddWithValue("@project", drProjects["Title"].ToString());
-                        cmd.Parameters.AddWithValue("@listid", drProjects["ListId"].ToString());
-                        cmd.Parameters.AddWithValue("@period_id", period);
-                        da = new SqlDataAdapter(cmd);
-                        DataSet ds = new DataSet();
-                        da.Fill(ds);
+                        sql = "select web_uid, list_uid,item_id,username,resourcename from vwTSTasks where web_uid=@webuid and (project=@project or (title=@project and list_uid=@listid)) and period_id=@period_id and totalhours > 0";
+                        using (var cmd = new SqlCommand(sql, cn))
+                        {
+                            cmd.Parameters.AddWithValue("@webuid", drProjects["WebId"].ToString());
 
-                        dtItems.Merge(ds.Tables[0], false);
+                            cmd.Parameters.AddWithValue("@project", drProjects["Title"].ToString());
+                            cmd.Parameters.AddWithValue("@listid", drProjects["ListId"].ToString());
+                            cmd.Parameters.AddWithValue("@period_id", period);
+                            using (var da = new SqlDataAdapter(cmd))
+                            {
+                                DataSet ds = new DataSet();
+                                da.Fill(ds);
+                                dtItems.Merge(ds.Tables[0], false);
+                            }
+                        }
                     }
 
-                    cmd =
-                        new SqlCommand(
-                            "select title,project,ts_uid,web_uid,list_uid,item_id,ts_item_uid,approval_status,resourcename,username from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project",
-                            cn);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@period_id", period);
-                    cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
-                    dsTimesheetTasks = new DataSet();
-                    da = new SqlDataAdapter(cmd);
-                    da.Fill(dsTimesheetTasks);
+                    sql = "select title,project,ts_uid,web_uid,list_uid,item_id,ts_item_uid,approval_status,resourcename,username from vwTSTasks where period_id=@period_id and site_uid=@siteid order by project";
+                    using (var cmd = new SqlCommand(sql, cn))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.AddWithValue("@period_id", period);
+                        cmd.Parameters.AddWithValue("@siteid", curWeb.Site.ID);
+                        dsTimesheetTasks = new DataSet();
+                        using (var da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dsTimesheetTasks);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
