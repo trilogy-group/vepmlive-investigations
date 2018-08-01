@@ -2,6 +2,8 @@
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.Fakes;
 using EPMLiveEnterprise;
+using EPMLiveEnterprise.WebSvcCustomFields;
+using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcProject.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
@@ -327,8 +329,8 @@ namespace EPMLivePS.Tests
             };
             var spFields = new SPField[0];
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => spFields.GetEnumerator();
-            EPMLiveEnterprise.WebSvcCustomFields.Fakes.ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid =
-                (_, __) => new EPMLiveEnterprise.WebSvcCustomFields.CustomFieldDataSet();
+            ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid =
+                (_, __) => new CustomFieldDataSet();
             ShimSqlConnection.AllInstances.Open = _ =>
             {
                 _isConnectionOpenedCalled = true;
