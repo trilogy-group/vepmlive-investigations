@@ -694,292 +694,301 @@ namespace EPMLiveEnterprise
                     pds = pSvc.ReadProject(new Guid(projectGuid), WebSvcProject.DataStoreEnum.PublishedStore);
                     string projectname = pds.Project[0].PROJ_NAME;
 
-                    SqlConnection cn = null;
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT transuid FROM publishercheck where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                        SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                        if (drPubCheck.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                            .getConnectionString(psweb.Site.WebApplication.Id)))
                         {
-                            Guid transuid = drPubCheck.GetGuid(0);
-                            drPubCheck.Close();
-
-                            SPList list = web.Lists["Task Center"];
-
-                            ArrayList alFields = new ArrayList();
-                            
-                            Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-
-                            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
-
-                            if (gSettings.DisplaySettings != "")
-                                fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-
-                            foreach (SPField f in list.Fields)
+                            connection.Open();
+                            using (var publisherCheckCommand = new SqlCommand(
+                                "SELECT transuid FROM publishercheck where projectguid=@projectguid",
+                                connection))
                             {
-                                string editable = "";
-                                try
+                                publisherCheckCommand.Parameters.AddWithValue("@projectguid", projectGuid);
+                                using (var drPubCheck = publisherCheckCommand.ExecuteReader())
                                 {
-                                    editable = fieldProperties[f.InternalName]["Editable"];
-                                    editable = editable.Split(";".ToCharArray())[0].ToLower();
-                                }
-                                catch { }
-
-                                if (editable != "never" && f.Reorderable)
-                                {
-                                    if (f.ShowInEditForm == null)
-                                        alFields.Add(f.Id);
-                                    else
-                                        if (f.ShowInEditForm == true)
-                                            alFields.Add(f.Id);
-                                }
-                            }
-
-                            UpdateFieldItem[] ufsTemp = new UpdateFieldItem[alFields.Count];
-                            int goodCount = 0;
-                            for (int i = 0; i < alFields.Count; i++)
-                            {
-                                SPField f = list.Fields[new Guid(alFields[i].ToString())];
-
-                                cmd = new SqlCommand("SELECT fieldname,wssfieldname FROM CUSTOMFIELDS where wssfieldname like @wssfieldname", cn);
-                                cmd.Parameters.AddWithValue("@wssfieldname", f.InternalName);
-                                SqlDataReader drField = cmd.ExecuteReader();
-                                if (drField.Read())
-                                {
-                                    //if (drField.GetString(1) != "StartDate" && drField.GetString(1) != "DueDate")
-                                    if(f.Type != SPFieldType.Calculated)
+                                    if (drPubCheck.Read())
                                     {
-                                        ufsTemp[goodCount] = new UpdateFieldItem();
-                                        ufsTemp[goodCount].displayName = f.Title;
-                                        ufsTemp[goodCount].value = "";
-                                        int temp = 0;
-                                        if (f.InternalName.Length > 3 && int.TryParse(f.InternalName.Substring(3), out temp))
+                                        Guid transuid = drPubCheck.GetGuid(0);
+                                        drPubCheck.Close();
+
+                                        SPList list = web.Lists["Task Center"];
+
+                                        ArrayList alFields = new ArrayList();
+
+                                        Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+
+                                        EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+
+                                        if (gSettings.DisplaySettings != "")
+                                            fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+
+                                        foreach (SPField f in list.Fields)
                                         {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + temp.ToString());
-                                            if (dr.Length > 0)
-                                            {
-                                                ufsTemp[goodCount].fieldId = temp;
-                                                ufsTemp[goodCount].internalFieldName = "";
-                                            }
-                                            else
-                                            {
-                                                ufsTemp[goodCount].fieldId = 0;
-                                                ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ufsTemp[goodCount].fieldId = 0;
-                                            ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
-                                        }
-
-                                        ufsTemp[goodCount].fieldGuid = f.Id;
-                                        goodCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (f.InternalName.Length > 3)
-                                    {
-                                        string fieldName = f.InternalName.Substring(3);
-                                        int temp = 0;
-                                        if (int.TryParse(fieldName, out temp))
-                                        {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
-                                            if (dr.Length > 0)
-                                            {
-                                                ufsTemp[goodCount] = new UpdateFieldItem();
-                                                ufsTemp[goodCount].displayName = f.Title;
-                                                ufsTemp[goodCount].value = "";
-                                                ufsTemp[goodCount].fieldId = int.Parse(fieldName);
-                                                ufsTemp[goodCount].internalFieldName = "";
-                                                ufsTemp[goodCount].fieldGuid = f.Id;
-                                                goodCount++;
-                                            }
-                                        }
-                                    }
-                                }
-                                drField.Close();
-                            }
-
-                            
-                            cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", cn);
-                            SqlDataReader dReader = cmd.ExecuteReader();
-                            if (dReader.Read())
-                            {
-                                try
-                                {
-                                    string tsHours = dReader.GetString(0);
-                                    if (tsHours != "")
-                                    {
-                                        if (tsHours == "251658250")
-                                        {
-                                            SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
-                                            ufsTemp[goodCount] = new UpdateFieldItem();
-                                            ufsTemp[goodCount].displayName = f.Title;
-                                            ufsTemp[goodCount].value = "";
-                                            ufsTemp[goodCount].fieldId = 0;
-                                            ufsTemp[goodCount].internalFieldName = "pjTaskActualWork";
-                                            ufsTemp[goodCount].fieldGuid = f.Id;
-                                            goodCount++;
-                                        }
-                                        else
-                                        {
-                                            SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
-                                            string fieldName = f.InternalName.Substring(3);
-                                            ufsTemp[goodCount] = new UpdateFieldItem();
-                                            ufsTemp[goodCount].displayName = f.Title;
-                                            ufsTemp[goodCount].value = "";
-                                            ufsTemp[goodCount].fieldId = int.Parse(tsHours);
-                                            ufsTemp[goodCount].internalFieldName = "";
-                                            ufsTemp[goodCount].fieldGuid = f.Id;
-                                            goodCount++;
-                                        }
-                                    }
-                                }
-                                catch { }
-                            }
-                            dReader.Close();
-
-                            UpdateFieldItem[] ufs = new UpdateFieldItem[goodCount];
-                            for (int i = 0; i < goodCount; i++)
-                            {
-                                ufs[i] = ufsTemp[i];
-                            }
-
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
-
-                            ArrayList alListItems = new ArrayList();
-
-                            foreach (SPListItem li in list.GetItems(query))
-                            {
-                                alListItems.Add(li.ID);
-                            }
-
-                            updates = new UpdateTaskItem[alListItems.Count];
-
-                            for (int i = 0; i < alListItems.Count; i++)
-                            {
-                                SPListItem li = list.GetItemById(int.Parse(alListItems[i].ToString()));
-                                updates[i] = new UpdateTaskItem();
-                                updates[i].taskname = li.Title;
-                                try
-                                {
-                                    updates[i].taskuid = li["taskuid"].ToString();
-                                }
-                                catch { }
-                                updates[i].startDate = getDate(li,"StartDate");
-                                updates[i].finishDate = getDate(li,"DueDate");
-
-                                if (li["Notes"] != null)
-                                {
-                                    string notes =  li["Notes"].ToString();
-                                    notes = notes.Replace("<div>", "").Replace("</div>","");
-                                    updates[i].notes = notes;
-                                }
-                                else
-                                    updates[i].notes = "";
-                                float pct = 0;
-                                try
-                                {
-                                    pct = float.Parse(li["PercentComplete"].ToString()) * (float)100;
-                                }catch{}
-                                updates[i].percentComplete = pct.ToString();
-                                try
-                                {
-                                    updates[i].taskHierarchy = li[li.ParentList.Fields.GetFieldByInternalName("TaskHierarchy").Id].ToString();
-                                }
-                                catch { }
-                                updates[i].updatefields = new UpdateFieldItem[ufs.Length];
-                                updates[i].listItemId = li.ID;
-
-                                for (int j = 0; j < ufs.Length; j++)
-                                {
-                                    updates[i].updatefields[j] = new UpdateFieldItem();
-                                    updates[i].updatefields[j].displayName = ufs[j].displayName;
-                                    updates[i].updatefields[j].fieldGuid = ufs[j].fieldGuid;
-                                    updates[i].updatefields[j].fieldId = ufs[j].fieldId;
-                                    updates[i].updatefields[j].internalFieldName = ufs[j].internalFieldName.Replace("_x0020_","");
-
-                                    if (li[updates[i].updatefields[j].fieldGuid] != null)
-                                    {
-                                        SPField f = li.Fields[updates[i].updatefields[j].fieldGuid];
-                                        if (f.Type == SPFieldType.DateTime)
-                                        {
-                                            updates[i].updatefields[j].value = getDate(li, f.InternalName);
-                                        }
-                                        else if (f.Type == SPFieldType.Currency)
-                                        {
-                                            string money = li[updates[i].updatefields[j].fieldGuid].ToString();
-
+                                            string editable = "";
                                             try
                                             {
-                                                money = float.Parse(money).ToString("0.00");
+                                                editable = fieldProperties[f.InternalName]["Editable"];
+                                                editable = editable.Split(";".ToCharArray())[0].ToLower();
                                             }
                                             catch { }
 
-                                            updates[i].updatefields[j].value = money;
-                                        }
-                                        else if (f.Type == SPFieldType.Boolean)
-                                        {
-                                            if(bool.Parse(li[f.Id].ToString()))
+                                            if (editable != "never" && f.Reorderable)
                                             {
-                                                updates[i].updatefields[j].value = "Yes";
-                                            }
-                                            else
-                                            {
-                                                updates[i].updatefields[j].value = "No";
+                                                if (f.ShowInEditForm == null)
+                                                    alFields.Add(f.Id);
+                                                else
+                                                    if (f.ShowInEditForm == true)
+                                                    alFields.Add(f.Id);
                                             }
                                         }
-                                        else if (f.Type == SPFieldType.Number)
+
+                                        UpdateFieldItem[] ufsTemp = new UpdateFieldItem[alFields.Count];
+                                        int goodCount = 0;
+                                        for (int i = 0; i < alFields.Count; i++)
                                         {
-                                            if (f.SchemaXml.ToUpper().Contains("PERCENTAGE=\"TRUE\""))
+                                            SPField f = list.Fields[new Guid(alFields[i].ToString())];
+
+                                            using (var customFieldsCommand = new SqlCommand(
+                                                "SELECT fieldname,wssfieldname FROM CUSTOMFIELDS where wssfieldname like @wssfieldname",
+                                                connection))
                                             {
-                                                pct = 0;
-                                                try
+                                                customFieldsCommand.Parameters.AddWithValue("@wssfieldname", f.InternalName);
+                                                using (var drField = customFieldsCommand.ExecuteReader())
                                                 {
-                                                    pct = float.Parse(li[updates[i].updatefields[j].fieldGuid].ToString()) * (float)100;
+                                                    if (drField.Read())
+                                                    {
+                                                        //if (drField.GetString(1) != "StartDate" && drField.GetString(1) != "DueDate")
+                                                        if (f.Type != SPFieldType.Calculated)
+                                                        {
+                                                            ufsTemp[goodCount] = new UpdateFieldItem();
+                                                            ufsTemp[goodCount].displayName = f.Title;
+                                                            ufsTemp[goodCount].value = "";
+                                                            int temp = 0;
+                                                            if (f.InternalName.Length > 3 && int.TryParse(f.InternalName.Substring(3), out temp))
+                                                            {
+                                                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + temp.ToString());
+                                                                if (dr.Length > 0)
+                                                                {
+                                                                    ufsTemp[goodCount].fieldId = temp;
+                                                                    ufsTemp[goodCount].internalFieldName = "";
+                                                                }
+                                                                else
+                                                                {
+                                                                    ufsTemp[goodCount].fieldId = 0;
+                                                                    ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                ufsTemp[goodCount].fieldId = 0;
+                                                                ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
+                                                            }
+
+                                                            ufsTemp[goodCount].fieldGuid = f.Id;
+                                                            goodCount++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (f.InternalName.Length > 3)
+                                                        {
+                                                            string fieldName = f.InternalName.Substring(3);
+                                                            int temp = 0;
+                                                            if (int.TryParse(fieldName, out temp))
+                                                            {
+                                                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
+                                                                if (dr.Length > 0)
+                                                                {
+                                                                    ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                    ufsTemp[goodCount].displayName = f.Title;
+                                                                    ufsTemp[goodCount].value = "";
+                                                                    ufsTemp[goodCount].fieldId = int.Parse(fieldName);
+                                                                    ufsTemp[goodCount].internalFieldName = "";
+                                                                    ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                    goodCount++;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
-                                                catch { }
-                                                updates[i].updatefields[j].value = pct.ToString();
-                                            }
-                                            else
-                                            {
-                                                updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
                                             }
                                         }
-                                        else
+
+
+                                        using (var configCommand = new SqlCommand(
+                                            "SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'",
+                                            connection))
                                         {
-                                            updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                            using (var dReader = configCommand.ExecuteReader())
+                                            {
+                                                if (dReader.Read())
+                                                {
+                                                    try
+                                                    {
+                                                        string tsHours = dReader.GetString(0);
+                                                        if (tsHours != "")
+                                                        {
+                                                            if (tsHours == "251658250")
+                                                            {
+                                                                SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
+                                                                ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                ufsTemp[goodCount].displayName = f.Title;
+                                                                ufsTemp[goodCount].value = "";
+                                                                ufsTemp[goodCount].fieldId = 0;
+                                                                ufsTemp[goodCount].internalFieldName = "pjTaskActualWork";
+                                                                ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                goodCount++;
+                                                            }
+                                                            else
+                                                            {
+                                                                SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
+                                                                string fieldName = f.InternalName.Substring(3);
+                                                                ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                ufsTemp[goodCount].displayName = f.Title;
+                                                                ufsTemp[goodCount].value = "";
+                                                                ufsTemp[goodCount].fieldId = int.Parse(tsHours);
+                                                                ufsTemp[goodCount].internalFieldName = "";
+                                                                ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                goodCount++;
+                                                            }
+                                                        }
+                                                    }
+                                                    catch { }
+                                                }
+                                            }
+                                        }
+                                        UpdateFieldItem[] ufs = new UpdateFieldItem[goodCount];
+                                        for (int i = 0; i < goodCount; i++)
+                                        {
+                                            ufs[i] = ufsTemp[i];
+                                        }
+
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
+
+                                        ArrayList alListItems = new ArrayList();
+
+                                        foreach (SPListItem li in list.GetItems(query))
+                                        {
+                                            alListItems.Add(li.ID);
+                                        }
+
+                                        updates = new UpdateTaskItem[alListItems.Count];
+
+                                        for (int i = 0; i < alListItems.Count; i++)
+                                        {
+                                            SPListItem li = list.GetItemById(int.Parse(alListItems[i].ToString()));
+                                            updates[i] = new UpdateTaskItem();
+                                            updates[i].taskname = li.Title;
+                                            try
+                                            {
+                                                updates[i].taskuid = li["taskuid"].ToString();
+                                            }
+                                            catch { }
+                                            updates[i].startDate = getDate(li, "StartDate");
+                                            updates[i].finishDate = getDate(li, "DueDate");
+
+                                            if (li["Notes"] != null)
+                                            {
+                                                string notes = li["Notes"].ToString();
+                                                notes = notes.Replace("<div>", "").Replace("</div>", "");
+                                                updates[i].notes = notes;
+                                            }
+                                            else
+                                                updates[i].notes = "";
+                                            float pct = 0;
+                                            try
+                                            {
+                                                pct = float.Parse(li["PercentComplete"].ToString()) * (float)100;
+                                            }
+                                            catch { }
+                                            updates[i].percentComplete = pct.ToString();
+                                            try
+                                            {
+                                                updates[i].taskHierarchy = li[li.ParentList.Fields.GetFieldByInternalName("TaskHierarchy").Id].ToString();
+                                            }
+                                            catch { }
+                                            updates[i].updatefields = new UpdateFieldItem[ufs.Length];
+                                            updates[i].listItemId = li.ID;
+
+                                            for (int j = 0; j < ufs.Length; j++)
+                                            {
+                                                updates[i].updatefields[j] = new UpdateFieldItem();
+                                                updates[i].updatefields[j].displayName = ufs[j].displayName;
+                                                updates[i].updatefields[j].fieldGuid = ufs[j].fieldGuid;
+                                                updates[i].updatefields[j].fieldId = ufs[j].fieldId;
+                                                updates[i].updatefields[j].internalFieldName = ufs[j].internalFieldName.Replace("_x0020_", "");
+
+                                                if (li[updates[i].updatefields[j].fieldGuid] != null)
+                                                {
+                                                    SPField f = li.Fields[updates[i].updatefields[j].fieldGuid];
+                                                    if (f.Type == SPFieldType.DateTime)
+                                                    {
+                                                        updates[i].updatefields[j].value = getDate(li, f.InternalName);
+                                                    }
+                                                    else if (f.Type == SPFieldType.Currency)
+                                                    {
+                                                        string money = li[updates[i].updatefields[j].fieldGuid].ToString();
+
+                                                        try
+                                                        {
+                                                            money = float.Parse(money).ToString("0.00");
+                                                        }
+                                                        catch { }
+
+                                                        updates[i].updatefields[j].value = money;
+                                                    }
+                                                    else if (f.Type == SPFieldType.Boolean)
+                                                    {
+                                                        if (bool.Parse(li[f.Id].ToString()))
+                                                        {
+                                                            updates[i].updatefields[j].value = "Yes";
+                                                        }
+                                                        else
+                                                        {
+                                                            updates[i].updatefields[j].value = "No";
+                                                        }
+                                                    }
+                                                    else if (f.Type == SPFieldType.Number)
+                                                    {
+                                                        if (f.SchemaXml.ToUpper().Contains("PERCENTAGE=\"TRUE\""))
+                                                        {
+                                                            pct = 0;
+                                                            try
+                                                            {
+                                                                pct = float.Parse(li[updates[i].updatefields[j].fieldGuid].ToString()) * (float)100;
+                                                            }
+                                                            catch { }
+                                                            updates[i].updatefields[j].value = pct.ToString();
+                                                        }
+                                                        else
+                                                        {
+                                                            updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        else
-                            drPubCheck.Close();
-
-                        cn.Close();
-
                     }
                     catch (Exception ex)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher Check WS");
-                        myLog.WriteEntry("Error in getUpdates() projectuid (" + projectGuid + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                        try
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher Check WS"))
                         {
-                            cn.Close();
+                            myLog.WriteEntry(
+                                string.Format("Error in getUpdates() projectuid ({0}): {1}{2}", projectGuid, ex.Message, ex.StackTrace),
+                                EventLogEntryType.Error,
+                                1000);
                         }
-                        catch { }
                     }
-
                 });
             }
             catch (Exception ex)
