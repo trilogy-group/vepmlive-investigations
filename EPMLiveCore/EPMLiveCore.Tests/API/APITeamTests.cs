@@ -1,20 +1,22 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using Microsoft.SharePoint.Fakes;
-using EPMLiveCore.API.Fakes;
-using System.Xml;
-using Microsoft.SharePoint;
-using System.Reflection;
-using System.Collections;
-using EPMLiveCore.Fakes;
-using System.Collections.Generic;
-using Microsoft.QualityTools.Testing.Fakes;
-using EPMLiveCore.ReportHelper.Fakes;
+﻿using System;
 using System.Data.SqlClient.Fakes;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.Fakes;
+using System.Data;
 using System.Linq;
+using System.Reflection;
+using System.Xml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
+using EPMLive.TestFakes;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -26,56 +28,47 @@ namespace EPMLiveCore.API.Tests
         private PrivateType _apiTeamPrivateType;
         private PrivateObject _apiTeamPrivateObject;
 
-        private IList<string> _sqlConnectionsDisposed;
-        private IList<string> _sqlCommandsDisposed;
-        private int _sqlDataReadersDisposed;
+        private AdoShims _adoShims;
+
+        private ShimSPList _spListShim;
+        private DataTable _dataTable;
+        private string _filterField;
+        private string _filterValue;
+        private bool _filterIsLookup;
+        private bool _hasPerms;
+        private ArrayList _arrColumns;
+        private ShimSPListItem _shimListItem;
+        private XmlNodeList _nodeTeam;
 
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
 
+            _filterField = "test-field";
+            _filterValue = "test-filter-value";
+            _filterIsLookup = false;
+            _hasPerms = false;
+            _arrColumns = new ArrayList();
+            _shimListItem = new ShimSPListItem();
+            _nodeTeam = null;
+
+            _spListShim = new ShimSPList();
             _webShim = new ShimSPWeb
             {
                 SiteGet = () => new ShimSPSite(),
                 ListsGet = () => new ShimSPListCollection
                 {
-                    ItemGetString = key => new ShimSPList()
-                }
+                    ItemGetString = key => _spListShim
+                },
+                CurrentUserGet = () => new ShimSPUser()
             };
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
-            ShimEPMData.ConstructorGuid = (instance, siteId) => { };
+            _dataTable = new DataTable();
 
-            ShimSqlCommand.AllInstances.ExecuteReader = instance => new ShimSqlDataReader();
-            ShimCoreFunctions.getConfigSettingSPWebString = (web, name) => string.Empty;
-
-            ShimComponent.AllInstances.Dispose = instance =>
-            {
-                var sqlConnection = instance as SqlConnection;
-                if (sqlConnection != null)
-                {
-                    _sqlConnectionsDisposed.Add(sqlConnection.ConnectionString);
-                }
-
-                var sqlCommand = instance as SqlCommand;
-                if (sqlCommand != null)
-                {
-                    _sqlCommandsDisposed.Add(sqlCommand.CommandText);
-                }
-            };
-            ShimDbDataReader.AllInstances.Dispose = instance =>
-            {
-                if (instance is SqlDataReader)
-                {
-                    _sqlDataReadersDisposed++;
-                }
-            };
-
-            _sqlConnectionsDisposed = new List<string>();
-            _sqlCommandsDisposed = new List<string>();
-            _sqlDataReadersDisposed = 0;
+            _adoShims = AdoShims.ShimAdoNetCalls();
         }
 
         [TestCleanup]
@@ -318,13 +311,6 @@ namespace EPMLiveCore.API.Tests
         public void getResources_SiteExists_AdoObjectsDisposed()
         {
             // Arrange
-            var filterField = "test-field";
-            var filterValue = "test-filter-value";
-            var hasPerms = false;
-            var arrColumns = new ArrayList();
-            var shimListItem = new ShimSPListItem();
-            XmlNodeList nodeTeam = null;
-
             ShimReportBiz.AllInstances.SiteExists = (instance) => true;
             ShimAPITeam.iGetResourceFromRPTSqlConnectionSPListDataTableSPWebStringStringBooleanBooleanArrayListSPListItemXmlNodeList =
                 (a, b, c, d, e, f, g, h, i, j, k) => null;
@@ -334,19 +320,150 @@ namespace EPMLiveCore.API.Tests
             // Act
             _apiTeamPrivateType.InvokeStatic("getResources",
                 _webShim.Instance,
-                filterField,
-                filterValue,
-                hasPerms,
-                arrColumns,
-                shimListItem.Instance,
-                nodeTeam);
+                _filterField,
+                _filterValue,
+                _hasPerms,
+                _arrColumns,
+                _shimListItem.Instance,
+                _nodeTeam);
 
             // Assert
-            Assert.IsTrue(_sqlConnectionsDisposed.Any());
-            Assert.AreEqual(1, _sqlCommandsDisposed.Count);
-            Assert.AreEqual(1, _sqlDataReadersDisposed);
+            Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_SelectSchemaForspGetReportListDataCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _spListShim.Instance,
+                _dataTable,
+                _webShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_spGetReportListDataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "spGetReportListData";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _spListShim.Instance,
+                _dataTable,
+                _webShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_spGetReportListCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "spGetReportListData";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _spListShim.Instance,
+                _dataTable,
+                _webShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_LSTUserInformationListDataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _spListShim.Instance,
+                _dataTable,
+                _webShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_LSTUserInformationListCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _spListShim.Instance,
+                _dataTable,
+                _webShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
         }
     }
+
     public class TestGroupEnumerator : IEnumerator
     {
         public SPGroup[] _spGroup = new SPGroup[1];
