@@ -53,13 +53,16 @@ namespace EPMLiveCore.API.Tests
 
             ShimComponent.AllInstances.Dispose = instance =>
             {
-                if (instance is SqlConnection)
+                var sqlConnection = instance as SqlConnection;
+                if (sqlConnection != null)
                 {
-                    _sqlConnectionsDisposed.Add((instance as SqlConnection).ConnectionString);
+                    _sqlConnectionsDisposed.Add(sqlConnection.ConnectionString);
                 }
-                if (instance is SqlCommand)
+
+                var sqlCommand = instance as SqlCommand;
+                if (sqlCommand != null)
                 {
-                    _sqlCommandsDisposed.Add((instance as SqlCommand).CommandText);
+                    _sqlCommandsDisposed.Add(sqlCommand.CommandText);
                 }
             };
             ShimDbDataReader.AllInstances.Dispose = instance =>
