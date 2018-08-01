@@ -40,11 +40,13 @@ namespace EPMLiveCore.API.Tests
         private XmlNodeList _nodeTeam;
         private Guid _listId;
         private int _itemId;
+        private DataTable _resources;
 
         private string _resourcePoolXml;
         private bool _resourcePoolEnsureFilterValueSafe;
         private string _setItemPermissionsUser;
         private string _setItemPermissionsPermissions;
+        private XmlDocument _teamDocument;
 
         [TestInitialize]
         public void SetUp()
@@ -65,6 +67,14 @@ namespace EPMLiveCore.API.Tests
 
             _dataTable = new DataTable();
             _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
+            
+            _teamDocument = new XmlDocument();
+            _teamDocument.LoadXml("<root />");
+            _resources = new DataTable();
+            _resources.Columns.Add("SPID");
+            _resources.Columns.Add("Groups");
+            _resources.Columns.Add("Title");
+            _resources.Rows.Add(0, "group-0", "test-title-0");
 
             _setItemPermissionsUser = "test-user";
             _setItemPermissionsPermissions = "permission1;permission2";
@@ -773,7 +783,12 @@ namespace EPMLiveCore.API.Tests
         public void GetTeamFromListItem_HasUserValues_AddedToDocument()
         {
             // Arrange
+            var isAppendUserValuesToTeamDocumentCalled = false;
             ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            ShimAPITeam.AppendUserValuesToTeamDocumentSPFieldUserValueCollectionXmlDocumentDataTableIListOfString = (a, b, c, d) =>
+            {
+                isAppendUserValuesToTeamDocumentCalled = true;
+            };
 
             // Act
             var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
@@ -785,7 +800,49 @@ namespace EPMLiveCore.API.Tests
                 _itemId) as XmlDocument;
 
             // Assert
-            Assert.AreEqual(0, result.FirstChild.ChildNodes.Count);
+            Assert.IsTrue(isAppendUserValuesToTeamDocumentCalled);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_NoSPIDResource_UserValueNotAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            _resources.Clear();
+
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(0, _teamDocument.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_HasSPIDResource_UserValueAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(1, _teamDocument.FirstChild.ChildNodes.Count);
+            Assert.AreEqual(_resources.Rows[0]["SPID"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["SPID"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Groups"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Title"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Title"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Permissions"].Value);
         }
     }
 

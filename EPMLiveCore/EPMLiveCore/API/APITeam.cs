@@ -1562,92 +1562,23 @@ namespace EPMLiveCore.API
                             var additionalPermissions = new List<string>();
                             var permissionsString = gridGanttSettings.BuildTeamPermissions.Split('|');
 
-                            for (var i = 0; i < permissionsString.Length; i+=2)
+                            for (var i = 0; i < permissionsString.Length; i += 2)
                             {
                                 var permissions = permissionsString[i].Split('~');
-                                for (int j = 0; j < permissions.Length; j+=2)
+                                for (int j = 0; j < permissions.Length; j += 2)
                                 {
                                     additionalPermissions.Add(permissions[j]);
                                 }
                             }
 
-                            DataTable resources = null;
-                            try
-                            {
-                                using (var rsite = new SPSite(resourceUrl))
-                                {
-                                    using (var rweb = rsite.OpenWeb())
-                                    {
-                                        resources = getResources(rweb, filterfield, filterval, true, arrColumns, listItem, null);
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (ex.Message.ToLower().Contains("access is denied"))
-                                {
-                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                                    {
-                                        using (SPWeb rweb = tSite.OpenWeb())
-                                        {
-                                            resources = getResources(rweb, filterfield, filterval, false, arrColumns, listItem, null);
-                                        }
-                                    });
-                                }
-
-                                // (CC-78170, 2018-08-01) It's probably a error, since it's being rethrown even if resources could be successfully fetched using elevated priveleges
-                                // But we're not allowed to fix it in scope of CC
-                                throw;
-                            }
+                            var resources = GetResourcesFromUrl(filterfield, filterval, arrColumns, tSite, listItem, resourceUrl);
 
                             try
                             {
                                 var userValueCollection = new SPFieldUserValueCollection(tWeb, Convert.ToString(listItem["AssignedTo"]));
-
-                                var index = 0;
-                                var users = new SortedList();
-
-                                foreach (SPFieldUserValue userValue in userValueCollection)
-                                {
-                                    var userResources = resources.Select("SPID='" + userValue.LookupId + "'");
-                                    if (userResources.Length > 0)
-                                    {
-                                        var memberNode = result.CreateNode(XmlNodeType.Element, "Member", result.NamespaceURI);
-
-                                        foreach (DataColumn column in resources.Columns)
-                                        {
-                                            addAttribute(ref memberNode, result, userResources[0], column.ColumnName);
-                                        }
-
-                                        var permissions = string.Empty;
-                                        try
-                                        {
-                                            var groups = Convert.ToString(userResources[0]["Groups"]);
-
-                                            if (!additionalPermissions.Contains(permissions))
-                                            {
-                                                permissions = groups;
-                                            }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                                        }
-
-                                        var permissionsAttribute = result.CreateAttribute("Permissions");
-                                        permissionsAttribute.Value = permissions.Trim(';');
-                                        memberNode.Attributes.Append(permissionsAttribute);
-
-                                        users.Add(userResources[0]["Title"].ToString() + index++, memberNode);
-                                    }
-                                }
-
-                                foreach (DictionaryEntry de in users)
-                                {
-                                    result.FirstChild.AppendChild((XmlNode)de.Value);
-                                }
+                                AppendUserValuesToTeamDocument(userValueCollection, result, resources, additionalPermissions);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                             }
@@ -1661,6 +1592,91 @@ namespace EPMLiveCore.API
             }
 
             return result;
+        }
+
+        private static void AppendUserValuesToTeamDocument(
+            SPFieldUserValueCollection userValueCollection, 
+            XmlDocument result, 
+            DataTable resources, 
+            IList<string> additionalPermissions)
+        {
+            var index = 0;
+            var users = new SortedList();
+
+            foreach (SPFieldUserValue userValue in userValueCollection)
+            {
+                var spidResources = resources.Select(string.Format("SPID='{0}'", userValue.LookupId));
+                if (spidResources.Length > 0)
+                {
+                    var spidResource = spidResources[0];
+                    var memberNode = result.CreateNode(XmlNodeType.Element, "Member", result.NamespaceURI);
+
+                    foreach (DataColumn column in resources.Columns)
+                    {
+                        addAttribute(ref memberNode, result, spidResource, column.ColumnName);
+                    }
+
+                    var permissions = string.Empty;
+                    try
+                    {
+                        var groups = Convert.ToString(spidResource["Groups"]);
+
+                        if (!additionalPermissions.Contains(groups))
+                        {
+                            permissions = groups;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+
+                    var permissionsAttribute = result.CreateAttribute("Permissions");
+                    permissionsAttribute.Value = permissions.Trim(';');
+                    memberNode.Attributes.Append(permissionsAttribute);
+
+                    users.Add(spidResource["Title"].ToString() + index++, memberNode);
+                }
+            }
+
+            foreach (DictionaryEntry de in users)
+            {
+                result.FirstChild.AppendChild((XmlNode)de.Value);
+            }
+        }
+
+        private static DataTable GetResourcesFromUrl(string filterfield, string filterval, ArrayList arrColumns, SPSite tSite, SPListItem listItem, string resourceUrl)
+        {
+            DataTable resources = null;
+            try
+            {
+                using (var rsite = new SPSite(resourceUrl))
+                {
+                    using (var rweb = rsite.OpenWeb())
+                    {
+                        resources = getResources(rweb, filterfield, filterval, true, arrColumns, listItem, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.ToLower().Contains("access is denied"))
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        using (SPWeb rweb = tSite.OpenWeb())
+                        {
+                            resources = getResources(rweb, filterfield, filterval, false, arrColumns, listItem, null);
+                        }
+                    });
+                }
+
+                // (CC-78170, 2018-08-01) It's probably a error, since it's being rethrown even if resources could be successfully fetched using elevated priveleges
+                // But we're not allowed to fix it in scope of CC
+                throw;
+            }
+
+            return resources;
         }
 
         private static XmlDocument GetTeamFromWeb(SPWeb web, string filterfield, string filterval, ArrayList arrColumns)
