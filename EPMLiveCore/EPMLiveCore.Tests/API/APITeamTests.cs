@@ -328,7 +328,7 @@ namespace EPMLiveCore.API.Tests
                 _nodeTeam);
 
             // Assert
-            Assert.AreEqual(2, _adoShims.ConnectionsDisposed.Count);
+            Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
             Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
             Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
         }
