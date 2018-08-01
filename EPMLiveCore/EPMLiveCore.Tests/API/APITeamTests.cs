@@ -42,6 +42,8 @@ namespace EPMLiveCore.API.Tests
 
         private string _resourcePoolXml;
         private bool _resourcePoolEnsureFilterValueSafe;
+        private string _setItemPermissionsUser;
+        private string _setItemPermissionsPermissions;
 
         [TestInitialize]
         public void SetUp()
@@ -62,6 +64,9 @@ namespace EPMLiveCore.API.Tests
             _dataTable = new DataTable();
             _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
 
+            _setItemPermissionsUser = "test-user";
+            _setItemPermissionsPermissions = "permission1;permission2";
+
             ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) =>
             {
                 return string.Empty;
@@ -69,6 +74,11 @@ namespace EPMLiveCore.API.Tests
 
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
+
+            ShimListCommands.GetGridGanttSettingsSPList = list => new GridGanttSettings(_sharepointShims.ListShim)
+            {
+                Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
+            };
         }
 
         [TestCleanup]
@@ -582,6 +592,137 @@ namespace EPMLiveCore.API.Tests
             // Assert
             Assert.AreEqual(2, retries);
             Assert.IsTrue(isPrivelegesElevated);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInList_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user =>
+            {
+                isUserAddedToGroup = true;
+            };
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasSecurityFieldValueAndRoleAssignments_DoesNotAddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => "security-value";
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsFalse(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasSecurityFieldValueAndNoRoleAssignments_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => "security-value";
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => false;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasNoSecurityFieldValue_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => string.Empty;
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullHasUnqueRoleAssignmentsGroupNotList_RemoveUserFromGroup()
+        {
+            // Arrange
+            var isUserRemovedFromGroup = false;
+
+            _setItemPermissionsPermissions = "1";
+            _sharepointShims.GroupShim.RemoveUserSPUser = user =>
+            {
+                isUserRemovedFromGroup = true;
+            };
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserRemovedFromGroup);
         }
     }
 

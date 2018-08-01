@@ -188,10 +188,12 @@ namespace EPMLive.TestFakes.Utility
                 ItemsGet = () => ListItemsShim,
                 FormsGet = () => FormsShim,
                 FieldsGet = () => FieldsShim,
+                GetItemByIdInt32 = id => ListItemShim,
                 GetItemsSPQuery = query => ListItemsShim,
                 GetItemByUniqueIdGuid = id => ListItemShim
             };
         }
+
         private ShimSPListItemCollection InitializeSPListItemCollectionShim()
         {
             return new ShimSPListItemCollection
@@ -246,6 +248,8 @@ namespace EPMLive.TestFakes.Utility
 
             ShimSPFieldUserValue.ConstructorSPWebString = (instance, web, fieldValue) => new Func<ShimSPFieldUserValue>(() => FieldUserValueShim)();
             ShimSPFieldUserValue.AllInstances.UserGet = instance => UserShim;
+
+            ShimSPFieldLookupValue.ConstructorString = (instance, value) => { };
 
             ShimSPSecurableObject.AllInstances.RoleAssignmentsGet = instance => RoleAssignmentsShim;
         }
