@@ -91,7 +91,6 @@ namespace EPMLiveCore.API
                 dt.Columns.Add("Title");
             }
 
-
             var reportBiz = new ReportHelper.ReportBiz(web.Site.ID);
             if (reportBiz.SiteExists())
             {
