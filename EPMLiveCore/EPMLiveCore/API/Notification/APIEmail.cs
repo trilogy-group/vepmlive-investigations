@@ -284,15 +284,15 @@ namespace EPMLiveCore.API
             string[] delusers,
             bool doNotEmail,
             bool unmarkread,
-            SPListItem li,
+            SPListItem listItem,
             SPUser curUser,
             bool forceNewEntry)
         {
             try
             {
-                using (SPSite site = new SPSite(li.ParentList.ParentWeb.Site.ID))
+                using (SPSite site = new SPSite(listItem.ParentList.ParentWeb.Site.ID))
                 {
-                    using (SPWeb web = site.OpenWeb(li.ParentList.ParentWeb.ID))
+                    using (SPWeb web = site.OpenWeb(listItem.ParentList.ParentWeb.ID))
                     {
                         using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
@@ -301,9 +301,9 @@ namespace EPMLiveCore.API
                             string body;
                             string subject;
                             GetSubjectAndBody(templateid, additionalParams, curUser, web, connection, out body, out subject);
-                            SubstituteItems(li, web, ref body, ref subject);
+                            SubstituteItems(listItem, web, ref body, ref subject);
 
-                            var id = GetNotificationIdByListId(templateid, li, connection);
+                            var id = GetNotificationIdByListId(templateid, listItem, connection);
 
                             using (var upsertNotificationCommand = new SqlCommand())
                             {
@@ -328,13 +328,13 @@ namespace EPMLiveCore.API
                                 }
                                 upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
                                 upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", li.ID);
+                                upsertNotificationCommand.Parameters.AddWithValue("@listid", listItem.ParentList.ID);
+                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", listItem.ID);
                                 upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
                                 upsertNotificationCommand.ExecuteNonQuery();
                             }
 
-                            ProcessNewUsersWithListItem(newusers, unmarkread, li, connection, id);
+                            ProcessNewUsers(newusers, unmarkread, connection, id, listItem: listItem);
                             DeleteUsers(delusers, connection, id);
                         }
                     }
@@ -395,12 +395,62 @@ namespace EPMLiveCore.API
             return id;
         }
 
-        private static void ProcessNewUsersWithListItem(
-            string[] newusers, 
-            bool unmarkread, 
-            SPListItem li, 
-            SqlConnection connection, 
-            string id)
+        //private static void ProcessNewUsersWithListItem(
+        //    string[] newUsers, 
+        //    bool unmarkread, 
+        //    SPListItem li, 
+        //    SqlConnection connection, 
+        //    string id)
+        //{
+        //    var dataSet = GetPersonalizationDataSet(connection, id);
+
+        //    foreach (var user in newUsers)
+        //    {
+        //        if (user != string.Empty)
+        //        {
+        //            var found = false;
+        //            if (dataSet.Tables.Count > 0)
+        //            {
+        //                var rowsFound = dataSet.Tables[0].Select(string.Format("userid='{0}'", user));
+
+        //                if (rowsFound.Length > 0)
+        //                {
+        //                    found = true;
+        //                    dataSet.Tables[0].Rows.Remove(rowsFound[0]);
+        //                }
+        //            }
+        //            if (!found)
+        //            {
+        //                InsertPersonalization(connection, id, user, listItem: li);
+        //            }
+        //            if (unmarkread)
+        //            {
+        //                ExecuteNSetBit(connection, id, user);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private static void InsertPersonalizationWithListItem(SPListItem li, SqlConnection connection, string id, string user)
+        //{
+        //    using (var command = new SqlCommand(
+        //                    "INSERT INTO personalizations " +
+        //                    "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
+        //                    "VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
+        //                    connection))
+        //    {
+        //        command.Parameters.AddWithValue("@id", id);
+        //        command.Parameters.AddWithValue("@value", "00");
+        //        command.Parameters.AddWithValue("@userid", user);
+        //        command.Parameters.AddWithValue("@siteid", li.ParentList.ParentWeb.Site.ID);
+        //        command.Parameters.AddWithValue("@webid", li.ParentList.ParentWeb.ID);
+        //        command.Parameters.AddWithValue("@listid", li.ParentList.ID);
+        //        command.Parameters.AddWithValue("@itemid", li.ID);
+        //        command.ExecuteNonQuery();
+        //    }
+        //}
+
+        private static DataSet GetPersonalizationDataSet(SqlConnection connection, string id)
         {
             var dataSet = new DataSet();
             using (var personalizationCommand =
@@ -413,47 +463,7 @@ namespace EPMLiveCore.API
                 }
             }
 
-            foreach (var user in newusers)
-            {
-                if (user != "")
-                {
-                    bool found = false;
-
-                    if (dataSet.Tables.Count > 0)
-                    {
-                        var rowsFound = dataSet.Tables[0].Select(string.Format("userid='{0}'", user));
-
-                        if (rowsFound.Length > 0)
-                        {
-                            found = true;
-                            dataSet.Tables[0].Rows.Remove(rowsFound[0]);
-                        }
-                    }
-                    if (!found)
-                    {
-                        using (var insertCommand = new SqlCommand(
-                            "INSERT INTO personalizations " +
-                            "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
-                            "VALUES " +
-                            "(@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
-                            connection))
-                        {
-                            insertCommand.Parameters.AddWithValue("@id", id);
-                            insertCommand.Parameters.AddWithValue("@value", "00");
-                            insertCommand.Parameters.AddWithValue("@userid", user);
-                            insertCommand.Parameters.AddWithValue("@siteid", li.ParentList.ParentWeb.Site.ID);
-                            insertCommand.Parameters.AddWithValue("@webid", li.ParentList.ParentWeb.ID);
-                            insertCommand.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                            insertCommand.Parameters.AddWithValue("@itemid", li.ID);
-                            insertCommand.ExecuteNonQuery();
-                        }
-                    }
-                    if (unmarkread)
-                    {
-                        ExecuteNSetBit(connection, id, user);
-                    }
-                }
-            }
+            return dataSet;
         }
 
         private static void iQueueItemMessage(
@@ -513,7 +523,7 @@ namespace EPMLiveCore.API
                                 upsertNotificationCommand.ExecuteNonQuery();
                             }
 
-                            ProcessNewUsers(newusers, unmarkread, web, connection, id);
+                            ProcessNewUsers(newusers, unmarkread, connection, id, web: web);
                             DeleteUsers(delusers, connection, id);
                         }
                     }
@@ -595,20 +605,17 @@ namespace EPMLiveCore.API
         private static void ProcessNewUsers(
             string[] newUsers, 
             bool unmarkread, 
-            SPWeb web, 
             SqlConnection connection, 
-            string id)
+            string id,
+            SPWeb web = null,
+            SPListItem listItem = null)
         {
-            var dataSet = new DataSet();
-            using (var personalizationCommand =
-                new SqlCommand("select * from personalizations where FK=@id", connection))
+            if (web == null && listItem == null)
             {
-                personalizationCommand.Parameters.AddWithValue("@id", id);
-                using (var dataAdapter = new SqlDataAdapter(personalizationCommand))
-                {
-                    dataAdapter.Fill(dataSet);
-                }
+                throw new ArgumentException($"{nameof(web)} or {nameof(listItem)} must be set.");
             }
+
+            var dataSet = GetPersonalizationDataSet(connection, id);
 
             foreach (var user in newUsers)
             {
@@ -627,7 +634,7 @@ namespace EPMLiveCore.API
                     }
                     if (!found)
                     {
-                        InsertPersonalization(web, connection, id, user);
+                        InsertPersonalization(connection, id, user, web, listItem);
                     }
                     if (unmarkread)
                     {
@@ -637,10 +644,14 @@ namespace EPMLiveCore.API
             }
         }
 
-        private static void InsertPersonalization(SPWeb web, SqlConnection connection, string id, string user)
+        private static void InsertPersonalization(
+            SqlConnection connection, 
+            string id, 
+            string user, 
+            SPWeb web = null, 
+            SPListItem listItem = null)
         {
-            using (var command = 
-                    new SqlCommand(
+            using (var command = new SqlCommand(
                         "INSERT INTO personalizations " +
                         "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
                         "VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
@@ -649,10 +660,10 @@ namespace EPMLiveCore.API
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@value", "00");
                 command.Parameters.AddWithValue("@userid", user);
-                command.Parameters.AddWithValue("@siteid", web.Site.ID);
-                command.Parameters.AddWithValue("@webid", web.ID);
-                command.Parameters.AddWithValue("@listid", DBNull.Value);
-                command.Parameters.AddWithValue("@itemid", DBNull.Value);
+                command.Parameters.AddWithValue("@siteid", listItem?.ParentList.ParentWeb.Site.ID ?? web.Site.ID);
+                command.Parameters.AddWithValue("@webid", listItem?.ParentList.ParentWeb.ID ?? web.ID);
+                command.Parameters.AddWithValue("@listid", listItem?.ParentList.ID ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@itemid", listItem?.ID ?? (object)DBNull.Value);
                 command.ExecuteNonQuery();
             }
         }

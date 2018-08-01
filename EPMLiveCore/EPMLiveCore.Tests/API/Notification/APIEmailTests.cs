@@ -27,6 +27,8 @@ namespace EPMLiveCore.Tests.API.Notification
         private static readonly Guid _listParentListId = new Guid("19EDE34A-5358-48B6-B468-E3FECA86E1E6");
         private static readonly Guid _webId = new Guid("8EB90CFE-34EA-4383-89DF-B04F8A2C29A9");
         private static readonly Guid _oWebId = new Guid("C93098C4-2B5A-4ABC-9D7A-080DCF4A55A7");
+        private static readonly Guid _parentWebId = new Guid("94112E0B-6FA7-4ECD-A081-FFCA908CC149");
+        private static readonly Guid _parentWebSiteId = new Guid("35FD03A8-C874-4E85-A7B2-06EF913D148E");
         private const int ItemId = 229;
         private const string ListId = "9BDC6F65-7849-49D7-946D-9B5C1D3B83B3";
         private const string ListName = "Goose";
@@ -415,6 +417,109 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.IsTrue(_calledUnmarkread);
         }
 
+        [TestMethod]
+        public void ProcessNewUsers_SpWebSet_CommandExecuted()
+        {
+            // Arrange
+            const string id = "71";
+            var shimSpWeb = new ShimSPWeb
+            {
+                IDGet = () => _oWebId,
+                SiteGet = () => new ShimSPSite
+                {
+                    IDGet = () => _listParentListId
+                }
+            };
+
+            var shimConnection = new ShimSqlConnection();
+
+            var arguments = new object[] 
+            {
+                new string[] {"slavik"},
+                true,
+                (SqlConnection)shimConnection,
+                id,
+                (SPWeb)shimSpWeb,
+                null
+            };
+
+            // Act
+            _apiEmailPrivate.Invoke(
+                "ProcessNewUsers", 
+                BindingFlags.Static | BindingFlags.NonPublic,
+                arguments);
+
+            // Asserts
+            Assert.AreEqual(2, _executeNonQueryCommands.Count);
+            foreach (var command in _executeNonQueryCommands)
+            {
+                Assert.AreSame((SqlConnection)shimConnection, command.Connection);
+            }
+
+            Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
+
+            Assert.AreEqual(id, _executeNonQueryCommands[0].Parameters[0].Value);
+            Assert.AreEqual(_listParentListId, _executeNonQueryCommands[0].Parameters[3].Value);
+            Assert.AreEqual(_oWebId, _executeNonQueryCommands[0].Parameters[4].Value);
+            Assert.AreEqual(DBNull.Value, _executeNonQueryCommands[0].Parameters[5].Value);
+            Assert.AreEqual(DBNull.Value, _executeNonQueryCommands[0].Parameters[6].Value);
+
+            Assert.AreEqual(CommandType.StoredProcedure, _executeNonQueryCommands[1].CommandType);
+            Assert.AreEqual(id, _executeNonQueryCommands[1].Parameters[0].Value);
+        }
+
+        [TestMethod]
+        public void ProcessNewUsers_SPListItemSet_CommandExecuted()
+        {
+            // Arrange
+            const string id = "71";
+            var shimSpWeb = new ShimSPWeb
+            {
+                IDGet = () => _oWebId,
+                SiteGet = () => new ShimSPSite
+                {
+                    IDGet = () => _listParentListId
+                }
+            };
+            var shimListItem = CreateShimSpListItem(_webAppGuid1);
+
+            var shimConnection = new ShimSqlConnection();
+
+            var arguments = new object[]
+            {
+                new string[] {"slavik"},
+                true,
+                (SqlConnection)shimConnection,
+                id,
+                null,
+                (SPListItem)shimListItem,
+            };
+
+            // Act
+            _apiEmailPrivate.Invoke(
+                "ProcessNewUsers",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                arguments);
+
+            // Asserts
+            Assert.AreEqual(2, _executeNonQueryCommands.Count);
+            foreach (var command in _executeNonQueryCommands)
+            {
+                Assert.AreSame((SqlConnection)shimConnection, command.Connection);
+            }
+
+            Assert.AreEqual(CommandType.Text, _executeNonQueryCommands[0].CommandType);
+
+            Assert.AreEqual(id, _executeNonQueryCommands[0].Parameters[0].Value);
+            Assert.AreEqual(_parentWebSiteId, _executeNonQueryCommands[0].Parameters[3].Value);
+            Assert.AreEqual(_parentWebId, _executeNonQueryCommands[0].Parameters[4].Value);
+            Assert.AreEqual(_listParentListId, _executeNonQueryCommands[0].Parameters[5].Value);
+            Assert.AreEqual(ListItemId, _executeNonQueryCommands[0].Parameters[6].Value);
+
+            Assert.AreEqual(CommandType.StoredProcedure, _executeNonQueryCommands[1].CommandType);
+            Assert.AreEqual(id, _executeNonQueryCommands[1].Parameters[0].Value);
+        }
+
         private void ShimQueueItemMessage()
         {
             ShimAPIEmail
@@ -593,7 +698,6 @@ namespace EPMLiveCore.Tests.API.Notification
             Assert.IsTrue(clientDisposed);
             Assert.IsTrue(messageDisposed);
         }
-
 
         private void AssertConnection()
         {
@@ -889,10 +993,12 @@ namespace EPMLiveCore.Tests.API.Notification
                         {
                             return new ShimSPWeb
                             {
+                                IDGet =() => _parentWebId,
                                 SiteGet = () =>
                                 {
                                     return new ShimSPSite
                                     {
+                                        IDGet = () => _parentWebSiteId,
                                         WebApplicationGet = () =>
                                         {
                                             return webAppShim;
