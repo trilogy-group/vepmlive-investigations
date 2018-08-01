@@ -1544,51 +1544,41 @@ namespace EPMLiveCore.API
 
         private static XmlDocument GetTeamFromListItem(SPWeb web, string filterfield, string filterval, ArrayList arrColumns, Guid ListId, int ItemId)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml("<Team/>");
+            var result = new XmlDocument();
+            result.LoadXml("<Team/>");
 
             try
             {
-                SPListItem li = null;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    using (SPSite tSite = new SPSite(web.Site.ID))
+                    using (var tSite = new SPSite(web.Site.ID))
                     {
-                        using (SPWeb tWeb = tSite.OpenWeb(web.ID))
+                        using (var tWeb = tSite.OpenWeb(web.ID))
                         {
-                            SPList list = tWeb.Lists[ListId];
-                            li = list.GetItemById(ItemId);
+                            var list = tWeb.Lists[ListId];
+                            var listItem = list.GetItemById(ItemId);
+                            var resourceUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
+                            var gridGanttSettings = ListCommands.GetGridGanttSettings(listItem.ParentList);
+                            var additionalPermissions = new List<string>();
+                            var permissionsString = gridGanttSettings.BuildTeamPermissions.Split('|');
 
-                            string resUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
-
-                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
-                            List<string> additionalPermissions = new List<string>();
-                            string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
-
-                            for (int i = 0; i < permissionsString.Length; i++)
+                            for (var i = 0; i < permissionsString.Length; i+=2)
                             {
-                                if (i % 2 == 0)
+                                var permissions = permissionsString[i].Split('~');
+                                for (int j = 0; j < permissions.Length; j+=2)
                                 {
-                                    string[] strIds = permissionsString[i].Split('~');
-                                    for (int j = 0; j < strIds.Length; j++)
-                                    {
-                                        if (j % 2 == 0)
-                                        {
-                                            additionalPermissions.Add(strIds[j]);
-                                        }
-                                    }
+                                    additionalPermissions.Add(permissions[j]);
                                 }
                             }
 
-                            DataTable dtResources = null;
-
+                            DataTable resources = null;
                             try
                             {
-                                using (SPSite rsite = new SPSite(resUrl))
+                                using (var rsite = new SPSite(resourceUrl))
                                 {
-                                    using (SPWeb rweb = rsite.OpenWeb())
+                                    using (var rweb = rsite.OpenWeb())
                                     {
-                                        dtResources = getResources(rweb, filterfield, filterval, true, arrColumns, li, null);
+                                        resources = getResources(rweb, filterfield, filterval, true, arrColumns, listItem, null);
                                     }
                                 }
                             }
@@ -1600,59 +1590,62 @@ namespace EPMLiveCore.API
                                     {
                                         using (SPWeb rweb = tSite.OpenWeb())
                                         {
-                                            dtResources = getResources(rweb, filterfield, filterval, false, arrColumns, li, null);
+                                            resources = getResources(rweb, filterfield, filterval, false, arrColumns, listItem, null);
                                         }
                                     });
                                 }
 
-                                throw ex;
+                                // (CC-78170, 2018-08-01) It's probably a error, since it's being rethrown even if resources could be successfully fetched using elevated priveleges
+                                // But we're not allowed to fix it in scope of CC
+                                throw;
                             }
 
                             try
                             {
+                                var userValueCollection = new SPFieldUserValueCollection(tWeb, Convert.ToString(listItem["AssignedTo"]));
 
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(tWeb, Convert.ToString(li["AssignedTo"]));
+                                var index = 0;
+                                var users = new SortedList();
 
-                                int index = 0;
-                                SortedList slUsers = new SortedList();
-
-                                foreach (SPFieldUserValue uv in uvc)
+                                foreach (SPFieldUserValue userValue in userValueCollection)
                                 {
-                                    DataRow[] drs = dtResources.Select("SPID='" + uv.LookupId + "'");
-                                    if (drs.Length > 0)
+                                    var userResources = resources.Select("SPID='" + userValue.LookupId + "'");
+                                    if (userResources.Length > 0)
                                     {
-                                        XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "Member", doc.NamespaceURI);
+                                        var memberNode = result.CreateNode(XmlNodeType.Element, "Member", result.NamespaceURI);
 
-                                        foreach (DataColumn dc in dtResources.Columns)
-                                            addAttribute(ref ndNew, doc, drs[0], dc.ColumnName);
+                                        foreach (DataColumn column in resources.Columns)
+                                        {
+                                            addAttribute(ref memberNode, result, userResources[0], column.ColumnName);
+                                        }
 
-                                        string perms = "";
+                                        var permissions = string.Empty;
                                         try
                                         {
-                                            perms = Convert.ToString(drs[0]["Groups"]);
+                                            var groups = Convert.ToString(userResources[0]["Groups"]);
 
-                                            if (additionalPermissions.Contains(perms))
-                                                perms = "";
-
+                                            if (!additionalPermissions.Contains(permissions))
+                                            {
+                                                permissions = groups;
+                                            }
                                         }
                                         catch (Exception ex)
                                         {
                                             WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                                         }
 
-                                        XmlAttribute attr = doc.CreateAttribute("Permissions");
-                                        attr.Value = perms.Trim(';');
-                                        ndNew.Attributes.Append(attr);
+                                        var permissionsAttribute = result.CreateAttribute("Permissions");
+                                        permissionsAttribute.Value = permissions.Trim(';');
+                                        memberNode.Attributes.Append(permissionsAttribute);
 
-                                        slUsers.Add(drs[0]["Title"].ToString() + index++, ndNew);
+                                        users.Add(userResources[0]["Title"].ToString() + index++, memberNode);
                                     }
                                 }
 
-                                foreach (DictionaryEntry de in slUsers)
+                                foreach (DictionaryEntry de in users)
                                 {
-                                    doc.FirstChild.AppendChild((XmlNode)de.Value);
+                                    result.FirstChild.AppendChild((XmlNode)de.Value);
                                 }
-
                             }
                             catch(Exception ex)
                             {
@@ -1667,7 +1660,7 @@ namespace EPMLiveCore.API
                 throw new APIException(3025, "Error: " + ex.Message);
             }
 
-            return doc;
+            return result;
         }
 
         private static XmlDocument GetTeamFromWeb(SPWeb web, string filterfield, string filterval, ArrayList arrColumns)
