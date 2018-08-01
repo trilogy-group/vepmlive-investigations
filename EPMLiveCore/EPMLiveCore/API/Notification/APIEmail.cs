@@ -305,34 +305,22 @@ namespace EPMLiveCore.API
 
                             var id = GetNotificationIdByListId(templateid, listItem, connection);
 
-                            using (var upsertNotificationCommand = new SqlCommand())
+                            new NotificationUpserter
                             {
-                                upsertNotificationCommand.Connection = connection;
-                                if (id == null || forceNewEntry)
-                                {
-                                    id = Guid.NewGuid().ToString();
-                                }
-                                upsertNotificationCommand.CommandText = GenerateUpsertSql(forceNewEntry, id);
-
-                                upsertNotificationCommand.Parameters.AddWithValue("@id", id);
-                                upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
-                                upsertNotificationCommand.Parameters.AddWithValue("@message", body);
-                                upsertNotificationCommand.Parameters.AddWithValue("@type", templateid);
-                                if (hidefrom)
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", _defaultUserId);
-                                }
-                                else
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", curUser.ID);
-                                }
-                                upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@listid", listItem.ParentList.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", listItem.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
-                                upsertNotificationCommand.ExecuteNonQuery();
-                            }
+                                Connection = connection,
+                                Id = id,
+                                TemplateId = templateid,
+                                CurUserId = curUser.ID,
+                                Subject = subject,
+                                Body = body,
+                                ForceNewEntry = forceNewEntry,
+                                HideFrom = hidefrom,
+                                DoNotEmail = doNotEmail,
+                                SiteId  = site.ID,
+                                WebId = web.ID,
+                                ListItemParentListID = listItem.ParentList.ID,
+                                ListItemId = listItem.ID
+                            }.Upsert();
 
                             ProcessNewUsers(newusers, unmarkread, connection, id, listItem: listItem);
                             DeleteUsers(delusers, connection, id);
@@ -395,61 +383,6 @@ namespace EPMLiveCore.API
             return id;
         }
 
-        //private static void ProcessNewUsersWithListItem(
-        //    string[] newUsers, 
-        //    bool unmarkread, 
-        //    SPListItem li, 
-        //    SqlConnection connection, 
-        //    string id)
-        //{
-        //    var dataSet = GetPersonalizationDataSet(connection, id);
-
-        //    foreach (var user in newUsers)
-        //    {
-        //        if (user != string.Empty)
-        //        {
-        //            var found = false;
-        //            if (dataSet.Tables.Count > 0)
-        //            {
-        //                var rowsFound = dataSet.Tables[0].Select(string.Format("userid='{0}'", user));
-
-        //                if (rowsFound.Length > 0)
-        //                {
-        //                    found = true;
-        //                    dataSet.Tables[0].Rows.Remove(rowsFound[0]);
-        //                }
-        //            }
-        //            if (!found)
-        //            {
-        //                InsertPersonalization(connection, id, user, listItem: li);
-        //            }
-        //            if (unmarkread)
-        //            {
-        //                ExecuteNSetBit(connection, id, user);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private static void InsertPersonalizationWithListItem(SPListItem li, SqlConnection connection, string id, string user)
-        //{
-        //    using (var command = new SqlCommand(
-        //                    "INSERT INTO personalizations " +
-        //                    "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
-        //                    "VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
-        //                    connection))
-        //    {
-        //        command.Parameters.AddWithValue("@id", id);
-        //        command.Parameters.AddWithValue("@value", "00");
-        //        command.Parameters.AddWithValue("@userid", user);
-        //        command.Parameters.AddWithValue("@siteid", li.ParentList.ParentWeb.Site.ID);
-        //        command.Parameters.AddWithValue("@webid", li.ParentList.ParentWeb.ID);
-        //        command.Parameters.AddWithValue("@listid", li.ParentList.ID);
-        //        command.Parameters.AddWithValue("@itemid", li.ID);
-        //        command.ExecuteNonQuery();
-        //    }
-        //}
-
         private static DataSet GetPersonalizationDataSet(SqlConnection connection, string id)
         {
             var dataSet = new DataSet();
@@ -494,34 +427,22 @@ namespace EPMLiveCore.API
 
                             var id = GetNotificationId(templateid, web, connection);
 
-                            using (var upsertNotificationCommand = new SqlCommand())
+                            new NotificationUpserter
                             {
-                                upsertNotificationCommand.Connection = connection;
-                                if (id == null || forceNewEntry)
-                                {
-                                    id = Guid.NewGuid().ToString();
-                                }
-                                upsertNotificationCommand.CommandText = GenerateUpsertSql(forceNewEntry, id);
-
-                                upsertNotificationCommand.Parameters.AddWithValue("@id", id);
-                                upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
-                                upsertNotificationCommand.Parameters.AddWithValue("@message", body);
-                                upsertNotificationCommand.Parameters.AddWithValue("@type", templateid);
-                                if (hidefrom)
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", _defaultUserId);
-                                }
-                                else
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", curUser.ID);
-                                }
-                                upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@listid", DBNull.Value);
-                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", DBNull.Value);
-                                upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
-                                upsertNotificationCommand.ExecuteNonQuery();
-                            }
+                                Connection = connection,
+                                Id = id,
+                                TemplateId = templateid,
+                                CurUserId = curUser.ID,
+                                Subject = subject,
+                                Body = body,
+                                ForceNewEntry = forceNewEntry,
+                                HideFrom = hidefrom,
+                                DoNotEmail = doNotEmail,
+                                SiteId = site.ID,
+                                WebId = web.ID,
+                                ListItemParentListID = DBNull.Value,
+                                ListItemId = DBNull.Value
+                            }.Upsert();
 
                             ProcessNewUsers(newusers, unmarkread, connection, id, web: web);
                             DeleteUsers(delusers, connection, id);
