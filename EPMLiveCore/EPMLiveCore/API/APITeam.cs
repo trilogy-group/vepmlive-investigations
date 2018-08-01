@@ -91,58 +91,47 @@ namespace EPMLiveCore.API
                 dt.Columns.Add("Title");
             }
 
-            var reportBiz = new ReportHelper.ReportBiz(web.Site.ID);
-            if (reportBiz.SiteExists())
+            var rb = new ReportHelper.ReportBiz(web.Site.ID);
+
+            if (rb.SiteExists())
             {
-                var epmData = new ReportHelper.EPMData(web.Site.ID);
-                using (var sqlConnection = epmData.GetClientReportingConnection)
+                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
+
+                SqlConnection cn = data.GetClientReportingConnection;
+
+                bool bNewDB = false;
+                bool blookup = false;
+
+                SqlCommand cmd = new SqlCommand("select * from sys.tables where name = 'RPTGROUPUSER'", cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                    bNewDB = true;
+
+                dr.Close();
+
+
+                if (bNewDB)
                 {
-                    var isNewDb = false;
-                    var isLookup = false;
-
-                    using (var sqlCommand = new SqlCommand("select * from sys.tables where name = 'RPTGROUPUSER'", sqlConnection))
+                    if (filterfield != "")
                     {
-                        using (var dataReader = sqlCommand.ExecuteReader())
+                        if (list.Fields.GetFieldByInternalName(filterfield).Type == SPFieldType.User || list.Fields.GetFieldByInternalName(filterfield).Type == SPFieldType.Lookup)
                         {
-                            isNewDb = dataReader.Read();
+                            filterfield += "Text";
+                            blookup = true;
                         }
                     }
 
-                    if (isNewDb)
-                    {
-                        if (filterfield != string.Empty)
-                        {
-                            var filterFieldType = list.Fields.GetFieldByInternalName(filterfield).Type;
-                            if (filterFieldType == SPFieldType.User || filterFieldType == SPFieldType.Lookup)
-                            {
-                                filterfield += "Text";
-                                isLookup = true;
-                            }
-                        }
-
-                        dt = iGetResourceFromRPT(
-                            sqlConnection,
-                            list,
-                            dt,
-                            web,
-                            filterfield,
-                            filtervalue,
-                            isLookup,
-                            hasPerms,
-                            arrColumns,
-                            liItem,
-                            nodeTeam);
-                    }
-                    else
-                    {
-                        dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
-                    }
+                    dt = iGetResourceFromRPT(cn, list, dt, web, filterfield, filtervalue, blookup, hasPerms, arrColumns, liItem, nodeTeam);
                 }
+                else
+                    dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
+
+                cn.Close();
+
+
             }
             else
-            {
                 dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
-            }
 
             return dt;
         }
