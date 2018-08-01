@@ -70,10 +70,15 @@ namespace EPMLiveIntegrationService.Tests
             ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, set) => 0;
         }
 
-        public static void InvokeMethod(object obj, string methodName, object[] parameters)
+        public static void InvokeMethod(object instance, string methodName, object[] parameters)
         {
-            var dynMethod = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            dynMethod?.Invoke(obj, parameters);
+            if (instance == null)
+            {
+                throw new ArgumentNullException(nameof(instance));
+            }
+
+            var dynMethod = instance.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+            dynMethod?.Invoke(instance, parameters);
         }
     }
 }
