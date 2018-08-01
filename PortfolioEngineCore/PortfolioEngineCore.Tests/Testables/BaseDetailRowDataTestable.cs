@@ -114,5 +114,15 @@ namespace PortfolioEngineCore.Tests.Testables
         {
             base.CopyData(source);
         }
+
+        public new void CaptureBurnRates(IEnumerable<IPeriodData> periods)
+        {
+            base.CaptureBurnRates(periods);
+        }
+
+        public new int CalculateOverlapLocal(DateTime barStart, DateTime barFinish, DateTime periodStart, DateTime periodFinish)
+        {
+            return base.CalculateOverlapLocal(barStart, barFinish, periodStart, periodFinish);
+        }
     }
 }

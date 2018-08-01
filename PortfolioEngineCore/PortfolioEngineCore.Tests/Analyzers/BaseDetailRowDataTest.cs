@@ -12,26 +12,47 @@ namespace PortfolioEngineCore.Tests.Analyzers
     [TestClass]
     public class BaseDetailRowDataTest
     {
-        private const int _arraySize = 1;
+        private const int _arraySize = 2;
+        private const int _periodOverlapForDefaultValues = 10;
         private BaseDetailRowDataTestable _testable;
 
         private IList<DateTime> _periodsStartDates;
         private IList<DateTime> _periodsEndDates;
         private IList<int> _periodsModes;
+        private IList<IPeriodData> _periods;
         private int _minP;
         private int _maxP;
 
         [TestInitialize]
         public void SetUp()
         {
-            _periodsStartDates = new List<DateTime> { new DateTime(2018, 01, 01), new DateTime(2018, 01, 06) };
-            _periodsEndDates = new List<DateTime> { new DateTime(2018, 01, 09), new DateTime(2018, 01, 12) };
-            _periodsModes = new List<int> { 1, 2 };
+            var baseDate = new DateTime(2018, 01, 01);
+            
             _minP = 0;
-            _maxP = _arraySize;
+            _maxP = _arraySize - 1;
+            _periodsStartDates = new List<DateTime>();
+            _periodsEndDates = new List<DateTime>();
+            _periods = new List<IPeriodData>();
+            _periodsModes = new List<int>();
+
+            for (var i = 0; i < _arraySize; i++)
+            {
+                var startDate = baseDate.AddDays(i * 5);
+                var endDate = baseDate.AddDays(9).AddDays(i * 3);
+                
+                _periodsModes.Add(i + 1);
+                _periodsStartDates.Add(startDate);
+                _periodsEndDates.Add(endDate);
+                _periods.Add(new clsPeriodData
+                {
+                    StartDate = startDate,
+                    FinishDate = endDate
+                });
+            }
 
             _testable = new BaseDetailRowDataTestable(_arraySize)
             {
+                mxdim = _periods.Count - 1,
                 bCapture = true,
                 BC_ROLE_UID = 1,
                 BC_SEQ = 2,
@@ -343,6 +364,63 @@ namespace PortfolioEngineCore.Tests.Analyzers
         // (CC-77750, 2018-07-23) Sadly, the DragBar logic is very difficult to understand. 
         // Not clear what it calculates and following which logic. 
         // Therefore it's difficult to create meaningful comprehandable tests for it's calculations
+
+        [TestMethod]
+        public void CaptureBurnRates_NoPeriods_DoesNotAffectBurnData()
+        {
+            // Arrange
+            var periods = Enumerable.Empty<IPeriodData>();
+
+            // Act
+            _testable.CaptureBurnRates(periods);
+
+            // Assert
+            Assert.IsTrue(_testable.Burnrate.All(pred => pred == 0));
+            Assert.IsTrue(_testable.BurnDuration.All(pred => pred == 0));
+        }
+
+        [TestMethod]
+        public void CaptureBurnRates_NoOverlap_ZeroBurnrate()
+        {
+            // Arrange
+            _testable.Det_Start = _periods.Max(pred => pred.FinishDate).AddDays(1);
+            _testable.bUseCosts = true;
+            _testable.zCost[1] = 5;
+
+            // Act
+            _testable.CaptureBurnRates(_periods);
+
+            // Assert
+            Assert.AreEqual(0, _testable.Burnrate[1]);
+        }
+
+        [TestMethod]
+        public void CaptureBurnRates_UseCost_SetsCostAsBurnRate()
+        {
+            // Arrange
+            _testable.bUseCosts = true;
+            _testable.zCost[1] = 5;
+
+            // Act
+            _testable.CaptureBurnRates(_periods);
+
+            // Assert
+            Assert.AreEqual(_testable.zCost[1] / _periodOverlapForDefaultValues, _testable.Burnrate[1]);
+        }
+
+        [TestMethod]
+        public void CaptureBurnRates_NotUseCost_SetsValueAsBurnRate()
+        {
+            // Arrange
+            _testable.bUseCosts = false;
+            _testable.zValue[1] = 5;
+
+            // Act
+            _testable.CaptureBurnRates(_periods);
+
+            // Assert
+            Assert.AreEqual(_testable.zValue[1] / _periodOverlapForDefaultValues, _testable.Burnrate[1]);
+        }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]

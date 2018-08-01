@@ -63,7 +63,7 @@ public class DetailRowData : BaseDetailRowData<TargetRowData>
         bUseCosts = (sUoM == string.Empty);
 
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
 
     public void RestoreInitialData(Dictionary<int, PeriodData> clnPer)
@@ -79,7 +79,7 @@ public class DetailRowData : BaseDetailRowData<TargetRowData>
             zFTE[i] = oFTE[i];
         }
 
-        CaptureBurnRates(clnPer);
+        CaptureBurnRates(clnPer.Values);
     }
 
     private void CaptureBurnRates(IDictionary<int, PeriodData> clnPer)
