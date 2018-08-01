@@ -1588,6 +1588,8 @@ namespace EPMLiveCore.API
             }
             catch (Exception ex)
             {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+
                 throw new APIException(3025, "Error: " + ex.Message);
             }
 
