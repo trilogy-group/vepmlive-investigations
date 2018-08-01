@@ -1037,180 +1037,196 @@ namespace EPMLiveCore.API
             return repository.FindProjectId(web, listId, id);
         }
 
-        private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem li)
+        private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem listItem)
         {
             try
             {
-                GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
-                SPFieldUserValue uv = new SPFieldUserValue(web, user);
-                ArrayList arr = new ArrayList(perms.Split(';'));
-                List<string> additionalPermissions = new List<string>();
-                List<string> lookupsSecurityGroups = new List<string>();
+                var gridGanttSettings = ListCommands.GetGridGanttSettings(listItem.ParentList);
 
-                if (li != null && li.HasUniqueRoleAssignments)
+                var lookupsSecurityGroups = GetListLookupsSecurityGroups(web, listItem, gridGanttSettings);
+                var additionalPermissions = GetListAdditionalPermissions(gridGanttSettings);
+                
+                ProcessListItemGroupRoleAssignments(
+                    web, 
+                    listItem, 
+                    user, 
+                    perms, 
+                    lookupsSecurityGroups, 
+                    additionalPermissions);
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                
+                // (CC-78078, 2018-08-01) There is an intentinal catch ex / throw ex logic from the original developer.
+                // Since we have no idea why he decided to catch and rethrow ex withouth the stack trace, no refactoring applied. Added trace to preserve exception stack.
+                throw ex;
+            }
+        }
+
+        private static void ProcessListItemGroupRoleAssignments(
+            SPWeb web, 
+            SPListItem listItem, 
+            string user,
+            string perms,
+            IList<string> lookupsSecurityGroups, 
+            IList<string> additionalPermissions)
+        {
+            var fieldUserValue = new SPFieldUserValue(web, user);
+
+            //check if this is for user or it's a generic (EPMLCID-11683)
+            if (fieldUserValue.User != null)
+            {
+                var groups = new ArrayList(perms.Split(';'));
+
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EnhancedLookupConfigValuesHelper valueHelper = null;
-                    string lookupSettings = gSettings.Lookups;
-                    //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
-                    valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
-
-                    if (valueHelper != null)
+                    using (var spSite = new SPSite(web.Site.ID))
                     {
-                        List<string> fields = valueHelper.GetSecuredFields();
-
-                        // has security fields
-                        if (fields != null && fields.Count > 0)
+                        using (var spWeb = spSite.OpenWeb(web.ID))
                         {
-                            foreach (string fld in fields)
+                            spWeb.AllowUnsafeUpdates = true;
+
+                            var spUser = spWeb.EnsureUser(fieldUserValue.User.LoginName);
+                            if (spUser != null)
                             {
-                                SPFieldLookup lookup = null;
-                                try
+                                // Re-opening the item with the system account
+                                var adminItem = spWeb.Lists[listItem.ParentList.ID].GetItemByUniqueId(listItem.UniqueId);
+
+                                foreach (SPRoleAssignment role in adminItem.RoleAssignments)
                                 {
-                                    lookup = li.ParentList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
-                                }
-                                catch { }
-
-                                if (lookup == null) continue;
-
-                                SPList lookupParentList = web.Lists[new Guid(lookup.LookupList)];
-                                GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
-
-                                // skip fields with empty lookup values
-                                string securityFieldValue = string.Empty;
-
-                                try { securityFieldValue = li[fld].ToString(); }
-                                catch { }
-
-                                if (string.IsNullOrEmpty(securityFieldValue)) continue;
-
-                                SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
-                                SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
-
-                                if (!parentListItem.HasUniqueRoleAssignments) continue;
-
-                                SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
-
-                                foreach (SPRoleAssignment ra in raCol)
-                                    lookupsSecurityGroups.Add(ra.Member.Name);
-                            }
-                        }
-                    }
-                }
-
-                string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
-                for (int i = 0; i < permissionsString.Length; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        string[] strIds = permissionsString[i].Split('~');
-                        for (int j = 0; j < strIds.Length; j++)
-                        {
-                            if (j % 2 == 0)
-                            {
-                                additionalPermissions.Add(strIds[j]);
-                            }
-                        }
-                    }
-                }
-
-                //check if this is for user or it's a generic (EPMLCID-11683)
-                if (uv.User != null)
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite spSite = new SPSite(web.Site.ID))
-                        {
-                            using (SPWeb spWeb = spSite.OpenWeb(web.ID))
-                            {
-                                spWeb.AllowUnsafeUpdates = true;
-                                SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
-                                if (spUser != null)
-                                {
-                                    // Re-opening the item with the system account
-                                    SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
-                                    foreach (SPRoleAssignment role in adminItem.RoleAssignments)
+                                    try
                                     {
-                                        try
+                                        if (role.Member.GetType() == typeof(SPGroup))
                                         {
-                                            if (role.Member.GetType() == typeof(SPGroup))
+                                            var roleGroup = spWeb.Groups.GetByID(role.Member.ID);
+                                            if (roleGroup != null)
                                             {
-                                                SPGroup group = spWeb.Groups.GetByID(role.Member.ID);
-                                                SPUser tempuser = null;
-
-                                                if (group != null)
+                                                if (lookupsSecurityGroups == null || !lookupsSecurityGroups.Contains(roleGroup.Name))
                                                 {
-                                                    if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                                    SPUser tempuser = null;
+                                                    try
                                                     {
-                                                        continue;
+                                                        tempuser = roleGroup.Users.GetByID(spUser.ID);
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        try
-                                                        {
-                                                            tempuser = group.Users.GetByID(spUser.ID);
-                                                        }
-                                                        catch { }
-                                                        if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                                        {
-                                                            group.AddUser(spUser);
-                                                        }
-                                                        if (tempuser != null && !arr.Contains(group.ID.ToString()) && li.HasUniqueRoleAssignments)
-                                                        {
-                                                            if (additionalPermissions.Contains(Convert.ToString(group.ID)))
-                                                                continue;
-                                                            else
-                                                                group.RemoveUser(spUser);
-                                                        }
+                                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                                    }
+
+                                                    if (tempuser == null && groups.Contains(roleGroup.ID.ToString()))
+                                                    {
+                                                        roleGroup.AddUser(spUser);
+                                                    }
+
+                                                    if (tempuser != null 
+                                                        && !groups.Contains(roleGroup.ID.ToString()) 
+                                                        && listItem.HasUniqueRoleAssignments
+                                                        && !additionalPermissions.Contains(Convert.ToString(roleGroup.ID)))
+                                                    {
+                                                        roleGroup.RemoveUser(spUser);
                                                     }
                                                 }
                                             }
                                         }
-                                        catch { }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                                     }
                                 }
                             }
                         }
-                    });
-                }
-                //foreach(SPGroup group in web.Groups)
-                //{
-                //    try
-                //    {
-                //        if(group.Users.GetByID(uv.LookupId) != null)
-                //        {
-                //            isCurrentlyInGroup = true;
-                //        }
-                //    }
-                //    catch { }
-
-                //    if(group.CanCurrentUserEditMembership)
-                //    {
-                //        if(arr.Contains(group.ID.ToString()))
-                //        {
-                //            try
-                //            {
-                //                group.AddUser(uv.User);
-                //                isAdded = true;
-                //            }
-                //            catch { }
-                //        }
-                //        else
-                //        {
-                //            try
-                //            {
-                //                group.RemoveUser(uv.User);
-                //            }
-                //            catch { }
-                //        }
-                //    }
-                //}
-                //if(!isCurrentlyInGroup && isAdded)
-                //{
-                //    APIEmail.sendEmail(2, uv.LookupId, new Hashtable());
-                //}
+                    }
+                });
             }
-            catch (Exception ex) { throw ex; }
+        }
 
+        private static List<string> GetListAdditionalPermissions(GridGanttSettings gridGanttSettings)
+        {
+            var additionalPermissions = new List<string>();
+            string[] permissionsString = gridGanttSettings.BuildTeamPermissions.Split('|');
+            for (int i = 0; i < permissionsString.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    string[] strIds = permissionsString[i].Split('~');
+                    for (int j = 0; j < strIds.Length; j++)
+                    {
+                        if (j % 2 == 0)
+                        {
+                            additionalPermissions.Add(strIds[j]);
+                        }
+                    }
+                }
+            }
+
+            return additionalPermissions;
+        }
+
+        private static List<string> GetListLookupsSecurityGroups(SPWeb web, SPListItem listItem, GridGanttSettings gridGanttSettings)
+        {
+            var lookupsSecurityGroups = new List<string>();
+
+            if (listItem != null && listItem.HasUniqueRoleAssignments)
+            {
+                var lookupSettings = gridGanttSettings.Lookups;
+                var valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                if (valueHelper != null)
+                {
+                    var securedFieldNames = valueHelper.GetSecuredFields();
+
+                    // has security fields
+                    if (securedFieldNames != null && securedFieldNames.Count > 0)
+                    {
+                        foreach (var fieldName in securedFieldNames)
+                        {
+                            SPFieldLookup lookup = null;
+                            try
+                            {
+                                lookup = listItem.ParentList.Fields.GetFieldByInternalName(fieldName) as SPFieldLookup;
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                            }
+
+                            if (lookup != null)
+                            {
+                                var lookupParentList = web.Lists[new Guid(lookup.LookupList)];
+                                var parentListSettings = new GridGanttSettings(lookupParentList);
+
+                                // skip fields with empty lookup values
+                                string securityFieldValue = null;
+
+                                try
+                                {
+                                    securityFieldValue = listItem[fieldName].ToString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                }
+
+                                if (!string.IsNullOrEmpty(securityFieldValue))
+                                {
+                                    var fieldLookupValue = new SPFieldLookupValue(securityFieldValue.ToString());
+                                    var parentListItem = lookupParentList.GetItemById(fieldLookupValue.LookupId);
+
+                                    if (parentListItem.HasUniqueRoleAssignments)
+                                    {
+                                        foreach (SPRoleAssignment roleAssignment in parentListItem.RoleAssignments)
+                                            lookupsSecurityGroups.Add(roleAssignment.Member.Name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return lookupsSecurityGroups;
         }
 
         private static void setPermissions(SPWeb web, string user, string perms)
