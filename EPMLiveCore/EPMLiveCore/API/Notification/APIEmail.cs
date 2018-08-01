@@ -82,43 +82,45 @@ namespace EPMLiveCore.API
             list.Update();
         }
 
-        private static void GetCoreInformation(SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser)
+        private static void GetCoreInformation(SqlConnection connection, int templateid, out string body, out string subject, SPWeb web, SPUser curUser)
         {
-            body = "";
-            subject = "";
-            //shortmessage = "";
+            body = string.Empty;
+            subject = string.Empty;
 
-            SqlCommand cmd = new SqlCommand("SELECT subject,body from EMAILTEMPLATES where emailid=@id", cn);
-            cmd.Parameters.AddWithValue("@id", templateid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            using (var command =
+                new SqlCommand("SELECT subject,body from EMAILTEMPLATES where emailid=@id", connection))
             {
-                subject = dr.GetString(0);
-                body = dr.GetString(1);
-                //shortmessage = dr.GetString(2);
+                command.Parameters.AddWithValue("@id", templateid);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        subject = reader.GetString(0);
+                        body = reader.GetString(1);
+                    }
+                }
             }
-            dr.Close();
-                                
-            body = body.Replace("{SiteName}", web.Title);
-            body = body.Replace("{SiteUrl}", web.Url);
 
-            body = body.Replace("{CurUser_Name}", curUser.Name);
-            body = body.Replace("{CurUser_Email}", curUser.Email);
-            body = body.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            body = SubstituteSubjectBodyPlaceholders(body, web, curUser);
+            subject = SubstituteSubjectBodyPlaceholders(subject, web, curUser);
+        }
 
-            subject = subject.Replace("{SiteName}", web.Title);
-            subject = subject.Replace("{SiteUrl}", web.Url);
+        private static string SubstituteSubjectBodyPlaceholders(string text, SPWeb web, SPUser curUser)
+        {
+            const string siteNamePlaceholder = "{SiteName}";
+            const string siteUrlPlaceholder = "{SiteUrl}";
+            const string curUserPlaceholder = "{CurUser_Name}";
+            const string curUserEmailPlaceholder = "{CurUser_Email}";
+            const string curUserNamePlaceholder = "{CurUser_Username}";
 
-            subject = subject.Replace("{CurUser_Name}", curUser.Name);
-            subject = subject.Replace("{CurUser_Email}", curUser.Email);
-            subject = subject.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            text = text.Replace(siteNamePlaceholder, web.Title);
+            text = text.Replace(siteUrlPlaceholder, web.Url);
 
-            //shortmessage = shortmessage.Replace("{SiteName}", web.Title);
-            //shortmessage = shortmessage.Replace("{SiteUrl}", web.Url);
+            text = text.Replace(curUserPlaceholder, curUser.Name);
+            text = text.Replace(curUserEmailPlaceholder, curUser.Email);
+            text = text.Replace(curUserNamePlaceholder, CoreFunctions.GetJustUsername(curUser.LoginName));
 
-            //shortmessage = shortmessage.Replace("{CurUser_Name}", curUser.Name);
-            //shortmessage = shortmessage.Replace("{CurUser_Email}", curUser.Email);
-            //shortmessage = shortmessage.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            return text;
         }
 
         public static void QueueItemMessage(int templateid, bool hideFromUser, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPListItem li, SPUser curUser, bool forceNewEntry)
@@ -405,8 +407,10 @@ namespace EPMLiveCore.API
                 new SqlCommand("select * from personalizations where FK=@id", connection))
             {
                 personalizationCommand.Parameters.AddWithValue("@id", id);
-                var dataAdapter = new SqlDataAdapter(personalizationCommand);
-                dataAdapter.Fill(dataSet);
+                using (var dataAdapter = new SqlDataAdapter(personalizationCommand))
+                {
+                    dataAdapter.Fill(dataSet);
+                }
             }
 
             foreach (var user in newusers)

@@ -85,6 +85,79 @@ namespace EPMLiveCore.Tests.API.Notification
         }
 
         [TestMethod]
+        public void GetCoreInformation_BodySubjectDb_PlaceholdersSubstituted()
+        {
+            // Arrange
+            ShimSqlDataReader.AllInstances.GetStringInt32 = (reader, number) =>
+            {
+                if (number == 0)
+                {
+                    return "db subject: {SiteName} {SiteUrl} {CurUser_Name} {CurUser_Email} {CurUser_Username}";
+                }
+                else if (number == 1)
+                {
+                    return "db body: {SiteName} {SiteUrl} {CurUser_Name} {CurUser_Email} {CurUser_Username}";
+                }
+
+                throw new ArgumentOutOfRangeException(nameof(number));
+            };
+
+            var arguments = ShimCoreWebAndUser();
+
+            ShimAPIEmail.GetCoreInformationSqlConnectionInt32StringOutStringOutSPWebSPUser = null;
+
+            // Act
+            _apiEmailPrivate.Invoke(
+                "GetCoreInformation",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                arguments);
+
+            // Assert
+            var subject = arguments[3];
+            var body = arguments[2];
+            Assert.AreEqual("db subject: WebTitle WebUrl UserName euser@fake.com UserLogin", subject);
+            Assert.AreEqual("db body: WebTitle WebUrl UserName euser@fake.com UserLogin", body);
+        }
+
+        private object[] ShimCoreWebAndUser()
+        {
+            const string webTitle = "WebTitle";
+            const string webUrl = "WebUrl";
+            const string userName = "UserName";
+            const string userEmail = "euser@fake.com";
+            const string userLogin = "UserLogin";
+
+            ShimIQueueItemMessage();
+            var shimConnection = new ShimSqlConnection();
+            string body = null;
+            string subject = null;
+
+            var shimSpWeb = new ShimSPWeb
+            {
+                TitleGet = () => webTitle,
+                UrlGet = () => webUrl
+            };
+
+            var shimCurrentUser = new ShimSPUser
+            {
+                NameGet = () => userName,
+                EmailGet = () => userEmail,
+                LoginNameGet = () => userLogin
+            };
+
+            var arguments = new object[]
+            {
+                (SqlConnection)shimConnection,
+                23,
+                body,
+                subject,
+                (SPWeb)shimSpWeb,
+                (SPUser)shimCurrentUser
+            };
+            return arguments;
+        }
+
+        [TestMethod]
         public void ClearNotificationItem_Called_ObjectDisposed()
         {
             // Arrange
