@@ -558,37 +558,50 @@ namespace EPMLiveEnterprise
         {
             SPWeb web = SPContext.Current.Web;
             
-            SqlConnection cn = null;
+            SqlConnection connection = null;
             int pubType = 0;
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", connection))
                 {
-                    pubType = dr.GetInt32(0);
+                    cmd.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = cmd.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            pubType = dataReader.GetInt32(0);
+                        }
+                    }
                 }
-                dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                 EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                 myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            web.Close();
+            finally
+            {
+                connection?.Close();
+                web.Close();
+                connection?.Dispose();
+            }
             return pubType;
         }
+
         [WebMethod]
         public void setApprovedTasks(TaskApprovalItem[] taskItems, Guid projectGuid)
         {
@@ -674,13 +687,14 @@ namespace EPMLiveEnterprise
             }
             finally
             {
-                connection.Close();
+                connection?.Close();
                 psweb.Close();
                 web.Close();
 
-                connection.Dispose();
+                connection?.Dispose();
             }
         }
+
         [WebMethod]
         public UpdateTaskItem[] getUpdates(string projectGuid)
         {

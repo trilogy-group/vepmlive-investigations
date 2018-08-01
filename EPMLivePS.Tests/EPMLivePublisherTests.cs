@@ -356,6 +356,7 @@ namespace EPMLivePS.Tests
             Assert.AreEqual(1, _executeReaderCallCount);
             Assert.IsTrue(_isWriteEntryCalled);
             AssertThatObjectsAreDisposed();
+            Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
         [TestMethod]
@@ -368,6 +369,39 @@ namespace EPMLivePS.Tests
 
             // Act
             _publisher.setApprovedTasks(null, Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.AreEqual(0, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetPublishType_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+
+            // Act
+            _publisher.getPublishType(Guid.Empty);
+
+            // Assert
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            Assert.IsFalse(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+        }
+
+        [TestMethod]
+        public void GetPublishType_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            _publisher.getPublishType(Guid.Empty);
 
             // Assert
             Assert.IsFalse(_isConnectionOpenedCalled);
