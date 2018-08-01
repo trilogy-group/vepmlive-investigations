@@ -191,6 +191,9 @@ Log-Section "Restoring missing packages . . ."
 restore `
 $projAbsPath
 
+& $nugetPath `
+restore `
+$projAUTPath
 
 if ($TestsOnly)
 {
