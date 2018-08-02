@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPageCode\GetgantttasksTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
   </ItemGroup>
   <ItemGroup>
