@@ -32,6 +32,7 @@ namespace EPMLiveCore.API
         private const string StandardRateColumn = "StandardRate";
         private const string TitleColumn = "Title";
         private const string UsernameColumn = "Username";
+        private const string ModifiedUsersSeparator = ",";
 
         private static DataTable getResources(SPWeb web, string filterfield, string filtervalue, bool hasPerms, ArrayList arrColumns, SPListItem liItem, XmlNodeList nodeTeam)
         {
@@ -714,39 +715,14 @@ namespace EPMLiveCore.API
 
             foreach (XmlNode memberNode in teamDocument.SelectNodes("//Team/Member"))
             {
-                var id = memberNode.Attributes["ID"].Value;
-                var memberResources = resourcePool.Select("ID='" + id + "'");
-                if (listItemsDataTable == null)
-                {
-                    var li = list.Items.Add();
-                    li["Title"] = memberResources[0]["Title"].ToString();
-                    li["ResID"] = memberResources[0]["ID"].ToString();
-                    li.Update();
-                }
-                else
-                {
-                    var listItemResources = listItemsDataTable.Select("ResID=" + id);
-                    if (listItemResources.Length == 0)
-                    {
-                        var li = list.Items.Add();
-                        li["Title"] = memberResources[0]["Title"].ToString();
-                        li["ResID"] = memberResources[0]["ID"].ToString();
-                        li.Update();
-                    }
-                    else
-                    {
-                        listItemsDataTable.Rows.Remove(listItemResources[0]);
-                    }
-                }
+                var memberSpid = SaveTeamForUnspecifiedListMemberNodeSettings(
+                    web,
+                    list,
+                    listItemsDataTable,
+                    resourcePool,
+                    memberNode);
 
-                setPermissions(web, memberResources[0]["SPAccountInfo"].ToString(), memberNode.Attributes["Permissions"].Value);
-
-                var memberSpidObject = memberResources[0]["SPID"];
-                var memberSpid = memberSpidObject != null
-                    ? memberSpidObject.ToString()
-                    : string.Empty;
-
-                modifiedUsers += "," + memberSpid;
+                modifiedUsers += ModifiedUsersSeparator + memberSpid;
 
                 var resultMemberElement = resultDocument.CreateNode(XmlNodeType.Element, "Member", resultDocument.NamespaceURI);
 
@@ -762,6 +738,78 @@ namespace EPMLiveCore.API
                 teamMemberCount++;
             }
 
+            SaveTeamForUnspecifiedListUpdateReport(web, teamMemberCount);
+
+            if (listItemsDataTable != null)
+            {
+                modifiedUsers += ModifiedUsersSeparator + string.Join(ModifiedUsersSeparator, 
+                    SaveTeamForUnspecifiedListCleanupUsers(
+                        web,
+                        list,
+                        listItemsDataTable,
+                        resourcePool));
+            }
+
+            return modifiedUsers;
+        }
+
+        private static IList<int> SaveTeamForUnspecifiedListCleanupUsers(SPWeb web, SPList list, DataTable listItemsDataTable, DataTable resourcePool)
+        {
+            var userIdsAffected = new List<int>();
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(web.Site.ID))
+                {
+                    using (var siteWeb = site.OpenWeb(web.ID))
+                    {
+                        siteWeb.AllowUnsafeUpdates = true;
+
+                        foreach (DataRow listItemDataRow in listItemsDataTable.Rows)
+                        {
+                            try
+                            {
+                                var listItemResources = resourcePool.Select(string.Format("ID='{0}'", listItemDataRow["ResID"]));
+                                var fieldUserValue = new SPFieldUserValue(web, listItemResources[0]["SPAccountInfo"].ToString());
+
+                                try
+                                {
+                                    // (CC-77975, 2018-08-02) User property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
+                                    userIdsAffected.Add(fieldUserValue.User.ID);
+                                }
+                                catch (Exception ex)
+                                {
+                                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                }
+
+                                foreach (SPGroup group in siteWeb.Groups)
+                                {
+                                    try
+                                    {
+                                        // (CC-77975, 2018-08-02) Users property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
+                                        group.Users.RemoveByID(fieldUserValue.LookupId);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                            }
+
+                            list.Items.DeleteItemById(int.Parse(listItemDataRow["ID"].ToString()));
+                        }
+                    }
+                }
+            });
+
+            return userIdsAffected;
+        }
+
+        private static void SaveTeamForUnspecifiedListUpdateReport(SPWeb web, int teamMemberCount)
+        {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 using (var site = new SPSite(web.Site.ID))
@@ -769,7 +817,12 @@ namespace EPMLiveCore.API
                     using (var connection = new SqlConnection(CoreFunctions.getReportingConnectionString(site.WebApplication.Id, site.ID)))
                     {
                         connection.Open();
-                        using (var command = new SqlCommand(@"Update [dbo].[RPTWeb] Set [Members] = " + teamMemberCount + " WHERE [SiteId] = '" + web.Site.ID + "' AND [WebId] = '" + web.ID + "'"))
+
+                        using (var command = new SqlCommand(string.Format(
+                            @"Update [dbo].[RPTWeb] Set [Members] = {0} WHERE [SiteId] = '{1}' AND [WebId] = '{2}'",
+                            teamMemberCount,
+                            web.Site.ID,
+                            web.ID)))
                         {
                             command.Connection = connection;
                             command.ExecuteNonQuery();
@@ -777,60 +830,42 @@ namespace EPMLiveCore.API
                     }
                 }
             });
+        }
 
-            if (listItemsDataTable != null)
+        private static string SaveTeamForUnspecifiedListMemberNodeSettings(SPWeb web, SPList list, DataTable listItemsDataTable, DataTable resourcePool, XmlNode memberNode)
+        {
+            var id = memberNode.Attributes["ID"].Value;
+            var memberResources = resourcePool.Select(string.Format("ID='{0}'", id));
+            if (listItemsDataTable == null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var li = list.Items.Add();
+                li["Title"] = memberResources[0]["Title"].ToString();
+                li["ResID"] = memberResources[0]["ID"].ToString();
+                li.Update();
+            }
+            else
+            {
+                var listItemResources = listItemsDataTable.Select("ResID=" + id);
+                if (listItemResources.Length == 0)
                 {
-                    using (var site = new SPSite(web.Site.ID))
-                    {
-                        using (var siteWeb = site.OpenWeb(web.ID))
-                        {
-                            siteWeb.AllowUnsafeUpdates = true;
-
-                            foreach (DataRow listItemDataRow in listItemsDataTable.Rows)
-                            {
-                                try
-                                {
-                                    var listItemResources = resourcePool.Select("ID='" + listItemDataRow["ResID"].ToString() + "'");
-                                    var fieldUserValue = new SPFieldUserValue(web, listItemResources[0]["SPAccountInfo"].ToString());
-
-                                    try
-                                    {
-                                        // (CC-77975, 2018-08-02) User property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
-                                        modifiedUsers += "," + fieldUserValue.User.ID;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                                    }
-
-                                    foreach (SPGroup group in siteWeb.Groups)
-                                    {
-                                        try
-                                        {
-                                            // (CC-77975, 2018-08-02) Users property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
-                                            group.Users.RemoveByID(fieldUserValue.LookupId);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                                }
-
-                                list.Items.DeleteItemById(int.Parse(listItemDataRow["ID"].ToString()));
-                            }
-                        }
-                    }
-                });
+                    var li = list.Items.Add();
+                    li["Title"] = memberResources[0]["Title"].ToString();
+                    li["ResID"] = memberResources[0]["ID"].ToString();
+                    li.Update();
+                }
+                else
+                {
+                    listItemsDataTable.Rows.Remove(listItemResources[0]);
+                }
             }
 
-            return modifiedUsers;
+            setPermissions(web, memberResources[0]["SPAccountInfo"].ToString(), memberNode.Attributes["Permissions"].Value);
+
+            var memberSpidObject = memberResources[0]["SPID"];
+            var memberSpid = memberSpidObject != null
+                ? memberSpidObject.ToString()
+                : string.Empty;
+            return memberSpid;
         }
 
         private static string SaveTeamForSpecificList(string teamDocumentXml, SPWeb web, Guid listId, int itemid, XmlDocument teamDocument)
@@ -868,7 +903,7 @@ namespace EPMLiveCore.API
             var savedRatesUserIds = new List<int>();
             foreach (XmlNode memberNode in teamDocument.SelectNodes("//Team/Member"))
             {
-                var userId = SaveTeamMemberNodeSettings(
+                var userId = SaveTeamSpecificListMemberNodeSettings(
                     web,
                     li,
                     projectResourceRatesFeatureIsEnabled,
@@ -881,7 +916,7 @@ namespace EPMLiveCore.API
 
                 if (userId != null)
                 {
-                    modifiedUsers += "," + userId;
+                    modifiedUsers += ModifiedUsersSeparator + userId;
                 }
             }
 
@@ -897,7 +932,7 @@ namespace EPMLiveCore.API
 
                         if (userValue.User != null)
                         {
-                            modifiedUsers += "," + userValue.User.ID;
+                            modifiedUsers += ModifiedUsersSeparator + userValue.User.ID;
                         }
                     }
                 }
@@ -928,7 +963,7 @@ namespace EPMLiveCore.API
             return modifiedUsers;
         }
 
-        private static int? SaveTeamMemberNodeSettings(SPWeb web, SPListItem li, bool projectResourceRatesFeatureIsEnabled, int projectId, SPFieldUserValueCollection userValueCollection, DataTable dtResourcePool, List<int> userLookupIds, List<int> savedRatesUserIds, XmlNode memberNode)
+        private static int? SaveTeamSpecificListMemberNodeSettings(SPWeb web, SPListItem li, bool projectResourceRatesFeatureIsEnabled, int projectId, SPFieldUserValueCollection userValueCollection, DataTable dtResourcePool, List<int> userLookupIds, List<int> savedRatesUserIds, XmlNode memberNode)
         {
             int? userId = null;
 
