@@ -1,12 +1,16 @@
-﻿using System;
+using System;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.Fakes;
 using EPMLiveEnterprise;
+using EPMLiveEnterprise.WebSvcCustomFields;
+using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcProject.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static EPMLiveEnterprise.EPMLivePublisher;
 using static EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
 
 namespace EPMLivePS.Tests
@@ -15,8 +19,12 @@ namespace EPMLivePS.Tests
     public class EPMLivePublisherTests
     {
         private const string ProjectIdColumn = "Proj_ID";
+        private const string ValidUrl = "http://epmlive.com";
+        private const string GetCustomFieldsMethod = "getCustomFields";
+        private const string SaveFieldsMethod = "saveFields";
 
         private EPMLivePublisher _publisher;
+        private PrivateObject _privateObject;
         private IDisposable _context;
         private bool _isConnectionOpenedCalled;
         private bool _isExecuteReaderCalled;
@@ -180,6 +188,102 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
+        [TestMethod]
+        public void GetAllProjectEnterpriseFieldList_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPContext.CurrentGet = () => null;
+
+            // Act
+            var result = _publisher.getAllProjectEnterpriseFieldList();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetAllTaskEnterpriseFieldList_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPContext.CurrentGet = () => null;
+
+            // Act
+            var result = _publisher.getAllTaskEnterpriseFieldList();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetCustomFields_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
+            SetupPrivateObject();
+
+            // Act
+            var parameters = new object[] { string.Empty, 0, string.Empty };
+            var result = _privateObject.Invoke(GetCustomFieldsMethod, parameters) as CustomField[];
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetCustomFields_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+            SetupPrivateObject();
+
+            // Act
+            var parameters = new object[] { string.Empty, 0, ValidUrl };
+            var result = _privateObject.Invoke(GetCustomFieldsMethod, parameters) as CustomField[];
+
+            // Assert
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.IsTrue(_isExecuteReaderCalled);
+            Assert.IsFalse(_isWriteEntryCalled);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+            Assert.IsFalse(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+        }
+
+        [TestMethod]
+        public void SaveFields_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPWeb.AllInstances.ListsGet = _ => { throw new InvalidOperationException(); };
+            SetupPrivateObject();
+
+            // Act
+            var parameters = new object[] { string.Empty, null, null };
+            _privateObject.Invoke(SaveFieldsMethod, parameters);
+
+            // Assert
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        private void SetupPrivateObject()
+        {
+            _privateObject = new PrivateObject(_publisher);
+        }
+
         private void AssertThatObjectsAreDisposed()
         {
             Assert.IsTrue(_isConnectionDisposeCalled);
@@ -188,23 +292,45 @@ namespace EPMLivePS.Tests
 
         private void SetupShims()
         {
+            var webApplication = new SPWebApplication()
+            {
+                Id = Guid.Empty
+            };
+            var shimSPSite = new ShimSPSite()
+            {
+                IDGet = () => Guid.Empty,
+                WebApplicationGet = () => webApplication,
+                RootWebGet = () => new ShimSPWeb()
+                {
+                    GetAvailableWebTemplatesUInt32 = _ => null
+                },
+                UrlGet = () => ValidUrl,
+                Close = () => { }
+            };
+            ShimSPSite.ConstructorString = (site, _) =>
+            {
+                site = shimSPSite;
+            };
+            ShimSPSite.AllInstances.WebApplicationGet = _ => webApplication;
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
-                SiteGet = () => new ShimSPSite()
+                SiteGet = () => shimSPSite,
+                WebGet = () => new ShimSPWeb()
                 {
-                    IDGet = () => Guid.Empty,
-                    WebApplicationGet = () => new SPWebApplication()
+                    Close = () => { },
+                    ListsGet = () => new ShimSPListCollection()
                     {
-                        Id = Guid.Empty
-                    },
-                    RootWebGet = () => new ShimSPWeb()
-                    {
-                        GetAvailableWebTemplatesUInt32 = _ => null
-                    },
-                    UrlGet = () => "http://epmlive.com"
-                },
+                        ItemGetString = _ => new ShimSPList()
+                        {
+                            FieldsGet = () => new ShimSPFieldCollection()
+                        }
+                    }
+                }
             };
-
+            var spFields = new SPField[0];
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => spFields.GetEnumerator();
+            ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid =
+                (_, __) => new CustomFieldDataSet();
             ShimSqlConnection.AllInstances.Open = _ =>
             {
                 _isConnectionOpenedCalled = true;
