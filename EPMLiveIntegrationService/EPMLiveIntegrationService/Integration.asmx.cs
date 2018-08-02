@@ -211,20 +211,21 @@ namespace EPMLiveIntegrationService
             {
                 connection.Open();
 
-                SqlCommand command = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", connection);
-                command.Parameters.AddWithValue("@authid", AuthCode);
-                SqlDataReader dr = command.ExecuteReader();
-                if (dr.Read())
+                var sql = "SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)";
+                using (var command = new SqlCommand(sql, connection))
                 {
-
-                    ui.bValidAuth = true;
-                    ui.username = dr.GetString(0);
-                    ui.email = dr.GetString(1);
-
+                    command.Parameters.AddWithValue("@authid", AuthCode);
+                    SqlDataReader dr = command.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        ui.bValidAuth = true;
+                        ui.username = dr.GetString(0);
+                        ui.email = dr.GetString(1);
+                    }
+                    dr.Close();
                 }
-                dr.Close();
 
-                using (command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", connection))
+                using (var command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", connection))
                 {
                     command.Parameters.AddWithValue("@authid", AuthCode);
                     command.ExecuteNonQuery();
