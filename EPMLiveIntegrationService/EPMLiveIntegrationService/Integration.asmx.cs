@@ -210,9 +210,9 @@ namespace EPMLiveIntegrationService
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
             cn.Open();
 
-            SqlCommand cmd = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", cn);
-            cmd.Parameters.AddWithValue("@authid", AuthCode);
-            SqlDataReader dr = cmd.ExecuteReader();
+            SqlCommand command = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", cn);
+            command.Parameters.AddWithValue("@authid", AuthCode);
+            SqlDataReader dr = command.ExecuteReader();
             if (dr.Read())
             {
 
@@ -222,11 +222,13 @@ namespace EPMLiveIntegrationService
 
             }
             dr.Close();
-            cmd = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", cn);
-            cmd.Parameters.AddWithValue("@authid", AuthCode);
-            cmd.ExecuteNonQuery();
-            cn.Close();
 
+            using (command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", cn))
+            {
+                command.Parameters.AddWithValue("@authid", AuthCode);
+                command.ExecuteNonQuery();
+            }
+            cn.Close();
 
             return ui;
         }

@@ -75,7 +75,7 @@ namespace EPMLiveIntegrationService.Tests
             InvokeMethod(service, "iCheckAuth", new object[] { new ShimSPWebApplication().Instance, string.Empty });
 
             //Assert
-            Assert.AreEqual(0, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeCommandWasCalled);
         }
 
         [TestMethod]
