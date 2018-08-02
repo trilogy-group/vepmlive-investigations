@@ -141,10 +141,10 @@ namespace EPMLiveIntegrationService.Tests
             // Arrange
             var service = new Integration();
             ArrangeShims();
-            var disposeCommandWasCalled = 0;
-            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
             {
-                disposeCommandWasCalled++;
+                disposeConnectionWasCalled++;
             };
             ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
 
@@ -152,7 +152,7 @@ namespace EPMLiveIntegrationService.Tests
             InvokeMethod(service, "iPostSimple", new object[] { new ShimSPWebApplication().Instance, string.Empty, string.Empty, string.Empty });
 
             //Assert
-            Assert.AreEqual(2, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeConnectionWasCalled);
         }
 
         private void ArrangeShims()
