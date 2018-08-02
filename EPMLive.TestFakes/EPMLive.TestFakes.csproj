@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
@@ -104,6 +110,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\AdoShims.cs" />
+    <Compile Include="Utility\SharepointShims.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
@@ -155,6 +163,7 @@
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
     <Fakes Include="Fakes\EPM Live Core.fakes" />
     <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
+    <None Include="EPMLive.TestFakes.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

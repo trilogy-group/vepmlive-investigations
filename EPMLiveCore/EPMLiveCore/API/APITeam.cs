@@ -91,48 +91,58 @@ namespace EPMLiveCore.API
                 dt.Columns.Add("Title");
             }
 
-
-            var rb = new ReportHelper.ReportBiz(web.Site.ID);
-
-            if (rb.SiteExists())
+            var reportBiz = new ReportHelper.ReportBiz(web.Site.ID);
+            if (reportBiz.SiteExists())
             {
-                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
-
-                SqlConnection cn = data.GetClientReportingConnection;
-
-                bool bNewDB = false;
-                bool blookup = false;
-
-                SqlCommand cmd = new SqlCommand("select * from sys.tables where name = 'RPTGROUPUSER'", cn);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                    bNewDB = true;
-
-                dr.Close();
-
-
-                if (bNewDB)
+                var epmData = new ReportHelper.EPMData(web.Site.ID);
+                using (var sqlConnection = epmData.GetClientReportingConnection)
                 {
-                    if (filterfield != "")
+                    var isNewDb = false;
+                    var isLookup = false;
+
+                    using (var sqlCommand = new SqlCommand("select * from sys.tables where name = 'RPTGROUPUSER'", sqlConnection))
                     {
-                        if (list.Fields.GetFieldByInternalName(filterfield).Type == SPFieldType.User || list.Fields.GetFieldByInternalName(filterfield).Type == SPFieldType.Lookup)
+                        using (var dataReader = sqlCommand.ExecuteReader())
                         {
-                            filterfield += "Text";
-                            blookup = true;
+                            isNewDb = dataReader.Read();
                         }
                     }
 
-                    dt = iGetResourceFromRPT(cn, list, dt, web, filterfield, filtervalue, blookup, hasPerms, arrColumns, liItem, nodeTeam);
+                    if (isNewDb)
+                    {
+                        if (filterfield != string.Empty)
+                        {
+                            var filterFieldType = list.Fields.GetFieldByInternalName(filterfield).Type;
+                            if (filterFieldType == SPFieldType.User || filterFieldType == SPFieldType.Lookup)
+                            {
+                                filterfield += "Text";
+                                isLookup = true;
+                            }
+                        }
+
+                        dt = iGetResourceFromRPT(
+                            sqlConnection,
+                            list,
+                            dt,
+                            web,
+                            filterfield,
+                            filtervalue,
+                            isLookup,
+                            hasPerms,
+                            arrColumns,
+                            liItem,
+                            nodeTeam);
+                    }
+                    else
+                    {
+                        dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
+                    }
                 }
-                else
-                    dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
-
-                cn.Close();
-
-
             }
             else
+            {
                 dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
+            }
 
             return dt;
         }
@@ -151,12 +161,17 @@ namespace EPMLiveCore.API
                     query = filterfield + " like '%" + filtervalue + "%'";
             }
 
-            SqlCommand cmd = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn);
-            bool borderby = false;
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-                borderby = true;
-            dr.Close();
+            var isOrderingEnabled = false;
+            using (var sqlCommand = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn))
+            {
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        isOrderingEnabled = true;
+                    }
+                }
+            }
 
             string filterOnID = "";
             string iDs = "";
@@ -225,35 +240,48 @@ namespace EPMLiveCore.API
                 }
             }
 
-            cmd = new SqlCommand("spGetReportListData", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@webid", web.ID);
-            cmd.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
-            cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-            cmd.Parameters.AddWithValue("@rollup", false);
-            cmd.Parameters.AddWithValue("@list", "Resourcepool");
-            cmd.Parameters.AddWithValue("@query", query != "" ? query : filterOnID);
-            if (borderby)
-                cmd.Parameters.AddWithValue("@orderby", "Title");
+            var reportListDataSet = new DataSet();
+            using (var sqlCommand = new SqlCommand("spGetReportListData", cn))
+            {
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                sqlCommand.Parameters.AddWithValue("@webid", web.ID);
+                sqlCommand.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
+                sqlCommand.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
+                sqlCommand.Parameters.AddWithValue("@rollup", false);
+                sqlCommand.Parameters.AddWithValue("@list", "Resourcepool");
+                sqlCommand.Parameters.AddWithValue("@query", !string.IsNullOrEmpty(query) ? query : filterOnID);
 
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
+                if (isOrderingEnabled)
+                {
+                    sqlCommand.Parameters.AddWithValue("@orderby", "Title");
+                }
 
-            DataSet dsUserInfo = new DataSet();
+                using (var dataAdapter = new SqlDataAdapter(sqlCommand))
+                {
+                    dataAdapter.Fill(reportListDataSet);
+                }
+            }
+
+            var dsUserInfo = new DataSet();
             DataTable dtUserInfo = null;
-            cmd = new SqlCommand("SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid", cn);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@webid", web.ID);
-            da = new SqlDataAdapter(cmd);
-            da.Fill(dsUserInfo);
+            using (var sqlCommand = new SqlCommand("SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid", cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                sqlCommand.Parameters.AddWithValue("@webid", web.ID);
+
+                using (var dataAdapter = new SqlDataAdapter(sqlCommand))
+                {
+                    dataAdapter.Fill(dsUserInfo);
+                }
+            }
+
             if (dsUserInfo.Tables.Count > 0)
             {
                 dtUserInfo = dsUserInfo.Tables[0];
             }
 
-            foreach (DataRow dRow in ds.Tables[0].Rows)
+            foreach (DataRow dRow in reportListDataSet.Tables[0].Rows)
             {
                 ArrayList item = new ArrayList();
 
@@ -1009,180 +1037,196 @@ namespace EPMLiveCore.API
             return repository.FindProjectId(web, listId, id);
         }
 
-        private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem li)
+        private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem listItem)
         {
             try
             {
-                GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
-                SPFieldUserValue uv = new SPFieldUserValue(web, user);
-                ArrayList arr = new ArrayList(perms.Split(';'));
-                List<string> additionalPermissions = new List<string>();
-                List<string> lookupsSecurityGroups = new List<string>();
+                var gridGanttSettings = ListCommands.GetGridGanttSettings(listItem.ParentList);
 
-                if (li != null && li.HasUniqueRoleAssignments)
+                var lookupsSecurityGroups = GetListLookupsSecurityGroups(web, listItem, gridGanttSettings);
+                var additionalPermissions = GetListAdditionalPermissions(gridGanttSettings);
+                
+                ProcessListItemGroupRoleAssignments(
+                    web, 
+                    listItem, 
+                    user, 
+                    perms, 
+                    lookupsSecurityGroups, 
+                    additionalPermissions);
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                
+                // (CC-78078, 2018-08-01) There is an intentinal catch ex / throw ex logic from the original developer.
+                // Since we have no idea why he decided to catch and rethrow ex withouth the stack trace, no refactoring applied. Added trace to preserve exception stack.
+                throw ex;
+            }
+        }
+
+        private static void ProcessListItemGroupRoleAssignments(
+            SPWeb web, 
+            SPListItem listItem, 
+            string user,
+            string perms,
+            IList<string> lookupsSecurityGroups, 
+            IList<string> additionalPermissions)
+        {
+            var fieldUserValue = new SPFieldUserValue(web, user);
+
+            //check if this is for user or it's a generic (EPMLCID-11683)
+            if (fieldUserValue.User != null)
+            {
+                var groups = new ArrayList(perms.Split(';'));
+
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EnhancedLookupConfigValuesHelper valueHelper = null;
-                    string lookupSettings = gSettings.Lookups;
-                    //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
-                    valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
-
-                    if (valueHelper != null)
+                    using (var spSite = new SPSite(web.Site.ID))
                     {
-                        List<string> fields = valueHelper.GetSecuredFields();
-
-                        // has security fields
-                        if (fields != null && fields.Count > 0)
+                        using (var spWeb = spSite.OpenWeb(web.ID))
                         {
-                            foreach (string fld in fields)
+                            spWeb.AllowUnsafeUpdates = true;
+
+                            var spUser = spWeb.EnsureUser(fieldUserValue.User.LoginName);
+                            if (spUser != null)
                             {
-                                SPFieldLookup lookup = null;
-                                try
+                                // Re-opening the item with the system account
+                                var adminItem = spWeb.Lists[listItem.ParentList.ID].GetItemByUniqueId(listItem.UniqueId);
+
+                                foreach (SPRoleAssignment role in adminItem.RoleAssignments)
                                 {
-                                    lookup = li.ParentList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
-                                }
-                                catch { }
-
-                                if (lookup == null) continue;
-
-                                SPList lookupParentList = web.Lists[new Guid(lookup.LookupList)];
-                                GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
-
-                                // skip fields with empty lookup values
-                                string securityFieldValue = string.Empty;
-
-                                try { securityFieldValue = li[fld].ToString(); }
-                                catch { }
-
-                                if (string.IsNullOrEmpty(securityFieldValue)) continue;
-
-                                SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
-                                SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
-
-                                if (!parentListItem.HasUniqueRoleAssignments) continue;
-
-                                SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
-
-                                foreach (SPRoleAssignment ra in raCol)
-                                    lookupsSecurityGroups.Add(ra.Member.Name);
-                            }
-                        }
-                    }
-                }
-
-                string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
-                for (int i = 0; i < permissionsString.Length; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        string[] strIds = permissionsString[i].Split('~');
-                        for (int j = 0; j < strIds.Length; j++)
-                        {
-                            if (j % 2 == 0)
-                            {
-                                additionalPermissions.Add(strIds[j]);
-                            }
-                        }
-                    }
-                }
-
-                //check if this is for user or it's a generic (EPMLCID-11683)
-                if (uv.User != null)
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite spSite = new SPSite(web.Site.ID))
-                        {
-                            using (SPWeb spWeb = spSite.OpenWeb(web.ID))
-                            {
-                                spWeb.AllowUnsafeUpdates = true;
-                                SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
-                                if (spUser != null)
-                                {
-                                    // Re-opening the item with the system account
-                                    SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
-                                    foreach (SPRoleAssignment role in adminItem.RoleAssignments)
+                                    try
                                     {
-                                        try
+                                        if (role.Member.GetType() == typeof(SPGroup))
                                         {
-                                            if (role.Member.GetType() == typeof(SPGroup))
+                                            var roleGroup = spWeb.Groups.GetByID(role.Member.ID);
+                                            if (roleGroup != null)
                                             {
-                                                SPGroup group = spWeb.Groups.GetByID(role.Member.ID);
-                                                SPUser tempuser = null;
-
-                                                if (group != null)
+                                                if (lookupsSecurityGroups == null || !lookupsSecurityGroups.Contains(roleGroup.Name))
                                                 {
-                                                    if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                                    SPUser tempuser = null;
+                                                    try
                                                     {
-                                                        continue;
+                                                        tempuser = roleGroup.Users.GetByID(spUser.ID);
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        try
-                                                        {
-                                                            tempuser = group.Users.GetByID(spUser.ID);
-                                                        }
-                                                        catch { }
-                                                        if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                                        {
-                                                            group.AddUser(spUser);
-                                                        }
-                                                        if (tempuser != null && !arr.Contains(group.ID.ToString()) && li.HasUniqueRoleAssignments)
-                                                        {
-                                                            if (additionalPermissions.Contains(Convert.ToString(group.ID)))
-                                                                continue;
-                                                            else
-                                                                group.RemoveUser(spUser);
-                                                        }
+                                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                                    }
+
+                                                    if (tempuser == null && groups.Contains(roleGroup.ID.ToString()))
+                                                    {
+                                                        roleGroup.AddUser(spUser);
+                                                    }
+
+                                                    if (tempuser != null 
+                                                        && !groups.Contains(roleGroup.ID.ToString()) 
+                                                        && listItem.HasUniqueRoleAssignments
+                                                        && !additionalPermissions.Contains(Convert.ToString(roleGroup.ID)))
+                                                    {
+                                                        roleGroup.RemoveUser(spUser);
                                                     }
                                                 }
                                             }
                                         }
-                                        catch { }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                                     }
                                 }
                             }
                         }
-                    });
-                }
-                //foreach(SPGroup group in web.Groups)
-                //{
-                //    try
-                //    {
-                //        if(group.Users.GetByID(uv.LookupId) != null)
-                //        {
-                //            isCurrentlyInGroup = true;
-                //        }
-                //    }
-                //    catch { }
-
-                //    if(group.CanCurrentUserEditMembership)
-                //    {
-                //        if(arr.Contains(group.ID.ToString()))
-                //        {
-                //            try
-                //            {
-                //                group.AddUser(uv.User);
-                //                isAdded = true;
-                //            }
-                //            catch { }
-                //        }
-                //        else
-                //        {
-                //            try
-                //            {
-                //                group.RemoveUser(uv.User);
-                //            }
-                //            catch { }
-                //        }
-                //    }
-                //}
-                //if(!isCurrentlyInGroup && isAdded)
-                //{
-                //    APIEmail.sendEmail(2, uv.LookupId, new Hashtable());
-                //}
+                    }
+                });
             }
-            catch (Exception ex) { throw ex; }
+        }
 
+        private static List<string> GetListAdditionalPermissions(GridGanttSettings gridGanttSettings)
+        {
+            var additionalPermissions = new List<string>();
+            string[] permissionsString = gridGanttSettings.BuildTeamPermissions.Split('|');
+            for (int i = 0; i < permissionsString.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    string[] strIds = permissionsString[i].Split('~');
+                    for (int j = 0; j < strIds.Length; j++)
+                    {
+                        if (j % 2 == 0)
+                        {
+                            additionalPermissions.Add(strIds[j]);
+                        }
+                    }
+                }
+            }
+
+            return additionalPermissions;
+        }
+
+        private static List<string> GetListLookupsSecurityGroups(SPWeb web, SPListItem listItem, GridGanttSettings gridGanttSettings)
+        {
+            var lookupsSecurityGroups = new List<string>();
+
+            if (listItem != null && listItem.HasUniqueRoleAssignments)
+            {
+                var lookupSettings = gridGanttSettings.Lookups;
+                var valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                if (valueHelper != null)
+                {
+                    var securedFieldNames = valueHelper.GetSecuredFields();
+
+                    // has security fields
+                    if (securedFieldNames != null && securedFieldNames.Count > 0)
+                    {
+                        foreach (var fieldName in securedFieldNames)
+                        {
+                            SPFieldLookup lookup = null;
+                            try
+                            {
+                                lookup = listItem.ParentList.Fields.GetFieldByInternalName(fieldName) as SPFieldLookup;
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                            }
+
+                            if (lookup != null)
+                            {
+                                var lookupParentList = web.Lists[new Guid(lookup.LookupList)];
+                                var parentListSettings = new GridGanttSettings(lookupParentList);
+
+                                // skip fields with empty lookup values
+                                string securityFieldValue = null;
+
+                                try
+                                {
+                                    securityFieldValue = listItem[fieldName].ToString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                }
+
+                                if (!string.IsNullOrEmpty(securityFieldValue))
+                                {
+                                    var fieldLookupValue = new SPFieldLookupValue(securityFieldValue.ToString());
+                                    var parentListItem = lookupParentList.GetItemById(fieldLookupValue.LookupId);
+
+                                    if (parentListItem.HasUniqueRoleAssignments)
+                                    {
+                                        foreach (SPRoleAssignment roleAssignment in parentListItem.RoleAssignments)
+                                            lookupsSecurityGroups.Add(roleAssignment.Member.Name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return lookupsSecurityGroups;
         }
 
         private static void setPermissions(SPWeb web, string user, string perms)
@@ -1500,124 +1544,141 @@ namespace EPMLiveCore.API
 
         private static XmlDocument GetTeamFromListItem(SPWeb web, string filterfield, string filterval, ArrayList arrColumns, Guid ListId, int ItemId)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml("<Team/>");
+            var result = new XmlDocument();
+            result.LoadXml("<Team/>");
 
             try
             {
-                SPListItem li = null;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    using (SPSite tSite = new SPSite(web.Site.ID))
+                    using (var tSite = new SPSite(web.Site.ID))
                     {
-                        using (SPWeb tWeb = tSite.OpenWeb(web.ID))
+                        using (var tWeb = tSite.OpenWeb(web.ID))
                         {
-                            SPList list = tWeb.Lists[ListId];
-                            li = list.GetItemById(ItemId);
+                            var list = tWeb.Lists[ListId];
+                            var listItem = list.GetItemById(ItemId);
+                            var resourceUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
+                            var gridGanttSettings = ListCommands.GetGridGanttSettings(listItem.ParentList);
+                            var additionalPermissions = new List<string>();
+                            var permissionsString = gridGanttSettings.BuildTeamPermissions.Split('|');
 
-                            string resUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
-
-                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
-                            List<string> additionalPermissions = new List<string>();
-                            string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
-
-                            for (int i = 0; i < permissionsString.Length; i++)
+                            for (var i = 0; i < permissionsString.Length; i += 2)
                             {
-                                if (i % 2 == 0)
+                                var permissions = permissionsString[i].Split('~');
+                                for (int j = 0; j < permissions.Length; j += 2)
                                 {
-                                    string[] strIds = permissionsString[i].Split('~');
-                                    for (int j = 0; j < strIds.Length; j++)
-                                    {
-                                        if (j % 2 == 0)
-                                        {
-                                            additionalPermissions.Add(strIds[j]);
-                                        }
-                                    }
+                                    additionalPermissions.Add(permissions[j]);
                                 }
                             }
 
-                            DataTable dtResources = null;
+                            var resources = GetResourcesFromUrl(filterfield, filterval, arrColumns, tSite, listItem, resourceUrl);
 
                             try
                             {
-                                using (SPSite rsite = new SPSite(resUrl))
-                                {
-                                    using (SPWeb rweb = rsite.OpenWeb())
-                                    {
-                                        dtResources = getResources(rweb, filterfield, filterval, true, arrColumns, li, null);
-                                    }
-                                }
+                                var userValueCollection = new SPFieldUserValueCollection(tWeb, Convert.ToString(listItem["AssignedTo"]));
+                                AppendUserValuesToTeamDocument(userValueCollection, result, resources, additionalPermissions);
                             }
                             catch (Exception ex)
                             {
-                                if (ex.Message.ToLower().Contains("access is denied"))
-                                {
-                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                                    {
-                                        using (SPWeb rweb = tSite.OpenWeb())
-                                        {
-                                            dtResources = getResources(rweb, filterfield, filterval, false, arrColumns, li, null);
-                                        }
-                                    });
-                                }
-
-                                throw ex;
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                             }
-
-                            try
-                            {
-
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(tWeb, Convert.ToString(li["AssignedTo"]));
-
-                                int index = 0;
-                                SortedList slUsers = new SortedList();
-
-                                foreach (SPFieldUserValue uv in uvc)
-                                {
-                                    DataRow[] drs = dtResources.Select("SPID='" + uv.LookupId + "'");
-                                    if (drs.Length > 0)
-                                    {
-                                        XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "Member", doc.NamespaceURI);
-
-                                        foreach (DataColumn dc in dtResources.Columns)
-                                            addAttribute(ref ndNew, doc, drs[0], dc.ColumnName);
-
-                                        string perms = "";
-                                        try
-                                        {
-                                            perms = Convert.ToString(drs[0]["Groups"]);
-
-                                            if (additionalPermissions.Contains(perms))
-                                                perms = "";
-
-                                        }
-                                        catch { }
-
-                                        XmlAttribute attr = doc.CreateAttribute("Permissions");
-                                        attr.Value = perms.Trim(';');
-                                        ndNew.Attributes.Append(attr);
-
-                                        slUsers.Add(drs[0]["Title"].ToString() + index++, ndNew);
-                                    }
-                                }
-
-                                foreach (DictionaryEntry de in slUsers)
-                                {
-                                    doc.FirstChild.AppendChild((XmlNode)de.Value);
-                                }
-
-                            }
-                            catch { }
                         }
                     }
                 });
             }
             catch (Exception ex)
             {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+
                 throw new APIException(3025, "Error: " + ex.Message);
             }
 
-            return doc;
+            return result;
+        }
+
+        private static void AppendUserValuesToTeamDocument(
+            SPFieldUserValueCollection userValueCollection, 
+            XmlDocument result, 
+            DataTable resources, 
+            IList<string> additionalPermissions)
+        {
+            var index = 0;
+            var users = new SortedList();
+
+            foreach (SPFieldUserValue userValue in userValueCollection)
+            {
+                var spidResources = resources.Select(string.Format("SPID='{0}'", userValue.LookupId));
+                if (spidResources.Length > 0)
+                {
+                    var spidResource = spidResources[0];
+                    var memberNode = result.CreateNode(XmlNodeType.Element, "Member", result.NamespaceURI);
+
+                    foreach (DataColumn column in resources.Columns)
+                    {
+                        addAttribute(ref memberNode, result, spidResource, column.ColumnName);
+                    }
+
+                    var permissions = string.Empty;
+                    try
+                    {
+                        var groups = Convert.ToString(spidResource["Groups"]);
+
+                        if (!additionalPermissions.Contains(groups))
+                        {
+                            permissions = groups;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+
+                    var permissionsAttribute = result.CreateAttribute("Permissions");
+                    permissionsAttribute.Value = permissions.Trim(';');
+                    memberNode.Attributes.Append(permissionsAttribute);
+
+                    users.Add(spidResource["Title"].ToString() + index++, memberNode);
+                }
+            }
+
+            foreach (DictionaryEntry de in users)
+            {
+                result.FirstChild.AppendChild((XmlNode)de.Value);
+            }
+        }
+
+        private static DataTable GetResourcesFromUrl(string filterfield, string filterval, ArrayList arrColumns, SPSite tSite, SPListItem listItem, string resourceUrl)
+        {
+            DataTable resources = null;
+            try
+            {
+                using (var rsite = new SPSite(resourceUrl))
+                {
+                    using (var rweb = rsite.OpenWeb())
+                    {
+                        resources = getResources(rweb, filterfield, filterval, true, arrColumns, listItem, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.ToLower().Contains("access is denied"))
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        using (SPWeb rweb = tSite.OpenWeb())
+                        {
+                            resources = getResources(rweb, filterfield, filterval, false, arrColumns, listItem, null);
+                        }
+                    });
+                }
+
+                // (CC-78170, 2018-08-01) It's probably a error, since it's being rethrown even if resources could be successfully fetched using elevated priveleges
+                // But we're not allowed to fix it in scope of CC
+                throw;
+            }
+
+            return resources;
         }
 
         private static XmlDocument GetTeamFromWeb(SPWeb web, string filterfield, string filterval, ArrayList arrColumns)
@@ -2446,161 +2507,29 @@ namespace EPMLiveCore.API
             return writer.ToString();
         }
 
-        public static DataTable GetResourcePool(string xml, SPWeb oWeb)
+        public static DataTable GetResourcePool(string xml, SPWeb web)
         {
-            string resUrl = "";
-
-            ArrayList arrColumns = null;
-            string filterval = "";
-            string filterfield = "";
-            XmlDocument doc = new XmlDocument();
-            try
-            {
-                if (!string.IsNullOrEmpty(xml))
-                {
-                    doc.LoadXml(xml);
-
-                    try
-                    {
-                        XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
-                        if (ndCols != null)
-                        {
-                            arrColumns = new ArrayList();
-
-                            if (ndCols.InnerText != "")
-                            {
-                                string[] cols = ndCols.InnerText.Split(',');
-                                foreach (string col in cols)
-                                {
-                                    arrColumns.Add(col);
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                        filterval = CoreFunctions.GetSafeUserTitle(Convert.ToString(doc.FirstChild.Attributes["FilterFieldValue"].Value));
-                    }
-                    catch { }
-                }
-            }
-            catch { }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (SPSite site = new SPSite(oWeb.Site.ID))
-                {
-                    using (SPWeb aweb = site.OpenWeb(oWeb.ID))
-                    {
-                        resUrl = CoreFunctions.getConfigSetting(aweb, "EPMLiveResourceURL", true, false);
-                    }
-                }
-            });
-
-            DataTable dt = new DataTable();
-
-            try
-            {
-                using (SPSite rsite = new SPSite(resUrl))
-                {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.ToLower().Contains("access is denied"))
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite rsite = new SPSite(resUrl))
-                        {
-                            using (SPWeb rweb = rsite.OpenWeb())
-                            {
-                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null, null);
-                            }
-                        }
-                    });
-                }
-
-                throw ex;
-            }
-
-            return dt;
+            return GetResourcePool(xml, web, null, true);
         }
 
-        public static DataTable GetResourcePoolForSave(string xml, SPWeb oWeb, XmlNodeList nodeTeam)
+        public static DataTable GetResourcePoolForSave(string xml, SPWeb web, XmlNodeList nodeTeam)
         {
-            string resUrl = "";
+            return GetResourcePool(xml, web, nodeTeam, false);
+        }
 
-            ArrayList arrColumns = null;
-            string filterval = "";
-            string filterfield = "";
-            XmlDocument doc = new XmlDocument();
+        private static DataTable GetResourcePool(string xml, SPWeb web, XmlNodeList nodeTeam, bool ensureFilterValueSafe)
+        {
+            ArrayList arrColumns;
+            string filterValue;
+            string filterField;
+            ReadFilterInfoFromXml(xml, ensureFilterValueSafe, out arrColumns, out filterValue, out filterField);
+
+            var resourceUrl = GetResourceUrl(web);
+            
+            DataTable result;
             try
             {
-                if (!string.IsNullOrEmpty(xml))
-                {
-                    doc.LoadXml(xml);
-
-                    try
-                    {
-                        XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
-                        if (ndCols != null)
-                        {
-                            arrColumns = new ArrayList();
-
-                            if (ndCols.InnerText != "")
-                            {
-                                string[] cols = ndCols.InnerText.Split(',');
-                                foreach (string col in cols)
-                                {
-                                    arrColumns.Add(col);
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                        filterval = doc.FirstChild.Attributes["FilterFieldValue"].Value;
-                    }
-                    catch { }
-                }
-            }
-            catch { }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (SPSite site = new SPSite(oWeb.Site.ID))
-                {
-                    using (SPWeb aweb = site.OpenWeb(oWeb.ID))
-                    {
-                        resUrl = CoreFunctions.getConfigSetting(aweb, "EPMLiveResourceURL", true, false);
-                    }
-                }
-            });
-
-            DataTable dt = new DataTable();
-
-            try
-            {
-                using (SPSite rsite = new SPSite(resUrl))
-                {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null, nodeTeam);
-                    }
-                }
+                result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
             }
             catch (Exception ex)
             {
@@ -2608,20 +2537,103 @@ namespace EPMLiveCore.API
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        using (SPSite rsite = new SPSite(resUrl))
-                        {
-                            using (SPWeb rweb = rsite.OpenWeb())
-                            {
-                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null, nodeTeam);
-                            }
-                        }
+                        result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
                     });
                 }
-
-                throw ex;
+                
+                // (CC-76569, 2018-07-31) Original code always re-throws the exception even in case when call with elevated priveleges successfully completed
+                // It's most likely a mistake, but we are not allowed to fix it in scope of CC
+                throw;
             }
 
-            return dt;
+            return result;
+        }
+
+        private static void ReadFilterInfoFromXml(
+            string xml, 
+            bool ensureFilterValueSafe, 
+            out ArrayList arrColumns, 
+            out string filterValue, 
+            out string filterField)
+        {
+            arrColumns = null;
+            filterValue = string.Empty;
+            filterField = string.Empty;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(xml))
+                {
+                    var document = new XmlDocument();
+                    document.LoadXml(xml);
+
+                    try
+                    {
+                        var columnsNode = document.FirstChild.SelectSingleNode("//Columns");
+                        if (columnsNode != null)
+                        {
+                            arrColumns = new ArrayList();
+
+                            if (!string.IsNullOrEmpty(columnsNode.InnerText))
+                            {
+                                var columns = columnsNode.InnerText.Split(',');
+                                arrColumns.AddRange(columns);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+
+                    try
+                    {
+                        filterField = document.FirstChild.Attributes["FilterField"].Value;
+                        filterValue = document.FirstChild.Attributes["FilterFieldValue"].Value;
+
+                        if (ensureFilterValueSafe)
+                        {
+                            filterValue = CoreFunctions.GetSafeUserTitle(Convert.ToString(filterValue));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+        }
+
+        private static string GetResourceUrl(SPWeb web)
+        {
+            var resourceUrl = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(web.Site.ID))
+                {
+                    using (var siteWeb = site.OpenWeb(web.ID))
+                    {
+                        resourceUrl = CoreFunctions.getConfigSetting(siteWeb, "EPMLiveResourceURL", true, false);
+                    }
+                }
+            });
+            return resourceUrl;
+        }
+
+        private static DataTable GetResourceData(XmlNodeList nodeTeam, ArrayList arrColumns, string filterValue, string filterField, string resourceUrl)
+        {
+            using (SPSite rsite = new SPSite(resourceUrl))
+            {
+                rsite.CatchAccessDeniedException = false;
+                using (SPWeb rweb = rsite.OpenWeb())
+                {
+                    return getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
+                }
+            }
         }
 
         public static List<SPGroup> GetWebGroups(SPWeb spWeb)
@@ -2658,21 +2670,30 @@ namespace EPMLiveCore.API
 
             try
             {
-                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
+                var data = new ReportHelper.EPMData(web.Site.ID);
 
-                SqlConnection cn = data.GetClientReportingConnection;
-                SqlCommand cmd = new SqlCommand("SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '" + web.ID.ToString() + "'", cn);
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
+                // (CC-75654, 2018-07-31) Not sure if connection must be disposed, or it is reused somewhere. Refraining from disposing.
+                var connection = data.GetClientReportingConnection;
 
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                var rptWebDataSet = new DataSet();
+                using (var command = new SqlCommand($"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{web.ID}'", connection))
                 {
-                    itemId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
-                    listId = new Guid(Convert.ToString(ds.Tables[0].Rows[0][1]));
+                    using (var dataAdapter = new SqlDataAdapter(command))
+                    {
+                        dataAdapter.Fill(rptWebDataSet);
+                    }
+                }
+
+                if (rptWebDataSet != null && rptWebDataSet.Tables[0].Rows.Count > 0)
+                {
+                    itemId = Convert.ToInt32(rptWebDataSet.Tables[0].Rows[0][0]);
+                    listId = new Guid(Convert.ToString(rptWebDataSet.Tables[0].Rows[0][1]));
                 }
             }
-            catch { }
+            catch(Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
         }
 
         private static bool IsProjectCenter(SPWeb web, Guid listId)

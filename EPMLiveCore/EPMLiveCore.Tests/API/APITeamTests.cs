@@ -1,19 +1,103 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using Microsoft.SharePoint.Fakes;
-using EPMLiveCore.API.Fakes;
-using System.Xml;
-using Microsoft.SharePoint;
-using System.Reflection;
+﻿using System;
+using System.Data.SqlClient.Fakes;
+using System.Data.Common.Fakes;
+using System.Data.SqlClient;
 using System.Collections;
-using EPMLiveCore.Fakes;
 using System.Collections.Generic;
+using System.ComponentModel.Fakes;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using EPMLiveCore.API.Fakes;
+using EPMLiveCore.Fakes;
+using EPMLiveCore.ReportHelper.Fakes;
+using EPMLive.TestFakes;
+using EPMLive.TestFakes.Utility;
 
 namespace EPMLiveCore.API.Tests
 {
     [TestClass()]
     public class APITeamTests
     {
+        private IDisposable _shimsContext;
+        private PrivateType _apiTeamPrivateType;
+        private PrivateObject _apiTeamPrivateObject;
+
+        private AdoShims _adoShims;
+        private SharepointShims _sharepointShims;
+
+        private DataTable _dataTable;
+        private string _filterField;
+        private string _filterValue;
+        private bool _filterIsLookup;
+        private bool _hasPerms;
+        private ArrayList _arrColumns;
+        private XmlNodeList _nodeTeam;
+        private Guid _listId;
+        private int _itemId;
+        private DataTable _resources;
+
+        private string _resourcePoolXml;
+        private bool _resourcePoolEnsureFilterValueSafe;
+        private string _setItemPermissionsUser;
+        private string _setItemPermissionsPermissions;
+        private XmlDocument _teamDocument;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _shimsContext = ShimsContext.Create();
+
+            _filterField = "test-field";
+            _filterValue = "test-filter-value";
+            _filterIsLookup = false;
+            _hasPerms = false;
+            _arrColumns = new ArrayList();
+            _nodeTeam = null;
+            _listId = Guid.NewGuid();
+            _itemId = 10;
+
+            _apiTeamPrivateType = new PrivateType(typeof(APITeam));
+            _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
+
+            _dataTable = new DataTable();
+            _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
+            
+            _teamDocument = new XmlDocument();
+            _teamDocument.LoadXml("<root />");
+            _resources = new DataTable();
+            _resources.Columns.Add("SPID");
+            _resources.Columns.Add("Groups");
+            _resources.Columns.Add("Title");
+            _resources.Rows.Add(0, "group-0", "test-title-0");
+
+            _setItemPermissionsUser = "test-user";
+            _setItemPermissionsPermissions = "permission1;permission2";
+
+            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) => string.Empty;
+
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
+
+            ShimListCommands.GetGridGanttSettingsSPList = list => new GridGanttSettings(_sharepointShims.ListShim)
+            {
+                Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
+            };
+
+            _sharepointShims.ListItemShim.ItemGetString = key => "test";
+        }
+
+        [TestCleanup]
+        public void TearDown()
+        {
+            _shimsContext.Dispose();
+        }
+
         [TestMethod()]
         public void GetTeamGridLayoutTest()
         {
@@ -244,8 +328,524 @@ namespace EPMLiveCore.API.Tests
             }
         }
 
+        [TestMethod]
+        public void getResources_SiteExists_AdoObjectsDisposed()
+        {
+            // Arrange
+            ShimReportBiz.AllInstances.SiteExists = (instance) => true;
+            ShimAPITeam.iGetResourceFromRPTSqlConnectionSPListDataTableSPWebStringStringBooleanBooleanArrayListSPListItemXmlNodeList =
+                (a, b, c, d, e, f, g, h, i, j, k) => null;
+            ShimAPITeam.iGetResourcesFromlistSPListDataTableSPWebStringStringBooleanArrayListSPListItem =
+                (a, b, c, d, e, f, g, h) => null;
+            
+            // Act
+            _apiTeamPrivateType.InvokeStatic("getResources",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _hasPerms,
+                _arrColumns,
+                _sharepointShims.ListItemShim.Instance,
+                _nodeTeam);
 
+            // Assert
+            Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
+            Assert.AreEqual(1, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(1, _adoShims.DataReadersDisposed.Count);
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_SelectSchemaForspGetReportListDataCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _sharepointShims.ListShim.Instance,
+                _dataTable,
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_spGetReportListDataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "spGetReportListData";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _sharepointShims.ListShim.Instance,
+                _dataTable,
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_spGetReportListCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "spGetReportListData";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _sharepointShims.ListShim.Instance,
+                _dataTable,
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_LSTUserInformationListDataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _sharepointShims.ListShim.Instance,
+                _dataTable,
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void iGetResourceFromRPT_Always_LSTUserInformationListCommandCreatedAndDisposed()
+        {
+            // Arrange
+            SPListItem listItem = null;
+            const string sql = "SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid";
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("iGetResourceFromRPT",
+                _adoShims.ConnectionShim.Instance,
+                _sharepointShims.ListShim.Instance,
+                _dataTable,
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _filterIsLookup,
+                _hasPerms,
+                _arrColumns,
+                listItem,
+                _nodeTeam);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_CommandCreatedAndDisposed()
+        {
+            // Arrange
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_sharepointShims.WebShim.Instance.ID}'";
+            int itemId;
+            Guid listId;
+
+            // Act
+            APITeam.VerifyProjectTeamWorkspace(_sharepointShims.WebShim, out itemId, out listId);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_DataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_sharepointShims.WebShim.Instance.ID}'";
+            int itemId;
+            Guid listId;
+
+            // Act
+            APITeam.VerifyProjectTeamWorkspace(_sharepointShims.WebShim, out itemId, out listId);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void GetResourcePool_EmptyXml_UsesDefaultValuesForFiltersAndColumns()
+        {
+            // Arrange
+            _resourcePoolXml = null;
+
+            string filterFieldUsed = null;
+            string filterValueUsed = null;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList =
+                (a, filterField, filterValue, d, e, f, g) =>
+                {
+                    filterFieldUsed = filterField;
+                    filterValueUsed = filterValue;
+                    return new DataTable();
+                };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
+            Assert.AreEqual(string.Empty, filterFieldUsed);
+            Assert.AreEqual(string.Empty, filterValueUsed);
+        }
+
+        [TestMethod]
+        public void GetResourcePool_ValidXml_UsesXmlValuesForFiltersAndColumns()
+        {
+            // Arrange
+            string filterFieldUsed = null;
+            string filterValueUsed = null;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList =
+                (a, filterField, filterValue, d, e, f, g) =>
+                {
+                    filterFieldUsed = filterField;
+                    filterValueUsed = filterValue;
+                    return new DataTable();
+                };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
+            Assert.AreEqual("Field1", filterFieldUsed);
+            Assert.AreEqual("Field1Value", filterValueUsed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "access is denied")]
+        public void GetResourcePool_GetResourceDataThrowsAccessDenied_RetriesWithElevatedPrivelege()
+        {
+            // Arrange
+            var retries = 0;
+            var isPrivelegesElevated = false;
+            ShimAPITeam.GetResourceDataXmlNodeListArrayListStringStringString = (a, b, c, d, e) =>
+            {
+                if (retries++ == 0)
+                {
+                    ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = action =>
+                    {
+                        isPrivelegesElevated = true;
+                        action();
+                    };
+
+                    throw new Exception("access is denied");
+                }
+
+                return new DataTable();
+            };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetResourcePool",
+                _resourcePoolXml,
+                _sharepointShims.WebShim.Instance,
+                _nodeTeam,
+                _resourcePoolEnsureFilterValueSafe);
+
+            // Assert
+            Assert.AreEqual(2, retries);
+            Assert.IsTrue(isPrivelegesElevated);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInList_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user =>
+            {
+                isUserAddedToGroup = true;
+            };
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasSecurityFieldValueAndRoleAssignments_DoesNotAddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => "security-value";
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsFalse(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasSecurityFieldValueAndNoRoleAssignments_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => "security-value";
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => false;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullGroupInListHasNoSecurityFieldValue_AddUserToGroup()
+        {
+            // Arrange
+            var isUserAddedToGroup = false;
+            var field = new ShimSPFieldLookup
+            {
+                LookupListGet = () => Guid.NewGuid().ToString()
+            };
+
+            _setItemPermissionsPermissions = "0";
+            _sharepointShims.UsersShim.GetByIDInt32 = id => null;
+            _sharepointShims.GroupShim.AddUserSPUser = user => isUserAddedToGroup = true;
+            _sharepointShims.FieldsShim.GetFieldByInternalNameString = fieldName => field;
+            _sharepointShims.ListItemShim.ItemGetString = (key) => string.Empty;
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserAddedToGroup);
+        }
+
+        [TestMethod]
+        public void setItemPermissions_UserNotNullHasUnqueRoleAssignmentsGroupNotList_RemoveUserFromGroup()
+        {
+            // Arrange
+            var isUserRemovedFromGroup = false;
+
+            _setItemPermissionsPermissions = "1";
+            _sharepointShims.GroupShim.RemoveUserSPUser = user =>
+            {
+                isUserRemovedFromGroup = true;
+            };
+            _sharepointShims.ListItemShim.HasUniqueRoleAssignmentsGet = () => true;
+
+            // Act
+            _apiTeamPrivateType.InvokeStatic("setItemPermissions",
+                _sharepointShims.WebShim.Instance,
+                _setItemPermissionsUser,
+                _setItemPermissionsPermissions,
+                _sharepointShims.ListItemShim.Instance);
+
+            // Assert
+            Assert.IsTrue(isUserRemovedFromGroup);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(APIException))]
+        public void GetTeamFromListItem_UnexpectedException_ApiExceptionThrown()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => 
+            {
+                throw new Exception("Unexpected exception");
+            };
+            
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            // ExpectedException - APIException
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_NoFieldUserValues_EmptyDocumentReturned()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            _sharepointShims.FieldUserValuesShim.Instance.Clear();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.AreEqual(0, result.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_HasUserValues_AddedToDocument()
+        {
+            // Arrange
+            var isAppendUserValuesToTeamDocumentCalled = false;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            ShimAPITeam.AppendUserValuesToTeamDocumentSPFieldUserValueCollectionXmlDocumentDataTableIListOfString = (a, b, c, d) =>
+            {
+                isAppendUserValuesToTeamDocumentCalled = true;
+            };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.IsTrue(isAppendUserValuesToTeamDocumentCalled);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_NoSPIDResource_UserValueNotAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            _resources.Clear();
+
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(0, _teamDocument.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_HasSPIDResource_UserValueAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(1, _teamDocument.FirstChild.ChildNodes.Count);
+            Assert.AreEqual(_resources.Rows[0]["SPID"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["SPID"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Groups"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Title"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Title"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Permissions"].Value);
+        }
     }
+
     public class TestGroupEnumerator : IEnumerator
     {
         public SPGroup[] _spGroup = new SPGroup[1];
