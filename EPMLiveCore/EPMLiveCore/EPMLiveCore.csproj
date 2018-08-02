@@ -182,6 +182,7 @@
     <Compile Include="API\Notification\APIEmail.cs" />
     <Compile Include="API\Notification\ItemMessage.cs" />
     <Compile Include="API\Notification\Notification.cs" />
+    <Compile Include="API\Notification\NotificationUpserter.cs" />
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
     <Compile Include="API\PlatformIntegration.cs" />
