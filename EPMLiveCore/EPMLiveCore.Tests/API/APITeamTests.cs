@@ -36,38 +36,75 @@ namespace EPMLiveCore.API.Tests
         private string _filterValue;
         private bool _filterIsLookup;
         private bool _hasPerms;
-        private ArrayList _arrColumns;
+        private ArrayList _columns;
         private XmlNodeList _nodeTeam;
         private Guid _listId;
         private int _itemId;
         private DataTable _resources;
-
+        
         private string _resourcePoolXml;
         private bool _resourcePoolEnsureFilterValueSafe;
         private string _setItemPermissionsUser;
         private string _setItemPermissionsPermissions;
         private XmlDocument _teamDocument;
+        private string _getTeamQueryDocumentXml;
+
+        private bool _isGetTeamFromCurrentCalled;
+        private bool _isGetTeamFromListItemCalled;
+        private bool _isGetTeamFromWebCalled;
+        private string _filterFieldUsed;
+        private string _filterValueUsed;
+        private ArrayList _columnsUsed;
+        private string _currentTeamUsed;
+        private Guid? _listIdUsed;
+        private int? _itemIdUsed;
 
         [TestInitialize]
         public void SetUp()
         {
             _shimsContext = ShimsContext.Create();
-
-            _filterField = "test-field";
-            _filterValue = "test-filter-value";
-            _filterIsLookup = false;
-            _hasPerms = false;
-            _arrColumns = new ArrayList();
-            _nodeTeam = null;
-            _listId = Guid.NewGuid();
-            _itemId = 10;
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
 
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
+            SetUpDefaultValues();
+
+            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) => string.Empty;
+
+            ShimListCommands.GetGridGanttSettingsSPList = list => new GridGanttSettings(_sharepointShims.ListShim)
+            {
+                Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
+            };
+
+            _sharepointShims.ListItemShim.ItemGetString = key => "test";
+        }
+
+        private void SetUpDefaultValues()
+        {
+            _filterField = "test-field";
+            _filterValue = "test-filter-value";
+            _filterIsLookup = false;
+            _hasPerms = false;
+            _columns = new ArrayList();
+            _nodeTeam = null;
+            _listId = Guid.NewGuid();
+            _itemId = 10;
+
+            _isGetTeamFromCurrentCalled = false;
+            _isGetTeamFromListItemCalled = false;
+            _isGetTeamFromWebCalled = false;
+            _filterFieldUsed = null;
+            _filterValueUsed = null;
+            _columnsUsed = null;
+            _currentTeamUsed = null;
+            _listIdUsed = null;
+            _itemIdUsed = null;
+
             _dataTable = new DataTable();
             _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
-            
+
             _teamDocument = new XmlDocument();
             _teamDocument.LoadXml("<root />");
             _resources = new DataTable();
@@ -79,17 +116,14 @@ namespace EPMLiveCore.API.Tests
             _setItemPermissionsUser = "test-user";
             _setItemPermissionsPermissions = "permission1;permission2";
 
-            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) => string.Empty;
-
-            _adoShims = AdoShims.ShimAdoNetCalls();
-            _sharepointShims = SharepointShims.ShimSharepointCalls();
-
-            ShimListCommands.GetGridGanttSettingsSPList = list => new GridGanttSettings(_sharepointShims.ListShim)
-            {
-                Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
-            };
-
-            _sharepointShims.ListItemShim.ItemGetString = key => "test";
+            _getTeamQueryDocumentXml = $@"<Query CurrentTeam='test-team' 
+                                                WebId='{_sharepointShims.WebShim.Instance.ID}' 
+                                                ListId='{_sharepointShims.ListShim.Instance.ID}'
+                                                ItemId='{_sharepointShims.ListItemShim.Instance.ID}'
+                                                Column='{_filterField}'
+                                                Value='{_filterValue}'>
+                                            <Columns></Columns>
+                                         </Query>";
         }
 
         [TestCleanup]
@@ -344,7 +378,7 @@ namespace EPMLiveCore.API.Tests
                 _filterField,
                 _filterValue,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 _sharepointShims.ListItemShim.Instance,
                 _nodeTeam);
 
@@ -371,7 +405,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _filterIsLookup,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 listItem,
                 _nodeTeam);
 
@@ -397,7 +431,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _filterIsLookup,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 listItem,
                 _nodeTeam);
 
@@ -423,7 +457,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _filterIsLookup,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 listItem,
                 _nodeTeam);
 
@@ -449,7 +483,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _filterIsLookup,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 listItem,
                 _nodeTeam);
 
@@ -475,7 +509,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _filterIsLookup,
                 _hasPerms,
-                _arrColumns,
+                _columns,
                 listItem,
                 _nodeTeam);
 
@@ -751,7 +785,7 @@ namespace EPMLiveCore.API.Tests
                 _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
-                _arrColumns,
+                _columns,
                 _listId,
                 _itemId) as XmlDocument;
 
@@ -771,7 +805,7 @@ namespace EPMLiveCore.API.Tests
                 _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
-                _arrColumns,
+                _columns,
                 _listId,
                 _itemId) as XmlDocument;
 
@@ -795,7 +829,7 @@ namespace EPMLiveCore.API.Tests
                 _sharepointShims.WebShim.Instance,
                 _filterField,
                 _filterValue,
-                _arrColumns,
+                _columns,
                 _listId,
                 _itemId) as XmlDocument;
 
@@ -843,6 +877,64 @@ namespace EPMLiveCore.API.Tests
             Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Groups"].Value);
             Assert.AreEqual(_resources.Rows[0]["Title"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Title"].Value);
             Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Permissions"].Value);
+        }
+
+        [TestMethod]
+        public void GetTeam_NotImplemented_NotImplemented()
+        {
+            // Arrange
+            ShimInternalCallsForGetTeam();
+
+            // Act
+            APITeam.GetTeam(_getTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+        }
+
+        private void ShimInternalCallsForGetTeam()
+        {
+            ShimGetTeamFromCurrent();
+            ShimGetTeamFromListItem();
+            ShimGetTeamFromWeb();
+        }
+
+        private void ShimGetTeamFromCurrent()
+        {
+            ShimAPITeam.GetTeamFromCurrentSPWebStringStringArrayListString = (web, filterField, filterValue, columns, currentTeam) =>
+            {
+                _filterFieldUsed = filterField;
+                _filterValueUsed = filterValue;
+                _columnsUsed = columns;
+                _currentTeamUsed = currentTeam;
+
+                return _teamDocument;
+            };
+        }
+
+        private void ShimGetTeamFromListItem()
+        {
+            ShimAPITeam.GetTeamFromListItemSPWebStringStringArrayListGuidInt32 = (web, filterField, filterValue, columns, listId, itemId) =>
+            {
+                _filterFieldUsed = filterField;
+                _filterValueUsed = filterValue;
+                _columnsUsed = columns;
+                _listIdUsed = listId;
+                _itemIdUsed = itemId;
+
+                return _teamDocument;
+            };
+        }
+
+        private void ShimGetTeamFromWeb()
+        {
+            ShimAPITeam.GetTeamFromWebSPWebStringStringArrayList = (web, filterField, filterValue, columns) =>
+            {
+                _filterFieldUsed = filterField;
+                _filterValueUsed = filterValue;
+                _columnsUsed = columns;
+
+                return _teamDocument;
+            };
         }
     }
 
