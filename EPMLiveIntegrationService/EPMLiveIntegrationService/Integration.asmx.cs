@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Services;
 using System.Data.SqlClient;
 using System.Data;
+using System.Diagnostics;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System.Xml;
@@ -39,10 +40,9 @@ namespace EPMLiveIntegrationService
         [SoapDocumentMethod(Action = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03/Notify", RequestNamespace = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03")]
         public string Notify(string eventXml, string tfsIdentityXml)
         {
-            string ret = "";
+            var ret = string.Empty;
             XmlDocument xmlDocument;
             XmlNode xmlNode;
-            XmlNode xmlNodeToCheckDelete;
             try
             {
                 if (!string.IsNullOrEmpty(eventXml))
@@ -54,19 +54,19 @@ namespace EPMLiveIntegrationService
                     {
                         case "WorkItemChangedEvent":
                             xmlNode = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/IntegerFields/Field");
-                            xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
-                            Int64 ID;
-                            Boolean isDeleted = false;
+                            var xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
+                            long ID;
+                            bool isDeleted = false;
                             if (xmlNode != null && Int64.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
                             {
                                 if (xmlNodeToCheckDelete != null)
                                 {
-                                    Boolean.TryParse(xmlNodeToCheckDelete.SelectSingleNode("NewValue").InnerText, out isDeleted);
+                                    bool.TryParse(xmlNodeToCheckDelete.SelectSingleNode("NewValue").InnerText, out isDeleted);
                                 }
 
-                                SPFarm farm = SPFarm.Local;
-                                SPWebService service = farm.Services.GetValue<SPWebService>("");
-                                foreach (SPWebApplication webapp in service.WebApplications)
+                                var farm = SPFarm.Local;
+                                var service = farm.Services.GetValue<SPWebService>(string.Empty);
+                                foreach (var webapp in service.WebApplications)
                                 {
                                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                                     {
@@ -97,43 +97,35 @@ namespace EPMLiveIntegrationService
         [WebMethod]
         public UserInfo CheckAuth(string AuthCode)
         {
+            var ui = new UserInfo {bValidAuth = false};
 
-            string ret = "";
-            UserInfo ui = new UserInfo();
-            ui.bValidAuth = false;
-            //try
+            var farm = SPFarm.Local;
+            //Get all SharePoint Web services 
+            var service = farm.Services.GetValue<SPWebService>(string.Empty);
+
+            foreach (var webapp in service.WebApplications)
             {
-                SPFarm farm = SPFarm.Local;
-                //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
-
-                foreach (SPWebApplication webapp in service.WebApplications)
+                if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
-                    {
-                        ui = iCheckAuth(webapp, AuthCode);
-                    }
+                    ui = iCheckAuth(webapp, AuthCode);
                 }
             }
-            //catch(Exception ex)
-            {
 
-            }
             return ui;
         }
 
         [WebMethod]
         public string PostItemSimple(string IntegrationKey, string ID)
         {
-            string ret = "";
+            string ret = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                     {
@@ -144,7 +136,7 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                ret = $"<Error>{ex.Message}</Error>";
             }
             return ret;
         }
@@ -152,15 +144,15 @@ namespace EPMLiveIntegrationService
         [WebMethod]
         public string AddUpdateItem(string IntegrationKey, string XML)
         {
-            string ret = "";
+            var ret = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                     {
@@ -171,7 +163,7 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                ret = $"<Error>{ex.Message}</Error>";
             }
             return ret;
         }
@@ -179,15 +171,15 @@ namespace EPMLiveIntegrationService
         [WebMethod]
         public string DeleteItem(string IntegrationKey, string ID)
         {
-            string ret = "";
+            var ret = string.Empty;
 
             try
             {
-                SPFarm farm = SPFarm.Local;
+                var farm = SPFarm.Local;
                 //Get all SharePoint Web services 
-                SPWebService service = farm.Services.GetValue<SPWebService>("");
+                var service = farm.Services.GetValue<SPWebService>(string.Empty);
 
-                foreach (SPWebApplication webapp in service.WebApplications)
+                foreach (var webapp in service.WebApplications)
                 {
                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                     {
@@ -198,15 +190,14 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                ret = $"<Error>{ex.Message}</Error>";
             }
             return ret;
         }
 
         private UserInfo iCheckAuth(SPWebApplication webapp, string AuthCode)
         {
-            UserInfo ui = new UserInfo();
-            ui.bValidAuth = false;
+            var ui = new UserInfo {bValidAuth = false};
             using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
             {
                 connection.Open();
@@ -215,14 +206,15 @@ namespace EPMLiveIntegrationService
                 using (var command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@authid", AuthCode);
-                    SqlDataReader dr = command.ExecuteReader();
-                    if (dr.Read())
+                    using (var dr = command.ExecuteReader())
                     {
-                        ui.bValidAuth = true;
-                        ui.username = dr.GetString(0);
-                        ui.email = dr.GetString(1);
+                        if (dr.Read())
+                        {
+                            ui.bValidAuth = true;
+                            ui.username = dr.GetString(0);
+                            ui.email = dr.GetString(1);
+                        }
                     }
-                    dr.Close();
                 }
 
                 using (var command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", connection))
@@ -265,7 +257,7 @@ namespace EPMLiveIntegrationService
 
                 if (GetRowsCount(dsIntegration) > 0)
                 {
-                    ret = "";
+                    ret = string.Empty;
                     return true;
                 }
 
@@ -277,20 +269,23 @@ namespace EPMLiveIntegrationService
                     commmand.Parameters.AddWithValue("@ip", ip);
                     commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                    var reader = commmand.ExecuteReader();
-                    if (reader.Read())
+                    using (var reader = commmand.ExecuteReader())
                     {
-                        found = true;
+                        if (reader.Read())
+                        {
+                            found = true;
+                        }
                     }
-                    reader.Close();
                 }
 
                 if (!found)
                 {
-                    var commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection);
-                    commmand.Parameters.AddWithValue("@ip", ip);
-                    commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
-                    commmand.ExecuteNonQuery();
+                    using (var commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection))
+                    {
+                        commmand.Parameters.AddWithValue("@ip", ip);
+                        commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+                        commmand.ExecuteNonQuery();
+                    }
                 }
             }
             else
@@ -324,14 +319,13 @@ namespace EPMLiveIntegrationService
 
         public static bool iCheckXml(XmlDocument doc, out string sError)
         {
-            sError = "";
+            sError = string.Empty;
 
             try
             {
-
                 if (doc.FirstChild.Name == "Items")
                 {
-                    XmlNode ndItem = doc.FirstChild.SelectSingleNode("Item");
+                    var ndItem = doc.FirstChild.SelectSingleNode("Item");
                     if (ndItem != null)
                     {
                         return true;
@@ -357,7 +351,7 @@ namespace EPMLiveIntegrationService
 
         private string iPostComplex(SPWebApplication webapp, string IntegrationKey, string XML)
         {
-            string ret = "";
+            string ret;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
@@ -370,44 +364,46 @@ namespace EPMLiveIntegrationService
                     {
                         if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
                         {
-                            string sError = "";
+                            string sError;
 
-                            XmlDocument doc = new XmlDocument();
+                            var doc = new XmlDocument();
                             doc.LoadXml(XML);
 
                             if (iCheckXml(doc, out sError))
                             {
-                                string idCol = "";
+                                var idCol = string.Empty;
 
                                 var sql = "SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'";
                                 using (var command = new SqlCommand(sql, connection))
                                 {
                                     command.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
-                                    SqlDataReader r = command.ExecuteReader();
-                                    if (r.Read())
+                                    using (var dataReader = command.ExecuteReader())
                                     {
-                                        idCol = r.GetString(0);
+                                        if (dataReader.Read())
+                                        {
+                                            idCol = dataReader.GetString(0);
+                                        }
                                     }
-                                    r.Close();
                                 }
 
-                                if (idCol != "")
+                                if (idCol != string.Empty)
                                 {
-                                    XmlNode ndItems = doc.SelectSingleNode("Items");
+                                    var ndItems = doc.SelectSingleNode("Items");
 
                                     foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
                                     {
-                                        string ID = "";
+                                        string ID = string.Empty;
 
                                         try
                                         {
                                             ID = ndItem.SelectSingleNode("Fields/Field[@Name='" + idCol + "']").InnerText;
                                         }
-                                        catch
+                                        catch (Exception ex)
                                         {
+                                            Debug.WriteLine(ex);
                                         }
 
-                                        if (ID != "")
+                                        if (ID != string.Empty)
                                         {
                                             sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)";
                                             using (var command = new SqlCommand(sql, connection))
@@ -450,14 +446,14 @@ namespace EPMLiveIntegrationService
 
         private string iPostSimple(SPWebApplication webapp, string IntegrationKey, string ID, string type)
         {
-            string ret = "";
+            string ret;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
                     connection.Open();
 
-                    DataSet dsIntegration = new DataSet();
+                    var dsIntegration = new DataSet();
 
                     if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
@@ -478,21 +474,21 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                ret = $"<Error>{ex.Message}</Error>";
             }
             return ret;
         }
 
         private string iDeleteItem(SPWebApplication webapp, string IntegrationKey, string ID)
         {
-            string ret = "";
+            string ret;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
                     connection.Open();
 
-                    DataSet dsIntegration = new DataSet();
+                    var dsIntegration = new DataSet();
 
                     if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
