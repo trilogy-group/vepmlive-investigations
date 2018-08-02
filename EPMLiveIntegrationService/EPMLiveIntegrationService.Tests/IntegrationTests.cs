@@ -70,12 +70,18 @@ namespace EPMLiveIntegrationService.Tests
             {
                 disposeCommandWasCalled++;
             };
-            
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
+
             // Act
             InvokeMethod(service, "iCheckAuth", new object[] { new ShimSPWebApplication().Instance, string.Empty });
 
             //Assert
             Assert.AreEqual(1, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeConnectionWasCalled);
         }
 
         [TestMethod]

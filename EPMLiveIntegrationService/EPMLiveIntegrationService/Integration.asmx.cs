@@ -207,28 +207,29 @@ namespace EPMLiveIntegrationService
         {
             UserInfo ui = new UserInfo();
             ui.bValidAuth = false;
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-            cn.Open();
-
-            SqlCommand command = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", cn);
-            command.Parameters.AddWithValue("@authid", AuthCode);
-            SqlDataReader dr = command.ExecuteReader();
-            if (dr.Read())
+            using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
             {
+                connection.Open();
 
-                ui.bValidAuth = true;
-                ui.username = dr.GetString(0);
-                ui.email = dr.GetString(1);
-
-            }
-            dr.Close();
-
-            using (command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", cn))
-            {
+                SqlCommand command = new SqlCommand("SELECT username,email from INT_AUTH WHERE     (AUTH_ID = @authid) AND (DATEDIFF(mi, datetime, GETDATE()) < 2)", connection);
                 command.Parameters.AddWithValue("@authid", AuthCode);
-                command.ExecuteNonQuery();
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.Read())
+                {
+
+                    ui.bValidAuth = true;
+                    ui.username = dr.GetString(0);
+                    ui.email = dr.GetString(1);
+
+                }
+                dr.Close();
+
+                using (command = new SqlCommand("DELETE from INT_AUTH WHERE     (AUTH_ID = @authid)", connection))
+                {
+                    command.Parameters.AddWithValue("@authid", AuthCode);
+                    command.ExecuteNonQuery();
+                }
             }
-            cn.Close();
 
             return ui;
         }
