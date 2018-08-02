@@ -150,7 +150,7 @@ namespace EPMLiveIntegrationService.Tests
 
             //Assert
             Assert.AreEqual(1, disposeConnectionWasCalled);
-            Assert.AreEqual(3, disposeCommandWasCalled);
+            Assert.AreEqual(4, disposeCommandWasCalled);
         }
 
         [TestMethod]
