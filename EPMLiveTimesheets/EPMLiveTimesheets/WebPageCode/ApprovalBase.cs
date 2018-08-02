@@ -18,7 +18,6 @@ namespace TimeSheets
 
         protected void AddPeriods(SPSite site, ArrayList arr, int period, ref string filterHead, SqlConnection connection)
         {
-
             if (site == null)
             {
                 throw new ArgumentNullException(nameof(site));
@@ -26,79 +25,79 @@ namespace TimeSheets
 
             var dayDefs = CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveDaySettings").Split('|');
 
-            using (var command = new SqlCommand("select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid", connection))
+            var sql = "select period_start,period_end,locked from TSPERIOD where period_id=@period_id and site_id=@siteid";
+            using (var command = new SqlCommand(sql, connection))
             {
                 command.CommandType = CommandType.Text;
 
                 command.Parameters.AddWithValue("@period_id", period);
                 command.Parameters.AddWithValue("@siteid", site.ID);
-                var dataReader = command.ExecuteReader();
-
-                if (dataReader.Read())
+                using (var dataReader = command.ExecuteReader())
                 {
-                    var dtStart = dataReader.GetDateTime(0);
-                    var dtEnd = dataReader.GetDateTime(1);
-                    var ts = dtEnd - dtStart;
-                    var colBase = docXml.SelectSingleNode("//head").SelectNodes("column").Count;
-                    var colCount = 0;
-                    for (var i = 0; i <= ts.Days; i++)
+                    if (dataReader.Read())
                     {
-                        var showday = string.Empty;
-                        try
+                        var dtStart = dataReader.GetDateTime(0);
+                        var dtEnd = dataReader.GetDateTime(1);
+                        var ts = dtEnd - dtStart;
+                        var colBase = docXml.SelectSingleNode("//head").SelectNodes("column").Count;
+                        var colCount = 0;
+                        for (var i = 0; i <= ts.Days; i++)
                         {
-                            showday = dayDefs[(int)dtStart.AddDays(i).DayOfWeek * 3];
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex);
+                            var showday = string.Empty;
+                            try
+                            {
+                                showday = dayDefs[(int)dtStart.AddDays(i).DayOfWeek * 3];
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex);
+                            }
+
+                            if (showday == "True")
+                            {
+                                filterHead += ",&nbsp;";
+                                colCount++;
+                                arr.Add(dtStart.AddDays(i));
+                                var newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+                                newCol.InnerXml = $"<![CDATA[{dtStart.AddDays(i).DayOfWeek.ToString().Substring(0, 3)}<br>{dtStart.AddDays(i).Day}]]>";
+                                var attrType = docXml.CreateAttribute("type");
+                                attrType.Value = "ro[=sum]";
+                                var attrWidth = docXml.CreateAttribute("width");
+                                attrWidth.Value = "40";
+                                var attrAlign = docXml.CreateAttribute("align");
+                                attrAlign.Value = "right";
+                                var attrId1 = docXml.CreateAttribute("id");
+                                attrId1.Value = $"_TsDate_{dtStart.AddDays(i).ToShortDateString().Replace("/", "_")}";
+
+                                newCol.Attributes.Append(attrType);
+                                newCol.Attributes.Append(attrWidth);
+                                newCol.Attributes.Append(attrAlign);
+                                newCol.Attributes.Append(attrId1);
+
+                                docXml.SelectSingleNode("//head").AppendChild(newCol);
+                            }
                         }
 
-                        if (showday == "True")
-                        {
-                            filterHead += ",&nbsp;";
-                            colCount++;
-                            arr.Add(dtStart.AddDays(i));
-                            var newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                            newCol.InnerXml = $"<![CDATA[{dtStart.AddDays(i).DayOfWeek.ToString().Substring(0, 3)}<br>{dtStart.AddDays(i).Day}]]>";
-                            var attrType = docXml.CreateAttribute("type");
-                            attrType.Value = "ro[=sum]";
-                            var attrWidth = docXml.CreateAttribute("width");
-                            attrWidth.Value = "40";
-                            var attrAlign = docXml.CreateAttribute("align");
-                            attrAlign.Value = "right";
-                            var attrId1 = docXml.CreateAttribute("id");
-                            attrId1.Value = $"_TsDate_{dtStart.AddDays(i).ToShortDateString().Replace("/", "_")}";
+                        var newCol1 = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+                        newCol1.InnerText = "Total";
+                        var attrType1 = docXml.CreateAttribute("type");
+                        attrType1.Value = "ro[=sum]";
+                        var attrWidth1 = docXml.CreateAttribute("width");
+                        attrWidth1.Value = "50";
+                        var attrAlign1 = docXml.CreateAttribute("align");
+                        attrAlign1.Value = "right";
 
-                            newCol.Attributes.Append(attrType);
-                            newCol.Attributes.Append(attrWidth);
-                            newCol.Attributes.Append(attrAlign);
-                            newCol.Attributes.Append(attrId1);
+                        var attrId = docXml.CreateAttribute("id");
+                        attrId.Value = "_TsTotal_";
 
-                            docXml.SelectSingleNode("//head").AppendChild(newCol);
-                        }
+                        newCol1.Attributes.Append(attrType1);
+                        newCol1.Attributes.Append(attrWidth1);
+                        newCol1.Attributes.Append(attrAlign1);
+                        newCol1.Attributes.Append(attrId);
+
+                        docXml.SelectSingleNode("//head").AppendChild(newCol1);
                     }
-
-                    var newCol1 = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                    newCol1.InnerText = "Total";
-                    var attrType1 = docXml.CreateAttribute("type");
-                    attrType1.Value = "ro[=sum]";
-                    var attrWidth1 = docXml.CreateAttribute("width");
-                    attrWidth1.Value = "50";
-                    var attrAlign1 = docXml.CreateAttribute("align");
-                    attrAlign1.Value = "right";
-
-                    var attrId = docXml.CreateAttribute("id");
-                    attrId.Value = "_TsTotal_";
-
-                    newCol1.Attributes.Append(attrType1);
-                    newCol1.Attributes.Append(attrWidth1);
-                    newCol1.Attributes.Append(attrAlign1);
-                    newCol1.Attributes.Append(attrId);
-
-                    docXml.SelectSingleNode("//head").AppendChild(newCol1);
                 }
-
-                dataReader.Close();
             }
         }
 
@@ -291,6 +290,26 @@ namespace TimeSheets
             bool timenotes,
             SqlConnection connection)
         {
+            if (xmlNode == null)
+            {
+                throw new ArgumentNullException(nameof(xmlNode));
+            }
+
+            if (site == null)
+            {
+                throw new ArgumentNullException(nameof(site));
+            }
+
+            if (ndListId == null)
+            {
+                throw new ArgumentNullException(nameof(ndListId));
+            }
+
+            if (ndItemId == null)
+            {
+                throw new ArgumentNullException(nameof(ndItemId));
+            }
+
             string curUser;
             var dsTotalHours = FillTotalHours(dsTSHours, xmlNode, ndListId, ndItemId, site, connection, period, out curUser);
             
@@ -298,81 +317,79 @@ namespace TimeSheets
 
             var tsItemUid = Guid.Empty.ToString();
 
-            using (var command =
-                new SqlCommand(
-                    "select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id",
-                    connection))
+            var sql = "select ts_item_uid,submitted,approval_status from vwtstasks where list_uid=@listuid and item_id=@itemid and username=@username and period_id=@period_id";
+            using (var command = new SqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@listuid", ndListId.InnerText);
                 command.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
                 command.Parameters.AddWithValue("@username", curUser);
                 command.Parameters.AddWithValue("@period_id", period);
 
-                var drItem = command.ExecuteReader();
-
-                AddColumn2(xmlNode, arrayList);
-
-                if (drItem.Read())
+                using (var drItem = command.ExecuteReader())
                 {
-                    tsItemUid = drItem.GetGuid(0).ToString();
+                    AddColumn2(xmlNode, arrayList);
 
-                    AddCell1(drItem, xmlNode);
-                }
-
-                AddCell2(drItem, xmlNode);
-
-                if (!usecurrent && drItem.GetBoolean(1))
-                {
-                    var arrCols = strColumns.Split(',');
-                    var ndList = xmlNode.SelectNodes("cell");
-
-                    for (var i = 0; i < ndList.Count; i++)
+                    if (drItem.Read())
                     {
-                        var cell = ndList[i].OuterXml;
-                        var colid = arrCols[i].Replace("<![CDATA[", string.Empty).Replace("]]>", string.Empty);
-                        if (colid == "Project")
-                        {
-                            var dataRows = dsTimesheetTasks.Tables[0].Select("ts_item_uid ='" + tsItemUid + "'");
-                            if (dataRows.Length > 0)
-                            {
-                                ndList[i].InnerText = dataRows[0]["project"].ToString();
-                            }
-                        }
-                        else if (colid != "Title" && colid != "List" && colid != "Site" && colid != string.Empty)
-                        {
-                            var drs = dsTimesheetMeta.Tables[0].Select("ts_item_uid='" + tsItemUid + "' and columnname='" + colid + "'");
-                            var colval = string.Empty;
-                            if (drs.Length > 0)
-                            {
-                                colval = drs[0]["columnvalue"].ToString();
-                            }
+                        tsItemUid = drItem.GetGuid(0).ToString();
 
-                            var bIsIndicator = false;
-                            try
+                        AddCell1(drItem, xmlNode);
+                    }
+
+                    AddCell2(drItem, xmlNode);
+
+                    if (!usecurrent && drItem.GetBoolean(1))
+                    {
+                        var arrCols = strColumns.Split(',');
+                        var ndList = xmlNode.SelectNodes("cell");
+
+                        for (var i = 0; i < ndList.Count; i++)
+                        {
+                            var cell = ndList[i].OuterXml;
+                            var colid = arrCols[i].Replace("<![CDATA[", string.Empty).Replace("]]>", string.Empty);
+                            if (colid == "Project")
                             {
-                                var field = list.Fields.GetFieldByInternalName(colid);
-                                if (field.Type == SPFieldType.Calculated && colval.ToLower().Contains(".gif"))
+                                var dataRows = dsTimesheetTasks.Tables[0].Select("ts_item_uid ='" + tsItemUid + "'");
+                                if (dataRows.Length > 0)
                                 {
-                                    bIsIndicator = true;
+                                    ndList[i].InnerText = dataRows[0]["project"].ToString();
                                 }
                             }
-                            catch (Exception ex)
+                            else if (colid != "Title" && colid != "List" && colid != "Site" && colid != string.Empty)
                             {
-                                Debug.WriteLine(ex);
-                            }
+                                var drs = dsTimesheetMeta.Tables[0].Select("ts_item_uid='" + tsItemUid + "' and columnname='" + colid + "'");
+                                var colval = string.Empty;
+                                if (drs.Length > 0)
+                                {
+                                    colval = drs[0]["columnvalue"].ToString();
+                                }
 
-                            if (bIsIndicator)
-                            {
-                                ndList[i].InnerText = "<img src=\"/_layouts/images/" + colval + "\">";
-                            }
-                            else
-                            {
-                                ndList[i].InnerText = colval;
+                                var bIsIndicator = false;
+                                try
+                                {
+                                    var field = list.Fields.GetFieldByInternalName(colid);
+                                    if (field.Type == SPFieldType.Calculated && colval.ToLower().Contains(".gif"))
+                                    {
+                                        bIsIndicator = true;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex);
+                                }
+
+                                if (bIsIndicator)
+                                {
+                                    ndList[i].InnerText = "<img src=\"/_layouts/images/" + colval + "\">";
+                                }
+                                else
+                                {
+                                    ndList[i].InnerText = colval;
+                                }
                             }
                         }
                     }
                 }
-                drItem.Close();
             }
             double total = 0;
             XmlNode newCol;
@@ -408,7 +425,7 @@ namespace TimeSheets
                     var attr = docXml.CreateAttribute("type");
                     attr.InnerText = "ro";
                     newCol.Attributes.Append(attr);
-                    var drs = dsTSHours.Tables[0].Select("ts_item_uid = '" + tsItemUid + "' and TS_ITEM_DATE=#" + dt.ToString("MM/dd/yyyy") + "#");
+                    var drs = dsTSHours.Tables[0].Select($"ts_item_uid = '{tsItemUid}' and TS_ITEM_DATE=#{dt.ToString("MM/dd/yyyy")}#");
                     if (drs.Length > 0)
                     {
                         newCol.InnerText = double.Parse(drs[0]["TS_ITEM_HOURS"].ToString()).ToString();
@@ -426,7 +443,7 @@ namespace TimeSheets
             newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
             newCol.InnerText = total.ToString();
             var attrStyle1 = docXml.CreateAttribute("style");
-            attrStyle1.Value = "background: #" + bgcolor + "; font-weight: bold";
+            attrStyle1.Value = $"background: #{bgcolor}; font-weight: bold";
             newCol.Attributes.Append(attrStyle1);
             xmlNode.InsertAfter(newCol, xmlNode.SelectNodes("cell")[xmlNode.SelectNodes("cell").Count - 1]);
 
@@ -443,7 +460,7 @@ namespace TimeSheets
             }
 
             attrStyle1 = docXml.CreateAttribute("style");
-            attrStyle1.Value = "background: #" + bgcolor + "; font-weight: bold";
+            attrStyle1.Value = $"background: #{bgcolor}; font-weight: bold";
             newCol.Attributes.Append(attrStyle1);
             xmlNode.InsertAfter(newCol, xmlNode.SelectNodes("cell")[xmlNode.SelectNodes("cell").Count - 1]);
         }
@@ -481,6 +498,10 @@ namespace TimeSheets
             ref bool timeeditor, 
             ref bool timenotes)
         {
+            if (site == null)
+            {
+                throw new ArgumentNullException(nameof(site));
+            }
             InsertColumns(innerXml, typeValue, widthValue, ndCols);
             
             InsertNodes(ndCols);
@@ -488,17 +509,18 @@ namespace TimeSheets
             using (var command = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", connection))
             {
                 command.Parameters.AddWithValue("@siteid", site.ID);
-                var dataReader = command.ExecuteReader();
-                var typesBuilder = new StringBuilder();
-                typesBuilder.Append(worktypes);
-                while (dataReader.Read())
+                using (var dataReader = command.ExecuteReader())
                 {
-                    timeeditor = true;
-                    typesBuilder.Append("|").Append(dataReader.GetInt32(0));
+                    var typesBuilder = new StringBuilder();
+                    typesBuilder.Append(worktypes);
+                    while (dataReader.Read())
+                    {
+                        timeeditor = true;
+                        typesBuilder.Append("|").Append(dataReader.GetInt32(0));
+                    }
+                    worktypes = typesBuilder.ToString();
+                    worktypes = worktypes != string.Empty ? worktypes.Substring(1) : "0";
                 }
-                worktypes = typesBuilder.ToString();
-                worktypes = worktypes != string.Empty ? worktypes.Substring(1) : "0";
-                dataReader.Close();
             }
 
             var config = CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowNotes");
@@ -518,6 +540,10 @@ namespace TimeSheets
 
         protected void AddCells(XmlNode xmlNode, string bgcolor, ArrayList arrayList)
         {
+            if (xmlNode == null)
+            {
+                throw new ArgumentNullException(nameof(xmlNode));
+            }
             var newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
             newCell.InnerText = string.Empty;
             var attrType = docXml.CreateAttribute("type");
@@ -539,7 +565,7 @@ namespace TimeSheets
             foreach (XmlNode ndCell in xmlNode.SelectNodes("cell"))
             {
                 var attrStyle = docXml.CreateAttribute("style");
-                attrStyle.Value = "background: #" + bgcolor + "; font-weight: bold;";
+                attrStyle.Value = $"background: #{bgcolor}; font-weight: bold;";
                 ndCell.Attributes.Append(attrStyle);
             }
 
@@ -548,7 +574,7 @@ namespace TimeSheets
                 var newCol = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                 newCol.InnerText = string.Empty;
                 var attrStyle = docXml.CreateAttribute("style");
-                attrStyle.Value = "background: #" + bgcolor;
+                attrStyle.Value = $"background: #{bgcolor}";
                 newCol.Attributes.Append(attrStyle);
 
                 xmlNode.InsertAfter(newCol, xmlNode.SelectNodes("cell")[xmlNode.SelectNodes("cell").Count - 1]);
@@ -557,7 +583,7 @@ namespace TimeSheets
             var newCol2 = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
             newCol2.InnerText = string.Empty;
             var attrStyle2 = docXml.CreateAttribute("style");
-            attrStyle2.Value = "background: #" + bgcolor + ";font-weight: bold;";
+            attrStyle2.Value = $"background: #{bgcolor};font-weight: bold;";
             newCol2.Attributes.Append(attrStyle2);
 
             xmlNode.InsertAfter(newCol2, xmlNode.SelectNodes("cell")[xmlNode.SelectNodes("cell").Count - 1]);
