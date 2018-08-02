@@ -485,29 +485,26 @@ namespace EPMLiveIntegrationService
             string ret = "";
             try
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-                cn.Open();
-
-                DataSet dsIntegration = new DataSet();
-
-                if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
-                    var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)";
-                    using (var command = new SqlCommand(sql, cn))
+                    connection.Open();
+
+                    DataSet dsIntegration = new DataSet();
+
+                    if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
-                        command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
-                        command.Parameters.AddWithValue("@intitemid", ID);
-                        command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
-                        command.ExecuteNonQuery();
+                        var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)";
+                        using (var command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                            command.Parameters.AddWithValue("@intitemid", ID);
+                            command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                            command.ExecuteNonQuery();
+                        }
+
+                        ret = "<Success/>";
                     }
-
-                    ret = "<Success/>";
                 }
-
-                cn.Close();
-
-                //ret = "<Success/>";
-
             }
             catch (Exception ex)
             {

@@ -95,6 +95,11 @@ namespace EPMLiveIntegrationService.Tests
             {
                 disposeCommandWasCalled++;
             };
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
             ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
 
             // Act
@@ -102,6 +107,7 @@ namespace EPMLiveIntegrationService.Tests
 
             //Assert
             Assert.AreEqual(3, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeConnectionWasCalled);
         }
 
         [TestMethod]
