@@ -82,7 +82,13 @@ namespace EPMLiveCore.API
             list.Update();
         }
 
-        private static void GetCoreInformation(SqlConnection connection, int templateid, out string body, out string subject, SPWeb web, SPUser curUser)
+        private static void GetCoreInformation(
+            SqlConnection connection, 
+            int templateid, 
+            out string body, 
+            out string subject, 
+            SPWeb web, 
+            SPUser curUser)
         {
             body = string.Empty;
             subject = string.Empty;
@@ -113,12 +119,12 @@ namespace EPMLiveCore.API
             const string curUserEmailPlaceholder = "{CurUser_Email}";
             const string curUserNamePlaceholder = "{CurUser_Username}";
 
-            text = text.Replace(siteNamePlaceholder, web.Title);
-            text = text.Replace(siteUrlPlaceholder, web.Url);
-
-            text = text.Replace(curUserPlaceholder, curUser.Name);
-            text = text.Replace(curUserEmailPlaceholder, curUser.Email);
-            text = text.Replace(curUserNamePlaceholder, CoreFunctions.GetJustUsername(curUser.LoginName));
+            text = text
+                .Replace(siteNamePlaceholder, web.Title)
+                .Replace(siteUrlPlaceholder, web.Url)
+                .Replace(curUserPlaceholder, curUser.Name)
+                .Replace(curUserEmailPlaceholder, curUser.Email)
+                .Replace(curUserNamePlaceholder, CoreFunctions.GetJustUsername(curUser.LoginName));
 
             return text;
         }
