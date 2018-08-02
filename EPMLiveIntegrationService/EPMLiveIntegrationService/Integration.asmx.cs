@@ -358,79 +358,79 @@ namespace EPMLiveIntegrationService
             string ret = "";
             try
             {
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
-                cn.Open();
-
-                DataSet dsIntegration = new DataSet();
-
-                if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
+                using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
                 {
-                    if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
+                    connection.Open();
+
+                    DataSet dsIntegration = new DataSet();
+
+                    if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
-                        string sError = "";
-
-                        XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(XML);
-
-                        if (iCheckXml(doc, out sError))
+                        if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
                         {
-                            string idCol = "";
+                            string sError = "";
 
-                            SqlCommand cmd = new SqlCommand("SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'", cn);
-                            cmd.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
-                            SqlDataReader r = cmd.ExecuteReader();
-                            if (r.Read())
+                            XmlDocument doc = new XmlDocument();
+                            doc.LoadXml(XML);
+
+                            if (iCheckXml(doc, out sError))
                             {
-                                idCol = r.GetString(0);
-                            }
-                            r.Close();
+                                string idCol = "";
 
-                            if (idCol != "")
-                            {
-                                XmlNode ndItems = doc.SelectSingleNode("Items");
-
-                                foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
+                                SqlCommand cmd = new SqlCommand("SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'", connection);
+                                cmd.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
+                                SqlDataReader r = cmd.ExecuteReader();
+                                if (r.Read())
                                 {
-                                    string ID = "";
-
-                                    try
-                                    {
-                                        ID = ndItem.SelectSingleNode("Fields/Field[@Name='" + idCol + "']").InnerText;
-                                    }
-                                    catch { }
-
-                                    if (ID != "")
-                                    {
-                                        cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", cn);
-                                        cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
-                                        cmd.Parameters.AddWithValue("@intitemid", ID);
-                                        cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
-                                        cmd.Parameters.AddWithValue("@data", ndItem.OuterXml);
-                                        cmd.ExecuteNonQuery();
-                                    }
+                                    idCol = r.GetString(0);
                                 }
+                                r.Close();
 
-                                ret = "<Success/>";
+                                if (idCol != "")
+                                {
+                                    XmlNode ndItems = doc.SelectSingleNode("Items");
+
+                                    foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
+                                    {
+                                        string ID = "";
+
+                                        try
+                                        {
+                                            ID = ndItem.SelectSingleNode("Fields/Field[@Name='" + idCol + "']").InnerText;
+                                        }
+                                        catch
+                                        {
+                                        }
+
+                                        if (ID != "")
+                                        {
+                                            cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", connection);
+                                            cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                                            cmd.Parameters.AddWithValue("@intitemid", ID);
+                                            cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                                            cmd.Parameters.AddWithValue("@data", ndItem.OuterXml);
+                                            cmd.ExecuteNonQuery();
+                                        }
+                                    }
+
+                                    ret = "<Success/>";
+                                }
+                                else
+                                {
+                                    ret = "<Error>ID Column not specified in settings</Error>";
+                                }
                             }
                             else
                             {
-                                ret = "<Error>ID Column not specified in settings</Error>";
+                                ret = "<Error>" + sError + "</Error>";
                             }
                         }
                         else
                         {
-                            ret = "<Error>" + sError + "</Error>";
+                            ret = "<Error>That integration key is not a generic integration</Error>";
                         }
                     }
-                    else
-                    {
-                        ret = "<Error>That integration key is not a generic integration</Error>";
-                    }
                 }
-
-                cn.Close();
-
-                //ret = "<Success/>";
 
             }
             catch (Exception ex)
