@@ -49,6 +49,7 @@ namespace EPMLiveCore.API.Tests
         private string _setItemPermissionsPermissions;
         private XmlDocument _teamDocument;
         private string _getTeamQueryDocumentXml;
+        private string _saveTeamQueryDocumentXml;
 
         private bool _isGetTeamFromCurrentCalled;
         private bool _isGetTeamFromListItemCalled;
@@ -1055,6 +1056,27 @@ namespace EPMLiveCore.API.Tests
                                             Value='{_filterValue}'>
                                         <Columns>{string.Join(",", _columns.ToArray())}</Columns>
                                         </Query>";
+        }
+
+        [TestMethod]
+        public void SaveTeam_()
+        {
+            // Arrange
+            SetUpForSaveTeam();
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+        }
+
+        private void SetUpForSaveTeam()
+        {
+            _saveTeamQueryDocumentXml = $@"<Query ListId='{_sharepointShims.ListShim.Instance.ID}'
+                                                  ItemId='{_sharepointShims.ListItemShim.Instance.ID}'/>";
+
+            ShimAPITeam.GetResourcePoolStringSPWeb = (documentXml, web) => new DataTable();
+            ShimCoreFunctions.getReportingConnectionStringGuidGuid = (webId, siteId) => string.Empty;
         }
 
         private void ShimGetTeamFromCurrent()
