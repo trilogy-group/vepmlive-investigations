@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 
-namespace EPMLive.TestFakes
+namespace EPMLive.TestFakes.Utility
 {
     public class AdoShims
     {

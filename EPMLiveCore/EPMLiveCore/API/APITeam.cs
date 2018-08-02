@@ -2474,161 +2474,29 @@ namespace EPMLiveCore.API
             return writer.ToString();
         }
 
-        public static DataTable GetResourcePool(string xml, SPWeb oWeb)
+        public static DataTable GetResourcePool(string xml, SPWeb web)
         {
-            string resUrl = "";
-
-            ArrayList arrColumns = null;
-            string filterval = "";
-            string filterfield = "";
-            XmlDocument doc = new XmlDocument();
-            try
-            {
-                if (!string.IsNullOrEmpty(xml))
-                {
-                    doc.LoadXml(xml);
-
-                    try
-                    {
-                        XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
-                        if (ndCols != null)
-                        {
-                            arrColumns = new ArrayList();
-
-                            if (ndCols.InnerText != "")
-                            {
-                                string[] cols = ndCols.InnerText.Split(',');
-                                foreach (string col in cols)
-                                {
-                                    arrColumns.Add(col);
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                        filterval = CoreFunctions.GetSafeUserTitle(Convert.ToString(doc.FirstChild.Attributes["FilterFieldValue"].Value));
-                    }
-                    catch { }
-                }
-            }
-            catch { }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (SPSite site = new SPSite(oWeb.Site.ID))
-                {
-                    using (SPWeb aweb = site.OpenWeb(oWeb.ID))
-                    {
-                        resUrl = CoreFunctions.getConfigSetting(aweb, "EPMLiveResourceURL", true, false);
-                    }
-                }
-            });
-
-            DataTable dt = new DataTable();
-
-            try
-            {
-                using (SPSite rsite = new SPSite(resUrl))
-                {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.ToLower().Contains("access is denied"))
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (SPSite rsite = new SPSite(resUrl))
-                        {
-                            using (SPWeb rweb = rsite.OpenWeb())
-                            {
-                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null, null);
-                            }
-                        }
-                    });
-                }
-
-                throw ex;
-            }
-
-            return dt;
+            return GetResourcePool(xml, web, null, true);
         }
 
-        public static DataTable GetResourcePoolForSave(string xml, SPWeb oWeb, XmlNodeList nodeTeam)
+        public static DataTable GetResourcePoolForSave(string xml, SPWeb web, XmlNodeList nodeTeam)
         {
-            string resUrl = "";
+            return GetResourcePool(xml, web, nodeTeam, false);
+        }
 
-            ArrayList arrColumns = null;
-            string filterval = "";
-            string filterfield = "";
-            XmlDocument doc = new XmlDocument();
+        private static DataTable GetResourcePool(string xml, SPWeb web, XmlNodeList nodeTeam, bool ensureFilterValueSafe)
+        {
+            ArrayList arrColumns;
+            string filterValue;
+            string filterField;
+            ReadFilterInfoFromXml(xml, ensureFilterValueSafe, out arrColumns, out filterValue, out filterField);
+
+            var resourceUrl = GetResourceUrl(web);
+            
+            DataTable result;
             try
             {
-                if (!string.IsNullOrEmpty(xml))
-                {
-                    doc.LoadXml(xml);
-
-                    try
-                    {
-                        XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
-                        if (ndCols != null)
-                        {
-                            arrColumns = new ArrayList();
-
-                            if (ndCols.InnerText != "")
-                            {
-                                string[] cols = ndCols.InnerText.Split(',');
-                                foreach (string col in cols)
-                                {
-                                    arrColumns.Add(col);
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                        filterval = doc.FirstChild.Attributes["FilterFieldValue"].Value;
-                    }
-                    catch { }
-                }
-            }
-            catch { }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
-            {
-                using (SPSite site = new SPSite(oWeb.Site.ID))
-                {
-                    using (SPWeb aweb = site.OpenWeb(oWeb.ID))
-                    {
-                        resUrl = CoreFunctions.getConfigSetting(aweb, "EPMLiveResourceURL", true, false);
-                    }
-                }
-            });
-
-            DataTable dt = new DataTable();
-
-            try
-            {
-                using (SPSite rsite = new SPSite(resUrl))
-                {
-                    rsite.CatchAccessDeniedException = false;
-                    using (SPWeb rweb = rsite.OpenWeb())
-                    {
-                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null, nodeTeam);
-                    }
-                }
+                result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
             }
             catch (Exception ex)
             {
@@ -2636,20 +2504,103 @@ namespace EPMLiveCore.API
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        using (SPSite rsite = new SPSite(resUrl))
-                        {
-                            using (SPWeb rweb = rsite.OpenWeb())
-                            {
-                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null, nodeTeam);
-                            }
-                        }
+                        result = GetResourceData(nodeTeam, arrColumns, filterValue, filterField, resourceUrl);
                     });
                 }
-
-                throw ex;
+                
+                // (CC-76569, 2018-07-31) Original code always re-throws the exception even in case when call with elevated priveleges successfully completed
+                // It's most likely a mistake, but we are not allowed to fix it in scope of CC
+                throw;
             }
 
-            return dt;
+            return result;
+        }
+
+        private static void ReadFilterInfoFromXml(
+            string xml, 
+            bool ensureFilterValueSafe, 
+            out ArrayList arrColumns, 
+            out string filterValue, 
+            out string filterField)
+        {
+            arrColumns = null;
+            filterValue = string.Empty;
+            filterField = string.Empty;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(xml))
+                {
+                    var document = new XmlDocument();
+                    document.LoadXml(xml);
+
+                    try
+                    {
+                        var columnsNode = document.FirstChild.SelectSingleNode("//Columns");
+                        if (columnsNode != null)
+                        {
+                            arrColumns = new ArrayList();
+
+                            if (!string.IsNullOrEmpty(columnsNode.InnerText))
+                            {
+                                var columns = columnsNode.InnerText.Split(',');
+                                arrColumns.AddRange(columns);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+
+                    try
+                    {
+                        filterField = document.FirstChild.Attributes["FilterField"].Value;
+                        filterValue = document.FirstChild.Attributes["FilterFieldValue"].Value;
+
+                        if (ensureFilterValueSafe)
+                        {
+                            filterValue = CoreFunctions.GetSafeUserTitle(Convert.ToString(filterValue));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+        }
+
+        private static string GetResourceUrl(SPWeb web)
+        {
+            var resourceUrl = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(web.Site.ID))
+                {
+                    using (var siteWeb = site.OpenWeb(web.ID))
+                    {
+                        resourceUrl = CoreFunctions.getConfigSetting(siteWeb, "EPMLiveResourceURL", true, false);
+                    }
+                }
+            });
+            return resourceUrl;
+        }
+
+        private static DataTable GetResourceData(XmlNodeList nodeTeam, ArrayList arrColumns, string filterValue, string filterField, string resourceUrl)
+        {
+            using (SPSite rsite = new SPSite(resourceUrl))
+            {
+                rsite.CatchAccessDeniedException = false;
+                using (SPWeb rweb = rsite.OpenWeb())
+                {
+                    return getResources(rweb, filterField, filterValue, true, arrColumns, null, nodeTeam);
+                }
+            }
         }
 
         public static List<SPGroup> GetWebGroups(SPWeb spWeb)
