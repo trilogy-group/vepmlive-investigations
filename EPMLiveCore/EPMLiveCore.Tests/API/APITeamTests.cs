@@ -37,13 +37,16 @@ namespace EPMLiveCore.API.Tests
         private bool _filterIsLookup;
         private bool _hasPerms;
         private ArrayList _arrColumns;
-        private ShimSPListItem _shimListItem;
         private XmlNodeList _nodeTeam;
+        private Guid _listId;
+        private int _itemId;
+        private DataTable _resources;
 
         private string _resourcePoolXml;
         private bool _resourcePoolEnsureFilterValueSafe;
         private string _setItemPermissionsUser;
         private string _setItemPermissionsPermissions;
+        private XmlDocument _teamDocument;
 
         [TestInitialize]
         public void SetUp()
@@ -55,22 +58,28 @@ namespace EPMLiveCore.API.Tests
             _filterIsLookup = false;
             _hasPerms = false;
             _arrColumns = new ArrayList();
-            _shimListItem = new ShimSPListItem();
             _nodeTeam = null;
+            _listId = Guid.NewGuid();
+            _itemId = 10;
 
             _apiTeamPrivateType = new PrivateType(typeof(APITeam));
             _apiTeamPrivateObject = new PrivateObject(typeof(APITeam));
 
             _dataTable = new DataTable();
             _resourcePoolXml = @"<XML FilterField='Field1' FilterFieldValue='Field1Value'><Columns>Column1,Column2</Columns></XML>";
+            
+            _teamDocument = new XmlDocument();
+            _teamDocument.LoadXml("<root />");
+            _resources = new DataTable();
+            _resources.Columns.Add("SPID");
+            _resources.Columns.Add("Groups");
+            _resources.Columns.Add("Title");
+            _resources.Rows.Add(0, "group-0", "test-title-0");
 
             _setItemPermissionsUser = "test-user";
             _setItemPermissionsPermissions = "permission1;permission2";
 
-            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) =>
-            {
-                return string.Empty;
-            };
+            ShimCoreFunctions.getConfigSettingSPWebStringBooleanBoolean = (web, key, translateUrl, relativeUrl) => string.Empty;
 
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
@@ -80,6 +89,7 @@ namespace EPMLiveCore.API.Tests
                 Lookups = "test-11^test-12^test-13^test-14^true|test-21^test-22^test-23^test-24"
             };
 
+            _sharepointShims.ListItemShim.ItemGetString = key => "test";
         }
 
         [TestCleanup]
@@ -335,7 +345,7 @@ namespace EPMLiveCore.API.Tests
                 _filterValue,
                 _hasPerms,
                 _arrColumns,
-                _shimListItem.Instance,
+                _sharepointShims.ListItemShim.Instance,
                 _nodeTeam);
 
             // Assert
@@ -725,6 +735,115 @@ namespace EPMLiveCore.API.Tests
             // Assert
             Assert.IsTrue(isUserRemovedFromGroup);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(APIException))]
+        public void GetTeamFromListItem_UnexpectedException_ApiExceptionThrown()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => 
+            {
+                throw new Exception("Unexpected exception");
+            };
+            
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            // ExpectedException - APIException
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_NoFieldUserValues_EmptyDocumentReturned()
+        {
+            // Arrange
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            _sharepointShims.FieldUserValuesShim.Instance.Clear();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.AreEqual(0, result.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void GetTeamFromListItem_HasUserValues_AddedToDocument()
+        {
+            // Arrange
+            var isAppendUserValuesToTeamDocumentCalled = false;
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+            ShimAPITeam.AppendUserValuesToTeamDocumentSPFieldUserValueCollectionXmlDocumentDataTableIListOfString = (a, b, c, d) =>
+            {
+                isAppendUserValuesToTeamDocumentCalled = true;
+            };
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("GetTeamFromListItem",
+                _sharepointShims.WebShim.Instance,
+                _filterField,
+                _filterValue,
+                _arrColumns,
+                _listId,
+                _itemId) as XmlDocument;
+
+            // Assert
+            Assert.IsTrue(isAppendUserValuesToTeamDocumentCalled);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_NoSPIDResource_UserValueNotAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            _resources.Clear();
+
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(0, _teamDocument.FirstChild.ChildNodes.Count);
+        }
+
+        [TestMethod]
+        public void AppendUserValuesToTeamDocument_HasSPIDResource_UserValueAppended()
+        {
+            // Arrange
+            var additionalPermissions = new string[] { };
+            ShimAPITeam.getResourcesSPWebStringStringBooleanArrayListSPListItemXmlNodeList = (a, b, c, d, e, f, g) => new DataTable();
+
+            // Act
+            var result = _apiTeamPrivateType.InvokeStatic("AppendUserValuesToTeamDocument",
+                _sharepointShims.FieldUserValuesShim.Instance,
+                _teamDocument,
+                _resources,
+                additionalPermissions);
+
+            // Assert
+            Assert.AreEqual(1, _teamDocument.FirstChild.ChildNodes.Count);
+            Assert.AreEqual(_resources.Rows[0]["SPID"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["SPID"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Groups"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Title"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Title"].Value);
+            Assert.AreEqual(_resources.Rows[0]["Groups"].ToString(), _teamDocument.FirstChild.ChildNodes[0].Attributes["Permissions"].Value);
+        }
     }
 
     public class TestGroupEnumerator : IEnumerator
@@ -757,5 +876,4 @@ namespace EPMLiveCore.API.Tests
         public void Reset()
         { }
     }
-
 }
