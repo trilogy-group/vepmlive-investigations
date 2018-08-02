@@ -470,7 +470,9 @@ namespace WorkEnginePPM.DataServiceModules
                             dtInsertCostDetailValues.Columns.Add("BD_PERIOD");
                             dtInsertCostDetailValues.Columns.Add("BD_VALUE");
                             dtInsertCostDetailValues.Columns.Add("BD_COST");
-
+                            dtInsertCostDetailValues.Columns.Add(dbaCostValues.DetailValuesDiscountRateColumn);
+                            dtInsertCostDetailValues.Columns.Add(dbaCostValues.DetailValuesDiscountValueColumn);
+                            
                             var insertCostDetailsQuery = from row in _dtInsertCostData.AsEnumerable()
                                                          where
                                                          row["calendarid"].Equals(calendarId) &&
