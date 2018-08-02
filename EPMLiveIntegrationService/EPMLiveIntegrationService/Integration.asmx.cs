@@ -29,6 +29,7 @@ namespace EPMLiveIntegrationService
     [System.Web.Script.Services.ScriptService]
     public class Integration : System.Web.Services.WebService
     {
+        public const string ModuleId = "a0950b9b-3525-40b8-a456-6403156dc49c";
         /// <summary>
         /// Used for TfsIntegration Events
         /// </summary>
@@ -230,55 +231,62 @@ namespace EPMLiveIntegrationService
             return ui;
         }
 
-        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection cn)
+        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection connection)
         {
-            Guid intlistid = Guid.Empty;
-            int attempts = 0;
-            dsIntegration = new DataSet();
-            string ip = HttpContext.Current.Request.UserHostAddress;
+            var attempts = 0;
 
-            SqlCommand cmd = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", cn);
-            cmd.Parameters.AddWithValue("@ip", ip);
-            SqlDataReader dr = cmd.ExecuteReader();
-            dr.Read();
-            attempts = dr.GetInt32(0);
-            dr.Close();
+            dsIntegration = new DataSet();
+            var ip = HttpContext.Current.Request.UserHostAddress;
+
+            using (var command = new SqlCommand("SELECT count(*) FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() )", connection))
+            {
+                command.Parameters.AddWithValue("@ip", ip);
+                var dataReader = command.ExecuteReader();
+                dataReader.Read();
+                attempts = dataReader.GetInt32(0);
+                dataReader.Close();
+            }
 
             if (attempts < 5)
             {
-                cmd = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", cn);
-                cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
+                using (var command = new SqlCommand("SELECT * FROM INT_LISTS where int_key=@intkey and LIVEINCOMING=1", connection))
+                {
+                    command.Parameters.AddWithValue("@intkey", IntegrationKey);
 
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsIntegration);
+                    using (var adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(dsIntegration);
+                    }
+                }
 
-                if (dsIntegration.Tables[0].Rows.Count > 0)
+                if (GetRowsCount(dsIntegration) > 0)
                 {
                     ret = "";
                     return true;
                 }
-                else
+
+                ret = "<Error>Invalid Key</Error>";
+
+                var commmand = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", connection);
+                commmand.Parameters.AddWithValue("@ip", ip);
+                commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+
+                var found = false;
+
+                var reader = commmand.ExecuteReader();
+                if (reader.Read())
                 {
-                    ret = "<Error>Invalid Key</Error>";
+                    found = true;
+                }
+                reader.Close();
 
-                    cmd = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", cn);
-                    cmd.Parameters.AddWithValue("@ip", ip);
-                    cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
+                if (!found)
+                {
+                    commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection);
+                    commmand.Parameters.AddWithValue("@ip", ip);
+                    commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+                    commmand.ExecuteNonQuery();
 
-                    bool found = false;
-
-                    dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                        found = true;
-                    dr.Close();
-
-                    if (!found)
-                    {
-                        cmd = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", cn);
-                        cmd.Parameters.AddWithValue("@ip", ip);
-                        cmd.Parameters.AddWithValue("@intkey", IntegrationKey);
-                        cmd.ExecuteNonQuery();
-                    }
                 }
             }
             else
@@ -288,7 +296,29 @@ namespace EPMLiveIntegrationService
             return false;
         }
 
-        private bool iCheckXml(XmlDocument doc, out string sError)
+        public static int GetRowsCount(DataSet dataSet, int tableIndex =0)
+        {
+            return dataSet.Tables.Count > tableIndex
+                ? dataSet.Tables[tableIndex].Rows.Count
+                : 0;
+        }
+
+        public static string GetRowValue(DataSet dataSet, string key, int tableIndex = 0, int rowIndex = 0)
+        {
+            var rows = dataSet.Tables.Count > tableIndex
+                ? dataSet.Tables[tableIndex].Rows
+                : null;
+            if (rows == null)
+            {
+                return string.Empty;
+            }
+
+            return rows.Count > rowIndex
+                ? rows[rowIndex][key].ToString()
+                : string.Empty;
+        }
+
+        public static bool iCheckXml(XmlDocument doc, out string sError)
         {
             sError = "";
 
@@ -333,7 +363,7 @@ namespace EPMLiveIntegrationService
 
                 if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
                 {
-                    if (dsIntegration.Tables[0].Rows[0]["MODULE_ID"].ToString() == "a0950b9b-3525-40b8-a456-6403156dc49c")
+                    if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
                     {
                         string sError = "";
 
@@ -345,7 +375,7 @@ namespace EPMLiveIntegrationService
                             string idCol = "";
 
                             SqlCommand cmd = new SqlCommand("SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'", cn);
-                            cmd.Parameters.AddWithValue("@intlistid", dsIntegration.Tables[0].Rows[0]["INT_LIST_ID"].ToString());
+                            cmd.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
                             SqlDataReader r = cmd.ExecuteReader();
                             if (r.Read())
                             {
@@ -370,9 +400,9 @@ namespace EPMLiveIntegrationService
                                     if (ID != "")
                                     {
                                         cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", cn);
-                                        cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
+                                        cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
                                         cmd.Parameters.AddWithValue("@intitemid", ID);
-                                        cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
+                                        cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
                                         cmd.Parameters.AddWithValue("@data", ndItem.OuterXml);
                                         cmd.ExecuteNonQuery();
                                     }
@@ -421,9 +451,9 @@ namespace EPMLiveIntegrationService
                 if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
                 {
                     SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)", cn);
-                    cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
+                    cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
                     cmd.Parameters.AddWithValue("@intitemid", ID);
-                    cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
+                    cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration,"INT_COLID"));
                     cmd.Parameters.AddWithValue("@type", type);
                     cmd.ExecuteNonQuery();
 
@@ -455,9 +485,9 @@ namespace EPMLiveIntegrationService
                 if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
                 {
                     SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)", cn);
-                    cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
+                    cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
                     cmd.Parameters.AddWithValue("@intitemid", ID);
-                    cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
+                    cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
                     cmd.ExecuteNonQuery();
 
                     ret = "<Success/>";
