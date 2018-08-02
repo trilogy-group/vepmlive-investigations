@@ -60,6 +60,7 @@ namespace EPMLiveCore.API.Tests
         private string _currentTeamUsed;
         private Guid? _listIdUsed;
         private int? _itemIdUsed;
+        private bool _saveTeamResourceRateFeatureEnabled;
 
         [TestInitialize]
         public void SetUp()
@@ -1059,7 +1060,99 @@ namespace EPMLiveCore.API.Tests
         }
 
         [TestMethod]
-        public void SaveTeam_()
+        public void SaveTeam_ListIdAndItemIdEmpty_UseWebRootForReference()
+        {
+            // Arrange
+            _currentTeam = null;
+            _listId = Guid.Empty;
+            _itemId = 0;
+            _sharepointShims.WebShim.IDGet = () => Guid.NewGuid();
+
+            var isParentListsUsed = false;
+            var parentWeb = new ShimSPWeb(_sharepointShims.WebShim)
+            {
+                IsRootWebGet = () => true,
+                ListsGet = () =>
+                {
+                    isParentListsUsed = true;
+                    return _sharepointShims.ListsShim;
+                }
+            };
+            _sharepointShims.WebShim.ParentWebGet = () => parentWeb;
+
+            ShimAPITeam.VerifyProjectTeamWorkspaceSPWebInt32OutGuidOut = (SPWeb web, out int itemId, out Guid listId) =>
+            {
+                itemId = 10;
+                listId = Guid.NewGuid();
+            };
+            SetUpForSaveTeam();
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.IsTrue(isParentListsUsed);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdAndItemIdEmpty_UseParentForWeb()
+        {
+            // Arrange
+            _currentTeam = null;
+            _listId = Guid.Empty;
+            _itemId = 0;
+            _sharepointShims.WebShim.IDGet = () => Guid.NewGuid();
+            _sharepointShims.WebShim.IsRootWebGet = () => true;
+            var isWebListUsed = false;
+
+            SetUpForSaveTeam();
+            ShimAPITeam.VerifyProjectTeamWorkspaceSPWebInt32OutGuidOut = (SPWeb web, out int itemId, out Guid listId) =>
+            {
+                itemId = 10;
+                listId = Guid.NewGuid();
+            };
+
+            ShimListCommands.GetGridGanttSettingsSPList = list =>
+            {
+                isWebListUsed = ReferenceEquals(list, _sharepointShims.ListShim.Instance);
+                var result = new ShimGridGanttSettings();
+                return result;
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.IsTrue(isWebListUsed);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndNotUseTeam_SetPermissionsForEachMember()
+        {
+            // Arrange
+            var setPermissionsTimesCalled = 0;
+            string accountInfoUsed = null;
+            string permissionsUsed = null;
+
+            SetUpForSaveTeam();
+            ShimAPITeam.setPermissionsSPWebStringString = (web, accountInfo, permissions) =>
+            {
+                setPermissionsTimesCalled++;
+                accountInfoUsed = accountInfo;
+                permissionsUsed = permissions;
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.AreEqual(2, setPermissionsTimesCalled);
+            Assert.AreEqual("test-account-info-2", accountInfoUsed);
+            Assert.AreEqual("test-permissions-2", permissionsUsed);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndNotUseTeam_RPTWebRecordUpdated()
         {
             // Arrange
             SetUpForSaveTeam();
@@ -1068,14 +1161,192 @@ namespace EPMLiveCore.API.Tests
             APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
 
             // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred =>
+                pred.CommandText == $@"Update [dbo].[RPTWeb] Set [Members] = 2 WHERE [SiteId] = '{_sharepointShims.SiteShim.Instance.ID}' AND [WebId] = '{_sharepointShims.WebShim.Instance.ID}'"
+            ));
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndNotUseTeamResourceNotExistsInTeamResources_RemovesUserFromGroups()
+        {
+            // Arrange
+            var removeUserByIdTimesCalled = 0;
+            var itemIdsRemoved = new List<int>();
+
+            SetUpForSaveTeam();
+            _sharepointShims.ListItemsShim.GetDataTable = () =>
+            {
+                var result = new DataTable();
+                result.Columns.Add("ID");
+                result.Columns.Add("ResID");
+
+                result.Rows.Add(1, 11);
+                return result;
+            };
+            _sharepointShims.UsersShim.RemoveByIDInt32 = id =>
+            {
+                removeUserByIdTimesCalled++;
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.AreEqual(_sharepointShims.GroupsShim.Instance.Count, removeUserByIdTimesCalled);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndNotUseTeamAndResourceNotExistsInTeamResources_ItemsDeleted()
+        {
+            // Arrange
+            var itemIdsRemoved = new List<int>();
+
+            SetUpForSaveTeam();
+            _sharepointShims.ListItemsShim.GetDataTable = () =>
+            {
+                var result = new DataTable();
+                result.Columns.Add("ID");
+                result.Columns.Add("ResID");
+
+                result.Rows.Add(1, 11);
+                return result;
+            };
+            _sharepointShims.ListItemsShim.DeleteItemByIdInt32 = id =>
+            {
+                itemIdsRemoved.Add(id);
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.IsTrue(itemIdsRemoved.SequenceEqual(new[] { 1 }));
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndNotUseTeamAndListDataTableNotNullItemsWithResIdSpecifiedExist_ItemsNotDeleted()
+        {
+            // Arrange
+            var itemIdsRemoved = new List<int>();
+
+            SetUpForSaveTeam();
+            _sharepointShims.ListItemsShim.GetDataTable = () =>
+            {
+                var result = new DataTable();
+                result.Columns.Add("ID");
+                result.Columns.Add("ResID");
+
+                result.Rows.Add(1, 1);
+                return result;
+            };
+            _sharepointShims.ListItemsShim.DeleteItemByIdInt32 = id =>
+            {
+                itemIdsRemoved.Add(id);
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.AreEqual(0, itemIdsRemoved.Count);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndResourceRatesFeatureIsEnabled_UpdateProjectResourceRateUpdated()
+        {
+            // Arrange
+            var isUpdateProjectResourceRateCalled = false;
+            int projectIdUsed;
+            int resourceIdUsed;
+            decimal? rateUsed = null;
+
+            ShimGridGanttSettings.ConstructorSPList = (instance, list) =>
+            {
+                instance.BuildTeam = true;
+            };
+            ShimAPITeam.UpdateProjectResourceRateSPWebInt32Int32NullableOfDecimal = (web, projectId, resourceId, rate) =>
+            {
+                isUpdateProjectResourceRateCalled = true;
+                projectIdUsed = projectId;
+                resourceIdUsed = resourceId;
+                rateUsed = rate;
+            };
+
+            SetUpForSaveTeam();
+            _saveTeamResourceRateFeatureEnabled = true;
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.IsTrue(isUpdateProjectResourceRateCalled);
+            Assert.AreEqual(1, rateUsed);
+        }
+
+        [TestMethod]
+        public void SaveTeam_ListIdNotEmptyAndResourceRatesFeatureIsEnabled_DeletesProjectResourceRates()
+        {
+            // Arrange
+            var isDeleteProjectResourceRatesCalled = false;
+            int projectIdExpected = 100, projectIdUsed = 0;
+            IList<int> userIdsExpected = new[] { 200, 200 }, userIdsUsed = null;
+
+            ShimGridGanttSettings.ConstructorSPList = (instance, list) =>
+            {
+                instance.BuildTeam = true;
+            };
+            ShimAPITeam.UpdateProjectResourceRateSPWebInt32Int32NullableOfDecimal = (web, projectId, resourceId, rate) => { };
+
+            SetUpForSaveTeam();
+            _saveTeamResourceRateFeatureEnabled = true;
+            ShimAPITeam.DeleteProjectResourceRatesSPWebInt32Int32Array = (web, projectId, userIds) =>
+            {
+                isDeleteProjectResourceRatesCalled = true;
+                projectIdUsed = projectId;
+                userIdsUsed = userIds;
+            };
+
+            // Act
+            APITeam.SaveTeam(_saveTeamQueryDocumentXml, _sharepointShims.WebShim);
+
+            // Assert
+            Assert.IsTrue(isDeleteProjectResourceRatesCalled);
+            Assert.AreEqual(projectIdExpected, projectIdUsed);
+            Assert.IsTrue(userIdsExpected.SequenceEqual(userIdsUsed));
         }
 
         private void SetUpForSaveTeam()
         {
             _saveTeamQueryDocumentXml = $@"<Query ListId='{_sharepointShims.ListShim.Instance.ID}'
-                                                  ItemId='{_sharepointShims.ListItemShim.Instance.ID}'/>";
+                                                  ItemId='{_sharepointShims.ListItemShim.Instance.ID}'>
+                                               <Team>
+                                                   <Member ID='1' Permissions='test-permissions-1' ProjectRate='1' />
+                                                   <Member ID='2' Permissions='test-permissions-2' ProjectRate='1' />
+                                               </Team>
+                                           </Query>";
+            _resources.Clear();
+            _resources.Columns.Clear();
+            _resources.Columns.Add("ID");
+            _resources.Columns.Add("SPID");
+            _resources.Columns.Add("SPAccountInfo");
+            _resources.Columns.Add("Title");
+            _resources.Columns.Add("StandardRate");
 
-            ShimAPITeam.GetResourcePoolStringSPWeb = (documentXml, web) => new DataTable();
+            _resources.Rows.Add("1", 1, "test-account-info-1", "test-title-1", 1);
+            _resources.Rows.Add("11", 11, "test-account-info-11", "test-title-11", 11);
+            _resources.Rows.Add("2", 11, "test-account-info-2", "test-title-2", 2);
+
+            _saveTeamResourceRateFeatureEnabled = false;
+
+            ShimAPITeam.GetResourcePoolStringSPWeb = (documentXml, web) => _resources;
+            ShimAPITeam.IsProjectCenterSPWebGuid = (web, list) => _saveTeamResourceRateFeatureEnabled;
+            ShimAPITeam.IsPfeSiteSPWeb = (web) => _saveTeamResourceRateFeatureEnabled;
+            ShimAPITeam.setPermissionsSPWebStringString = (web, accountInfo, permissions) => { };
+            ShimAPITeam.GetResourcePoolForSaveStringSPWebXmlNodeList = (a, b, c) => _resources;
+            ShimAPITeam.setItemPermissionsSPWebStringStringSPListItem = (a, b, c, d) => { };
+            ShimAPITeam.GetProjectIdSPWebGuidInt32 = (a, b, c) => 100;
+            ShimAPITeam.GetResourceIdSPWebDataRow = (a, b) => 200;
+            ShimAPITeam.DeleteProjectResourceRatesSPWebInt32Int32Array = (a, b, c) => { };
             ShimCoreFunctions.getReportingConnectionStringGuidGuid = (webId, siteId) => string.Empty;
         }
 

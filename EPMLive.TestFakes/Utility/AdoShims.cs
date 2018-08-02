@@ -66,6 +66,11 @@ namespace EPMLive.TestFakes.Utility
                 instance.Connection = connection;
                 CommandsCreated.Add(instance);
             };
+            ShimSqlCommand.ConstructorString = (instance, commandText) =>
+            {
+                instance.CommandText = commandText;
+                CommandsCreated.Add(instance);
+            };
 
             ShimDbDataReader.AllInstances.Dispose = instance =>
             {
