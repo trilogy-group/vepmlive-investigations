@@ -634,308 +634,323 @@ namespace EPMLiveCore.API
             return dt;
         }
 
-        public static string SaveTeam(string sdoc, SPWeb oWeb)
+        public static string SaveTeam(string teamDocumentXml, SPWeb web)
         {
-            ResourceGrid.ClearCache(oWeb);
-            XmlDocument docOut = new XmlDocument();
-            docOut.LoadXml("<Team/>");
-            bool bUseTeam = false;
-            int teamMemberCount = 0;
+            ResourceGrid.ClearCache(web);
+
+            var resultDocument = new XmlDocument();
+            resultDocument.LoadXml("<Team/>");
+
+            var useTeam = false;
+            var teamMemberCount = 0;
 
             try
             {
-                string modifiedUsers = "";
+                var modifiedUsers = string.Empty;
 
-                XmlDocument docTeam = new XmlDocument();
-                docTeam.LoadXml(sdoc);
+                var teamDocument = new XmlDocument();
+                teamDocument.LoadXml(teamDocumentXml);
 
-                Guid listid = Guid.Empty;
-                int itemid = 0;
-
-                try
+                Guid listId;
+                var listIdAttribute = teamDocument.FirstChild.Attributes["ListId"];
+                if (listIdAttribute == null || !Guid.TryParse(listIdAttribute.Value, out listId))
                 {
-                    listid = new Guid(docTeam.FirstChild.Attributes["ListId"].Value);
+                    listId = Guid.Empty;
                 }
-                catch { }
-                try
+                
+                int itemid;
+                var itemIdAttribute = teamDocument.FirstChild.Attributes["ItemId"];
+                if (itemIdAttribute == null || !int.TryParse(itemIdAttribute.Value, out itemid))
                 {
-                    itemid = int.Parse(docTeam.FirstChild.Attributes["ItemId"].Value);
+                    itemid = 0;
                 }
-                catch { }
 
                 try
                 {
-                    if (listid == Guid.Empty && itemid == 0)
+                    if (listId == Guid.Empty && itemid == 0)
                     {
-                        APITeam.VerifyProjectTeamWorkspace(oWeb, out itemid, out listid);
-                        if (itemid > 0 && listid != Guid.Empty)
+                        VerifyProjectTeamWorkspace(web, out itemid, out listId);
+                        if (itemid > 0 && listId != Guid.Empty)
                         {
                             try
                             {
-                                while (!oWeb.IsRootWeb) //Inherit | Open
+                                while (!web.IsRootWeb) //Inherit | Open
                                 {
-                                    if (oWeb.IsRootWeb)
-                                        break;
-                                    oWeb = oWeb.ParentWeb;
+                                    web = web.ParentWeb;
                                 }
 
-                                SPList list = oWeb.Lists[listid];
-                                GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                                bUseTeam = gSettings.BuildTeam;
+                                var list = web.Lists[listId];
+                                var gSettings = ListCommands.GetGridGanttSettings(list);
+                                useTeam = gSettings.BuildTeam;
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                            }
                         }
                     }
                 }
-                catch { }
-
-                oWeb.AllowUnsafeUpdates = true;
-
-                if (listid != Guid.Empty)
+                catch (Exception ex)
                 {
-                    SPList list = oWeb.Lists[listid];
-                    GridGanttSettings gSettings = new GridGanttSettings(list);
-                    bUseTeam = gSettings.BuildTeam;
+                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 }
 
-                if (listid != Guid.Empty && bUseTeam)
-                {
-                    SPList list = oWeb.Lists[listid];
-                    SPListItem li = list.GetItemById(itemid);
-                    var projectResourceRatesFeatureIsEnabled = IsProjectCenter(oWeb, listid) && IsPfeSite(oWeb);
-                    var projectId = projectResourceRatesFeatureIsEnabled ? GetProjectId(oWeb, listid, itemid) : 0;
+                web.AllowUnsafeUpdates = true;
 
-                    SPFieldUserValueCollection uvc = null;
+                if (listId != Guid.Empty)
+                {
+                    useTeam = GetListUseTeamSetting(web.Lists[listId]);
+                }
+
+                if (listId != Guid.Empty && useTeam)
+                {
+                    var list = web.Lists[listId];
+                    var li = list.GetItemById(itemid);
+
+                    var projectResourceRatesFeatureIsEnabled = IsProjectCenter(web, listId) && IsPfeSite(web);
+                    var projectId = projectResourceRatesFeatureIsEnabled ? GetProjectId(web, listId, itemid) : 0;
+
+                    SPFieldUserValueCollection userValueCollection = null;
                     try
                     {
-                        uvc = new SPFieldUserValueCollection(oWeb, Convert.ToString(li["AssignedTo"]));
+                        userValueCollection = new SPFieldUserValueCollection(web, Convert.ToString(li["AssignedTo"]));
                     }
-                    catch { }
-                    if (uvc == null)
-                        uvc = new SPFieldUserValueCollection();
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                        userValueCollection = new SPFieldUserValueCollection();
+                    }
 
                     DataTable dtResourcePool = null;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        dtResourcePool = GetResourcePoolForSave(sdoc, oWeb, docTeam.SelectNodes("//Team/Member"));
+                        dtResourcePool = GetResourcePoolForSave(teamDocumentXml, web, teamDocument.SelectNodes("//Team/Member"));
                     });
 
-                    ArrayList arrUsers = new ArrayList();
-
-                    foreach (SPFieldUserValue uv in uvc)
+                    var userLookupIds = new ArrayList();
+                    foreach (var userValue in userValueCollection)
                     {
-                        arrUsers.Add(uv.LookupId);
+                        userLookupIds.Add(userValue.LookupId);
                     }
 
                     var savedRatesUserIds = new List<int>();
-                    foreach (XmlNode nd in docTeam.SelectNodes("//Team/Member"))
+                    foreach (XmlNode memberNode in teamDocument.SelectNodes("//Team/Member"))
                     {
-                        DataRow[] drRes = dtResourcePool.Select("ID='" + nd.Attributes["ID"].Value + "'");
-                        if (drRes.Length > 0)
+                        var memberResources = dtResourcePool.Select("ID='" + memberNode.Attributes["ID"].Value + "'");
+                        if (memberResources.Length > 0)
                         {
-                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPAccountInfo"].ToString());
+                            var userValue = new SPFieldUserValue(web, memberResources[0]["SPAccountInfo"].ToString());
 
-                            if (!arrUsers.Contains(int.Parse(drRes[0]["SPID"].ToString())))
+                            if (!userLookupIds.Contains(int.Parse(memberResources[0]["SPID"].ToString())))
                             {
-                                uvc.Add(uv);
+                                userValueCollection.Add(userValue);
                             }
 
-                            if (uv.User != null)
+                            if (userValue.User != null)
                             {
-                                modifiedUsers += "," + uv.User.ID;
+                                modifiedUsers += "," + userValue.User.ID;
                             }
 
-                            setItemPermissions(oWeb, uv.ToString(), nd.Attributes["Permissions"].Value, li);
+                            setItemPermissions(web, userValue.ToString(), memberNode.Attributes["Permissions"].Value, li);
 
                             if (projectResourceRatesFeatureIsEnabled)
                             {
-                                var resourceId = GetResourceId(oWeb, drRes[0]);
+                                var resourceId = GetResourceId(web, memberResources[0]);
                                 if (resourceId > 0 && projectId > 0)
                                 {
                                     // update rate for existing resources if rate is not equal to the standard rate, otherwise remove rate
-                                    var rateString = nd.Attributes[ProjectRateColumn].Value;
-                                    var standardRateString = drRes[0].Table.Columns.Contains(StandardRateColumn) 
-                                        ? drRes[0][StandardRateColumn]?.ToString()
+                                    var rateString = memberNode.Attributes[ProjectRateColumn].Value;
+                                    var standardRateString = memberResources[0].Table.Columns.Contains(StandardRateColumn) 
+                                        ? memberResources[0][StandardRateColumn]?.ToString()
                                         : null;
 
                                     var rateValue = !string.IsNullOrWhiteSpace(rateString) ? Convert.ToDecimal(rateString) : (decimal?)null;
                                     var standardRateValue =  !string.IsNullOrWhiteSpace(standardRateString) ? Convert.ToDecimal(standardRateString) : 0;
-                                    UpdateProjectResourceRate(oWeb, projectId, resourceId, rateValue != standardRateValue ? rateValue : null);
+                                    UpdateProjectResourceRate(web, projectId, resourceId, rateValue != standardRateValue ? rateValue : null);
 
                                     // keep resource id for cleanup action
                                     savedRatesUserIds.Add(resourceId);
                                 }
                             }
 
-                            try
+                            if (memberResources != null && memberResources.Length > 0)
                             {
-                                arrUsers.Remove(int.Parse(drRes[0]["SPID"].ToString()));
-                            }
-                            catch { }
-                        }
-                    }
-
-                    ArrayList arrDelete = new ArrayList();
-
-                    foreach (int i in arrUsers)
-                    {
-                        foreach (SPFieldUserValue uv in uvc)
-                        {
-                            if (uv.LookupId == i)
-                            {
-                                arrDelete.Add(uv);
-                                setItemPermissions(oWeb, uv.ToString(), "", li);
-
-                                if (uv.User != null)
+                                int memberSpid;
+                                var memberSpidObject = memberResources[0]["SPID"];
+                                if (memberSpidObject != null && int.TryParse(memberSpidObject.ToString(), out memberSpid))
                                 {
-                                    modifiedUsers += "," + uv.User.ID;
+                                    userLookupIds.Remove(memberSpid);
                                 }
                             }
                         }
                     }
 
-                    foreach (SPFieldUserValue uv in arrDelete)
+                    var userValuesToDelete = new List<SPFieldUserValue>();
+                    foreach (int userLookupId in userLookupIds)
                     {
-                        uvc.Remove(uv);
+                        foreach (var userValue in userValueCollection)
+                        {
+                            if (userValue.LookupId == userLookupId)
+                            {
+                                userValuesToDelete.Add(userValue);
+                                setItemPermissions(web, userValue.ToString(), string.Empty, li);
+
+                                if (userValue.User != null)
+                                {
+                                    modifiedUsers += "," + userValue.User.ID;
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (var userValue in userValuesToDelete)
+                    {
+                        userValueCollection.Remove(userValue);
                     }
 
                     if (projectResourceRatesFeatureIsEnabled && projectId > 0)
                     {
                         // remove rates for all resources except whose we saved recently (cleanup for removed team members)
-                        DeleteProjectResourceRates(oWeb, projectId, savedRatesUserIds.ToArray());
+                        DeleteProjectResourceRates(web, projectId, savedRatesUserIds.ToArray());
                     }
 
                     try
                     {
-                        li["AssignedTo"] = uvc;
+                        li["AssignedTo"] = userValueCollection;
                         li.SystemUpdate();
                     }
                     catch (UnauthorizedAccessException ex)
                     {
                         string error = $"You do not have write access to project: {li["Title"]}";
-                        throw new Exception(error, ex);
+                        throw new AggregateException(error, ex);
                     }
-
-
                 }
                 else
                 {
-                    SPList list = oWeb.Lists["Team"];
-                    DataTable dt = list.Items.GetDataTable();
+                    var list = web.Lists["Team"];
+                    var listItemsDataTable = list.Items.GetDataTable();
 
-                    DataTable dtResourcePool = null;
+                    DataTable resourcePool = null;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        dtResourcePool = GetResourcePool(sdoc, oWeb);
+                        resourcePool = GetResourcePool(teamDocumentXml, web);
                     });
 
-                    foreach (XmlNode nd in docTeam.SelectNodes("//Team/Member"))
+                    foreach (XmlNode memberNode in teamDocument.SelectNodes("//Team/Member"))
                     {
-
-                        string id = nd.Attributes["ID"].Value;
-                        DataRow[] drRes = dtResourcePool.Select("ID='" + id + "'");
-                        if (dt == null)
+                        var id = memberNode.Attributes["ID"].Value;
+                        var memberResources = resourcePool.Select("ID='" + id + "'");
+                        if (listItemsDataTable == null)
                         {
-                            SPListItem li = list.Items.Add();
-                            li["Title"] = drRes[0]["Title"].ToString();
-                            li["ResID"] = drRes[0]["ID"].ToString();
+                            var li = list.Items.Add();
+                            li["Title"] = memberResources[0]["Title"].ToString();
+                            li["ResID"] = memberResources[0]["ID"].ToString();
                             li.Update();
                         }
                         else
                         {
-                            DataRow[] drs = dt.Select("ResID=" + id);
-
-                            if (drs.Length == 0)
+                            var listItemResources = listItemsDataTable.Select("ResID=" + id);
+                            if (listItemResources.Length == 0)
                             {
-                                SPListItem li = list.Items.Add();
-                                li["Title"] = drRes[0]["Title"].ToString();
-                                li["ResID"] = drRes[0]["ID"].ToString();
+                                var li = list.Items.Add();
+                                li["Title"] = memberResources[0]["Title"].ToString();
+                                li["ResID"] = memberResources[0]["ID"].ToString();
                                 li.Update();
                             }
                             else
                             {
-                                dt.Rows.Remove(drs[0]);
+                                listItemsDataTable.Rows.Remove(listItemResources[0]);
                             }
                         }
-                        setPermissions(oWeb, drRes[0]["SPAccountInfo"].ToString(), nd.Attributes["Permissions"].Value);
 
-                        try
-                        {
-                            modifiedUsers += "," + drRes[0]["SPID"].ToString();
-                        }
-                        catch { }
+                        setPermissions(web, memberResources[0]["SPAccountInfo"].ToString(), memberNode.Attributes["Permissions"].Value);
 
-                        XmlNode ndNew = docOut.CreateNode(XmlNodeType.Element, "Member", docOut.NamespaceURI);
+                        var memberSpidObject = memberResources[0]["SPID"];
+                        var memberSpid = memberSpidObject != null 
+                            ? memberSpidObject.ToString()
+                            : string.Empty;
 
-                        XmlAttribute nattr = docOut.CreateAttribute("ID");
-                        nattr.Value = nd.Attributes["ID"].Value;
-                        ndNew.Attributes.Append(nattr);
+                        modifiedUsers += "," + memberSpid;
 
-                        nattr = docOut.CreateAttribute("Status");
-                        nattr.Value = "0";
-                        ndNew.Attributes.Append(nattr);
+                        var resultMemberElement = resultDocument.CreateNode(XmlNodeType.Element, "Member", resultDocument.NamespaceURI);
 
-                        docOut.FirstChild.AppendChild(ndNew);
+                        var idAttribute = resultDocument.CreateAttribute("ID");
+                        idAttribute.Value = memberNode.Attributes["ID"].Value;
+                        resultMemberElement.Attributes.Append(idAttribute);
 
+                        var statusAttribute = resultDocument.CreateAttribute("Status");
+                        statusAttribute.Value = "0";
+                        resultMemberElement.Attributes.Append(statusAttribute);
+
+                        resultDocument.FirstChild.AppendChild(resultMemberElement);
                         teamMemberCount++;
                     }
 
                     SPSecurity.RunWithElevatedPrivileges(() =>
                     {
-                        using (SPSite eSite = new SPSite(oWeb.Site.ID))
+                        using (var site = new SPSite(web.Site.ID))
                         {
-                            using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
+                            using (var connection = new SqlConnection(CoreFunctions.getReportingConnectionString(site.WebApplication.Id, site.ID)))
                             {
-                                con.Open();
-                                var cmd = new SqlCommand(@"Update [dbo].[RPTWeb] Set [Members] = " + teamMemberCount + " WHERE [SiteId] = '" + oWeb.Site.ID + "' AND [WebId] = '" + oWeb.ID + "'");
-                                cmd.Connection = con;
-                                cmd.ExecuteNonQuery();
+                                connection.Open();
+                                using (var command = new SqlCommand(@"Update [dbo].[RPTWeb] Set [Members] = " + teamMemberCount + " WHERE [SiteId] = '" + web.Site.ID + "' AND [WebId] = '" + web.ID + "'"))
+                                {
+                                    command.Connection = connection;
+                                    command.ExecuteNonQuery();
+                                }
                             }
                         }
                     });
 
-                    if (dt != null)
+                    if (listItemsDataTable != null)
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            using (SPSite oSite = new SPSite(oWeb.Site.ID))
+                            using (var site = new SPSite(web.Site.ID))
                             {
-                                using (SPWeb Web = oSite.OpenWeb(oWeb.ID))
+                                using (var siteWeb = site.OpenWeb(web.ID))
                                 {
-                                    Web.AllowUnsafeUpdates = true;
+                                    siteWeb.AllowUnsafeUpdates = true;
 
-                                    foreach (DataRow dr in dt.Rows)
+                                    foreach (DataRow listItemDataRow in listItemsDataTable.Rows)
                                     {
                                         try
                                         {
-                                            DataRow[] drRes = dtResourcePool.Select("ID='" + dr["ResID"].ToString() + "'");
-
-                                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPAccountInfo"].ToString());
+                                            var listItemResources = resourcePool.Select("ID='" + listItemDataRow["ResID"].ToString() + "'");
+                                            var fieldUserValue = new SPFieldUserValue(web, listItemResources[0]["SPAccountInfo"].ToString());
 
                                             try
                                             {
-                                                modifiedUsers += "," + uv.User.ID;
+                                                // (CC-77975, 2018-08-02) User property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
+                                                modifiedUsers += "," + fieldUserValue.User.ID;
                                             }
-                                            catch { }
+                                            catch (Exception ex)
+                                            {
+                                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                            }
 
-                                            foreach (SPGroup g in Web.Groups)
+                                            foreach (SPGroup group in siteWeb.Groups)
                                             {
                                                 try
                                                 {
-                                                    g.Users.RemoveByID(uv.LookupId);
+                                                    // (CC-77975, 2018-08-02) Users property is a SharePoint property and possibly can throw exception on access, therefore not replacing with NULL check
+                                                    group.Users.RemoveByID(fieldUserValue.LookupId);
                                                 }
-                                                catch { }
+                                                catch (Exception ex)
+                                                {
+                                                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                                }
                                             }
                                         }
-                                        catch { }
+                                        catch (Exception ex)
+                                        {
+                                            WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                                        }
 
-                                        list.Items.DeleteItemById(int.Parse(dr["ID"].ToString()));
-
+                                        list.Items.DeleteItemById(int.Parse(listItemDataRow["ID"].ToString()));
                                     }
-
                                 }
                             }
-
                         });
                     }
                 }
@@ -943,16 +958,31 @@ namespace EPMLiveCore.API
 
                 try
                 {
-                    Guid tJob = API.Timer.AddTimerJob(oWeb.Site.ID, oWeb.ID, "Process Security", 40, modifiedUsers.Trim(','), "", 0, 99, "");
-                    API.Timer.Enqueue(tJob, 0, oWeb.Site);
+                    var timerJob = Timer.AddTimerJob(
+                        web.Site.ID,
+                        web.ID,
+                        "Process Security",
+                        40,
+                        modifiedUsers.Trim(','), 
+                        string.Empty, 
+                        0,
+                        99,
+                        string.Empty);
+
+                    Timer.Enqueue(timerJob, 0, web.Site);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                }
             }
             catch (Exception ex)
             {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 throw new APIException(3010, ex.Message);
             }
-            return docOut.OuterXml;
+
+            return resultDocument.OuterXml;
         }
 
         /// <summary>
