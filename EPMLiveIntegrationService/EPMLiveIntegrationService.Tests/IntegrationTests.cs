@@ -115,10 +115,15 @@ namespace EPMLiveIntegrationService.Tests
             {
                 disposeConnectionWasCalled++;
             };
+            var disposeCommandWasCalled = 0;
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            {
+                disposeCommandWasCalled++;
+            };
+            ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
             ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
             ShimSqlDataReader.AllInstances.Read = reader => true;
             ShimSqlDataReader.AllInstances.GetStringInt32 = (reader, i) => "id";
-
             
             string xml = @"<root>
     <Items>
@@ -139,6 +144,7 @@ namespace EPMLiveIntegrationService.Tests
 
             //Assert
             Assert.AreEqual(1, disposeConnectionWasCalled);
+            Assert.AreEqual(3, disposeCommandWasCalled);
         }
 
         [TestMethod]

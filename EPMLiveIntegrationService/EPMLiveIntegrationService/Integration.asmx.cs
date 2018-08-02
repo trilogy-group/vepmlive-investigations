@@ -379,14 +379,17 @@ namespace EPMLiveIntegrationService
                             {
                                 string idCol = "";
 
-                                SqlCommand cmd = new SqlCommand("SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'", connection);
-                                cmd.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
-                                SqlDataReader r = cmd.ExecuteReader();
-                                if (r.Read())
+                                var sql = "SELECT [VALUE] FROM INT_PROPS WHERE INT_LIST_ID=@intlistid and [PROPERTY]='IDColumn'";
+                                using (var command = new SqlCommand(sql, connection))
                                 {
-                                    idCol = r.GetString(0);
+                                    command.Parameters.AddWithValue("@intlistid", GetRowValue(dsIntegration, "INT_LIST_ID"));
+                                    SqlDataReader r = command.ExecuteReader();
+                                    if (r.Read())
+                                    {
+                                        idCol = r.GetString(0);
+                                    }
+                                    r.Close();
                                 }
-                                r.Close();
 
                                 if (idCol != "")
                                 {
@@ -406,12 +409,12 @@ namespace EPMLiveIntegrationService
 
                                         if (ID != "")
                                         {
-                                            cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", connection);
-                                            cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
-                                            cmd.Parameters.AddWithValue("@intitemid", ID);
-                                            cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
-                                            cmd.Parameters.AddWithValue("@data", ndItem.OuterXml);
-                                            cmd.ExecuteNonQuery();
+                                            var command = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)", connection);
+                                            command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                                            command.Parameters.AddWithValue("@intitemid", ID);
+                                            command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                                            command.Parameters.AddWithValue("@data", ndItem.OuterXml);
+                                            command.ExecuteNonQuery();
                                         }
                                     }
 
