@@ -1893,7 +1893,8 @@ namespace PortfolioEngineCore
                     ResourceValues.clsNWValue oResNWValue = null;
 
                     oCommand = new SqlCommand("EPG_SP_GetNonWorkByPeriod", _dba.Connection);
-                    oCommand.Parameters.AddWithValue("CalID", RVClass.PlanningCalendarID);
+                    //It will get current period which is selected while resource analyzer calendar selection and pick date for time off accordingly
+                    oCommand.Parameters.AddWithValue("CalID", RVClass.CalendarID);
                     oCommand.Parameters.AddWithValue("FirstPeriodID", RVClass.FromPeriodID);
                     oCommand.Parameters.AddWithValue("LastPeriodID", RVClass.ToPeriodID);
                     oCommand.Parameters.AddWithValue("sList", sResourceList);
