@@ -181,8 +181,8 @@ namespace EPMLiveIntegrationService.Tests
 
         private void ArrangeShims()
         {
-            ShimHttpContext.CurrentGet = () => new ShimHttpContext(); 
-            ShimHttpContext.AllInstances.RequestGet =context => new ShimHttpRequest();
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext();
+            ShimHttpContext.AllInstances.RequestGet = context => new ShimHttpRequest();
 
             ShimHttpRequest.AllInstances.UserHostAddressGet = request => string.Empty;
 

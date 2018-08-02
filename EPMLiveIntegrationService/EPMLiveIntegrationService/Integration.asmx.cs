@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Data.SqlClient;
 using System.Data;
 using System.Diagnostics;
+using System.Web.Script.Services;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System.Xml;
 using System.Web.Services.Protocols;
+using System.Xml.XPath;
 
 namespace EPMLiveIntegrationService
 {
@@ -25,9 +29,9 @@ namespace EPMLiveIntegrationService
     /// </summary>
     [WebService(Namespace = "http://epmlive.com/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-    [System.ComponentModel.ToolboxItem(false)]
+    [ToolboxItem(false)]
     // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
-    [System.Web.Script.Services.ScriptService]
+    [ScriptService]
     public class Integration : System.Web.Services.WebService
     {
         public const string ModuleId = "a0950b9b-3525-40b8-a456-6403156dc49c";
@@ -68,7 +72,7 @@ namespace EPMLiveIntegrationService
                                 var service = farm.Services.GetValue<SPWebService>(string.Empty);
                                 foreach (var webapp in service.WebApplications)
                                 {
-                                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                                     {
                                         ret = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
                                         break;
@@ -105,7 +109,7 @@ namespace EPMLiveIntegrationService
 
             foreach (var webapp in service.WebApplications)
             {
-                if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                 {
                     ui = iCheckAuth(webapp, AuthCode);
                 }
@@ -127,7 +131,7 @@ namespace EPMLiveIntegrationService
 
                 foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
                         ret = iPostSimple(webapp, IntegrationKey, ID, "1");
                         break;
@@ -154,7 +158,7 @@ namespace EPMLiveIntegrationService
 
                 foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
                         ret = iPostComplex(webapp, IntegrationKey, XML);
                         break;
@@ -181,7 +185,7 @@ namespace EPMLiveIntegrationService
 
                 foreach (var webapp in service.WebApplications)
                 {
-                    if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
+                    if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
                         ret = iDeleteItem(webapp, IntegrationKey, ID);
                         break;
@@ -358,7 +362,7 @@ namespace EPMLiveIntegrationService
                 {
                     connection.Open();
 
-                    DataSet dsIntegration = new DataSet();
+                    var dsIntegration = new DataSet();
 
                     if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
@@ -386,24 +390,24 @@ namespace EPMLiveIntegrationService
                                     }
                                 }
 
-                                if (idCol != string.Empty)
+                                if (!string.IsNullOrWhiteSpace(idCol))
                                 {
                                     var ndItems = doc.SelectSingleNode("Items");
 
                                     foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
                                     {
-                                        string ID = string.Empty;
+                                        var ID = string.Empty;
 
                                         try
                                         {
-                                            ID = ndItem.SelectSingleNode("Fields/Field[@Name='" + idCol + "']").InnerText;
+                                            ID = ndItem.SelectSingleNode($"Fields/Field[@Name='{idCol}']").InnerText;
                                         }
-                                        catch (Exception ex)
+                                        catch (XPathException ex)
                                         {
-                                            Debug.WriteLine(ex);
+                                            Debug.WriteLine("Error evaluating XPath: " + ex);
                                         }
 
-                                        if (ID != string.Empty)
+                                        if (!string.IsNullOrWhiteSpace(ID)))
                                         {
                                             sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)";
                                             using (var command = new SqlCommand(sql, connection))
