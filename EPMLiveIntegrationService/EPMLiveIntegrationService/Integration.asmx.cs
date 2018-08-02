@@ -453,12 +453,15 @@ namespace EPMLiveIntegrationService
 
                     if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
                     {
-                        SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)", connection);
-                        cmd.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
-                        cmd.Parameters.AddWithValue("@intitemid", ID);
-                        cmd.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
-                        cmd.Parameters.AddWithValue("@type", type);
-                        cmd.ExecuteNonQuery();
+                        var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)";
+                        using (var command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
+                            command.Parameters.AddWithValue("@intitemid", ID);
+                            command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
+                            command.Parameters.AddWithValue("@type", type);
+                            command.ExecuteNonQuery();
+                        }
 
                         ret = "<Success/>";
                     }
