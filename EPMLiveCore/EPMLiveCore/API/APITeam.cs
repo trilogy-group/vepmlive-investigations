@@ -647,60 +647,25 @@ namespace EPMLiveCore.API
             try
             {
                 var modifiedUsers = string.Empty;
+                Guid listId;
+                int itemid;
 
                 var teamDocument = new XmlDocument();
                 teamDocument.LoadXml(teamDocumentXml);
 
-                Guid listId;
-                var listIdAttribute = teamDocument.FirstChild.Attributes["ListId"];
-                if (listIdAttribute == null || !Guid.TryParse(listIdAttribute.Value, out listId))
-                {
-                    listId = Guid.Empty;
-                }
-                
-                int itemid;
-                var itemIdAttribute = teamDocument.FirstChild.Attributes["ItemId"];
-                if (itemIdAttribute == null || !int.TryParse(itemIdAttribute.Value, out itemid))
-                {
-                    itemid = 0;
-                }
+                ReadSaveTeamQuerySettingsFromXml(teamDocument, out listId, out itemid);
 
-                try
+                if (listId == Guid.Empty && itemid == 0)
                 {
-                    if (listId == Guid.Empty && itemid == 0)
-                    {
-                        VerifyProjectTeamWorkspace(web, out itemid, out listId);
-                        if (itemid > 0 && listId != Guid.Empty)
-                        {
-                            try
-                            {
-                                while (!web.IsRootWeb) //Inherit | Open
-                                {
-                                    web = web.ParentWeb;
-                                }
-
-                                var list = web.Lists[listId];
-                                var gSettings = ListCommands.GetGridGanttSettings(list);
-                                useTeam = gSettings.BuildTeam;
-                            }
-                            catch (Exception ex)
-                            {
-                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                            }
-                        }
-                    }
+                    ReadSaveTeamSettingsFromWorkspaceRootWeb(ref web, ref useTeam, ref listId, ref itemid);
                 }
-                catch (Exception ex)
-                {
-                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
-                }
-
-                web.AllowUnsafeUpdates = true;
 
                 if (listId != Guid.Empty)
                 {
                     useTeam = GetListUseTeamSetting(web.Lists[listId]);
                 }
+
+                web.AllowUnsafeUpdates = true;
 
                 if (listId != Guid.Empty && useTeam)
                 {
@@ -760,12 +725,12 @@ namespace EPMLiveCore.API
                                 {
                                     // update rate for existing resources if rate is not equal to the standard rate, otherwise remove rate
                                     var rateString = memberNode.Attributes[ProjectRateColumn].Value;
-                                    var standardRateString = memberResources[0].Table.Columns.Contains(StandardRateColumn) 
+                                    var standardRateString = memberResources[0].Table.Columns.Contains(StandardRateColumn)
                                         ? memberResources[0][StandardRateColumn]?.ToString()
                                         : null;
 
                                     var rateValue = !string.IsNullOrWhiteSpace(rateString) ? Convert.ToDecimal(rateString) : (decimal?)null;
-                                    var standardRateValue =  !string.IsNullOrWhiteSpace(standardRateString) ? Convert.ToDecimal(standardRateString) : 0;
+                                    var standardRateValue = !string.IsNullOrWhiteSpace(standardRateString) ? Convert.ToDecimal(standardRateString) : 0;
                                     UpdateProjectResourceRate(web, projectId, resourceId, rateValue != standardRateValue ? rateValue : null);
 
                                     // keep resource id for cleanup action
@@ -866,7 +831,7 @@ namespace EPMLiveCore.API
                         setPermissions(web, memberResources[0]["SPAccountInfo"].ToString(), memberNode.Attributes["Permissions"].Value);
 
                         var memberSpidObject = memberResources[0]["SPID"];
-                        var memberSpid = memberSpidObject != null 
+                        var memberSpid = memberSpidObject != null
                             ? memberSpidObject.ToString()
                             : string.Empty;
 
@@ -955,7 +920,6 @@ namespace EPMLiveCore.API
                     }
                 }
 
-
                 try
                 {
                     var timerJob = Timer.AddTimerJob(
@@ -963,8 +927,8 @@ namespace EPMLiveCore.API
                         web.ID,
                         "Process Security",
                         40,
-                        modifiedUsers.Trim(','), 
-                        string.Empty, 
+                        modifiedUsers.Trim(','),
+                        string.Empty,
                         0,
                         99,
                         string.Empty);
@@ -983,6 +947,49 @@ namespace EPMLiveCore.API
             }
 
             return resultDocument.OuterXml;
+        }
+
+        private static void ReadSaveTeamSettingsFromWorkspaceRootWeb(ref SPWeb web, ref bool useTeam, ref Guid listId, ref int itemid)
+        {
+            try
+            {
+                VerifyProjectTeamWorkspace(web, out itemid, out listId);
+
+                if (itemid > 0 && listId != Guid.Empty)
+                {
+                    try
+                    {
+                        while (!web.IsRootWeb) //Inherit | Open
+                        {
+                            web = web.ParentWeb;
+                        }
+
+                        useTeam = GetListUseTeamSetting(web.Lists[listId]);
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+        }
+
+        private static void ReadSaveTeamQuerySettingsFromXml(XmlDocument teamDocument, out Guid listId, out int itemid)
+        {
+            var listIdAttribute = teamDocument.FirstChild.Attributes["ListId"];
+            if (listIdAttribute == null || !Guid.TryParse(listIdAttribute.Value, out listId))
+            {
+                listId = Guid.Empty;
+            }
+            var itemIdAttribute = teamDocument.FirstChild.Attributes["ItemId"];
+            if (itemIdAttribute == null || !int.TryParse(itemIdAttribute.Value, out itemid))
+            {
+                itemid = 0;
+            }
         }
 
         /// <summary>
