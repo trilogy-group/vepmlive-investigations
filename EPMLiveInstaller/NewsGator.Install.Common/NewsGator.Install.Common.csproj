@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2D9D0C80-CDF4-4B46-907B-1DBA2D8F5B8E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NewsGator.Install.Common</RootNamespace>
+    <AssemblyName>NewsGator.Install.Common</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Server, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\14\ISAPI\Microsoft.Office.Server.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Server.UserProfiles, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\14\ISAPI\Microsoft.Office.Server.UserProfiles.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\14\ISAPI\Microsoft.SharePoint.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Publishing, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\14\ISAPI\Microsoft.SharePoint.Publishing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Presentation" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BuildVersion.cs" />
+    <Compile Include="Constants\Assemblies\Enrich.cs" />
+    <Compile Include="Constants\Assemblies\Innovation.cs" />
+    <Compile Include="Constants\Assemblies\InterComm.cs" />
+    <Compile Include="Constants\Assemblies\NewsStream.cs" />
+    <Compile Include="Constants\Assemblies\SocialPlatform.cs" />
+    <Compile Include="Constants\Assemblies\VideoStream.cs" />
+    <Compile Include="Constants\CommandLine.cs" />
+    <Compile Include="Constants\FarmIdentifiers.cs" />
+    <Compile Include="Constants\Features\CanadaCommon.cs" />
+    <Compile Include="Constants\Features\Enrich.cs" />
+    <Compile Include="Constants\Features\EnrichVideoScenarios.cs" />
+    <Compile Include="Constants\Features\Innovation.cs" />
+    <Compile Include="Constants\Features\InterComm.cs" />
+    <Compile Include="Constants\Features\NewsStream.cs" />
+    <Compile Include="Constants\Features\Orphaned.cs" />
+    <Compile Include="Constants\Features\Scorecard.cs" />
+    <Compile Include="Constants\Features\SocialPlatform.cs" />
+    <Compile Include="Constants\Features\Spotlight.cs" />
+    <Compile Include="Constants\Features\VideoStream.cs" />
+    <Compile Include="Constants\ReceiverPrefixes.cs" />
+    <Compile Include="Constants\Solutions\All.cs" />
+    <Compile Include="Constants\Solutions\CanadaCommon.cs" />
+    <Compile Include="Constants\Solutions\Enrich.cs" />
+    <Compile Include="Constants\Solutions\EnrichVideoScenarios.cs" />
+    <Compile Include="Constants\Solutions\IdeaStream.cs" />
+    <Compile Include="Constants\Solutions\Innovation.cs" />
+    <Compile Include="Constants\Solutions\InterComm.cs" />
+    <Compile Include="Constants\Solutions\NewsStream.cs" />
+    <Compile Include="Constants\Solutions\PivotViewer.cs" />
+    <Compile Include="Constants\Solutions\Scorecard.cs" />
+    <Compile Include="Constants\Solutions\SocialPlatform.cs" />
+    <Compile Include="Constants\Solutions\Spotlight.cs" />
+    <Compile Include="Constants\Solutions\VideoScreenCast.cs" />
+    <Compile Include="Constants\Solutions\VideoStream.cs" />
+    <Compile Include="Constants\TypeNames\Enrich.cs" />
+    <Compile Include="Constants\TypeNames\Innovation.cs" />
+    <Compile Include="Constants\TypeNames\InterComm.cs" />
+    <Compile Include="Constants\TypeNames\NewsStream.cs" />
+    <Compile Include="Constants\TypeNames\SocialPlatform.cs" />
+    <Compile Include="Constants\TypeNames\VideoStream.cs" />
+    <Compile Include="Constants\WindowsServices.cs" />
+    <Compile Include="Entities\Flags\InstallMethod.cs" />
+    <Compile Include="Entities\Flags\InstallSource.cs" />
+    <Compile Include="Entities\Flags\InstallStep.cs" />
+    <Compile Include="Entities\Flags\PrerequisiteStatus.cs" />
+    <Compile Include="Entities\Flags\ServiceApplicationType.cs" />
+    <Compile Include="Entities\Flags\SolutionSet.cs" />
+    <Compile Include="Entities\Installer\CommandLineParameter.cs" />
+    <Compile Include="Entities\Installer\Prerequisite.cs" />
+    <Compile Include="Entities\Installer\Prerequisites.cs" />
+    <Compile Include="Entities\Installer\SocialSitesWSPAssemblyVersion.cs" />
+    <Compile Include="Entities\SharePoint\SharePointAccessRule.cs" />
+    <Compile Include="Entities\SharePoint\SharePointApplicationPool.cs" />
+    <Compile Include="Entities\SharePoint\SharePointDatabase.cs" />
+    <Compile Include="Entities\SharePoint\SharePointEventReceiver.cs" />
+    <Compile Include="Entities\SharePoint\SharePointFarm.cs" />
+    <Compile Include="Entities\SharePoint\SharePointFeature.cs" />
+    <Compile Include="Entities\SharePoint\SharePointInstance.cs" />
+    <Compile Include="Entities\SharePoint\SharePointList.cs" />
+    <Compile Include="Entities\SharePoint\SharePointProperty.cs" />
+    <Compile Include="Entities\SharePoint\SharePointServer.cs" />
+    <Compile Include="Entities\SharePoint\SharePointService.cs" />
+    <Compile Include="Entities\SharePoint\SharePointServiceApplication.cs" />
+    <Compile Include="Entities\SharePoint\SharePointSiteCollection.cs" />
+    <Compile Include="Entities\SharePoint\SharePointSolution.cs" />
+    <Compile Include="Entities\SharePoint\SharePointUser.cs" />
+    <Compile Include="Entities\SharePoint\SharePointWeb.cs" />
+    <Compile Include="Entities\SharePoint\SharePointWebApplication.cs" />
+    <Compile Include="Entities\SocialSites\Caching\CacheSettings.cs" />
+    <Compile Include="Entities\SocialSites\Database.cs" />
+    <Compile Include="Entities\SocialSites\PlatformService.cs" />
+    <Compile Include="Entities\SocialSites\PlatformServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ReceiverPrefix.cs" />
+    <Compile Include="Entities\SocialSites\Service.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationConfiguration.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\EnrichServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\InnovationServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\InterCommServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\NewsManagerServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\SocialServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplicationProxies\VideoServiceApplicationProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\EnrichServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\InnovationServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\InterCommServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\NewsManagerServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\SocialServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceApplications\VideoServiceApplication.cs" />
+    <Compile Include="Entities\SocialSites\ServiceConfigurations\EnrichServiceConfiguration.cs" />
+    <Compile Include="Entities\SocialSites\ServiceConfigurations\InnovationServiceConfiguration.cs" />
+    <Compile Include="Entities\SocialSites\ServiceConfigurations\VideoServiceConfiguration.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\EnrichServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\InnovationServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\InterCommServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\NewsManagerServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\SocialServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceInstances\VideoServiceInstance.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\EnrichServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\InnovationServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\InterCommServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\NewsManagerServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\SocialServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceProxies\VideoServiceProxy.cs" />
+    <Compile Include="Entities\SocialSites\ServiceSetupInformation\EnrichSetupInformation.cs" />
+    <Compile Include="Entities\SocialSites\ServiceSetupInformation\InnovationSetupInformation.cs" />
+    <Compile Include="Entities\SocialSites\ServiceSetupInformation\VideoSetupInformation.cs" />
+    <Compile Include="Entities\SocialSites\Services\EnrichService.cs" />
+    <Compile Include="Entities\SocialSites\Services\InnovationService.cs" />
+    <Compile Include="Entities\SocialSites\Services\InterCommService.cs" />
+    <Compile Include="Entities\SocialSites\Services\NewsManagerService.cs" />
+    <Compile Include="Entities\SocialSites\Services\SocialService.cs" />
+    <Compile Include="Entities\SocialSites\Services\VideoService.cs" />
+    <Compile Include="Entities\SocialSites\SocialSitesConfiguration.cs" />
+    <Compile Include="Entities\SocialSites\SocialSitesFeature.cs" />
+    <Compile Include="Entities\SocialSites\SocialSitesInstance.cs" />
+    <Compile Include="Entities\SocialSites\SocialSitesSolution.cs" />
+    <Compile Include="Entities\SocialSites\SqlSession.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="LocalFarm.cs" />
+    <Compile Include="Output\OutputEventArgs.cs" />
+    <Compile Include="Output\OutputManager.cs" />
+    <Compile Include="Output\OutputQueue.cs" />
+    <Compile Include="Output\OutputQueueItem.cs" />
+    <Compile Include="Output\OutputType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\Debugger\DisableDebugger.cs" />
+    <Compile Include="Tasks\Debugger\EnableDebugger.cs" />
+    <Compile Include="Tasks\Features\DisableFeatures.cs" />
+    <Compile Include="Tasks\Features\ReactivateFeatures.cs" />
+    <Compile Include="Tasks\Features\RemoveOrphanedFeatures.cs" />
+    <Compile Include="Tasks\Features\UpdateFeatures.cs" />
+    <Compile Include="Tasks\IInstallTask.cs" />
+    <Compile Include="Tasks\Jobs\DisableJobs.cs" />
+    <Compile Include="Tasks\Jobs\DisableUserProfileJob.cs" />
+    <Compile Include="Tasks\Jobs\EnableJobs.cs" />
+    <Compile Include="Tasks\Jobs\EnableUserProfileJob.cs" />
+    <Compile Include="Tasks\Jobs\RecycleTimerServiceJob.cs" />
+    <Compile Include="Tasks\Jobs\ExecuteAdminServiceJobsTask.cs" />
+    <Compile Include="Tasks\MySite\MySiteEnableLookout.cs" />
+    <Compile Include="Tasks\MySite\MySiteNewsFeedPage.cs" />
+    <Compile Include="Tasks\MySite\MySiteSetLookoutHomePage.cs" />
+    <Compile Include="Tasks\MySite\MySiteWebParts.cs" />
+    <Compile Include="Tasks\TaskUpdateEventArgs.cs" />
+    <Compile Include="Tasks\ServiceApplications\ProvisionServiceApplication.cs" />
+    <Compile Include="Tasks\ServiceApplications\RemoveServiceApplication.cs" />
+    <Compile Include="Tasks\ServiceApplications\UpdateServiceApplication.cs" />
+    <Compile Include="Tasks\Services\RestartServices.cs" />
+    <Compile Include="Tasks\Solutions\SolutionDeploy.cs" />
+    <Compile Include="Tasks\Solutions\SolutionUpdate.cs" />
+    <Compile Include="Tasks\Solutions\SolutionAdd.cs" />
+    <Compile Include="Tasks\Solutions\SolutionRemove.cs" />
+    <Compile Include="Tasks\TaskExtensions.cs" />
+    <Compile Include="Tasks\TaskStatus.cs" />
+    <Compile Include="Tasks\WebApplications\CopyAppBinContent.cs" />
+    <Compile Include="Tasks\WebApplications\EnsureWebApplications.cs" />
+    <Compile Include="Tasks\WebApplications\EnableWebApplications.cs" />
+    <Compile Include="Tasks\WebApplications\DisableWebApplications.cs" />
+    <Compile Include="Utilities\ActivityTypes.cs" />
+    <Compile Include="Utilities\ApplicationPools.cs" />
+    <Compile Include="Utilities\Assemblies.cs" />
+    <Compile Include="Utilities\Caching.cs" />
+    <Compile Include="Utilities\Compression\ArchiveException.cs" />
+    <Compile Include="Utilities\Compression\ArchiveFileInfo.cs" />
+    <Compile Include="Utilities\Compression\ArchiveFileStreamContext.cs" />
+    <Compile Include="Utilities\Compression\ArchiveInfo.cs" />
+    <Compile Include="Utilities\Compression\ArchiveProgressEventArgs.cs" />
+    <Compile Include="Utilities\Compression\ArchiveProgressType.cs" />
+    <Compile Include="Utilities\Compression\BasicUnpackStreamContext.cs" />
+    <Compile Include="Utilities\Compression\CargoStream.cs" />
+    <Compile Include="Utilities\Compression\CompressionEngine.cs" />
+    <Compile Include="Utilities\Compression\CompressionLevel.cs" />
+    <Compile Include="Utilities\Compression\DuplicateStream.cs" />
+    <Compile Include="Utilities\Compression\IPackStreamContext.cs" />
+    <Compile Include="Utilities\Compression\IUnpackStreamContext.cs" />
+    <Compile Include="Utilities\Compression\OffsetStream.cs" />
+    <Compile Include="Utilities\Compression\SafeNativeMethods.cs" />
+    <Compile Include="Utilities\Compression\Zip\ConcatStream.cs" />
+    <Compile Include="Utilities\Compression\Zip\CrcStream.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipCompressionMethod.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipEngine.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipException.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipFileInfo.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipFormat.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipInfo.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipPacker.cs" />
+    <Compile Include="Utilities\Compression\Zip\ZipUnpacker.cs" />
+    <Compile Include="Utilities\Conversions.cs" />
+    <Compile Include="Utilities\DebuggerRegistry.cs" />
+    <Compile Include="Utilities\FarmExtensions.cs" />
+    <Compile Include="Utilities\Features.cs" />
+    <Compile Include="Utilities\Files.cs" />
+    <Compile Include="Utilities\Jobs.cs" />
+    <Compile Include="Utilities\Lookout.cs" />
+    <Compile Include="Utilities\MySite.cs" />
+    <Compile Include="Utilities\NTFSStreams\AlternateDataStreamInfo.cs" />
+    <Compile Include="Utilities\NTFSStreams\DirectoryInfoExtensions.cs" />
+    <Compile Include="Utilities\NTFSStreams\FileInfoExtensions.cs" />
+    <Compile Include="Utilities\NTFSStreams\FileStreamAttributes.cs" />
+    <Compile Include="Utilities\NTFSStreams\FileStreamType.cs" />
+    <Compile Include="Utilities\NTFSStreams\FileSystem.cs" />
+    <Compile Include="Utilities\NTFSStreams\SafeHGlobalHandle.cs" />
+    <Compile Include="Utilities\NTFSStreams\SafeNativeMethods.cs" />
+    <Compile Include="Utilities\NTFSStreams\StreamName.cs" />
+    <Compile Include="Utilities\Parallel.cs" />
+    <Compile Include="Utilities\Prerequisites.cs" />
+    <Compile Include="Utilities\Receivers.cs" />
+    <Compile Include="Utilities\Reflection.cs" />
+    <Compile Include="Utilities\Runspace.cs" />
+    <Compile Include="Utilities\Security.cs" />
+    <Compile Include="Utilities\Serializer.cs" />
+    <Compile Include="Utilities\Server.cs" />
+    <Compile Include="Utilities\ServiceApplication.cs" />
+    <Compile Include="Utilities\Services.cs" />
+    <Compile Include="Utilities\Setup.cs" />
+    <Compile Include="Utilities\SiteCollections.cs" />
+    <Compile Include="Utilities\Sites.cs" />
+    <Compile Include="Utilities\SocialSitesSolutionCollectionExtensions.cs" />
+    <Compile Include="Utilities\Solutions.cs" />
+    <Compile Include="Utilities\Strings.cs" />
+    <Compile Include="Utilities\Threading.cs" />
+    <Compile Include="Utilities\Types.cs" />
+    <Compile Include="Utilities\UserProfileService.cs" />
+    <Compile Include="Utilities\WebApplications.cs" />
+    <Compile Include="Version.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NewsGator.Install.Resources\NewsGator.Install.Resources.csproj">
+      <Project>{9A9BF541-7DBA-434B-88F3-9F5F871842A1}</Project>
+      <Name>NewsGator.Install.Resources</Name>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

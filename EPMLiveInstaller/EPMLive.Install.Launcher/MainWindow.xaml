@@ -1,0 +1,271 @@
+﻿<Window x:Class="EPMLive.Install.Launcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:CommonControls="clr-namespace:NewsGator.Install.Resources;assembly=NewsGator.Install.Resources"
+        xmlns:CommonResources="clr-namespace:NewsGator.Install.Resources;assembly=NewsGator.Install.Resources"
+        xmlns:CommonControlsLoading="clr-namespace:NewsGator.Install.Resources.Loading;assembly=NewsGator.Install.Resources"
+        Title="Skyvera Launcher" 
+        Height="680" 
+        Width="640"
+        Style="{DynamicResource ModernUIWindow}"
+        WindowStartupLocation="CenterScreen"
+        MouseDown="Window_MouseDown">
+
+    <Grid Style="{DynamicResource ModernUIWindowBackground}">
+        <Grid Style="{DynamicResource ModernUIWindowBackground}">
+            <TextBlock x:Name="txtApplicationTitle" Text="Skyvera Launcher" Style="{DynamicResource ModernUIText}" Margin="3,3,0,0" />
+            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource ChromeButtonStyle}" Click="CloseButton_Click">
+                <TextBlock TextWrapping="Wrap" Text="r" FontFamily="Webdings" Foreground="#FF919191" FontSize="13.333" />
+            </Button>
+        </Grid>
+        <DockPanel>
+            <Grid Name="ContentPanel" Margin="0,25,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"></RowDefinition>
+                    <RowDefinition Height="40"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="60"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <TextBlock Name="txtTitle" Margin="12,0,12,0" Text="Skyvera" Style="{DynamicResource ModernUITitle}" Grid.Row="0" TextWrapping="Wrap"></TextBlock>
+
+                <TextBlock Name="txtDescription" Margin="12,0,12,0" Text="The Skyvera Launcher provides easy access to the installation, configuration, and support tools for Skyvera products." Grid.Row="1" Style="{DynamicResource ModernUITextLabel}" TextWrapping="Wrap"></TextBlock>
+
+
+                <ScrollViewer Name="scrollViewerAdvancedInstall" Visibility="Visible" Style="{StaticResource ScrollViewBorder}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="2">
+                    <StackPanel>
+                        <Border Name="borderAdvancedInstall" Style="{DynamicResource ModernUIBorderNonInteractive}">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,16,0,16">
+                                    <Image RenderOptions.BitmapScalingMode="HighQuality" Height="60" Width="60" VerticalAlignment="Top" Margin="0,5,0,0">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Source" Value="/NewsGator.Install.Resources;component/Resources/Advanced.png"></Setter>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                    <StackPanel Name="spContainer" Orientation="Vertical" Margin="16,0,0,0" Width="510">
+
+
+                                        <!--<ComboBox Name="cbServiceApplicationPoolUsername" SelectionChanged="cbServiceApplicationPool_SelectionChanged" >
+                                            <ComboBoxItem Content="{x:Static CommonResources:UserDisplay.ComboBoxCreateNew}" Tag="NGCreateNew"></ComboBoxItem>
+                                        </ComboBox>-->
+
+                                        <TextBlock Text="Install or Upgrade EPMLive with Advanced Options" Style="{DynamicResource ModernUISubtitle}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <!--<TextBlock Text="{x:Static CommonResources:UserDisplay.LauncherActionInstallAdvancedDesc}" Style="{DynamicResource ModernUITextLabel}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>-->
+
+                                        <TextBlock Text="Web Application" Style="{DynamicResource ModernUISectionTitleNonInteractive}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <ComboBox Name="cbWebApps" Tag="webAppName" ItemsSource="{Binding WebApplicationList}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ComboBoxItem Name="WebAppCheckBox" Content="{Binding Url}" Tag="{Binding Url}" ></ComboBoxItem>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+
+                                        <TextBlock Text="Appliction Pools" Tag="appPool" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <Label Name="lblServiceApplicationPool" Visibility="Collapsed" Content="{x:Static CommonResources:UserDisplay.ServiceApplicationPoolSocial}"></Label>
+                                        <ComboBox Name="cbServiceApplicationPool" >
+                                            <ComboBoxItem Tag="NGCreateNew"></ComboBoxItem>
+                                        </ComboBox>
+
+                                        <!--<TextBlock Text="{x:Static CommonResources:UserDisplay.LauncherOptionConsumerFarm}" Style="{DynamicResource ModernUISectionTitleNonInteractive}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>-->
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Name="chkDeploy" Tag="deployPFE" Margin="5,5,5,0"></CheckBox>
+                                            <TextBlock Text="Install/Update portfolio service" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        </StackPanel>
+
+                                        <!--<TextBlock Text="{x:Static CommonResources:UserDisplay.LauncherOptionIgnoreMissingModules}" Style="{DynamicResource ModernUISectionTitleNonInteractive}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>-->
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Name="chkDeployTimer" Tag="deployTimer" Margin="5,5,5,0"></CheckBox>
+                                            <TextBlock Text="Install/Update Workengine Timer Service" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        </StackPanel>
+
+                                        <!--<TextBlock Text="{x:Static CommonResources:UserDisplay.LauncherOptionIgnoreMissingModules}" Style="{DynamicResource ModernUISectionTitleNonInteractive}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>-->
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Name="chkDeploySolutions" Tag="deploySolutions" Margin="5,5,5,0"></CheckBox>
+                                            <TextBlock Text="Deploy Solutions" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Name="chkCreateDB" Tag="createDB" Margin="5,5,5,0"></CheckBox>
+                                            <TextBlock Text="Create EPMLive Database" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox Name="chkUpgradeSites" Margin="5,5,5,0"></CheckBox>
+                                            <TextBlock Text="Upgrade Sites" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        </StackPanel>
+
+                                        <TextBlock Text="Database Host" Style="{DynamicResource ModernUISectionTitleNonInteractive}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtDBHost" Tag="dbService" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                        <TextBlock Text="Database Name" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtDBName" Tag="dbName" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                        <TextBlock Text="User Name" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtUserName" Tag="comUserName" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                        <TextBlock Text="Password" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <PasswordBox Name="password" Tag="inPassword" Margin="0,5,0,0" Width="300"></PasswordBox>
+
+                                        <TextBlock Text="Version" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtVersion" Tag="version" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                        <TextBlock Text="Upgrade Sites" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtUpgrdeSites" Tag="createDB" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                        <TextBlock Text="Upgrade Sites File" Style="{DynamicResource ModernUISectionTitleNonInteractiveNoMargin}" TextWrapping="Wrap" MaxWidth="510"></TextBlock>
+                                        <TextBox Name="txtUpgradeSitesFile" Tag="upgradeSitesFile" Margin="0,5,0,0" Width="300"></TextBox>
+
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel Name="pnlInstallStatus" Visibility="Collapsed" Grid.Row="2">
+
+                    <StackPanel Margin="0,0,0,10">
+                        <Grid Margin="0,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="240"></RowDefinition>
+                                <RowDefinition Height="25"></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <!-- Animation -->
+                            <CommonControlsLoading:LoadingAnimation x:Name="loadingAnimationInstall" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0"></CommonControlsLoading:LoadingAnimation>
+
+
+
+                            <!-- Verbose Output -->
+                            <ScrollViewer Name="outputVerbose" Style="{StaticResource ScrollViewBorder}" Visibility="Visible" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="0">
+                                <StackPanel Margin="0,0,0,10">
+                                    <Border Style="{DynamicResource ModernUIBorderNonInteractive}">
+                                        <StackPanel Margin="0,10,0,10">
+                                            <TextBlock Name="txtInstallStatusVerbose" TextWrapping="Wrap"></TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                            <!-- Errors -->
+                            <ScrollViewer Name="outputErrors" Style="{StaticResource ScrollViewBorder}" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="0">
+                                <StackPanel Margin="0,0,0,10">
+                                    <Border Style="{DynamicResource ModernUIBorderNonInteractive}">
+                                        <StackPanel Margin="0,10,0,10">
+                                            <TextBlock Name="txtInstallStatusErrors" TextWrapping="Wrap"></TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                            <!-- Warnings -->
+                            <ScrollViewer Name="outputWarnings" Style="{StaticResource ScrollViewBorder}" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="0">
+                                <StackPanel Margin="0,0,0,10">
+                                    <Border Style="{DynamicResource ModernUIBorderNonInteractive}">
+                                        <StackPanel Margin="0,10,0,10">
+                                            <TextBlock Name="txtInstallStatusWarnings" TextWrapping="Wrap"></TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Toggles -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                <Label Name="lblOutput" Style="{DynamicResource OutputUILabel}">
+                                    <TextBlock Name="txtOutput" Text="{x:Static CommonResources:UserDisplay.UIOutput}" Style="{DynamicResource OutputUI}"></TextBlock>
+                                </Label>
+
+                                <!--<Button Name="btnOutputHide" Click="btnOutput_Click" Style="{DynamicResource NoChromeButton}">
+                                    <Label Name="lblOutputHide" Style="{DynamicResource OutputUIVerbose}" FontWeight="Bold">
+                                        <Border Name="borderOutputHide" BorderThickness="0 0 0 2" BorderBrush="#666666" Margin="0,0,0,0" Padding="0,0,0,0">
+                                            <TextBlock Name="txtOutputHide" Text="{x:Static CommonResources:UserDisplay.UIOutputTasks}" Style="{DynamicResource OutputUI}"></TextBlock>
+                                        </Border>
+                                    </Label>
+                                </Button>-->
+
+                                <Button Name="btnOutputVerbose" Click="btnOutput_Click" Style="{DynamicResource NoChromeButton}">
+                                    <Label Name="lblOutputVerbose" Style="{DynamicResource OutputUIVerbose}">
+                                        <Border Name="borderOutputVerbose" BorderThickness="0 0 0 2" BorderBrush="#FFFFFF" Margin="0,0,0,0" Padding="0,0,0,0">
+                                            <TextBlock Name="txtOutputVerbose" Text="{x:Static CommonResources:UserDisplay.UIOutputVerbose}" Style="{DynamicResource OutputUI}"></TextBlock>
+                                        </Border>
+                                    </Label>
+                                </Button>
+
+                                <Button Name="btnOutputErrors" Click="btnOutput_Click" Style="{DynamicResource NoChromeButton}">
+                                    <Label Name="lblOutputErrors" Style="{DynamicResource OutputUIErrors}">
+                                        <Border Name="borderOutputErrors" BorderThickness="0 0 0 2" BorderBrush="#FFFFFF" Margin="0,0,0,0" Padding="0,0,0,0">
+                                            <TextBlock Name="txtOutputErrors" Text="Errors (0)" Style="{DynamicResource OutputUI}"></TextBlock>
+                                        </Border>
+                                    </Label>
+                                </Button>
+
+                                <Button Name="btnOutputWarnings" Click="btnOutput_Click" Style="{DynamicResource NoChromeButton}">
+                                    <Label Name="lblOutputWarnings" Style="{DynamicResource OutputUIWarnings}">
+                                        <Border Name="borderOutputWarnings" BorderThickness="0 0 0 2" BorderBrush="#FFFFFF" Margin="0,0,0,0" Padding="0,0,0,0">
+                                            <TextBlock Name="txtOutputWarnings" Text="Warnings (0)" Style="{DynamicResource OutputUI}"></TextBlock>
+                                        </Border>
+                                    </Label>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Name="btnPrevious" Visibility="Collapsed" Content="{x:Static CommonResources:UserDisplay.ButtonPrevious}" Click="btnClick" Style="{DynamicResource ModernUIButtonSecondary}" Grid.Row="3" HorizontalAlignment="Left">
+                    <Button.Template>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                SnapsToDevicePixels="true">
+                                <ContentPresenter Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button Name="btnInstallAdvanced" Visibility="Visible" Content="{x:Static CommonResources:UserDisplay.ButtonInstallOrUpgrade}" Click="btnClick" Style="{DynamicResource ModernUIButtonPrimary}" Grid.Row="3" HorizontalAlignment="Right">
+                    <Button.Template>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                SnapsToDevicePixels="true">
+                                <ContentPresenter Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button Name="btnExit" Content="{x:Static CommonResources:UserDisplay.ButtonClose}" Click="btnExit_Click" Style="{DynamicResource ModernUIButtonSecondary}" Grid.Row="3" HorizontalAlignment="Left">
+                    <Button.Template>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                SnapsToDevicePixels="true">
+                                <ContentPresenter Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

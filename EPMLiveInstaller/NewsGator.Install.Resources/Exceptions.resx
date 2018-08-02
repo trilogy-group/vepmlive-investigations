@@ -1,0 +1,768 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActivitiesError" xml:space="preserve">
+    <value>Error provisioning Activity Templates: {0}</value>
+  </data>
+  <data name="AdminServiceError" xml:space="preserve">
+    <value>The SharePoint Admin Service Is Not Running on {0}</value>
+  </data>
+  <data name="AdminServiceMissingOnServerError" xml:space="preserve">
+    <value>The SharePoint Admin Service Is Missing on {0}.</value>
+  </data>
+  <data name="AdminServiceRestartError" xml:space="preserve">
+    <value>This SharePoint Admin Service Failed To Restart on {0}: {1}</value>
+  </data>
+  <data name="AnErrorHasOccurredTitle" xml:space="preserve">
+    <value>An Error Has Occurred</value>
+  </data>
+  <data name="AppDomainError" xml:space="preserve">
+    <value>Error in the AppDomain Runner - {0}: {1}</value>
+  </data>
+  <data name="ApplicationPoolException" xml:space="preserve">
+    <value>An error has occurred creating application pool: {0} - {1}</value>
+  </data>
+  <data name="CommandLineArgsError" xml:space="preserve">
+    <value>Unknown Command Argument(s): {0}</value>
+  </data>
+  <data name="DebuggerDisableError" xml:space="preserve">
+    <value>Error Disabling Just-In-Time Debugger: {0}</value>
+  </data>
+  <data name="DebuggerEnableError" xml:space="preserve">
+    <value>Error Enabling Just-In-Time Debugger: {0}</value>
+  </data>
+  <data name="DeploySolutionError" xml:space="preserve">
+    <value>Error Deploying Solution '{0}': {1}</value>
+  </data>
+  <data name="DeploySolutionJobAlreadyRunning" xml:space="preserve">
+    <value>Another Deployment Job Already Running.</value>
+  </data>
+  <data name="DeploySolutionJobFailed" xml:space="preserve">
+    <value>Deployment Job Failed.</value>
+  </data>
+  <data name="DeploySolutionRemoveJobFailed" xml:space="preserve">
+    <value>Job Definition '{0}' for '{1}' Could Not Be Deleted: {2}</value>
+  </data>
+  <data name="DeserializationError" xml:space="preserve">
+    <value>Error deserializing output: {0}</value>
+  </data>
+  <data name="DirectoryDoesNotExist" xml:space="preserve">
+    <value>Directory Does Not Exist: {0}</value>
+  </data>
+  <data name="DisableJobsError" xml:space="preserve">
+    <value>Unable to Disable Sitrion Social Jobs: {0}</value>
+  </data>
+  <data name="DisableJobsProcessingError" xml:space="preserve">
+    <value>Unable to Disable Sitrion Social Jobs for '{0}' - {1}</value>
+  </data>
+  <data name="DisableJobsUnableToDisableError" xml:space="preserve">
+    <value>Unable to Disable Sitrion Social Job '{0}': {1}</value>
+  </data>
+  <data name="DisposedError" xml:space="preserve">
+    <value>This object has been disposed.</value>
+  </data>
+  <data name="EnableJobsError" xml:space="preserve">
+    <value>An error has occurred trying to enable and/or upgrade Sitrion Social jobs: {0}</value>
+  </data>
+  <data name="EnableJobsProcessingError" xml:space="preserve">
+    <value>Unable to Enable Sitrion Social Jobs for '{0}' - {1}</value>
+  </data>
+  <data name="EnableJobsUnableToEnableError" xml:space="preserve">
+    <value>Unable to Error Sitrion Social Job '{0}': {1}</value>
+  </data>
+  <data name="EnsureTimerServiceError" xml:space="preserve">
+    <value>Error Restarting Timer Service on {0}: {1}</value>
+  </data>
+  <data name="ErrorAttemptingToUnblockFiles" xml:space="preserve">
+    <value>An error occurred while attempting to unblock the Installation Files or Solution Files (files can be manually unblocked in Windows Explorer): {0}</value>
+  </data>
+  <data name="ErrorCheckingAssemblyVersions" xml:space="preserve">
+    <value>An error occurred while verifying assembly versions: {0}</value>
+  </data>
+  <data name="ErrorCleaningUpFiles" xml:space="preserve">
+    <value>Unable to Clean Up Extracted Files, They May Be Manually Removed: {0}</value>
+  </data>
+  <data name="ErrorCreatingService" xml:space="preserve">
+    <value>Error Creating Service: {0}</value>
+  </data>
+  <data name="ErrorDeletingFeature" xml:space="preserve">
+    <value>Error Deleting Feature '{0}': {1}</value>
+  </data>
+  <data name="ErrorDisablingFeature" xml:space="preserve">
+    <value>Error Disabling Feature '{0}': {1}</value>
+  </data>
+  <data name="ErrorDuringRemoveOrphanFeatures" xml:space="preserve">
+    <value>An error occurred while attempting to remove old features: {0}</value>
+  </data>
+  <data name="ErrorEnsuringApplicationPools" xml:space="preserve">
+    <value>An error has occurred trying to ensure IIS Application Pools are started: {0}</value>
+  </data>
+  <data name="ErrorExportingSocialSitesConfiguration" xml:space="preserve">
+    <value>Error Exporting Sitrion Social Configuration: {0}</value>
+  </data>
+  <data name="ErrorExtractingFiles" xml:space="preserve">
+    <value>An error occurred while extracting Solution Files (.wsp): {0}</value>
+  </data>
+  <data name="ErrorGettingActivityTypes" xml:space="preserve">
+    <value>An error has occurred trying to get the installed SharePoint Activity Types: {0}</value>
+  </data>
+  <data name="ErrorGettingFeatureDefinition" xml:space="preserve">
+    <value>An error has occurred trying to read the feature definition for: {0}</value>
+  </data>
+  <data name="ErrorOpeningSite" xml:space="preserve">
+    <value>Error opening site collection '{0}': {1}</value>
+  </data>
+  <data name="ErrorProcessingSolutionFiles" xml:space="preserve">
+    <value>An error occurred while verifying the available Solution Files (.wsp): {0}</value>
+  </data>
+  <data name="ErrorProvisioningServiceApplication" xml:space="preserve">
+    <value>Error Provisioning Service Application: {0}</value>
+  </data>
+  <data name="ErrorReactivatingFeature" xml:space="preserve">
+    <value>An error has occurred trying to reactivate the following feature: {0}</value>
+  </data>
+  <data name="ErrorReactivatingFeatureOn" xml:space="preserve">
+    <value>An error has occurred trying to reactivate the following feature: {0} on {1}</value>
+  </data>
+  <data name="ErrorRemovingEventReceivers" xml:space="preserve">
+    <value>An error occurred while removing Event Receivers: {0}</value>
+  </data>
+  <data name="ErrorRemovingServiceApplication" xml:space="preserve">
+    <value>An error occurred while removing Service Application: {0}</value>
+  </data>
+  <data name="ErrorRestartingSearchServices" xml:space="preserve">
+    <value>An error has occurred trying to restart Search Services: {0}</value>
+  </data>
+  <data name="ErrorRestartingServiceOnServer" xml:space="preserve">
+    <value>An error has occurred trying to restart '{0}' on '{1}': {2}</value>
+  </data>
+  <data name="ErrorRetrievingSocialSitesConfiguration" xml:space="preserve">
+    <value>Error Retrieving Sitrion Social Configuration: {0}</value>
+  </data>
+  <data name="ErrorRunningUpdateMethod" xml:space="preserve">
+    <value>An error has occurred trying to run the '{0}' upgrade method on the service application: {1}</value>
+  </data>
+  <data name="ErrorSettingLookoutHomePage" xml:space="preserve">
+    <value>An error has occurred trying to set Lookout as the My Site home page: {0}</value>
+  </data>
+  <data name="ErrorStartingApplicationPool" xml:space="preserve">
+    <value>An error has occurred trying to start an IIS Application Pool ('{0}'): {1}</value>
+  </data>
+  <data name="ErrorStartingServiceOnServer" xml:space="preserve">
+    <value>An error has occurred trying to start '{0}' on '{1}': {2}</value>
+  </data>
+  <data name="ErrorStoppingApplicationPool" xml:space="preserve">
+    <value>An error has occurred trying to stop an IIS Application Pool ('{0}'): {1}</value>
+  </data>
+  <data name="ErrorStoppingSearchServices" xml:space="preserve">
+    <value>An error has occurred trying to stop Search Services: {0}</value>
+  </data>
+  <data name="ErrorStoppingServiceOnServer" xml:space="preserve">
+    <value>An error has occurred trying to stop '{0}' on '{1}': {2}</value>
+  </data>
+  <data name="ErrorUnprovisioningEmailWeb" xml:space="preserve">
+    <value>Error Removing Email Web Handlers: {0}</value>
+  </data>
+  <data name="ErrorUnprovisioningUserProfileDigestEmailProperty" xml:space="preserve">
+    <value>Error Removing User Profile Email Digest Property: {0}</value>
+  </data>
+  <data name="ErrorUnprovisioningUserProfileEmailNotificationProperty" xml:space="preserve">
+    <value>Error Removing User Profile Email Notification Property: {0}</value>
+  </data>
+  <data name="ErrorUpdatingDatabaseVerbose" xml:space="preserve">
+    <value>Error Updating {0} Database, Run Database Scripts Manually From Central Administration: {1}</value>
+  </data>
+  <data name="ErrorUpdatingDatabaseWarning" xml:space="preserve">
+    <value>Error Updating {0} Database, Run Database Scripts Manually From Central Administration.</value>
+  </data>
+  <data name="ErrorUpdatingFeatureOnFarm" xml:space="preserve">
+    <value>Error updating feature {0} on Farm</value>
+  </data>
+  <data name="ErrorUpdatingFeatureOnSite" xml:space="preserve">
+    <value>Error updating feature {0} on {1}</value>
+  </data>
+  <data name="ErrorUpdatingFeatureOnWeb" xml:space="preserve">
+    <value>Error updating feature {0} on {1}</value>
+  </data>
+  <data name="ErrorUpdatingFeatureOnWebApp" xml:space="preserve">
+    <value>Error updating feature {0} on {1}</value>
+  </data>
+  <data name="ErrorUpdatingFeaturesOnWeb" xml:space="preserve">
+    <value>Error updating features on {0}</value>
+  </data>
+  <data name="ErrorUpdatingProxyVerbose" xml:space="preserve">
+    <value>Error Updating {0} Application Proxy: {1}</value>
+  </data>
+  <data name="ErrorWhileAddingFeature" xml:space="preserve">
+    <value>Error While Adding Feature {0}: {1}</value>
+  </data>
+  <data name="ErrorWritingOutput" xml:space="preserve">
+    <value>An error has occurred trying to write output to the log: {0}</value>
+  </data>
+  <data name="FatalError" xml:space="preserve">
+    <value>A Fatal Error has occurred and setup cannot continue.  See the Log file or Windows Event Viewer for details.</value>
+  </data>
+  <data name="FeatureActivationError" xml:space="preserve">
+    <value>Error Activating Feature '{0}' at '{1}'. {2}</value>
+  </data>
+  <data name="FeatureMissingError" xml:space="preserve">
+    <value>Unabled to Upgrade Sitrion Social Feature {0}: Feature Not Found on Farm.</value>
+  </data>
+  <data name="FeatureNotUpgraded" xml:space="preserve">
+    <value>'{0}' ({1}) feature was not upgraded on '{2}'.  Expected feature version '{3}', actual '{4}'.</value>
+  </data>
+  <data name="FeatureSiteError" xml:space="preserve">
+    <value>Could Not Locate '{0}'.</value>
+  </data>
+  <data name="FileIsNull" xml:space="preserve">
+    <value>File is Null</value>
+  </data>
+  <data name="FilesLockedError" xml:space="preserve">
+    <value>Error Checking if File is Locked: {0}</value>
+  </data>
+  <data name="InstalledSolutionsMissing" xml:space="preserve">
+    <value>The following Solution Files are installed to the local SharePoint Farm, but are missing from the Solutions folder: {0}</value>
+  </data>
+  <data name="InvalidAssemblyVersion" xml:space="preserve">
+    <value>One or more assemblies do not match the version of the installer.</value>
+  </data>
+  <data name="LaunchCentralAdministrationError" xml:space="preserve">
+    <value>Unable to Launch Central Administration: Cannot locate PSConfigUI.exe, it is possible SharePoint Server is not installed on this computer.</value>
+  </data>
+  <data name="LaunchInstallError" xml:space="preserve">
+    <value>Unable to Launch Sitrion Social Installer: Cannot locate Install.exe.</value>
+  </data>
+  <data name="LaunchInstallFromLauncherError" xml:space="preserve">
+    <value>In order to run the Sitrion Social Installer, please run the Sitrion Social Launcher (Launcher.exe).</value>
+  </data>
+  <data name="LaunchManagementShellError" xml:space="preserve">
+    <value>Unable to Launch Sitrion Social Management Shell:  Cannot locate ManagementShellStartupScript.ps1.</value>
+  </data>
+  <data name="LaunchProductConfigurationWizardError" xml:space="preserve">
+    <value>Unable to Launch SharePoint Products Configuration Wizard: Cannot locate PSConfigUI.exe, it is possible SharePoint Server is not installed on this computer.</value>
+  </data>
+  <data name="LaunchSharePointShellError" xml:space="preserve">
+    <value>Unable to Launch Microsoft SharePoint Management Shell:  Cannot locate SharePoint.ps1.</value>
+  </data>
+  <data name="LaunchVideoComponentsInstaller" xml:space="preserve">
+    <value>Unable to Launch Additional Components Installer for Video: Cannot locate Setup.exe.</value>
+  </data>
+  <data name="LicenseKeyError" xml:space="preserve">
+    <value>Error Setting License Key: {0}</value>
+  </data>
+  <data name="MissingCoreSolutions" xml:space="preserve">
+    <value>One or more required solution files are missing, setup cannot continue.</value>
+  </data>
+  <data name="MissingCoreSolutionsFormat" xml:space="preserve">
+    <value>Missing Solution: {0}</value>
+  </data>
+  <data name="MissingSocialServiceApplicationTypesError" xml:space="preserve">
+    <value>Unable to get Social Sites Service Application Type or Social Sites Service Application Proxy Type.</value>
+  </data>
+  <data name="MissingSolution" xml:space="preserve">
+    <value>Missing solution: {0}</value>
+  </data>
+  <data name="MySitePrerequisiteCheckError" xml:space="preserve">
+    <value>Error Checking for a Site Collection with the My Site Host Feature Enabled: {0}</value>
+  </data>
+  <data name="NewServiceApplicationTimeout" xml:space="preserve">
+    <value>Creating the Service Application has taken longer than 30 minutes, aborting.</value>
+  </data>
+  <data name="NewsGatorCoreWspSolutionIsNotDeployedCanno" xml:space="preserve">
+    <value>NewsGator.Core.wsp or NewsGator.Core.Application.wsp solution is not deployed, cannot provision the service application.</value>
+  </data>
+  <data name="NewsGatorCoreWspSolutionIsNotInstalledCann" xml:space="preserve">
+    <value>NewsGator.Core.wsp or NewsGator.Core.Application.wsp solution is not installed, cannot provision the service application.</value>
+  </data>
+  <data name="NewsGatorEnrichWspSolutionIsNotDep" xml:space="preserve">
+    <value>NewsGator.LearningPoint.App.wsp solution is not deployed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorEnrichWspSolutionIsNotIns" xml:space="preserve">
+    <value>NewsGator.LearningPoint.App.wsp solution is not installed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorInnovationAppWspSolutionIsNotDep" xml:space="preserve">
+    <value>NewsGator.Innovation.App.wsp solution is not deployed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorInnovationAppWspSolutionIsNotIns" xml:space="preserve">
+    <value>NewsGator.Innovation.App.wsp solution is not installed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorInterCommWspSolutionIsNotDeploy" xml:space="preserve">
+    <value>NewsGator.CorpComm.wsp Solution is not deployed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorInterCommWspSolutionIsNotInstal" xml:space="preserve">
+    <value>NewsGator.CorpComm.wsp Solution is not installed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorNewsManagerWspSolutionIsNotDeploy" xml:space="preserve">
+    <value>NewsGator.NewsManager.wsp Solution is not deployed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorNewsManagerWspSolutionIsNotInstal" xml:space="preserve">
+    <value>NewsGator.NewsManager.wsp Solution is not installed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorVideoStreamAppWspSolutionIsNotDep" xml:space="preserve">
+    <value>NewsGator.VideoStream.App.wsp solution is not deployed, cannot provision the service application</value>
+  </data>
+  <data name="NewsGatorVideoStreamAppWspSolutionIsNotIns" xml:space="preserve">
+    <value>NewsGator.VideoStream.App.wsp solution is not installed, cannot provision the service application</value>
+  </data>
+  <data name="NoFarmError" xml:space="preserve">
+    <value>The local SharePoint Farm is not accessible.  Either the local SharePoint Farm is offline or the current user is not a Farm Administrator.</value>
+  </data>
+  <data name="NoModulesSpecified" xml:space="preserve">
+    <value>No Modules Specified, Doing Nothing.</value>
+  </data>
+  <data name="NoServiceApplicationsSpecified" xml:space="preserve">
+    <value>No Service Applications Specified, Doing Nothing.</value>
+  </data>
+  <data name="NullException" xml:space="preserve">
+    <value>'{0}' is null.</value>
+  </data>
+  <data name="PleaseNote" xml:space="preserve">
+    <value>Please Note</value>
+  </data>
+  <data name="PrerequisitesMissing" xml:space="preserve">
+    <value>One or more prerequisites are missing, setup cannot continue.</value>
+  </data>
+  <data name="PrerequisitesMissingFormat" xml:space="preserve">
+    <value>Missing Prerequisite: {0}</value>
+  </data>
+  <data name="ProvisioningEmailHandlerError" xml:space="preserve">
+    <value>Error Provisioning Email Handler: {0}</value>
+  </data>
+  <data name="ProvisionNewsgatorCustomUserProfilePropertiesError" xml:space="preserve">
+    <value>Error Provisioning User Profile Properties: {0}</value>
+  </data>
+  <data name="ReactivatingFeaturesTimeout" xml:space="preserve">
+    <value>Reactivating features has taken longer than 30 minutes, aborting.</value>
+  </data>
+  <data name="RemovingFeatureError" xml:space="preserve">
+    <value>Error updating feature '{0}': {1}</value>
+  </data>
+  <data name="ReportingDatabaseUpgradeError" xml:space="preserve">
+    <value>Error upgrading Reporting database: {0}</value>
+  </data>
+  <data name="RequiredSolutionsMissing" xml:space="preserve">
+    <value>The following required Solution Files are missing from the Solutions folder: {0}</value>
+  </data>
+  <data name="RestartAnalyticsError" xml:space="preserve">
+    <value>Error Restarting Web Analytics Service: {0}</value>
+  </data>
+  <data name="RestartAnalyticsErrorOnServer" xml:space="preserve">
+    <value>Error Restarting Web Analytics Service on '{0}': {1}</value>
+  </data>
+  <data name="RestartAnalyticsNotRunning" xml:space="preserve">
+    <value>Web Analytics Service Is Not Started, Cannot Restart.</value>
+  </data>
+  <data name="RestartAnalyticsNotRunningOnServer" xml:space="preserve">
+    <value>Web Analytics Service Is Not Started on '{0}', Cannot Restart.</value>
+  </data>
+  <data name="RestartForefrontError" xml:space="preserve">
+    <value>Error Restarting Forefront Indentity Manager Service: {0}</value>
+  </data>
+  <data name="RestartForefrontErrorOnServer" xml:space="preserve">
+    <value>Error Restarting Forefront Indentity Manager Service '{0}': {1}</value>
+  </data>
+  <data name="RestartForefrontNotRunning" xml:space="preserve">
+    <value>Forefront Identity Manager Service is Not Running, Cannot Restart.</value>
+  </data>
+  <data name="RestartForefrontNotRunningOnServer" xml:space="preserve">
+    <value>Forefront Identity Manager Service is Not Running '{0}', Cannot Restart.</value>
+  </data>
+  <data name="RestartServicesError" xml:space="preserve">
+    <value>Error Restarting Services: {0}</value>
+  </data>
+  <data name="RestartServicesException" xml:space="preserve">
+    <value>An error has occurred while restarting SharePoint services: {0}</value>
+  </data>
+  <data name="RestartServicesExceptionOn" xml:space="preserve">
+    <value>An error has occurred while restarting SharePoint services: {0} - {1}</value>
+  </data>
+  <data name="RestartServicesMissingSolution" xml:space="preserve">
+    <value>Unable to restart SharePoint services, NewsGator.Install.Jobs.wsp is not deployed to the SharePoint farm.</value>
+  </data>
+  <data name="SecurityReportDatabaseError" xml:space="preserve">
+    <value>Error Setting Security on Report Database: {0}</value>
+  </data>
+  <data name="SecuritySocialDatabaseError" xml:space="preserve">
+    <value>Error Setting Security on Social Database: {0}</value>
+  </data>
+  <data name="ServiceApplicationAlreadyExists" xml:space="preserve">
+    <value>Service Application Already Exists, Doing Nothing.</value>
+  </data>
+  <data name="ServiceApplicationPoolError" xml:space="preserve">
+    <value>Error Getting or Creating Service Application Pool: {0}</value>
+  </data>
+  <data name="SetupIsNull" xml:space="preserve">
+    <value>Setup Is Null</value>
+  </data>
+  <data name="SharePointNotInstalledMessage" xml:space="preserve">
+    <value>The Microsoft SharePoint assemblies could not be located.  Microsoft SharePoint Server is not installed or the current installation may have been corrupted.</value>
+  </data>
+  <data name="SocialDatabaseUpgradeError" xml:space="preserve">
+    <value>Error upgrading social database: {0}</value>
+  </data>
+  <data name="SolutionAddException" xml:space="preserve">
+    <value>An error has occurred while adding solution: {0} - {1}</value>
+  </data>
+  <data name="SolutionAddTimeout" xml:space="preserve">
+    <value>Adding solution timed out, the solution may need to be added manually: {0}</value>
+  </data>
+  <data name="SolutionAlreadyAddedToFarm" xml:space="preserve">
+    <value>Solution already exists on the farm: {0}</value>
+  </data>
+  <data name="SolutionAlreadyDeployed" xml:space="preserve">
+    <value>Solution already deployed to the farm: {0}</value>
+  </data>
+  <data name="SolutionAlreadyExists" xml:space="preserve">
+    <value>Solution Already Exists on Farm, Doing Nothing: {0}</value>
+  </data>
+  <data name="SolutionDeployException" xml:space="preserve">
+    <value>An error has occurred while deploying solution: {0} - {1}</value>
+  </data>
+  <data name="SolutionDeploymentJobTimeout" xml:space="preserve">
+    <value>Solution has not been successfully deployed or updated: {0} \r\nLast Operation: {1} \r\n{2}</value>
+  </data>
+  <data name="SolutionJobTimeout" xml:space="preserve">
+    <value>Solution deployment, update, or retraction job has taken longer than 20 minutes, aborting: {0}</value>
+  </data>
+  <data name="SolutionManifestCheckError" xml:space="preserve">
+    <value>Error Checking Solution Manifest Version for '{0}': {1}</value>
+  </data>
+  <data name="SolutionMissingFormat" xml:space="preserve">
+    <value>{0}; </value>
+  </data>
+  <data name="SolutionNotAddedToFarm" xml:space="preserve">
+    <value>Solution does not exist on the farm: {0}</value>
+  </data>
+  <data name="SolutionNotDeployed" xml:space="preserve">
+    <value>Solution did not deploy or update successfully, manually deployment may be required: {0}</value>
+  </data>
+  <data name="SolutionNotDeployedDetails" xml:space="preserve">
+    <value>{0} \r\nLast Operation Result: \r\n{1} \r\nLast Operation Details: \r\n{2}</value>
+  </data>
+  <data name="SolutionRemoveException" xml:space="preserve">
+    <value>An error has occurred while removing solution: {0} - {1}</value>
+  </data>
+  <data name="SolutionRemoveStillDeployed" xml:space="preserve">
+    <value>Solution is deployed, it cannot be removed until it has been retracted: {0}</value>
+  </data>
+  <data name="SolutionRemoveTimeout" xml:space="preserve">
+    <value>Removing solution timed out, the solution may need to be removed manually: {0}</value>
+  </data>
+  <data name="TimerServiceError" xml:space="preserve">
+    <value>The SharePoint Timer Service Is Not Running on {0}</value>
+  </data>
+  <data name="TimerServiceMissingOnServerError" xml:space="preserve">
+    <value>The SharePoint Timer Service Is Missing on {0}.</value>
+  </data>
+  <data name="TimerServiceRestartError" xml:space="preserve">
+    <value>This SharePoint Timer Service Failed To Restart on {0}: {1}</value>
+  </data>
+  <data name="UnableToAddEntryToLogFile" xml:space="preserve">
+    <value>Unable to Add Entry to Log File: {0}</value>
+  </data>
+  <data name="UnableToCreateServiceAppPool" xml:space="preserve">
+    <value>Unable to Create Service Application Pool '{0}': {1}</value>
+  </data>
+  <data name="UnableToDeserializeSolutionsList" xml:space="preserve">
+    <value>Unable to Deserialize List of Solutions Installed, All Feature Solutions Will be Updated.</value>
+  </data>
+  <data name="UnableToParseConfiguration" xml:space="preserve">
+    <value>Unable to parse imported Social Sites Configuration: {0}</value>
+  </data>
+  <data name="UnableToSerializeSolutionsList" xml:space="preserve">
+    <value>Unable to Serialize List of Solutions Installed, All Feature Solutions Will be Updated.</value>
+  </data>
+  <data name="UnhandledException" xml:space="preserve">
+    <value>An unhandled exception has occurred.</value>
+  </data>
+  <data name="UnhandledExceptionNoInnerException" xml:space="preserve">
+    <value>An unhandled exception has occurred, no exception details provided.</value>
+  </data>
+  <data name="UpdateFeatureSiteLockedError" xml:space="preserve">
+    <value>Unable to Update Sitrion Social Features for Locked Site: '{0}' </value>
+  </data>
+  <data name="UpdateFeaturesTimeout" xml:space="preserve">
+    <value>Updating features has taken longer than 30 minutes, aborting.  The Update-SocialSitesFeatures Cmdlet may be run from the Sitrion Social Management Shell to complete the feature upgrade process.</value>
+  </data>
+  <data name="UpdateServiceApplicationsTimeout" xml:space="preserve">
+    <value>Updating Service Application has taken longer than 30 minutes, aborting.  Run database scripts from Central Administration to complete the upgrade process.</value>
+  </data>
+  <data name="UpdatingFeatureError" xml:space="preserve">
+    <value>Error updating feature '{0}' ({1}): {2}</value>
+  </data>
+  <data name="UpgradeFeatureOrphanedSiteVerbose" xml:space="preserve">
+    <value>Skipping Update for Features on Orphaned Site '{0}'.</value>
+  </data>
+  <data name="UpgradeFeatureSiteAccessError" xml:space="preserve">
+    <value>Unable to Update Features on Site Collection '{0}', User Does Not Have Access: {1}.</value>
+  </data>
+  <data name="UpgradingFeatureError" xml:space="preserve">
+    <value>An error occurred trying to upgrade feature '{0}': {1}</value>
+  </data>
+  <data name="UserProfileServiceApplicationNotFound" xml:space="preserve">
+    <value>Unable to Locate User Profile Service Application: {0}</value>
+  </data>
+  <data name="WarningRemovingServiceApplicationTypeMissing" xml:space="preserve">
+    <value>Could not locate the type for the {0}, either the solutions for the service application are not installed or the current installation has been corrupted.  If the service application exists, manual removal may be required. </value>
+  </data>
+  <data name="WebAppCopyAppBinException" xml:space="preserve">
+    <value>An error has occurred while copying application bin content: {0}</value>
+  </data>
+  <data name="WebAppCopyAppBinExceptionOn" xml:space="preserve">
+    <value>An error has occurred while copying application bin content on {0}: {1}</value>
+  </data>
+  <data name="WebAppDisableException" xml:space="preserve">
+    <value>An error has occurred while disabling web applications: {0}</value>
+  </data>
+  <data name="WebAppDisableExceptionOn" xml:space="preserve">
+    <value>An error has occurred while disabling web applications on {0}: {1}</value>
+  </data>
+  <data name="WebAppEnableException" xml:space="preserve">
+    <value>An error has occurred while enabling web applications: {0}</value>
+  </data>
+  <data name="WebAppEnableExceptionOn" xml:space="preserve">
+    <value>An error has occurred while enabling web applications on {0}: {1}</value>
+  </data>
+  <data name="WebAppEnsureException" xml:space="preserve">
+    <value>An error has occurred while ensuring web application pools: {0}</value>
+  </data>
+  <data name="WebAppEnsureExceptionOn" xml:space="preserve">
+    <value>An error has occurred while ensuring web application pools on {0}: {1}</value>
+  </data>
+  <data name="WebApplicationError" xml:space="preserve">
+    <value>An error has occurred trying to connect to the following Web Application: {0}</value>
+  </data>
+  <data name="ErrorDisablingFeatureSite" xml:space="preserve">
+    <value>Error Disabling Feature '{0}' on Site Collection '{1}': {2}</value>
+  </data>
+  <data name="ErrorDisablingFeatureWeb" xml:space="preserve">
+    <value>Error Disabling Feature '{0}' on Site '{1}': {2}</value>
+  </data>
+  <data name="DisableFeaturesException" xml:space="preserve">
+    <value>An error has occurred while disabling features: {0}</value>
+  </data>
+  <data name="DisableJobsException" xml:space="preserve">
+    <value>An error has occurred while disabling jobs: {0}</value>
+  </data>
+  <data name="DisableUserProfileJobException" xml:space="preserve">
+    <value>An error has occurred while disabling user profile job: {0}</value>
+  </data>
+  <data name="EnableJobsException" xml:space="preserve">
+    <value>An error has occurred while enabling jobs: {0}</value>
+  </data>
+  <data name="EnableUserProfileJobException" xml:space="preserve">
+    <value>An error has occurred while enabling user profile job: {0}</value>
+  </data>
+  <data name="MySiteEnableLookoutException" xml:space="preserve">
+    <value>An error has occurred while enabling Lookout on the My Site host: {0}</value>
+  </data>
+  <data name="MySiteNewsFeedPageException" xml:space="preserve">
+    <value>An error has occurred while replacing web parts on the My Site Newsfeed page: {0}</value>
+  </data>
+  <data name="MySiteSetLookoutHomePageException" xml:space="preserve">
+    <value>An error has occurred while setting Lookout as the home page of the My Site host: {0}</value>
+  </data>
+  <data name="MySiteWebPartsException" xml:space="preserve">
+    <value>An error has occurred while enabling Social Sites web parts on the My Site host: {0}</value>
+  </data>
+  <data name="ProvisionServiceApplicationException" xml:space="preserve">
+    <value>An error has occurred while provisioning service application: {0}</value>
+  </data>
+  <data name="RemoveServiceApplicationException" xml:space="preserve">
+    <value>An error has occurred while removing service application: {0}</value>
+  </data>
+  <data name="UpdateFeaturesException" xml:space="preserve">
+    <value>An error has occurred while updating features: {0}</value>
+  </data>
+  <data name="UpdateRegistryException" xml:space="preserve">
+    <value>An error has occurred while updating the registry keys for the just-in-time debugger: {0}</value>
+  </data>
+  <data name="UpdateServiceApplicationException" xml:space="preserve">
+    <value>An error has occurred while updating service application: {0}</value>
+  </data>
+  <data name="ReactivateFeaturesException" xml:space="preserve">
+    <value>An error has occurred while reactivating features: {0}</value>
+  </data>
+  <data name="RemoveOrphanedFeaturesException" xml:space="preserve">
+    <value>An error has occurred while trying to remove orphaned features: {0}</value>
+  </data>
+  <data name="RunspaceNoOutput" xml:space="preserve">
+    <value>No output received from runspace.</value>
+  </data>
+  <data name="RunspaceUnexpectedOutput" xml:space="preserve">
+    <value>Unexpected output received from runspace: {0}</value>
+  </data>
+  <data name="ExecuteAdminJobsException" xml:space="preserve">
+    <value>An error has occurred while executing SharePoint Admin service jobs: {0}</value>
+  </data>
+  <data name="ExecuteAdminJobsExceptionOn" xml:space="preserve">
+    <value>An error has occurred while executing SharePoint Admin service jobs on {0}: {1}</value>
+  </data>
+  <data name="TimerJobException" xml:space="preserve">
+    <value>An error has occurred while trying to execute timer job: {0}</value>
+  </data>
+  <data name="TimerJobExceptionOn" xml:space="preserve">
+    <value>An error has occurred while trying to execute timer job: {0} - {1}</value>
+  </data>
+  <data name="ExecuteTimerRecycleJobException" xml:space="preserve">
+    <value>An error has occurred while executing SharePoint Timer Service Recycle job: {0}</value>
+  </data>
+  <data name="ExecuteTimerRecycleJobExceptionOn" xml:space="preserve">
+    <value>An error has occurred while executing SharePoint Timer Service Recycle job on {0}: {1}</value>
+  </data>
+  <data name="JobsNotFoundException" xml:space="preserve">
+    <value>The job could not be found on the farm.</value>
+  </data>
+  <data name="DisableFarmCacheException" xml:space="preserve">
+    <value>An error has occurred trying to disable farm object caching: {0}</value>
+  </data>
+  <data name="EnableFarmCacheException" xml:space="preserve">
+    <value>An error has occurred trying to enable farm object caching: {0}</value>
+  </data>
+  <data name="ExceptionRunningCommandOn" xml:space="preserve">
+    <value>An error has occurred starting '{0}' on '{1}': {2}</value>
+  </data>
+  <data name="UpdateNewsManagerObjectsException" xml:space="preserve">
+    <value>An error has occurred trying to update News Stream objects: {0}</value>
+  </data>
+  <data name="SPFarmException" xml:space="preserve">
+    <value>Could not load the local SharePoint farm configuration: {0}</value>
+  </data>
+  <data name="ErrorFixingSearchFeature" xml:space="preserve">
+    <value>An error has occurred trying to initialize features: {0}</value>
+  </data>
+  <data name="ErrorReactivatingFeatures" xml:space="preserve">
+    <value>An error has occurred trying to reactivate features: {0}</value>
+  </data>
+  <data name="VersionCheckCanadaModuleDoesntMatch" xml:space="preserve">
+    <value>Solutions for the Video, Enrich, and Innovation modules must be the same version.  One or more of the solutions for these modules do not match the other solutions.</value>
+  </data>
+  <data name="VersionCheckModuleDoesntMatchCore" xml:space="preserve">
+    <value>Solutions for the '{0}' module do not match the version of the core (e.g. NewsGator.Core.wsp) solutions.  Solutions for the News Manager, Spotlight, and Ideas modules must match the full build version of the core solutions (e.g. 4.5.100).  Solutions for the Video, Enrich, and Innovation modules must match the major and minor version of the core solutions (e.g. 4.5).</value>
+  </data>
+  <data name="VersionCheckUnableToFindCaCore" xml:space="preserve">
+    <value>Unable to identify version of the NewsGator.CA.CommonAssemblies.App.wsp solution.</value>
+  </data>
+  <data name="VersionCheckUnableToFindCore" xml:space="preserve">
+    <value>Unable to identify version of the NewsGator.Core.wsp solution.</value>
+  </data>
+  <data name="ErrorUpdatingFeature" xml:space="preserve">
+    <value>Error updating feature {0}</value>
+  </data>
+</root>
