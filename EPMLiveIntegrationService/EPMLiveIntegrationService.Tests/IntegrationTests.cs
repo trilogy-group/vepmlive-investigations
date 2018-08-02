@@ -101,7 +101,7 @@ namespace EPMLiveIntegrationService.Tests
             InvokeMethod(service, "iDeleteItem", new object[] { new ShimSPWebApplication().Instance, string.Empty, string.Empty });
 
             //Assert
-            Assert.AreEqual(2, disposeCommandWasCalled);
+            Assert.AreEqual(3, disposeCommandWasCalled);
         }
 
         [TestMethod]
