@@ -1283,118 +1283,59 @@ namespace EPMLiveCore.API
             catch (Exception ex) { throw ex; }
         }
 
-        public static string GetTeam(string queryDoc, SPWeb oWeb)
+        public static string GetTeam(string queryDocumentXml, SPWeb oWeb)
         {
             try
             {
-                string filterfield = "";
-                string filterval = "";
+                var filterField = string.Empty;
+                var filterValue = string.Empty;
                 ArrayList columns = null;
-                Guid webid = Guid.Empty;
-                Guid listid = Guid.Empty;
-                int itemid = 0;
+                var webId = Guid.Empty;
+                var listId = Guid.Empty;
+                var itemId = 0;
                 string currentteam = null;
                 SPList list = null;
-                bool bUseTeam = false;
+                var useTeam = false;
 
-                if (queryDoc != "")
+                ReadGetTeamQuerySettingsFromXml(
+                    queryDocumentXml, 
+                    ref filterField, 
+                    ref filterValue, 
+                    ref columns, 
+                    ref webId, 
+                    ref listId, 
+                    ref itemId, 
+                    ref currentteam);
+
+                var doc = new XmlDocument();
+                if (webId != Guid.Empty)
                 {
+                    SPWeb web = oWeb.Site.OpenWeb(webId);
                     try
                     {
-                        XmlDocument docQuery = new XmlDocument();
-                        docQuery.LoadXml(queryDoc);
-
-                        try
-                        {
-                            if (docQuery.FirstChild.Attributes["CurrentTeam"] != null)
-                                currentteam = docQuery.FirstChild.Attributes["CurrentTeam"].Value;
-                        }
-                        catch { }
-                        try
-                        {
-                            if (docQuery.FirstChild.Attributes["WebId"] != null)
-                                webid = new Guid(docQuery.FirstChild.Attributes["WebId"].Value);
-                        }
-                        catch { }
-                        try
-                        {
-                            if (docQuery.FirstChild.Attributes["ListId"] != null)
-                                listid = new Guid(docQuery.FirstChild.Attributes["ListId"].Value);
-                        }
-                        catch { }
-                        try
-                        {
-                            if (docQuery.FirstChild.Attributes["ItemId"] != null)
-                                itemid = int.Parse(docQuery.FirstChild.Attributes["ItemId"].Value);
-                        }
-                        catch { }
-
-                        try
-                        {
-                            if (docQuery.FirstChild.Attributes["Column"] != null && docQuery.FirstChild.Attributes["Value"] != null)
-                            {
-                                filterfield = docQuery.FirstChild.Attributes["Column"].Value;
-                                filterval = docQuery.FirstChild.Attributes["Value"].Value;
-                            }
-                        }
-                        catch { }
-
-                        try
-                        {
-                            XmlNode ndCols = docQuery.FirstChild.SelectSingleNode("//Columns");
-                            if (ndCols != null)
-                            {
-                                columns = new ArrayList();
-
-                                if (ndCols.InnerText != "")
-                                {
-                                    string[] cols = ndCols.InnerText.Split(',');
-                                    foreach (string col in cols)
-                                    {
-                                        columns.Add(col);
-                                    }
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-                    catch { }
-
-
-                }
-
-                XmlDocument doc = new XmlDocument();
-
-
-
-                if (webid != Guid.Empty)
-                {
-                    SPWeb web = oWeb.Site.OpenWeb(webid);
-                    try
-                    {
-                        if (listid != Guid.Empty)
+                        if (listId != Guid.Empty)
                         {
                             try
                             {
-                                list = web.Lists[listid];
+                                list = web.Lists[listId];
                                 GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                                bUseTeam = gSettings.BuildTeam;
+                                useTeam = gSettings.BuildTeam;
                             }
                             catch (Exception ex)
                             {
                                 //EPML-5575:need to re-initialize these variables in case of Item level workspace created using Project/Collaborative workspace template
-                                listid = Guid.Empty;
-                                itemid = 0;
+                                listId = Guid.Empty;
+                                itemId = 0;
                                 LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
                             }
                         }
 
                         try
                         {
-                            if (listid == Guid.Empty && itemid == 0)
+                            if (listId == Guid.Empty && itemId == 0)
                             {
-                                APITeam.VerifyProjectTeamWorkspace(web, out itemid, out listid);
-                                if (itemid > 0 && listid != Guid.Empty)
+                                APITeam.VerifyProjectTeamWorkspace(web, out itemId, out listId);
+                                if (itemId > 0 && listId != Guid.Empty)
                                 {
                                     try
                                     {
@@ -1405,9 +1346,9 @@ namespace EPMLiveCore.API
                                             web = web.ParentWeb;
                                         }
 
-                                        list = web.Lists[listid];
+                                        list = web.Lists[listId];
                                         GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                                        bUseTeam = gSettings.BuildTeam;
+                                        useTeam = gSettings.BuildTeam;
                                     }
                                     catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                                 }
@@ -1417,15 +1358,15 @@ namespace EPMLiveCore.API
 
                         if (currentteam != null)
                         {
-                            doc = GetTeamFromCurrent(web, filterfield, filterval, columns, currentteam);
+                            doc = GetTeamFromCurrent(web, filterField, filterValue, columns, currentteam);
                         }
-                        else if (listid != Guid.Empty && bUseTeam)
+                        else if (listId != Guid.Empty && useTeam)
                         {
-                            doc = GetTeamFromListItem(web, filterfield, filterval, columns, listid, itemid);
+                            doc = GetTeamFromListItem(web, filterField, filterValue, columns, listId, itemId);
                         }
                         else
                         {
-                            doc = GetTeamFromWeb(web, filterfield, filterval, columns);
+                            doc = GetTeamFromWeb(web, filterField, filterValue, columns);
                         }
                     }
                     catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
@@ -1433,24 +1374,24 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    if (listid != Guid.Empty)
+                    if (listId != Guid.Empty)
                     {
-                        list = oWeb.Lists[listid];
+                        list = oWeb.Lists[listId];
                         GridGanttSettings gSettings = new GridGanttSettings(list);
-                        bUseTeam = gSettings.BuildTeam;
+                        useTeam = gSettings.BuildTeam;
                     }
 
                     if (currentteam != null)
                     {
-                        doc = GetTeamFromCurrent(oWeb, filterfield, filterval, columns, currentteam);
+                        doc = GetTeamFromCurrent(oWeb, filterField, filterValue, columns, currentteam);
                     }
-                    else if (listid != Guid.Empty && bUseTeam)
+                    else if (listId != Guid.Empty && useTeam)
                     {
-                        doc = GetTeamFromListItem(oWeb, filterfield, filterval, columns, listid, itemid);
+                        doc = GetTeamFromListItem(oWeb, filterField, filterValue, columns, listId, itemId);
                     }
                     else
                     {
-                        doc = GetTeamFromWeb(oWeb, filterfield, filterval, columns);
+                        doc = GetTeamFromWeb(oWeb, filterField, filterValue, columns);
                     }
                 }
 
@@ -1460,6 +1401,77 @@ namespace EPMLiveCore.API
             {
                 LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
                 throw new APIException(3010, "Error in Get Team: " + ex.Message);
+            }
+        }
+
+        private static void ReadGetTeamQuerySettingsFromXml(string queryDocumentXml, ref string filterField, ref string filterValue, ref ArrayList columns, ref Guid webId, ref Guid listId, ref int itemId, ref string currentteam)
+        {
+            if (!string.IsNullOrWhiteSpace(queryDocumentXml))
+            {
+                var queryDocument = new XmlDocument();
+                try
+                {
+                    queryDocument.LoadXml(queryDocumentXml);
+                }
+                catch (Exception ex)
+                {
+                    queryDocument = null;
+                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                }
+
+                if (queryDocument != null)
+                {
+                    var documentRoot = queryDocument.FirstChild;
+                    if (documentRoot != null)
+                    {
+                        var currentItemAttribute = documentRoot.Attributes["CurrentTeam"];
+                        if (currentItemAttribute != null)
+                        {
+                            currentteam = currentItemAttribute.Value;
+                        }
+
+                        var webIdAttribute = documentRoot.Attributes["WebId"];
+                        if (webIdAttribute != null)
+                        {
+                            Guid.TryParse(webIdAttribute.Value, out webId);
+                        }
+
+                        var listIdAttribute = documentRoot.Attributes["ListId"];
+                        if (listIdAttribute != null)
+                        {
+                            Guid.TryParse(listIdAttribute.Value, out listId);
+                        }
+
+                        var itemIdAttribute = documentRoot.Attributes["ItemId"];
+                        if (itemIdAttribute != null)
+                        {
+                            int.TryParse(itemIdAttribute.Value, out itemId);
+                        }
+
+                        var columnAttribute = documentRoot.Attributes["Column"];
+                        var valueAttribute = documentRoot.Attributes["Value"];
+                        if (columnAttribute != null && valueAttribute != null)
+                        {
+                            filterField = columnAttribute.Value;
+                            filterValue = valueAttribute.Value;
+                        }
+
+                        var columnsNode = documentRoot.SelectSingleNode("//Columns");
+                        if (columnsNode != null)
+                        {
+                            columns = new ArrayList();
+
+                            if (!string.IsNullOrEmpty(columnsNode.InnerText))
+                            {
+                                var columnsSplit = columnsNode.InnerText.Split(',');
+                                foreach (var column in columnsSplit)
+                                {
+                                    columns.Add(column);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
