@@ -268,27 +268,27 @@ namespace EPMLiveIntegrationService
                 }
 
                 ret = "<Error>Invalid Key</Error>";
-
-                var commmand = new SqlCommand("SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey", connection);
-                commmand.Parameters.AddWithValue("@ip", ip);
-                commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
-
                 var found = false;
-
-                var reader = commmand.ExecuteReader();
-                if (reader.Read())
+                var sql = "SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey";
+                using (var commmand = new SqlCommand(sql, connection))
                 {
-                    found = true;
+                    commmand.Parameters.AddWithValue("@ip", ip);
+                    commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
+
+                    var reader = commmand.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        found = true;
+                    }
+                    reader.Close();
                 }
-                reader.Close();
 
                 if (!found)
                 {
-                    commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection);
+                    var commmand = new SqlCommand("INSERT INTO INT_IP (IP,intkey) VALUES (@ip,@intkey)", connection);
                     commmand.Parameters.AddWithValue("@ip", ip);
                     commmand.Parameters.AddWithValue("@intkey", IntegrationKey);
                     commmand.ExecuteNonQuery();
-
                 }
             }
             else
