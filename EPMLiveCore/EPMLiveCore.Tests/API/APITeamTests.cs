@@ -69,6 +69,7 @@ namespace EPMLiveCore.API.Tests
 
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
+
         }
 
         [TestCleanup]

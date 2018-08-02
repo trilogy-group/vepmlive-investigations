@@ -1062,15 +1062,21 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getCustomFields(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getCustomFields(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
 
             web.Close();
         }
+
         private CustomField[] getCustomFields(string listName, int visibleCol, string projectServerURL)
         {
             ArrayList arrCF = new ArrayList();
@@ -1082,7 +1088,6 @@ namespace EPMLiveEnterprise
 
             try
             {
-
                 SPSite psSite = new SPSite(projectServerURL);
                 Guid psSiteID = psSite.ID;
                 string scn = EPMLiveCore.CoreFunctions.getConnectionString(psSite.WebApplication.Id);
@@ -1096,88 +1101,96 @@ namespace EPMLiveEnterprise
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(scn);
-                    cn.Open();
-
-                    //Read Standard and Custom Fields
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM CUSTOMFIELDS WHERE fieldcategory = 1 OR fieldcategory=2 or fieldcategory=3", cn);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    while (dr.Read())
+                    using (var connection = new SqlConnection(scn))
                     {
-                        CustomField cf = new CustomField();
-                        cf.displayName = dr.GetString(2);
-                        cf.editable = dr.GetBoolean(1);
-                        cf.fieldCategory = dr.GetInt32(3);
-                        cf.locked = dr.GetBoolean(visibleCol);
-                        cf.visible = dr.GetBoolean(visibleCol);
-                        cf.wssFieldName = dr.GetString(4);
-                        cf.fieldType = getFieldType(dr.GetString(7));
+                        connection.Open();
 
-                        if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                        //Read Standard and Custom Fields
+                        using (var command = new SqlCommand(
+                            "SELECT * FROM CUSTOMFIELDS WHERE fieldcategory = 1 OR fieldcategory=2 or fieldcategory=3",
+                            connection))
                         {
-                            cf.visible = true;
-                            if (hshCurFields[cf.wssFieldName] == null)
-                                cf.editable = true;
-                            else
-                                cf.editable = (bool)hshCurFields[cf.wssFieldName];
-                        }
-
-                        arrCF.Add(cf);
-
-                        hshDBFields.Add(cf.wssFieldName, "");
-                    }
-                    dr.Close();
-
-                    //Read Enterprise Fields
-                    WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
-                    svcCF.Url = projectServerURL + "/_vti_bin/psi/customfields.asmx";
-                    svcCF.UseDefaultCredentials = true;
-                    WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
-
-                    dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-
-                    for (int i = 0; i < dsF.CustomFields.Count; i++)
-                    {
-                        WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
-
-                        string wssField = "ENT" + customField.MD_PROP_ID.ToString();
-
-                        if (!hshDBFields.Contains(wssField))
-                        {
-                            CustomField cf = new CustomField();
-                            cf.displayName = customField.MD_PROP_NAME;
-                            cf.editable = false;
-                            cf.fieldCategory = 3;
-                            cf.locked = false;
-                            cf.visible = false;
-                            cf.wssFieldName = wssField;
-
-                            if (customField.IsMD_LOOKUP_TABLE_UIDNull())
-                                cf.fieldType = getFieldTypeFromCF(((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString());
-                            else
-                                cf.fieldType = SPFieldType.Choice;
-
-                            if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                            using (var dataReader = command.ExecuteReader())
                             {
-                                cf.visible = true;
-                                cf.editable = (bool)hshCurFields[cf.wssFieldName];
-                            }
+                                while (dataReader.Read())
+                                {
+                                    CustomField cf = new CustomField();
+                                    cf.displayName = dataReader.GetString(2);
+                                    cf.editable = dataReader.GetBoolean(1);
+                                    cf.fieldCategory = dataReader.GetInt32(3);
+                                    cf.locked = dataReader.GetBoolean(visibleCol);
+                                    cf.visible = dataReader.GetBoolean(visibleCol);
+                                    cf.wssFieldName = dataReader.GetString(4);
+                                    cf.fieldType = getFieldType(dataReader.GetString(7));
 
-                            arrCF.Add(cf);
+                                    if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                                    {
+                                        cf.visible = true;
+                                        if (hshCurFields[cf.wssFieldName] == null)
+                                            cf.editable = true;
+                                        else
+                                            cf.editable = (bool)hshCurFields[cf.wssFieldName];
+                                    }
+
+                                    arrCF.Add(cf);
+
+                                    hshDBFields.Add(cf.wssFieldName, "");
+                                }
+                            }
+                        }
+
+                        //Read Enterprise Fields
+                        WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
+                        svcCF.Url = projectServerURL + "/_vti_bin/psi/customfields.asmx";
+                        svcCF.UseDefaultCredentials = true;
+                        WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
+
+                        dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+
+                        for (int i = 0; i < dsF.CustomFields.Count; i++)
+                        {
+                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+
+                            string wssField = "ENT" + customField.MD_PROP_ID.ToString();
+
+                            if (!hshDBFields.Contains(wssField))
+                            {
+                                CustomField cf = new CustomField();
+                                cf.displayName = customField.MD_PROP_NAME;
+                                cf.editable = false;
+                                cf.fieldCategory = 3;
+                                cf.locked = false;
+                                cf.visible = false;
+                                cf.wssFieldName = wssField;
+
+                                if (customField.IsMD_LOOKUP_TABLE_UIDNull())
+                                    cf.fieldType = getFieldTypeFromCF(((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString());
+                                else
+                                    cf.fieldType = SPFieldType.Choice;
+
+                                if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                                {
+                                    cf.visible = true;
+                                    cf.editable = (bool)hshCurFields[cf.wssFieldName];
+                                }
+
+                                arrCF.Add(cf);
+                            }
                         }
                     }
-                    cn.Close();
                 });
-
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getCustomFields(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getCustomFields(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
 
@@ -1193,8 +1206,6 @@ namespace EPMLiveEnterprise
 
             return cfs;
         }
-
-        
 
         private SPFieldType getFieldTypeFromCF(string fieldType)
         {
@@ -1279,13 +1290,19 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllTaskEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllTaskEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
 
             return ret;
         }
+
         [WebMethod]
         public string[] getAllProjectEnterpriseFieldList()
         {
@@ -1326,12 +1343,18 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllProjectEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllProjectEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
             return ret;
         }
+
         [WebMethod]
         public bool publish(Guid projectUid, int pubType, string url)
         {
