@@ -462,6 +462,38 @@ namespace EPMLiveCore.API.Tests
             Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
             Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
         }
+
+        [TestMethod]
+        public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_CommandCreatedAndDisposed()
+        {
+            // Arrange
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_webShim.Instance.ID}'";
+            int itemId;
+            Guid listId;
+
+            // Act
+            APITeam.VerifyProjectTeamWorkspace(_webShim, out itemId, out listId);
+
+            // Assert
+            Assert.IsTrue(_adoShims.CommandsCreated.Any(pred => pred.CommandText == sql));
+            Assert.IsTrue(_adoShims.CommandsDisposed.Any(pred => pred.CommandText == sql));
+        }
+
+        [TestMethod]
+        public void VerifyProjectTeamWorkspace_EPMDataAndConnectionInitialized_DataAdapterCreatedAndDisposed()
+        {
+            // Arrange
+            var sql = $"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{_webShim.Instance.ID}'";
+            int itemId;
+            Guid listId;
+
+            // Act
+            APITeam.VerifyProjectTeamWorkspace(_webShim, out itemId, out listId);
+
+            // Assert
+            Assert.IsTrue(_adoShims.DataAdaptersCreated.Any(pred => pred.Key.CommandText == sql));
+            Assert.IsTrue(_adoShims.DataAdaptersDisposed.Any(pred => pred.Key.CommandText == sql));
+        }
     }
 
     public class TestGroupEnumerator : IEnumerator

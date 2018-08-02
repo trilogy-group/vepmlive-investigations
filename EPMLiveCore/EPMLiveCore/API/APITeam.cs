@@ -2686,21 +2686,30 @@ namespace EPMLiveCore.API
 
             try
             {
-                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
+                var data = new ReportHelper.EPMData(web.Site.ID);
 
-                SqlConnection cn = data.GetClientReportingConnection;
-                SqlCommand cmd = new SqlCommand("SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '" + web.ID.ToString() + "'", cn);
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
+                // (CC-75654, 2018-07-31) Not sure if connection must be disposed, or it is reused somewhere. Refraining from disposing.
+                var connection = data.GetClientReportingConnection;
 
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                var rptWebDataSet = new DataSet();
+                using (var command = new SqlCommand($"SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '{web.ID}'", connection))
                 {
-                    itemId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
-                    listId = new Guid(Convert.ToString(ds.Tables[0].Rows[0][1]));
+                    using (var dataAdapter = new SqlDataAdapter(command))
+                    {
+                        dataAdapter.Fill(rptWebDataSet);
+                    }
+                }
+
+                if (rptWebDataSet != null && rptWebDataSet.Tables[0].Rows.Count > 0)
+                {
+                    itemId = Convert.ToInt32(rptWebDataSet.Tables[0].Rows[0][0]);
+                    listId = new Guid(Convert.ToString(rptWebDataSet.Tables[0].Rows[0][1]));
                 }
             }
-            catch { }
+            catch(Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
         }
 
         private static bool IsProjectCenter(SPWeb web, Guid listId)
