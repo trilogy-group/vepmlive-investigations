@@ -507,48 +507,60 @@ namespace EPMLiveEnterprise
                     pds = pSvc.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                     string projectname = pds.Project[0].PROJ_NAME;
 
-                    SqlConnection cn = null;
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT transuid FROM publishercheck where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                        SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                        if (drPubCheck.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                            .getConnectionString(web.Site.WebApplication.Id)))
                         {
-                            Guid transuid = drPubCheck.GetGuid(0);
-                            drPubCheck.Close();
+                            connection.Open();
 
-                            SPList list = web.Lists["Task Center"];
+                            using (var command = new SqlCommand(
+                                "SELECT transuid FROM publishercheck where projectguid=@projectguid",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@projectguid", projectGuid);
+                                using (var drPubCheck = command.ExecuteReader())
+                                {
+                                    if (drPubCheck.Read())
+                                    {
+                                        Guid transuid = drPubCheck.GetGuid(0);
+                                        drPubCheck.Close();
 
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
+                                        SPList list = web.Lists["Task Center"];
 
-                            if (list.GetItems(query).Count > 0)
-                                isUpdates = true;
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
 
+                                        if (list.GetItems(query).Count > 0)
+                                        {
+                                            isUpdates = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                        myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                        try
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
                         {
-                            cn.Close();
+                            myLog.WriteEntry(
+                                string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                                EventLogEntryType.Error,
+                                1000);
                         }
-                        catch { }
                     }
                 });
             }
             catch (Exception ex)
             {
-                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                {
+                    myLog.WriteEntry(
+                        string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        1000);
+                }
             }
             web.Close();
             return isUpdates;
@@ -558,43 +570,56 @@ namespace EPMLiveEnterprise
         {
             SPWeb web = SPContext.Current.Web;
             
-            SqlConnection cn = null;
+            SqlConnection connection = null;
             int pubType = 0;
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", connection))
                 {
-                    pubType = dr.GetInt32(0);
+                    cmd.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = cmd.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            pubType = dataReader.GetInt32(0);
+                        }
+                    }
                 }
-                dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                 EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                 myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            web.Close();
+            finally
+            {
+                connection?.Close();
+                web.Close();
+                connection?.Dispose();
+            }
             return pubType;
         }
+
         [WebMethod]
         public void setApprovedTasks(TaskApprovalItem[] taskItems, Guid projectGuid)
         {
             SPWeb psweb = SPContext.Current.Web;
 
-            SqlConnection cn = null;
+            SqlConnection connection = null;
 
             string url = getProjectSite(projectGuid);
 
@@ -603,66 +628,85 @@ namespace EPMLiveEnterprise
 
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var command = new SqlCommand(
+                    "SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid",
+                    connection))
                 {
-                    Guid transuid = dr.GetGuid(0);
-                    dr.Close();
-
-                    SPList list = web.Lists["Task Center"];
-
-                    foreach (TaskApprovalItem ta in taskItems)
+                    command.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        try
+                        if (dataReader.Read())
                         {
-                            SPListItem li = list.GetItemById(ta.listItemId);
-                            if(ta.approvalStatus == 2)
-                                li["Publisher_x0020_Approval_x0020_S"] = "Approved";
-                            else
-                                li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
-                            li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
-                            try
+                            Guid transuid = dataReader.GetGuid(0);
+                            dataReader.Close();
+
+                            SPList list = web.Lists["Task Center"];
+
+                            foreach (TaskApprovalItem ta in taskItems)
                             {
-                                li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                try
+                                {
+                                    SPListItem li = list.GetItemById(ta.listItemId);
+                                    if (ta.approvalStatus == 2)
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Approved";
+                                    else
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
+                                    li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
+                                    try
+                                    {
+                                        li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                    }
+                                    catch { }
+                                    li["transuid"] = transuid.ToString();
+                                    li.Update();
+                                }
+                                catch (Exception ex)
+                                {
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                    {
+                                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                                        {
+                                            myLog.WriteEntry(
+                                                string.Format("Error in setApprovedTasks() updating list item: {0}{1}", ex.Message, ex.StackTrace),
+                                                EventLogEntryType.Error,
+                                                1000);
+                                        }
+                                    });
+                                }
                             }
-                            catch { }
-                            li["transuid"] = transuid.ToString();
-                            li.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                            {
-                                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                                myLog.WriteEntry("Error in setApprovedTasks() updating list item: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-                            });
                         }
                     }
-
                 }
-                else
-                    dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            psweb.Close();
-            web.Close();
+            finally
+            {
+                connection?.Close();
+                psweb.Close();
+                web.Close();
+
+                connection?.Dispose();
+            }
         }
+
         [WebMethod]
         public UpdateTaskItem[] getUpdates(string projectGuid)
         {
