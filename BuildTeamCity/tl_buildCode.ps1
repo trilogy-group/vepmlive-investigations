@@ -85,7 +85,7 @@ $referencePath = $referencePath -replace ";","%3B"
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
 $projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projSSRSPath = Join-Path $SourcesDirectory "\EPMLiveNativeSSRSComponents\EPMLiveNativeSSRSComponents.sln"
-$projAUTPath = Join-Path $SourcesDirectory "EPMLive.AUT.Tests.sln"
+$projAUTPath = Join-Path $SourcesDirectory "\AUT\EPMLive.AUT.Tests.sln"
 
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
