@@ -85,6 +85,16 @@ namespace EPMLive.TestFakes.Utility
             return CommandsDisposed.Any(pred => pred.CommandText == commandText);
         }
 
+        public bool IsDataReaderCreatedForCommand(string commandText)
+        {
+            return DataReadersCreated.Any(pred => pred.Key.CommandText == commandText);
+        }
+
+        public bool IsDataReaderDisposedForCommand(string commandText)
+        {
+            return DataReadersDisposed.Any(pred => pred.Key.CommandText == commandText);
+        }
+
         private void InitializeStaticShims()
         {
             ShimEPMData.ConstructorGuid = (instance, siteId) => { };
