@@ -370,6 +370,35 @@ namespace PortfolioEngineCore.Analyzers
             }
         }
 
+        protected void CaptureBurnRates(IEnumerable<IPeriodData> periods)
+        {
+            if (periods == null)
+            {
+                throw new ArgumentNullException("periods");
+            }
+
+            int i = 0;
+            int periodOverlap = 0;
+
+            foreach (var period in periods)
+            {
+                ++i;
+                periodOverlap = CalculateOverlapLocal(Det_Start, Det_Finish, period.StartDate, period.FinishDate);
+
+                BurnDuration[i] = periodOverlap;
+                Burnrate[i] = bUseCosts
+                    ? zCost[i]
+                    : zValue[i];
+
+                if (Burnrate[i] != 0)
+                {
+                    Burnrate[i] = periodOverlap == 0 
+                        ? 0
+                        : Burnrate[i] / (double)periodOverlap;
+                }
+            }
+        }
+
         protected int CalculateOverlapLocal(DateTime dtBarStart, DateTime dtBarFinish, DateTime dtPeriodStart, DateTime dtPeriodFinish)
         {
             if (dtBarStart > dtPeriodFinish || dtBarFinish < dtPeriodStart)

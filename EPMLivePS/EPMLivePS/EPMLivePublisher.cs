@@ -507,48 +507,60 @@ namespace EPMLiveEnterprise
                     pds = pSvc.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
                     string projectname = pds.Project[0].PROJ_NAME;
 
-                    SqlConnection cn = null;
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT transuid FROM publishercheck where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                        SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                        if (drPubCheck.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                            .getConnectionString(web.Site.WebApplication.Id)))
                         {
-                            Guid transuid = drPubCheck.GetGuid(0);
-                            drPubCheck.Close();
+                            connection.Open();
 
-                            SPList list = web.Lists["Task Center"];
+                            using (var command = new SqlCommand(
+                                "SELECT transuid FROM publishercheck where projectguid=@projectguid",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@projectguid", projectGuid);
+                                using (var drPubCheck = command.ExecuteReader())
+                                {
+                                    if (drPubCheck.Read())
+                                    {
+                                        Guid transuid = drPubCheck.GetGuid(0);
+                                        drPubCheck.Close();
 
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
+                                        SPList list = web.Lists["Task Center"];
 
-                            if (list.GetItems(query).Count > 0)
-                                isUpdates = true;
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
 
+                                        if (list.GetItems(query).Count > 0)
+                                        {
+                                            isUpdates = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                        myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                        try
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
                         {
-                            cn.Close();
+                            myLog.WriteEntry(
+                                string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                                EventLogEntryType.Error,
+                                1000);
                         }
-                        catch { }
                     }
                 });
             }
             catch (Exception ex)
             {
-                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                myLog.WriteEntry("Error in isTaskUpdates(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                {
+                    myLog.WriteEntry(
+                        string.Format("Error in isTaskUpdates(): {0}{1}", ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        1000);
+                }
             }
             web.Close();
             return isUpdates;
@@ -558,43 +570,56 @@ namespace EPMLiveEnterprise
         {
             SPWeb web = SPContext.Current.Web;
             
-            SqlConnection cn = null;
+            SqlConnection connection = null;
             int pubType = 0;
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var cmd = new SqlCommand("SELECT pubtype from PUBLISHERCHECK where projectguid=@projectguid", connection))
                 {
-                    pubType = dr.GetInt32(0);
+                    cmd.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = cmd.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            pubType = dataReader.GetInt32(0);
+                        }
+                    }
                 }
-                dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                 EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                 myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            web.Close();
+            finally
+            {
+                connection?.Close();
+                web.Close();
+                connection?.Dispose();
+            }
             return pubType;
         }
+
         [WebMethod]
         public void setApprovedTasks(TaskApprovalItem[] taskItems, Guid projectGuid)
         {
             SPWeb psweb = SPContext.Current.Web;
 
-            SqlConnection cn = null;
+            SqlConnection connection = null;
 
             string url = getProjectSite(projectGuid);
 
@@ -603,66 +628,85 @@ namespace EPMLiveEnterprise
 
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
-                    cn.Open();
+                    connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
+                    connection.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid", cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var command = new SqlCommand(
+                    "SELECT transuid from PUBLISHERCHECK where projectguid=@projectguid",
+                    connection))
                 {
-                    Guid transuid = dr.GetGuid(0);
-                    dr.Close();
-
-                    SPList list = web.Lists["Task Center"];
-
-                    foreach (TaskApprovalItem ta in taskItems)
+                    command.Parameters.AddWithValue("@projectguid", projectGuid);
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        try
+                        if (dataReader.Read())
                         {
-                            SPListItem li = list.GetItemById(ta.listItemId);
-                            if(ta.approvalStatus == 2)
-                                li["Publisher_x0020_Approval_x0020_S"] = "Approved";
-                            else
-                                li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
-                            li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
-                            try
+                            Guid transuid = dataReader.GetGuid(0);
+                            dataReader.Close();
+
+                            SPList list = web.Lists["Task Center"];
+
+                            foreach (TaskApprovalItem ta in taskItems)
                             {
-                                li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                try
+                                {
+                                    SPListItem li = list.GetItemById(ta.listItemId);
+                                    if (ta.approvalStatus == 2)
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Approved";
+                                    else
+                                        li["Publisher_x0020_Approval_x0020_S"] = "Rejected";
+                                    li["Publisher_x0020_Approval_x0020_C"] = ta.approvalNotes;
+                                    try
+                                    {
+                                        li["taskuid"] = ta.taskuid;// li["taskuid"].ToString();
+                                    }
+                                    catch { }
+                                    li["transuid"] = transuid.ToString();
+                                    li.Update();
+                                }
+                                catch (Exception ex)
+                                {
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                    {
+                                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                                        {
+                                            myLog.WriteEntry(
+                                                string.Format("Error in setApprovedTasks() updating list item: {0}{1}", ex.Message, ex.StackTrace),
+                                                EventLogEntryType.Error,
+                                                1000);
+                                        }
+                                    });
+                                }
                             }
-                            catch { }
-                            li["transuid"] = transuid.ToString();
-                            li.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                            {
-                                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                                myLog.WriteEntry("Error in setApprovedTasks() updating list item: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-                            });
                         }
                     }
-
                 }
-                else
-                    dr.Close();
-                cn.Close();
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in setApprovedTasks(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in setApprovedTasks(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
-            psweb.Close();
-            web.Close();
+            finally
+            {
+                connection?.Close();
+                psweb.Close();
+                web.Close();
+
+                connection?.Dispose();
+            }
         }
+
         [WebMethod]
         public UpdateTaskItem[] getUpdates(string projectGuid)
         {
@@ -694,292 +738,301 @@ namespace EPMLiveEnterprise
                     pds = pSvc.ReadProject(new Guid(projectGuid), WebSvcProject.DataStoreEnum.PublishedStore);
                     string projectname = pds.Project[0].PROJ_NAME;
 
-                    SqlConnection cn = null;
                     try
                     {
-                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(psweb.Site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT transuid FROM publishercheck where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectGuid);
-                        SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                        if (drPubCheck.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions
+                            .getConnectionString(psweb.Site.WebApplication.Id)))
                         {
-                            Guid transuid = drPubCheck.GetGuid(0);
-                            drPubCheck.Close();
-
-                            SPList list = web.Lists["Task Center"];
-
-                            ArrayList alFields = new ArrayList();
-                            
-                            Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-
-                            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
-
-                            if (gSettings.DisplaySettings != "")
-                                fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-
-                            foreach (SPField f in list.Fields)
+                            connection.Open();
+                            using (var publisherCheckCommand = new SqlCommand(
+                                "SELECT transuid FROM publishercheck where projectguid=@projectguid",
+                                connection))
                             {
-                                string editable = "";
-                                try
+                                publisherCheckCommand.Parameters.AddWithValue("@projectguid", projectGuid);
+                                using (var drPubCheck = publisherCheckCommand.ExecuteReader())
                                 {
-                                    editable = fieldProperties[f.InternalName]["Editable"];
-                                    editable = editable.Split(";".ToCharArray())[0].ToLower();
-                                }
-                                catch { }
-
-                                if (editable != "never" && f.Reorderable)
-                                {
-                                    if (f.ShowInEditForm == null)
-                                        alFields.Add(f.Id);
-                                    else
-                                        if (f.ShowInEditForm == true)
-                                            alFields.Add(f.Id);
-                                }
-                            }
-
-                            UpdateFieldItem[] ufsTemp = new UpdateFieldItem[alFields.Count];
-                            int goodCount = 0;
-                            for (int i = 0; i < alFields.Count; i++)
-                            {
-                                SPField f = list.Fields[new Guid(alFields[i].ToString())];
-
-                                cmd = new SqlCommand("SELECT fieldname,wssfieldname FROM CUSTOMFIELDS where wssfieldname like @wssfieldname", cn);
-                                cmd.Parameters.AddWithValue("@wssfieldname", f.InternalName);
-                                SqlDataReader drField = cmd.ExecuteReader();
-                                if (drField.Read())
-                                {
-                                    //if (drField.GetString(1) != "StartDate" && drField.GetString(1) != "DueDate")
-                                    if(f.Type != SPFieldType.Calculated)
+                                    if (drPubCheck.Read())
                                     {
-                                        ufsTemp[goodCount] = new UpdateFieldItem();
-                                        ufsTemp[goodCount].displayName = f.Title;
-                                        ufsTemp[goodCount].value = "";
-                                        int temp = 0;
-                                        if (f.InternalName.Length > 3 && int.TryParse(f.InternalName.Substring(3), out temp))
+                                        Guid transuid = drPubCheck.GetGuid(0);
+                                        drPubCheck.Close();
+
+                                        SPList list = web.Lists["Task Center"];
+
+                                        ArrayList alFields = new ArrayList();
+
+                                        Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+
+                                        EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+
+                                        if (gSettings.DisplaySettings != "")
+                                            fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+
+                                        foreach (SPField f in list.Fields)
                                         {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + temp.ToString());
-                                            if (dr.Length > 0)
-                                            {
-                                                ufsTemp[goodCount].fieldId = temp;
-                                                ufsTemp[goodCount].internalFieldName = "";
-                                            }
-                                            else
-                                            {
-                                                ufsTemp[goodCount].fieldId = 0;
-                                                ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ufsTemp[goodCount].fieldId = 0;
-                                            ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
-                                        }
-
-                                        ufsTemp[goodCount].fieldGuid = f.Id;
-                                        goodCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (f.InternalName.Length > 3)
-                                    {
-                                        string fieldName = f.InternalName.Substring(3);
-                                        int temp = 0;
-                                        if (int.TryParse(fieldName, out temp))
-                                        {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
-                                            if (dr.Length > 0)
-                                            {
-                                                ufsTemp[goodCount] = new UpdateFieldItem();
-                                                ufsTemp[goodCount].displayName = f.Title;
-                                                ufsTemp[goodCount].value = "";
-                                                ufsTemp[goodCount].fieldId = int.Parse(fieldName);
-                                                ufsTemp[goodCount].internalFieldName = "";
-                                                ufsTemp[goodCount].fieldGuid = f.Id;
-                                                goodCount++;
-                                            }
-                                        }
-                                    }
-                                }
-                                drField.Close();
-                            }
-
-                            
-                            cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", cn);
-                            SqlDataReader dReader = cmd.ExecuteReader();
-                            if (dReader.Read())
-                            {
-                                try
-                                {
-                                    string tsHours = dReader.GetString(0);
-                                    if (tsHours != "")
-                                    {
-                                        if (tsHours == "251658250")
-                                        {
-                                            SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
-                                            ufsTemp[goodCount] = new UpdateFieldItem();
-                                            ufsTemp[goodCount].displayName = f.Title;
-                                            ufsTemp[goodCount].value = "";
-                                            ufsTemp[goodCount].fieldId = 0;
-                                            ufsTemp[goodCount].internalFieldName = "pjTaskActualWork";
-                                            ufsTemp[goodCount].fieldGuid = f.Id;
-                                            goodCount++;
-                                        }
-                                        else
-                                        {
-                                            SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
-                                            string fieldName = f.InternalName.Substring(3);
-                                            ufsTemp[goodCount] = new UpdateFieldItem();
-                                            ufsTemp[goodCount].displayName = f.Title;
-                                            ufsTemp[goodCount].value = "";
-                                            ufsTemp[goodCount].fieldId = int.Parse(tsHours);
-                                            ufsTemp[goodCount].internalFieldName = "";
-                                            ufsTemp[goodCount].fieldGuid = f.Id;
-                                            goodCount++;
-                                        }
-                                    }
-                                }
-                                catch { }
-                            }
-                            dReader.Close();
-
-                            UpdateFieldItem[] ufs = new UpdateFieldItem[goodCount];
-                            for (int i = 0; i < goodCount; i++)
-                            {
-                                ufs[i] = ufsTemp[i];
-                            }
-
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
-
-                            ArrayList alListItems = new ArrayList();
-
-                            foreach (SPListItem li in list.GetItems(query))
-                            {
-                                alListItems.Add(li.ID);
-                            }
-
-                            updates = new UpdateTaskItem[alListItems.Count];
-
-                            for (int i = 0; i < alListItems.Count; i++)
-                            {
-                                SPListItem li = list.GetItemById(int.Parse(alListItems[i].ToString()));
-                                updates[i] = new UpdateTaskItem();
-                                updates[i].taskname = li.Title;
-                                try
-                                {
-                                    updates[i].taskuid = li["taskuid"].ToString();
-                                }
-                                catch { }
-                                updates[i].startDate = getDate(li,"StartDate");
-                                updates[i].finishDate = getDate(li,"DueDate");
-
-                                if (li["Notes"] != null)
-                                {
-                                    string notes =  li["Notes"].ToString();
-                                    notes = notes.Replace("<div>", "").Replace("</div>","");
-                                    updates[i].notes = notes;
-                                }
-                                else
-                                    updates[i].notes = "";
-                                float pct = 0;
-                                try
-                                {
-                                    pct = float.Parse(li["PercentComplete"].ToString()) * (float)100;
-                                }catch{}
-                                updates[i].percentComplete = pct.ToString();
-                                try
-                                {
-                                    updates[i].taskHierarchy = li[li.ParentList.Fields.GetFieldByInternalName("TaskHierarchy").Id].ToString();
-                                }
-                                catch { }
-                                updates[i].updatefields = new UpdateFieldItem[ufs.Length];
-                                updates[i].listItemId = li.ID;
-
-                                for (int j = 0; j < ufs.Length; j++)
-                                {
-                                    updates[i].updatefields[j] = new UpdateFieldItem();
-                                    updates[i].updatefields[j].displayName = ufs[j].displayName;
-                                    updates[i].updatefields[j].fieldGuid = ufs[j].fieldGuid;
-                                    updates[i].updatefields[j].fieldId = ufs[j].fieldId;
-                                    updates[i].updatefields[j].internalFieldName = ufs[j].internalFieldName.Replace("_x0020_","");
-
-                                    if (li[updates[i].updatefields[j].fieldGuid] != null)
-                                    {
-                                        SPField f = li.Fields[updates[i].updatefields[j].fieldGuid];
-                                        if (f.Type == SPFieldType.DateTime)
-                                        {
-                                            updates[i].updatefields[j].value = getDate(li, f.InternalName);
-                                        }
-                                        else if (f.Type == SPFieldType.Currency)
-                                        {
-                                            string money = li[updates[i].updatefields[j].fieldGuid].ToString();
-
+                                            string editable = "";
                                             try
                                             {
-                                                money = float.Parse(money).ToString("0.00");
+                                                editable = fieldProperties[f.InternalName]["Editable"];
+                                                editable = editable.Split(";".ToCharArray())[0].ToLower();
                                             }
                                             catch { }
 
-                                            updates[i].updatefields[j].value = money;
-                                        }
-                                        else if (f.Type == SPFieldType.Boolean)
-                                        {
-                                            if(bool.Parse(li[f.Id].ToString()))
+                                            if (editable != "never" && f.Reorderable)
                                             {
-                                                updates[i].updatefields[j].value = "Yes";
-                                            }
-                                            else
-                                            {
-                                                updates[i].updatefields[j].value = "No";
+                                                if (f.ShowInEditForm == null)
+                                                    alFields.Add(f.Id);
+                                                else
+                                                    if (f.ShowInEditForm == true)
+                                                    alFields.Add(f.Id);
                                             }
                                         }
-                                        else if (f.Type == SPFieldType.Number)
+
+                                        UpdateFieldItem[] ufsTemp = new UpdateFieldItem[alFields.Count];
+                                        int goodCount = 0;
+                                        for (int i = 0; i < alFields.Count; i++)
                                         {
-                                            if (f.SchemaXml.ToUpper().Contains("PERCENTAGE=\"TRUE\""))
+                                            SPField f = list.Fields[new Guid(alFields[i].ToString())];
+
+                                            using (var customFieldsCommand = new SqlCommand(
+                                                "SELECT fieldname,wssfieldname FROM CUSTOMFIELDS where wssfieldname like @wssfieldname",
+                                                connection))
                                             {
-                                                pct = 0;
-                                                try
+                                                customFieldsCommand.Parameters.AddWithValue("@wssfieldname", f.InternalName);
+                                                using (var drField = customFieldsCommand.ExecuteReader())
                                                 {
-                                                    pct = float.Parse(li[updates[i].updatefields[j].fieldGuid].ToString()) * (float)100;
+                                                    if (drField.Read())
+                                                    {
+                                                        //if (drField.GetString(1) != "StartDate" && drField.GetString(1) != "DueDate")
+                                                        if (f.Type != SPFieldType.Calculated)
+                                                        {
+                                                            ufsTemp[goodCount] = new UpdateFieldItem();
+                                                            ufsTemp[goodCount].displayName = f.Title;
+                                                            ufsTemp[goodCount].value = "";
+                                                            int temp = 0;
+                                                            if (f.InternalName.Length > 3 && int.TryParse(f.InternalName.Substring(3), out temp))
+                                                            {
+                                                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + temp.ToString());
+                                                                if (dr.Length > 0)
+                                                                {
+                                                                    ufsTemp[goodCount].fieldId = temp;
+                                                                    ufsTemp[goodCount].internalFieldName = "";
+                                                                }
+                                                                else
+                                                                {
+                                                                    ufsTemp[goodCount].fieldId = 0;
+                                                                    ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                ufsTemp[goodCount].fieldId = 0;
+                                                                ufsTemp[goodCount].internalFieldName = "pjTask" + fixFieldName(drField.GetString(1));
+                                                            }
+
+                                                            ufsTemp[goodCount].fieldGuid = f.Id;
+                                                            goodCount++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (f.InternalName.Length > 3)
+                                                        {
+                                                            string fieldName = f.InternalName.Substring(3);
+                                                            int temp = 0;
+                                                            if (int.TryParse(fieldName, out temp))
+                                                            {
+                                                                WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] dr = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
+                                                                if (dr.Length > 0)
+                                                                {
+                                                                    ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                    ufsTemp[goodCount].displayName = f.Title;
+                                                                    ufsTemp[goodCount].value = "";
+                                                                    ufsTemp[goodCount].fieldId = int.Parse(fieldName);
+                                                                    ufsTemp[goodCount].internalFieldName = "";
+                                                                    ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                    goodCount++;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
-                                                catch { }
-                                                updates[i].updatefields[j].value = pct.ToString();
-                                            }
-                                            else
-                                            {
-                                                updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
                                             }
                                         }
-                                        else
+
+
+                                        using (var configCommand = new SqlCommand(
+                                            "SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'",
+                                            connection))
                                         {
-                                            updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                            using (var dReader = configCommand.ExecuteReader())
+                                            {
+                                                if (dReader.Read())
+                                                {
+                                                    try
+                                                    {
+                                                        string tsHours = dReader.GetString(0);
+                                                        if (tsHours != "")
+                                                        {
+                                                            if (tsHours == "251658250")
+                                                            {
+                                                                SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
+                                                                ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                ufsTemp[goodCount].displayName = f.Title;
+                                                                ufsTemp[goodCount].value = "";
+                                                                ufsTemp[goodCount].fieldId = 0;
+                                                                ufsTemp[goodCount].internalFieldName = "pjTaskActualWork";
+                                                                ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                goodCount++;
+                                                            }
+                                                            else
+                                                            {
+                                                                SPField f = list.Fields.GetFieldByInternalName("TimesheetHours");
+                                                                string fieldName = f.InternalName.Substring(3);
+                                                                ufsTemp[goodCount] = new UpdateFieldItem();
+                                                                ufsTemp[goodCount].displayName = f.Title;
+                                                                ufsTemp[goodCount].value = "";
+                                                                ufsTemp[goodCount].fieldId = int.Parse(tsHours);
+                                                                ufsTemp[goodCount].internalFieldName = "";
+                                                                ufsTemp[goodCount].fieldGuid = f.Id;
+                                                                goodCount++;
+                                                            }
+                                                        }
+                                                    }
+                                                    catch { }
+                                                }
+                                            }
+                                        }
+                                        UpdateFieldItem[] ufs = new UpdateFieldItem[goodCount];
+                                        for (int i = 0; i < goodCount; i++)
+                                        {
+                                            ufs[i] = ufsTemp[i];
+                                        }
+
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><And><Eq><FieldRef Name='Project'/><Value Type='Text'>" + projectname + "</Value></Eq><Neq><FieldRef Name='transuid'/><Value Type='Text'>" + transuid.ToString() + "</Value></Neq></And></Where>";
+
+                                        ArrayList alListItems = new ArrayList();
+
+                                        foreach (SPListItem li in list.GetItems(query))
+                                        {
+                                            alListItems.Add(li.ID);
+                                        }
+
+                                        updates = new UpdateTaskItem[alListItems.Count];
+
+                                        for (int i = 0; i < alListItems.Count; i++)
+                                        {
+                                            SPListItem li = list.GetItemById(int.Parse(alListItems[i].ToString()));
+                                            updates[i] = new UpdateTaskItem();
+                                            updates[i].taskname = li.Title;
+                                            try
+                                            {
+                                                updates[i].taskuid = li["taskuid"].ToString();
+                                            }
+                                            catch { }
+                                            updates[i].startDate = getDate(li, "StartDate");
+                                            updates[i].finishDate = getDate(li, "DueDate");
+
+                                            if (li["Notes"] != null)
+                                            {
+                                                string notes = li["Notes"].ToString();
+                                                notes = notes.Replace("<div>", "").Replace("</div>", "");
+                                                updates[i].notes = notes;
+                                            }
+                                            else
+                                                updates[i].notes = "";
+                                            float pct = 0;
+                                            try
+                                            {
+                                                pct = float.Parse(li["PercentComplete"].ToString()) * (float)100;
+                                            }
+                                            catch { }
+                                            updates[i].percentComplete = pct.ToString();
+                                            try
+                                            {
+                                                updates[i].taskHierarchy = li[li.ParentList.Fields.GetFieldByInternalName("TaskHierarchy").Id].ToString();
+                                            }
+                                            catch { }
+                                            updates[i].updatefields = new UpdateFieldItem[ufs.Length];
+                                            updates[i].listItemId = li.ID;
+
+                                            for (int j = 0; j < ufs.Length; j++)
+                                            {
+                                                updates[i].updatefields[j] = new UpdateFieldItem();
+                                                updates[i].updatefields[j].displayName = ufs[j].displayName;
+                                                updates[i].updatefields[j].fieldGuid = ufs[j].fieldGuid;
+                                                updates[i].updatefields[j].fieldId = ufs[j].fieldId;
+                                                updates[i].updatefields[j].internalFieldName = ufs[j].internalFieldName.Replace("_x0020_", "");
+
+                                                if (li[updates[i].updatefields[j].fieldGuid] != null)
+                                                {
+                                                    SPField f = li.Fields[updates[i].updatefields[j].fieldGuid];
+                                                    if (f.Type == SPFieldType.DateTime)
+                                                    {
+                                                        updates[i].updatefields[j].value = getDate(li, f.InternalName);
+                                                    }
+                                                    else if (f.Type == SPFieldType.Currency)
+                                                    {
+                                                        string money = li[updates[i].updatefields[j].fieldGuid].ToString();
+
+                                                        try
+                                                        {
+                                                            money = float.Parse(money).ToString("0.00");
+                                                        }
+                                                        catch { }
+
+                                                        updates[i].updatefields[j].value = money;
+                                                    }
+                                                    else if (f.Type == SPFieldType.Boolean)
+                                                    {
+                                                        if (bool.Parse(li[f.Id].ToString()))
+                                                        {
+                                                            updates[i].updatefields[j].value = "Yes";
+                                                        }
+                                                        else
+                                                        {
+                                                            updates[i].updatefields[j].value = "No";
+                                                        }
+                                                    }
+                                                    else if (f.Type == SPFieldType.Number)
+                                                    {
+                                                        if (f.SchemaXml.ToUpper().Contains("PERCENTAGE=\"TRUE\""))
+                                                        {
+                                                            pct = 0;
+                                                            try
+                                                            {
+                                                                pct = float.Parse(li[updates[i].updatefields[j].fieldGuid].ToString()) * (float)100;
+                                                            }
+                                                            catch { }
+                                                            updates[i].updatefields[j].value = pct.ToString();
+                                                        }
+                                                        else
+                                                        {
+                                                            updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        updates[i].updatefields[j].value = li[updates[i].updatefields[j].fieldGuid].ToString();
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        else
-                            drPubCheck.Close();
-
-                        cn.Close();
-
                     }
                     catch (Exception ex)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher Check WS");
-                        myLog.WriteEntry("Error in getUpdates() projectuid (" + projectGuid + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                        try
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher Check WS"))
                         {
-                            cn.Close();
+                            myLog.WriteEntry(
+                                string.Format("Error in getUpdates() projectuid ({0}): {1}{2}", projectGuid, ex.Message, ex.StackTrace),
+                                EventLogEntryType.Error,
+                                1000);
                         }
-                        catch { }
                     }
-
                 });
             }
             catch (Exception ex)
@@ -1062,15 +1115,21 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getCustomFields(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getCustomFields(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
 
             web.Close();
         }
+
         private CustomField[] getCustomFields(string listName, int visibleCol, string projectServerURL)
         {
             ArrayList arrCF = new ArrayList();
@@ -1082,7 +1141,6 @@ namespace EPMLiveEnterprise
 
             try
             {
-
                 SPSite psSite = new SPSite(projectServerURL);
                 Guid psSiteID = psSite.ID;
                 string scn = EPMLiveCore.CoreFunctions.getConnectionString(psSite.WebApplication.Id);
@@ -1096,88 +1154,96 @@ namespace EPMLiveEnterprise
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(scn);
-                    cn.Open();
-
-                    //Read Standard and Custom Fields
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM CUSTOMFIELDS WHERE fieldcategory = 1 OR fieldcategory=2 or fieldcategory=3", cn);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    while (dr.Read())
+                    using (var connection = new SqlConnection(scn))
                     {
-                        CustomField cf = new CustomField();
-                        cf.displayName = dr.GetString(2);
-                        cf.editable = dr.GetBoolean(1);
-                        cf.fieldCategory = dr.GetInt32(3);
-                        cf.locked = dr.GetBoolean(visibleCol);
-                        cf.visible = dr.GetBoolean(visibleCol);
-                        cf.wssFieldName = dr.GetString(4);
-                        cf.fieldType = getFieldType(dr.GetString(7));
+                        connection.Open();
 
-                        if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                        //Read Standard and Custom Fields
+                        using (var command = new SqlCommand(
+                            "SELECT * FROM CUSTOMFIELDS WHERE fieldcategory = 1 OR fieldcategory=2 or fieldcategory=3",
+                            connection))
                         {
-                            cf.visible = true;
-                            if (hshCurFields[cf.wssFieldName] == null)
-                                cf.editable = true;
-                            else
-                                cf.editable = (bool)hshCurFields[cf.wssFieldName];
-                        }
-
-                        arrCF.Add(cf);
-
-                        hshDBFields.Add(cf.wssFieldName, "");
-                    }
-                    dr.Close();
-
-                    //Read Enterprise Fields
-                    WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
-                    svcCF.Url = projectServerURL + "/_vti_bin/psi/customfields.asmx";
-                    svcCF.UseDefaultCredentials = true;
-                    WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
-
-                    dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-
-                    for (int i = 0; i < dsF.CustomFields.Count; i++)
-                    {
-                        WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
-
-                        string wssField = "ENT" + customField.MD_PROP_ID.ToString();
-
-                        if (!hshDBFields.Contains(wssField))
-                        {
-                            CustomField cf = new CustomField();
-                            cf.displayName = customField.MD_PROP_NAME;
-                            cf.editable = false;
-                            cf.fieldCategory = 3;
-                            cf.locked = false;
-                            cf.visible = false;
-                            cf.wssFieldName = wssField;
-
-                            if (customField.IsMD_LOOKUP_TABLE_UIDNull())
-                                cf.fieldType = getFieldTypeFromCF(((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString());
-                            else
-                                cf.fieldType = SPFieldType.Choice;
-
-                            if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                            using (var dataReader = command.ExecuteReader())
                             {
-                                cf.visible = true;
-                                cf.editable = (bool)hshCurFields[cf.wssFieldName];
-                            }
+                                while (dataReader.Read())
+                                {
+                                    CustomField cf = new CustomField();
+                                    cf.displayName = dataReader.GetString(2);
+                                    cf.editable = dataReader.GetBoolean(1);
+                                    cf.fieldCategory = dataReader.GetInt32(3);
+                                    cf.locked = dataReader.GetBoolean(visibleCol);
+                                    cf.visible = dataReader.GetBoolean(visibleCol);
+                                    cf.wssFieldName = dataReader.GetString(4);
+                                    cf.fieldType = getFieldType(dataReader.GetString(7));
 
-                            arrCF.Add(cf);
+                                    if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                                    {
+                                        cf.visible = true;
+                                        if (hshCurFields[cf.wssFieldName] == null)
+                                            cf.editable = true;
+                                        else
+                                            cf.editable = (bool)hshCurFields[cf.wssFieldName];
+                                    }
+
+                                    arrCF.Add(cf);
+
+                                    hshDBFields.Add(cf.wssFieldName, "");
+                                }
+                            }
+                        }
+
+                        //Read Enterprise Fields
+                        WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
+                        svcCF.Url = projectServerURL + "/_vti_bin/psi/customfields.asmx";
+                        svcCF.UseDefaultCredentials = true;
+                        WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
+
+                        dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+
+                        for (int i = 0; i < dsF.CustomFields.Count; i++)
+                        {
+                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
+
+                            string wssField = "ENT" + customField.MD_PROP_ID.ToString();
+
+                            if (!hshDBFields.Contains(wssField))
+                            {
+                                CustomField cf = new CustomField();
+                                cf.displayName = customField.MD_PROP_NAME;
+                                cf.editable = false;
+                                cf.fieldCategory = 3;
+                                cf.locked = false;
+                                cf.visible = false;
+                                cf.wssFieldName = wssField;
+
+                                if (customField.IsMD_LOOKUP_TABLE_UIDNull())
+                                    cf.fieldType = getFieldTypeFromCF(((PSLibrary.PropertyType)customField.MD_PROP_TYPE_ENUM).ToString());
+                                else
+                                    cf.fieldType = SPFieldType.Choice;
+
+                                if (hshCurFields.Contains(cf.wssFieldName) && cf.visible == false)
+                                {
+                                    cf.visible = true;
+                                    cf.editable = (bool)hshCurFields[cf.wssFieldName];
+                                }
+
+                                arrCF.Add(cf);
+                            }
                         }
                     }
-                    cn.Close();
                 });
-
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getCustomFields(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getCustomFields(): {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
 
@@ -1193,8 +1259,6 @@ namespace EPMLiveEnterprise
 
             return cfs;
         }
-
-        
 
         private SPFieldType getFieldTypeFromCF(string fieldType)
         {
@@ -1279,13 +1343,19 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllTaskEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllTaskEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
 
             return ret;
         }
+
         [WebMethod]
         public string[] getAllProjectEnterpriseFieldList()
         {
@@ -1326,12 +1396,18 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getAllProjectEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getAllProjectEnterpriseFieldList() username ({0}): {1}{2}", username, ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
             }
             return ret;
         }
+
         [WebMethod]
         public bool publish(Guid projectUid, int pubType, string url)
         {
@@ -1339,62 +1415,70 @@ namespace EPMLiveEnterprise
             Guid siteid = SPContext.Current.Site.ID;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = null;
                 try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    WebSvcProject.Project svcProject = new WebSvcProject.Project();
-                    svcProject.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/project.asmx";
-                    svcProject.UseDefaultCredentials = true;
-
-                    WebSvcProject.ProjectDataSet pds = svcProject.ReadProject(projectUid, WebSvcProject.DataStoreEnum.WorkingStore);
-                    string projectname = pds.Project[0].PROJ_NAME;
-
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM publishercheck where projectguid=@projectguid", cn);
-                    cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                    SqlDataReader drPubCheck = cmd.ExecuteReader();
-
-                    if (drPubCheck.Read())
+                    using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        drPubCheck.Close();
-                        cmd = new SqlCommand("UPDATE publishercheck set checkbit=1,pubType=@pubType,weburl=@weburl,projectname=@projectname,percentcomplete=1,status=1,laststatusdate=getdate() where projectguid=@projectguid", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                        cmd.Parameters.AddWithValue("@pubtype", pubType);
-                        cmd.Parameters.AddWithValue("@weburl", url);
-                        cmd.Parameters.AddWithValue("@projectname", projectname);
-                        cmd.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        drPubCheck.Close();
-                        cmd = new SqlCommand("INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) VALUES (@projectguid,1,@pubtype,@weburl,@projectname,1,1,GETDATE())", cn);
-                        cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                        cmd.Parameters.AddWithValue("@pubtype", pubType);
-                        cmd.Parameters.AddWithValue("@weburl", url);
-                        cmd.Parameters.AddWithValue("@projectname", projectname);
-                        cmd.ExecuteNonQuery();
-                    }
+                        connection.Open();
 
-                    cn.Close();
-                    bRet = true;
+                        WebSvcProject.Project svcProject = new WebSvcProject.Project();
+                        svcProject.Url = SPContext.Current.Site.Url + "/_vti_bin/psi/project.asmx";
+                        svcProject.UseDefaultCredentials = true;
+
+                        WebSvcProject.ProjectDataSet pds = svcProject.ReadProject(projectUid, WebSvcProject.DataStoreEnum.WorkingStore);
+                        string projectname = pds.Project[0].PROJ_NAME;
+
+                        using (var command = new SqlCommand("SELECT * FROM publishercheck where projectguid=@projectguid", connection))
+                        {
+                            command.Parameters.AddWithValue("@projectguid", projectUid);
+                            using (var drPubCheck = command.ExecuteReader())
+                            {
+                                if (drPubCheck.Read())
+                                {
+                                    using (var updateCommand = new SqlCommand(
+                                        "UPDATE publishercheck set " + 
+                                        "checkbit=1,pubType=@pubType,weburl=@weburl,projectname=@projectname,percentcomplete=1,status=1,laststatusdate=getdate() " +
+                                        "where projectguid=@projectguid", 
+                                        connection))
+                                    {
+                                        updateCommand.Parameters.AddWithValue("@projectguid", projectUid);
+                                        updateCommand.Parameters.AddWithValue("@pubtype", pubType);
+                                        updateCommand.Parameters.AddWithValue("@weburl", url);
+                                        updateCommand.Parameters.AddWithValue("@projectname", projectname);
+                                        updateCommand.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    using (var insertCommand = new SqlCommand(
+                                        "INSERT INTO publishercheck (projectguid,checkbit,pubType,weburl, projectname,percentcomplete,status,laststatusdate) " + 
+                                        "VALUES (@projectguid,1,@pubtype,@weburl,@projectname,1,1,GETDATE())", 
+                                        connection))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@projectguid", projectUid);
+                                        insertCommand.Parameters.AddWithValue("@pubtype", pubType);
+                                        insertCommand.Parameters.AddWithValue("@weburl", url);
+                                        insertCommand.Parameters.AddWithValue("@projectname", projectname);
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                            bRet = true;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher Check WS");
-                    myLog.WriteEntry("Error: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
-
-                    try
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher Check WS"))
                     {
-                        cn.Close();
+                        myLog.WriteEntry("Error: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                        bRet = false;
                     }
-                    catch { }
-                    bRet = false;
                 }
             });
             return bRet;
         }
+
         [WebMethod]
         public string[] getSiteTemplates()
         {
@@ -1403,30 +1487,33 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-
                     try
                     {
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", cn);
-                        SqlDataReader dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
+                        using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
-                            string[] strValidtemplates = dReader.GetString(0).Split('|');
-                            foreach (string template in strValidtemplates)
+                            connection.Open();
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", connection))
                             {
-                                arrValidTemplates.Add(template);
+                                using (var dataReader = command.ExecuteReader())
+                                {
+                                    if (dataReader.Read())
+                                    {
+                                        string[] strValidtemplates = dataReader.GetString(0).Split('|');
+                                        foreach (string template in strValidtemplates)
+                                        {
+                                            arrValidTemplates.Add(template);
+                                        }
+                                    }
+                                }
                             }
                         }
-                        dReader.Close();
-
-                        cn.Close();
                     }
                     catch (Exception ex1)
                     {
-                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                        myLog.WriteEntry("Error getting valid templates(): " + ex1.Message, EventLogEntryType.Error, 1000);
+                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                        {
+                            myLog.WriteEntry("Error getting valid templates(): " + ex1.Message, EventLogEntryType.Error, 1000);
+                        }
                     }
                 });
             }
@@ -1449,37 +1536,49 @@ namespace EPMLiveEnterprise
             }
             return templates;
         }
+
         [WebMethod]
         public string getEnterpriseSetting(string setting)
         {
-            string ret = "";
-            Guid siteId = SPContext.Current.Site.ID;
+            var returnValue = string.Empty;
+            var siteId = SPContext.Current.Site.ID;
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                    cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='" + setting + "'", cn);
-                    SqlDataReader dReader = cmd.ExecuteReader();
-                    if (dReader.Read())
+                    using (var connection = new SqlConnection(
+                        EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        ret = dReader.GetString(0);
+                        connection.Open();
+                        using (var command = new SqlCommand(
+                            string.Format("SELECT config_value FROM ECONFIG where config_name='{0}'", setting),
+                            connection))
+                        {
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    returnValue = dataReader.GetString(0);
+                                }
+                            }
+                        }
                     }
-                    dReader.Close();
-                    cn.Close();
                 });
             }
             catch (Exception ex)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in getEnterpriseSetting(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            string.Format("Error in getEnterpriseSetting(): {0}{1}", ex.Message, ex.StackTrace), 
+                            EventLogEntryType.Error, 
+                            1000);
+                    }
                 });
             }
-            return ret;
+            return returnValue;
         }
     }
 }

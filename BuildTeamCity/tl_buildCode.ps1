@@ -198,8 +198,9 @@ $projAUTPath
 
 if ($TestsOnly)
 {
-	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests", "EPMLiveCore.AUT.Tests")
-	
+	$projectsToBeBuildAsDLL = @("EPMLiveCore.Tests","EPMLiveReporting.Tests","EPMLiveTimerService.Tests", "EPMLiveTimesheets.Tests", "EPMLiveWebParts.Tests", "EPMLiveWorkPlanner.Tests", "PortfolioEngineCore.Tests", "WorkEnginePPM.Tests", "ProjectPublisher2016.Tests", "EPMLiveCore.AUT.Tests",
+	"EPMLiveSynch.Tests")
+
 	# Directory for outputs
 	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
 	if (!(Test-Path -Path $OutputDirectory)){

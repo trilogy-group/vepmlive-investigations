@@ -14,6 +14,7 @@ namespace EPMLiveCore.API
     public class APIEmail
     {
         private const int _defaultUserId = 1073741823;
+        private const string _successReponse = "Success";
 
         public static void InstallAssignedToEvent(SPList list)
         {
@@ -81,43 +82,51 @@ namespace EPMLiveCore.API
             list.Update();
         }
 
-        private static void GetCoreInformation(SqlConnection cn, int templateid, out string body, out string subject, SPWeb web, SPUser curUser)
+        private static void GetCoreInformation(
+            SqlConnection connection, 
+            int templateid, 
+            out string body, 
+            out string subject, 
+            SPWeb web, 
+            SPUser curUser)
         {
-            body = "";
-            subject = "";
-            //shortmessage = "";
+            body = string.Empty;
+            subject = string.Empty;
 
-            SqlCommand cmd = new SqlCommand("SELECT subject,body from EMAILTEMPLATES where emailid=@id", cn);
-            cmd.Parameters.AddWithValue("@id", templateid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            using (var command =
+                new SqlCommand("SELECT subject,body from EMAILTEMPLATES where emailid=@id", connection))
             {
-                subject = dr.GetString(0);
-                body = dr.GetString(1);
-                //shortmessage = dr.GetString(2);
+                command.Parameters.AddWithValue("@id", templateid);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        subject = reader.GetString(0);
+                        body = reader.GetString(1);
+                    }
+                }
             }
-            dr.Close();
-                                
-            body = body.Replace("{SiteName}", web.Title);
-            body = body.Replace("{SiteUrl}", web.Url);
 
-            body = body.Replace("{CurUser_Name}", curUser.Name);
-            body = body.Replace("{CurUser_Email}", curUser.Email);
-            body = body.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            body = SubstituteSubjectBodyPlaceholders(body, web, curUser);
+            subject = SubstituteSubjectBodyPlaceholders(subject, web, curUser);
+        }
 
-            subject = subject.Replace("{SiteName}", web.Title);
-            subject = subject.Replace("{SiteUrl}", web.Url);
+        private static string SubstituteSubjectBodyPlaceholders(string text, SPWeb web, SPUser curUser)
+        {
+            const string siteNamePlaceholder = "{SiteName}";
+            const string siteUrlPlaceholder = "{SiteUrl}";
+            const string curUserPlaceholder = "{CurUser_Name}";
+            const string curUserEmailPlaceholder = "{CurUser_Email}";
+            const string curUserNamePlaceholder = "{CurUser_Username}";
 
-            subject = subject.Replace("{CurUser_Name}", curUser.Name);
-            subject = subject.Replace("{CurUser_Email}", curUser.Email);
-            subject = subject.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            text = text
+                .Replace(siteNamePlaceholder, web.Title)
+                .Replace(siteUrlPlaceholder, web.Url)
+                .Replace(curUserPlaceholder, curUser.Name)
+                .Replace(curUserEmailPlaceholder, curUser.Email)
+                .Replace(curUserNamePlaceholder, CoreFunctions.GetJustUsername(curUser.LoginName));
 
-            //shortmessage = shortmessage.Replace("{SiteName}", web.Title);
-            //shortmessage = shortmessage.Replace("{SiteUrl}", web.Url);
-
-            //shortmessage = shortmessage.Replace("{CurUser_Name}", curUser.Name);
-            //shortmessage = shortmessage.Replace("{CurUser_Email}", curUser.Email);
-            //shortmessage = shortmessage.Replace("{CurUser_Username}", CoreFunctions.GetJustUsername(curUser.LoginName));
+            return text;
         }
 
         public static void QueueItemMessage(int templateid, bool hideFromUser, Hashtable additionalParams, string[] newusers, string[] delusers, bool doNotEmail, bool unmarkread, SPListItem li, SPUser curUser, bool forceNewEntry)
@@ -176,174 +185,101 @@ namespace EPMLiveCore.API
 
         public static string QueueItemMessageXml(string data, SPWeb oWeb)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(data);
-            int templateid = int.Parse(doc.FirstChild.Attributes["TemplateID"].Value);
-            bool hideFromUser = false;
-            bool doNotEmail = false;
-            bool unMarkRead = true;
-            bool forceNewEntry = false;
-            string listName = "";
-            string listId = "";
-            string itemid = "";
-            string webid = "";
-            string sExternalColumn = "";
-             
-            try
-            {
-                listName = doc.FirstChild.Attributes["ListName"].Value;
-            }catch{}
-            try
-            {
-                listId = doc.FirstChild.Attributes["ListID"].Value;
-            }catch{}
-            try
-            {
-                itemid = doc.FirstChild.Attributes["ItemID"].Value;
-            }catch{}
-            try
-            {
-                webid = doc.FirstChild.Attributes["WebID"].Value;
-            }catch{}
+            var document = new XmlDocument();
+            document.LoadXml(data);
+            var itemMessage = new ItemMessage(document, oWeb);
 
-            try 
+            var ret = Response.Failure(30010, "Error: No Item Id specificied");
+            if(itemMessage.ItemId != string.Empty && 
+                (itemMessage.ListId != string.Empty || itemMessage.ListName != string.Empty))
             {
-                hideFromUser = bool.Parse(doc.FirstChild.Attributes["HideFromUser"].Value);
-            }catch{}
-            try
-            {
-                doNotEmail = bool.Parse(doc.FirstChild.Attributes["DoNotEmail"].Value);
-            }catch{}
-            try
-            {
-                unMarkRead = bool.Parse(doc.FirstChild.Attributes["UnMarkRead"].Value);
-            }catch{}
-            try
-            {
-                forceNewEntry = bool.Parse(doc.FirstChild.Attributes["ForceNewEntry"].Value);
-            }catch{}
-
-            Hashtable hshParams = new Hashtable();
-
-            XmlNode nd = doc.FirstChild.SelectSingleNode("Params");
-            foreach(XmlNode ndParam in nd.SelectNodes("Param"))
-            {
-                hshParams.Add(ndParam.Attributes["Name"].Value, ndParam.InnerText);
-            }
-
-            ArrayList ArrNew = new ArrayList();
-            ArrayList ArrDel = new ArrayList();
-
-            try
-            {
-                ArrNew = new ArrayList(doc.FirstChild.Attributes["NewUsers"].Value.Split(','));
-            }
-            catch { }
-            try
-            {
-                ArrDel = new ArrayList(doc.FirstChild.Attributes["RemoveUsers"].Value.Split(','));
-            }
-            catch { }
-            try
-            {
-                sExternalColumn = doc.FirstChild.Attributes["ExternalColumn"].Value;
-            }
-            catch { }
-
-            if(sExternalColumn != "")
-            {
-                DataTable dtResources = API.APITeam.GetResourcePool("<Get><Columns>" + sExternalColumn + "</Columns></Get>", oWeb);
-
-                ArrayList ArrNewTemp = new ArrayList();
-
-                foreach(string s in ArrNew)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    DataRow[] dr = dtResources.Select(sExternalColumn + " ='" + s + "'");
-                    if(dr.Length > 0)
-                    {
-                        ArrNewTemp.Add(dr[0]["SPID"].ToString());
-                    }
-                }
-
-                ArrNew = ArrNewTemp;
-            }
-
-            string ret = Response.Failure(30010, "Error: No Item Id specificied");
-            if(itemid != "" && (listId != "" || listName != ""))
-            {
-                SPSecurity.RunWithElevatedPrivileges(delegate(){
-
                     SPList oList = null;
                     try
                     {
                         using(SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            if(webid != "")
+                            if(itemMessage.WebId != string.Empty)
                             {
-                                using(SPWeb tWeb = site.OpenWeb(new Guid(webid)))
-                                {
-                                    if(listId != "")
-                                    {
-                                        oList = tWeb.Lists[new Guid(listId)];
-                                    }
-                                    else
-                                    {
-                                        oList = tWeb.Lists.TryGetList(listName);
-                                    }
-
-                                    if(oList != null)
-                                    {
-                                        SPListItem li = oList.GetItemById(int.Parse(itemid));
-
-                                        API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, li, oWeb.CurrentUser, forceNewEntry);
-
-                                        ret = Response.Success("Success");
-                                    }
-                                }
+                                oList = QueueItemMessageFromXml(
+                                    new Guid(itemMessage.WebId), 
+                                    oWeb.CurrentUser, 
+                                    itemMessage, 
+                                    ref ret, 
+                                    site);
                             }
                             else
                             {
-                                using(SPWeb web = site.OpenWeb(oWeb.ID))
-                                {
-                                    if(listId != "")
-                                    {
-                                        oList = web.Lists[new Guid(listId)];
-                                    }
-                                    else
-                                    {
-                                        oList = web.Lists.TryGetList(listName);
-                                    }
-
-                                    if(oList != null)
-                                    {
-                                        SPListItem li = oList.GetItemById(int.Parse(itemid));
-
-                                        API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, li, oWeb.CurrentUser, forceNewEntry);
-
-                                        ret = Response.Success("Success");
-                                    }
-                                }
+                                oList = QueueItemMessageFromXml(oWeb.ID, oWeb.CurrentUser, itemMessage, ref ret, site);
                             }
-
-                            
                         }
-                    }catch{}
-
-                    
+                    }
+                    catch(Exception exception)
+                    {
+                        Trace.TraceError(exception.ToString());
+                    }
                 });
 
                 return ret;
-                
             }
             else
             {
+                QueueItemMessage(
+                    itemMessage.TemplatedId,
+                    itemMessage.HideFromUser,
+                    itemMessage.ParamsTable, 
+                    (string[])itemMessage.NewUsers.ToArray(typeof(string)), 
+                    (string[])itemMessage.RemovedUsers.ToArray(typeof(string)),
+                    itemMessage.DoNotEmail,
+                    itemMessage.UnMarkRead, 
+                    oWeb, 
+                    oWeb.CurrentUser,
+                    itemMessage.ForceNewEntry);
+                return Response.Success(_successReponse);
+            }
+        }
 
-                API.APIEmail.QueueItemMessage(templateid, hideFromUser, hshParams, (string[])ArrNew.ToArray(typeof(string)), (string[])ArrDel.ToArray(typeof(string)), doNotEmail, unMarkRead, oWeb, oWeb.CurrentUser, forceNewEntry);
+        private static SPList QueueItemMessageFromXml(
+            Guid webId, 
+            SPUser currentUser, 
+            ItemMessage itemMessage, 
+            ref string response, 
+            SPSite site)
+        {
+            SPList oList;
+            using (SPWeb web = site.OpenWeb(webId))
+            {
+                if (itemMessage.ListId != string.Empty)
+                {
+                    oList = web.Lists[new Guid(itemMessage.ListId)];
+                }
+                else
+                {
+                    oList = web.Lists.TryGetList(itemMessage.ListName);
+                }
 
-                return Response.Success("Success");
+                if (oList != null)
+                {
+                    SPListItem li = oList.GetItemById(int.Parse(itemMessage.ItemId));
+
+                    QueueItemMessage(
+                        itemMessage.TemplatedId,
+                        itemMessage.HideFromUser,
+                        itemMessage.ParamsTable,
+                        (string[])itemMessage.NewUsers.ToArray(typeof(string)),
+                        (string[])itemMessage.RemovedUsers.ToArray(typeof(string)),
+                        itemMessage.DoNotEmail,
+                        itemMessage.UnMarkRead,
+                        li,
+                        currentUser,
+                        itemMessage.ForceNewEntry);
+
+                    response = Response.Success(_successReponse);
+                }
             }
 
-            return Response.Failure(30010, "Error: No Item Id specificied");
+            return oList;
         }
 
         private static void iQueueItemMessage(
@@ -354,15 +290,15 @@ namespace EPMLiveCore.API
             string[] delusers,
             bool doNotEmail,
             bool unmarkread,
-            SPListItem li,
+            SPListItem listItem,
             SPUser curUser,
             bool forceNewEntry)
         {
             try
             {
-                using (SPSite site = new SPSite(li.ParentList.ParentWeb.Site.ID))
+                using (SPSite site = new SPSite(listItem.ParentList.ParentWeb.Site.ID))
                 {
-                    using (SPWeb web = site.OpenWeb(li.ParentList.ParentWeb.ID))
+                    using (SPWeb web = site.OpenWeb(listItem.ParentList.ParentWeb.ID))
                     {
                         using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
@@ -371,40 +307,28 @@ namespace EPMLiveCore.API
                             string body;
                             string subject;
                             GetSubjectAndBody(templateid, additionalParams, curUser, web, connection, out body, out subject);
-                            SubstituteItems(li, web, ref body, ref subject);
+                            SubstituteItems(listItem, web, ref body, ref subject);
 
-                            var id = GetNotificationIdByListId(templateid, li, connection);
+                            var id = GetNotificationIdByListId(templateid, listItem, connection);
 
-                            using (var upsertNotificationCommand = new SqlCommand())
+                            new NotificationUpserter
                             {
-                                upsertNotificationCommand.Connection = connection;
-                                if (id == null || forceNewEntry)
-                                {
-                                    id = Guid.NewGuid().ToString();
-                                }
-                                upsertNotificationCommand.CommandText = GenerateUpsertSql(forceNewEntry, id);
+                                Connection = connection,
+                                Id = id,
+                                TemplateId = templateid,
+                                CurUserId = curUser.ID,
+                                Subject = subject,
+                                Body = body,
+                                ForceNewEntry = forceNewEntry,
+                                HideFrom = hidefrom,
+                                DoNotEmail = doNotEmail,
+                                SiteId  = site.ID,
+                                WebId = web.ID,
+                                ListItemParentListID = listItem.ParentList.ID,
+                                ListItemId = listItem.ID
+                            }.Upsert();
 
-                                upsertNotificationCommand.Parameters.AddWithValue("@id", id);
-                                upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
-                                upsertNotificationCommand.Parameters.AddWithValue("@message", body);
-                                upsertNotificationCommand.Parameters.AddWithValue("@type", templateid);
-                                if (hidefrom)
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", _defaultUserId);
-                                }
-                                else
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", curUser.ID);
-                                }
-                                upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", li.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
-                                upsertNotificationCommand.ExecuteNonQuery();
-                            }
-
-                            ProcessNewUsersWithListItem(newusers, unmarkread, li, connection, id);
+                            ProcessNewUsers(newusers, unmarkread, connection, id, listItem: listItem);
                             DeleteUsers(delusers, connection, id);
                         }
                     }
@@ -465,63 +389,20 @@ namespace EPMLiveCore.API
             return id;
         }
 
-        private static void ProcessNewUsersWithListItem(
-            string[] newusers, 
-            bool unmarkread, 
-            SPListItem li, 
-            SqlConnection connection, 
-            string id)
+        private static DataSet GetPersonalizationDataSet(SqlConnection connection, string id)
         {
             var dataSet = new DataSet();
             using (var personalizationCommand =
                 new SqlCommand("select * from personalizations where FK=@id", connection))
             {
                 personalizationCommand.Parameters.AddWithValue("@id", id);
-                var dataAdapter = new SqlDataAdapter(personalizationCommand);
-                dataAdapter.Fill(dataSet);
-            }
-
-            foreach (var user in newusers)
-            {
-                if (user != "")
+                using (var dataAdapter = new SqlDataAdapter(personalizationCommand))
                 {
-                    bool found = false;
-
-                    if (dataSet.Tables.Count > 0)
-                    {
-                        var rowsFound = dataSet.Tables[0].Select(string.Format("userid='{0}'", user));
-
-                        if (rowsFound.Length > 0)
-                        {
-                            found = true;
-                            dataSet.Tables[0].Rows.Remove(rowsFound[0]);
-                        }
-                    }
-                    if (!found)
-                    {
-                        using (var insertCommand = new SqlCommand(
-                            "INSERT INTO personalizations " +
-                            "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
-                            "VALUES " +
-                            "(@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
-                            connection))
-                        {
-                            insertCommand.Parameters.AddWithValue("@id", id);
-                            insertCommand.Parameters.AddWithValue("@value", "00");
-                            insertCommand.Parameters.AddWithValue("@userid", user);
-                            insertCommand.Parameters.AddWithValue("@siteid", li.ParentList.ParentWeb.Site.ID);
-                            insertCommand.Parameters.AddWithValue("@webid", li.ParentList.ParentWeb.ID);
-                            insertCommand.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                            insertCommand.Parameters.AddWithValue("@itemid", li.ID);
-                            insertCommand.ExecuteNonQuery();
-                        }
-                    }
-                    if (unmarkread)
-                    {
-                        ExecuteNSetBit(connection, id, user);
-                    }
+                    dataAdapter.Fill(dataSet);
                 }
             }
+
+            return dataSet;
         }
 
         private static void iQueueItemMessage(
@@ -552,36 +433,24 @@ namespace EPMLiveCore.API
 
                             var id = GetNotificationId(templateid, web, connection);
 
-                            using (var upsertNotificationCommand = new SqlCommand())
+                            new NotificationUpserter
                             {
-                                upsertNotificationCommand.Connection = connection;
-                                if (id == null || forceNewEntry)
-                                {
-                                    id = Guid.NewGuid().ToString();
-                                }
-                                upsertNotificationCommand.CommandText = GenerateUpsertSql(forceNewEntry, id);
+                                Connection = connection,
+                                Id = id,
+                                TemplateId = templateid,
+                                CurUserId = curUser.ID,
+                                Subject = subject,
+                                Body = body,
+                                ForceNewEntry = forceNewEntry,
+                                HideFrom = hidefrom,
+                                DoNotEmail = doNotEmail,
+                                SiteId = site.ID,
+                                WebId = web.ID,
+                                ListItemParentListID = DBNull.Value,
+                                ListItemId = DBNull.Value
+                            }.Upsert();
 
-                                upsertNotificationCommand.Parameters.AddWithValue("@id", id);
-                                upsertNotificationCommand.Parameters.AddWithValue("@title", subject);
-                                upsertNotificationCommand.Parameters.AddWithValue("@message", body);
-                                upsertNotificationCommand.Parameters.AddWithValue("@type", templateid);
-                                if (hidefrom)
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", _defaultUserId);
-                                }
-                                else
-                                {
-                                    upsertNotificationCommand.Parameters.AddWithValue("@createdby", curUser.ID);
-                                }
-                                upsertNotificationCommand.Parameters.AddWithValue("@siteid", site.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@webid", web.ID);
-                                upsertNotificationCommand.Parameters.AddWithValue("@listid", DBNull.Value);
-                                upsertNotificationCommand.Parameters.AddWithValue("@itemid", DBNull.Value);
-                                upsertNotificationCommand.Parameters.AddWithValue("@emailed", doNotEmail);
-                                upsertNotificationCommand.ExecuteNonQuery();
-                            }
-
-                            ProcessNewUsers(newusers, unmarkread, web, connection, id);
+                            ProcessNewUsers(newusers, unmarkread, connection, id, web: web);
                             DeleteUsers(delusers, connection, id);
                         }
                     }
@@ -663,20 +532,17 @@ namespace EPMLiveCore.API
         private static void ProcessNewUsers(
             string[] newUsers, 
             bool unmarkread, 
-            SPWeb web, 
             SqlConnection connection, 
-            string id)
+            string id,
+            SPWeb web = null,
+            SPListItem listItem = null)
         {
-            var dataSet = new DataSet();
-            using (var personalizationCommand =
-                new SqlCommand("select * from personalizations where FK=@id", connection))
+            if (web == null && listItem == null)
             {
-                personalizationCommand.Parameters.AddWithValue("@id", id);
-                using (var dataAdapter = new SqlDataAdapter(personalizationCommand))
-                {
-                    dataAdapter.Fill(dataSet);
-                }
+                throw new ArgumentException($"{nameof(web)} or {nameof(listItem)} must be set.");
             }
+
+            var dataSet = GetPersonalizationDataSet(connection, id);
 
             foreach (var user in newUsers)
             {
@@ -695,7 +561,7 @@ namespace EPMLiveCore.API
                     }
                     if (!found)
                     {
-                        InsertPersonalization(web, connection, id, user);
+                        InsertPersonalization(connection, id, user, web, listItem);
                     }
                     if (unmarkread)
                     {
@@ -705,10 +571,14 @@ namespace EPMLiveCore.API
             }
         }
 
-        private static void InsertPersonalization(SPWeb web, SqlConnection connection, string id, string user)
+        private static void InsertPersonalization(
+            SqlConnection connection, 
+            string id, 
+            string user, 
+            SPWeb web = null, 
+            SPListItem listItem = null)
         {
-            using (var command = 
-                    new SqlCommand(
+            using (var command = new SqlCommand(
                         "INSERT INTO personalizations " +
                         "(FK, [key], value, userid, siteid, webid, listid, itemid) " +
                         "VALUES (@id, 'Notifications', @value, @userid, @siteid, @webid, @listid, @itemid)",
@@ -717,10 +587,10 @@ namespace EPMLiveCore.API
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@value", "00");
                 command.Parameters.AddWithValue("@userid", user);
-                command.Parameters.AddWithValue("@siteid", web.Site.ID);
-                command.Parameters.AddWithValue("@webid", web.ID);
-                command.Parameters.AddWithValue("@listid", DBNull.Value);
-                command.Parameters.AddWithValue("@itemid", DBNull.Value);
+                command.Parameters.AddWithValue("@siteid", listItem?.ParentList.ParentWeb.Site.ID ?? web.Site.ID);
+                command.Parameters.AddWithValue("@webid", listItem?.ParentList.ParentWeb.ID ?? web.ID);
+                command.Parameters.AddWithValue("@listid", listItem?.ParentList.ID ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@itemid", listItem?.ID ?? (object)DBNull.Value);
                 command.ExecuteNonQuery();
             }
         }
