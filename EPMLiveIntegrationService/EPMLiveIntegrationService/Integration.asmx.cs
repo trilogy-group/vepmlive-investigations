@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -44,7 +44,7 @@ namespace EPMLiveIntegrationService
         [SoapDocumentMethod(Action = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03/Notify", RequestNamespace = "http://schemas.microsoft.com/TeamFoundation/2005/06/Services/Notification/03")]
         public string Notify(string eventXml, string tfsIdentityXml)
         {
-            var ret = string.Empty;
+            var result = string.Empty;
             XmlDocument xmlDocument;
             XmlNode xmlNode;
             try
@@ -60,8 +60,8 @@ namespace EPMLiveIntegrationService
                             xmlNode = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/IntegerFields/Field");
                             var xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
                             long ID;
-                            bool isDeleted = false;
-                            if (xmlNode != null && Int64.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
+                            var isDeleted = false;
+                            if (xmlNode != null && long.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
                             {
                                 if (xmlNodeToCheckDelete != null)
                                 {
@@ -74,7 +74,7 @@ namespace EPMLiveIntegrationService
                                 {
                                     if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                                     {
-                                        ret = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
+                                        result = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
                                         break;
                                     }
                                 }
@@ -87,21 +87,21 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
             finally
             {
                 xmlDocument = null;
                 xmlNode = null;
             }
-            return ret;
+            return result;
         }
 
 
         [WebMethod]
         public UserInfo CheckAuth(string AuthCode)
         {
-            var ui = new UserInfo {bValidAuth = false};
+            var userInfo = new UserInfo { bValidAuth = false };
 
             var farm = SPFarm.Local;
             //Get all SharePoint Web services 
@@ -111,17 +111,17 @@ namespace EPMLiveIntegrationService
             {
                 if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                 {
-                    ui = iCheckAuth(webapp, AuthCode);
+                    userInfo = iCheckAuth(webapp, AuthCode);
                 }
             }
 
-            return ui;
+            return userInfo;
         }
 
         [WebMethod]
         public string PostItemSimple(string IntegrationKey, string ID)
         {
-            string ret = string.Empty;
+            var result = string.Empty;
 
             try
             {
@@ -133,22 +133,22 @@ namespace EPMLiveIntegrationService
                 {
                     if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iPostSimple(webapp, IntegrationKey, ID, "1");
+                        result = iPostSimple(webapp, IntegrationKey, ID, "1");
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = $"<Error>{ex.Message}</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         [WebMethod]
         public string AddUpdateItem(string IntegrationKey, string XML)
         {
-            var ret = string.Empty;
+            var result = string.Empty;
 
             try
             {
@@ -160,22 +160,22 @@ namespace EPMLiveIntegrationService
                 {
                     if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iPostComplex(webapp, IntegrationKey, XML);
+                        result = iPostComplex(webapp, IntegrationKey, XML);
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = $"<Error>{ex.Message}</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         [WebMethod]
         public string DeleteItem(string IntegrationKey, string ID)
         {
-            var ret = string.Empty;
+            var result = string.Empty;
 
             try
             {
@@ -187,21 +187,21 @@ namespace EPMLiveIntegrationService
                 {
                     if (webapp.Name == ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iDeleteItem(webapp, IntegrationKey, ID);
+                        result = iDeleteItem(webapp, IntegrationKey, ID);
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = $"<Error>{ex.Message}</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private UserInfo iCheckAuth(SPWebApplication webapp, string AuthCode)
         {
-            var ui = new UserInfo {bValidAuth = false};
+            var ui = new UserInfo { bValidAuth = false };
             using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
             {
                 connection.Open();
@@ -210,13 +210,13 @@ namespace EPMLiveIntegrationService
                 using (var command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@authid", AuthCode);
-                    using (var dr = command.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        if (dr.Read())
+                        if (dataReader.Read())
                         {
                             ui.bValidAuth = true;
-                            ui.username = dr.GetString(0);
-                            ui.email = dr.GetString(1);
+                            ui.username = dataReader.GetString(0);
+                            ui.email = dataReader.GetString(1);
                         }
                     }
                 }
@@ -231,7 +231,7 @@ namespace EPMLiveIntegrationService
             return ui;
         }
 
-        private bool iAuthenticate(string IntegrationKey, out string ret, out DataSet dsIntegration, SqlConnection connection)
+        private bool iAuthenticate(string IntegrationKey, out string result, out DataSet dsIntegration, SqlConnection connection)
         {
             var attempts = 0;
 
@@ -261,11 +261,11 @@ namespace EPMLiveIntegrationService
 
                 if (GetRowsCount(dsIntegration) > 0)
                 {
-                    ret = string.Empty;
+                    result = string.Empty;
                     return true;
                 }
 
-                ret = "<Error>Invalid Key</Error>";
+                result = "<Error>Invalid Key</Error>";
                 var found = false;
                 var sql = "SELECT * FROM INT_IP where IP=@ip and DTLOGGED > DATEADD (d , -1 , GETDATE() ) and intkey=@intkey";
                 using (var commmand = new SqlCommand(sql, connection))
@@ -294,12 +294,12 @@ namespace EPMLiveIntegrationService
             }
             else
             {
-                ret = "<Error>Too Many Attempts</Error>";
+                result = "<Error>Too Many Attempts</Error>";
             }
             return false;
         }
 
-        public static int GetRowsCount(DataSet dataSet, int tableIndex =0)
+        public static int GetRowsCount(DataSet dataSet, int tableIndex = 0)
         {
             return dataSet.Tables.Count > tableIndex
                 ? dataSet.Tables[tableIndex].Rows.Count
@@ -355,7 +355,7 @@ namespace EPMLiveIntegrationService
 
         private string iPostComplex(SPWebApplication webapp, string IntegrationKey, string XML)
         {
-            string ret;
+            string result;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
@@ -364,7 +364,7 @@ namespace EPMLiveIntegrationService
 
                     var dsIntegration = new DataSet();
 
-                    if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
                     {
                         if (GetRowValue(dsIntegration, "MODULE_ID") == ModuleId)
                         {
@@ -396,24 +396,24 @@ namespace EPMLiveIntegrationService
 
                                     foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
                                     {
-                                        var ID = string.Empty;
+                                        var id = string.Empty;
 
                                         try
                                         {
-                                            ID = ndItem.SelectSingleNode($"Fields/Field[@Name='{idCol}']").InnerText;
+                                            id = ndItem.SelectSingleNode($"Fields/Field[@Name='{idCol}']").InnerText;
                                         }
                                         catch (XPathException ex)
                                         {
                                             Debug.WriteLine("Error evaluating XPath: " + ex);
                                         }
 
-                                        if (!string.IsNullOrWhiteSpace(ID))
+                                        if (!string.IsNullOrWhiteSpace(id))
                                         {
                                             sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)";
                                             using (var command = new SqlCommand(sql, connection))
                                             {
                                                 command.Parameters.AddWithValue("@listid", GetRowValue(dsIntegration, "LIST_ID"));
-                                                command.Parameters.AddWithValue("@intitemid", ID);
+                                                command.Parameters.AddWithValue("@intitemid", id);
                                                 command.Parameters.AddWithValue("@colid", GetRowValue(dsIntegration, "INT_COLID"));
                                                 command.Parameters.AddWithValue("@data", ndItem.OuterXml);
                                                 command.ExecuteNonQuery();
@@ -421,21 +421,21 @@ namespace EPMLiveIntegrationService
                                         }
                                     }
 
-                                    ret = "<Success/>";
+                                    result = "<Success/>";
                                 }
                                 else
                                 {
-                                    ret = "<Error>ID Column not specified in settings</Error>";
+                                    result = "<Error>ID Column not specified in settings</Error>";
                                 }
                             }
                             else
                             {
-                                ret = "<Error>" + sError + "</Error>";
+                                result = $"<Error>{sError}</Error>";
                             }
                         }
                         else
                         {
-                            ret = "<Error>That integration key is not a generic integration</Error>";
+                            result = "<Error>That integration key is not a generic integration</Error>";
                         }
                     }
                 }
@@ -443,14 +443,14 @@ namespace EPMLiveIntegrationService
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private string iPostSimple(SPWebApplication webapp, string IntegrationKey, string ID, string type)
         {
-            string ret;
+            string result;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
@@ -459,7 +459,7 @@ namespace EPMLiveIntegrationService
 
                     var dsIntegration = new DataSet();
 
-                    if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
                     {
                         var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)";
                         using (var command = new SqlCommand(sql, connection))
@@ -471,21 +471,21 @@ namespace EPMLiveIntegrationService
                             command.ExecuteNonQuery();
                         }
 
-                        ret = "<Success/>";
+                        result = "<Success/>";
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                ret = $"<Error>{ex.Message}</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
 
         private string iDeleteItem(SPWebApplication webapp, string IntegrationKey, string ID)
         {
-            string ret;
+            string result;
             try
             {
                 using (var connection = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id)))
@@ -494,7 +494,7 @@ namespace EPMLiveIntegrationService
 
                     var dsIntegration = new DataSet();
 
-                    if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, connection))
+                    if (iAuthenticate(IntegrationKey, out result, out dsIntegration, connection))
                     {
                         var sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 2)";
                         using (var command = new SqlCommand(sql, connection))
@@ -505,15 +505,15 @@ namespace EPMLiveIntegrationService
                             command.ExecuteNonQuery();
                         }
 
-                        ret = "<Success/>";
+                        result = "<Success/>";
                     }
                 }
             }
             catch (Exception ex)
             {
-                ret = "<Error>" + ex.Message + "</Error>";
+                result = $"<Error>{ex.Message}</Error>";
             }
-            return ret;
+            return result;
         }
     }
 }
