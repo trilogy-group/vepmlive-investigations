@@ -50,15 +50,10 @@ SetAssemblyFileVersion (Join-Path $epmLiveInstallerRoot "NewsGator.Install.Resou
 $epmLiveInstallLauncherRoot = Join-Path $epmLiveInstallerRoot "EPMLive.Install.Launcher"
 SetAssemblyFileVersion (Join-Path $epmLiveInstallLauncherRoot "Properties/AssemblyInfo.cs") $version
 $epmLiveInstallerSln = Join-Path $epmLiveInstallerRoot "EPMLive.Installer.sln"
-$msbuild = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
-Write-Host "Launch & $msbuild /p:Configuration="Release" /p:Platform="Any CPU" /m:4 $epmLiveInstallerSln"
-& $msbuild /p:Configuration="Release" /p:Platform="Any CPU" /m:4 $epmLiveInstallerSln
-if ($LastExitCode) {
-    throw "Msbuild failed with exit code $LastExitCode"
-}
-$epmLiveInstallerBin = Join-Path $epmLiveInstallLauncherRoot "bin/Release"
+RunMsBuild $epmLiveInstallerSln
 
 Write-Host "Copy GUI installer to output dir"
+$epmLiveInstallerBin = Join-Path $epmLiveInstallLauncherRoot "bin/Release"
 Copy-Item -Path (Join-Path $epmLiveInstallerBin "*") -Destination $outputDir -Recurse -Exclude "*.pdb"
 
 Write-Host "Done. Installer is located at $outputDir"
