@@ -85,12 +85,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebPageCode\GetgantttasksTests.cs" />
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
-    <Compile Include="WebPageCode\MockHttpContext.cs" />
-    <Compile Include="WebPageCode\MockHttpResponse.cs" />
-    <Compile Include="WebPageCode\MockHttpRequest.cs" />
-    <Compile Include="WebPageCode\TestablePage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
