@@ -1,6 +1,7 @@
 export class OptimizerPageConstants {
     static readonly newViewName = 'New View';
     static readonly viewTab= 'View tab';
+    static readonly saveView= 'Save view popup';
 
     static get viewManagementOptions() {
         return {
@@ -39,4 +40,3 @@ export class OptimizerPageConstants {
         };
     }
 }
-

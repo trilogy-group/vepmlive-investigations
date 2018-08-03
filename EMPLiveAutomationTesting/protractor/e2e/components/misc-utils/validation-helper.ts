@@ -132,4 +132,8 @@ export class ValidationsHelper {
     static getNewViewCloumnShouldDisplayed(columnName: string) {
         return `Newly created public view ${columnName} should be selected`;
     }
+
+    static getNewViewShouldDisplayed(viewName: string) {
+        return `Newly created  view ${viewName} should be selected`;
+    }
 }

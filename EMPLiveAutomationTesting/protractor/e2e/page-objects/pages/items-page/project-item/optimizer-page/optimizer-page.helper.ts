@@ -31,7 +31,7 @@ export class OptimizerPageHelper {
         stepLogger.verification('Columns which were selected and saved for this particular view displayed');
         for ( i = 0; i < columnsSelected.length - 1 ; i++) {
             await expect(columnsSelected).toContain( await OptimizerPage.getDisplyedColumns( i + 1).getText(),
-                ValidationsHelper.getDisplayedValidation(columnsSelected[i]));
+                ValidationsHelper.getNewViewCloumnShouldDisplayed(columnsSelected[i]));
         }
     }
 
