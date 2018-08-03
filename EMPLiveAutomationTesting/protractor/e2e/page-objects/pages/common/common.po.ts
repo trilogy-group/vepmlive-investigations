@@ -121,6 +121,7 @@ export class CommonPage extends BasePage {
             editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource, true),
             resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer),
             delete: CommonPageHelper.getRibbonButtonById(labels.delete),
+            optimizer: CommonPageHelper.getRibbonButtonByText(labels.optimizer)
         };
     }
 
