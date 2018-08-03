@@ -207,7 +207,10 @@ namespace EPMLive.TestFakes.Utility
 
         private ShimSPSite InitializeSPSiteShim()
         {
-            return new ShimSPSite();
+            return new ShimSPSite
+            {
+                WebApplicationGet = () => ApplicationShim
+            };
         }
 
         private ShimSPFieldUserValue InitializeSPFieldUserValueShim()
@@ -254,6 +257,7 @@ namespace EPMLive.TestFakes.Utility
             ShimSPSite.ConstructorString = (instance, url) => new Func<ShimSPSite>(() => SiteShim)();
             ShimSPSite.AllInstances.OpenWeb = instance => WebShim;
             ShimSPSite.AllInstances.OpenWebGuid = (instance, webId) => WebShim;
+            ShimSPSite.AllInstances.WebApplicationGet = (instance) => ApplicationShim;
 
             ShimSPFieldUserValue.ConstructorSPWebString = (instance, web, fieldValue) => new Func<ShimSPFieldUserValue>(() => FieldUserValueShim)();
             ShimSPFieldUserValue.AllInstances.UserGet = instance => UserShim;
