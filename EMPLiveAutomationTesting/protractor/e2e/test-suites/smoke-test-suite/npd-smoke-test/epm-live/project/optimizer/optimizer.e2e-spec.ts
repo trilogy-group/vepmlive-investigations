@@ -1,17 +1,18 @@
+import {browser} from 'protractor';
 import {SuiteNames} from '../../../../../helpers/suite-names';
 import {LoginPage} from '../../../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../../../components/html/page-helper';
 import {StepLogger} from '../../../../../../../core/logger/step-logger';
+import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
+import {TextboxHelper} from '../../../../../../components/html/textbox-helper';
 import {CommonPageHelper} from '../../../../../../page-objects/pages/common/common-page.helper';
+import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../../../page-objects/pages/common/common-page.constants';
+import {WaitHelper} from '../../../../../../components/html/wait-helper';
+import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
 import {OptimizerPage} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer.po';
 import {OptimizerPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 import {OptimizerPageConstants} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.constants';
-import {browser} from 'protractor';
-import {WaitHelper} from '../../../../../../components/html/wait-helper';
-import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
-import {CommonPage} from '../../../../../../page-objects/pages/common/common.po';
-import {ValidationsHelper} from '../../../../../../components/misc-utils/validation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -72,8 +73,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // Generating unique save name
         const uniqueId = PageHelper.getUniqueId();
         const viewName = `${OptimizerPageConstants.newViewName}${uniqueId}`;
-        await label.viewName.clear();
-        await PageHelper.sendKeysToInputField(label.viewName, viewName);
+        await TextboxHelper.sendKeys(label.viewName, viewName);
         const personalViewSelected = await label.personalView.isSelected();
         if (!personalViewSelected) {
             await PageHelper.click(label.personalView);
