@@ -3702,51 +3702,55 @@ namespace EPMLiveCore
 
         public static void enqueue(Guid timerjobuid, int defaultstatus, SPSite site)
         {
-            using (SPWeb web = site.OpenWeb())
+            using (var web = site.OpenWeb())
             {
                 //Added code for the Cost Planner Integration - EPML-5327
-                int userid = 0;
-                if (web.CurrentUser == null)
-                    userid = 1;
-                else
-                    userid = web.CurrentUser.ID;
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SqlConnection cn = new SqlConnection(getConnectionString(site.WebApplication.Id));
-                    cn.Open();
+                    var status = 2;
 
-                    SqlCommand cmd = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", cn);
-                    cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    int status = 2;
-
-                    if (dr.Read())
+                    using (var connection = new SqlConnection(getConnectionString(site.WebApplication.Id)))
                     {
-                        status = dr.GetInt32(0);
+                        connection.Open();
+
+                        using (var command = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", connection))
+                        {
+                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    status = dataReader.GetInt32(0);
+                                }
+                            }
+                        }
+
+                        if (status == 2)
+                        {
+                            using (var command = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.ExecuteNonQuery();
+                            }
+
+                            using (var command = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.ExecuteNonQuery();
+                            }
+
+                            using (var command = new SqlCommand(@"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
+                                                                  VALUES (@timerjobuid, @status, 0, @userid) ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.Parameters.AddWithValue("@status", defaultstatus);
+                                command.Parameters.AddWithValue("@userid", web.CurrentUser != null ? web.CurrentUser.ID : 1);
+                                command.ExecuteNonQuery();
+                            }
+                        }
                     }
-
-                    dr.Close();
-
-                    if (status == 2)
-                    {
-                        cmd = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.ExecuteNonQuery();
-
-                        cmd = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.ExecuteNonQuery();
-
-                        cmd = new SqlCommand("INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) VALUES (@timerjobuid, @status, 0, @userid) ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.Parameters.AddWithValue("@status", defaultstatus);
-                        cmd.Parameters.AddWithValue("@userid", userid);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    cn.Close();
                 });
             }
         }
