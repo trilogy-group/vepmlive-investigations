@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EPMLiveWebParts.Tests.WebPageCode
 {
     [TestClass]
-    public class GetgantttasksTests
+    public class GetGanttTasksTests
     {
         private IDisposable _shimContext;
         private SharepointShims _sharepointShims;
