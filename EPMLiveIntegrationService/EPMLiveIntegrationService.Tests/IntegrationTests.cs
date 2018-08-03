@@ -11,7 +11,6 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TimerService.Fakes;
 
 namespace EPMLiveIntegrationService.Tests
 {
