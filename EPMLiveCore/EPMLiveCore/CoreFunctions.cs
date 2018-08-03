@@ -3702,6 +3702,11 @@ namespace EPMLiveCore
 
         public static void enqueue(Guid timerjobuid, int defaultstatus, SPSite site)
         {
+            if (site == null)
+            {
+                throw new ArgumentNullException("site");
+            }
+
             using (var web = site.OpenWeb())
             {
                 //Added code for the Cost Planner Integration - EPML-5327
