@@ -1,19 +1,12 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.Text;
-using System.Xml;
-using System.Text.RegularExpressions;
-
+using System.Data;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
+using System.Web;
+using System.Xml;
+using DiagTrace = System.Diagnostics.Trace;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts
 {
@@ -923,129 +916,163 @@ namespace EPMLiveWebParts
 
         private void processList(SPWeb web, string spquery, SPList curList, SortedList arrGTemp)
         {
-            SPQuery query = new SPQuery();
-                query.Query = spquery;
-
-                foreach (SPListItem li in curList.GetItems(query))
+            var query = new SPQuery { Query = spquery };
+            foreach (SPListItem listItem in curList.GetItems(query))
+            {
+                if (!(string.Equals(Request["ignorelistid"], curList.ID.ToString("B"), StringComparison.CurrentCulture) && 
+                    string.Equals(Request["ignoreitemid"], listItem.ID.ToString(), StringComparison.CurrentCulture)))
                 {
-                    if (!(Request["ignorelistid"] == curList.ID.ToString("B") && Request["ignoreitemid"] == li.ID.ToString()))
+                    var canView = true;
+                    if (filterfield != string.Empty)
                     {
-                        bool canView = true;
-                        if (filterfield != "")
+                        try
                         {
-                            try
+                            var field = listItem.Fields.GetFieldByInternalName(filterfield);
+                            string val = listItem[field.Id].ToString();
+                            if (field.Type == SPFieldType.Lookup)
                             {
-                                SPField f = li.Fields.GetFieldByInternalName(filterfield);
-                                string val = li[f.Id].ToString();
-                                if (f.Type == SPFieldType.Lookup)
-                                {
-                                    val = val.Replace(";#", "\n").Split('\n')[1];
-                                }
-                                if (val != filtervalue)
-                                {
-                                    canView = false;
-                                }
+                                val = val.Replace(";#", "\n").Split('\n')[1];
                             }
-                            catch { }
-                        }
-                        if (canView)
-                        {
-                            string[] group = new string[1] { null };
-                            if (arrGroupFields != null)
+                            if (val != filtervalue)
                             {
-                                foreach (string groupby in arrGroupFields)
+                                canView = false;
+                            }
+                        }
+                        catch(Exception exception)
+                        {
+                            DiagTrace.TraceError(exception.ToString());
+                        }
+                    }
+                    if (canView)
+                    {
+                        var group = new string[] { null };
+                        if (arrGroupFields != null)
+                        {
+                            foreach (var groupBy in arrGroupFields)
+                            {
+                                if ("--SITE--".Equals(groupBy, StringComparison.InvariantCulture))
                                 {
-
-                                    if (groupby == "--SITE--")
+                                    if (group[0] == null)
                                     {
-                                        if (group[0] == null)
-                                            group[0] = web.Title;
-                                        else
-                                            group[0] += "\n" + web.Title;
-                                        if (!arrGTemp.Contains(group[0]))
-                                        {
-                                            arrGTemp.Add(group[0], "");
-                                        }
+                                        group[0] = web.Title;
                                     }
                                     else
                                     {
-                                        SPField field = list.Fields.GetFieldByInternalName(groupby);
-                                        string newgroup = getField(li, groupby);
-                                        if (newgroup == "")
-                                            newgroup = " No " + field.Title;
-                                        if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.TypeAsString == "LookupMulti")
-                                        {
-                                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(newgroup);
-
-                                            if (lvc.Count > 0)
-                                            {
-                                                //string[] sGroups = newgroup.Replace(";#","\n").Split('\n');
-                                                string[] tmpGroups = new string[group.Length * lvc.Count];
-
-                                                //group = new string[sGroups.Length];
-                                                int tmpCounter = 0;
-                                                foreach (string g in group)
-                                                {
-                                                    foreach (SPFieldLookupValue lv in lvc)
-                                                    {
-                                                        if (g == null)
-                                                            tmpGroups[tmpCounter] = lv.LookupValue;
-                                                        else
-                                                            tmpGroups[tmpCounter] = g + "\n" + lv.LookupValue;
-
-                                                        if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                                        {
-                                                            arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                                        }
-                                                        tmpCounter++;
-                                                    }
-                                                }
-                                                group = tmpGroups;
-                                            }
-                                            else
-                                            {
-                                                int tmpCounter = 0;
-                                                string[] tmpGroups = new string[group.Length];
-                                                foreach (string g in group)
-                                                {
-                                                    if (g == null)
-                                                        tmpGroups[tmpCounter] = "";
-                                                    else
-                                                        tmpGroups[tmpCounter] = g + "\n";
-
-                                                    if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                                    {
-                                                        arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                                    }
-                                                    tmpCounter++;
-                                                }
-                                                group = tmpGroups;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true);
-                                            for (int i = 0; i < group.Length; i++)
-                                            {
-                                                if (group[i] == null)
-                                                    group[i] = newgroup;
-                                                else
-                                                    group[i] += "\n" + newgroup;
-                                                if (!arrGTemp.Contains(group[i]))
-                                                {
-                                                    arrGTemp.Add(group[i], "");
-                                                }
-                                            }
-                                        }
+                                        group[0] += $"\n{web.Title}";
                                     }
-
+                                    if (!arrGTemp.Contains(group[0]))
+                                    {
+                                        arrGTemp.Add(group[0], string.Empty);
+                                    }
+                                }
+                                else
+                                {
+                                    var field = list.Fields.GetFieldByInternalName(groupBy);
+                                    var newgroup = getField(listItem, groupBy);
+                                    if (newgroup == string.Empty)
+                                    {
+                                        newgroup = $" No {field.Title}";
+                                    }
+                                    ProcessField(arrGTemp, ref group, groupBy, field, ref newgroup);
                                 }
                             }
-                            arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
-                            queueAllItems.Enqueue(li);
                         }
+                        arrItems.Add(string.Join(".", web.ID, listItem.ParentList.ID, listItem.ID), group);
+                        queueAllItems.Enqueue(listItem);
                     }
                 }
+            }
+        }
+
+        private void ProcessField(
+            SortedList arrGTemp, 
+            ref string[] groups, 
+            string groupby, 
+            SPField field, 
+            ref string newgroup)
+        {
+            if (field.Type == SPFieldType.User || 
+                field.Type == SPFieldType.MultiChoice || 
+                field.TypeAsString == "LookupMulti")
+            {
+                groups = ProcessUserField(arrGTemp, groups, newgroup);
+            }
+            else
+            {
+                newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true);
+                for (int iGroup = 0; iGroup < groups.Length; iGroup++)
+                {
+                    if (groups[iGroup] == null)
+                    {
+                        groups[iGroup] = newgroup;
+                    }
+                    else
+                    {
+                        groups[iGroup] += $"\n{newgroup}";
+                    }
+                    if (!arrGTemp.Contains(groups[iGroup]))
+                    {
+                        arrGTemp.Add(groups[iGroup], string.Empty);
+                    }
+                }
+            }
+        }
+
+        private static string[] ProcessUserField(SortedList arrGTemp, string[] groups, string newgroup)
+        {
+            var lookupCollection = new SPFieldLookupValueCollection(newgroup);
+
+            if (lookupCollection.Count > 0)
+            {
+                var tmpGroups = new string[groups.Length * lookupCollection.Count];
+                var tmpCounter = 0;
+                foreach (var currentGroup in groups)
+                {
+                    foreach (var lookupValue in lookupCollection)
+                    {
+                        if (currentGroup == null)
+                        {
+                            tmpGroups[tmpCounter] = lookupValue.LookupValue;
+                        }
+                        else
+                        {
+                            tmpGroups[tmpCounter] = $"{currentGroup}\n{lookupValue.LookupValue}";
+                        }
+
+                        if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
+                        {
+                            arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
+                        }
+                        tmpCounter++;
+                    }
+                }
+                groups = tmpGroups;
+            }
+            else
+            {
+                var tmpCounter = 0;
+                var tmpGroups = new string[groups.Length];
+                foreach (string currentGroup in groups)
+                {
+                    if (currentGroup == null)
+                    {
+                        tmpGroups[tmpCounter] = string.Empty;
+                    }
+                    else
+                    {
+                        tmpGroups[tmpCounter] = $"{currentGroup}\n";
+                    }
+
+                    if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
+                    {
+                        arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
+                    }
+                    tmpCounter++;
+                }
+                groups = tmpGroups;
+            }
+
+            return groups;
         }
 
         private string additionalPerfFields(string dqFields, ArrayList arr)
