@@ -74,7 +74,7 @@ namespace EPMLiveCore.Tests
         public void enqueue_Always_CorrectlyManagesDatabaseConnection()
         {
             // Arrange
-            const string connectionStringExpected = "test-connection-string";
+            const string connectionStringExpected = @"Data Source=(local)\SQLExpress;Initial Catalog=MyDatabase;";
             ShimCoreFunctions.getConnectionStringGuid = webApplicationId => connectionStringExpected;
 
             // Act
