@@ -172,8 +172,7 @@ namespace EPMLiveCore.API
 
                                     if (!string.IsNullOrEmpty(creatorThumbnail))
                                     {
-                                        epmNotification.CreatorThumbnail =
-                                            creatorThumbnail.Remove(creatorThumbnail.IndexOf(','));
+                                        epmNotification.CreatorThumbnail = creatorThumbnail.IndexOf(',') >= 0 ? creatorThumbnail.Remove(creatorThumbnail.IndexOf(',')) : creatorThumbnail;
                                     }
                                 }
                             }
