@@ -847,8 +847,8 @@ namespace EPMLiveWorkPlanner
 
                     if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject) || isKanban)
                     {
-
-                        arrPlanners.Add(sPlanner[0], sPlanner[1]);
+                        if(!arrPlanners.ContainsKey(sPlanner[0]))
+                            arrPlanners.Add(sPlanner[0], sPlanner[1]);
 
                         bool bFPJ = false;
 

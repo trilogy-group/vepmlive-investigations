@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportHelper.Fakes;
 
-namespace EPMLive.TestFakes
+namespace EPMLive.TestFakes.Utility
 {
     public class AdoShims
     {
@@ -50,6 +50,8 @@ namespace EPMLive.TestFakes
             ShimEPMData.ConstructorGuid = (instance, siteId) => { };
             ShimCoreFunctions.getConfigSettingSPWebString = (web, name) => string.Empty;
 
+            ShimSqlConnection.AllInstances.Open = instance => { };
+
             ShimSqlCommand.AllInstances.ExecuteReader = instance =>
             {
                 var result = new ShimSqlDataReader();
@@ -57,6 +59,19 @@ namespace EPMLive.TestFakes
                 DataReadersCreated.Add(instance, result.Instance);
                 return result;
             };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = instance => 1;
+            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
+            {
+                instance.CommandText = commandText;
+                instance.Connection = connection;
+                CommandsCreated.Add(instance);
+            };
+            ShimSqlCommand.ConstructorString = (instance, commandText) =>
+            {
+                instance.CommandText = commandText;
+                CommandsCreated.Add(instance);
+            };
+
             ShimDbDataReader.AllInstances.Dispose = instance =>
             {
                 if (instance is SqlDataReader)
@@ -64,17 +79,18 @@ namespace EPMLive.TestFakes
                     DataReadersDisposed.Add(DataReadersCreated.Single(pred => pred.Value == instance as SqlDataReader));
                 }
             };
-            ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
-            {
-                instance.CommandText = commandText;
-                instance.Connection = connection;
-                CommandsCreated.Add(instance);
-            };
+
             ShimSqlDataAdapter.ConstructorSqlCommand = (instance, command) =>
             {
                 instance.SelectCommand = command;
                 DataAdaptersCreated.Add(command, instance);
             };
+            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
+            {
+                dataSet.Tables.Add();
+                return 1;
+            };
+
             ShimComponent.AllInstances.Dispose = instance =>
             {
                 if (instance is SqlConnection)
@@ -90,12 +106,6 @@ namespace EPMLive.TestFakes
                     DataAdaptersDisposed.Add(
                         DataAdaptersCreated.Single(pred => pred.Value == instance as SqlDataAdapter));
                 }
-            };
-
-            ShimDbDataAdapter.AllInstances.FillDataSet = (instance, dataSet) =>
-            {
-                dataSet.Tables.Add();
-                return 1;
             };
         }
     }

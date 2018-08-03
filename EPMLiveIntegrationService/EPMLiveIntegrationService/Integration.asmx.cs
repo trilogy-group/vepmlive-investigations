@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -407,7 +407,7 @@ namespace EPMLiveIntegrationService
                                             Debug.WriteLine("Error evaluating XPath: " + ex);
                                         }
 
-                                        if (!string.IsNullOrWhiteSpace(ID)))
+                                        if (!string.IsNullOrWhiteSpace(ID))
                                         {
                                             sql = "INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE, DATA) VALUES (@listid, @intitemid, @colid, 0, 2, 1, @data)";
                                             using (var command = new SqlCommand(sql, connection))
