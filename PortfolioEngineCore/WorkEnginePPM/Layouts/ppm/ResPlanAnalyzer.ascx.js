@@ -577,18 +577,32 @@
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-            var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+            var StartID = -1;
+            if (FromList.selectedIndex > -1) {
+                StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+            }
+            else {
+                StartID = this.UsingPeriods.CurrentPeriod.Value;
+                FromList.selectedIndex = 0;
+                this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+                alert('Start date of the current view does not exist in the selected calendar so default start period has been selected');
+            }
 
             var initialColumnCount = 0;
             this.maxPeriodLimitExceeds = false;
             var hideTemp = [];
             var showTemp = [];
 
-            if (StartID == -1) {
-                StartID = this.UsingPeriods.CurrentPeriod.Value;
-            }
+            var FinishID = ToList.options[ToList.length - 1];
 
-            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            if (ToList.selectedIndex > -1) {
+                FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            }
+            else {
+                ToList.selectedIndex = ToList.length - 1;
+                this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                alert('Finish date of the current view does not exist in the selected calendar so default finish period has been selected');
+            }
 
             for (var i = 0; i < gcols.length; i++) {
                 if (gcols[i] == "P1C1") {
@@ -914,18 +928,32 @@
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-            var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            var StartID = -1;
+            if (FromList.selectedIndex > -1) {
+                StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+            }
+            else {
+                StartID = this.UsingPeriods.CurrentPeriod.Value;
+                FromList.selectedIndex = 0;
+                this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+                alert('Start date of the current view does not exist in the selected calendar so default start period has been selected');
+            }
+
+            var FinishID = ToList.options[ToList.length - 1];
+
+            if (ToList.selectedIndex > -1) {
+                FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            }
+            else {
+                ToList.selectedIndex = ToList.length - 1;
+                this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                alert('Finish date of the current view does not exist in the selected calendar so default finish period has been selected');
+            }
 
             var initialColumnCount = 0;
             this.maxPeriodLimitExceeds = false;
             var hideTemp = [];
             var showTemp = [];
-
-
-            if (StartID == -1) {
-                StartID = this.UsingPeriods.CurrentPeriod.Value;
-            }
 
 
 
@@ -1032,7 +1060,7 @@
                 }
 
                 if (showLoading) {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         grid.ChangeColsVisibility(showTemp, hideTemp, 0);
                         $this.HideWorkingPopup("divLoading");
                         $this.ApplyRowFilters(grid);
