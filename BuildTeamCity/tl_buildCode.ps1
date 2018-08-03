@@ -187,14 +187,17 @@ $nugetPath = $SourcesDirectory + "\nuget.exe"
 $NUVersion = '3.5.0'
 Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v$NUVersion/nuget.exe" -OutFile $nugetPath
 
-Log-Section "Restoring missing packages . . ."
+$nuSln = Resolve-Path $projAbsPath
+Log-Section "Restoring missing packages . . . $nuSln"
 & $nugetPath `
 restore `
-$projAbsPath
+$nuSln
 
+$nuSln = Resolve-Path $projAUTPath
+Log-Section "Restoring missing packages . . . $nuSln"
 & $nugetPath `
 restore `
-$projAUTPath
+$nuSln
 
 if ($TestsOnly)
 {
