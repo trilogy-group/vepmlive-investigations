@@ -19,12 +19,13 @@ export class OptimizerPage extends BasePage {
 
     static get saveViewPopup(){
         const label = OptimizerPageConstants.saveViewPopup;
+        const activeWindow = 'div.dhtmlx_window_active';
         return{
             viewName: element(By.id(label.viewName)),
             defaultView: element(By.id(label.defaultView)),
             personalView: element(By.id(label.personalView)),
-            ok: element(By.css('div.dhtmlx_window_active input[value="OK"]')),
-            cancel: element(By.css('div.dhtmlx_window_active input[value="Cancel"]'))
+            ok: element(By.css(`${activeWindow} input[value="${label.ok}"]`)),
+            cancel: element(By.css(`${activeWindow} input[value="${label.cancel}"]`))
         };
     }
 
@@ -33,7 +34,7 @@ export class OptimizerPage extends BasePage {
         return{
             ok: ElementHelper.getElementByText(label.ok),
             hideAll: ElementHelper.getElementByText(label.hideAll),
-            eachColumn: element.all(By.css('.GMColumnsMenuItemText')),
+            column: element.all(By.css('.GMColumnsMenuItemText')),
             selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div'))
         };
     }

@@ -158,6 +158,13 @@ export class PageHelper {
         return attributeValue.trim();
     }
 
+    static async getText(elem: ElementFinder) {
+        await WaitHelper.getInstance().waitForElementToBePresent(elem);
+        await browser.wait(async () => (await elem.getText()).trim() !== '').catch(() => false);
+        const text = await elem.getText();
+        return text.trim();
+    }
+
     /**
      * Click on element
      * @param {ElementFinder} targetElement
