@@ -4,6 +4,7 @@ using System.Diagnostics.Fakes;
 using System.Security.Principal;
 using System.Web.Fakes;
 using EPMLiveEnterprise;
+using EPMLiveEnterprise.Fakes;
 using EPMLiveEnterprise.WebSvcCustomFields;
 using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcProject.Fakes;
@@ -331,6 +332,115 @@ namespace EPMLivePS.Tests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Length);
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.AreEqual(0, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void SetApprovedTasks_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+            SetupDataReaderShims(1);
+            ShimEPMLivePublisher.AllInstances.getProjectSiteGuid = (_, __) => ValidUrl;
+            ShimSPList.AllInstances.GetItemByIdInt32 = (_, __) => { throw new InvalidOperationException(); };
+
+            // Act
+            var taskApprovalItems = new TaskApprovalItem[] { new TaskApprovalItem() };
+            _publisher.setApprovedTasks(taskApprovalItems, Guid.Empty);
+
+            // Assert
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void SetApprovedTasks_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimEPMLivePublisher.AllInstances.getProjectSiteGuid = (_, __) => ValidUrl;
+            ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            _publisher.setApprovedTasks(null, Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.AreEqual(0, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetPublishType_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+
+            // Act
+            _publisher.getPublishType(Guid.Empty);
+
+            // Assert
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            Assert.IsFalse(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+        }
+
+        [TestMethod]
+        public void GetPublishType_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            _publisher.getPublishType(Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(_isConnectionOpenedCalled);
+            Assert.AreEqual(0, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void IsTaskUpdates_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+            ShimSqlDataReader.AllInstances.Read = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.isTaskUpdates(Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            Assert.IsTrue(_isWriteEntryCalled);
+            AssertThatObjectsAreDisposed();
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void IsTaskUpdates_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            ShimSPWeb.AllInstances.SiteGet = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.isTaskUpdates(Guid.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
             Assert.IsFalse(_isConnectionOpenedCalled);
             Assert.AreEqual(0, _executeReaderCallCount);
             Assert.IsTrue(_isWriteEntryCalled);

@@ -1,10 +1,15 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Reflection;
 using System.Web.Fakes;
+using System.Xml;
+using System.Xml.Fakes;
+using EPMLiveIntegrationService.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint.Administration.Fakes;
+using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPMLiveIntegrationService.Tests
@@ -49,14 +54,134 @@ namespace EPMLiveIntegrationService.Tests
             InvokeMethod(service, "iAuthenticate", new object[] {string.Empty, ret, dsIntegration, new ShimSqlConnection().Instance} );
 
             //Assert
-            Assert.AreEqual(2, disposeCommandWasCalled);
+            Assert.AreEqual(4, disposeCommandWasCalled);
             Assert.AreEqual(1, disposeAdapterWasCalled);
+        }
+
+        [TestMethod]
+        public void iCheckAuth_Should_Dispose()
+        {
+            // Arrange
+            var service = new Integration();
+            ArrangeShims();
+            var disposeCommandWasCalled = 0;
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            {
+                disposeCommandWasCalled++;
+            };
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
+
+            // Act
+            InvokeMethod(service, "iCheckAuth", new object[] { new ShimSPWebApplication().Instance, string.Empty });
+
+            //Assert
+            Assert.AreEqual(2, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeConnectionWasCalled);
+        }
+
+        [TestMethod]
+        public void iDeleteItem_Should_Dispose()
+        {
+            // Arrange
+            var service = new Integration();
+            ArrangeShims();
+            var disposeCommandWasCalled = 0;
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            {
+                disposeCommandWasCalled++;
+            };
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
+            ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
+
+            // Act
+            InvokeMethod(service, "iDeleteItem", new object[] { new ShimSPWebApplication().Instance, string.Empty, string.Empty });
+
+            //Assert
+            Assert.AreEqual(3, disposeCommandWasCalled);
+            Assert.AreEqual(1, disposeConnectionWasCalled);
+        }
+
+        [TestMethod]
+        public void iPostComplex_Should_Dispose()
+        {
+            // Arrange
+            var service = new Integration();
+            ArrangeShims();
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
+            var disposeCommandWasCalled = 0;
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            {
+                disposeCommandWasCalled++;
+            };
+            ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
+            ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
+            ShimSqlDataReader.AllInstances.Read = reader => true;
+            ShimSqlDataReader.AllInstances.GetStringInt32 = (reader, i) => "id";
+            
+            string xml = @"<root>
+    <Items>
+        <Item>
+            <Fields>
+                <Field name='id'>
+                </Field>
+            </Fields>
+        </Item>
+    </Items>
+</root>";
+            var document = new XmlDocument();
+            document.LoadXml(xml);
+            ShimXmlNode.AllInstances.SelectNodesString = (node, s) => new ShimXmlNodeList(document.ChildNodes);
+
+            // Act
+            InvokeMethod(service, "iPostComplex", new object[] { new ShimSPWebApplication().Instance, string.Empty, xml });
+
+            //Assert
+            Assert.AreEqual(1, disposeConnectionWasCalled);
+            Assert.AreEqual(4, disposeCommandWasCalled);
+        }
+
+        [TestMethod]
+        public void iPostSimple_Should_Dispose()
+        {
+            // Arrange
+            var service = new Integration();
+            ArrangeShims();
+            var disposeConnectionWasCalled = 0;
+            ShimSqlConnection.AllInstances.DisposeBoolean = (connection, b) =>
+            {
+                disposeConnectionWasCalled++;
+            };
+            var disposeCommandWasCalled = 0;
+            ShimSqlCommand.AllInstances.DisposeBoolean = (command, b) =>
+            {
+                disposeCommandWasCalled++;
+            };
+            ShimIntegration.GetRowsCountDataSetInt32 = (set, i) => 1;
+
+            // Act
+            InvokeMethod(service, "iPostSimple", new object[] { new ShimSPWebApplication().Instance, string.Empty, string.Empty, string.Empty });
+
+            //Assert
+            Assert.AreEqual(1, disposeConnectionWasCalled);
+            Assert.AreEqual(3, disposeCommandWasCalled);
         }
 
         private void ArrangeShims()
         {
-            ShimHttpContext.CurrentGet = () => new ShimHttpContext(); 
-            ShimHttpContext.AllInstances.RequestGet =context => new ShimHttpRequest();
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext();
+            ShimHttpContext.AllInstances.RequestGet = context => new ShimHttpRequest();
 
             ShimHttpRequest.AllInstances.UserHostAddressGet = request => string.Empty;
 
@@ -68,6 +193,24 @@ namespace EPMLiveIntegrationService.Tests
             ShimSqlDataAdapter.ConstructorSqlCommand = (adapter, command) => { };
 
             ShimDbDataAdapter.AllInstances.FillDataSet = (adapter, set) => 0;
+
+            ShimSPSecurity.RunWithElevatedPrivilegesWaitCallbackObject = (callback, o) => { };
+
+            ShimSPPersistedObject.AllInstances.IdGet = o => Guid.Empty;
+
+            ShimSqlConnection.ConstructorString = (connection, s) => { };
+            ShimSqlConnection.AllInstances.Open = connection => { };
+            ShimSqlConnection.AllInstances.Close = connection => { };
+
+            ShimIntegration.GetRowValueDataSetStringInt32Int32 = (set, s, arg3, arg4) => Integration.ModuleId;
+            ShimIntegration.iCheckXmlXmlDocumentStringOut = (XmlDocument document, out string error) =>
+            {
+                error = string.Empty;
+                return true;
+            };
+
+            ShimXmlNode.AllInstances.SelectSingleNodeString = (node, s) => new ShimXmlDocument();
+            ShimXmlNode.AllInstances.InnerTextGet = node => "id";
         }
 
         public static void InvokeMethod(object instance, string methodName, object[] parameters)
