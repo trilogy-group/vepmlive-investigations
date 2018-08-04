@@ -1,67 +1,21 @@
-﻿using EPMLiveWebParts.Fakes;
-using EPMLiveWebParts.Tests.Helpers;
-using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Fakes;
 using System.Web.UI.WebControls;
+using EPMLiveWebParts.Fakes;
+using EPMLiveWebParts.SSRS2005.Fakes;
+using EPMLiveWebParts.SSRS2006.Fakes;
+using EPMLiveWebParts.Tests.Helpers;
+using Microsoft.SharePoint;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using ReportParameter2005 = EPMLiveWebParts.SSRS2005.ReportParameter;
+using ReportParameter2006 = EPMLiveWebParts.SSRS2006.ReportParameter;
 
 namespace EPMLiveWebParts.Tests
 {
     [TestClass]
-    public class ReportViewerTest
+    public class ReportViewerTest : ReportWebPartsTestBase<ReportViewer>
     {
-        private const string MethodPopulateTree = "populateTree";
-        private const string TreeNodeFolderImage = "/_layouts/images/16fold.gif";
-        private const string TreeNodeFileImage = "/_layouts/images/16doc.gif";
-        private const string WebUrl = "www.weburl.com/SP";
-        private const string ServerRelativeUrl = "/SP";
-        private const string FieldWeb = "web";
-        private const string RdlExtension = ".rdl";
-        private IDisposable _shimsContext;
-        private ReportViewer _testEntity;
-        private PrivateObject _testEntityPrivate;
-        private SPWeb _web;
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            _shimsContext = ShimsContext.Create();
-            _testEntity = new ReportViewer();
-            _testEntityPrivate = new PrivateObject(_testEntity);
-
-            var shimSpWeb = new ShimSPWeb();
-            shimSpWeb.UrlGet = () => WebUrl;
-            shimSpWeb.ServerRelativeUrlGet = () => ServerRelativeUrl;
-
-            _web = shimSpWeb.Instance;
-            _testEntityPrivate.SetField(FieldWeb, _web);
-
-            ShimHttpUtility.UrlEncodeString = url => url;
-            ShimHttpUtility.HtmlEncodeString = url => url;
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            if (_shimsContext != null)
-            {
-                _shimsContext.Dispose();
-            }
-
-            if (_testEntity != null)
-            {
-                _testEntity.Dispose();
-            }
-        }
-
         [TestMethod]
         public void PopulateTree_IfListItemIsFolder_CallsPopulateTreeRecursively()
         {
@@ -90,12 +44,11 @@ namespace EPMLiveWebParts.Tests
                 UniqueId = Guid.NewGuid()
             };
 
+            ShimReportWebPartBase.AllInstances.Get2006ParametersString = (instance, url) => url;
+
             var folders = CreateSpListItems(SPFileSystemObjectType.Folder, folder01);
             var files = CreateSpListItems(SPFileSystemObjectType.File, file01, file02);
             var allItems = folders.Concat(files);
-
-            ShimReportViewer.AllInstances.RSString = (instance, url) => url;
-
             var shimListItems = CreateShimSpListItemCollection(folders);
             var shimSpDoc = CreateShimSpDoc(allItems);
             var treeNode = new TreeNode();
@@ -119,8 +72,7 @@ namespace EPMLiveWebParts.Tests
                     var expectedNavigateUrl = string.Format("Javascript:frameview(\"{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={0}/{1}{2}&rv:HeaderArea=none\");",
                                                             ServerRelativeUrl,
                                                             file01.Url,
-                                                            string.Format("{0}/{1}",
-                                                            _web.Url, file01.Url));
+                                                            string.Format("{0}/{1}",_webField.Url, file01.Url));
                     var file01Node = treeNode.ChildNodes[0].ChildNodes[0];
                     file01Node.Text.ShouldBe(file01.Title);
                     file01Node.ImageUrl.ShouldBe(TreeNodeFileImage);
@@ -134,63 +86,205 @@ namespace EPMLiveWebParts.Tests
                 });
         }
 
-        
-
-        private ShimSPListItemCollection CreateShimSpListItemCollection(ICollection<SPListItem> folders)
+        [TestMethod]
+        public void Rs_WhenCalled_ReturnsParametersString()
         {
-            var shimListItems = new ShimSPListItemCollection();
-            shimListItems.GetEnumerator = () => folders.GetEnumerator();
-            return shimListItems;
-        }
-
-        private ShimSPDocumentLibrary CreateShimSpDoc(IEnumerable<SPListItem> allItems)
-        {
-            var shimSpDoc = new ShimSPDocumentLibrary();
-            var shimSpDocBase = new ShimSPList(shimSpDoc.Instance);
-            shimSpDocBase.GetItemByUniqueIdGuid = uid => allItems.FirstOrDefault(item => item.UniqueId == uid);
-
-            var shimItemsInFolder = new ShimSPListItemCollection();
-            shimSpDoc.GetItemsInFolderSPViewSPFolder = (_, __) =>
+            // Arrange
+            var reportParameters = new ReportParameter2006[]
             {
-                var files = allItems.Where(item => item.FileSystemObjectType == SPFileSystemObjectType.File);
-                shimItemsInFolder.CountGet = () => files.Count();
-                shimItemsInFolder.GetEnumerator = () => files.GetEnumerator();
-
-                return shimItemsInFolder.Instance;
+                new ReportParameter2006() { Name = ReportParamNameUrl, Prompt = string.Empty },
+                new ReportParameter2006() { Name = ReportParamNameSiteId, Prompt = string.Empty },
+                new ReportParameter2006() { Name = ReportParamNameWebId, Prompt = string.Empty },
+                new ReportParameter2006() { Name = ReportParamNameUserId, Prompt = string.Empty },
+                new ReportParameter2006() { Name = ReportParamNameUsername, Prompt = string.Empty }
             };
 
-            return shimSpDoc;
+            var shimReportingService = new ShimReportingService2006();
+            shimReportingService.GetReportParametersStringStringParameterValueArrayDataSourceCredentialsArray =
+                (url, a, b, c) => reportParameters;
+
+            _testEntityPrivate.SetField(FieldSrs2006, shimReportingService.Instance);
+
+            var expectedParametersString = string.Concat(
+                string.Format(ReportParam2006Template, ReportParamNameUrl, _curWebField.ServerRelativeUrl),
+                string.Format(ReportParam2006Template, ReportParamNameSiteId, _spContextCurrent.Site.ID),
+                string.Format(ReportParam2006Template, ReportParamNameWebId, _spContextCurrent.Web.ID),
+                string.Format(ReportParam2006Template, ReportParamNameUserId, UserId),
+                string.Format(ReportParam2006Template, ReportParamNameUsername, Username));
+
+            // Act
+            var result = _testEntityPrivate.Invoke(MethodGet2006Parameters, string.Empty) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(expectedParametersString));
         }
 
-        private ICollection<SPListItem> CreateSpListItems(SPFileSystemObjectType objType, params SpListItemDefinition[] itemDefinitions)
+        [TestMethod]
+        public void Rsnoim_WhenCalled_ReturnsParametersString()
         {
-            if (itemDefinitions == null)
+            // Arrange
+            var reportParameters = new ReportParameter2005[]
             {
-                throw new ArgumentNullException(nameof(itemDefinitions));
-            }
+                new ReportParameter2005() { Name = ReportParamNameUrl, Prompt = string.Empty },
+                new ReportParameter2005() { Name = ReportParamNameSiteId, Prompt = string.Empty },
+                new ReportParameter2005() { Name = ReportParamNameWebId, Prompt = string.Empty },
+                new ReportParameter2005() { Name = ReportParamNameUserId, Prompt = string.Empty },
+                new ReportParameter2005() { Name = ReportParamNameUsername, Prompt = string.Empty }
+            };
 
-            var items = new List<SPListItem>();
-            foreach (var definition in itemDefinitions)
-            {
-                var shimListItem = new ShimSPListItem()
-                {
-                    NameGet = () => definition.Name,
-                    TitleGet = () => definition.Title,
-                    UniqueIdGet = () => definition.UniqueId,
-                    UrlGet = () => definition.Url,
-                    FileSystemObjectTypeGet = () => objType,
-                    FileGet = () =>
-                    {
-                        var shimFile = new ShimSPFile();
-                        shimFile.NameGet = () => definition.Name;
-                        return shimFile.Instance;
-                    }
-                };
+            var shimReportingService = new ShimReportingService2005();
+            shimReportingService.GetReportParametersStringStringBooleanParameterValueArrayDataSourceCredentialsArray =
+                (url, a, b, c, d) => reportParameters;
 
-                items.Add(shimListItem.Instance);
-            }
+            _testEntityPrivate.SetField(FieldSrs2005, shimReportingService.Instance);
 
-            return items;
+            var expectedParametersString = string.Concat(
+                string.Format(ReportParam2005Template, ReportParamNameUrl, _curWebField.ServerRelativeUrl),
+                string.Format(ReportParam2005Template, ReportParamNameSiteId, _spContextCurrent.Site.ID),
+                string.Format(ReportParam2005Template, ReportParamNameWebId, _spContextCurrent.Web.ID),
+                string.Format(ReportParam2005Template, ReportParamNameUserId, UserId),
+                string.Format(ReportParam2005Template, ReportParamNameUsername, Username));
+
+            // Act
+            var result = _testEntityPrivate.Invoke(MethodGet2005Parameters, string.Empty) as string;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(expectedParametersString));
+        }
+
+        [TestMethod]
+        public void ReportsFolderName_IfBackingFieldIsEmptyAndIsTopListIsTrue_SetsFieldAndReturnsValue()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldReportsFolderName, string.Empty);
+            _testEntityPrivate.SetField(FieldIsTopList, true);
+            var expectedResult = string.Concat(ReportsRootFolderName, "/epmlivetl");
+
+            // Act
+            var result = _testEntity.ReportsFolderName;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(expectedResult),
+                () => _testEntityBasePrivate.GetField(FieldReportsFolderName).ShouldNotBeNull(),
+                () => _testEntityBasePrivate.GetField(FieldReportsFolderName).ShouldBe(expectedResult));
+        }
+
+        [TestMethod]
+        public void ReportsFolderName_IfBackingFieldIsEmptyAndIsTopListIsFalse_SetsFieldAndReturnsValue()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldReportsFolderName, string.Empty);
+            _testEntityPrivate.SetField(FieldIsTopList, false);
+            var expectedResult = string.Concat(ReportsRootFolderName, "/epmlive");
+
+            // Act
+            var result = _testEntity.ReportsFolderName;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(expectedResult),
+                () => _testEntityBasePrivate.GetField(FieldReportsFolderName).ShouldNotBeNull(),
+                () => _testEntityBasePrivate.GetField(FieldReportsFolderName).ShouldBe(expectedResult));
+        }
+
+        [TestMethod]
+        public void PropReportsPath_IfBackingFieldIsNull_ReturnsEmptyString()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldReportsPath, null);
+
+            // Act
+            var result = _testEntity.PropReportsPath;
+
+            // Assert
+            result.ShouldBeEmpty();
+        }
+
+        [TestMethod]
+        public void PropReportsPath_SetAndGetValue()
+        {
+            // Arrange
+            const string expectedValue = "Value";
+
+            // Act
+            _testEntity.PropReportsPath = expectedValue;
+            var result = _testEntity.PropReportsPath;
+
+            // Assert
+            result.ShouldBe(expectedValue);
+        }
+
+        [TestMethod]
+        public void PropSRSUrl_IfBackingFieldIsNull_ReturnsEmptyString()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldSRSUrl, null);
+
+            // Act
+            var result = _testEntity.PropSRSUrl;
+
+            // Assert
+            result.ShouldBeEmpty();
+        }
+
+        [TestMethod]
+        public void PropSRSUrl_SetAndGetValue()
+        {
+            // Arrange
+            const string expectedValue = "Value";
+
+            // Act
+            _testEntity.PropSRSUrl = expectedValue;
+            var result = _testEntity.PropSRSUrl;
+
+            // Assert
+            result.ShouldBe(expectedValue);
+        }
+
+        [TestMethod]
+        public void UseDefaults_IfBackingFieldIsNullAndSrsUrlAndReportsPathPropsAreEmpty_ReturnsTrue()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldUseDefaults, null);
+            _testEntity.PropReportsPath = string.Empty;
+            _testEntity.PropSRSUrl = string.Empty;
+
+            // Act
+            var result = _testEntity.UseDefaults;
+
+            // Assert
+            result.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void UseDefaults_IfBackingFieldIsNullAndSrsUrlIsNotEmpty_ReturnsFalse()
+        {
+            // Arrange
+            _testEntityBasePrivate.SetField(FieldUseDefaults, null);
+            _testEntity.PropReportsPath = string.Empty;
+            _testEntity.PropSRSUrl = "anything";
+
+            // Act
+            var result = _testEntity.UseDefaults;
+
+            // Assert
+            result.ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void UseDefaults_SetAndGetValue()
+        {
+            // Arrange & Act
+            _testEntity.UseDefaults = true;
+            var result = _testEntity.UseDefaults;
+
+            // Assert
+            result.ShouldBeTrue();
         }
     }
 }

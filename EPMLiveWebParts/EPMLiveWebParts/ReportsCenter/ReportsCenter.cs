@@ -1,162 +1,36 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Net;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Web;
+using System.Web.Services.Protocols;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Web.Services.Protocols;
-
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.WebPartPages;
-
-using System.Net;
-using System.IO;
-using System.Text;
-using System.ComponentModel;
-
-using System.Data;
-using System.Data.SqlClient;
-
-using System.Configuration;
 using EPMLiveWebParts.SSRS2005;
 using EPMLiveWebParts.SSRS2006;
-
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveWebParts
 {
     [Guid("10ff0c0e-6406-48d7-9226-48e739657307"), XmlRoot(Namespace = "ReportCenterWebPart")]
-    public class ReportsCenter : Microsoft.SharePoint.WebPartPages.WebPart
+    public class ReportsCenter : ReportWebPartBase
     {
-
-        //protected DropDownList ddl;
-        //string url = "";
-        string ReportingServicesURL = "";
-        string ReportsRootFolderName = "";
-        bool Integrated;
-
-        private string sReportsFolderName = "";
-        StringBuilder sbRptList = new StringBuilder("", 5000);
-        ReportingService2005 srs2005;
-        ReportingService2006 srs2006;
-        private SPWeb web;
-        private SPWeb curWeb;
-
-
-        bool? bUseDefaults;
-        bool bIsTopList;
-        bool bIsIntegratedMode;
-        string strSRSUrl;
-        string strReportsPath = "";
-        //string currFolder = "";
-        //int iDeepestFolderLevel = 1;
-
-        TreeNode tnCurrNode = new TreeNode();
-        TreeNodeCollection tncNodes = new TreeNodeCollection();
-        TreeView tvReportView;
-        //Label lblErrMessage;
-        SSRS2006.ReportParameter[] parametersSSRS2006 = null;
-        SSRS2005.ReportParameter[] parametersSSRS2005 = null;
+        private readonly StringBuilder sbRptList = new StringBuilder(5000);
+        private string ReportingServicesURL = string.Empty;
+        private bool Integrated;
+        private bool bIsIntegratedMode;
+        private TreeView tvReportView;
 
         public ReportsCenter()
         {
             this.ExportMode = WebPartExportMode.All;
-        }
-
-        public string ReportsFolderName
-        {
-            get
-            {
-                if (sReportsFolderName == "")
-                {
-                    if (bIsTopList)
-                    {
-                        sReportsFolderName = ReportsRootFolderName + "/epmlivetl";
-                    }
-                    else
-                    {
-                        sReportsFolderName = ReportsRootFolderName + "/epmlive";
-                    }
-                }
-
-                return sReportsFolderName;
-            }
-        }
-
-
-        [Category("Reporting Properties")]
-        [DefaultValue("")]
-        [WebPartStorage(Storage.Shared)]
-        [FriendlyNameAttribute("Reports Path")]
-        [Description("Use this option if your reports are not installed in the root directory. Path must start with a '/'")]
-        [Browsable(true)]
-        [XmlElement(ElementName = "PropReportsPath")]
-        // The accessor for this property.
-        public string PropReportsPath
-        {
-            get
-            {
-                if (strReportsPath == null)
-                    return "";
-                return strReportsPath;
-            }
-            set
-            {
-                strReportsPath = value;
-            }
-        }
-
-        [Category("Reporting Properties")]
-        [DefaultValue(false)]
-        [WebPartStorage(Storage.Shared)]
-        [FriendlyNameAttribute("Use Application Defaults")]
-        [Description("")]
-        [Browsable(true)]
-        [XmlElement(ElementName = "UseDefaults")]
-        // The accessor for this property.
-        public bool UseDefaults
-        {
-            get
-            {
-                if (bUseDefaults == null)
-                {
-                    if (PropSRSUrl == "" && PropReportsPath == "")
-                        return true;
-                    else
-                        return false;
-                }
-                else
-                    return bUseDefaults.Value;
-            }
-            set
-            {
-                bUseDefaults = value;
-            }
-        }
-
-        [Category("Reporting Properties")]
-        [DefaultValue("")]
-        [WebPartStorage(Storage.Shared)]
-        [FriendlyNameAttribute("SQL Reporting Services URL")]
-        [Description("")]
-        [Browsable(true)]
-        [XmlElement(ElementName = "PropSRSUrl")]
-        // The accessor for this property.
-        public string PropSRSUrl
-        {
-            get
-            {
-                if (strSRSUrl == null)
-                    return "";
-                return strSRSUrl;
-            }
-            set
-            {
-                strSRSUrl = value;
-            }
         }
 
         [Category("Reporting Properties")]
@@ -171,11 +45,11 @@ namespace EPMLiveWebParts
         {
             get
             {
-                return bIsTopList;
+                return isTopList;
             }
             set
             {
-                bIsTopList = value;
+                isTopList = value;
             }
         }
 
@@ -198,9 +72,7 @@ namespace EPMLiveWebParts
                 bIsIntegratedMode = value;
             }
         }
-
-
-
+        
         void ddl_DataBound(object sender, EventArgs e)
         {
 
@@ -452,66 +324,34 @@ namespace EPMLiveWebParts
             TreeNode tn = new TreeNode("RootNode", "0");
 
             // Pass the new node by reference, nodes will be added as children
-            populateTree(listItems, doc, ref tn);
+            PopulateTree(listItems, doc, tn);
 
             return tn;
         }
 
-        private void populateTree(SPListItemCollection listItems, SPDocumentLibrary doc, ref TreeNode tn)
+        protected override void PopulateTree(SPListItemCollection listItems, SPDocumentLibrary doc, TreeNode treeNode)
         {
-            TreeNode tnAdd = null;
+            if (listItems == null)
+            {
+                throw new ArgumentNullException("listItems");
+            }
 
+            if (doc == null)
+            {
+                throw new ArgumentNullException("doc");
+            }
+
+            if (treeNode == null)
+            {
+                throw new ArgumentNullException("treeNode");
+            }
+
+            TreeNode tnAdd;
             foreach (SPListItem item in listItems)
             {
                 try
                 {
-                    tnAdd = new TreeNode(item.Name, item.UniqueId.ToString());
-
-                    try
-                    {
-                        // Find out if the item has a title and use it
-                        SPListItem spListItem = doc.GetItemByUniqueId(item.UniqueId);
-                        if (spListItem.Title.Length > 0)
-                        {
-                            tnAdd.Text = spListItem.Title;
-                        }
-                    }
-                    catch { }
-
-                    if (item.FileSystemObjectType == SPFileSystemObjectType.Folder)
-                    {
-                        tnAdd.Text = "<b>" + tnAdd.Text + "</b>";
-                        tnAdd.SelectAction = TreeNodeSelectAction.None;
-                        tnAdd.ImageUrl = "/_layouts/images/16fold.gif";
-
-                        SPListItemCollection folderItems = doc.GetItemsInFolder(doc.DefaultView, item.Folder);
-                        if (folderItems.Count > 0)
-                        {
-                            populateTree(folderItems, doc, ref tnAdd);
-                        }
-                    }
-                    else if (item.FileSystemObjectType == SPFileSystemObjectType.File && item.File.Name.ToLower().EndsWith("rdl"))
-                    {
-                        if (tnAdd.Text.ToLower().EndsWith(".rdl"))
-                        {
-                            tnAdd.Text = tnAdd.Text.Substring(0, tnAdd.Text.Length - 4);
-                        }
-                        tnAdd.ImageUrl = "/_layouts/images/16doc.gif";
-
-                        try
-                        {
-                            string URLIM = RS(Microsoft.SharePoint.Utilities.SPUrlUtility.CombineUrl(web.Url, item.Url));
-                            //tnAdd.NavigateUrl = "Javascript:frameview(\"" + ReportingServicesURL + "?" + System.Web.HttpUtility.UrlEncode(web.Url + "/" + item.Url) + URLIM + "\");";
-                            tnAdd.NavigateUrl = "Javascript:window.open('" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" + System.Web.HttpUtility.UrlEncode(((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/" + item.Url) + URLIM + "&rv:HeaderArea=none','',config='toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');void(0);";
-                        }
-                        catch (Exception ex)
-                        {
-                            tnAdd.Text = item.Name + " <img src=\"/_layouts/epmlive/images/warning.png\" alt=\"" + HttpUtility.HtmlEncode(ex.Message + ex.StackTrace) + "\" border=\"0\">";
-                        }
-
-                        //tnAdd.NavigateUrl = "Javascript:openWindow('" + HttpUtility.UrlEncode(item.Url) + "');";
-                        //tnAdd.NavigateUrl = ReportingServicesURL + "?" + System.Web.HttpUtility.UrlEncode(item.File.Url) + "&URL=" + HttpUtility.UrlEncode(web.ServerRelativeUrl);
-                    }
+                    tnAdd = CreateTreeNode(item, doc);
                 }
                 catch (Exception ex)
                 {
@@ -523,12 +363,53 @@ namespace EPMLiveWebParts
 
                 if (tnAdd.ImageUrl != null && tnAdd.ImageUrl.Length > 0)
                 {
-                    tn.ChildNodes.Add(tnAdd);
+                    treeNode.ChildNodes.Add(tnAdd);
                 }
             }
-
         }
 
+        protected override string GetFileNodeNavigationUrl(SPListItem item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            const string urlTemplate = "Javascript:window.open('{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}{2}&rv:HeaderArea=none','',config='toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');void(0);";
+            const string slash = "/";
+
+            var relativeUrl = web.ServerRelativeUrl == slash ? string.Empty : web.ServerRelativeUrl;
+
+
+            var urlParameters = Get2006Parameters(SPUrlUtility.CombineUrl(web.Url, item.Url));
+            var navUrl = string.Format(urlTemplate,
+                                       relativeUrl,
+                                       HttpUtility.UrlEncode(string.Concat(relativeUrl, slash, item.Url)),
+                                       urlParameters);
+
+            return navUrl;
+        }
+
+        protected override string GetFileNodeErrorText(SPListItem item, Exception exception)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
+            const string textTemplate = "{0} <img src=\"/_layouts/epmlive/images/warning.png\" alt=\"{1}\" border=\"0\">";
+
+            var errorText = string.Format(textTemplate,
+                                          item.Name,
+                                          HttpUtility.HtmlEncode(string.Concat(exception.Message, exception.StackTrace)));
+
+            return errorText;
+        }
 
         private void AppendToRptList(SSRS2005.CatalogItem item, bool tab, bool isFldr, string imgURL)
         {
@@ -555,7 +436,7 @@ namespace EPMLiveWebParts
             {
                 try
                 {
-                    string parameters = RSNOIM(item.Path);
+                    var parameters = Get2005Parameters(item.Path);
                     sbRptList.Append("<A onfocus=\"OnLink(this)\" HREF=\"#\" onClick=\"Javascript:window.open('" + ReportingServicesURL + "?" + System.Web.HttpUtility.UrlEncode(item.Path) + parameters + "','',config='toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');\">" + item.Name + "</A>");
                 }
                 catch (Exception ex)
@@ -567,112 +448,6 @@ namespace EPMLiveWebParts
             sbRptList.Append("</TD></TR>");
 
         }
-
-        private string RS(string url)
-        {
-            parametersSSRS2006 = srs2006.GetReportParameters(url, null, null, null);
-            string parameters = "";
-            foreach (SSRS2006.ReportParameter rp in parametersSSRS2006)
-            {
-                if (rp.Prompt == "")
-                {
-                    switch (rp.Name)
-                    {
-                        case "URL":
-                            parameters += "&rp:URL=" + HttpUtility.UrlEncode(curWeb.ServerRelativeUrl);
-                            break;
-                        case "SiteId":
-                            parameters += "&rp:SiteId=" + SPContext.Current.Site.ID;
-                            break;
-                        case "WebId":
-                            parameters += "&rp:WebId=" + SPContext.Current.Web.ID;
-                            break;
-                        case "UserId":
-                            parameters += "&rp:UserId=" + SPContext.Current.Web.CurrentUser.ID;
-                            break;
-                        case "Username":
-                            parameters += "&rp:Username=" + HttpContext.Current.User.Identity.Name;
-                            break;
-                    };
-                }
-            }
-            return (parameters);
-        }
-
-        private string RSNOIM(string url)
-        {
-
-            parametersSSRS2005 = srs2005.GetReportParameters(url, null, true, null, null);
-            string parameters = "";
-            foreach (SSRS2005.ReportParameter rp in parametersSSRS2005)
-            {
-                if (rp.Prompt == "")
-                {
-                    switch (rp.Name)
-                    {
-                        case "URL":
-                            parameters += "&URL=" + HttpUtility.UrlEncode(web.ServerRelativeUrl);
-                            break;
-                        case "SiteId":
-                            parameters += "&SiteId=" + SPContext.Current.Site.ID;
-                            break;
-                        case "WebId":
-                            parameters += "&WebId=" + SPContext.Current.Web.ID;
-                            break;
-                        case "UserId":
-                            parameters += "&UserId=" + SPContext.Current.Web.CurrentUser.ID;
-                            break;
-                        case "Username":
-                            parameters += "&Username=" + HttpContext.Current.User.Identity.Name;
-                            break;
-                    };
-                }
-            }
-            return (parameters);
-        }
-
-        private string buildFilterTableTop()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append("<table class=\"ms-menutoolbar\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">");
-            sb.Append("<tr height=\"23\">");
-            sb.Append("<td class=\"ms-toolbar\" nowrap=\"true\">");
-            sb.Append("<table border=\"0\" cellpadding=\"3\"><tr><td><b>Choose Report: ");
-
-            return sb.ToString();
-        }
-
-        private string buildFilterTableBottom()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("</td></tr></table></td>");
-            sb.Append("</tr>");
-            sb.Append("</table>");
-            return sb.ToString();
-        }
-
-        //void ddl_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    if (ddl.SelectedValue.Trim() != "")
-        //    {
-        //        SPWeb web = SPContext.Current.Web;
-        //        url = ddl.SelectedValue + "&URL=" + web.ServerRelativeUrl;
-        //    }
-        //}
-
-        //#region Overriden properties
-        //public override ControlCollection Controls
-        //{
-        //    get
-        //    {
-        //        EnsureChildControls();
-        //        return base.Controls;
-        //    }
-        //}
-        //#endregion
-
-        #region Overriden Methods
 
         protected override void OnInit(EventArgs e)
         {
@@ -766,6 +541,5 @@ namespace EPMLiveWebParts
             //    this.Controls.Add(tvReportView);
             //}
         }
-        #endregion
     }
 }

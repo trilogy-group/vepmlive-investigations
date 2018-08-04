@@ -87,7 +87,6 @@
     </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      
       <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.Web.CommandUI\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.Web.CommandUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -404,6 +403,7 @@
     <Compile Include="ReportsCenter\ReportsCenter.cs" />
     <Compile Include="ReportViewerSingle\ReportViewerSingle.cs" />
     <Compile Include="ReportViewer\ReportViewer.cs" />
+    <Compile Include="ReportWebPartBase.cs" />
     <Compile Include="ResourceGrid\ResourceGrid.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
