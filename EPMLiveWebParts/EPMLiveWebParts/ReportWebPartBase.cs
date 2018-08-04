@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using System.Web;
+using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Serialization;
 using EPMLiveWebParts.SSRS2005;
@@ -10,11 +11,6 @@ using EPMLiveWebParts.SSRS2006;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebPartPages;
 using SpWebPart = Microsoft.SharePoint.WebPartPages.WebPart;
-using ReportParameter2005 = EPMLiveWebParts.SSRS2005.ReportParameter;
-using ReportParameter2006 = EPMLiveWebParts.SSRS2006.ReportParameter;
-using System.Web.UI.WebControls;
-using Microsoft.SharePoint.Utilities;
-using System.Diagnostics;
 
 namespace EPMLiveWebParts
 {
@@ -45,6 +41,10 @@ namespace EPMLiveWebParts
         protected SPWeb web;
         protected SPWeb curWeb;
         protected bool isTopList;
+
+        protected abstract void PopulateTree(SPListItemCollection listItems, SPDocumentLibrary doc, TreeNode treeNode);
+        protected abstract string GetFileNodeNavigationUrl(SPListItem item);
+        protected abstract string GetFileNodeErrorText(SPListItem item, Exception exception);
 
         public string ReportsFolderName
         {
@@ -197,8 +197,6 @@ namespace EPMLiveWebParts
             }
         }
 
-        protected abstract void PopulateTree(SPListItemCollection listItems, SPDocumentLibrary doc, TreeNode treeNode);
-
         protected TreeNode CreateTreeNode(SPListItem item, SPDocumentLibrary doc)
         {
             if (item == null)
@@ -254,8 +252,5 @@ namespace EPMLiveWebParts
 
             return node;
         }
-
-        protected abstract string GetFileNodeNavigationUrl(SPListItem item);
-        protected abstract string GetFileNodeErrorText(SPListItem item, Exception exception);
     }
 }
