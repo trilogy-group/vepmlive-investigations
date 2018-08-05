@@ -216,6 +216,10 @@ export class PageHelper {
         }
       }
 
+    static async getAlertText() {
+        return browser.switchTo().alert().getText();
+    }
+
     /**
      * Verify whether element is displayed on page or not
      * @param {ElementFinder} targetElement

@@ -2,6 +2,7 @@ import {OptimizerPage} from './optimizer.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
+import {OptimizerPageConstants} from './optimizer-page.constants';
 
 export class OptimizerPageHelper {
 
@@ -38,4 +39,37 @@ export class OptimizerPageHelper {
         await PageHelper.click(OptimizerPage.viewManagementOptions.currentViewDropdown);
         await PageHelper.click(OptimizerPage.getCurrentViewDropdownValue(viewName));
     }
+
+    static async verifyFilterSectionLabels(stepLogger: StepLogger) {
+        const label = OptimizerPage.getOptimizerConfiguration;
+        stepLogger.verification('Verified the content of label name "Which fields will be used as filters?"');
+        await expect(await PageHelper.isElementDisplayed(label.availableFields))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.optimizerConfiguration.availableFields));
+        await expect(await PageHelper.isElementDisplayed(label.selectedFilelds))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.optimizerConfiguration.selectedFilelds));
+        await expect(await PageHelper.isElementDisplayed(label.availableFieldsSelect))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.availableFieldsSection));
+        await expect(await PageHelper.isElementDisplayed(label.selectedFieldsSelect))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.selectedFieldsSection));
+        await expect(await PageHelper.isElementDisplayed(label.upArrow))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.upArrow));
+        await expect(await PageHelper.isElementDisplayed(label.downArrow))
+            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.downArrow));
+        await expect(await PageHelper.isElementDisplayed(label.add))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.add));
+        await expect(await PageHelper.isElementDisplayed(label.remove))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.remove));
+    }
+
+    static async verifyDeleteStrategyPopup() {
+        const label = OptimizerPage.getDeleteStrategyPopup;
+        const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
+        await expect(PageHelper.getText(label.message)).toBe(optimizerConstLabel.message,
+                ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.deleteStrategy, optimizerConstLabel.message));
+        await expect(await PageHelper.isElementDisplayed(label.ok))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.ok));
+        await expect(await PageHelper.isElementDisplayed(label.cancel))
+            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.cancel));
+    }
+
 }

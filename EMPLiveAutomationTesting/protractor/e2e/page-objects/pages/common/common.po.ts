@@ -240,6 +240,11 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
     }
 
+    static get secondRecord() {
+        return element(By.xpath(
+            `//tr[contains(@class,"GMClassSelected")]/following-sibling::tr[1]/td[contains(@class,"GMCellPanel GMEmpty")]`));
+    }
+
     static get recordWithoutGreenTicket() {
         return element(By.xpath(`(${this.selectorForRecordsWithoutGreenTick})[1]`));
     }

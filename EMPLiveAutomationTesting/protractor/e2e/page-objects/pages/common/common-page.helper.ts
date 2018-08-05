@@ -427,6 +427,17 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
+    static async selectTwoRecordsFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
+        stepLogger.stepId(2);
+        stepLogger.step('Select the check box for two record');
+        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await PageHelper.click(item);
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(CommonPage.secondRecord);
+        stepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+    }
+
     static getSpanByText(text: string) {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }

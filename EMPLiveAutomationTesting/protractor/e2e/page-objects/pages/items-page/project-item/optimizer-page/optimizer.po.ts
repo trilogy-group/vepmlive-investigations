@@ -2,6 +2,8 @@ import {OptimizerPageConstants} from './optimizer-page.constants';
 import {BasePage} from '../../../base-page';
 import {By, element} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ComponentHelpers} from '../../../../../components/devfactory/component-helpers/component-helpers';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 export class OptimizerPage extends BasePage {
 
@@ -57,5 +59,57 @@ export class OptimizerPage extends BasePage {
     static getButtonOnPopup(buttonName: string) {
         const activeWindow = 'div.dhtmlx_window_active';
         return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
+    }
+
+    static get getConfigure(){
+        return element(By.xpath('//div[@id="idOptimizerTabDiv_ribbon"]//img[contains(@src,"configure")]'));
+    }
+
+    static get getOptimizerConfiguration(){
+        const label = OptimizerPageConstants.optimizerConfiguration;
+        return{
+            thirdQuestention: element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(label.thirdQuestention, true)}]`)),
+            availableFields: ElementHelper.getElementByText(label.availableFields),
+            selectedFilelds: ElementHelper.getElementByText(label.selectedFilelds),
+            add: AnchorHelper.getItemById(label.add),
+            remove: AnchorHelper.getItemById(label.remove),
+            availableFieldsSelect: AnchorHelper.getItemById(label.availableFieldsSelect),
+            selectedFieldsSelect: AnchorHelper.getItemById(label.selectedFieldsSelect),
+            upArrow: AnchorHelper.getItemById(label.upArrow),
+            downArrow: AnchorHelper.getItemById(label.downArrow),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static get getOptimizerStrategyActions(){
+        const label = OptimizerPageConstants.optimizerStrategyActions;
+        return{
+            saveStrategy: AnchorHelper.getAnchorById(label.saveStrategy),
+            renameStrategy: AnchorHelper.getAnchorById(label.renameStrategy),
+            deleteStrategy: AnchorHelper.getAnchorById(label.deleteStrategy),
+            commitStrategy: AnchorHelper.getAnchorById(label.commitStrategy),
+            currentStrategyDropdown: AnchorHelper.getAnchorById(label.currentStrategyDropdown),
+            currentStrategyDropdownValue: element(By.xpath('//li[@id="idOptTab_SelView_viewinternal"]/a[2]'))
+        };
+    }
+
+    static get getOptimierSaveStrategyPopup(){
+        const label = OptimizerPageConstants.optimierSaveStrategyPopup;
+        return{
+            strategyName: element(By.id(label.strategyName)),
+            personalStrategyCheckBox: element(By.id(label.personalStrategyCheckBox)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static get getDeleteStrategyPopup(){
+        const label = OptimizerPageConstants.optimierSaveStrategyPopup;
+        return{
+            message: element(By.xpath('//div[@id="idDeleteStratagy"]/div/div[1]')),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
     }
 }
