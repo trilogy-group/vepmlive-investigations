@@ -85,8 +85,8 @@ describe(SuiteNames.smokeTestSuite, () => {
         await WaitHelper.getInstance().waitForTextToBePresent(OptimizerPage.viewManagementOptions.currentViewDropdown, viewName);
         // Taking time to reflect
         stepLogger.verification('View saved and displayed under "Current View"');
-        await expect(await PageHelper.getAttributeValue(OptimizerPage.viewManagementOptions.currentViewDropdown,
-            'innerText')).toEqual(viewName, ValidationsHelper.getNewViewShouldDisplayed(viewName));
+        await expect(await PageHelper.getText(OptimizerPage.viewManagementOptions.currentViewDropdown))
+            .toEqual(viewName, ValidationsHelper.getNewViewShouldDisplayed(viewName));
 
         stepLogger.stepId(8);
         stepLogger.step('Click on "Close"');
@@ -106,7 +106,6 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(10);
         stepLogger.step('Go to "View" Tab and Expand "Current View" drop down');
         await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.view));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(OptimizerPage.viewManagementOptions.saveView, PageHelper.timeout.s);
         await OptimizerPageHelper.selectPreviouslySavedView(viewName);
 
         stepLogger.stepId(11);
