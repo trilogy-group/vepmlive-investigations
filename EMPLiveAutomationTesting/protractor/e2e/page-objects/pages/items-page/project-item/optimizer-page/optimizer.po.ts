@@ -19,13 +19,12 @@ export class OptimizerPage extends BasePage {
 
     static get saveViewPopup(){
         const label = OptimizerPageConstants.saveViewPopup;
-        const activeWindow = 'div.dhtmlx_window_active';
         return{
             viewName: element(By.id(label.viewName)),
             defaultView: element(By.id(label.defaultView)),
             personalView: element(By.id(label.personalView)),
-            ok: element(By.css(`${activeWindow} input[value="${label.ok}"]`)),
-            cancel: element(By.css(`${activeWindow} input[value="${label.cancel}"]`))
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
         };
     }
 
@@ -53,5 +52,10 @@ export class OptimizerPage extends BasePage {
 
     static getCurrentViewDropdownValue(viewName: string) {
         return element(By.xpath(`//*[@id='idAnalyzerTab_SelView_viewinternal']//span[text()="${viewName}"]/following-sibling::span[1]`));
+    }
+
+    static getButtonOnPopup(buttonName: string) {
+        const activeWindow = 'div.dhtmlx_window_active';
+        return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
     }
 }
