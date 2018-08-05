@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using EPMLiveCore;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
-using System.Data.SqlClient;
-using System.Diagnostics;
 
 namespace EPMLiveEnterprise.Layouts.epmlive
 {
@@ -226,87 +222,96 @@ namespace EPMLiveEnterprise.Layouts.epmlive
 
                         ddlTimesheetHours.Items.Add(new ListItem("Actual Work", "251658250"));
 
-                        //SqlConnection cn = new SqlConnection(EPMLiveHelperClasses.getEPMLiveConnectionString(siteGuid));
-                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", cn);
-                        SqlDataReader dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
+                        using (var connection = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                         {
-                            ddlAssignedToField.SelectedValue = dReader.GetString(0);
+                            connection.Open();
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlAssignedToField.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlTimesheet.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ddlTimesheetHours.SelectedValue = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='LockSynch'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkLockSynch.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ForceWS'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkForceWS.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    loadTemplates(reader.GetString(0));
+                                }
+                                else
+                                {
+                                    loadTemplates(string.Empty);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='CrossSite'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    chkCrossSite.Checked = bool.Parse(reader.GetString(0));
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='DefaultURL'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    txtDefaultURL.Text = reader.GetString(0);
+                                }
+                            }
+
+                            using (var command = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ConnectedURLs'", connection))
+                            using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    txtUrls.Text = reader.GetString(0);
+                                }
+                            }
                         }
-                        dReader.Close();
 
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetField'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            ddlTimesheet.SelectedValue = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='TimesheetHoursField'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            ddlTimesheetHours.SelectedValue = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='LockSynch'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkLockSynch.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ForceWS'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkForceWS.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ValidTemplates'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            loadTemplates(dReader.GetString(0));
-                        }
-                        else
-                            loadTemplates("");
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='CrossSite'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            chkCrossSite.Checked = bool.Parse(dReader.GetString(0));
-                        }
-                        dReader.Close();
-
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='DefaultURL'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            txtDefaultURL.Text = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='ConnectedURLs'", cn);
-                        dReader = cmd.ExecuteReader();
-                        if (dReader.Read())
-                        {
-                            txtUrls.Text = dReader.GetString(0);
-                        }
-                        dReader.Close();
-
-                        cn.Close();
                         lblError.Visible = false;
 
                         WebSvcEvents.Events events = new EPMLiveEnterprise.WebSvcEvents.Events();
