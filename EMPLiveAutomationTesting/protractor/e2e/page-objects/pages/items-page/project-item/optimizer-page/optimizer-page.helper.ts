@@ -3,6 +3,7 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {OptimizerPageConstants} from './optimizer-page.constants';
+import {CommonPageConstants} from '../../../common/common-page.constants';
 
 export class OptimizerPageHelper {
 
@@ -61,10 +62,11 @@ export class OptimizerPageHelper {
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.remove));
     }
 
-    static async verifyDeleteStrategyPopup() {
+    static async verifyDeleteStrategyPopup(stepLogger: StepLogger) {
+        stepLogger.verification('Delete strategy popup verified with message, OK and Cancel buttons');
         const label = OptimizerPage.getDeleteStrategyPopup;
         const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
-        await expect(PageHelper.getText(label.message)).toBe(optimizerConstLabel.message,
+        await expect(await PageHelper.getText(label.message)).toBe(optimizerConstLabel.message,
                 ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.deleteStrategy, optimizerConstLabel.message));
         await expect(await PageHelper.isElementDisplayed(label.ok))
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.ok));
@@ -72,4 +74,23 @@ export class OptimizerPageHelper {
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.cancel));
     }
 
+    static async verifyOptimizerWindowClosed(stepLogger: StepLogger) {
+        stepLogger.verification('Optimizer window closed');
+        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCloseOptimizerWindow)).toBe(false,
+            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.ribbonLabels.optimizer));
+    }
+
+    static async verifyAlertMessageForSingleProjectSelection(stepLogger: StepLogger) {
+        const alertText = await  PageHelper.getAlertText();
+        stepLogger.verification('Alert displayed and validated the content');
+        expect(alertText).toBe(OptimizerPageConstants.oneItemConfigureAlertMsg, ValidationsHelper.getDisplayedValidation(
+            OptimizerPageConstants.oneItemConfigureAlertMsg));
+        await PageHelper.acceptAlert();
+    }
+
+    static async verifyCurrentStrategyName(strategyName: string, stepLogger: StepLogger) {
+        stepLogger.verification('Saved Strategy name displayed in the Current Strategy drop down box');
+        await expect(PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown)).toBe(strategyName,
+            ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.currentStrategy, strategyName));
+    }
 }

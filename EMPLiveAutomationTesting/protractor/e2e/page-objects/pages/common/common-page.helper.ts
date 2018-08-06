@@ -438,6 +438,12 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
+    static async verifyProjectCenterDisplayed(stepLogger: StepLogger) {
+        stepLogger.verification('Project Center opened ');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectsCenter)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectCenter));
+    }
+
     static getSpanByText(text: string) {
         return element(By.xpath(`//span[${ComponentHelpers.getXPathFunctionForText(text)}]`));
     }
