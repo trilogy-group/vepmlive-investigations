@@ -73,7 +73,6 @@ namespace EPMLiveWebParts
         [Description("Use this option if your reports are not installed in the root directory. Path must start with a '/'")]
         [Browsable(true)]
         [XmlElement(ElementName = "PropReportsPath")]
-        // The accessor for this property.
         public string PropReportsPath
         {
             get
@@ -98,7 +97,6 @@ namespace EPMLiveWebParts
         [Description("")]
         [Browsable(true)]
         [XmlElement(ElementName = "UseDefaults")]
-        // The accessor for this property.
         public bool UseDefaults
         {
             get
@@ -125,7 +123,6 @@ namespace EPMLiveWebParts
         [Description("")]
         [Browsable(true)]
         [XmlElement(ElementName = "PropSRSUrl")]
-        // The accessor for this property.
         public string PropSRSUrl
         {
             get
@@ -194,6 +191,8 @@ namespace EPMLiveWebParts
                 case ReportParamNameUsername:
                     paramBuilder.AppendFormat(parameterTemplate, ReportParamNameUsername, HttpContext.Current.User.Identity.Name);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(string.Format("Unexpected value: {0}", parameterName));
             }
         }
 

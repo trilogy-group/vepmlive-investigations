@@ -375,14 +375,15 @@ namespace EPMLiveWebParts
                 throw new ArgumentNullException("item");
             }
 
-            const string urlTemplate = "Javascript:window.open('{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}{2}&rv:HeaderArea=none','',config='toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');void(0);";
             const string slash = "/";
+            var urlTemplateBuilder = new StringBuilder().Append("Javascript:window.open('{0}/_layouts/ReportServer/RSViewerPage.aspx?")
+                                                        .Append("rv:RelativeReportUrl={1}{2}")
+                                                        .Append("&rv:HeaderArea=none','',config='toolbar=no, menubar=no, scrollbars=yes, ")
+                                                        .Append("resizable=yes,location=no, directories=no, status=yes');void(0);");
 
             var relativeUrl = web.ServerRelativeUrl == slash ? string.Empty : web.ServerRelativeUrl;
-
-
             var urlParameters = Get2006Parameters(SPUrlUtility.CombineUrl(web.Url, item.Url));
-            var navUrl = string.Format(urlTemplate,
+            var navUrl = string.Format(urlTemplateBuilder.ToString(),
                                        relativeUrl,
                                        HttpUtility.UrlEncode(string.Concat(relativeUrl, slash, item.Url)),
                                        urlParameters);
