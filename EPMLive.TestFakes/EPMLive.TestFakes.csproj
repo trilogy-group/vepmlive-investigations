@@ -34,12 +34,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveEnterprise.Fakes">
       <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveIntegrationService.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveTimerService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
@@ -113,6 +122,10 @@
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveIntegrationService\EPMLiveIntegrationService\EPMLiveIntegrationService.csproj">
+      <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
+      <Name>EPMLiveIntegrationService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
       <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
       <Name>EPMLivePS</Name>
@@ -158,6 +171,8 @@
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
     <Fakes Include="Fakes\EPM Live Core.fakes" />
     <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
+    <None Include="EPMLive.TestFakes.snk" />
+    <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

@@ -10,8 +10,14 @@ using System.Text;
 
 namespace EPMLiveSynch
 {
-    public class LogHelper : IDisposable 
+    public class LogHelper : IDisposable
     {
+        private const string DtLoggedColumn = "dtLogged";
+        private const string ResultColumn = "result";
+        private const string ResultTextColumn = "resulttext";
+
+        private const string ListGuidParam = "@listguid";
+
         private SPWeb currWeb;
         private string sConn = null;
         private string sSource = "";
@@ -130,41 +136,7 @@ namespace EPMLiveSynch
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
-                            SqlConnection cn = new SqlConnection();
-                            cn.ConnectionString = sConn;
-                            cn.Open();
-
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.CommandText = "Select Top 1 result, dtLogged From vwqueuetimerlog Where listguid=@listguid and jobtype=4";
-                            cmd.Parameters.AddWithValue("@listguid", sSource);
-                            cmd.Connection = cn;
-                            SqlDataReader rdr;
-                            rdr = cmd.ExecuteReader();
-
-                            if (rdr.HasRows == true)
-                            {
-                                while (rdr.Read())
-                                {
-                                    dt.Rows.Add(new string[] { rdr["result"].ToString(), rdr["dtLogged"].ToString() });
-                                }
-
-                                
-                                string sLogDateTime = dt.Rows[0].ItemArray[1].ToString();
-                                //if (sLogDateTime != "")
-                                //{
-                                //    DateTime dtLogDateTime = DateTime.Parse(sLogDateTime);
-                                //    System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(currWeb.Locale.LCID);
-                                //    IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
-
-                                //    sLogDateTime = dtLogDateTime.ToLocalTime().GetDateTimeFormats(culture)[72]; //dt.ToShortDateString() + " " + dt.ToShortTimeString();
-                                //}
-                                sRet = dt.Rows[0].ItemArray[0].ToString() + ".  Log time: " + sLogDateTime;
-                                
-                            }
-
-                            cmd.Dispose();
-                            cn.Close();
-                            cn.Dispose();
+                            sRet = InitializeResults(dt, sConn, sRet, sSource);
                         });
 
                     }
@@ -182,6 +154,45 @@ namespace EPMLiveSynch
 
                 return sRet;
             }
+        }
+
+        public string InitializeResults(DataTable dataTable, string connectionString, string resultString, object source)
+        {
+            if (dataTable == null)
+            {
+                throw new ArgumentNullException(nameof(dataTable));
+            }
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentNullException(nameof(connectionString));
+            }
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand("Select Top 1 result, dtLogged From vwqueuetimerlog Where listguid=@listguid and jobtype=4", connection))
+                {
+                    command.Parameters.AddWithValue(ListGuidParam, source);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                dataTable.Rows.Add(reader[ResultColumn].ToString(), reader[DtLoggedColumn].ToString());
+                            }
+
+                            var sLogDateTime = dataTable.Rows[0].ItemArray[1].ToString();
+                            resultString = $"{dataTable.Rows[0].ItemArray[0]}.  Log time: {sLogDateTime}";
+                        }
+                    }
+                }
+            }
+
+            return resultString;
         }
 
         public string GetLastResultLogText
@@ -208,30 +219,7 @@ namespace EPMLiveSynch
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
-                            SqlConnection cn = new SqlConnection();
-                            cn.ConnectionString = sConn;
-                            cn.Open();
-
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.CommandText = "Select Top 1 resulttext From vwqueuetimerlog Where listguid=@listguid and jobtype=4";
-                            cmd.Parameters.AddWithValue("@listguid", sSource);
-                            cmd.Connection = cn;
-                            SqlDataReader rdr;
-                            rdr = cmd.ExecuteReader();
-
-                            if (rdr.HasRows == true)
-                            {
-                                while (rdr.Read())
-                                {
-                                    dt.Rows.Add(new string[] { rdr["resulttext"].ToString() });
-                                }
-
-                                sRet = dt.Rows[0].ItemArray[0].ToString();
-                            }
-
-                            cmd.Dispose();
-                            cn.Close();
-                            cn.Dispose();
+                            sRet = InitializeResultText(dt, sConn, sRet, sSource);
                         });
 
                     }
@@ -249,6 +237,44 @@ namespace EPMLiveSynch
 
                 return sRet;
             }
+        }
+
+        public string InitializeResultText(DataTable dataTable, string connectionString, string resultString, object source)
+        {
+            if (dataTable == null)
+            {
+                throw new ArgumentNullException(nameof(dataTable));
+            }
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentNullException(nameof(connectionString));
+            }
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand("Select Top 1 resulttext From vwqueuetimerlog Where listguid=@listguid and jobtype=4", connection))
+                {
+                    command.Parameters.AddWithValue(ListGuidParam, source);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                dataTable.Rows.Add(reader[ResultTextColumn].ToString());
+                            }
+
+                            resultString = dataTable.Rows[0].ItemArray[0].ToString();
+                        }
+                    }
+                }
+            }
+
+            return resultString;
         }
 
         public string DeleteLastResult()
@@ -270,17 +296,7 @@ namespace EPMLiveSynch
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        SqlConnection cn = new SqlConnection();
-                        cn.ConnectionString = sConn;
-                        cn.Open();
-
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.CommandText = "Delete From EPMLive_Log Where source = '" + sSource + "' And UPPER(action) = '" + sAction + "'";
-                        cmd.Connection = cn;
-                        cmd.ExecuteNonQuery();
-                        cmd.Dispose();
-                        cn.Close();
-                        cn.Dispose();
+                        DeleteLogBySourceAndAction(sConn, sSource, sAction);
                     });
 
                 }
@@ -295,6 +311,36 @@ namespace EPMLiveSynch
             }
 
             return sRet;
+        }
+
+        public void DeleteLogBySourceAndAction(string connectionString, string source, string action)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentNullException(nameof(connectionString));
+            }
+
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (string.IsNullOrWhiteSpace(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var commandText = $"Delete From EPMLive_Log Where source = '{source}' And UPPER(action) = '{action}'";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand(commandText, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public string FirstLetterUCase(string s)
