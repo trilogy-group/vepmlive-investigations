@@ -1,3 +1,4 @@
+import {browser} from 'protractor';
 import {OptimizerPage} from './optimizer.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
@@ -92,5 +93,24 @@ export class OptimizerPageHelper {
         stepLogger.verification('Saved Strategy name displayed in the Current Strategy drop down box');
         await expect(PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown)).toBe(strategyName,
             ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.currentStrategy, strategyName));
+    }
+
+    static async deleteStrategy() {
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownSpan);
+        // takes time to expand dropdown
+        await browser.sleep(PageHelper.timeout.xs);
+        const strategyName = await PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
+        return strategyName;
+    }
+
+    static async verifyDeletedStrategy(stepLogger: StepLogger, deletedStrategyName: string) {
+        stepLogger.verification('Deleted the strategy in the current strategy dropdown');
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownSpan);
+        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCurrentStrategyByName(deletedStrategyName))).toBe(false,
+            ValidationsHelper.getFieldShouldNotHaveValueValidation(OptimizerPageConstants.currentStrategy, deletedStrategyName));
     }
 }

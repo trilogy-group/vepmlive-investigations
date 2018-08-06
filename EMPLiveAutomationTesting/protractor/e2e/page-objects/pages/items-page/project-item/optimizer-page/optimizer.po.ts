@@ -90,7 +90,8 @@ export class OptimizerPage extends BasePage {
             deleteStrategy: AnchorHelper.getAnchorById(label.deleteStrategy),
             commitStrategy: AnchorHelper.getAnchorById(label.commitStrategy),
             currentStrategyDropdown: AnchorHelper.getAnchorById(label.currentStrategyDropdown),
-            currentStrategyDropdownValue: element(By.xpath('//li[@id="idOptTab_SelView_viewinternal"]/a[2]'))
+            currentStrategyDropdownValue: element(By.xpath('//li[@id="idOptTab_SelView_viewinternal"]/a[2]')),
+            currentStrategyDropdownSpan: element(By.id(label.currentStrategyDropdownSpan))
         };
     }
 
@@ -111,5 +112,9 @@ export class OptimizerPage extends BasePage {
             ok: this.getButtonOnPopup(label.ok),
             cancel: this.getButtonOnPopup(label.cancel)
         };
+    }
+
+    static getCurrentStrategyByName(strategyName: string) {
+        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())"${strategyName}"]`));
     }
 }

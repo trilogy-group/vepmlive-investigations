@@ -74,7 +74,8 @@ export class OptimizerPageConstants {
             renameStrategy: 'idrenamestrat',
             deleteStrategy: 'idptDelScen',
             commitStrategy: 'idptCmtScen',
-            currentStrategyDropdown: 'idOptTab_SelView_textbox'
+            currentStrategyDropdown: 'idOptTab_SelView_textbox',
+            currentStrategyDropdownSpan: 'idOptTab_SelView_button'
         };
     }
 

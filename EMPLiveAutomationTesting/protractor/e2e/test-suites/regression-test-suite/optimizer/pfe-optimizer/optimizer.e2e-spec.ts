@@ -121,4 +121,52 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
         await OptimizerPageHelper.verifyDeleteStrategyPopup(stepLogger);
     });
+
+    it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
+        async () => {
+            const stepLogger = new StepLogger(744356);
+            // Step 1 is inside the below function
+            await CommonPageHelper.navigateToItemPageUnderNavigation(
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
+                stepLogger);
+            await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+            // Step 2 is inside the below function
+            await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+            stepLogger.stepId(3);
+            stepLogger.step('Click on Optimizer button from the items tab, Click on Configure button');
+            await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
+            // Takes time to load the iframe
+            await browser.sleep(PageHelper.timeout.m);
+            await CommonPageHelper.switchToFirstContentFrame();
+            await PageHelper.click(OptimizerPage.getConfigure);
+            await OptimizerPageHelper.verifyFilterSectionLabels(stepLogger);
+     });
+
+    it('Verify that Strategy should be Deleted.  - [744370]', async () => {
+        const stepLogger = new StepLogger(744370);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Optimizer button from the items tab.');
+        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.m);
+        await CommonPageHelper.switchToFirstContentFrame();
+        stepLogger.stepId(4);
+        stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
+        const strategyNameToDel = await OptimizerPageHelper.deleteStrategy();
+        stepLogger.stepId(5);
+        stepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.getDeleteStrategyPopup.ok);
+        await OptimizerPageHelper.verifyDeletedStrategy(stepLogger, strategyNameToDel);
+    });
 });
