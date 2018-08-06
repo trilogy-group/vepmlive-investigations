@@ -114,7 +114,7 @@ namespace EPMLive.TestFakes.Utility
                 },
                 FieldsGet = () => new ShimSPFieldCollection
                 {
-                    GetFieldByInternalNameString = (internalName) => new ShimSPField()
+                    GetFieldByInternalNameString = internalName => new ShimSPField()
                 },
                 GetItemsSPQuery = (query) => new ShimSPListItemCollection()
                     .Bind(new ShimSPListItem[] { })

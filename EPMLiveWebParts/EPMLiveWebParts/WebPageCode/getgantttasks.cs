@@ -928,12 +928,12 @@ namespace EPMLiveWebParts
                         try
                         {
                             var field = listItem.Fields.GetFieldByInternalName(filterfield);
-                            string val = listItem[field.Id].ToString();
+                            var fieldValue = listItem[field.Id].ToString();
                             if (field.Type == SPFieldType.Lookup)
                             {
-                                val = val.Replace(";#", "\n").Split('\n')[1];
+                                fieldValue = fieldValue.Replace(";#", "\n").Split('\n')[1];
                             }
-                            if (val != filtervalue)
+                            if (fieldValue != filtervalue)
                             {
                                 canView = false;
                             }
