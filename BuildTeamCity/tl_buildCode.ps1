@@ -206,11 +206,13 @@ if ($TestsOnly)
 
 	# Directory for outputs
 	$OutputDirectory = Join-Path $SourcesDirectory "Test-Output"
-	if (!(Test-Path -Path $OutputDirectory)){
-		New-Item $OutputDirectory -ItemType Directory
-	}
+	
 	foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
-    
+    $projOutput = Join-Path $OutputDirectory $projectToBeBuildAsDLL
+	if (!(Test-Path -Path $projOutput)){
+		New-Item $projOutput -ItemType Directory
+	}
+	
     $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
 
 
@@ -219,7 +221,7 @@ if ($TestsOnly)
 	
 	& $MSBuildExec $projectPath `
 	/t:Build `
-	/p:OutputPath="$OutputDirectory" `
+	/p:OutputPath="$projOutput" `
     /p:PreBuildEvent= `
     /p:PostBuildEvent= `
     /p:Configuration="Debug" `
