@@ -113,4 +113,10 @@ export class OptimizerPageHelper {
         await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCurrentStrategyByName(deletedStrategyName))).toBe(false,
             ValidationsHelper.getFieldShouldNotHaveValueValidation(OptimizerPageConstants.currentStrategy, deletedStrategyName));
     }
+
+    static async verifyRibbonCollapsed(stepLogger: StepLogger) {
+        stepLogger.verification('Ribbon collapsed');
+        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getOptimizerRibbon.collapseView)).toBe(true,
+            ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.collapsed));
+    }
 }

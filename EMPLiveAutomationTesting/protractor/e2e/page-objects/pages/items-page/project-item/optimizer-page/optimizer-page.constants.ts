@@ -14,6 +14,7 @@ export class OptimizerPageConstants {
     static readonly deleteStrategy = 'Delete strategy popup';
     static readonly ok= 'OK';
     static readonly cancel= 'Cancel';
+    static readonly collapsed = 'Collapsed Ribbon';
 
     static get viewManagementOptions() {
         return {
@@ -93,6 +94,13 @@ export class OptimizerPageConstants {
             message: 'Are you sure you want to delete this Strategy?',
             ok: 'OK',
             cancel: 'Cancel'
+        };
+    }
+
+    static get optimizerRibbon() {
+        return{
+            collapseView: 'idOptimizerTabDiv_ulCollapsed',
+                expandView: 'idOptimizerTabDiv_ul',
         };
     }
 }

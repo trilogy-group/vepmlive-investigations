@@ -117,4 +117,14 @@ export class OptimizerPage extends BasePage {
     static getCurrentStrategyByName(strategyName: string) {
         return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())"${strategyName}"]`));
     }
+
+    static get getOptimizerRibbon() {
+        const label = OptimizerPageConstants.optimizerRibbon;
+        return{
+            collapseView: element(By.id(label.collapseView)),
+            expandView: element(By.id(label.expandView)),
+            minusSign: element(By.css(`#${label.expandView}>span>img`)),
+            plusSign: element(By.css(`#${label.collapseView}>span>img`))
+        };
+    }
 }
