@@ -15,6 +15,7 @@ export class OptimizerPageConstants {
     static readonly ok= 'OK';
     static readonly cancel= 'Cancel';
     static readonly collapsed = 'Collapsed Ribbon';
+    static readonly optimizer = 'Optimizer Window';
 
     static get viewManagementOptions() {
         return {

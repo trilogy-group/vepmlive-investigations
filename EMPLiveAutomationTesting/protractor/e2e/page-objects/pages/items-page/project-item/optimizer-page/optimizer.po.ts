@@ -127,4 +127,9 @@ export class OptimizerPage extends BasePage {
             plusSign: element(By.css(`#${label.collapseView}>span>img`))
         };
     }
+
+    static get getCloseOptimizerViewTab(){
+        return element(By.xpath('//ul[@id="idViewTabDiv_ul"]//span[text()="Close"]'));
+    }
+
 }

@@ -185,11 +185,37 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.step('Click on Optimizer button from the items tab.');
         await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
         // Takes time to load the iframe
-        await browser.sleep(PageHelper.timeout.l);
+        await browser.sleep(PageHelper.timeout.m);
         await CommonPageHelper.switchToFirstContentFrame();
         stepLogger.stepId(4);
         stepLogger.step('Click on Minus Sign');
         await PageHelper.click(OptimizerPage.getOptimizerRibbon.minusSign);
         await OptimizerPageHelper.verifyRibbonCollapsed(stepLogger);
+    });
+
+    it('Verify the close button of the View Tab.  - [744376]', async () => {
+        const stepLogger = new StepLogger(744376);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        stepLogger.step('Click on Optimizer button from the items tab.');
+        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.m);
+        await CommonPageHelper.switchToFirstContentFrame();
+        stepLogger.stepId(4);
+        stepLogger.step('Click on View Tab');
+        await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.view));
+        stepLogger.stepId(5);
+        stepLogger.step('Click on Close button from the View Option tab.');
+        await PageHelper.click(OptimizerPage.getCloseOptimizerViewTab);
+        await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
     });
 });

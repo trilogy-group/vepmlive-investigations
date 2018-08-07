@@ -4,7 +4,8 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {OptimizerPageConstants} from './optimizer-page.constants';
-import {CommonPageConstants} from '../../../common/common-page.constants';
+// import {CommonPageConstants} from '../../../common/common-page.constants';
+import {CommonPage} from '../../../common/common.po';
 
 export class OptimizerPageHelper {
 
@@ -77,8 +78,9 @@ export class OptimizerPageHelper {
 
     static async verifyOptimizerWindowClosed(stepLogger: StepLogger) {
         stepLogger.verification('Optimizer window closed');
-        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCloseOptimizerWindow)).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.ribbonLabels.optimizer));
+        await browser.sleep(PageHelper.timeout.s);
+        await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.optimizer, false)).toBe(true,
+            ValidationsHelper.getNotDisplayedValidation(OptimizerPageConstants.optimizer));
     }
 
     static async verifyAlertMessageForSingleProjectSelection(stepLogger: StepLogger) {
