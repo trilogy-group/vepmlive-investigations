@@ -1,4 +1,3 @@
-// import {browser} from 'protractor';
 import {SuiteNames} from '../../../helpers/suite-names';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -7,9 +6,6 @@ import {CommonPageHelper} from '../../../../page-objects/pages/common/common-pag
 import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-// import {OptimizerPage} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer.po';
-// import {OptimizerPageConstants} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.constants';
-// import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
