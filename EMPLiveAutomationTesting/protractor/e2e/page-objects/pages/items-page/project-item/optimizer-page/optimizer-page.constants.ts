@@ -14,6 +14,7 @@ export class OptimizerPageConstants {
     static readonly deleteStrategy = 'Delete strategy popup';
     static readonly ok= 'OK';
     static readonly cancel= 'Cancel';
+    static readonly optimizer = 'Optimizer Window';
 
     static get viewManagementOptions() {
         return {
