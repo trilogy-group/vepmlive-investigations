@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -93,6 +93,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,7 +108,7 @@
       <Name>EPMLive.TestFakes</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts.csproj">
-      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
+      <Project>{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}</Project>
       <Name>EPMLiveWebParts</Name>
     </ProjectReference>
   </ItemGroup>
@@ -115,7 +116,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <!--<Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
