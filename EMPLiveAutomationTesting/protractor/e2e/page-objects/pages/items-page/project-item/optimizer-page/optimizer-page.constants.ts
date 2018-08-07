@@ -16,6 +16,8 @@ export class OptimizerPageConstants {
     static readonly cancel= 'Cancel';
     static readonly collapsed = 'Collapsed Ribbon';
     static readonly optimizer = 'Optimizer Window';
+    static readonly deleteView = 'Delete view popup';
+    static readonly currentView= 'Current View';
 
     static get viewManagementOptions() {
         return {
@@ -102,6 +104,16 @@ export class OptimizerPageConstants {
         return{
             collapseView: 'idOptimizerTabDiv_ulCollapsed',
                 expandView: 'idOptimizerTabDiv_ul',
+        };
+    }
+
+    static get deleteViewPopup(){
+        return {
+            deleteViewPopup: 'idDeleteViewDlg',
+            deleteViewMessage: 'Are you sure you want to delete this view?',
+            viewName: 'id_DeleteView_Name',
+            ok: 'OK',
+            cancel: 'Cancel'
         };
     }
 }

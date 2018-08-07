@@ -121,4 +121,25 @@ export class OptimizerPageHelper {
         await expect(await PageHelper.isElementDisplayed(OptimizerPage.getOptimizerRibbon.collapseView)).toBe(true,
             ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.collapsed));
     }
+
+    static async deleteView(stepLogger: StepLogger) {
+        const viewName = await PageHelper.getText(OptimizerPage.viewManagementOptions.currentViewDropdown);
+        await PageHelper.click(OptimizerPage.viewManagementOptions.deleteView);
+        await browser.sleep(PageHelper.timeout.s);
+        const actualDelMessage = await PageHelper.getText(OptimizerPage.getDeleteViewPopup.deleteViewMessage);
+        const expectedDelMessage = OptimizerPageConstants.deleteViewPopup.deleteViewMessage;
+        stepLogger.verification('Message on delete view popup');
+        await expect(actualDelMessage).toBe(expectedDelMessage,
+            ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.deleteView, expectedDelMessage));
+        return viewName;
+    }
+
+    static async verifyDeletedView(stepLogger: StepLogger, deletedViewName: string) {
+        stepLogger.verification('Deleted the view in the current view dropdown');
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.viewManagementOptions.currentViewDropdown);
+        await browser.sleep(PageHelper.timeout.s);
+        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCurrentViewByName(deletedViewName), false)).toBe(false,
+            ValidationsHelper.getFieldShouldNotHaveValueValidation(OptimizerPageConstants.currentView, deletedViewName));
+    }
 }

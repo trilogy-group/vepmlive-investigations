@@ -132,4 +132,17 @@ export class OptimizerPage extends BasePage {
         return element(By.xpath('//ul[@id="idViewTabDiv_ul"]//span[text()="Close"]'));
     }
 
+    static get getDeleteViewPopup(){
+        const label = OptimizerPageConstants.deleteViewPopup;
+        return {
+            deleteViewMessage: element(By.xpath(`//div[@id="${label.deleteViewPopup}"]/div/div[1]`)),
+            viewName: element(By.id(label.viewName)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static getCurrentViewByName(viewName: string) {
+        return element(By.xpath(`//li[@id="idAnalyzerTab_SelView_viewinternal"]//span[normalize-space(text())="${viewName}"]`));
+    }
 }
