@@ -140,8 +140,8 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("CanEdit", 0);
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateIntAttr("CanHide", 1);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanResize", 0);
+            xC.CreateIntAttr("CanSort", 1);
+            xC.CreateIntAttr("CanResize", 1);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("Width", 50);
             xHeader1.CreateStringAttr("ExportRowStatus", "Status");
