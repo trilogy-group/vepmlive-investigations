@@ -1,10 +1,9 @@
+import {browser} from 'protractor';
 import {OptimizerPage} from './optimizer.po';
 import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {OptimizerPageConstants} from './optimizer-page.constants';
-// import {CommonPage} from '../../../common/common.po';
-import {browser} from 'protractor';
 import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
 import {CommonPageHelper} from '../../../common/common-page.helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
@@ -48,26 +47,21 @@ export class OptimizerPageHelper {
     static async verifyFilterSectionLabels(stepLogger: StepLogger) {
         const label = OptimizerPage.getOptimizerConfiguration;
         stepLogger.verification('Verified the content of label name "Which fields will be used as filters?"');
-        await expect(await PageHelper.isElementDisplayed(label.availableFields))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.optimizerConfiguration.availableFields));
-        await expect(await PageHelper.isElementDisplayed(label.selectedFilelds))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.optimizerConfiguration.selectedFilelds));
-        await expect(await PageHelper.isElementDisplayed(label.availableFieldsSelect))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.availableFieldsSection));
-        await expect(await PageHelper.isElementDisplayed(label.selectedFieldsSelect))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.selectedFieldsSection));
-        await expect(await PageHelper.isElementDisplayed(label.upArrow))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.upArrow));
-        await expect(await PageHelper.isElementDisplayed(label.downArrow))
-            .toBe(true, ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.downArrow));
-        await expect(await PageHelper.isElementDisplayed(label.add))
-            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.add));
-        await expect(await PageHelper.isElementDisplayed(label.remove))
-            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.remove));
+        await ExpectationHelper.verifyDisplayedStatus(label.availableFields,
+            OptimizerPageConstants.optimizerConfiguration.availableFields, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.selectedFilelds,
+            OptimizerPageConstants.optimizerConfiguration.selectedFilelds, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.availableFieldsSelect,
+            OptimizerPageConstants.availableFieldsSection, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.selectedFieldsSelect,
+            OptimizerPageConstants.selectedFieldsSection, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.upArrow, OptimizerPageConstants.upArrow, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.downArrow, OptimizerPageConstants.downArrow, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.add, OptimizerPageConstants.add, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.remove, OptimizerPageConstants.remove, stepLogger);
     }
 
     static async verifyDeleteStrategyPopup(stepLogger: StepLogger) {
-        stepLogger.verification('Delete strategy popup verified with message, OK and Cancel buttons');
         const label = OptimizerPage.getDeleteStrategyPopup;
         const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
         await ExpectationHelper.verifyText(label.message,
