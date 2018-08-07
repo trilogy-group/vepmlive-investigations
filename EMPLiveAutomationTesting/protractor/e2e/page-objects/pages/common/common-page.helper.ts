@@ -279,7 +279,7 @@ export class CommonPageHelper {
     }
 
     static async showColumns(columnNames: string[]) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ganttGrid);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ganttGrid);
         let isApplyRequired = false;
         let promises = await Array.from(columnNames, async (key: string) => {
             const isOptionAvailable = await CommonPageHelper.getColumnHeaderByText(key).isPresent();
@@ -291,7 +291,7 @@ export class CommonPageHelper {
         await Promise.all(promises);
         if (isApplyRequired) {
             await PageHelper.click(CommonPage.actionMenuIcons.selectColumns);
-            await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.selectColumnPanel);
+            await WaitHelper.waitForElementToBeDisplayed(CommonPage.selectColumnPanel);
             promises = await Array.from(columnNames, async (key: string) => {
                 await CheckboxHelper.markCheckbox(CommonPageHelper.getCheckboxByExactText(key), true);
             });
@@ -351,10 +351,10 @@ export class CommonPageHelper {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
         await ResourceAnalyzerPageHelper.clickDisplayButton(stepLogger);
         await PageHelper.acceptAlert();
         stepLogger.step('Resource Analyzer Page is displayed');
@@ -370,7 +370,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
@@ -420,7 +420,7 @@ export class CommonPageHelper {
     static async selectRecordFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for record');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
 
         stepLogger.step('Click on ITEMS on ribbon');
@@ -430,7 +430,7 @@ export class CommonPageHelper {
     static async selectTwoRecordsFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for two record');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
         await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(CommonPage.secondRecord);
@@ -505,7 +505,7 @@ export class CommonPageHelper {
     static async actionTakenViaContextMenu(item: ElementFinder, actionItem: ElementFinder, stepLogger: StepLogger) {
         stepLogger.stepId(3);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
         await ElementHelper.actionHoverOver(item);
 
         stepLogger.step('Click on the Ellipses button (...)');
@@ -556,7 +556,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(addWindowTitle,
@@ -599,7 +599,7 @@ export class CommonPageHelper {
 
     static async checkItemCreated(titleValue: string, label: ElementArrayFinder) {
         let itemFound = false, text;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        await WaitHelper.waitForElementToBeDisplayed(label.first());
         const size = await label.count();
         for (let index = 0; index < size && !itemFound; index++) {
             await ElementHelper.scrollToElement(label.get(index));
@@ -699,7 +699,7 @@ export class CommonPageHelper {
             .toBe(true, ValidationsHelper.getNotDisplayedValidation(name));
     }
     static async labelDisplayedValidation(targetElement: ElementFinder , name: string) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(targetElement);
+        await WaitHelper.waitForElementToBeDisplayed(targetElement);
         await expect(await PageHelper.isElementPresent(targetElement))
             .toBe(true,
                 ValidationsHelper.getLabelDisplayedValidation(name));
@@ -709,7 +709,7 @@ export class CommonPageHelper {
             .toContain(title, ValidationsHelper.getLabelDisplayedValidation(title));
     }
     static async windowShouldNotBeDisplayedValidation( name: string) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(name));
@@ -719,7 +719,7 @@ export class CommonPageHelper {
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(name));
     }
     static async pageDisplayedValidation( name: string) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect((await CommonPage.title.getText()).trim())
             .toBe(name,
                 ValidationsHelper.getPageDisplayedValidation(name));
@@ -742,18 +742,26 @@ export class CommonPageHelper {
         await PageHelper.click(this.getApplyLink());
        }
     static async waitForApplyButtontoDisplayed() {
-        await  WaitHelper.getInstance().waitForElementToBeClickable(this.getApplyLink());
+        await  WaitHelper.waitForElementToBeClickable(this.getApplyLink());
     }
     static async resourceAnalyzerPopUp(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
         stepLogger.step('Select "Edit Resource Analyzer" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.resourceAnalyzer);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourceAnalyzerPage.display);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
     }
     static async getRibbonIsDisable( targetElement: ElementFinder, attributeName: string) {
         return await ElementHelper.getAttributeValue(targetElement, attributeName);
     }
-   }
+
+    static async gotoOptimizer(stepLogger: StepLogger) {
+        stepLogger.step('Click on Optimizer button from the items tab.');
+        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.m);
+        await CommonPageHelper.switchToFirstContentFrame();
+    }
+}

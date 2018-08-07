@@ -62,7 +62,7 @@ export class OptimizerPage extends BasePage {
     }
 
     static get getConfigure(){
-        return element(By.xpath('//div[@id="idOptimizerTabDiv_ribbon"]//img[contains(@src,"configure")]'));
+        return element(By.css('div#idOptimizerTabDiv_ribbon img[src*="configure"]'));
     }
 
     static get getOptimizerConfiguration(){

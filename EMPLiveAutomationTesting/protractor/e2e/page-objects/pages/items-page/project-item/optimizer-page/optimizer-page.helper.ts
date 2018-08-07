@@ -3,8 +3,11 @@ import {StepLogger} from '../../../../../../core/logger/step-logger';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {ValidationsHelper} from '../../../../../components/misc-utils/validation-helper';
 import {OptimizerPageConstants} from './optimizer-page.constants';
-import {CommonPage} from '../../../common/common.po';
+// import {CommonPage} from '../../../common/common.po';
 import {browser} from 'protractor';
+import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
+import {CommonPageHelper} from '../../../common/common-page.helper';
+import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 
 export class OptimizerPageHelper {
 
@@ -67,32 +70,75 @@ export class OptimizerPageHelper {
         stepLogger.verification('Delete strategy popup verified with message, OK and Cancel buttons');
         const label = OptimizerPage.getDeleteStrategyPopup;
         const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
-        await expect(await PageHelper.getText(label.message)).toBe(optimizerConstLabel.message,
-                ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.deleteStrategy, optimizerConstLabel.message));
-        await expect(await PageHelper.isElementDisplayed(label.ok))
-            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.ok));
-        await expect(await PageHelper.isElementDisplayed(label.cancel))
-            .toBe(true, ValidationsHelper.getButtonDisplayedValidation(OptimizerPageConstants.cancel));
+        await ExpectationHelper.verifyText(label.message,
+             optimizerConstLabel.message , optimizerConstLabel.message, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok,  OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel,  OptimizerPageConstants.cancel, stepLogger);
     }
 
     static async verifyOptimizerWindowClosed(stepLogger: StepLogger) {
-        stepLogger.verification('Optimizer window closed');
-        await browser.sleep(PageHelper.timeout.s);
-        await expect(await PageHelper.isElementDisplayed(CommonPage.ribbonItems.optimizer, false)).toBe(true,
-            ValidationsHelper.getNotDisplayedValidation(OptimizerPageConstants.optimizer));
+        await browser.sleep(PageHelper.timeout.xs);
+        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getConfigure, 'optimizer tab', stepLogger);
     }
 
     static async verifyAlertMessageForSingleProjectSelection(stepLogger: StepLogger) {
-        const alertText = await  PageHelper.getAlertText();
+        const alertText = await PageHelper.getAlertText();
         stepLogger.verification('Alert displayed and validated the content');
-        expect(alertText).toBe(OptimizerPageConstants.oneItemConfigureAlertMsg, ValidationsHelper.getDisplayedValidation(
-            OptimizerPageConstants.oneItemConfigureAlertMsg));
+        await ExpectationHelper.verifyStringEqualTo(alertText, OptimizerPageConstants.oneItemConfigureAlertMsg, stepLogger);
         await PageHelper.acceptAlert();
     }
 
     static async verifyCurrentStrategyName(strategyName: string, stepLogger: StepLogger) {
-        stepLogger.verification('Saved Strategy name displayed in the Current Strategy drop down box');
-        await expect(PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown)).toBe(strategyName,
-            ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.currentStrategy, strategyName));
+        stepLogger.step('Verify the Current Strategy drop down.');
+        await browser.sleep(PageHelper.timeout.xs);
+        await ExpectationHelper.verifyText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown,
+            OptimizerPageConstants.currentStrategy, strategyName, stepLogger);
     }
+
+    static async verifyOptimizerPageOpened(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure,  'Optimizer page', stepLogger);
+    }
+
+    static async closeOptimizerWindowFromOptimizerTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on Close button of the optimizer tab.');
+        await PageHelper.click(OptimizerPage.getCloseOptimizerWindow);
+    }
+
+    static async gotoConfigureSection(stepLogger: StepLogger) {
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        stepLogger.step('Click on Configure button.');
+        await PageHelper.click(OptimizerPage.getConfigure);
+    }
+
+    static async openSaveStrategyPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Save Strategy button.');
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.saveStrategy);
+    }
+
+    static async verifySaveStrtegyPopupDisplayed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimierSaveStrategyPopup.strategyName,
+            'Save Strategy popup', stepLogger);
+    }
+
+    static async enterNewStrategyNameAndSubmit(stepLogger: StepLogger) {
+        stepLogger.step('Enter Strategy name and submit');
+        const uniqueId = PageHelper.getUniqueId();
+        const strategyName = `${OptimizerPageConstants.strategyName}${uniqueId}`;
+        await TextboxHelper.sendKeys(OptimizerPage.getOptimierSaveStrategyPopup.strategyName, strategyName);
+        await PageHelper.click(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        return strategyName;
+    }
+
+    static async openDeleteStrategyPopup(stepLogger: StepLogger) {
+        stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
+        // takes time to expand dropdown
+        await browser.sleep(PageHelper.timeout.xs);
+        const strategyName = await PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
+        return strategyName;
+    }
+
 }

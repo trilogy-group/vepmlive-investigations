@@ -1,4 +1,4 @@
-import {browser} from 'protractor';
+// import {browser} from 'protractor';
 import {SuiteNames} from '../../../helpers/suite-names';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 import {PageHelper} from '../../../../components/html/page-helper';
@@ -7,9 +7,9 @@ import {CommonPageHelper} from '../../../../page-objects/pages/common/common-pag
 import {HomePage} from '../../../../page-objects/pages/homepage/home.po';
 import {CommonPage} from '../../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../../page-objects/pages/common/common-page.constants';
-import {OptimizerPage} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer.po';
-import {OptimizerPageConstants} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.constants';
-import {TextboxHelper} from '../../../../components/html/textbox-helper';
+// import {OptimizerPage} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer.po';
+// import {OptimizerPageConstants} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.constants';
+// import {TextboxHelper} from '../../../../components/html/textbox-helper';
 import {OptimizerPageHelper} from '../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 
 describe(SuiteNames.regressionTestSuite, () => {
@@ -32,14 +32,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        stepLogger.step('Click on Optimizer button from the items tab.');
-        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
-        // Takes time to load the iframe
-        await browser.sleep(PageHelper.timeout.m);
-        await CommonPageHelper.switchToFirstContentFrame();
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
-        stepLogger.step('Click on Close button of the optimizer tab.');
-        await PageHelper.click(OptimizerPage.getCloseOptimizerWindow);
+        await OptimizerPageHelper.closeOptimizerWindowFromOptimizerTab(stepLogger);
         await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
     });
 
@@ -55,12 +51,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectRecordFromGrid(stepLogger);
         stepLogger.stepId(3);
-        stepLogger.step('Click on Optimizer button from the items tab < Click on Configure button.');
-        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
-        // Takes time to load the iframe
-        await browser.sleep(PageHelper.timeout.m);
-        await CommonPageHelper.switchToFirstContentFrame();
-        await PageHelper.click(OptimizerPage.getConfigure);
+        await OptimizerPageHelper.gotoConfigureSection(stepLogger);
         await OptimizerPageHelper.verifyAlertMessageForSingleProjectSelection(stepLogger);
     });
 
@@ -76,21 +67,12 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        stepLogger.step('Click on Optimizer button from the items tab, Click on Save Strategy button.');
-        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
-        // Takes time to load the iframe
-        await browser.sleep(PageHelper.timeout.m);
-        await CommonPageHelper.switchToFirstContentFrame();
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.saveStrategy);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.openSaveStrategyPopup(stepLogger);
+        await OptimizerPageHelper.verifySaveStrtegyPopupDisplayed(stepLogger);
         stepLogger.stepId(4);
-        stepLogger.step('Enter Strategy name.');
-        const uniqueId = PageHelper.getUniqueId();
-        const strategyName = `${OptimizerPageConstants.strategyName}${uniqueId}`;
-        await TextboxHelper.sendKeys(OptimizerPage.getOptimierSaveStrategyPopup.strategyName, strategyName);
-        await PageHelper.click(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        const strategyName = await OptimizerPageHelper.enterNewStrategyNameAndSubmit(stepLogger);
         stepLogger.stepId(5);
-        stepLogger.step('Verify the Current Strategy drop down.');
-        await browser.sleep(PageHelper.timeout.xs);
         await OptimizerPageHelper.verifyCurrentStrategyName(strategyName, stepLogger);
     });
 
@@ -106,19 +88,11 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        stepLogger.step('Click on Optimizer button from the items tab.');
-        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
-        // Takes time to load the iframe
-        await browser.sleep(PageHelper.timeout.m);
-        await CommonPageHelper.switchToFirstContentFrame();
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
-        // takes time to expand dropdown
-        await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
-        await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
+        await OptimizerPageHelper.openDeleteStrategyPopup(stepLogger);
         await OptimizerPageHelper.verifyDeleteStrategyPopup(stepLogger);
     });
 });
