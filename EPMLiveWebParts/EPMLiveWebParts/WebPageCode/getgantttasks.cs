@@ -914,13 +914,13 @@ namespace EPMLiveWebParts
 
         }
 
-        private void processList(SPWeb web, string spquery, SPList curList, SortedList arrGTemp)
+        private void processList(SPWeb web, string spquery, SPList currentItems, SortedList tempGroups)
         {
             var query = new SPQuery { Query = spquery };
-            foreach (SPListItem listItem in curList.GetItems(query))
+            foreach (SPListItem listItem in currentItems.GetItems(query))
             {
-                if (!(string.Equals(Request["ignorelistid"], curList.ID.ToString("B"), StringComparison.CurrentCulture) && 
-                    string.Equals(Request["ignoreitemid"], listItem.ID.ToString(), StringComparison.CurrentCulture)))
+                if (!(string.Equals(Request["ignorelistid"], currentItems.ID.ToString("B"), StringComparison.OrdinalIgnoreCase) && 
+                    Request["ignoreitemid"] == listItem.ID.ToString()))
                 {
                     var canView = true;
                     if (filterfield != string.Empty)
@@ -950,7 +950,7 @@ namespace EPMLiveWebParts
                         {
                             foreach (var groupBy in arrGroupFields)
                             {
-                                if ("--SITE--".Equals(groupBy, StringComparison.InvariantCulture))
+                                if ("--SITE--" == groupBy)
                                 {
                                     if (group[0] == null)
                                     {
@@ -960,20 +960,20 @@ namespace EPMLiveWebParts
                                     {
                                         group[0] += $"\n{web.Title}";
                                     }
-                                    if (!arrGTemp.Contains(group[0]))
+                                    if (!tempGroups.Contains(group[0]))
                                     {
-                                        arrGTemp.Add(group[0], string.Empty);
+                                        tempGroups.Add(group[0], string.Empty);
                                     }
                                 }
                                 else
                                 {
                                     var field = list.Fields.GetFieldByInternalName(groupBy);
                                     var newgroup = getField(listItem, groupBy);
-                                    if (newgroup == string.Empty)
+                                    if (string.IsNullOrEmpty(newgroup))
                                     {
                                         newgroup = $" No {field.Title}";
                                     }
-                                    ProcessField(arrGTemp, ref group, groupBy, field, ref newgroup);
+                                    ProcessField(tempGroups, ref group, groupBy, field, ref newgroup);
                                 }
                             }
                         }
@@ -1002,14 +1002,9 @@ namespace EPMLiveWebParts
                 newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true);
                 for (int iGroup = 0; iGroup < groups.Length; iGroup++)
                 {
-                    if (groups[iGroup] == null)
-                    {
-                        groups[iGroup] = newgroup;
-                    }
-                    else
-                    {
-                        groups[iGroup] += $"\n{newgroup}";
-                    }
+                    groups[iGroup] = groups[iGroup] == null
+                        ? newgroup
+                        : $"{groups[iGroup]}\n{newgroup}";
                     if (!arrGTemp.Contains(groups[iGroup]))
                     {
                         arrGTemp.Add(groups[iGroup], string.Empty);
@@ -1030,15 +1025,9 @@ namespace EPMLiveWebParts
                 {
                     foreach (var lookupValue in lookupCollection)
                     {
-                        if (currentGroup == null)
-                        {
-                            tmpGroups[tmpCounter] = lookupValue.LookupValue;
-                        }
-                        else
-                        {
-                            tmpGroups[tmpCounter] = $"{currentGroup}\n{lookupValue.LookupValue}";
-                        }
-
+                        tmpGroups[tmpCounter] = currentGroup == null
+                            ? lookupValue.LookupValue
+                            : $"{currentGroup}\n{lookupValue.LookupValue}";
                         if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
                         {
                             arrGTemp.Add(tmpGroups[tmpCounter], string.Empty);
