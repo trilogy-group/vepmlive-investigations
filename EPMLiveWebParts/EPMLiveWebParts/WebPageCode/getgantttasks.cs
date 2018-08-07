@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
-using DiagTrace = System.Diagnostics.Trace;
 using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts
@@ -938,10 +937,7 @@ namespace EPMLiveWebParts
                                 canView = false;
                             }
                         }
-                        catch(Exception exception)
-                        {
-                            DiagTrace.TraceError(exception.ToString());
-                        }
+                        catch {}
                     }
                     if (canView)
                     {
