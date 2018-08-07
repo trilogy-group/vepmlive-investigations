@@ -7,5 +7,10 @@
     <Clear/>
     <Add FullName="EPMLiveWebParts.getgriditems!"/>
     <Add FullName="EPMLiveWebParts.getgantttasks!"/>
+		<Add FullName="EPMLiveWebParts.ReportsCenter!"/>
+		<Add FullName="EPMLiveWebParts.ReportViewer!"/>
+		<Add FullName="EPMLiveWebParts.SSRS2005.ReportingService2005!"/>
+		<Add FullName="EPMLiveWebParts.SSRS2006.ReportingService2006!"/>
+		<Add FullName="EPMLiveWebParts.ReportWebPartBase!"/>
   </ShimGeneration>
 </Fakes>
