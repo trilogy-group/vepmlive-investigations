@@ -87,7 +87,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         await CommonPageHelper.gotoOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
-        stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
         await OptimizerPageHelper.openDeleteStrategyPopup(stepLogger);
         await OptimizerPageHelper.verifyDeleteStrategyPopup(stepLogger);
     });
