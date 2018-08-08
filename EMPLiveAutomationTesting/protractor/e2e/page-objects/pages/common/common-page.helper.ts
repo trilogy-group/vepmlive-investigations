@@ -757,9 +757,13 @@ export class CommonPageHelper {
         return await ElementHelper.getAttributeValue(targetElement, attributeName);
     }
 
+    static getOptimizerButton() {
+        return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer);
+    }
+
     static async gotoOptimizer(stepLogger: StepLogger) {
         stepLogger.step('Click on Optimizer button from the items tab.');
-        await PageHelper.click(CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer));
+        await PageHelper.click( this.getOptimizerButton());
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.m);
         await CommonPageHelper.switchToFirstContentFrame();

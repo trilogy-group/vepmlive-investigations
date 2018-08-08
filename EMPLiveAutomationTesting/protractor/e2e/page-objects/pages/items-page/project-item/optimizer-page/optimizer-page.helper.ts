@@ -77,7 +77,6 @@ export class OptimizerPageHelper {
 
     static async verifyAlertMessageForSingleProjectSelection(stepLogger: StepLogger) {
         const alertText = await PageHelper.getAlertText();
-        stepLogger.verification('Alert displayed and validated the content');
         await ExpectationHelper.verifyStringEqualTo(alertText, OptimizerPageConstants.oneItemConfigureAlertMsg, stepLogger);
         await PageHelper.acceptAlert();
     }
@@ -116,22 +115,24 @@ export class OptimizerPageHelper {
 
     static async enterNewStrategyNameAndSubmit(stepLogger: StepLogger) {
         stepLogger.step('Enter Strategy name and submit');
+        const label = OptimizerPage.getOptimierSaveStrategyPopup;
         const uniqueId = PageHelper.getUniqueId();
         const strategyName = `${OptimizerPageConstants.strategyName}${uniqueId}`;
-        await TextboxHelper.sendKeys(OptimizerPage.getOptimierSaveStrategyPopup.strategyName, strategyName);
-        await PageHelper.click(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        await TextboxHelper.sendKeys(label.strategyName, strategyName);
+        await PageHelper.click(label.ok);
         return strategyName;
     }
 
     static async openDeleteStrategyPopup(stepLogger: StepLogger) {
+        const label = OptimizerPage.getOptimizerStrategyActions ;
         stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
+        await PageHelper.click(label.currentStrategyDropdown);
         // takes time to expand dropdown
         await browser.sleep(PageHelper.timeout.xs);
-        const strategyName = await PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        const strategyName = await PageHelper.getText(label.currentStrategyDropdownValue);
+        await PageHelper.click(label.currentStrategyDropdownValue);
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
+        await PageHelper.click(label.deleteStrategy);
         return strategyName;
     }
 
