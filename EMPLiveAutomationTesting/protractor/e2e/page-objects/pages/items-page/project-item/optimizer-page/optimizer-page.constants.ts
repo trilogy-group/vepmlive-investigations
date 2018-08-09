@@ -19,6 +19,7 @@ export class OptimizerPageConstants {
     static readonly deleteView = 'Delete view popup';
     static readonly currentView= 'Current View';
     static readonly configure= 'Configure window';
+    static readonly selectColumns= 'Select Columns Window';
 
     static get viewManagementOptions() {
         return {
@@ -46,7 +47,8 @@ export class OptimizerPageConstants {
             ok: 'OK',
             hideAll: 'Hide all',
             cancel: 'Cancel',
-            eachColumn: '.GMColumnsMenuItemText'
+            column: '.GMColumnsMenuItemText',
+            header: 'Select columns to display'
         };
     }
 

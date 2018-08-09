@@ -34,9 +34,13 @@ export class OptimizerPage extends BasePage {
         const label = OptimizerPageConstants.selectColumnsPopup;
         return{
             ok: ElementHelper.getElementByText(label.ok),
+            cancel: ElementHelper.getElementByText(label.cancel),
             hideAll: ElementHelper.getElementByText(label.hideAll),
             column: element.all(By.css('.GMColumnsMenuItemText')),
-            selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div'))
+            eachColumn: element(By.css('.GMColumnsMenuItemText')),
+            selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div')),
+            eachSelectedColumn: element(By.css('.GMColumnsMenuCheckedIconRight>div')),
+            heading: element(By.css('.GMColumnsMenuHead'))
         };
     }
 

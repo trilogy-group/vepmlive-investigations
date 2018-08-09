@@ -209,4 +209,22 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.gotoConfigureSection(stepLogger);
         await OptimizerPageHelper.verifyMessageOnConfiguration(stepLogger);
     });
+
+    it('Verify that Current strategy drop down. - [744372]', async () => {
+        const stepLogger = new StepLogger(744372);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.verfyCurrentStrategyDropdown(stepLogger);
+    });
 });

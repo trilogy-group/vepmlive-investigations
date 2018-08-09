@@ -216,7 +216,30 @@ export class OptimizerPageHelper {
     }
 
     static async verifyMessageOnConfiguration(stepLogger: StepLogger) {
+        const expectedMessage = OptimizerPageConstants.optimizerConfiguration.message;
         await ExpectationHelper.verifyContainsText(OptimizerPage.getOptimizerConfiguration.message,
-            OptimizerPageConstants.configure, OptimizerPageConstants.optimizerConfiguration.message, stepLogger);
+            OptimizerPageConstants.configure, expectedMessage, stepLogger);
+    }
+
+    static async verfyCurrentStrategyDropdown(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown,
+            OptimizerPageConstants.currentStrategy, stepLogger);
+    }
+
+    static async clickSelectColumns(stepLogger: StepLogger) {
+        stepLogger.step('Click on Select Column button');
+        await PageHelper.click(OptimizerPage.viewManagementOptions.selectColumns);
+    }
+
+    static async verifySelectColumnsPopup(stepLogger: StepLogger) {
+        const label = OptimizerPage.getSelectColumnsPopup;
+        const optConst = OptimizerPageConstants.selectColumnsPopup;
+        await ExpectationHelper.verifyText(label.heading,
+            OptimizerPageConstants.selectColumns, optConst.header, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.eachColumn, 'Column names' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.eachSelectedColumn, 'Column checkbox' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.hideAll, optConst.hideAll , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel , stepLogger);
     }
 }
