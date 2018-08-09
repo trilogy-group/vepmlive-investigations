@@ -67,7 +67,7 @@ export class OptimizerPage extends BasePage {
     }
 
     static get getConfigure(){
-        return element(By.css('div#idOptimizerTabDiv_ribbon img[src*="configure"]'));
+        return element(By.css('ul#idOptimizerTabDiv_ul img[src*="configure"]'));
     }
 
     static get getOptimizerConfiguration(){
@@ -120,7 +120,7 @@ export class OptimizerPage extends BasePage {
     }
 
     static getCurrentStrategyByName(strategyName: string) {
-        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())"${strategyName}"]`));
+        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())="${strategyName}"]`));
     }
 
     static get getOptimizerRibbon() {

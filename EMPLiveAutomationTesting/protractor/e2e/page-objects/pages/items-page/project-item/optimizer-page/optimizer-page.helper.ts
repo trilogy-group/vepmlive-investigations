@@ -7,8 +7,6 @@ import {OptimizerPageConstants} from './optimizer-page.constants';
 import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
 import {CommonPageHelper} from '../../../common/common-page.helper';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
-// import {CommonPageConstants} from '../../../common/common-page.constants';
-import {CommonPage} from '../../../common/common.po';
 
 export class OptimizerPageHelper {
 
@@ -102,6 +100,7 @@ export class OptimizerPageHelper {
     static async gotoConfigureSection(stepLogger: StepLogger) {
         await CommonPageHelper.gotoOptimizer(stepLogger);
         stepLogger.step('Click on Configure button.');
+        await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.getConfigure);
     }
 
@@ -138,42 +137,49 @@ export class OptimizerPageHelper {
         return strategyName;
     }
 
-
-    static async deleteStrategy() {
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownSpan);
+    static async deleteStrategy(stepLogger: StepLogger) {
+        const label = OptimizerPage.getOptimizerStrategyActions ;
+        stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
+        await PageHelper.click(label.currentStrategyDropdownSpan);
         // takes time to expand dropdown
         await browser.sleep(PageHelper.timeout.xs);
-        const strategyName = await PageHelper.getText(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownValue);
+        const strategyName = await PageHelper.getText(label.currentStrategyDropdownValue);
+        await PageHelper.click(label.currentStrategyDropdownValue);
         await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.deleteStrategy);
+        await PageHelper.click(label.deleteStrategy);
         return strategyName;
     }
 
+    static async clickOKonDeleteStrategyPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.getDeleteStrategyPopup.ok);
+    }
+
     static async verifyDeletedStrategy(stepLogger: StepLogger, deletedStrategyName: string) {
-        stepLogger.verification('Deleted the strategy in the current strategy dropdown');
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdownSpan);
-        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCurrentStrategyByName(deletedStrategyName))).toBe(false,
-            ValidationsHelper.getFieldShouldNotHaveValueValidation(OptimizerPageConstants.currentStrategy, deletedStrategyName));
+        await browser.sleep(PageHelper.timeout.xs);
+        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getCurrentStrategyByName(deletedStrategyName),
+            deletedStrategyName, stepLogger);
     }
 
     static async verifyRibbonCollapsed(stepLogger: StepLogger) {
-        stepLogger.verification('Ribbon collapsed');
-        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getOptimizerRibbon.collapseView)).toBe(true,
-            ValidationsHelper.getDisplayedValidation(OptimizerPageConstants.collapsed));
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerRibbon.collapseView,
+            OptimizerPageConstants.collapsed, stepLogger);
     }
 
-    static async deleteView(stepLogger: StepLogger) {
+    static async clickDeleteView(stepLogger: StepLogger) {
+        stepLogger.step('Click on Delete View button.');
         const viewName = await PageHelper.getText(OptimizerPage.viewManagementOptions.currentViewDropdown);
         await PageHelper.click(OptimizerPage.viewManagementOptions.deleteView);
         await browser.sleep(PageHelper.timeout.s);
+        return viewName;
+    }
+
+    static async verifyDeleteViewPopup(stepLogger: StepLogger) {
         const actualDelMessage = await PageHelper.getText(OptimizerPage.getDeleteViewPopup.deleteViewMessage);
         const expectedDelMessage = OptimizerPageConstants.deleteViewPopup.deleteViewMessage;
-        stepLogger.verification('Message on delete view popup');
-        await expect(actualDelMessage).toBe(expectedDelMessage,
-            ValidationsHelper.getFieldShouldHaveValueValidation(OptimizerPageConstants.deleteView, expectedDelMessage));
-        return viewName;
+        await ExpectationHelper.verifyStringEqualTo(actualDelMessage, expectedDelMessage, stepLogger);
     }
 
     static async verifyDeletedView(stepLogger: StepLogger, deletedViewName: string) {
@@ -181,7 +187,31 @@ export class OptimizerPageHelper {
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.viewManagementOptions.currentViewDropdown);
         await browser.sleep(PageHelper.timeout.s);
-        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCurrentViewByName(deletedViewName), false)).toBe(false,
-            ValidationsHelper.getFieldShouldNotHaveValueValidation(OptimizerPageConstants.currentView, deletedViewName));
+        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getCurrentViewByName(deletedViewName),
+            deletedViewName, stepLogger);
+    }
+
+    static async clickMinusSign(stepLogger: StepLogger) {
+        stepLogger.step('Click on Minus Sign');
+        await PageHelper.click(OptimizerPage.getOptimizerRibbon.minusSign);
+    }
+
+    static async clickViewTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on View Tab');
+        await PageHelper.click(OptimizerPage.getTabOptions.view);
+    }
+
+    static async verifyViewPageOpened(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.saveView,  'View page', stepLogger);
+    }
+
+    static async closeOptimizerWindowFromViewTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on Close button of the optimizer tab.');
+        await PageHelper.click(OptimizerPage.getCloseOptimizerViewTab);
+    }
+
+    static async clickOKonDeleteViewPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.getDeleteViewPopup.ok);
     }
 }
