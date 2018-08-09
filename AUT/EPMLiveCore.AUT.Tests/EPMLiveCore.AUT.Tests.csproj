@@ -60,6 +60,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
@@ -96,6 +98,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Web.UI.Skins, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Telerik.Web.UI.Skins.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\Analytics\AnalyticsDataTest.cs" />
@@ -145,6 +155,218 @@
     <Compile Include="API\TimerTest.cs" />
     <Compile Include="API\ViewManagerTest.cs" />
     <Compile Include="API\WorkspaceCenter\WorkspaceCenterTest.cs" />
+    <Compile Include="AppsListEvents\AppsListEventsTest.cs" />
+    <Compile Include="AssignmentPlanner\API\GatewayTest.cs" />
+    <Compile Include="AssignmentPlanner\AssignmentManagerTest.cs" />
+    <Compile Include="AssignmentPlanner\GridManagerTest.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTest.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControlTest.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControlTest.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldSettingsTest.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldTest.cs" />
+    <Compile Include="Controls\Navigation\EPMLiveNavigationTest.cs" />
+    <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\AssociatedItemsLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\FavoritesLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\GenericLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\SettingsLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\WorkplaceLinkProviderTest.cs" />
+    <Compile Include="Controls\Navigation\Providers\WorkspaceLinkProviderTest.cs" />
+    <Compile Include="DepartmentEvent\DepartmentEventTest.cs" />
+    <Compile Include="EPMLiveConfig\EPMLiveConfigFieldControlTest.cs" />
+    <Compile Include="EPMLiveConfig\EPMLiveConfigFieldTest.cs" />
+    <Compile Include="EPMLivePCForm\ManageableListsTest.cs" />
+    <Compile Include="EPMLivePCForm\PCFieldIteratorTest.cs" />
+    <Compile Include="EPMLivePCForm\TCFieldIteratorTest.cs" />
+    <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEventTest.cs" />
+    <Compile Include="EPMLiveTaskCenterEvent\EPMLiveTaskCenterEventTest.cs" />
+    <Compile Include="Events\ClearCacheEventTest.cs" />
+    <Compile Include="Features\EPMLiveLogging\EPMLiveLoggingEventReceiverTest.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldControlTest.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldEditorTest.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldTest.cs" />
+    <Compile Include="FilteredLookup\MultipleFilteredLookupFieldControlTest.cs" />
+    <Compile Include="Infrastructure\AssemblyManagerTest.cs" />
+    <Compile Include="Infrastructure\BaseClasses\BaseManagerTest.cs" />
+    <Compile Include="Infrastructure\BaseClasses\ReportingProxyBaseTest.cs" />
+    <Compile Include="Infrastructure\BaseClasses\SPListItemManagerTest.cs" />
+    <Compile Include="Infrastructure\CachedValueTest.cs" />
+    <Compile Include="Infrastructure\CacheStoreCategoryTest.cs" />
+    <Compile Include="Infrastructure\CacheStoreTest.cs" />
+    <Compile Include="Infrastructure\EPMLiveFileStoreTest.cs" />
+    <Compile Include="Infrastructure\EPMLiveScriptManagerTest.cs" />
+    <Compile Include="Infrastructure\GridView\GridViewManagerFactoryTest.cs" />
+    <Compile Include="Infrastructure\GridView\GridViewTest.cs" />
+    <Compile Include="Infrastructure\Logging\LoggerTest.cs" />
+    <Compile Include="Infrastructure\Logging\LoggingServiceTest.cs" />
+    <Compile Include="Infrastructure\Navigation\NavLinkProviderInfoAttributeTest.cs" />
+    <Compile Include="Infrastructure\Navigation\NavLinkTest.cs" />
+    <Compile Include="Infrastructure\Navigation\NavNodeTest.cs" />
+    <Compile Include="Infrastructure\Navigation\NavObjectTest.cs" />
+    <Compile Include="Infrastructure\Navigation\SPNavLinkTest.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\DepartmentManagerTest.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManagerTest.cs" />
+    <Compile Include="Infrastructure\SessionManagerTest.cs" />
+    <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTest.cs" />
+    <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTest.cs" />
+    <Compile Include="Infrastructure\WEFeaturesTest.cs" />
+    <Compile Include="IntegrateEvents\IntegrateEventsTest.cs" />
+    <Compile Include="Integrations\Office365\IntegratorTest.cs" />
+    <Compile Include="Integrations\Salesforce\IntegratorTest.cs" />
+    <Compile Include="ISAPI\Lic\LicensingTest.cs" />
+    <Compile Include="ISAPI\WorkEngineAPITest.cs" />
+    <Compile Include="Jobs\AdSynchJobTest.cs" />
+    <Compile Include="Jobs\Applications\InstallAndConfigureTest.cs" />
+    <Compile Include="Jobs\Applications\UninstallTest.cs" />
+    <Compile Include="Jobs\CreateWorkspaceJobTest.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\DdlHelperTest.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\UpgraderTest.cs" />
+    <Compile Include="Jobs\IntegrationTest.cs" />
+    <Compile Include="Jobs\NotificationsTest.cs" />
+    <Compile Include="Jobs\ResourceImportJobTest.cs" />
+    <Compile Include="Jobs\ResourceImportLogTest.cs" />
+    <Compile Include="Jobs\ResourceImportMessageTest.cs" />
+    <Compile Include="Jobs\ResourceImportResultTest.cs" />
+    <Compile Include="Jobs\ResourcePlanTest.cs" />
+    <Compile Include="Jobs\RollupJobTest.cs" />
+    <Compile Include="Jobs\SecurityUpdateTest.cs" />
+    <Compile Include="Jobs\SSRS\ExtensionMethodsTest.cs" />
+    <Compile Include="Jobs\SSRS\ReportingService2010ExtendedTest.cs" />
+    <Compile Include="Jobs\SSRS\ReportingServiceTest.cs" />
+    <Compile Include="Jobs\SSRS\ReportItemTest.cs" />
+    <Compile Include="Jobs\SSRS\SSRSSyncQueueAgentTest.cs" />
+    <Compile Include="Jobs\SSRS\SubscriptionPropertiesTest.cs" />
+    <Compile Include="Jobs\SSRS\SyncJobTest.cs" />
+    <Compile Include="Jobs\TimerFixTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\JobStepAttributeTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddFilesTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\DBUpgraderTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallAndConfigureListsTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallReportingEventsTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\MiscellaneousTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\PFEPermissionMapperTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ReportingUpgradeTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\SiteFeaturesTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\TimeOffTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTest.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebsTest.cs" />
+    <Compile Include="Jobs\Upgrades\WE43UpgradeJobTest.cs" />
+    <Compile Include="Layouts\epmlive\ActtestTest.cs" />
+    <Compile Include="Layouts\epmlive\AddFavoriteTest.cs" />
+    <Compile Include="Layouts\epmlive\AddusersTest.cs" />
+    <Compile Include="Layouts\epmlive\Admin\CacheManagerTest.cs" />
+    <Compile Include="Layouts\epmlive\AdsyncadminTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\AddCommunityTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\AppsTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\AppstoreTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\ChooseCommunityTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\InstallDoneTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\InstallfromstoreTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\InstallNavTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\InstallTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\ManageAppsTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\ManageTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\NoactTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\PreCheckDoneTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\PrecheckTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\ProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\TermsTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\UninstallCheckDoneTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\UninstallcheckTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\UninstallDoneTest.cs" />
+    <Compile Include="Layouts\epmlive\applications\UninstallTest.cs" />
+    <Compile Include="Layouts\epmlive\AsyncNavActionsTest.cs" />
+    <Compile Include="Layouts\epmlive\BuildTeamHelperTest.cs" />
+    <Compile Include="Layouts\epmlive\BuildTeamTest.cs" />
+    <Compile Include="Layouts\epmlive\ChangeAppAjaxDataHostTest.cs" />
+    <Compile Include="Layouts\epmlive\ChangeAppTest.cs" />
+    <Compile Include="Layouts\epmlive\CommentersupdateTest.cs" />
+    <Compile Include="Layouts\epmlive\CommentsProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\CommentsTest.cs" />
+    <Compile Include="Layouts\epmlive\CommonActionsAjaxDataHostTest.cs" />
+    <Compile Include="Layouts\epmlive\CreateNewAjaxDataHostTest.cs" />
+    <Compile Include="Layouts\epmlive\CreateNewWorkspaceTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomEditNavTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomNewNavTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomQlReordTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomQuikLnchTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomTnReordTest.cs" />
+    <Compile Include="Layouts\epmlive\CustomTopNavTest.cs" />
+    <Compile Include="Layouts\epmlive\DeletewebTest.cs" />
+    <Compile Include="Layouts\epmlive\FileDownloaderTest.cs" />
+    <Compile Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandlerTest.cs" />
+    <Compile Include="Layouts\epmlive\GetLastIDTest.cs" />
+    <Compile Include="Layouts\epmlive\GetWorkspaceListTreeTest.cs" />
+    <Compile Include="Layouts\epmlive\GotoresourcesTest.cs" />
+    <Compile Include="Layouts\epmlive\GridganttsettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\IconPickerTest.cs" />
+    <Compile Include="Layouts\epmlive\ImportResourceStatusTest.cs" />
+    <Compile Include="Layouts\epmlive\ImportResourcesTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\AddTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ColumnsTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ConnectionTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\DeleteTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\EditFieldsTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\GotoremoteframeTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\GotoremoteTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\IntegrationListTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\LogTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ManageTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\OpenControlTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\PropertiesTest.cs" />
+    <Compile Include="Layouts\epmlive\Integration\ProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\ListLookupConfigTest.cs" />
+    <Compile Include="Layouts\epmlive\ListLookupEditTest.cs" />
+    <Compile Include="Layouts\epmlive\ListViewHostTest.cs" />
+    <Compile Include="Layouts\epmlive\MoreInformationTest.cs" />
+    <Compile Include="Layouts\epmlive\MyworksettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\NewappTest.cs" />
+    <Compile Include="Layouts\epmlive\NewitemTest.cs" />
+    <Compile Include="Layouts\epmlive\NoaccessTest.cs" />
+    <Compile Include="Layouts\epmlive\NotificationsadminTest.cs" />
+    <Compile Include="Layouts\epmlive\NotificiationsTest.cs" />
+    <Compile Include="Layouts\epmlive\OptInUpgradeTest.cs" />
+    <Compile Include="Layouts\epmlive\PerformUpgradeTest.cs" />
+    <Compile Include="Layouts\epmlive\PermissionsTest.cs" />
+    <Compile Include="Layouts\epmlive\PrjsetngTest.cs" />
+    <Compile Include="Layouts\epmlive\PublishersettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\QueueCreateWorkspaceTest.cs" />
+    <Compile Include="Layouts\epmlive\QueuejobsTest.cs" />
+    <Compile Include="Layouts\epmlive\RegionalsetngTest.cs" />
+    <Compile Include="Layouts\epmlive\ReportCheckActionsTest.cs" />
+    <Compile Include="Layouts\epmlive\ReportFilterViewCreatorTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\izenda\AddTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\izenda\EditTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\izenda\ManageTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\izenda\RedirectTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\izenda\ReportingTest.cs" />
+    <Compile Include="Layouts\epmlive\reporting\ReportslandingTest.cs" />
+    <Compile Include="Layouts\epmlive\RequestworkspaceTest.cs" />
+    <Compile Include="Layouts\epmlive\ResourcecapacityTest.cs" />
+    <Compile Include="Layouts\epmlive\SaveCurrentSiteAsTemplateTest.cs" />
+    <Compile Include="Layouts\epmlive\SettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\SetupTest.cs" />
+    <Compile Include="Layouts\epmlive\SitepermissionsTest.cs" />
+    <Compile Include="Layouts\epmlive\SmallParentUrlDialogTest.cs" />
+    <Compile Include="Layouts\epmlive\SolutionStoreProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\TemplateGalleryRedirectTest.cs" />
+    <Compile Include="Layouts\epmlive\TimersettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\TotalfieldsTest.cs" />
+    <Compile Include="Layouts\epmlive\UnsealfieldsTest.cs" />
+    <Compile Include="Layouts\epmlive\UpgradeResultTest.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\ProxyTest.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDoneTest.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeTest.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\WE432UpgraderTest.cs" />
+    <Compile Include="Layouts\epmlive\Upgraders\WE43UpgraderTest.cs" />
+    <Compile Include="Layouts\epmlive\UpgradeTest.cs" />
+    <Compile Include="Layouts\epmlive\ViewmessagesTest.cs" />
+    <Compile Include="Layouts\epmlive\WebsettingsTest.cs" />
+    <Compile Include="Layouts\epmlive\WEPeopleEditorAjaxHandlerTest.cs" />
+    <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +386,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
