@@ -40,8 +40,13 @@ export class OptimizerPage extends BasePage {
         };
     }
 
-    static getTabOptions(tabName: string) {
-            return element(By.xpath(`//div[contains(@class,"dhx_tabbar_row")]//span[normalize-space(text())="${tabName}"]`));
+    static get getTabOptions() {
+        const label = OptimizerPageConstants.tabOptions;
+        const tabSection = '//div[contains(@class,"dhx_tabbar_row")]';
+        return {
+            optimizer: element(By.xpath(`${tabSection}//span[normalize-space(text())="${label.optimizer}"]`)),
+            view: element(By.xpath(`${tabSection}//span[normalize-space(text())="${label.view}"]`))
+        };
     }
 
     static get getCloseOptimizerWindow(){
@@ -62,7 +67,7 @@ export class OptimizerPage extends BasePage {
     }
 
     static get getConfigure(){
-        return element(By.xpath('//div[@id="idOptimizerTabDiv_ribbon"]//img[contains(@src,"configure")]'));
+        return element(By.css('div#idOptimizerTabDiv_ribbon img[src*="configure"]'));
     }
 
     static get getOptimizerConfiguration(){

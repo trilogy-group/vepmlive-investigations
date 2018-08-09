@@ -241,8 +241,7 @@ export class CommonPage extends BasePage {
     }
 
     static get secondRecord() {
-        return element(By.xpath(
-            `//tr[contains(@class,"GMClassSelected")]/following-sibling::tr[1]/td[contains(@class,"GMCellPanel GMEmpty")]`));
+        return element(By.css(`tr.GMClassSelected +tr > td.GMCellPanel`));
     }
 
     static get recordWithoutGreenTicket() {

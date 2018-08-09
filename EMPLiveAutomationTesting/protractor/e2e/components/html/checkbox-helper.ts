@@ -28,9 +28,8 @@ export class CheckboxHelper {
     }
 
     static async markCheckbox(elementt: ElementFinder, markChecked: boolean) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(elementt);
-        // Retry mark checkbox if previous try fails.  This is
-        // useful on slow environments like on remote executions.
+        await WaitHelper.waitForElementToBeClickable(elementt);
+
         const isSelected = await elementt.isSelected();
         if (isSelected !== markChecked) {
             await elementt.click();
@@ -38,14 +37,8 @@ export class CheckboxHelper {
         return;
     }
 
-    static async checkboxstatus(elementt: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(elementt);
-        // Retry mark checkbox if previous try fails.  This is
-        // useful on slow environments like on remote executions.
-        const isSelected = await elementt.isSelected();
-        if (isSelected !== true) {
-            return false;
-        }
-        return true;
+    static async isCheckboxChecked(locator: ElementFinder) {
+        await WaitHelper.waitForElementToBeDisplayed(locator);
+        return locator.isSelected();
     }
 }

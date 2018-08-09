@@ -2,6 +2,7 @@ export class ValidationsHelper {
     static get types() {
         return {
             field: 'Field',
+            dropDown: 'Drop down',
             page: 'Page',
             button: 'Button',
             label: 'Label',
@@ -10,8 +11,13 @@ export class ValidationsHelper {
             notification: 'Notification',
             grid: 'Grid',
             menu: 'Menu',
+            link: 'Link',
             checkBox: 'CheckBox',
         };
+    }
+
+    static getOnlyOneRecordShouldBeDisplayed(type: string, title: string) {
+        return `There should only be 1 record displayed in ${type} with title ${title}`;
     }
 
     static getFieldShouldHaveValueValidation(fieldLabel: string, value: string) {
@@ -26,20 +32,16 @@ export class ValidationsHelper {
         return `${this.types.field} ${fieldLabel} should ${status} have value as ${value}`;
     }
 
-    static getCheckBoxStatusValidation(status = '') {
-        return `${this.types.checkBox} should ${status} have checked`;
+    static getNoOptionDisplayed(fieldLabel: string) {
+        return `${this.types.dropDown} ${fieldLabel} should not have any option displayed`;
+    }
+
+    static getOptionDisplayed(fieldLabel: string, optionLabel: string) {
+        return `${this.types.dropDown} ${fieldLabel} should display option with text ${optionLabel}`;
     }
 
     static getPageDisplayedValidation(name: string) {
         return `${this.types.page} ${this.getDisplayedValidation(name)}`;
-    }
-
-    static getCheckBoxNotSelectedValidation() {
-        return this.getCheckBoxStatusValidation('not');
-    }
-
-    static getCheckBoxSelectedValidation() {
-        return this.getCheckBoxStatusValidation('');
     }
 
     static getFieldDisplayedValidation(name: string) {
@@ -50,8 +52,28 @@ export class ValidationsHelper {
         return `${this.types.button} ${this.getDisplayedValidation(name)}`;
     }
 
+    static getButtonDisabledValidation(name: string) {
+        return `${this.types.button} ${this.getDisabledValidation(name)}`;
+    }
+
     static getMenuDisplayedValidation(name: string) {
         return `${this.types.menu} ${this.getDisplayedValidation(name)}`;
+    }
+
+    static getMenuShouldNotBeDisplayedValidation(name: string) {
+        return `${this.types.menu} ${this.getNotDisplayedValidation(name)}`;
+    }
+
+    static getMenuExpandedValidation(name: string) {
+        return `${this.types.menu} ${name} should be expanded`;
+    }
+
+    static getMenuCollapsedValidation(name: string) {
+        return `${this.types.menu} ${name} should be shrinked`;
+    }
+
+    static getMenuShouldNotHaveChildValidation(name: string) {
+        return `${this.types.menu} "${name}" should not have children`;
     }
 
     static getLabelDisplayedValidation(name: string) {
@@ -70,8 +92,8 @@ export class ValidationsHelper {
         return `Confirmation box for deletion of record which contains ${this.getDisplayedValidation(recordText)}`;
     }
 
-    static getRecordCreatedValidation(recordText: string) {
-        return this.getRecordContainsMessage(this.getDisplayedValidation(recordText));
+    static getRecordCreatedValidation(recordText: string[]) {
+        return this.getRecordContainsMessage(this.getDisplayedValidation(recordText.join(',')));
     }
 
     static getRecordDeletedValidation(recordText: string) {
@@ -86,17 +108,38 @@ export class ValidationsHelper {
         return `${name} should be displayed`;
     }
 
+    static getDisabledValidation(name: string) {
+        return `${name} should be disabled`;
+    }
+
+    static getEnabledValidation(name: string) {
+        return `${name} should be enabled`;
+    }
+
+    static getEnabledButtonValidation(name: string) {
+        return `${name} should be enabled`;
+    }
+
+    static getNotEnabledButtonValidation(name: string) {
+        return `${name} should not be enabled`;
+    }
+
+    static getDisabledButtonValidation(name: string) {
+        return `${name} should be disabled`;
+    }
+
     static getErrorDisplayedValidation(error: string) {
         return `Error ${this.getDisplayedValidation(error)}`;
+    }
+
+    static getErrorDisplayedValidationForField(field: string, error: string) {
+        return `Error ${this.getDisplayedValidation(error)} for field ${field}`;
     }
 
     static getWindowShouldNotBeDisplayedValidation(name: string) {
         return `${this.types.window} ${this.getNotDisplayedValidation(name)}`;
     }
 
-    static getWindowShouldBeDisplayedValidation(name: string) {
-        return `${this.types.window} ${this.getDisplayedValidation(name)}`;
-    }
     static getNotificationDisplayedValidation(name: string) {
         return `${this.types.notification} ${this.getDisplayedValidation(name)}`;
     }
@@ -106,19 +149,119 @@ export class ValidationsHelper {
     }
 
     static getOnlyOneRecordShouldBeDisplayedInGrid(name: string) {
-        return `There should only be 1 record displayed in grid with title ${name}`;
+        return this.getOnlyOneRecordShouldBeDisplayed(this.types.dropDown, name);
     }
 
-    static getDisabledValidation(name: string) {
-        return `${name} should be disabled`;
+    static getOnlyOneRecordShouldBeDisplayedInDropDown(name: string) {
+        return this.getOnlyOneRecordShouldBeDisplayed(this.types.grid, name);
     }
 
-    static getEnabledValidation(name: string) {
-        return `${name} should be enabled`;
+    static getMessageDisplayedValidation(msg: string) {
+        return `Message ${this.getDisplayedValidation(msg)}`;
     }
 
-    static getButtonDisabledValidation(name: string) {
-        return `${this.types.button} ${this.getDisabledValidation(name)}`;
+    static getLinkDisplayedValidation(name: string) {
+        return `${this.types.link} ${this.getDisplayedValidation(name)}`;
+    }
+
+    static getLinkNotDisplayedValidation(name: string) {
+        return `${this.types.link} ${this.getNotDisplayedValidation(name)}`;
+    }
+
+    static getCheckedValidation(name: string) {
+        return `${name} should be checked`;
+    }
+
+    static getElementDisplayedValidation(name: string) {
+        return `${name} element should be displayed`;
+    }
+
+    static getIconDisplayedValidation(name: string) {
+        return `Icon ${this.getDisplayedValidation(name)}`;
+    }
+
+    static getIconNotDisplayedValidation(name: string) {
+        return `Icon ${this.getNotDisplayedValidation(name)}`;
+    }
+
+    static getFieldHasValueValidation(fieldLabel: string, value: string) {
+        return `Field ${fieldLabel} has value as ${value}`;
+    }
+
+    static getFieldDoesNotHaveValueValidation(fieldLabel: string, value: string) {
+        return `Field ${fieldLabel} does not have value as ${value}`;
+    }
+
+    static getAlertHasMessage(message: string) {
+        return `Alert box has message ${message}`;
+    }
+
+    static getPresentValidation(name: string) {
+        return `${name} should be present`;
+    }
+
+    static getNotPresentValidation(name: string) {
+        return `${name} should not be present`;
+    }
+
+    static getSelectedValidation(name: string) {
+        return `${name} should be selected`;
+    }
+
+    static getUnSelectedValidation(name: string) {
+        return `${name} should be unselected`;
+    }
+
+    static getGraterThanValidation(actualValue: number, expectedValue: number) {
+        return `${actualValue} should be grater than ${expectedValue}`;
+    }
+
+    static getLessThanOrEqualToValidation(actualValue: number, expectedValue: number) {
+        return `${actualValue} should be less than or equal ${expectedValue}`;
+    }
+
+    static getGreaterThanOrEqualToValidation(actualValue: number, expectedValue: number) {
+        return `${actualValue} should be greater than or equal ${expectedValue}`;
+    }
+
+    static getEqualToValidation(actualValue: number, expectedValue: number) {
+        return `${actualValue} should be equal to ${expectedValue}`;
+    }
+
+    static getStringEqualToValidation(actualValue: string, expectedValue: string) {
+        return `${actualValue} should be equal to ${expectedValue}`;
+    }
+
+    static getNotEqualToValidation(actualValue: string, expectedValue: string) {
+        return `${actualValue} should be not be equal to ${expectedValue}`;
+    }
+
+    static getStringNotEqualToValidation(actualValue: string, expectedValue: string) {
+        return `${actualValue} should not be equal to ${expectedValue}`;
+    }
+
+    static getStringToContain(actualValue: string, expectedValue: string) {
+        return `${actualValue} should contain ${expectedValue}`;
+    }
+
+    static getStringToNotContain(actualValue: string, expectedValue: string) {
+        return `${actualValue} should not contain ${expectedValue}`;
+    }
+
+    static getCheckBoxStatusValidation(status = '') {
+        return `${this.types.checkBox} should ${status} have checked`;
+    }
+
+    static getCheckBoxNotSelectedValidation() {
+        return this.getCheckBoxStatusValidation('not');
+    }
+
+    static getCheckBoxSelectedValidation() {
+        return this.getCheckBoxStatusValidation('');
+    }
+
+    static getWindowShouldBeDisplayedValidation(name: string) {
+        return `${this.types.window} ${this.getDisplayedValidation(name)}`;
     }
 
     static getButtonEnabledValidation(name: string) {
