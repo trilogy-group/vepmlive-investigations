@@ -305,28 +305,7 @@ namespace EPMLiveCore.Jobs.SSRS
         }
 
         #endregion
-
-        #region Method Call : (GetStringValue) (Return Type : string) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_GetStringValue_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var doc = CreateType<XmlDocument>();
-            var path = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => ExtensionMethods.GetStringValue(doc, path);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetStringValue) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
