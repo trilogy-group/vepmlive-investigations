@@ -1,536 +1,164 @@
 using System;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Shouldly;
-using Should = Shouldly.Should;
-using NUnit.Framework;
-using AUT.ConfigureTestProjects.BaseSetup;
+using Action = System.Action;
 using AUT.ConfigureTestProjects.Analyzer;
+using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
+using AUT.ConfigureTestProjects.StaticTypes;
 using Microsoft.SharePoint;
+using NUnit.Framework;
+using Should = Shouldly.Should;
+using Shouldly;
 
 namespace EPMLiveCore.API
 {
     /// <summary>
-    ///     Automatic Unit Tests for (<see cref="BaseJob" />) class
-    ///     using generator's artificial intelligence.
+    ///     Automatic Unit Tests or bulk unit tests for (<see cref="EPMLiveCore.API.BaseJob" />)
+    ///     and namespace <see cref="EPMLiveCore.API"/> class using generator(v:0.2.1)'s 
+    ///     artificial intelligence.
     /// </summary>
     [TestFixture]
     [ExcludeFromCodeCoverage]
-    public class BaseJobTest : AbstractGenericTest
+    public partial class BaseJobTest : AbstractBaseSetupTypedTest<BaseJob>
     {
+
         #region Category : General
-
-        #region Category : MethodCallTest
-
-        #region General Method Call : Class (BaseJob) => Method (finishJob) (Return Type : void) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_finishJob_Method_Direct_Call_ParameterToken_1_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var baseJobInstance  = Create(out exception);
-            var isInstanceNotNull = baseJobInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => baseJobInstance.finishJob();
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => baseJobInstance.finishJob(), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => baseJobInstance.finishJob());
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_BaseJob_finishJob_Method_Direct_Call_ParameterToken_1_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var baseJobInstance  = Create(out exception);
-            var isInstanceNotNull = baseJobInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => baseJobInstance.finishJob();
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => baseJobInstance.finishJob());
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_finishJob_Method_With_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "finishJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var finishJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var finishJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var returnType1 = finishJobMethodInfo1.ReturnType;
-                var returnType2 = finishJobMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                baseJobInstance.ShouldNotBeNull();
-                finishJobMethodInfo1.ShouldNotBeNull();
-                finishJobMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_finishJob_Method_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "finishJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var finishJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var finishJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                finishJobMethodInfo1.InvokeMethodInfo(baseJobInstance, out exception1, parametersOutRanged);
-                finishJobMethodInfo2.InvokeMethodInfo(baseJobInstance, out exception2, parametersOutRanged);
-                finishJobMethodInfo1.InvokeMethodInfo(baseJobInstance, out exception3, parametersInDifferentNumber);
-                finishJobMethodInfo2.InvokeMethodInfo(baseJobInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                Should.Throw(() => finishJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => finishJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => finishJobMethodInfo1.Invoke(baseJobInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => finishJobMethodInfo2.Invoke(baseJobInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => finishJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => finishJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => finishJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => finishJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_BaseJob_finishJob_Method_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Object[] parameters = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "finishJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var finishJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var finishJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                finishJobMethodInfo1.InvokeMethodInfo(baseJobInstance, out exception1, parameters);
-                finishJobMethodInfo2.InvokeMethodInfo(baseJobInstance, out exception2, parameters);
-                finishJobMethodInfo1.InvokeMethodInfo(baseJobInstance, out exception3, parameters);
-                finishJobMethodInfo2.InvokeMethodInfo(baseJobInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    Should.NotThrow(() => finishJobMethodInfo1.Invoke(baseJobInstance, parameters));
-                    Should.NotThrow(() => finishJobMethodInfo2.Invoke(baseJobInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #region General Method Call : Class (BaseJob) => Method (initJob) (Return Type : bool) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_initJob_Method_1_Parameters_Method_Direct_Call_ParameterToken_2_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var baseJobInstance  = Create(out exception);
-            var isInstanceNotNull = baseJobInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => baseJobInstance.initJob(site);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => baseJobInstance.initJob(site), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => baseJobInstance.initJob(site));
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_BaseJob_initJob_Method_1_Parameters_ParameterToken_2_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var baseJobInstance  = Create(out exception);
-            var isInstanceNotNull = baseJobInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => baseJobInstance.initJob(site);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => baseJobInstance.initJob(site));
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_initJob_Method_With_1_Parameters_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Object[] parametersOutRanged = {site, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "initJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var initJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var initJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var returnType1 = initJobMethodInfo1.ReturnType;
-                var returnType2 = initJobMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                baseJobInstance.ShouldNotBeNull();
-                initJobMethodInfo1.ShouldNotBeNull();
-                initJobMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_BaseJob_initJob_Method_With_1_Call_Using_Reflection_Result_Compare_If_Not_Null_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Object[] parametersOutRanged = {site, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "initJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var initJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var initJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var returnType1 = initJobMethodInfo1.ReturnType;
-                var returnType2 = initJobMethodInfo2.ReturnType;
-                var result1 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception1, parametersOutRanged);
-                var result2 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception2, parametersOutRanged);
-                var result3 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception3, parametersInDifferentNumber);
-                var result4 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                result1.ShouldBe(result2);
-                result3.ShouldBe(result4);
-                result1.ShouldNotBeNull();
-                result2.ShouldNotBeNull();
-                result3.ShouldNotBeNull();
-                result4.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_initJob_Method_With_1_Call_Using_Reflection_Result_Validate_Null_Results_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Object[] parametersOutRanged = {site, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "initJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var initJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var initJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var result1 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception1, parametersOutRanged);
-                var result2 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception2, parametersOutRanged);
-                var result3 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception3, parametersInDifferentNumber);
-                var result4 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                result1.ShouldBe(result2);
-                result3.ShouldBe(result4);
-                result1.ShouldNotBeNull();
-                result2.ShouldNotBeNull();
-                result3.ShouldNotBeNull();
-                result4.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_BaseJob_initJob_Method_With_1_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Object[] parametersOutRanged = {site, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "initJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var initJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var initJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var result1 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception1, parametersOutRanged);
-                var result2 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception2, parametersOutRanged);
-                var result3 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception3, parametersInDifferentNumber);
-                var result4 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                result1.ShouldBe(result2);
-                result3.ShouldBe(result4);
-                result1.ShouldNotBeNull();
-                result2.ShouldNotBeNull();
-                result3.ShouldNotBeNull();
-                result4.ShouldNotBeNull();
-                Should.Throw(() => initJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => initJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => initJobMethodInfo1.Invoke(baseJobInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => initJobMethodInfo2.Invoke(baseJobInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => initJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => initJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => initJobMethodInfo1.Invoke(baseJobInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => initJobMethodInfo2.Invoke(baseJobInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_BaseJob_initJob_Method_With_1_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var site = CreateType<SPSite>();
-            Object[] parameters = {site};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var baseJobInstance  = Create(out exception);
-            const string methodName = "initJob";
-
-            if (baseJobInstance != null)
-            {
-                // Act
-                var initJobMethodInfo1 = baseJobInstance.GetType().GetMethod(methodName);
-                var initJobMethodInfo2 = baseJobInstance.GetType().GetMethod(methodName);
-                var result1 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception1, parameters);
-                var result2 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception2, parameters);
-                var result3 = initJobMethodInfo1.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception3, parameters);
-                var result4 = initJobMethodInfo2.GetResultMethodInfo<BaseJob, bool>(baseJobInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    result1.ShouldBe(result2);
-                    result3.ShouldBe(result4);
-                    result1.ShouldNotBeNull();
-                    result2.ShouldNotBeNull();
-                    result3.ShouldNotBeNull();
-                    result4.ShouldNotBeNull();
-                    Should.NotThrow(() => initJobMethodInfo1.Invoke(baseJobInstance, parameters));
-                    Should.NotThrow(() => initJobMethodInfo2.Invoke(baseJobInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
 
         #region Category : Initializer
 
         #region General Initializer : Class (BaseJob) Initializer
 
-        /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator.
-        /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
-        [ExcludeFromCodeCoverage]
-        private T CreateType<T>()
-        {
-            Exception exception;
-            return CreateType<T>(out exception);
-        }
+        private const string MethodCreateConnection = "CreateConnection";
+        private const string MethodfinishJob = "finishJob";
+        private const string MethodupdateProgress = "updateProgress";
+        private const string MethodinitJob = "initJob";
+        private const string FieldsErrors = "sErrors";
+        private const string FieldbErrors = "bErrors";
+        private const string Fieldqueuetype = "queuetype";
+        private const string FieldtotalCount = "totalCount";
+        private const string FieldlastPercent = "lastPercent";
+        private const string FieldpercentInterval = "percentInterval";
+        private const string FieldJobUid = "JobUid";
+        private const string FieldQueueUid = "QueueUid";
+        private const string Fielduserid = "userid";
+        private const string FieldWebAppId = "WebAppId";
+        private const string FieldListUid = "ListUid";
+        private const string FieldItemID = "ItemID";
+        private const string Fieldkey = "key";
+        private const string FieldDocData = "DocData";
+        private Type _baseJobInstanceType;
+        private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
+        private BaseJob _baseJobInstance;
+        private BaseJob _baseJobInstanceFixture;
+
+        #region General Initializer : Class (BaseJob) One time setup
 
         /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator or Constructor.
+        ///    Setting up everything for <see cref="BaseJob" /> one time.
         /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
+        [OneTimeSetUp]
         [ExcludeFromCodeCoverage]
-        private T CreateType<T>(out Exception exception)
+        public void OneTimeSetup()
         {
-            return CreateAnalyzer.CreateTypeUsingFixtureOrConstuctor<T>(fixture: Fixture, exception: out exception);
+            _baseJobInstanceType = typeof(BaseJob);
+            _baseJobInstanceFixture = Create(true);
+            _baseJobInstance = Create(false);
         }
 
-        /// <summary>
-        ///    Create <see cref="BaseJob" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="BaseJob" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private BaseJob Create(bool useFixtureAtFirst = false)
-        {
-            Exception createException;
-            var parameters = CreateOrGetPrameters();
-            return Create(createException: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create <see cref="BaseJob" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="BaseJob" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private BaseJob Create(out Exception createException, object[] parameters = null, bool useFixtureAtFirst = false)
-        {
-            return CreateAnalyzer.Create<BaseJob>(fixture: Fixture, exception: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create Multiple of <see cref="BaseJob" /> classes depending on the given number.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="BaseJob" />.</returns>
-        private BaseJob[] CreateMany(out Exception[] createExceptions, out bool isResultsAreNull, int number = 6, object[] parameters = null)
-        {
-            return CreateAnalyzer.CreateMany<BaseJob>(number: number, fixture: Fixture, exceptions: out createExceptions, isResultsAreNull: out isResultsAreNull, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create dynamic parameters for <see cref="BaseJob" /> class using AutoFixture.
-        ///    Returns null if no parameters present.
-        /// </summary>
-        /// <returns>Returns a object array if parameters present or else returns null.</returns>
-        [ExcludeFromCodeCoverage]
-        private object[] CreateOrGetPrameters()
-        {
-            var exceptionNumber = CreateType<int>();
-            var message = CreateType<string>();
-            return new object[] {exceptionNumber, message};
-        }
+        #endregion
 
         #endregion
 
         #region Explore Class for Coverage Gain : Class (BaseJob)
 
-        /// <summary>
-        ///     Regular class (<see cref="BaseJob" />) non-public fields explore and verify for coverage gain.
-        /// </summary>
-        [Test]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_BaseJob_NonPublic_Fields_Explore_Verify()
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicFields<BaseJob>(Fixture);
-        }
+        #region General Initializer : Class (BaseJob) All Methods Explore Verification.
 
         /// <summary>
-        ///     Regular class (<see cref="BaseJob" />) non-public properties explore and verify for coverage gain.
+        ///     Class (<see cref="BaseJob" />) explore and verify fields for coverage gain.
         /// </summary>
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
-        public void AUT_RegularClass_BaseJob_NonPublic_Properties_Explore_Verify()
+        [TestCase(MethodCreateConnection, 0)]
+        [TestCase(MethodfinishJob, 0)]
+        [TestCase(MethodupdateProgress, 0)]
+        [TestCase(MethodinitJob, 0)]
+        public void AUT_BaseJob_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicProperties<BaseJob>(Fixture);
-        }
+            // Arrange
+            var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
 
-        /// <summary>
-        ///     Regular class (<see cref="BaseJob" />) non-public methods explore and verify for coverage gain.
-        /// </summary>
-        [Test]
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        [TestCase(5)]
-        [TestCase(6)]
-        [TestCase(7)]
-        [TestCase(8)]
-        [TestCase(9)]
-        [TestCase(10)]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_BaseJob_NonPublic_Methods_Explore_Verify(int pageNumber = 1, int perPageMethodsToVerify = 3)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicMethods<BaseJob>(Fixture, pageNumber, perPageMethodsToVerify);
+            // Act
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_baseJobInstanceFixture, 
+                                                                 Fixture, 
+                                                                 currentMethodInfo);
+
+            // Assert
+            currentMethodInfo.ShouldNotBeNull();
         }
 
         #endregion
+
+        #region General Initializer : Class (BaseJob) All Fields Explore By Name
+
+        /// <summary>
+        ///     Class (<see cref="BaseJob" />) explore and verify fields for coverage gain.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        [TestCase(FieldsErrors)]
+        [TestCase(FieldbErrors)]
+        [TestCase(Fieldqueuetype)]
+        [TestCase(FieldtotalCount)]
+        [TestCase(FieldlastPercent)]
+        [TestCase(FieldpercentInterval)]
+        [TestCase(FieldJobUid)]
+        [TestCase(FieldQueueUid)]
+        [TestCase(Fielduserid)]
+        [TestCase(FieldWebAppId)]
+        [TestCase(FieldListUid)]
+        [TestCase(FieldItemID)]
+        [TestCase(Fieldkey)]
+        [TestCase(FieldDocData)]
+        public void AUT_BaseJob_All_Fields_Explore_Verify_By_Name_Test(string name)
+        {
+            // Arrange
+            var fieldInfo = GetFieldInfo(name);
+
+            // Act
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_baseJobInstanceFixture, 
+                                                                Fixture, 
+                                                                fieldInfo);
+
+            // Assert
+            fieldInfo.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Category : Instance
+
+        /// <summary>
+        ///     Class (<see cref="BaseJob" />) can be created test
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Instance")]
+        public void AUT_BaseJob_Is_Instance_Present_Test()
+        {
+            // Assert
+            _baseJobInstanceType.ShouldNotBeNull();
+            _baseJobInstance.ShouldNotBeNull();
+            _baseJobInstanceFixture.ShouldNotBeNull();
+            _baseJobInstance.ShouldBeAssignableTo<BaseJob>();
+            _baseJobInstanceFixture.ShouldBeAssignableTo<BaseJob>();
+        }
 
         #endregion
 
@@ -539,58 +167,563 @@ namespace EPMLiveCore.API
         #region General Constructor : Class (BaseJob) without Parameter Test
 
         [Test]
-        [Category("AUT Constructor")]
-        public void AUT_Constructor_BaseJob_Instantiated_Without_Parameter_Throw_Exception_Test()
-        {
-            // Arrange
-            BaseJob instance = null;
-            var exception = CreateAnalyzer.GetThrownExceptionWhenCreate(out instance);
-
-            if (exception != null)
-            {
-                // Assert
-                Should.Throw<Exception>(() => new BaseJob());
-                instance.ShouldBeNull();
-                exception.ShouldNotBeNull();
-                instance.ShouldNotBeOfType<BaseJob>();
-            }
-        }
-
-        [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Constructor")]
         public void AUT_Constructor_BaseJob_Instantiated_Without_Parameter_No_Throw_Exception_Test()
         {
             // Arrange
             BaseJob instance = null;
-            var exception = CreateAnalyzer.GetThrownExceptionWhenCreate(out instance);
-
-            if (exception == null)
-            {
-                // Assert
-                Should.NotThrow(() => new BaseJob());
-                instance.ShouldNotBeNull();
-                exception.ShouldBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT Constructor")]
-        public void AUT_Constructor_BaseJob_Without_Parameter_Created_Instance_Type_Test()
-        {
-            // Arrange
-            BaseJob instance = null;
-            Exception creationException = null;
-            Action createAction = () => instance = new BaseJob();
 
             // Act
-            creationException = ActionAnalyzer.GetActionException(createAction);
+            var exception = CreateAnalyzer.GetThrownExceptionWhenCreate(out instance);
 
-            if (instance != null)
-            {
-                // Assert
-                instance.ShouldNotBeNull();
-                instance.ShouldBeOfType<BaseJob>();
-            }
+            // Assert
+            instance.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            _baseJobInstanceType.ShouldNotBeNull();
+            _baseJobInstance.ShouldNotBeNull();
+            _baseJobInstanceFixture.ShouldNotBeNull();
+            _baseJobInstance.ShouldBeAssignableTo<BaseJob>();
+            _baseJobInstanceFixture.ShouldBeAssignableTo<BaseJob>();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Category : MethodCallTest
+
+        #region Method Call : NonStatic methods call tests
+
+        /// <summary>
+        ///      Class (<see cref="BaseJob" />) public, non-public non-static methods exploration for coverage gain.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        [TestCase(MethodCreateConnection)]
+        [TestCase(MethodfinishJob)]
+        [TestCase(MethodupdateProgress)]
+        [TestCase(MethodinitJob)]
+        public void AUT_BaseJob_NonStatic_Methods_Explore_Verify_Test(string methodName)
+        {
+            // AAA: Arrange, Act, Assert
+            ShouldlyExtension.ExploreVerifyMethods<BaseJob>(Fixture, methodName);
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_BaseJob_CreateConnection_Method_Call_Internally(Type[] types)
+        {
+            var methodCreateConnectionPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodCreateConnection, Fixture, methodCreateConnectionPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_CreateConnection_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        {
+            // Arrange
+            Type [] methodCreateConnectionPrametersTypes = null;
+            object[] parametersOfCreateConnection = null; // no parameter present
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodCreateConnection, methodCreateConnectionPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<BaseJob, SqlConnection>(_baseJobInstanceFixture, out exception1, parametersOfCreateConnection);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<BaseJob, SqlConnection>(_baseJobInstance, MethodCreateConnection, parametersOfCreateConnection, methodCreateConnectionPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldBeNull();
+            result2.ShouldBeNull();
+            parametersOfCreateConnection.ShouldBeNull();
+            methodCreateConnectionPrametersTypes.ShouldBeNull();
+            Should.Throw<Exception>(() => methodInfo.Invoke(_baseJobInstanceFixture, parametersOfCreateConnection));
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_CreateConnection_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            Type [] methodCreateConnectionPrametersTypes = null;
+            object[] parametersOfCreateConnection = null; // no parameter present
+
+            // Assert
+            parametersOfCreateConnection.ShouldBeNull();
+            methodCreateConnectionPrametersTypes.ShouldBeNull();
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<BaseJob, SqlConnection>(_baseJobInstance, MethodCreateConnection, parametersOfCreateConnection, methodCreateConnectionPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_CreateConnection_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            Type [] methodCreateConnectionPrametersTypes = null;
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodCreateConnection, Fixture, methodCreateConnectionPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodCreateConnectionPrametersTypes.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_CreateConnection_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Type [] methodCreateConnectionPrametersTypes = null;
+            const int parametersCount = 0;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodCreateConnection, Fixture, methodCreateConnectionPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodCreateConnectionPrametersTypes.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (CreateConnection) (Return Type : SqlConnection) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_CreateConnection_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodCreateConnection, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_baseJobInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_BaseJob_finishJob_Method_Call_Internally(Type[] types)
+        {
+            var methodfinishJobPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodfinishJob, Fixture, methodfinishJobPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_finishJob_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _baseJobInstance.finishJob();
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_finishJob_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
+        {
+            // Arrange
+            Type [] methodfinishJobPrametersTypes = null;
+            object[] parametersOffinishJob = null; // no parameter present
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodfinishJob, methodfinishJobPrametersTypes, out exception);
+
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_baseJobInstanceFixture, parametersOffinishJob);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOffinishJob.ShouldBeNull();
+            methodfinishJobPrametersTypes.ShouldBeNull();
+            Should.Throw<Exception>(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_finishJob_Method_Call_Void_With_No_Parameters_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            Type [] methodfinishJobPrametersTypes = null;
+            object[] parametersOffinishJob = null; // no parameter present
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_baseJobInstance, MethodfinishJob, parametersOffinishJob, methodfinishJobPrametersTypes);
+
+            // Assert
+            parametersOffinishJob.ShouldBeNull();
+            methodfinishJobPrametersTypes.ShouldBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_finishJob_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Type [] methodfinishJobPrametersTypes = null;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodfinishJob, Fixture, methodfinishJobPrametersTypes);
+
+            // Assert
+            methodfinishJobPrametersTypes.ShouldBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (finishJob) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_finishJob_Method_Call_With_No_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodfinishJob, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_baseJobInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (updateProgress) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_BaseJob_updateProgress_Method_Call_Internally(Type[] types)
+        {
+            var methodupdateProgressPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodupdateProgress, Fixture, methodupdateProgressPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (updateProgress) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_updateProgress_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var newCount = CreateType<float>();
+            var methodupdateProgressPrametersTypes = new Type[] { typeof(float) };
+            object[] parametersOfupdateProgress = { newCount };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_baseJobInstance, MethodupdateProgress, parametersOfupdateProgress, methodupdateProgressPrametersTypes);
+
+            // Assert
+            parametersOfupdateProgress.ShouldNotBeNull();
+            parametersOfupdateProgress.Length.ShouldBe(1);
+            methodupdateProgressPrametersTypes.Length.ShouldBe(1);
+            methodupdateProgressPrametersTypes.Length.ShouldBe(parametersOfupdateProgress.Length);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (updateProgress) (Return Type : void) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_updateProgress_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodupdateProgress, 0);
+            const int parametersCount = 1;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (updateProgress) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_updateProgress_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodupdateProgressPrametersTypes = new Type[] { typeof(float) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodupdateProgress, Fixture, methodupdateProgressPrametersTypes);
+
+            // Assert
+            methodupdateProgressPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (updateProgress) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_updateProgress_Method_Call_With_1_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodupdateProgress, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_baseJobInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_BaseJob_initJob_Method_Call_Internally(Type[] types)
+        {
+            var methodinitJobPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodinitJob, Fixture, methodinitJobPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            var site = CreateType<SPSite>();
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _baseJobInstance.initJob(site);
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        {
+            // Arrange
+            var site = CreateType<SPSite>();
+            var methodinitJobPrametersTypes = new Type[] { typeof(SPSite) };
+            object[] parametersOfinitJob = { site };
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodinitJob, methodinitJobPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<BaseJob, bool>(_baseJobInstanceFixture, out exception1, parametersOfinitJob);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<BaseJob, bool>(_baseJobInstance, MethodinitJob, parametersOfinitJob, methodinitJobPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldNotBeNull();
+            result2.ShouldNotBeNull();
+            result1.ShouldBe(result2);
+            parametersOfinitJob.ShouldNotBeNull();
+            parametersOfinitJob.Length.ShouldBe(1);
+            methodinitJobPrametersTypes.Length.ShouldBe(1);
+            Should.Throw<Exception>(() => methodInfo.Invoke(_baseJobInstanceFixture, parametersOfinitJob));
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) Results Not Null and no exception thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_With_Results_Should_Not_Be_Null_Test()
+        {
+            // Arrange
+            var site = CreateType<SPSite>();
+            var methodinitJobPrametersTypes = new Type[] { typeof(SPSite) };
+            object[] parametersOfinitJob = { site };
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodinitJob, methodinitJobPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<BaseJob, bool>(_baseJobInstanceFixture, out exception1, parametersOfinitJob);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<BaseJob, bool>(_baseJobInstance, MethodinitJob, parametersOfinitJob, methodinitJobPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldNotBeNull();
+            result2.ShouldNotBeNull();
+            result1.ShouldBe(result2);
+            parametersOfinitJob.ShouldNotBeNull();
+            parametersOfinitJob.Length.ShouldBe(1);
+            methodinitJobPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<BaseJob, bool>(_baseJobInstance, MethodinitJob, parametersOfinitJob, methodinitJobPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var site = CreateType<SPSite>();
+            var methodinitJobPrametersTypes = new Type[] { typeof(SPSite) };
+            object[] parametersOfinitJob = { site };
+
+            // Assert
+            parametersOfinitJob.ShouldNotBeNull();
+            parametersOfinitJob.Length.ShouldBe(1);
+            methodinitJobPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<BaseJob, bool>(_baseJobInstance, MethodinitJob, parametersOfinitJob, methodinitJobPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodinitJobPrametersTypes = new Type[] { typeof(SPSite) };
+            const int parametersCount = 1;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_baseJobInstance, MethodinitJob, Fixture, methodinitJobPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodinitJobPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodinitJob, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_baseJobInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (initJob) (Return Type : bool) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_BaseJob_initJob_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodinitJob, 0);
+            const int parametersCount = 1;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
         }
 
         #endregion

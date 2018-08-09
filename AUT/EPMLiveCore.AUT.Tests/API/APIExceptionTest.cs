@@ -1,215 +1,105 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Shouldly;
-using Should = Shouldly.Should;
-using NUnit.Framework;
-using AUT.ConfigureTestProjects.BaseSetup;
+using Action = System.Action;
 using AUT.ConfigureTestProjects.Analyzer;
+using AUT.ConfigureTestProjects.Attribute;
+using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
+using AUT.ConfigureTestProjects.StaticTypes;
+using NUnit.Framework;
+using Should = Shouldly.Should;
+using Shouldly;
 
 namespace EPMLiveCore.API
 {
     /// <summary>
-    ///     Automatic Unit Tests for (<see cref="APIException" />) class
-    ///     using generator's artificial intelligence.
+    ///     Automatic Unit Tests or bulk unit tests for (<see cref="EPMLiveCore.API.APIException" />)
+    ///     and namespace <see cref="EPMLiveCore.API"/> class using generator(v:0.2.1)'s 
+    ///     artificial intelligence.
     /// </summary>
     [TestFixture]
     [ExcludeFromCodeCoverage]
-    public class APIExceptionTest : AbstractGenericTest
+    public class APIExceptionTest : AbstractBaseSetupTypedTest<APIException>
     {
+
         #region Category : General
 
         #region Category : Initializer
 
         #region General Initializer : Class (APIException) Initializer
 
-        /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator.
-        /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
-        [ExcludeFromCodeCoverage]
-        private T CreateType<T>()
-        {
-            Exception exception;
-            return CreateType<T>(out exception);
-        }
+        private const string PropertyExceptionNumber = "ExceptionNumber";
+        private Type _aPIExceptionInstanceType;
+        private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
+        private APIException _aPIExceptionInstance;
+        private APIException _aPIExceptionInstanceFixture;
+
+        #region General Initializer : Class (APIException) One time setup
 
         /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator or Constructor.
+        ///    Setting up everything for <see cref="APIException" /> one time.
         /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
+        [OneTimeSetUp]
         [ExcludeFromCodeCoverage]
-        private T CreateType<T>(out Exception exception)
+        public void OneTimeSetup()
         {
-            return CreateAnalyzer.CreateTypeUsingFixtureOrConstuctor<T>(fixture: Fixture, exception: out exception);
+            _aPIExceptionInstanceType = typeof(APIException);
+            _aPIExceptionInstanceFixture = Create(true);
+            _aPIExceptionInstance = Create(false);
         }
 
-        /// <summary>
-        ///    Create <see cref="APIException" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="APIException" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private APIException Create(bool useFixtureAtFirst = false)
-        {
-            Exception createException;
-            var parameters = CreateOrGetPrameters();
-            return Create(createException: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create <see cref="APIException" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="APIException" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private APIException Create(out Exception createException, object[] parameters = null, bool useFixtureAtFirst = false)
-        {
-            return CreateAnalyzer.Create<APIException>(fixture: Fixture, exception: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create Multiple of <see cref="APIException" /> classes depending on the given number.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="APIException" />.</returns>
-        private APIException[] CreateMany(out Exception[] createExceptions, out bool isResultsAreNull, int number = 6, object[] parameters = null)
-        {
-            return CreateAnalyzer.CreateMany<APIException>(number: number, fixture: Fixture, exceptions: out createExceptions, isResultsAreNull: out isResultsAreNull, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create dynamic parameters for <see cref="APIException" /> class using AutoFixture.
-        ///    Returns null if no parameters present.
-        /// </summary>
-        /// <returns>Returns a object array if parameters present or else returns null.</returns>
-        [ExcludeFromCodeCoverage]
-        private object[] CreateOrGetPrameters()
-        {
-            var exceptionNumber = CreateType<int>();
-            var message = CreateType<string>();
-            return new object[] {exceptionNumber, message};
-        }
+        #endregion
 
         #endregion
 
         #region Explore Class for Coverage Gain : Class (APIException)
 
-        /// <summary>
-        ///     Regular class (<see cref="APIException" />) non-public fields explore and verify for coverage gain.
-        /// </summary>
-        [Test]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_APIException_NonPublic_Fields_Explore_Verify()
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicFields<APIException>(Fixture);
-        }
+        #region General Initializer : Class (APIException) All Properties Explore By Name
 
         /// <summary>
-        ///     Regular class (<see cref="APIException" />) non-public properties explore and verify for coverage gain.
+        ///     Class (<see cref="APIException" />) explore and verify properties for coverage gain.
         /// </summary>
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
-        public void AUT_RegularClass_APIException_NonPublic_Properties_Explore_Verify()
+        [TestCase(PropertyExceptionNumber)]
+        public void AUT_APIException_All_Properties_Explore_Verify_By_Name_Test(string name)
         {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicProperties<APIException>(Fixture);
+            // Arrange
+            var propertyInfo = GetPropertyInfo(name);
+
+            // Act
+            ShouldlyExtension.ExploreProperty(_aPIExceptionInstanceFixture,
+                                              Fixture,
+                                              propertyInfo);
+
+            // Assert
+            propertyInfo.ShouldNotBeNull();
         }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Category : Instance
 
         /// <summary>
-        ///     Regular class (<see cref="APIException" />) non-public methods explore and verify for coverage gain.
+        ///     Class (<see cref="APIException" />) can be created test
         /// </summary>
         [Test]
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        [TestCase(5)]
-        [TestCase(6)]
-        [TestCase(7)]
-        [TestCase(8)]
-        [TestCase(9)]
-        [TestCase(10)]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_APIException_NonPublic_Methods_Explore_Verify(int pageNumber = 1, int perPageMethodsToVerify = 3)
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Instance")]
+        public void AUT_APIException_Is_Instance_Present_Test()
         {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicMethods<APIException>(Fixture, pageNumber, perPageMethodsToVerify);
+            // Assert
+            _aPIExceptionInstanceType.ShouldNotBeNull();
+            _aPIExceptionInstance.ShouldNotBeNull();
+            _aPIExceptionInstanceFixture.ShouldNotBeNull();
+            _aPIExceptionInstance.ShouldBeAssignableTo<APIException>();
+            _aPIExceptionInstanceFixture.ShouldBeAssignableTo<APIException>();
         }
-
-        #endregion
-
-        #endregion
-
-        #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (APIException) => All Properties and Fields Test
-
-        [Test]
-        [Category("AUT GetterSetter")]
-        public void AUT_APIException_Class_All_Properties_Getter_Settter_Test()
-        {
-            // Arrange
-            Exception creationException;
-            var aPIExceptionInstance  = Create(out creationException);
-            var exceptionNumber = CreateType<int>();
-
-            if (aPIExceptionInstance != null)
-            {
-                // Act
-                aPIExceptionInstance.ExceptionNumber = exceptionNumber;
-
-                // Assert
-                aPIExceptionInstance.ExceptionNumber.ShouldNotBeNull();
-            }
-        }
-
-        #endregion
-
-        #region General Getters/Setters : Class (APIException) => Property (ExceptionNumber) Exists tests
-
-        [Test]
-        [Category("AUT GetterSetter")]
-        public void AUT_APIException_Class_Invalid_Property_ExceptionNumberNotPresent_Access_Using_Reflexion_Doesnt_Throw_Exception_Test()
-        {
-            // Arrange
-            const string propertyNameExceptionNumber = "ExceptionNumberNotPresent";
-            Exception creationException;
-            var aPIExceptionInstance  = Create(out creationException);
-
-            if (aPIExceptionInstance != null)
-            {
-                // Assert
-                Should.NotThrow(() => aPIExceptionInstance.GetType().GetProperty(propertyNameExceptionNumber));
-            }
-        }
-
-        [Test]
-        [Category("AUT GetterSetter")]
-        public void AUT_APIException_Public_Class_ExceptionNumber_Coverage_For_Property_Is_Present_And_Can_Read_Test()
-        {
-            // Arrange
-            const string propertyNameExceptionNumber = "ExceptionNumber";
-            Exception creationException;
-            var aPIExceptionInstance  = Create(out creationException);
-
-            if (aPIExceptionInstance != null)
-            {
-                // Arrange
-                var propertyInfo  = aPIExceptionInstance.GetType().GetProperty(propertyNameExceptionNumber);
-
-                if (propertyInfo != null && propertyInfo.IsPublicGet())
-                {
-                    // Act
-                    var canRead = propertyInfo.CanRead;
-
-                    // Assert
-                    canRead.ShouldBeTrue();
-                }
-            }
-        }
-
-        #endregion
 
         #endregion
 
@@ -218,47 +108,224 @@ namespace EPMLiveCore.API
         #region General Constructor : Class (APIException) with Parameter Test
 
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Constructor")]
-        public void AUT_Constructor_APIException_With_Parameter_Created_Instance_Type_Test()
+        public void AUT_APIException_Constructor_With_Parameter_Created_Instance_Type_Test()
         {
             // Arrange
             var exceptionNumber = CreateType<int>();
             var message = CreateType<string>();
             APIException instance = null;
             Exception creationException = null;
-            Action createAction = ()=> instance = new APIException(exceptionNumber, message);
 
             // Act
+            Action createAction = () => instance = new APIException(exceptionNumber, message);
             creationException = ActionAnalyzer.GetActionException(createAction);
 
             // Assert
-            if (creationException == null)
-            {
-                instance.ShouldNotBeNull();
-                instance.ShouldBeOfType<APIException>();
-            }
+            instance.ShouldNotBeNull();
+            _aPIExceptionInstance.ShouldNotBeNull();
+            _aPIExceptionInstanceFixture.ShouldNotBeNull();
+            instance.ShouldBeOfType<APIException>();
         }
 
+        #endregion
+
+        #region General Constructor : Class (APIException) with Parameter Test
+
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Constructor")]
-        public void AUT_Constructor_APIException_Instantiation_With_Parameter_Test()
+        public void AUT_APIException_Constructor_Instantiation_With_Parameter_Test()
         {
             // Arrange
             var exceptionNumber = CreateType<int>();
             var message = CreateType<string>();
             APIException instance = null;
             Exception creationException = null;
-            Action createAction = ()=> instance = new APIException(exceptionNumber, message);
 
             // Act
+            Action createAction = () => instance = new APIException(exceptionNumber, message);
             creationException = ActionAnalyzer.GetActionException(createAction);
 
             // Assert
-            if (creationException == null)
-            {
-                instance.ShouldNotBeNull();
-                Should.NotThrow(createAction);
-            }
+            instance.ShouldNotBeNull();
+            _aPIExceptionInstance.ShouldNotBeNull();
+            _aPIExceptionInstanceFixture.ShouldNotBeNull();
+            Should.NotThrow(createAction);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) instance created
+
+        /// <summary>
+        ///     Class (<see cref="APIException" />) can be created test
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_Is_Created_Test()
+        {
+            // Assert
+            _aPIExceptionInstance.ShouldNotBeNull();
+            _aPIExceptionInstanceFixture.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors coverage gain tests by index
+
+        /// <summary>
+        ///     Class (<see cref="APIException" />) explore and verify it's constructors by index.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        [TestCase(0)]
+        [TestCase(1)]
+        public void AUT_APIException_Constructor_Explore_Verify_By_Index_Test(int constructorIndex)
+        {
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructor<APIException>(Fixture, constructorIndex);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify all constructors of Class (<see cref="APIException" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_All_Constructors_Explore_Verify_Test()
+        {
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructors<APIException>(Fixture);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors with parameter () coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="APIException" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_Constructors_Explore_Verify_Test()
+        {
+            // Arrange
+            var exceptionNumber = CreateType<int>();
+            var message = CreateType<string>();
+            object[] parametersOfAPIException = { exceptionNumber, message };
+            var methodAPIExceptionPrametersTypes = new Type[] { typeof(int), typeof(string) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByGivenParameters(_aPIExceptionInstanceType, methodAPIExceptionPrametersTypes, parametersOfAPIException);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors with dynamic parameters () coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="APIException" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_Constructors_With_Dynamic_Explore_Verify_Test()
+        {
+            // Arrange
+            var methodAPIExceptionPrametersTypes = new Type[] { typeof(int), typeof(string) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByDynamicParameters(_aPIExceptionInstanceType, Fixture, methodAPIExceptionPrametersTypes);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors with parameter (Overloading_Of_1_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="APIException" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_Constructors_Overloading_Of_1_Explore_Verify_Test()
+        {
+            // Arrange
+            var exceptionNumber = CreateType<int>();
+            var message = CreateType<string>();
+            var exception = CreateType<Exception>();
+            object[] parametersOfAPIException = { exceptionNumber, message, exception };
+            var methodAPIExceptionPrametersTypes = new Type[] { typeof(int), typeof(string), typeof(Exception) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByGivenParameters(_aPIExceptionInstanceType, methodAPIExceptionPrametersTypes, parametersOfAPIException);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (APIException) constructors with dynamic parameters (Overloading_Of_1_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="APIException" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_APIException_Constructors_Overloading_Of_1_With_Dynamic_Explore_Verify_Test()
+        {
+            // Arrange
+            var methodAPIExceptionPrametersTypes = new Type[] { typeof(int), typeof(string), typeof(Exception) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByDynamicParameters(_aPIExceptionInstanceType, Fixture, methodAPIExceptionPrametersTypes);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Category : GetterSetter
+
+        #region General Getters/Setters : Class (APIException) => all properties (non-static) explore and verify type tests
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT GetterSetter")]
+        [TestCaseGeneric(typeof(int) , PropertyExceptionNumber)]
+        public void AUT_APIException_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
+        {
+            // AAA : Arrange, Act, Assert
+            ShouldlyExtension.PropertyTypeVerify<APIException, T>(_aPIExceptionInstance, propertyName, Fixture);
+        }
+
+        #endregion
+
+        #region General Getters/Setters : Class (APIException) => Property (ExceptionNumber) (Can Read) tests
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT GetterSetter")]
+        public void AUT_APIException_Public_Class_ExceptionNumber_Coverage_For_Property_Is_Present_And_Can_Read_Test()
+        {
+            // Arrange
+            var propertyInfo  = GetPropertyInfo(PropertyExceptionNumber);
+
+            // Act
+            var canRead = propertyInfo?.CanRead;
+
+            // Assert
+            propertyInfo.ShouldNotBeNull();
+            canRead.ShouldNotBeNull();
+            canRead?.ShouldBeTrue();
         }
 
         #endregion
