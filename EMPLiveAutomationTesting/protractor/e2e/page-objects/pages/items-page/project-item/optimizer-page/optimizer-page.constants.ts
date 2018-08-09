@@ -18,6 +18,7 @@ export class OptimizerPageConstants {
     static readonly optimizer = 'Optimizer Window';
     static readonly deleteView = 'Delete view popup';
     static readonly currentView= 'Current View';
+    static readonly configure= 'Configure window';
 
     static get viewManagementOptions() {
         return {
@@ -68,7 +69,10 @@ export class OptimizerPageConstants {
             upArrow: 'idOptConfSelectedColsMoveUp',
             downArrow: 'idOptConfSelectedColsMoveDown',
             ok: 'OK',
-            cancel: 'Cancel'
+            cancel: 'Cancel',
+            message: 'Selecting more fields that can fit in to the space available in the filter section on the ' +
+                'ribbon bar, will cause the filter section to not appear. If this occurs, then reduce the number of fields' +
+                ' selected until it does appear.'
         };
     }
 

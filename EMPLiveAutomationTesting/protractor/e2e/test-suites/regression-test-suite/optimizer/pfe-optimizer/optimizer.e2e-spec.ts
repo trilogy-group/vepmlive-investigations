@@ -192,4 +192,21 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickOKonDeleteViewPopup(stepLogger);
         await OptimizerPageHelper.verifyDeletedView(stepLogger, viewNameToDel);
     });
+
+    it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
+            const stepLogger = new StepLogger(744356);
+            // Step 1 is inside the below function
+            await CommonPageHelper.navigateToItemPageUnderNavigation(
+                HomePage.navigation.projects.projects,
+                CommonPage.pageHeaders.projects.projectsCenter,
+                CommonPageConstants.pageHeaders.projects.projectCenter,
+                stepLogger);
+            await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+            // Step 2 is inside the below function
+            await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+            // Step 3 and 4 are inside this function
+            stepLogger.stepId(3);
+            await OptimizerPageHelper.gotoConfigureSection(stepLogger);
+            await OptimizerPageHelper.verifyMessageOnConfiguration(stepLogger);
+    });
 });

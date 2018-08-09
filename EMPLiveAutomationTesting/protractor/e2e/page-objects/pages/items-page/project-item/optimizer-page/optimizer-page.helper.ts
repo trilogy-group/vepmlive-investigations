@@ -214,4 +214,9 @@ export class OptimizerPageHelper {
         stepLogger.step('Click on Ok');
         await PageHelper.click(OptimizerPage.getDeleteViewPopup.ok);
     }
+
+    static async verifyMessageOnConfiguration(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyContainsText(OptimizerPage.getOptimizerConfiguration.message,
+            OptimizerPageConstants.configure, OptimizerPageConstants.optimizerConfiguration.message, stepLogger);
+    }
 }

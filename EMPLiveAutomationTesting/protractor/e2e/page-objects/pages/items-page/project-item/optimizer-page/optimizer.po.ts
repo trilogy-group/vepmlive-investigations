@@ -83,7 +83,8 @@ export class OptimizerPage extends BasePage {
             upArrow: AnchorHelper.getItemById(label.upArrow),
             downArrow: AnchorHelper.getItemById(label.downArrow),
             ok: this.getButtonOnPopup(label.ok),
-            cancel: this.getButtonOnPopup(label.cancel)
+            cancel: this.getButtonOnPopup(label.cancel),
+            message : element(By.css('#idOptDlg>div>div:last-child'))
         };
     }
 
