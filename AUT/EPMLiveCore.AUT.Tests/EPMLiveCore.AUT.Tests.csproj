@@ -34,33 +34,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AUT.ConfigureTestProjects, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AUT.ConfigureTestProjects.3.3.0\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
+    <Reference Include="AUT.ConfigureTestProjects, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AUT.ConfigureTestProjects.4.2.2\lib\net462\AUT.ConfigureTestProjects.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoFixture, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.4.4.0\lib\net452\AutoFixture.dll</HintPath>
+    <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.5.0\lib\net452\AutoFixture.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoFixture.AutoMoq, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.AutoMoq.4.4.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
+    <Reference Include="AutoFixture.AutoMoq, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoMoq.4.5.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoFixture.NUnit3, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.NUnit3.4.4.0\lib\net452\AutoFixture.NUnit3.dll</HintPath>
+    <Reference Include="AutoFixture.NUnit3, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.NUnit3.4.5.0\lib\net452\AutoFixture.NUnit3.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Moq, Version=4.8.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.8.3\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -87,6 +88,8 @@
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -104,10 +107,45 @@
     <Compile Include="API\Analytics\RecentItemsTest.cs" />
     <Compile Include="API\APIExceptionTest.cs" />
     <Compile Include="API\APITeamTest.cs" />
+    <Compile Include="API\AssociatedListItems\AssociatedListItemsTest.cs" />
     <Compile Include="API\BaseJobTest.cs" />
+    <Compile Include="API\CreateWorkspace\CreatedWorkspaceInfoTest.cs" />
+    <Compile Include="API\CreateWorkspace\DownloadedTempWorkspaceFactoryTest.cs" />
+    <Compile Include="API\CreateWorkspace\DownloadedWorkspaceInfoTest.cs" />
+    <Compile Include="API\CreateWorkspace\OnlineTempWorkspaceFactoryTest.cs" />
+    <Compile Include="API\CreateWorkspace\OnlineWorkspaceInfoTest.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceControllerTest.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceDataTest.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceFactoryTest.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceTimerjobAgentTest.cs" />
+    <Compile Include="API\Integration\GenericTest.cs" />
+    <Compile Include="API\Integration\IntegrationControlsTest.cs" />
+    <Compile Include="API\Integration\IntegrationControlTemplateTest.cs" />
+    <Compile Include="API\Integration\IntegrationCoreTest.cs" />
+    <Compile Include="API\Integration\IntegrationDescriptionTemplateTest.cs" />
+    <Compile Include="API\Integration\SQLTest.cs" />
+    <Compile Include="API\ListCommands\AssociatedListInfoTest.cs" />
+    <Compile Include="API\ListCommands\ListCommandsTest.cs" />
+    <Compile Include="API\ListCommands\ListPlannerPropsTest.cs" />
+    <Compile Include="API\ListCommands\RibbonPropertiesTest.cs" />
+    <Compile Include="API\MyWorkSummaryListItems\MyWorkSummaryListItemsTest.cs" />
+    <Compile Include="API\MyWork\MyPersonalizationTest.cs" />
+    <Compile Include="API\MyWork\MyWorkGridViewTest.cs" />
+    <Compile Include="API\MyWork\MyWorkTest.cs" />
+    <Compile Include="API\MyWork\UtilsTest.cs" />
     <Compile Include="API\NavigationServiceTest.cs" />
+    <Compile Include="API\Notification\APIEmailTest.cs" />
     <Compile Include="API\PersonalizationTest.cs" />
+    <Compile Include="API\PropertyHashTest.cs" />
+    <Compile Include="API\Reporting\ReportingTest.cs" />
+    <Compile Include="API\ResourceGrid\ImportCompletedEventHandlerArgsTest.cs" />
+    <Compile Include="API\ResourceGrid\ImportProgressChangedEventHandlerArgsTest.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGridTest.cs" />
+    <Compile Include="API\ResourceGrid\ResourceImporterTest.cs" />
     <Compile Include="API\ResponseTest.cs" />
+    <Compile Include="API\TimerTest.cs" />
+    <Compile Include="API\ViewManagerTest.cs" />
+    <Compile Include="API\WorkspaceCenter\WorkspaceCenterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +156,10 @@
     <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveIntegration\EPMLiveIntegration\EPMLiveIntegration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLiveIntegration</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
