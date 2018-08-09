@@ -189,7 +189,6 @@ describe(SuiteNames.regressionTestSuite, () => {
         const viewNameToDel = await OptimizerPageHelper.clickDeleteView(stepLogger);
         await OptimizerPageHelper.verifyDeleteViewPopup(stepLogger);
         stepLogger.stepId(5);
-        stepLogger.stepId(5);
         await OptimizerPageHelper.clickOKonDeleteViewPopup(stepLogger);
         await OptimizerPageHelper.verifyDeletedView(stepLogger, viewNameToDel);
     });
