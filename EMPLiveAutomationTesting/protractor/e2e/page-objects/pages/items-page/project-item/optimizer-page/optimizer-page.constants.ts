@@ -48,7 +48,8 @@ export class OptimizerPageConstants {
             hideAll: 'Hide all',
             cancel: 'Cancel',
             column: '.GMColumnsMenuItemText',
-            header: 'Select columns to display'
+            header: 'Select columns to display',
+            showAll: 'Show all'
         };
     }
 

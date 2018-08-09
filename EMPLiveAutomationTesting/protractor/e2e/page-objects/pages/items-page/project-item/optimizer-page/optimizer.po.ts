@@ -40,7 +40,9 @@ export class OptimizerPage extends BasePage {
             eachColumn: element(By.css('.GMColumnsMenuItemText')),
             selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div')),
             eachSelectedColumn: element(By.css('.GMColumnsMenuCheckedIconRight>div')),
-            heading: element(By.css('.GMColumnsMenuHead'))
+            heading: element(By.css('.GMColumnsMenuHead')),
+            unchecked: element(By.css('.GMColumnsMenuUncheckedIconRight')),
+            showAll: ElementHelper.getElementByText(label.showAll),
         };
     }
 

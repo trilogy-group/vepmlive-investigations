@@ -242,4 +242,26 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok , stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel , stepLogger);
     }
+
+    static async clickHideAll(stepLogger: StepLogger) {
+        stepLogger.step('Click on Hide all button.');
+        await PageHelper.click(OptimizerPage.getSelectColumnsPopup.hideAll);
+    }
+
+    static async verifyNoColumnSelected(stepLogger: StepLogger) {
+        const label = OptimizerPage.getSelectColumnsPopup;
+        await browser.sleep(PageHelper.timeout.xs);
+        await ExpectationHelper.verifyNotDisplayedStatus(label.eachSelectedColumn, 'Checkbox selected' , stepLogger);
+    }
+
+    static async clickShowAll(stepLogger: StepLogger) {
+        stepLogger.step('Click on Show all button.');
+        await PageHelper.click(OptimizerPage.getSelectColumnsPopup.showAll);
+    }
+
+    static async verifyAllColumnSelected(stepLogger: StepLogger) {
+        const label = OptimizerPage.getSelectColumnsPopup;
+        await browser.sleep(PageHelper.timeout.xs);
+        await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected' , stepLogger);
+    }
 }

@@ -247,4 +247,29 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickSelectColumns(stepLogger);
         await OptimizerPageHelper.verifySelectColumnsPopup(stepLogger);
     });
+
+    it('Verify the Hide all button of the Select column to display page should be displayed - [744385]', async () => {
+        const stepLogger = new StepLogger(744385);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.clickViewTab(stepLogger);
+        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.clickSelectColumns(stepLogger);
+        stepLogger.stepId(5);
+        await OptimizerPageHelper.clickHideAll(stepLogger);
+        await OptimizerPageHelper.verifyNoColumnSelected(stepLogger);
+        stepLogger.stepId(6);
+        await OptimizerPageHelper.clickShowAll(stepLogger);
+        await OptimizerPageHelper.verifyAllColumnSelected(stepLogger);
+    });
 });
