@@ -2,1241 +2,2425 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Shouldly;
-using Should = Shouldly.Should;
-using NUnit.Framework;
-using AUT.ConfigureTestProjects.BaseSetup;
+using System.Threading;
+using Action = System.Action;
 using AUT.ConfigureTestProjects.Analyzer;
+using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
+using AUT.ConfigureTestProjects.StaticTypes;
+using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
+using NUnit.Framework;
+using Should = Shouldly.Should;
+using Shouldly;
 
 namespace EPMLiveCore.API
 {
     /// <summary>
-    ///     Automatic Unit Tests for (<see cref="NavigationService" />) class
-    ///     using generator's artificial intelligence.
+    ///     Automatic Unit Tests or bulk unit tests for (<see cref="EPMLiveCore.API.NavigationService" />)
+    ///     and namespace <see cref="EPMLiveCore.API"/> class using generator(v:0.2.1)'s 
+    ///     artificial intelligence.
     /// </summary>
     [TestFixture]
     [ExcludeFromCodeCoverage]
-    public class NavigationServiceTest : AbstractGenericTest
+    public class NavigationServiceTest : AbstractBaseSetupTypedTest<NavigationService>
     {
+
         #region Category : General
-
-        #region Category : MethodCallTest
-
-        #region General Method Call : Class (NavigationService) => Method (GetContextualMenuItems) (Return Type : object) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_1_Parameters_Method_Direct_Call_ParameterToken_1_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetContextualMenuItems(data);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => navigationServiceInstance.GetContextualMenuItems(data), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => navigationServiceInstance.GetContextualMenuItems(data));
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_1_Parameters_ParameterToken_1_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetContextualMenuItems(data);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => navigationServiceInstance.GetContextualMenuItems(data));
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_With_1_Parameters_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetContextualMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getContextualMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getContextualMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getContextualMenuItemsMethodInfo1.ReturnType;
-                var returnType2 = getContextualMenuItemsMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                navigationServiceInstance.ShouldNotBeNull();
-                getContextualMenuItemsMethodInfo1.ShouldNotBeNull();
-                getContextualMenuItemsMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_With_1_Call_Using_Reflection_Result_Compare_If_Not_Null_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetContextualMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getContextualMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getContextualMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getContextualMenuItemsMethodInfo1.ReturnType;
-                var returnType2 = getContextualMenuItemsMethodInfo2.ReturnType;
-                var result1 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                if (result1 != null)
-                {
-                    result1.ShouldNotBeNull();
-                    result2.ShouldNotBeNull();
-                    result3.ShouldNotBeNull();
-                    result4.ShouldNotBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_With_1_Call_Using_Reflection_Result_Validate_Null_Results_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetContextualMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getContextualMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getContextualMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                if (result1 == null)
-                {
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_With_1_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetContextualMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getContextualMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getContextualMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                result1.ShouldBeNull();
-                result2.ShouldBeNull();
-                result3.ShouldBeNull();
-                result4.ShouldBeNull();
-                Should.Throw(() => getContextualMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => getContextualMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => getContextualMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getContextualMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getContextualMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => getContextualMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getContextualMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getContextualMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetContextualMenuItems_Method_With_1_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parameters = {data};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetContextualMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getContextualMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getContextualMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception1, parameters);
-                var result2 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception2, parameters);
-                var result3 = getContextualMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception3, parameters);
-                var result4 = getContextualMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, object>(navigationServiceInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                    Should.NotThrow(() => getContextualMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parameters));
-                    Should.NotThrow(() => getContextualMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #region General Method Call : Class (NavigationService) => Method (GetLinks) (Return Type : string) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetLinks_Method_Direct_Call_ParameterToken_2_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetLinks();
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => navigationServiceInstance.GetLinks(), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => navigationServiceInstance.GetLinks());
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetLinks_Method_Direct_Call_ParameterToken_2_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetLinks();
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => navigationServiceInstance.GetLinks());
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetLinks_Method_With_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getLinksMethodInfo1.ReturnType;
-                var returnType2 = getLinksMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                navigationServiceInstance.ShouldNotBeNull();
-                getLinksMethodInfo1.ShouldNotBeNull();
-                getLinksMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetLinks_Method_Call_Using_Reflection_Result_Compare_If_Not_Null_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getLinksMethodInfo1.ReturnType;
-                var returnType2 = getLinksMethodInfo2.ReturnType;
-                var result1 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                if (result1 != null)
-                {
-                    result1.ShouldNotBeNull();
-                    result2.ShouldNotBeNull();
-                    result3.ShouldNotBeNull();
-                    result4.ShouldNotBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetLinks_Method_Call_Using_Reflection_Result_Validate_Null_Results_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                if (result1 == null)
-                {
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetLinks_Method_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            Object[] parametersOutRanged = {null, "", null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                result1.ShouldBeNull();
-                result2.ShouldBeNull();
-                result3.ShouldBeNull();
-                result4.ShouldBeNull();
-                Should.Throw(() => getLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => getLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => getLinksMethodInfo1.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getLinksMethodInfo2.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => getLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetLinks_Method_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Object[] parameters = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception1, parameters);
-                var result2 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception2, parameters);
-                var result3 = getLinksMethodInfo1.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception3, parameters);
-                var result4 = getLinksMethodInfo2.GetResultMethodInfo<NavigationService, string>(navigationServiceInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                    Should.NotThrow(() => getLinksMethodInfo1.Invoke(navigationServiceInstance, parameters));
-                    Should.NotThrow(() => getLinksMethodInfo2.Invoke(navigationServiceInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #region General Method Call : Class (NavigationService) => Method (GetMenuItems) (Return Type : DataTable) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetMenuItems_Method_6_Parameters_Method_Direct_Call_ParameterToken_3_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo));
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetMenuItems_Method_6_Parameters_ParameterToken_3_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo));
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetMenuItems_Method_With_6_Parameters_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Object[] parametersOutRanged = {siteId, webId, listId, itemId, userId, diagnosticInfo, null, null};
-            Object[] parametersInDifferentNumber = {siteId, webId, listId, itemId, userId};
-            Exception exception;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getMenuItemsMethodInfo1.ReturnType;
-                var returnType2 = getMenuItemsMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                navigationServiceInstance.ShouldNotBeNull();
-                getMenuItemsMethodInfo1.ShouldNotBeNull();
-                getMenuItemsMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetMenuItems_Method_With_6_Call_Using_Reflection_Result_Compare_If_Not_Null_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Object[] parametersOutRanged = {siteId, webId, listId, itemId, userId, diagnosticInfo, null, null};
-            Object[] parametersInDifferentNumber = {siteId, webId, listId, itemId, userId};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = getMenuItemsMethodInfo1.ReturnType;
-                var returnType2 = getMenuItemsMethodInfo2.ReturnType;
-                var result1 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                if (result1 != null)
-                {
-                    result1.ShouldNotBeNull();
-                    result2.ShouldNotBeNull();
-                    result3.ShouldNotBeNull();
-                    result4.ShouldNotBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetMenuItems_Method_With_6_Call_Using_Reflection_Result_Validate_Null_Results_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Object[] parametersOutRanged = {siteId, webId, listId, itemId, userId, diagnosticInfo, null, null};
-            Object[] parametersInDifferentNumber = {siteId, webId, listId, itemId, userId};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                if (result1 == null)
-                {
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                }
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_GetMenuItems_Method_With_6_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Object[] parametersOutRanged = {siteId, webId, listId, itemId, userId, diagnosticInfo, null, null};
-            Object[] parametersInDifferentNumber = {siteId, webId, listId, itemId, userId};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception1, parametersOutRanged);
-                var result2 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception2, parametersOutRanged);
-                var result3 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                var result4 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                result1.ShouldBeNull();
-                result2.ShouldBeNull();
-                result3.ShouldBeNull();
-                result4.ShouldBeNull();
-                Should.Throw(() => getMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => getMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => getMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => getMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => getMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => getMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_GetMenuItems_Method_With_6_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var siteId = CreateType<Guid>();
-            var webId = CreateType<Guid>();
-            var listId = CreateType<Guid>();
-            var itemId = CreateType<int>();
-            var userId = CreateType<int>();
-            var diagnosticInfo = CreateType<Dictionary<string, string>>();
-            Object[] parameters = {siteId, webId, listId, itemId, userId, diagnosticInfo};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "GetMenuItems";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var getMenuItemsMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var getMenuItemsMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var result1 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception1, parameters);
-                var result2 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception2, parameters);
-                var result3 = getMenuItemsMethodInfo1.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception3, parameters);
-                var result4 = getMenuItemsMethodInfo2.GetResultMethodInfo<NavigationService, DataTable>(navigationServiceInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    result1.ShouldBeNull();
-                    result2.ShouldBeNull();
-                    result3.ShouldBeNull();
-                    result4.ShouldBeNull();
-                    Should.NotThrow(() => getMenuItemsMethodInfo1.Invoke(navigationServiceInstance, parameters));
-                    Should.NotThrow(() => getMenuItemsMethodInfo2.Invoke(navigationServiceInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #region General Method Call : Class (NavigationService) => Method (RemoveNavigationLink) (Return Type : void) Test
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_RemoveNavigationLink_Method_1_Parameters_Method_Direct_Call_ParameterToken_4_Simple_Exploration_With_Throw_Exception_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.RemoveNavigationLink(data);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                // Assert
-                Should.Throw(() => navigationServiceInstance.RemoveNavigationLink(data), exceptionType: actionException.GetType());
-                Should.Throw<Exception>(() => navigationServiceInstance.RemoveNavigationLink(data));
-                actionException.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_RemoveNavigationLink_Method_1_Parameters_ParameterToken_4_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.RemoveNavigationLink(data);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => navigationServiceInstance.RemoveNavigationLink(data));
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_RemoveNavigationLink_Method_With_1_Parameters_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "RemoveNavigationLink";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var removeNavigationLinkMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var removeNavigationLinkMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = removeNavigationLinkMethodInfo1.ReturnType;
-                var returnType2 = removeNavigationLinkMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                navigationServiceInstance.ShouldNotBeNull();
-                removeNavigationLinkMethodInfo1.ShouldNotBeNull();
-                removeNavigationLinkMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_RemoveNavigationLink_Method_With_1_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "RemoveNavigationLink";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var removeNavigationLinkMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var removeNavigationLinkMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                removeNavigationLinkMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception1, parametersOutRanged);
-                removeNavigationLinkMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception2, parametersOutRanged);
-                removeNavigationLinkMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                removeNavigationLinkMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                Should.Throw(() => removeNavigationLinkMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => removeNavigationLinkMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => removeNavigationLinkMethodInfo1.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => removeNavigationLinkMethodInfo2.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => removeNavigationLinkMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => removeNavigationLinkMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => removeNavigationLinkMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => removeNavigationLinkMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_RemoveNavigationLink_Method_With_1_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parameters = {data};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "RemoveNavigationLink";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var removeNavigationLinkMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var removeNavigationLinkMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                removeNavigationLinkMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception1, parameters);
-                removeNavigationLinkMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception2, parameters);
-                removeNavigationLinkMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception3, parameters);
-                removeNavigationLinkMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    Should.NotThrow(() => removeNavigationLinkMethodInfo1.Invoke(navigationServiceInstance, parameters));
-                    Should.NotThrow(() => removeNavigationLinkMethodInfo2.Invoke(navigationServiceInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #region General Method Call : Class (NavigationService) => Method (ReorderLinks) (Return Type : void) Test
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_ReorderLinks_Method_1_Parameters_ParameterToken_5_Simple_Exploration_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Action executeAction = null;
-            Exception exception = null, actionException = null;
-            var navigationServiceInstance  = Create(out exception);
-            var isInstanceNotNull = navigationServiceInstance != null;
-
-            if (isInstanceNotNull)
-            {
-                // Act
-                executeAction = () => navigationServiceInstance.ReorderLinks(data);
-                actionException = ActionAnalyzer.GetActionException(executeAction);
-
-                if (actionException == null)
-                {
-                    // Assert
-                    actionException.ShouldBeNull();
-                    Should.NotThrow(() => navigationServiceInstance.ReorderLinks(data));
-                }
-            }
-        }
-        
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_ReorderLinks_Method_With_1_Parameters_Call_With_Reflection_MethodExploration_By_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOfReorderLinks = {data};
-            Exception exception = null, invokeException = null;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "ReorderLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var reorderLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var reorderLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-
-                // Assert
-                invokeException.ShouldBeNull();
-                Should.NotThrow(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOfReorderLinks));
-                Should.NotThrow(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOfReorderLinks));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_ReorderLinks_Method_With_1_Parameters_Call_With_Reflection_Observe_Using_Overflow_Parameters_Obvious_Not_Null_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "ReorderLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var reorderLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var reorderLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var returnType1 = reorderLinksMethodInfo1.ReturnType;
-                var returnType2 = reorderLinksMethodInfo2.ReturnType;
-
-                // Assert
-                parametersOutRanged.ShouldNotBeNull();
-                parametersInDifferentNumber.ShouldNotBeNull();
-                returnType1.ShouldNotBeNull();
-                returnType2.ShouldNotBeNull();
-                returnType1.ShouldBe(returnType2);
-                navigationServiceInstance.ShouldNotBeNull();
-                reorderLinksMethodInfo1.ShouldNotBeNull();
-                reorderLinksMethodInfo2.ShouldNotBeNull();
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        public void AUT_NavigationService_ReorderLinks_Method_With_1_Call_Using_Reflection_Throw_Exceptions_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parametersOutRanged = {data, null, null};
-            Object[] parametersInDifferentNumber = {};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "ReorderLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var reorderLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var reorderLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                reorderLinksMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception1, parametersOutRanged);
-                reorderLinksMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception2, parametersOutRanged);
-                reorderLinksMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception3, parametersInDifferentNumber);
-                reorderLinksMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception4, parametersInDifferentNumber);
-
-                // Assert
-                exception1.ShouldNotBeNull();
-                exception2.ShouldNotBeNull();
-                Should.Throw(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception1.GetType());
-                Should.Throw(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged), exceptionType: exception2.GetType());
-                Should.Throw<Exception>(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parametersInDifferentNumber));
-                Should.Throw<Exception>(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<Exception>(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parametersOutRanged));
-                Should.Throw<TargetParameterCountException>(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parametersOutRanged));
-            }
-        }
-
-        [Test]
-        [Category("AUT MethodCallTest")]
-        [ExcludeFromCodeCoverage]
-        public void AUT_NavigationService_ReorderLinks_Method_With_1_Call_Using_Reflection_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var data = CreateType<string>();
-            Object[] parameters = {data};
-            Exception exception, exception1, exception2, exception3, exception4;
-            var navigationServiceInstance  = Create(out exception);
-            const string methodName = "ReorderLinks";
-
-            if (navigationServiceInstance != null)
-            {
-                // Act
-                var reorderLinksMethodInfo1 = navigationServiceInstance.GetType().GetMethod(methodName);
-                var reorderLinksMethodInfo2 = navigationServiceInstance.GetType().GetMethod(methodName);
-                reorderLinksMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception1, parameters);
-                reorderLinksMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception2, parameters);
-                reorderLinksMethodInfo1.InvokeMethodInfo(navigationServiceInstance, out exception3, parameters);
-                reorderLinksMethodInfo2.InvokeMethodInfo(navigationServiceInstance, out exception4, parameters);
-
-                // Assert
-                if (exception1 == null)
-                {
-                    exception1.ShouldBeNull();
-                    Should.NotThrow(() => reorderLinksMethodInfo1.Invoke(navigationServiceInstance, parameters));
-                    Should.NotThrow(() => reorderLinksMethodInfo2.Invoke(navigationServiceInstance, parameters));
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
 
         #region Category : Initializer
 
         #region General Initializer : Class (NavigationService) Initializer
 
-        /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator.
-        /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
-        [ExcludeFromCodeCoverage]
-        private T CreateType<T>()
-        {
-            Exception exception;
-            return CreateType<T>(out exception);
-        }
+        private const string MethodGetContextualMenuItems = "GetContextualMenuItems";
+        private const string MethodGetLinks = "GetLinks";
+        private const string MethodGetMenuItems = "GetMenuItems";
+        private const string MethodRemoveNavigationLink = "RemoveNavigationLink";
+        private const string MethodReorderLinks = "ReorderLinks";
+        private const string MethodAT = "AT";
+        private const string MethodCalculateLinkId = "CalculateLinkId";
+        private const string MethodGetContextualMenuItems_ParseRequest = "GetContextualMenuItems_ParseRequest";
+        private const string MethodGetLinkId = "GetLinkId";
+        private const string MethodGetNavigationLinks = "GetNavigationLinks";
+        private const string MethodLIP = "LIP";
+        private const string MethodLoadProvider = "LoadProvider";
+        private const string MethodLP = "LP";
+        private const string MethodLPPFEPermissionCheck = "LPPFEPermissionCheck";
+        private const string MethodGetPFEActions = "GetPFEActions";
+        private const string MethodGetSocialActions = "GetSocialActions";
+        private const string MethodGetWorkspaceActions = "GetWorkspaceActions";
+        private const string MethodGetGeneralActions = "GetGeneralActions";
+        private const string MethodGetPlannerActions = "GetPlannerActions";
+        private const string FieldLocker1 = "Locker1";
+        private const string FieldLocker2 = "Locker2";
+        private const string Field_linkProviders = "_linkProviders";
+        private const string Field_navLinkProperties = "_navLinkProperties";
+        private const string Field_spWeb = "_spWeb";
+        private Type _navigationServiceInstanceType;
+        private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
+        private NavigationService _navigationServiceInstance;
+        private NavigationService _navigationServiceInstanceFixture;
+
+        #region General Initializer : Class (NavigationService) One time setup
 
         /// <summary>
-        ///    Create parameter or simple data-type using AutoFixture or Activator or Constructor.
+        ///    Setting up everything for <see cref="NavigationService" /> one time.
         /// </summary>
-        /// <typeparam name="T">Create Given type.</typeparam>
-        /// <returns>Returns a type of T</returns>
+        [OneTimeSetUp]
         [ExcludeFromCodeCoverage]
-        private T CreateType<T>(out Exception exception)
+        public void OneTimeSetup()
         {
-            return CreateAnalyzer.CreateTypeUsingFixtureOrConstuctor<T>(fixture: Fixture, exception: out exception);
+            _navigationServiceInstanceType = typeof(NavigationService);
+            _navigationServiceInstanceFixture = Create(true);
+            _navigationServiceInstance = Create(false);
         }
 
-        /// <summary>
-        ///    Create <see cref="NavigationService" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="NavigationService" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private NavigationService Create(bool useFixtureAtFirst = false)
-        {
-            Exception createException;
-            var parameters = CreateOrGetPrameters();
-            return Create(createException: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create <see cref="NavigationService" /> class.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="NavigationService" />.</returns>
-        [ExcludeFromCodeCoverage]
-        private NavigationService Create(out Exception createException, object[] parameters = null, bool useFixtureAtFirst = false)
-        {
-            return CreateAnalyzer.Create<NavigationService>(fixture: Fixture, exception: out createException, useFixtureAtFirst: useFixtureAtFirst, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create Multiple of <see cref="NavigationService" /> classes depending on the given number.
-        /// </summary>
-        /// <returns>Returns a newly created <see cref="NavigationService" />.</returns>
-        private NavigationService[] CreateMany(out Exception[] createExceptions, out bool isResultsAreNull, int number = 6, object[] parameters = null)
-        {
-            return CreateAnalyzer.CreateMany<NavigationService>(number: number, fixture: Fixture, exceptions: out createExceptions, isResultsAreNull: out isResultsAreNull, parameters: parameters);
-        }
-
-        /// <summary>
-        ///    Create dynamic parameters for <see cref="NavigationService" /> class using AutoFixture.
-        ///    Returns null if no parameters present.
-        /// </summary>
-        /// <returns>Returns a object array if parameters present or else returns null.</returns>
-        [ExcludeFromCodeCoverage]
-        private object[] CreateOrGetPrameters()
-        {
-            var spWeb = CreateType<SPWeb>();
-            return new object[] {spWeb};
-        }
+        #endregion
 
         #endregion
 
         #region Explore Class for Coverage Gain : Class (NavigationService)
 
-        /// <summary>
-        ///     Regular class (<see cref="NavigationService" />) non-public fields explore and verify for coverage gain.
-        /// </summary>
-        [Test]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_NavigationService_NonPublic_Fields_Explore_Verify()
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicFields<NavigationService>(Fixture);
-        }
+        #region General Initializer : Class (NavigationService) All Methods Explore Verification.
 
         /// <summary>
-        ///     Regular class (<see cref="NavigationService" />) non-public properties explore and verify for coverage gain.
+        ///     Class (<see cref="NavigationService" />) explore and verify fields for coverage gain.
         /// </summary>
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
-        public void AUT_RegularClass_NavigationService_NonPublic_Properties_Explore_Verify()
+        [TestCase(MethodGetContextualMenuItems, 0)]
+        [TestCase(MethodGetLinks, 0)]
+        [TestCase(MethodGetMenuItems, 0)]
+        [TestCase(MethodRemoveNavigationLink, 0)]
+        [TestCase(MethodReorderLinks, 0)]
+        [TestCase(MethodAT, 0)]
+        [TestCase(MethodGetContextualMenuItems_ParseRequest, 0)]
+        [TestCase(MethodGetNavigationLinks, 0)]
+        [TestCase(MethodLIP, 0)]
+        [TestCase(MethodLP, 0)]
+        [TestCase(MethodLPPFEPermissionCheck, 0)]
+        [TestCase(MethodGetGeneralActions, 0)]
+        public void AUT_NavigationService_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicProperties<NavigationService>(Fixture);
-        }
+            // Arrange
+            var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
 
-        /// <summary>
-        ///     Regular class (<see cref="NavigationService" />) non-public methods explore and verify for coverage gain.
-        /// </summary>
-        [Test]
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        [TestCase(5)]
-        [TestCase(6)]
-        [TestCase(7)]
-        [TestCase(8)]
-        [TestCase(9)]
-        [TestCase(10)]
-        [Category("AUT Initializer")]
-        public void AUT_RegularClass_NavigationService_NonPublic_Methods_Explore_Verify(int pageNumber = 1, int perPageMethodsToVerify = 3)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyNonPublicMethods<NavigationService>(Fixture, pageNumber, perPageMethodsToVerify);
+            // Act
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_navigationServiceInstanceFixture, 
+                                                                 Fixture, 
+                                                                 currentMethodInfo);
+
+            // Assert
+            currentMethodInfo.ShouldNotBeNull();
         }
 
         #endregion
+
+        #region General Initializer : Class (NavigationService) All Fields Explore By Name
+
+        /// <summary>
+        ///     Class (<see cref="NavigationService" />) explore and verify fields for coverage gain.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        [TestCase(FieldLocker1)]
+        [TestCase(FieldLocker2)]
+        public void AUT_NavigationService_All_Fields_Explore_Verify_By_Name_Test(string name)
+        {
+            // Arrange
+            var fieldInfo = GetFieldInfo(name);
+
+            // Act
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_navigationServiceInstanceFixture, 
+                                                                Fixture, 
+                                                                fieldInfo);
+
+            // Assert
+            fieldInfo.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Category : Instance
+
+        /// <summary>
+        ///     Class (<see cref="NavigationService" />) can be created test
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Instance")]
+        public void AUT_NavigationService_Is_Instance_Present_Test()
+        {
+            // Assert
+            _navigationServiceInstanceType.ShouldNotBeNull();
+            _navigationServiceInstance.ShouldNotBeNull();
+            _navigationServiceInstanceFixture.ShouldNotBeNull();
+            _navigationServiceInstance.ShouldBeAssignableTo<NavigationService>();
+            _navigationServiceInstanceFixture.ShouldBeAssignableTo<NavigationService>();
+        }
 
         #endregion
 
         #region Category : Constructor
 
-        #region General Constructor : Class (NavigationService) with Parameter Test
+        #region General Constructor : Class (NavigationService) instance created
 
+        /// <summary>
+        ///     Class (<see cref="NavigationService" />) can be created test
+        /// </summary>
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Constructor")]
-        public void AUT_Constructor_NavigationService_With_Parameter_Created_Instance_Type_Test()
+        public void AUT_NavigationService_Is_Created_Test()
         {
-            // Arrange
-            var providers = CreateType<IEnumerable<string>>();
-            var spWeb = CreateType<SPWeb>();
-            NavigationService instance = null;
-            Exception creationException = null;
-            Action createAction = ()=> instance = new NavigationService(providers, spWeb);
-
-            // Act
-            creationException = ActionAnalyzer.GetActionException(createAction);
-
             // Assert
-            if (creationException == null)
-            {
-                instance.ShouldNotBeNull();
-                instance.ShouldBeOfType<NavigationService>();
-            }
+            _navigationServiceInstance.ShouldNotBeNull();
+            _navigationServiceInstanceFixture.ShouldNotBeNull();
         }
 
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors coverage gain tests by index
+
+        /// <summary>
+        ///     Class (<see cref="NavigationService" />) explore and verify it's constructors by index.
+        /// </summary>
         [Test]
+        [Timeout(TestsTimeOut)]
         [Category("AUT Constructor")]
-        public void AUT_Constructor_NavigationService_Instantiation_With_Parameter_Test()
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public void AUT_NavigationService_Constructor_Explore_Verify_By_Index_Test(int constructorIndex)
+        {
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructor<NavigationService>(Fixture, constructorIndex);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify all constructors of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_All_Constructors_Explore_Verify_Test()
+        {
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructors<NavigationService>(Fixture);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with parameter () coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_Explore_Verify_Test()
         {
             // Arrange
             var providers = CreateType<IEnumerable<string>>();
             var spWeb = CreateType<SPWeb>();
-            NavigationService instance = null;
-            Exception creationException = null;
-            Action createAction = ()=> instance = new NavigationService(providers, spWeb);
-
-            // Act
-            creationException = ActionAnalyzer.GetActionException(createAction);
+            object[] parametersOfNavigationService = { providers, spWeb };
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(IEnumerable<string>), typeof(SPWeb) };
 
             // Assert
-            if (creationException == null)
-            {
-                instance.ShouldNotBeNull();
-                Should.NotThrow(createAction);
-            }
+            ShouldlyExtension.ExploreVerifyConstructorByGivenParameters(_navigationServiceInstanceType, methodNavigationServicePrametersTypes, parametersOfNavigationService);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with dynamic parameters () coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_With_Dynamic_Explore_Verify_Test()
+        {
+            // Arrange
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(IEnumerable<string>), typeof(SPWeb) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByDynamicParameters(_navigationServiceInstanceType, Fixture, methodNavigationServicePrametersTypes);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with parameter (Overloading_Of_1_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_Overloading_Of_1_Explore_Verify_Test()
+        {
+            // Arrange
+            var provider = CreateType<string>();
+            var spWeb = CreateType<SPWeb>();
+            object[] parametersOfNavigationService = { provider, spWeb };
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(string), typeof(SPWeb) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByGivenParameters(_navigationServiceInstanceType, methodNavigationServicePrametersTypes, parametersOfNavigationService);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with dynamic parameters (Overloading_Of_1_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_Overloading_Of_1_With_Dynamic_Explore_Verify_Test()
+        {
+            // Arrange
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(string), typeof(SPWeb) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByDynamicParameters(_navigationServiceInstanceType, Fixture, methodNavigationServicePrametersTypes);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with parameter (Overloading_Of_2_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_Overloading_Of_2_Explore_Verify_Test()
+        {
+            // Arrange
+            var spWeb = CreateType<SPWeb>();
+            object[] parametersOfNavigationService = { spWeb };
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(SPWeb) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByGivenParameters(_navigationServiceInstanceType, methodNavigationServicePrametersTypes, parametersOfNavigationService);
+        }
+
+        #endregion
+
+        #region General Constructor : Class (NavigationService) constructors with dynamic parameters (Overloading_Of_2_) coverage gain tests
+
+        /// <summary>
+        ///     Explore and verify constructors (with / without parameter) of Class (<see cref="NavigationService" />).
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Constructor")]
+        public void AUT_NavigationService_Constructors_Overloading_Of_2_With_Dynamic_Explore_Verify_Test()
+        {
+            // Arrange
+            var methodNavigationServicePrametersTypes = new Type[] { typeof(SPWeb) };
+
+            // Assert
+            ShouldlyExtension.ExploreVerifyConstructorByDynamicParameters(_navigationServiceInstanceType, Fixture, methodNavigationServicePrametersTypes);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Category : MethodCallTest
+
+        #region Method Call : Static methods call tests
+
+        /// <summary>
+        ///     Class (<see cref="NavigationService" />) public, non-public static only methods exploration for coverage gain.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        [TestCase(MethodAT)]
+        [TestCase(MethodGetContextualMenuItems_ParseRequest)]
+        [TestCase(MethodGetNavigationLinks)]
+        [TestCase(MethodLIP)]
+        [TestCase(MethodLP)]
+        [TestCase(MethodLPPFEPermissionCheck)]
+        [TestCase(MethodGetGeneralActions)]
+        public void AUT_NavigationService_Static_Methods_Explore_Verify_Test(string methodName)
+        {
+            // AAA: Arrange, Act, Assert
+            ShouldlyExtension.ExploreVerifyStaticMethodsWithOrWithoutInstance(_navigationServiceInstanceFixture,
+                                                                              _navigationServiceInstanceType,
+                                                                              Fixture,
+                                                                              methodName);
+        }
+
+        #endregion
+
+        #region Method Call : NonStatic methods call tests
+
+        /// <summary>
+        ///      Class (<see cref="NavigationService" />) public, non-public non-static methods exploration for coverage gain.
+        /// </summary>
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        [TestCase(MethodGetContextualMenuItems)]
+        [TestCase(MethodGetLinks)]
+        [TestCase(MethodGetMenuItems)]
+        [TestCase(MethodRemoveNavigationLink)]
+        [TestCase(MethodReorderLinks)]
+        [TestCase(MethodCalculateLinkId)]
+        [TestCase(MethodGetLinkId)]
+        [TestCase(MethodLoadProvider)]
+        [TestCase(MethodGetPFEActions)]
+        [TestCase(MethodGetSocialActions)]
+        [TestCase(MethodGetWorkspaceActions)]
+        [TestCase(MethodGetPlannerActions)]
+        public void AUT_NavigationService_NonStatic_Methods_Explore_Verify_Test(string methodName)
+        {
+            // AAA: Arrange, Act, Assert
+            ShouldlyExtension.ExploreVerifyMethods<NavigationService>(Fixture, methodName);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetContextualMenuItems_Method_Call_Internally(Type[] types)
+        {
+            var methodGetContextualMenuItemsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetContextualMenuItems, Fixture, methodGetContextualMenuItemsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _navigationServiceInstance.GetContextualMenuItems(data);
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodGetContextualMenuItemsPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfGetContextualMenuItems = { data };
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems, methodGetContextualMenuItemsPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<NavigationService, object>(_navigationServiceInstanceFixture, out exception1, parametersOfGetContextualMenuItems);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<NavigationService, object>(_navigationServiceInstance, MethodGetContextualMenuItems, parametersOfGetContextualMenuItems, methodGetContextualMenuItemsPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldBeNull();
+            result2.ShouldBeNull();
+            parametersOfGetContextualMenuItems.ShouldNotBeNull();
+            parametersOfGetContextualMenuItems.Length.ShouldBe(1);
+            methodGetContextualMenuItemsPrametersTypes.Length.ShouldBe(1);
+            Should.Throw<Exception>(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetContextualMenuItems));
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodGetContextualMenuItemsPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfGetContextualMenuItems = { data };
+
+            // Assert
+            parametersOfGetContextualMenuItems.ShouldNotBeNull();
+            parametersOfGetContextualMenuItems.Length.ShouldBe(1);
+            methodGetContextualMenuItemsPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, object>(_navigationServiceInstance, MethodGetContextualMenuItems, parametersOfGetContextualMenuItems, methodGetContextualMenuItemsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            var methodGetContextualMenuItemsPrametersTypes = new Type[] { typeof(string) };
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetContextualMenuItems, Fixture, methodGetContextualMenuItemsPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodGetContextualMenuItemsPrametersTypes.Length.ShouldBe(1);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetContextualMenuItemsPrametersTypes = new Type[] { typeof(string) };
+            const int parametersCount = 1;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetContextualMenuItems, Fixture, methodGetContextualMenuItemsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetContextualMenuItemsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems) (Return Type : object) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems, 0);
+            const int parametersCount = 1;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetLinks_Method_Call_Internally(Type[] types)
+        {
+            var methodGetLinksPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinks, Fixture, methodGetLinksPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _navigationServiceInstance.GetLinks();
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        {
+            // Arrange
+            Type [] methodGetLinksPrametersTypes = null;
+            object[] parametersOfGetLinks = null; // no parameter present
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodGetLinks, methodGetLinksPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<NavigationService, string>(_navigationServiceInstanceFixture, out exception1, parametersOfGetLinks);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<NavigationService, string>(_navigationServiceInstance, MethodGetLinks, parametersOfGetLinks, methodGetLinksPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldBeNull();
+            result2.ShouldBeNull();
+            parametersOfGetLinks.ShouldBeNull();
+            methodGetLinksPrametersTypes.ShouldBeNull();
+            Should.Throw<Exception>(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetLinks));
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            Type [] methodGetLinksPrametersTypes = null;
+            object[] parametersOfGetLinks = null; // no parameter present
+
+            // Assert
+            parametersOfGetLinks.ShouldBeNull();
+            methodGetLinksPrametersTypes.ShouldBeNull();
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, string>(_navigationServiceInstance, MethodGetLinks, parametersOfGetLinks, methodGetLinksPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            Type [] methodGetLinksPrametersTypes = null;
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinks, Fixture, methodGetLinksPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodGetLinksPrametersTypes.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Type [] methodGetLinksPrametersTypes = null;
+            const int parametersCount = 0;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinks, Fixture, methodGetLinksPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetLinksPrametersTypes.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinks) (Return Type : string) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinks_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetLinks, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetMenuItems_Method_Call_Internally(Type[] types)
+        {
+            var methodGetMenuItemsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetMenuItems, Fixture, methodGetMenuItemsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            var siteId = CreateType<Guid>();
+            var webId = CreateType<Guid>();
+            var listId = CreateType<Guid>();
+            var itemId = CreateType<int>();
+            var userId = CreateType<int>();
+            var diagnosticInfo = CreateType<Dictionary<string, string>>();
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _navigationServiceInstance.GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo);
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        {
+            // Arrange
+            var siteId = CreateType<Guid>();
+            var webId = CreateType<Guid>();
+            var listId = CreateType<Guid>();
+            var itemId = CreateType<int>();
+            var userId = CreateType<int>();
+            var diagnosticInfo = CreateType<Dictionary<string, string>>();
+            var methodGetMenuItemsPrametersTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetMenuItems = { siteId, webId, listId, itemId, userId, diagnosticInfo };
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodGetMenuItems, methodGetMenuItemsPrametersTypes, out exception);
+
+            // Act
+            var result1 = methodInfo.GetResultMethodInfo<NavigationService, DataTable>(_navigationServiceInstanceFixture, out exception1, parametersOfGetMenuItems);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<NavigationService, DataTable>(_navigationServiceInstance, MethodGetMenuItems, parametersOfGetMenuItems, methodGetMenuItemsPrametersTypes);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            result1.ShouldBeNull();
+            result2.ShouldBeNull();
+            parametersOfGetMenuItems.ShouldNotBeNull();
+            parametersOfGetMenuItems.Length.ShouldBe(6);
+            methodGetMenuItemsPrametersTypes.Length.ShouldBe(6);
+            Should.Throw<Exception>(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetMenuItems));
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var siteId = CreateType<Guid>();
+            var webId = CreateType<Guid>();
+            var listId = CreateType<Guid>();
+            var itemId = CreateType<int>();
+            var userId = CreateType<int>();
+            var diagnosticInfo = CreateType<Dictionary<string, string>>();
+            var methodGetMenuItemsPrametersTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetMenuItems = { siteId, webId, listId, itemId, userId, diagnosticInfo };
+
+            // Assert
+            parametersOfGetMenuItems.ShouldNotBeNull();
+            parametersOfGetMenuItems.Length.ShouldBe(6);
+            methodGetMenuItemsPrametersTypes.Length.ShouldBe(6);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, DataTable>(_navigationServiceInstance, MethodGetMenuItems, parametersOfGetMenuItems, methodGetMenuItemsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            var methodGetMenuItemsPrametersTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(Dictionary<string, string>) };
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetMenuItems, Fixture, methodGetMenuItemsPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodGetMenuItemsPrametersTypes.Length.ShouldBe(6);
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetMenuItemsPrametersTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(Dictionary<string, string>) };
+            const int parametersCount = 6;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetMenuItems, Fixture, methodGetMenuItemsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetMenuItemsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetMenuItems, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetMenuItems) (Return Type : DataTable) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetMenuItems_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodGetMenuItems, 0);
+            const int parametersCount = 6;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_RemoveNavigationLink_Method_Call_Internally(Type[] types)
+        {
+            var methodRemoveNavigationLinkPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodRemoveNavigationLink, Fixture, methodRemoveNavigationLinkPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_DirectCall_Throw_Exception_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _navigationServiceInstance.RemoveNavigationLink(data);
+
+            // Assert
+            Should.Throw<Exception>(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_Call_Void_With_1_Parameters_Throw_Exception_Thrown_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodRemoveNavigationLinkPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfRemoveNavigationLink = { data };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodRemoveNavigationLink, methodRemoveNavigationLinkPrametersTypes, out exception);
+
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfRemoveNavigationLink);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfRemoveNavigationLink.ShouldNotBeNull();
+            parametersOfRemoveNavigationLink.Length.ShouldBe(1);
+            methodRemoveNavigationLinkPrametersTypes.Length.ShouldBe(1);
+            methodRemoveNavigationLinkPrametersTypes.Length.ShouldBe(parametersOfRemoveNavigationLink.Length);
+            Should.Throw<Exception>(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodRemoveNavigationLinkPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfRemoveNavigationLink = { data };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_navigationServiceInstance, MethodRemoveNavigationLink, parametersOfRemoveNavigationLink, methodRemoveNavigationLinkPrametersTypes);
+
+            // Assert
+            parametersOfRemoveNavigationLink.ShouldNotBeNull();
+            parametersOfRemoveNavigationLink.Length.ShouldBe(1);
+            methodRemoveNavigationLinkPrametersTypes.Length.ShouldBe(1);
+            methodRemoveNavigationLinkPrametersTypes.Length.ShouldBe(parametersOfRemoveNavigationLink.Length);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodRemoveNavigationLink, 0);
+            const int parametersCount = 1;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodRemoveNavigationLinkPrametersTypes = new Type[] { typeof(string) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodRemoveNavigationLink, Fixture, methodRemoveNavigationLinkPrametersTypes);
+
+            // Assert
+            methodRemoveNavigationLinkPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (RemoveNavigationLink) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_RemoveNavigationLink_Method_Call_With_1_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodRemoveNavigationLink, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_ReorderLinks_Method_Call_Internally(Type[] types)
+        {
+            var methodReorderLinksPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodReorderLinks, Fixture, methodReorderLinksPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) No Exception Thrown Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_DirectCall_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            Action executeAction = null;
+
+            // Act
+            executeAction = () => _navigationServiceInstance.ReorderLinks(data);
+
+            // Assert
+            Should.NotThrow(executeAction);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) No Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodReorderLinksPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfReorderLinks = { data };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodReorderLinks, methodReorderLinksPrametersTypes, out exception);
+
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfReorderLinks);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfReorderLinks.ShouldNotBeNull();
+            parametersOfReorderLinks.Length.ShouldBe(1);
+            methodReorderLinksPrametersTypes.Length.ShouldBe(1);
+            methodReorderLinksPrametersTypes.Length.ShouldBe(parametersOfReorderLinks.Length);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var methodReorderLinksPrametersTypes = new Type[] { typeof(string) };
+            object[] parametersOfReorderLinks = { data };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_navigationServiceInstance, MethodReorderLinks, parametersOfReorderLinks, methodReorderLinksPrametersTypes);
+
+            // Assert
+            parametersOfReorderLinks.ShouldNotBeNull();
+            parametersOfReorderLinks.Length.ShouldBe(1);
+            methodReorderLinksPrametersTypes.Length.ShouldBe(1);
+            methodReorderLinksPrametersTypes.Length.ShouldBe(parametersOfReorderLinks.Length);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodReorderLinks, 0);
+            const int parametersCount = 1;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodReorderLinksPrametersTypes = new Type[] { typeof(string) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodReorderLinks, Fixture, methodReorderLinksPrametersTypes);
+
+            // Assert
+            methodReorderLinksPrametersTypes.Length.ShouldBe(1);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (ReorderLinks) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_ReorderLinks_Method_Call_With_1_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodReorderLinks, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_AT_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodATPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodAT, Fixture, methodATPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) No Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_AT_Static_Method_Call_With_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var title = CreateType<string>();
+            var command = CreateType<string>();
+            var imgUrl = CreateType<string>();
+            var allowed = CreateType<bool>();
+            var kind = CreateType<string>();
+            var methodATPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(bool), typeof(string) };
+            object[] parametersOfAT = { title, command, imgUrl, allowed, kind };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodAT, methodATPrametersTypes, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfAT.ShouldNotBeNull();
+            parametersOfAT.Length.ShouldBe(5);
+            methodATPrametersTypes.Length.ShouldBe(5);
+            Should.NotThrow(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfAT));
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_AT_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var title = CreateType<string>();
+            var command = CreateType<string>();
+            var imgUrl = CreateType<string>();
+            var allowed = CreateType<bool>();
+            var kind = CreateType<string>();
+            var methodATPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(bool), typeof(string) };
+            object[] parametersOfAT = { title, command, imgUrl, allowed, kind };
+
+            // Assert
+            parametersOfAT.ShouldNotBeNull();
+            parametersOfAT.Length.ShouldBe(5);
+            methodATPrametersTypes.Length.ShouldBe(5);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<Tuple<string, string, string, string, bool>>(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodAT, parametersOfAT, methodATPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_AT_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodATPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(bool), typeof(string) };
+            const int parametersCount = 5;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodAT, Fixture, methodATPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodATPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) without parameters value verify result should not be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_AT_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodAT, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (AT) (Return Type : Tuple<string, string, string, string, bool>) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_AT_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodAT, 0);
+            const int parametersCount = 5;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (CalculateLinkId) (Return Type : string) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_CalculateLinkId_Method_Call_Internally(Type[] types)
+        {
+            var methodCalculateLinkIdPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodCalculateLinkId, Fixture, methodCalculateLinkIdPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (CalculateLinkId) (Return Type : string) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_CalculateLinkId_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var navLink = CreateType<NavLink>();
+            var providerName = CreateType<string>();
+            var methodCalculateLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+            object[] parametersOfCalculateLinkId = { navLink, providerName };
+
+            // Assert
+            parametersOfCalculateLinkId.ShouldNotBeNull();
+            parametersOfCalculateLinkId.Length.ShouldBe(2);
+            methodCalculateLinkIdPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, string>(_navigationServiceInstance, MethodCalculateLinkId, parametersOfCalculateLinkId, methodCalculateLinkIdPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (CalculateLinkId) (Return Type : string) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_CalculateLinkId_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            var methodCalculateLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodCalculateLinkId, Fixture, methodCalculateLinkIdPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodCalculateLinkIdPrametersTypes.Length.ShouldBe(2);
+        }
+
+        #endregion
+
+        #region Method Call : (CalculateLinkId) (Return Type : string) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_CalculateLinkId_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodCalculateLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodCalculateLinkId, Fixture, methodCalculateLinkIdPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodCalculateLinkIdPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodGetContextualMenuItems_ParseRequestPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetContextualMenuItems_ParseRequest, Fixture, methodGetContextualMenuItems_ParseRequestPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_Void_With_7_Parameters_Throw_Exception_Thrown_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var siteId = CreateType<Guid>();
+            var webId = CreateType<Guid>();
+            var listId = CreateType<Guid>();
+            var itemId = CreateType<int>();
+            var userId = CreateType<int>();
+            var debugMode = CreateType<bool>();
+            var methodGetContextualMenuItems_ParseRequestPrametersTypes = new Type[] { typeof(string), typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(bool) };
+            object[] parametersOfGetContextualMenuItems_ParseRequest = { data, siteId, webId, listId, itemId, userId, debugMode };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems_ParseRequest, methodGetContextualMenuItems_ParseRequestPrametersTypes, out exception);
+
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetContextualMenuItems_ParseRequest);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfGetContextualMenuItems_ParseRequest.ShouldNotBeNull();
+            parametersOfGetContextualMenuItems_ParseRequest.Length.ShouldBe(7);
+            methodGetContextualMenuItems_ParseRequestPrametersTypes.Length.ShouldBe(7);
+            Should.Throw<Exception>(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_Void_With_7_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var data = CreateType<string>();
+            var siteId = CreateType<Guid>();
+            var webId = CreateType<Guid>();
+            var listId = CreateType<Guid>();
+            var itemId = CreateType<int>();
+            var userId = CreateType<int>();
+            var debugMode = CreateType<bool>();
+            var methodGetContextualMenuItems_ParseRequestPrametersTypes = new Type[] { typeof(string), typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(bool) };
+            object[] parametersOfGetContextualMenuItems_ParseRequest = { data, siteId, webId, listId, itemId, userId, debugMode };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetContextualMenuItems_ParseRequest, parametersOfGetContextualMenuItems_ParseRequest, methodGetContextualMenuItems_ParseRequestPrametersTypes);
+
+            // Assert
+            parametersOfGetContextualMenuItems_ParseRequest.ShouldNotBeNull();
+            parametersOfGetContextualMenuItems_ParseRequest.Length.ShouldBe(7);
+            methodGetContextualMenuItems_ParseRequestPrametersTypes.Length.ShouldBe(7);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems_ParseRequest, 0);
+            const int parametersCount = 7;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetContextualMenuItems_ParseRequestPrametersTypes = new Type[] { typeof(string), typeof(Guid), typeof(Guid), typeof(Guid), typeof(int), typeof(int), typeof(bool) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetContextualMenuItems_ParseRequest, Fixture, methodGetContextualMenuItems_ParseRequestPrametersTypes);
+
+            // Assert
+            methodGetContextualMenuItems_ParseRequestPrametersTypes.Length.ShouldBe(7);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetContextualMenuItems_ParseRequest) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetContextualMenuItems_ParseRequest_Static_Method_Call_With_7_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetContextualMenuItems_ParseRequest, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinkId) (Return Type : string) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetLinkId_Method_Call_Internally(Type[] types)
+        {
+            var methodGetLinkIdPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinkId, Fixture, methodGetLinkIdPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinkId) (Return Type : string) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinkId_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var navLink = CreateType<NavLink>();
+            var providerName = CreateType<string>();
+            var methodGetLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+            object[] parametersOfGetLinkId = { navLink, providerName };
+
+            // Assert
+            parametersOfGetLinkId.ShouldNotBeNull();
+            parametersOfGetLinkId.Length.ShouldBe(2);
+            methodGetLinkIdPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, string>(_navigationServiceInstance, MethodGetLinkId, parametersOfGetLinkId, methodGetLinkIdPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinkId) (Return Type : string) Results Null (if not primitive type) Test
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinkId_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
+        {
+            // Arrange
+            var methodGetLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+
+            // Act
+            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinkId, Fixture, methodGetLinkIdPrametersTypes);
+
+            // Assert
+            result.ShouldBeNull();
+            methodGetLinkIdPrametersTypes.Length.ShouldBe(2);
+        }
+
+        #endregion
+
+        #region Method Call : (GetLinkId) (Return Type : string) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetLinkId_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetLinkIdPrametersTypes = new Type[] { typeof(NavLink), typeof(string) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetLinkId, Fixture, methodGetLinkIdPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetLinkIdPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodGetNavigationLinksPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetNavigationLinks, Fixture, methodGetNavigationLinksPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) No Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var linkProvider = CreateType<INavLinkProvider>();
+            var links = CreateType<SortedDictionary<int, NavLink>>();
+            var methodGetNavigationLinksPrametersTypes = new Type[] { typeof(INavLinkProvider), typeof(SortedDictionary<int, NavLink>) };
+            object[] parametersOfGetNavigationLinks = { linkProvider, links };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodGetNavigationLinks, methodGetNavigationLinksPrametersTypes, out exception);
+
+            // Act
+            Action currentAction = () => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetNavigationLinks);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfGetNavigationLinks.ShouldNotBeNull();
+            parametersOfGetNavigationLinks.Length.ShouldBe(2);
+            methodGetNavigationLinksPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var linkProvider = CreateType<INavLinkProvider>();
+            var links = CreateType<SortedDictionary<int, NavLink>>();
+            var methodGetNavigationLinksPrametersTypes = new Type[] { typeof(INavLinkProvider), typeof(SortedDictionary<int, NavLink>) };
+            object[] parametersOfGetNavigationLinks = { linkProvider, links };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidStaticMethod(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetNavigationLinks, parametersOfGetNavigationLinks, methodGetNavigationLinksPrametersTypes);
+
+            // Assert
+            parametersOfGetNavigationLinks.ShouldNotBeNull();
+            parametersOfGetNavigationLinks.Length.ShouldBe(2);
+            methodGetNavigationLinksPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodGetNavigationLinks, 0);
+            const int parametersCount = 2;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetNavigationLinksPrametersTypes = new Type[] { typeof(INavLinkProvider), typeof(SortedDictionary<int, NavLink>) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetNavigationLinks, Fixture, methodGetNavigationLinksPrametersTypes);
+
+            // Assert
+            methodGetNavigationLinksPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (GetNavigationLinks) (Return Type : void) Invoke without parameter types and should not throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetNavigationLinks_Static_Method_Call_With_2_Parameters_Dynamic_Invoking_Without_Parameters_Should_Not_Throw_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetNavigationLinks, 0);
+
+            // Act
+            Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (LIP) (Return Type : bool) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_LIP_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodLIPPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLIP, Fixture, methodLIPPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (LIP) (Return Type : bool) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LIP_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var listItem = CreateType<SPListItem>();
+            var spBasePermissions = CreateType<SPBasePermissions>();
+            var methodLIPPrametersTypes = new Type[] { typeof(SPListItem), typeof(SPBasePermissions) };
+            object[] parametersOfLIP = { listItem, spBasePermissions };
+
+            // Assert
+            parametersOfLIP.ShouldNotBeNull();
+            parametersOfLIP.Length.ShouldBe(2);
+            methodLIPPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<bool>(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLIP, parametersOfLIP, methodLIPPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (LIP) (Return Type : bool) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LIP_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodLIPPrametersTypes = new Type[] { typeof(SPListItem), typeof(SPBasePermissions) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLIP, Fixture, methodLIPPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodLIPPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (LIP) (Return Type : bool) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LIP_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodLIP, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (LIP) (Return Type : bool) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LIP_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodLIP, 0);
+            const int parametersCount = 2;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (LoadProvider) (Return Type : void) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_LoadProvider_Method_Call_Internally(Type[] types)
+        {
+            var methodLoadProviderPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodLoadProvider, Fixture, methodLoadProviderPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (LoadProvider) (Return Type : void) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LoadProvider_Method_Call_Void_With_2_Parameters_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var provider = CreateType<string>();
+            var types = CreateType<dynamic>();
+            var methodLoadProviderPrametersTypes = new Type[] { typeof(string), typeof(IEnumerable<Type>) };
+            object[] parametersOfLoadProvider = { provider, types };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_navigationServiceInstance, MethodLoadProvider, parametersOfLoadProvider, methodLoadProviderPrametersTypes);
+
+            // Assert
+            parametersOfLoadProvider.ShouldNotBeNull();
+            parametersOfLoadProvider.Length.ShouldBe(2);
+            methodLoadProviderPrametersTypes.Length.ShouldBe(2);
+            methodLoadProviderPrametersTypes.Length.ShouldBe(parametersOfLoadProvider.Length);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (LoadProvider) (Return Type : void) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LoadProvider_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodLoadProviderPrametersTypes = new Type[] { typeof(string), typeof(IEnumerable<Type>) };
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodLoadProvider, Fixture, methodLoadProviderPrametersTypes);
+
+            // Assert
+            methodLoadProviderPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(currentAction);
+        }
+
+        #endregion
+
+        #region Method Call : (LP) (Return Type : bool) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_LP_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodLPPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLP, Fixture, methodLPPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (LP) (Return Type : bool) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LP_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var list = CreateType<SPList>();
+            var spBasePermissions = CreateType<SPBasePermissions>();
+            var methodLPPrametersTypes = new Type[] { typeof(SPList), typeof(SPBasePermissions) };
+            object[] parametersOfLP = { list, spBasePermissions };
+
+            // Assert
+            parametersOfLP.ShouldNotBeNull();
+            parametersOfLP.Length.ShouldBe(2);
+            methodLPPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<bool>(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLP, parametersOfLP, methodLPPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (LP) (Return Type : bool) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LP_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodLPPrametersTypes = new Type[] { typeof(SPList), typeof(SPBasePermissions) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLP, Fixture, methodLPPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodLPPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (LP) (Return Type : bool) without parameters value verify result should be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LP_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodLP, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (LP) (Return Type : bool) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LP_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodLP, 0);
+            const int parametersCount = 2;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodLPPFEPermissionCheckPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLPPFEPermissionCheck, Fixture, methodLPPFEPermissionCheckPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) No Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_With_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var list = CreateType<SPList>();
+            var spBasePermissions = CreateType<SPBasePermissions>();
+            var methodLPPFEPermissionCheckPrametersTypes = new Type[] { typeof(SPList), typeof(SPBasePermissions) };
+            object[] parametersOfLPPFEPermissionCheck = { list, spBasePermissions };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodLPPFEPermissionCheck, methodLPPFEPermissionCheckPrametersTypes, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfLPPFEPermissionCheck.ShouldNotBeNull();
+            parametersOfLPPFEPermissionCheck.Length.ShouldBe(2);
+            methodLPPFEPermissionCheckPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfLPPFEPermissionCheck));
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var list = CreateType<SPList>();
+            var spBasePermissions = CreateType<SPBasePermissions>();
+            var methodLPPFEPermissionCheckPrametersTypes = new Type[] { typeof(SPList), typeof(SPBasePermissions) };
+            object[] parametersOfLPPFEPermissionCheck = { list, spBasePermissions };
+
+            // Assert
+            parametersOfLPPFEPermissionCheck.ShouldNotBeNull();
+            parametersOfLPPFEPermissionCheck.Length.ShouldBe(2);
+            methodLPPFEPermissionCheckPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<bool>(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLPPFEPermissionCheck, parametersOfLPPFEPermissionCheck, methodLPPFEPermissionCheckPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodLPPFEPermissionCheckPrametersTypes = new Type[] { typeof(SPList), typeof(SPBasePermissions) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodLPPFEPermissionCheck, Fixture, methodLPPFEPermissionCheckPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodLPPFEPermissionCheckPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) without parameters value verify result should not be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodLPPFEPermissionCheck, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (LPPFEPermissionCheck) (Return Type : bool) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_LPPFEPermissionCheck_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodLPPFEPermissionCheck, 0);
+            const int parametersCount = 2;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetPFEActions) (Return Type : Tuple<string, string, string, string, bool>[]) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetPFEActions_Method_Call_Internally(Type[] types)
+        {
+            var methodGetPFEActionsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetPFEActions, Fixture, methodGetPFEActionsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetPFEActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetPFEActions_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var list = CreateType<SPList>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetPFEActionsPrametersTypes = new Type[] { typeof(SPList), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetPFEActions = { list, di };
+
+            // Assert
+            parametersOfGetPFEActions.ShouldNotBeNull();
+            parametersOfGetPFEActions.Length.ShouldBe(2);
+            methodGetPFEActionsPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, Tuple<string, string, string, string, bool>[]>(_navigationServiceInstance, MethodGetPFEActions, parametersOfGetPFEActions, methodGetPFEActionsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetPFEActions) (Return Type : Tuple<string, string, string, string, bool>[]) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetPFEActions_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetPFEActionsPrametersTypes = new Type[] { typeof(SPList), typeof(Dictionary<string, string>) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetPFEActions, Fixture, methodGetPFEActionsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetPFEActionsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetSocialActions) (Return Type : Tuple<string, string, string, string, bool>[]) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetSocialActions_Method_Call_Internally(Type[] types)
+        {
+            var methodGetSocialActionsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetSocialActions, Fixture, methodGetSocialActionsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetSocialActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetSocialActions_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var listItem = CreateType<SPListItem>();
+            var settings = CreateType<GridGanttSettings>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetSocialActionsPrametersTypes = new Type[] { typeof(SPListItem), typeof(GridGanttSettings), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetSocialActions = { listItem, settings, di };
+
+            // Assert
+            parametersOfGetSocialActions.ShouldNotBeNull();
+            parametersOfGetSocialActions.Length.ShouldBe(3);
+            methodGetSocialActionsPrametersTypes.Length.ShouldBe(3);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, Tuple<string, string, string, string, bool>[]>(_navigationServiceInstance, MethodGetSocialActions, parametersOfGetSocialActions, methodGetSocialActionsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetSocialActions) (Return Type : Tuple<string, string, string, string, bool>[]) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetSocialActions_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetSocialActionsPrametersTypes = new Type[] { typeof(SPListItem), typeof(GridGanttSettings), typeof(Dictionary<string, string>) };
+            const int parametersCount = 3;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetSocialActions, Fixture, methodGetSocialActionsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetSocialActionsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetWorkspaceActions) (Return Type : Tuple<string, string, string, string, bool>[]) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetWorkspaceActions_Method_Call_Internally(Type[] types)
+        {
+            var methodGetWorkspaceActionsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetWorkspaceActions, Fixture, methodGetWorkspaceActionsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetWorkspaceActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetWorkspaceActions_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var li = CreateType<SPListItem>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetWorkspaceActionsPrametersTypes = new Type[] { typeof(SPListItem), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetWorkspaceActions = { li, di };
+
+            // Assert
+            parametersOfGetWorkspaceActions.ShouldNotBeNull();
+            parametersOfGetWorkspaceActions.Length.ShouldBe(2);
+            methodGetWorkspaceActionsPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, Tuple<string, string, string, string, bool>[]>(_navigationServiceInstance, MethodGetWorkspaceActions, parametersOfGetWorkspaceActions, methodGetWorkspaceActionsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetWorkspaceActions) (Return Type : Tuple<string, string, string, string, bool>[]) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetWorkspaceActions_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetWorkspaceActionsPrametersTypes = new Type[] { typeof(SPListItem), typeof(Dictionary<string, string>) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetWorkspaceActions, Fixture, methodGetWorkspaceActionsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetWorkspaceActionsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetGeneralActions_Static_Method_Call_Internally(Type[] types)
+        {
+            var methodGetGeneralActionsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetGeneralActions, Fixture, methodGetGeneralActionsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetGeneralActions_Static_Method_Call_With_No_Exception_Thrown_Test()
+        {
+            // Arrange
+            var usePopup = CreateType<bool>();
+            var list = CreateType<SPList>();
+            var bfancyforms = CreateType<bool>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetGeneralActionsPrametersTypes = new Type[] { typeof(bool), typeof(SPList), typeof(bool), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetGeneralActions = { usePopup, list, bfancyforms, di };
+            Exception exception = null;
+            var methodInfo = GetMethodInfo(MethodGetGeneralActions, methodGetGeneralActionsPrametersTypes, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
+            parametersOfGetGeneralActions.ShouldNotBeNull();
+            parametersOfGetGeneralActions.Length.ShouldBe(4);
+            methodGetGeneralActionsPrametersTypes.Length.ShouldBe(4);
+            Should.NotThrow(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfGetGeneralActions));
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetGeneralActions_Static_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var usePopup = CreateType<bool>();
+            var list = CreateType<SPList>();
+            var bfancyforms = CreateType<bool>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetGeneralActionsPrametersTypes = new Type[] { typeof(bool), typeof(SPList), typeof(bool), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetGeneralActions = { usePopup, list, bfancyforms, di };
+
+            // Assert
+            parametersOfGetGeneralActions.ShouldNotBeNull();
+            parametersOfGetGeneralActions.Length.ShouldBe(4);
+            methodGetGeneralActionsPrametersTypes.Length.ShouldBe(4);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfStaticMethod<Tuple<string, string, string, string, bool>[]>(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetGeneralActions, parametersOfGetGeneralActions, methodGetGeneralActionsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetGeneralActions_Static_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetGeneralActionsPrametersTypes = new Type[] { typeof(bool), typeof(SPList), typeof(bool), typeof(Dictionary<string, string>) };
+            const int parametersCount = 4;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_navigationServiceInstanceFixture, _navigationServiceInstanceType, MethodGetGeneralActions, Fixture, methodGetGeneralActionsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetGeneralActionsPrametersTypes.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) without parameters value verify result should not be null.
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetGeneralActions_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
+        {
+            // Arrange
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodGetGeneralActions, 0);
+
+            // Act
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_navigationServiceInstanceFixture, Fixture, out exception);
+
+            // Assert
+            methodInfo.ShouldNotBeNull();
+            result.ShouldNotBeNull();
+        }
+
+        #endregion
+
+        #region Method Call : (GetGeneralActions) (Return Type : Tuple<string, string, string, string, bool>[]) Parameters Count verify
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetGeneralActions_Static_Method_Call_Parameters_Count_Verification_Test()
+        {
+            // Arrange
+            var methodInfo = GetMethodInfo(MethodGetGeneralActions, 0);
+            const int parametersCount = 4;
+
+            // Act
+            var parameters = methodInfo.GetParameters();
+
+            // Assert
+            parameters.Length.ShouldBe(parametersCount);
+        }
+
+        #endregion
+
+        #region Method Call : (GetPlannerActions) (Return Type : Tuple<string, string, string, string, bool>[]) private call definition
+
+        [ExcludeFromCodeCoverage]
+        private void AUT_NavigationService_GetPlannerActions_Method_Call_Internally(Type[] types)
+        {
+            var methodGetPlannerActionsPrametersTypes = types;
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetPlannerActions, Fixture, methodGetPlannerActionsPrametersTypes);
+        }
+
+        #endregion
+
+        #region Method Call : (GetPlannerActions) (Return Type : Tuple<string, string, string, string, bool>[]) No Exception with encapsulation Thrown
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetPlannerActions_Method_Call_With_Call_No_Exception_Thrown_With_Encapsulation_Test()
+        {
+            // Arrange
+            var list = CreateType<SPList>();
+            var di = CreateType<Dictionary<string, string>>();
+            var methodGetPlannerActionsPrametersTypes = new Type[] { typeof(SPList), typeof(Dictionary<string, string>) };
+            object[] parametersOfGetPlannerActions = { list, di };
+
+            // Assert
+            parametersOfGetPlannerActions.ShouldNotBeNull();
+            parametersOfGetPlannerActions.Length.ShouldBe(2);
+            methodGetPlannerActionsPrametersTypes.Length.ShouldBe(2);
+            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<NavigationService, Tuple<string, string, string, string, bool>[]>(_navigationServiceInstance, MethodGetPlannerActions, parametersOfGetPlannerActions, methodGetPlannerActionsPrametersTypes));
+        }
+
+        #endregion
+
+        #region Method Call : (GetPlannerActions) (Return Type : Tuple<string, string, string, string, bool>[]) Invoke Should Not Throw
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        public void AUT_NavigationService_GetPlannerActions_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
+        {
+            // Arrange
+            var methodGetPlannerActionsPrametersTypes = new Type[] { typeof(SPList), typeof(Dictionary<string, string>) };
+            const int parametersCount = 2;
+
+            // Act
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_navigationServiceInstance, MethodGetPlannerActions, Fixture, methodGetPlannerActionsPrametersTypes);
+
+            // Assert
+            Should.NotThrow(currentAction);
+            methodGetPlannerActionsPrametersTypes.Length.ShouldBe(parametersCount);
         }
 
         #endregion

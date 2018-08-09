@@ -34,7 +34,9 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		[LASTMODIFIEDBYU] [varchar](255) NULL,
 		[LASTMODIFIEDBYN] [varchar](255) NULL,
 		[TSUSER_UID] [uniqueidentifier] NULL,
-		[APPROVAL_DATE] datetime NULL,
+		[APPROVAL_DATE] [datetime] NULL,
+		[LastSubmittedByName] [varchar](255) NULL,
+		[LastSubmittedByUser] [varchar](255) NULL,
 		 CONSTRAINT [PK_TSTIMESHEET] PRIMARY KEY CLUSTERED 
 		(
 			[TS_UID] ASC
