@@ -12,11 +12,10 @@ export class OptimizerPageHelper {
 
     static async selectColumns(stepLogger: StepLogger) {
         const label = OptimizerPage.getSelectColumnsPopup;
-        stepLogger.stepId(3);
         stepLogger.step(`select columns by checking respective check box`);
         await PageHelper.click(label.hideAll);
         let i, j: number;
-        for ( i = 0; i < 3; i++) {
+        for ( i = 0; i < 7; i++) {
             await PageHelper.click(label.column.get(i));
         }
         // Getting the selected columns dynamically
@@ -263,5 +262,10 @@ export class OptimizerPageHelper {
         const label = OptimizerPage.getSelectColumnsPopup;
         await browser.sleep(PageHelper.timeout.xs);
         await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected' , stepLogger);
+    }
+
+    static async clickOKonSelectColumnPopup(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ok');
+        await PageHelper.click(OptimizerPage.getSelectColumnsPopup.ok);
     }
 }

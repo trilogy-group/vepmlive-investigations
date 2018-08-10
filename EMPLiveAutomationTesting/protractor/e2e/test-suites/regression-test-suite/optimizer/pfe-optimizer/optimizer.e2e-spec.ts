@@ -272,4 +272,27 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickShowAll(stepLogger);
         await OptimizerPageHelper.verifyAllColumnSelected(stepLogger);
     });
+
+    it('Verify that selected column should be displayed on View Management grid. - [744386]', async () => {
+        const stepLogger = new StepLogger(744386);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.clickViewTab(stepLogger);
+        await OptimizerPageHelper.verifyViewPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.clickSelectColumns(stepLogger);
+        const selectedColNames = await OptimizerPageHelper.selectColumns(stepLogger);
+        stepLogger.stepId(5);
+        await OptimizerPageHelper.clickOKonSelectColumnPopup(stepLogger);
+        await OptimizerPageHelper.verifyColumnNamesInGrid(selectedColNames, stepLogger);
+    });
 });
