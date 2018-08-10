@@ -209,7 +209,6 @@
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManagerTest.cs" />
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManagerTest.cs" />
     <Compile Include="Infrastructure\SessionManagerTest.cs" />
-    <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTest.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTest.cs" />
     <Compile Include="Infrastructure\WEFeaturesTest.cs" />
     <Compile Include="IntegrateEvents\IntegrateEventsTest.cs" />
