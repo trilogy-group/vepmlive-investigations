@@ -500,6 +500,5 @@ namespace EPMLiveCore
                 table.Rows[i].Dispose();
             }
         }
-        
     }
 }
