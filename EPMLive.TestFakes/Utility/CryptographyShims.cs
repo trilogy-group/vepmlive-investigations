@@ -21,6 +21,7 @@ namespace EPMLive.TestFakes.Utility
         public IList<DeriveBytes> DeriveBytesCreated { get; private set; }
         public IList<DeriveBytes> DeriveBytesDisposed { get; private set; }
         public IList<TestableCryptoTransform> EncryptorsCreated { get; private set; }
+        public IList<TestableCryptoTransform> DecryptorsCreated { get; private set; }
 
         private CryptographyShims()
         {
@@ -33,6 +34,7 @@ namespace EPMLive.TestFakes.Utility
             DeriveBytesCreated = new List<DeriveBytes>();
             DeriveBytesDisposed = new List<DeriveBytes>();
             EncryptorsCreated = new List<TestableCryptoTransform>();
+            DecryptorsCreated = new List<TestableCryptoTransform>();
         }
 
         public static CryptographyShims ShimCryptographyCalls()
@@ -50,6 +52,12 @@ namespace EPMLive.TestFakes.Utility
             {
                 var result = new TestableCryptoTransform();
                 EncryptorsCreated.Add(result);
+                return result;
+            };
+            ShimRijndaelManaged.AllInstances.CreateDecryptorByteArrayByteArray = (instance, a, b) =>
+            {
+                var result = new TestableCryptoTransform();
+                DecryptorsCreated.Add(result);
                 return result;
             };
 
@@ -73,6 +81,11 @@ namespace EPMLive.TestFakes.Utility
         public bool CheckIfAllEncryptorsDisposed()
         {
             return EncryptorsCreated.All(pred => pred.IsDisposed);
+        }
+
+        public bool CheckIfAllDecryptorsDisposed()
+        {
+            return DecryptorsCreated.All(pred => pred.IsDisposed);
         }
     }
 }

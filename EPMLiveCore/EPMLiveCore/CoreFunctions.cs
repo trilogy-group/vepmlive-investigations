@@ -3417,44 +3417,40 @@ namespace EPMLiveCore
         {
             try
             {
-                byte[] initVectorBytes = Encoding.ASCII.GetBytes("77B2c3D4e1F3g7R1");
-                byte[] saltValueBytes = Encoding.ASCII.GetBytes("f53fNDH@");
-                byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+                var initVectorBytes = Encoding.ASCII.GetBytes("77B2c3D4e1F3g7R1");
+                var saltValueBytes = Encoding.ASCII.GetBytes("f53fNDH@");
+                var cipherTextBytes = Convert.FromBase64String(cipherText);
+                byte[] keyBytes;
+                byte[] plainTextBytes;
+                int decryptedByteCount;
 
-                PasswordDeriveBytes password = new PasswordDeriveBytes(
-                                                                passPhrase,
-                                                                saltValueBytes,
-                                                                "SHA1",
-                                                                2);
+                using (var password = new PasswordDeriveBytes(passPhrase, saltValueBytes, "SHA1", 2))
+                {
+                    keyBytes = password.GetBytes(256 / 8);
+                }
 
-                byte[] keyBytes = password.GetBytes(256 / 8);
-
-                RijndaelManaged symmetricKey = new RijndaelManaged();
-                symmetricKey.Mode = CipherMode.CBC;
-                ICryptoTransform decryptor = symmetricKey.CreateDecryptor(
-                                                                 keyBytes,
-                                                                 initVectorBytes);
-
-                MemoryStream memoryStream = new MemoryStream(cipherTextBytes);
-
-                CryptoStream cryptoStream = new CryptoStream(memoryStream,
-                                                              decryptor,
-                                                              CryptoStreamMode.Read);
-
-                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-
-                int decryptedByteCount = cryptoStream.Read(plainTextBytes,
-                                                           0,
-                                                           plainTextBytes.Length);
-                memoryStream.Close();
-                cryptoStream.Close();
-
-                string plainText = Encoding.UTF8.GetString(plainTextBytes,
-                                                           0,
-                                                           decryptedByteCount);
-                return plainText;
+                using (var symmetricKey = new RijndaelManaged { Mode = CipherMode.CBC })
+                {
+                    using (var decryptor = symmetricKey.CreateDecryptor(keyBytes, initVectorBytes))
+                    {
+                        using (var memoryStream = new MemoryStream(cipherTextBytes))
+                        {
+                            using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                            {
+                                plainTextBytes = new byte[cipherTextBytes.Length];
+                                decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
+                            }
+                        }
+                    }
+                }
+                
+                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
             }
-            catch { return ""; }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                return string.Empty;
+            }
         }
 
         public static void deleteKey(string key)
