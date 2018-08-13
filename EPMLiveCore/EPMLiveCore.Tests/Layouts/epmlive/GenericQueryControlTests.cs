@@ -79,9 +79,9 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
 
             // Assert
             _testEntity.ShouldSatisfyAllConditions(
-                () => disposeCountOfWebControls.ShouldBe(1),            // 10
-                () => disposeCountOfHtmlSelect.ShouldBe(0),             // 1
-                () => disposeCountOfHtmlGenericControl.ShouldBe(0));    // 1
+                () => disposeCountOfWebControls.ShouldBe(10),
+                () => disposeCountOfHtmlSelect.ShouldBe(1),
+                () => disposeCountOfHtmlGenericControl.ShouldBe(1));
         }
 
         private void InitializeSharePoint()
