@@ -40,8 +40,16 @@ namespace EPMLive.TestFakes.Utility
         private void InitializeStaticShims()
         {
             ShimStream.Constructor = instance => StreamsCreated.Add(instance);
-            ShimStream.AllInstances.Dispose = instance => StreamsDisposed.Add(instance);
-            ShimStream.AllInstances.DisposeBoolean = (instance, flag) => StreamsDisposed.Add(instance);
+            ShimStream.AllInstances.Dispose = instance =>
+            {
+                instance.Flush();
+                StreamsDisposed.Add(instance);
+            };
+            ShimStream.AllInstances.DisposeBoolean = (instance, flag) =>
+            {
+                instance.Flush();
+                StreamsDisposed.Add(instance);
+            };
         }
     }
 }

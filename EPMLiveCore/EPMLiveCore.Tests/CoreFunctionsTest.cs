@@ -221,8 +221,8 @@ namespace EPMLiveCore.Tests
             var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
 
             // Assert
-            Assert.AreEqual(1, _cryptographyShims.CryptoStreamsCreated.Count);
-            Assert.IsTrue(_cryptographyShims.CheckIfAllCryptoStreamsDisposed());
+            Assert.IsTrue(_ioShims.StreamsCreated.OfType<CryptoStream>().Any());
+            Assert.IsTrue(_ioShims.StreamsDisposed.OfType<CryptoStream>().Any());
         }
 
         [TestMethod]
@@ -233,6 +233,17 @@ namespace EPMLiveCore.Tests
 
             // Assert
             Assert.IsTrue(_ioShims.StreamsDisposed.OfType<MemoryStream>().Any());
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_EncryptorManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.EncryptorsCreated.Count);
+            Assert.IsTrue(_cryptographyShims.CheckIfAllEncryptorsDisposed());
         }
     }
 }

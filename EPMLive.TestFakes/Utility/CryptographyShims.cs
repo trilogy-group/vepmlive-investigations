@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Fakes;
+using EPMLive.TestFakes.Testables;
 
 namespace EPMLive.TestFakes.Utility
 {
@@ -14,12 +15,12 @@ namespace EPMLive.TestFakes.Utility
         // (CC-75592, 2018-08-13) Some of the types from mscorlib can not be shimmed, if project is not targeting latest .NET Framework version
         // https://blogs.msdn.microsoft.com/harshjain/2016/12/29/generating-fakes-assembly-for-system-dll-for-test-project/
         // Which prevents of from mocking certain types and interfaces like ICryptoTransform
-
+        
         public IList<RijndaelManaged> RijndaelManagedCreated { get; private set; }
         public IList<SymmetricAlgorithm> SymmetricAlgorithmsDisposed { get; private set; }
         public IList<DeriveBytes> DeriveBytesCreated { get; private set; }
         public IList<DeriveBytes> DeriveBytesDisposed { get; private set; }
-        public IList<CryptoStream> CryptoStreamsCreated { get; private set; }
+        public IList<TestableCryptoTransform> EncryptorsCreated { get; private set; }
 
         private CryptographyShims()
         {
@@ -31,7 +32,7 @@ namespace EPMLive.TestFakes.Utility
             SymmetricAlgorithmsDisposed = new List<SymmetricAlgorithm>();
             DeriveBytesCreated = new List<DeriveBytes>();
             DeriveBytesDisposed = new List<DeriveBytes>();
-            CryptoStreamsCreated = new List<CryptoStream>();
+            EncryptorsCreated = new List<TestableCryptoTransform>();
         }
 
         public static CryptographyShims ShimCryptographyCalls()
@@ -45,13 +46,18 @@ namespace EPMLive.TestFakes.Utility
         private void InitializeStaticShims()
         {
             ShimRijndaelManaged.Constructor = instance => RijndaelManagedCreated.Add(instance);
+            ShimRijndaelManaged.AllInstances.CreateEncryptorByteArrayByteArray = (instance, a, b) =>
+            {
+                var result = new TestableCryptoTransform();
+                EncryptorsCreated.Add(result);
+                return result;
+            };
+
             ShimSymmetricAlgorithm.AllInstances.Dispose = instance => SymmetricAlgorithmsDisposed.Add(instance);
             ShimSymmetricAlgorithm.AllInstances.DisposeBoolean = (instance, flag) => SymmetricAlgorithmsDisposed.Add(instance);
-
+            
             ShimDeriveBytes.Constructor = instance => DeriveBytesCreated.Add(instance);
             ShimDeriveBytes.AllInstances.Dispose = instance => DeriveBytesDisposed.Add(instance);
-
-            ShimCryptoStream.ConstructorStreamICryptoTransformCryptoStreamMode = (instance, a, b, c) => CryptoStreamsCreated.Add(instance);
         }
 
         public bool CheckIfAllRijindaelManagedDisposed()
@@ -64,9 +70,9 @@ namespace EPMLive.TestFakes.Utility
             return DeriveBytesCreated.All(pred => DeriveBytesDisposed.Contains(pred));
         }
 
-        public bool CheckIfAllCryptoStreamsDisposed()
+        public bool CheckIfAllEncryptorsDisposed()
         {
-            return CryptoStreamsCreated.All(pred => IOShims.Instance.StreamsDisposed.Contains(pred));
+            return EncryptorsCreated.All(pred => pred.IsDisposed);
         }
     }
 }
