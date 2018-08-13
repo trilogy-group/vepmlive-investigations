@@ -9,7 +9,7 @@ namespace EPMLive.TestFakes.Utility
         private static IOShims _instance;
         public static IOShims Instance
         {
-            get { return _instance ?? (_instance = ShimIO()); }
+            get { return _instance ?? (_instance = ShimIOCalls()); }
         }
 
         public ShimStream StreamShim { get; private set; }
@@ -29,7 +29,7 @@ namespace EPMLive.TestFakes.Utility
             StreamsDisposed = new List<Stream>();
         }
 
-        public static IOShims ShimIO()
+        public static IOShims ShimIOCalls()
         {
             var result = new IOShims();
             result.InitializeStaticShims();

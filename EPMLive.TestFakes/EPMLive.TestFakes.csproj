@@ -83,6 +83,7 @@
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>

@@ -64,7 +64,7 @@ namespace EPMLive.TestFakes.Utility
             return DeriveBytesCreated.All(pred => DeriveBytesDisposed.Contains(pred));
         }
 
-        public bool CheckIfAllCryptoStreamsdDisposed()
+        public bool CheckIfAllCryptoStreamsDisposed()
         {
             return CryptoStreamsCreated.All(pred => IOShims.Instance.StreamsDisposed.Contains(pred));
         }
