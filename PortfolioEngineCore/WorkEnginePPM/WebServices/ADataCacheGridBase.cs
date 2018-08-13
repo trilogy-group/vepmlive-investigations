@@ -7,6 +7,10 @@ using PortfolioEngineCore;
 
 internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBase<TPeriodData, TDetailRowData>
 {
+
+    protected CStruct DefinitionRight;
+    protected CStruct DefinitionLeaf;
+
     protected abstract int CalculateInternalPeriodMin(TDetailRowData resxData);
 
     protected abstract int CalculateInternalPeriodMax(TDetailRowData resxData);
@@ -59,6 +63,36 @@ internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBa
     }
 
     protected override int DetailRowIdBase => 1;
+
+    protected void InitializePeriodHeatMapColumn(
+        string periodId, 
+        string periodName, 
+        bool setFormulaForDefinitionRight, 
+        string sumFunc)
+    {
+        var prefix = "P" + periodId + "H";
+
+        Header1.CreateStringAttr(prefix, periodName + "\nHeatMap");
+
+        var column = CreateColumn(PeriodCols, prefix, "Float",
+            visible: false,
+            canMove: false,
+            canResize: null,
+            canFilter: null);
+
+        column.CreateStringAttr("Format", ",0.##");
+        column.CreateStringAttr("Align", "Right");
+        column.CreateIntAttr("MinWidth", 45);
+        column.CreateIntAttr("Width", 65);
+
+        if (setFormulaForDefinitionRight)
+        {
+            DefinitionRight.CreateStringAttr(prefix + "Formula", sumFunc);
+            DefinitionRight.CreateStringAttr(prefix + "Format", ",#.##");
+        }
+
+        DefinitionLeaf.CreateStringAttr(prefix + "Formula", string.Empty);
+    }
 
     private void CreateIntAttributeFromBoolNullable(CStruct column, string attributeName, bool? value)
     {

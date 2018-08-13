@@ -22,8 +22,6 @@ namespace RPADataCache
         protected readonly clsResourceValues _resourceValues;
         protected readonly clsLookupList _categoryLookupList;
 
-        protected CStruct DefinitionRight;
-        protected CStruct DefinitionLeaf;
         protected CStruct MiddleCols;
 
         public RPADataCacheGridBase(

@@ -14,12 +14,15 @@ namespace RPADataCache
     {
         private readonly bool _isLayoutByRole;
         private readonly string _roleHeader;
+        private readonly bool _useHeatMap;
+        private readonly int _mode;
 
         protected CStruct DefinitionPI;
 
         public RPABottomGrid(
             bool isLayoutByRole,
             string roleHeader,
+            bool useHeatMap,
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
             string xmlString, 
@@ -31,6 +34,7 @@ namespace RPADataCache
         {
             _isLayoutByRole = isLayoutByRole;
             _roleHeader = roleHeader;
+            _useHeatMap = useHeatMap;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -201,12 +205,130 @@ namespace RPADataCache
 
         protected override string ResolvePeriodId(CPeriod periodData, int index)
         {
-            throw new NotImplementedException();
+            return periodData.PeriodID.ToString();
         }
 
         protected override void AddPeriodColumns(IEnumerable<CPeriod> periods)
         {
-            throw new NotImplementedException();
+            var index = 0;
+            foreach (var period in periods)
+            {
+                var periodId = ResolvePeriodId(period, index++);
+                var periodName = period.PeriodName;
+
+                const string sumFunc = "(Row.id == 'Filter' ? '' : sum())";
+                const string maxFunc = "(Row.id == 'Filter' ? '' : max())";
+                const string minFunc = "(Row.id == 'Filter' ? '' : min())";
+
+                var span = _displayList.Count;
+                if (_useHeatMap)
+                {
+                    InitializePeriodHeatMapColumn(periodId, periodName, _mode != 3, sumFunc);
+                    span *= 2;
+                }
+
+                var counter = 0;
+                foreach (var displayRow in _displayList)
+                {
+                    try
+                    {
+                        counter++;
+                        var prefix = $"P{periodId}C{counter}";
+                        if (counter == 1)
+                        {
+                            if (_displayList.Count > 1)
+                            {
+                                Header1.CreateIntAttr($"P{periodId}C1Span", span);
+                            }
+
+                            Header1.CreateStringAttr(prefix, periodName);
+
+                            var xC = CreateColumn(
+                                PeriodCols,
+                                prefix,
+                                "Float",
+                                canMove: false,
+                                canResize: null,
+                                canFilter: null);
+                            xC.CreateStringAttr("Format", ",0.##");
+                            xC.CreateStringAttr("Align", "Right");
+
+                            if (_useHeatMap)
+                            {
+                                Header1.CreateStringAttr($"X{periodId}C{counter}", GlobalConstants.Whitespace);
+                                Header1.CreateStringAttr($"Y{periodId}C{counter}", GlobalConstants.Whitespace);
+                                Header2.CreateStringAttr($"X{periodId}C{counter}", periodName + displayRow.Name + "HeatMap");
+                                Header2.CreateStringAttr($"Y{periodId}C{counter}", periodName + displayRow.Name + "HeatMap");
+
+                                xC = CreateColumn(
+                                    PeriodCols,
+                                    $"X{periodId}C{counter}",
+                                    "Float",
+                                    visible: false,
+                                    canMove: false,
+                                    canResize: null,
+                                    canFilter: null);
+                                xC.CreateStringAttr("Format", ",0.##");
+                                xC.CreateStringAttr("Align", "Right");
+                                
+                                xC = CreateColumn(
+                                    PeriodCols,
+                                    $"Y{periodId}C{counter}",
+                                    "Float",
+                                    visible: false,
+                                    canMove: false,
+                                    canResize: null,
+                                    canFilter: null);
+                                xC.CreateStringAttr("Format", ",0.##");
+                                xC.CreateStringAttr("Align", "Right");
+                            }
+
+                            if (_mode != 3)
+                            {
+                                if (_useHeatMap)
+                                {
+                                    DefinitionRight.CreateStringAttr($"X{periodId}C{counter}Format", "##");
+                                    DefinitionRight.CreateStringAttr($"X{periodId}C{counter}Formula", maxFunc);
+                                    DefinitionRight.CreateStringAttr($"Y{periodId}C{counter}Format", "##");
+                                    DefinitionRight.CreateStringAttr($"Y{periodId}C{counter}Formula", minFunc);
+                                }
+
+                                DefinitionRight.CreateStringAttr($"P{periodId}C{counter}Format", "##");
+                                DefinitionRight.CreateStringAttr($"P{periodId}C{counter}Formula", sumFunc);
+                            }
+
+                            if (_useHeatMap)
+                            {
+                                DefinitionLeaf.CreateStringAttr($"X{periodId}C{counter}Formula", string.Empty);
+                                DefinitionLeaf.CreateStringAttr($"Y{periodId}C{counter}Formula", string.Empty);
+                                DefinitionPI.CreateStringAttr($"X{periodId}C{counter}Formula", string.Empty);
+                                DefinitionPI.CreateStringAttr($"Y{periodId}C{counter}Formula", string.Empty);
+                            }
+
+                            DefinitionLeaf.CreateStringAttr($"P{periodId}C{counter}Formula", string.Empty);
+                            DefinitionPI.CreateStringAttr($"P{periodId}C{counter}Formula", string.Empty);
+
+                            xC.CreateIntAttr("MinWidth", 45);
+                            xC.CreateIntAttr("Width", 65);
+                        }
+                        else
+                        {
+                            Header1.CreateStringAttr(prefix, GlobalConstants.Whitespace);
+                        }
+
+                        Header2.CreateStringAttr(prefix, displayRow.Name);
+                        Header2.CreateStringAttr(prefix + "SortIcons", "0");
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(
+                          Area.EPMLiveWorkEnginePPM,
+                          Categories.EPMLiveWorkEnginePPM.Others,
+                          TraceSeverity.VerboseEx,
+                          ex.ToString());
+                    }
+                }
+            }
         }
 
         protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
