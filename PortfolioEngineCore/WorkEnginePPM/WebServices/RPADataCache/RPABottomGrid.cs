@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using PortfolioEngineCore;
 using ResourceValues;
 
 namespace RPADataCache
 {
     internal class RPABottomGrid : RPADataCacheGridBase
     {
+        protected CStruct DefinitionPI;
+
         public RPABottomGrid(
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
@@ -40,6 +43,16 @@ namespace RPADataCache
             var xCfg = InitializeGridLayoutConfig("ResOrRole", 1, 0, 400, 400);
             xCfg.CreateIntAttr("ConstHeight", 1);
             xCfg.CreateIntAttr("LeftCanResize", 0);
+
+            var xLeftCols = Constructor.CreateSubStruct("LeftCols");
+            var xCols = Constructor.CreateSubStruct("Cols");
+            var xRightCols = Constructor.CreateSubStruct("RightCols");
+            PeriodCols = xRightCols;
+
+            var m_xDef = Constructor.CreateSubStruct("Def");
+            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef, true);
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef, false);
+            DefinitionPI = InitializeGridLayoutDefinition("Leaf", m_xDef, false);
         }
 
         protected override string ResolvePeriodId(CPeriod periodData, int index)

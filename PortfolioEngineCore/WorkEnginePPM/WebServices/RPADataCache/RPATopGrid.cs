@@ -67,12 +67,8 @@ namespace RPADataCache
             MiddleCols = xCols;
 
             var m_xDef = Constructor.CreateSubStruct("Def");
-
-            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef);
-            DefinitionRight.CreateStringAttr("Calculated", "1");
-
-            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef);
-            DefinitionLeaf.CreateStringAttr("Calculated", "0");
+            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef, true);
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef, false);
             
             var xHead = Constructor.CreateSubStruct("Head");
             var xFilter = xHead.CreateSubStruct("Filter");
