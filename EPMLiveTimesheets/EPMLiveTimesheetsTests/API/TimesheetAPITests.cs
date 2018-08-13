@@ -1,26 +1,46 @@
-﻿using EPMLiveCore.Fakes;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.SqlClient.Fakes;
+using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportingProxy.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlClient.Fakes;
+using EPMLive.TestFakes.Utility;
+using Microsoft.QualityTools.Testing.Fakes;
 
 namespace TimeSheets.Tests
 {
     [TestClass()]
-    public class TimesheetAPITests
+    public partial class TimesheetAPITests
     {
+        private IDisposable _shimsContext;
+        private SharepointShims _sharepointShims;
+        private AdoShims _adoShims;
+
         private class TestRoleChecker : ISPRoleChecker
         {
             public bool ContainsRole(SPWeb web, string roleName)
             {
                 return false;
             }
+        }
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _shimsContext = ShimsContext.Create();
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
+        }
+
+        [TestCleanup]
+        public void Teardown()
+        {
+            _shimsContext?.Dispose();
         }
 
         [TestMethod()]

@@ -125,6 +125,9 @@ namespace EPMLive.TestFakes.Utility
             {
                 ConnectionsOpened.Add(instance);
             };
+            ShimSqlConnection.AllInstances.Close = instance =>
+            {
+            };
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
             {
                 instance.CommandText = commandText;

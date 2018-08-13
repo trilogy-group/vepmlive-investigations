@@ -1,21 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using Microsoft.SharePoint;
-using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using System.Data;
-using System.Collections;
-using EPMLiveCore.ReportingProxy;
-using System.Globalization;
 using EPMLiveCore.API;
-using TimeSheets.Models;
-using System.ComponentModel;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 using TimeSheets.Log;
-using System.Transactions;
-using System.Text.RegularExpressions;
+using TimeSheets.Models;
+using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
 
 namespace TimeSheets
 {
@@ -463,90 +462,111 @@ namespace TimeSheets
         {
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
+                var tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var message = string.Empty;
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                int userid = 0;
-
-                if (dr.Read())
-                {
-                    userid = dr.GetInt32(0);
-                }
-                dr.Close();
-
-                string message = "";
-
-                if (userid != 0)
-                {
-
-
-                    SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
-
-                    if (user.ID != userid)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        message = "<UnSubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        connection = new SqlConnection(
+                            EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
+
+                    var userid = 0;
+                    using (var command = new SqlCommand(
+                        "SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER " +
+                        "INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
+                        " WHERE TS_UID=@tsuid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                userid = reader.GetInt32(0);
+                            }
+                            reader.Close();
+                        }
                     }
-                    else
+
+                    if (userid != 0)
                     {
-                        TimesheetSettings settings = new TimesheetSettings(oWeb);
+                        var user = GetUser(oWeb, userid.ToString());
 
-                        cmd = new SqlCommand("SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        bool bLocked = false;
-                        int approval = 0;
-                        dr = cmd.ExecuteReader();
-                        if (dr.Read())
+                        if (user.ID != userid)
                         {
-                            bLocked = dr.GetBoolean(0);
-                            approval = dr.GetInt32(1);
-                        }
-                        dr.Close();
-
-                        if (bLocked)
-                        {
-                            message = "<UnSubmitTimesheet Status=\"4\">That timesheet is locked.</UnSubmitTimesheet>";
-                        }
-                        else if (approval == 1 && !settings.DisableApprovals)
-                        {
-                            message = "<UnSubmitTimesheet Status=\"3\">That timesheet has already been approved.</UnSubmitTimesheet>";
+                            message = 
+                                "<UnSubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
                         }
                         else
                         {
+                            var settings = new TimesheetSettings(oWeb);
+                            var bLocked = false;
+                            var approval = 0;
+                            using (var command = new SqlCommand(
+                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", 
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    if (reader.Read())
+                                    {
+                                        bLocked = reader.GetBoolean(0);
+                                        approval = reader.GetInt32(1);
+                                    }
+                                    reader.Close();
+                                }
+                            }
 
-                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
-                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                            cmd.ExecuteNonQuery();
+                            if (bLocked)
+                            {
+                                message = "<UnSubmitTimesheet Status=\"4\">That timesheet is locked.</UnSubmitTimesheet>";
+                            }
+                            else if (approval == 1 && !settings.DisableApprovals)
+                            {
+                                message = "<UnSubmitTimesheet Status=\"3\">That timesheet has already been approved.</UnSubmitTimesheet>";
+                            }
+                            else
+                            {
+                                using (var command = new SqlCommand(
+                                    "Update TSTIMESHEET set " +
+                                    "submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name " +
+                                    "where TS_UID=@tsuid",
+                                    connection))
+                                {
+                                    command.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
+                                    command.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.ExecuteNonQuery();
+                                }
 
-                            message = "<UnSubmitTimesheet Status=\"0\"></UnSubmitTimesheet>";
+                                message = "<UnSubmitTimesheet Status=\"0\"></UnSubmitTimesheet>";
+                            }
                         }
                     }
+                    else
+                    {
+                        message = "<UnSubmitTimesheet Status=\"2\">Invalid user found for timesheet.</UnSubmitTimesheet>";
+                    }
                 }
-                else
-                    message = "<UnSubmitTimesheet Status=\"2\">Invalid user found for timesheet.</UnSubmitTimesheet>";
-
-                cn.Close();
+                finally
+                {
+                    connection.Dispose();
+                }
 
                 return message;
             }
             catch (Exception ex)
             {
-                return "<UnSubmitTimesheet Status=\"1\">Error: " + ex.Message + "</UnSubmitTimesheet>";
+                return $"<UnSubmitTimesheet Status=\"1\">Error: {ex.Message}</UnSubmitTimesheet>";
             }
         }
 
