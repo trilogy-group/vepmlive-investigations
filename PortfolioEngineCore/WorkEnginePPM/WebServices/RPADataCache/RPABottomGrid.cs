@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using CostDataValues;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure.Logging;
 using Microsoft.SharePoint.Administration;
@@ -14,9 +16,20 @@ namespace RPADataCache
     {
         private readonly bool _isLayoutByRole;
         private readonly string _roleHeader;
-        private readonly bool _useHeatMap;
+        private readonly int _heatFieldColor;
         private readonly int _mode;
-
+        private readonly bool _useHeatMap;
+        private readonly int _heatMapId;
+        private readonly int _heatMapColor;
+        private readonly IList<clsViewTargetColours> _targetColors;
+        private readonly bool _doZeroRowCleverStuff;
+        private readonly NumberFormatInfo _numberFormat = new NumberFormatInfo
+        {
+            NumberDecimalSeparator = ".",
+            NumberGroupSeparator = ",",
+            NumberGroupSizes = new int[] { 3 }
+        };
+        
         protected CStruct DefinitionPI;
 
         public RPABottomGrid(
@@ -333,7 +346,37 @@ namespace RPADataCache
 
         protected override bool CheckIfDetailRowShouldBeAdded(clsResFullDAta detailRow)
         {
-            throw new NotImplementedException();
+            if (_doZeroRowCleverStuff)
+            {
+                if (_displayList.Count != 0)
+                {
+                    for (var i = 0; i < Periods.Count; i++)
+                    {
+                        try
+                        {
+                            foreach (var displayRow in _displayList)
+                            {
+                                if (GetDataValue(detailRow, displayRow.fid, _mode,  i, false, _useHeatMap ? _heatMapId : 0) != 0)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            WriteTrace(
+                                Area.EPMLiveWorkEnginePPM,
+                                Categories.EPMLiveWorkEnginePPM.Others,
+                                TraceSeverity.VerboseEx,
+                                ex.ToString());
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         protected override void AddDetailRow(clsResFullDAta detailRowData, int rowId)
@@ -354,6 +397,482 @@ namespace RPADataCache
         protected override void InitializeGridData(GridRenderingTypes renderingType)
         {
             throw new NotImplementedException();
+        }
+
+        private double GetDataValue(clsResFullDAta oDet, int fid, int iMode, int i, bool bForHeatmap, int iHeatmapID)
+        {
+            double retval = 0;
+            double vval = 0;
+            double fval = 0;
+
+            if (fid == 0)
+            {
+                vval = oDet.tot_Totals.getvarr(i);
+                fval = oDet.tot_Totals.getftarr(i);
+            }
+            else if (fid == -1)
+            {
+                vval = oDet.tot_actual.getvarr(i);
+                fval = oDet.tot_actual.getftarr(i);
+            }
+            else if (fid == -2)
+            {
+                vval = oDet.tot_proposal.getvarr(i);
+                fval = oDet.tot_proposal.getftarr(i);
+            }
+            else if (fid == -3)
+            {
+                vval = oDet.tot_scheduled.getvarr(i);
+                fval = oDet.tot_scheduled.getftarr(i);
+            }
+            else if (fid == -4)
+            {
+                vval = oDet.tot_committed.getvarr(i);
+                fval = oDet.tot_committed.getftarr(i);
+            }
+            else if (fid == -5)
+            {
+                vval = oDet.tot_personel.getvarr(i);
+                fval = oDet.tot_personel.getftarr(i);
+            }
+            else if (fid == -6)
+            {
+                vval = oDet.tot_avail.getvarr(i);
+                fval = oDet.tot_avail.getftarr(i);
+            }
+            else if (fid == -7)
+            {
+                if (bForHeatmap)
+                {
+                    vval = oDet.tot_Totals.getvarr(i);
+                    fval = oDet.tot_Totals.getftarr(i);
+                }
+                else
+                {
+                    vval = oDet.tot_avail.getvarr(i) - oDet.tot_Totals.getvarr(i);
+                    fval = oDet.tot_avail.getftarr(i) - oDet.tot_Totals.getftarr(i);
+                }
+            }
+            else if (fid == -8)
+            {
+                if (iHeatmapID == 0 || iHeatmapID > oDet.CapScen.Count)
+                {
+                    vval = -oDet.tot_Totals.getvarr(i);
+                    fval = -oDet.tot_Totals.getftarr(i);
+                }
+                else if (iHeatmapID <= -1 && iHeatmapID >= -6)
+                {
+                    if (iHeatmapID == -1)
+                    {
+                        vval = oDet.tot_actual.getvarr(i);
+                        fval = oDet.tot_actual.getftarr(i);
+                    }
+                    else if (iHeatmapID == -2)
+                    {
+                        vval = oDet.tot_proposal.getvarr(i);
+                        fval = oDet.tot_proposal.getftarr(i);
+                    }
+                    else if (iHeatmapID == -3)
+                    {
+                        vval = oDet.tot_scheduled.getvarr(i);
+                        fval = oDet.tot_scheduled.getftarr(i);
+                    }
+                    else if (iHeatmapID == -4)
+                    {
+                        vval = oDet.tot_committed.getvarr(i);
+                        fval = oDet.tot_committed.getftarr(i);
+                    }
+                    else if (iHeatmapID == -5)
+                    {
+                        vval = oDet.tot_personel.getvarr(i);
+                        fval = oDet.tot_personel.getftarr(i);
+                    }
+                    else if (iHeatmapID == -6)
+                    {
+                        vval = oDet.tot_avail.getvarr(i);
+                        fval = oDet.tot_avail.getftarr(i);
+                    }
+
+                    vval -= oDet.tot_Totals.getvarr(i);
+                    fval -= oDet.tot_Totals.getftarr(i);
+                }
+
+                else if (bForHeatmap)
+                {
+                    vval = oDet.tot_Totals.getvarr(i);
+                    fval = oDet.tot_Totals.getftarr(i);
+                }
+                else
+                {
+                    vval = oDet.CapScen[iHeatmapID - 1].getvarr(i) - oDet.tot_Totals.getvarr(i);
+                    fval = oDet.CapScen[iHeatmapID - 1].getftarr(i) - oDet.tot_Totals.getftarr(i);
+                }
+            }
+            else if (fid > 0 && fid <= oDet.CapScen.Count)
+            {
+                vval = oDet.CapScen[fid - 1].getvarr(i);
+                fval = oDet.CapScen[fid - 1].getftarr(i);
+            }
+
+            if (iMode == 3)
+            {
+                if (fval == 0)
+                    retval = 0;
+                else
+                    retval = (vval * 100) / fval;
+            }
+            else if (iMode == 0)
+                retval = vval;
+            else
+                retval = fval;
+
+            if (iMode == 1)
+                retval /= 100;
+
+            return retval;
+        }
+
+        private double GetPIDataValue(clsResXData oDet, int iMode, int i)
+        {
+            double retval = 0;
+            double vval = 0;
+            double fval = 0;
+
+
+            vval = oDet.getvarr(i);
+            fval = oDet.getftarr(i);
+
+            if (iMode == 3)
+            {
+                if (fval == 0)
+                    retval = 0;
+                else
+                    retval = (vval * 100) / fval;
+            }
+            else if (iMode == 0)
+                retval = vval;
+            else
+                retval = fval;
+
+
+
+            if (iMode == 1)
+                retval /= 100;
+
+            return retval;
+        }
+
+        private double GetPIDataValue(clsResFullDAta oFullData, clsResXData oDet, int iMode, int i, int fid, int idx, bool bUseHeatmap, int iHeatMapID, int projectId, bool byRole)
+        {
+            //All the calculation performd for Show Totals section is based on following link:
+            //https://upland.screenstepslive.com/s/EPMLive2013/m/UserGuide/l/147531-how-do-i-use-the-total-column-feature-within-the-resource-analyzer
+            double retval = 0;
+            double vval = 0;
+            double fval = 0;
+
+            try
+            {
+                if (fid == 0)
+                {
+                    vval = oDet.getvarr(i);
+                    fval = oDet.getftarr(i);
+                }
+                else if (fid == -1)
+                {
+                    //Actual Work equals Timesheet Actuals entered.
+                    if (oFullData.actual.Count > 0)
+                    {
+                        idx = -1;
+                        if (byRole)
+                        {
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                            {
+                                if (oFullData.actual[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                            {
+                                if (oFullData.actual[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -2)
+                {
+                    //Proposed Work equals resource planned work that has not yet been committed.
+                    if (oFullData.proposal.Count > 0)
+                    {
+                        idx = -1;
+                        if (byRole)
+                        {
+                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
+                            {
+                                if (oFullData.proposal[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
+                            {
+                                if (oFullData.proposal[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -3)
+                {
+                    //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
+                        {
+                            if (oFullData.scheduled[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.scheduled.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
+                            {
+                                if (oFullData.scheduled[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -4)
+                {
+                    //Committed Work equals the hours in resource plans that have been committed.
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.committed.Count; counter++)
+                        {
+                            if (oFullData.committed[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.committed.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.committed.Count; counter++)
+                            {
+                                if (oFullData.committed[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -5)
+                {
+                    //Personal Time Off pulls in the hours entered into the Time Off Requests.
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.personel.Count; counter++)
+                        {
+                            if (oFullData.personel[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.personel.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.personel.Count; counter++)
+                            {
+                                if (oFullData.personel[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -6)
+                {
+                    //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
+                    //It is important to note that this is resource specific based on each resource’s work hours schedule.
+                    vval = oFullData.tot_avail.getvarr(i);
+                    fval = oFullData.tot_avail.getftarr(i);
+                }
+                else if (fid == -7)
+                {
+                    //Remaining Availability equals Availability minus any committed and scheduled work.
+                    double totWrkHrs = 0, totFTEHrs = 0;
+                    double avlWrkHrs = 0, avlFTEHrs = 0;
+
+                    if (oDet.ProjectID == projectId)
+                    {
+                        if (byRole)
+                        {
+                            avlWrkHrs = oFullData.tot_avail.getvarr(i);
+                            avlFTEHrs = oFullData.tot_avail.getftarr(i);
+                        }
+                        else
+                        {
+                            if (oFullData.avail.Count > 0)
+                            {
+                                idx = 0;
+                                for (int counter = 0; counter < oFullData.avail.Count; counter++)
+                                {
+                                    if (oFullData.avail[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    avlWrkHrs = avlFTEHrs = 0;
+                                }
+                                else
+                                {
+                                    avlWrkHrs = Convert.ToDouble(oFullData.avail[idx].WrkHours[i]);
+                                    avlFTEHrs = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+
+                        totWrkHrs = oDet.getvarr(i);
+                        totFTEHrs = oDet.getftarr(i);
+
+                        vval = avlWrkHrs - totWrkHrs;
+                        fval = avlFTEHrs - totFTEHrs;
+                    }
+                }
+                else if (fid > 0 && fid <= oFullData.CapScen.Count)
+                {
+                    vval = oFullData.CapScen[fid - 1].getvarr(i);
+                    fval = oFullData.CapScen[fid - 1].getftarr(i);
+                }
+
+                if (iMode == 3)
+                {
+                    if (fval == 0)
+                        retval = 0;
+                    else
+                        retval = (vval * 100) / fval;
+                }
+                else if (iMode == 0)
+                    retval = vval;
+                else
+                    retval = fval;
+
+                if (iMode == 1)
+                    retval /= 100;
+
+                return retval;
+            }
+            catch { return 0; }
         }
     }
 }
