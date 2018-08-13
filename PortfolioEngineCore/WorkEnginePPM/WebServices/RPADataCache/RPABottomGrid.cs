@@ -20,7 +20,26 @@ namespace RPADataCache
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
         {
-            throw new NotImplementedException();
+            if (renderingType == GridRenderingTypes.None)
+            {
+                throw new ArgumentException("renderingType");
+            }
+
+            var xToolbar = Constructor.CreateSubStruct("Toolbar");
+            xToolbar.CreateIntAttr("Visible", 0);
+
+            var xMenuc = Constructor.CreateSubStruct("MenuCfg");
+
+            var xPanel = Constructor.CreateSubStruct("Panel");
+            xPanel.CreateIntAttr("Visible", 0);
+            xPanel.CreateIntAttr("Select", 0);
+            xPanel.CreateIntAttr("Delete", 0);
+            xPanel.CreateIntAttr("CanHide", 0);
+            xPanel.CreateIntAttr("CanSelect", 0);
+
+            var xCfg = InitializeGridLayoutConfig("ResOrRole", 1, 0, 400, 400);
+            xCfg.CreateIntAttr("ConstHeight", 1);
+            xCfg.CreateIntAttr("LeftCanResize", 0);
         }
 
         protected override string ResolvePeriodId(CPeriod periodData, int index)
