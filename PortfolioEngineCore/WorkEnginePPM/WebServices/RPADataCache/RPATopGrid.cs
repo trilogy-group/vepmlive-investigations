@@ -15,7 +15,7 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace RPADataCache
 {
-    internal class RPATopGrid : RPADataCacheGridBase
+    internal class RPATopGrid : RPADataCacheGridBase<Tuple<clsResXData, clsPIData>>
     {
         public RPATopGrid(
             IList<clsRXDisp> columns, 
@@ -480,6 +480,46 @@ namespace RPADataCache
             }
         }
 
+        protected override int CalculateInternalPeriodMax(Tuple<clsResXData, clsPIData> data)
+        {
+            for (int i = _resourceValues.Periods.Values.Count; i > 1; i--)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        var value = GetDetailRowValue(data.Item1, displayRow.fid, i);
+
+                        if (value != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        protected override int CalculateInternalPeriodMin(Tuple<clsResXData, clsPIData> data)
+        {
+            var i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                ++i;
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        var value = GetDetailRowValue(data.Item1, displayRow.fid, i);
+                        return i;
+                    }
+                }
+            }
+
+            return 0;
+        }
+
         private void ProcessDetailDataRowPeriod(CPeriod period, int i, clsResXData resxData, CStruct xI)
         {
             string cellval;
@@ -787,6 +827,66 @@ namespace RPADataCache
             }
 
             return true;
+        }
+
+        protected double GetDetailRowValue(clsResXData detailRowData, int fieldId, int i)
+        {
+            double result = 0;
+
+            if (fieldId == 0)
+            {
+                switch (_displayMode)
+                {
+                    case 3:
+                        try
+                        {
+                            if (detailRowData.getftarr(i) == 0)
+                            {
+                                result = 0;
+                            }
+                            else
+                            {
+                                result = detailRowData.getvarr(i) * 100;
+                                result /= detailRowData.getftarr(i);
+                                result = (int)result;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            result = 0;
+
+                            LoggingService.WriteTrace(
+                                Area.EPMLiveWorkEnginePPM,
+                                Categories.EPMLiveWorkEnginePPM.Others,
+                                TraceSeverity.VerboseEx,
+                                ex.ToString());
+                        }
+                        break;
+                    case 0:
+                        result = detailRowData.getvarr(i);
+                        break;
+                    default:
+                        result = detailRowData.getftarr(i);
+                        break;
+                }
+            }
+
+            if (fieldId == 1)
+            {
+                if (detailRowData.bRealone)
+                {
+                    result = _displayMode == 0
+                        ? detailRowData.getvarr(i)
+                        : detailRowData.getftarr(i);
+                }
+            }
+
+            if (_displayMode == 1)
+            {
+                result /= 100;
+            }
+
+            return result;
         }
 
         protected virtual string GetResourceAnalyzerView(string sXML)

@@ -10,7 +10,7 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace RPADataCache
 {
-    internal class RPABottomGrid : RPADataCacheGridBase
+    internal class RPABottomGrid : RPADataCacheGridBase<clsResFullDAta>
     {
         private readonly bool _isLayoutByRole;
         private readonly string _roleHeader;
@@ -331,12 +331,22 @@ namespace RPADataCache
             }
         }
 
-        protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
+        protected override bool CheckIfDetailRowShouldBeAdded(clsResFullDAta detailRow)
         {
             throw new NotImplementedException();
         }
 
-        protected override void AddDetailRow(Tuple<clsResXData, clsPIData> detailRowData, int rowId)
+        protected override void AddDetailRow(clsResFullDAta detailRowData, int rowId)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMin(clsResFullDAta resxData)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override int CalculateInternalPeriodMax(clsResFullDAta resxData)
         {
             throw new NotImplementedException();
         }
