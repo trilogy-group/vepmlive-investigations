@@ -3374,42 +3374,43 @@ namespace EPMLiveCore
 
         public static string Encrypt(string plainText, string passPhrase)
         {
-
             try
             {
-                byte[] initVectorBytes = Encoding.ASCII.GetBytes(initVector);
-                byte[] saltValueBytes = Encoding.ASCII.GetBytes(saltValue);
+                var initVectorBytes = Encoding.ASCII.GetBytes(initVector);
+                var saltValueBytes = Encoding.ASCII.GetBytes(saltValue);
+                var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+                byte[] keyBytes;
+                byte[] cipherTextBytes;
 
-                byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+                using (var password = new PasswordDeriveBytes(passPhrase, saltValueBytes, hashAlgorithm, passwordIterations))
+                {
+                    keyBytes = password.GetBytes(keySize / 8);
+                }
 
-                PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, saltValueBytes, hashAlgorithm, passwordIterations);
+                using (var symmetricKey = new RijndaelManaged())
+                {
+                    symmetricKey.Mode = CipherMode.CBC;
+                    using (var encryptor = symmetricKey.CreateEncryptor(keyBytes, initVectorBytes))
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                            {
+                                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+                                cryptoStream.FlushFinalBlock();
+                                cipherTextBytes = memoryStream.ToArray();
+                            }
+                        }
+                    }
+                }
 
-                byte[] keyBytes = password.GetBytes(keySize / 8);
-
-                RijndaelManaged symmetricKey = new RijndaelManaged();
-
-                symmetricKey.Mode = CipherMode.CBC;
-
-                ICryptoTransform encryptor = symmetricKey.CreateEncryptor(
-                                                                 keyBytes,
-                                                                 initVectorBytes);
-                MemoryStream memoryStream = new MemoryStream();
-
-                CryptoStream cryptoStream = new CryptoStream(memoryStream,
-                                                             encryptor,
-                                                             CryptoStreamMode.Write);
-
-                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
-
-                cryptoStream.FlushFinalBlock();
-
-                byte[] cipherTextBytes = memoryStream.ToArray();
-                memoryStream.Close();
-                cryptoStream.Close();
-                string cipherText = Convert.ToBase64String(cipherTextBytes);
-                return cipherText;
+                return Convert.ToBase64String(cipherTextBytes);
             }
-            catch { return ""; }
+            catch(Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                return string.Empty;
+            }
         }
 
         public static string Decrypt(string cipherText, string passPhrase)
