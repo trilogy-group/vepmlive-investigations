@@ -86,11 +86,11 @@ namespace RPADataCache
             var xSolid = Constructor.CreateSubStruct("Solid");
             var xGroup = xSolid.CreateSubStruct("Group");
 
-            foreach (clsRXDisp col in _columns)
+            foreach (var column in _columns)
             {
-                if (col.m_id != RPConstants.TGRID_GRP_ID)
+                if (column.m_id != RPConstants.TGRID_GRP_ID)
                 {
-                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, categoryColumn, col);
+                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, categoryColumn, column);
                 }
             }
         }
@@ -270,7 +270,7 @@ namespace RPADataCache
             Header1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
             yield return categoryColumn;
 
-            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Type",
+            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Icon",
                 width: 20,
                 canEdit: false,
                 canMove: false,
