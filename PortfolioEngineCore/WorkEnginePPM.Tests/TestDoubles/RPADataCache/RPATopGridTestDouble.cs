@@ -24,9 +24,8 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             string xmlString,
             int displayMode,
             IList<RPATGRow> displayList,
-            clsResourceValues resourceValues,
-            clsLookupList categoryLookupList) 
-        : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
+            clsResourceValues resourceValues) 
+        : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues)
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");

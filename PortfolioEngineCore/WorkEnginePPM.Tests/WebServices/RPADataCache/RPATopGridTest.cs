@@ -28,7 +28,6 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         private int _displayMode;
         private IList<RPATGRow> _displayList;
         private clsResourceValues _resourceValues;
-        private clsLookupList _categoryLookupList;
         private GridRenderingTypes _renderingType;
         private RPATopGridTestDouble _testDouble;
 
@@ -79,7 +78,6 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             {
                 Periods = _periods.ToDictionary(pred => pred.PeriodID, pred => pred)
             };
-            _categoryLookupList = new clsLookupList();
 
             _detailRow = Tuple.Create(
                 new clsResXData
@@ -160,8 +158,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                 _xmlString,
                 _displayMode,
                 _displayList,
-                _resourceValues,
-                _categoryLookupList
+                _resourceValues
             );
         }
 
@@ -275,7 +272,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         {
             // Arrange
             var definitionsInitialized = new List<string>();
-            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionStringCStruct = (instance, name, definitions) =>
+            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionStringCStructNullableOfBoolean = (instance, name, definitions, a) =>
             {
                 definitionsInitialized.Add(name);
                 return new PortfolioEngineCore.CStruct();
