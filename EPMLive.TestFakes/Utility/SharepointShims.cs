@@ -12,11 +12,13 @@ namespace EPMLive.TestFakes.Utility
     public class SharepointShims
     {
         public ShimSPWeb WebShim { get; private set; }
+        public ShimSPWeb RootWebShim { get; private set; }
         public ShimSPSite SiteShim { get; private set; }
         public ShimSPListItem ListItemShim { get; private set; }
         public ShimSPListItemCollection ListItemsShim { get; private set; }
         public ShimSPList ListShim { get; private set; }
         public ShimSPListCollection ListsShim { get; private set; }
+        public ShimSPListCollection RootWebListsShim { get; private set; }
         public ShimSPUser UserShim { get; private set; }
         public ShimSPUserCollection UsersShim { get; private set; }
         public ShimSPWebApplication ApplicationShim { get; private set; }
@@ -58,6 +60,8 @@ namespace EPMLive.TestFakes.Utility
             FieldShim = InitializeSPFieldShim();
             FieldsShim = InitializeSPFieldsShim();
             PrincipalShim = InitializeSPPrincipalShim();
+            RootWebListsShim = InitializeRootWebSPListCollectionShim();
+            RootWebShim = InitializeRootWebSPSiteShim();
             SiteShim = InitializeSPSiteShim();
             ListItemShim = InitializeSPListItemShim();
             ListItemsShim = InitializeSPListItemCollectionShim();
@@ -205,11 +209,35 @@ namespace EPMLive.TestFakes.Utility
             .Bind(new ShimSPListItem[] { });
         }
 
+        private ShimSPListCollection InitializeRootWebSPListCollectionShim()
+        {
+            return new ShimSPListCollection
+            {
+                ItemGetString = key => ListShim,
+                ItemGetGuid = key => ListShim,
+                ItemGetInt32 = key => ListShim
+            };
+        }
+
         private ShimSPSite InitializeSPSiteShim()
         {
             return new ShimSPSite
             {
-                WebApplicationGet = () => ApplicationShim
+                WebApplicationGet = () => ApplicationShim,
+                RootWebGet = () => RootWebShim
+            };
+        }
+
+        private ShimSPWeb InitializeRootWebSPSiteShim()
+        {
+            return new ShimSPWeb
+            {
+                CurrentUserGet = () => UserShim,
+                ServerRelativeUrlGet = () => ServerRelativeUrl,
+                ListsGet = () => ListsShim,
+                SiteGet = () => SiteShim,
+                GroupsGet = () => GroupsShim,
+                EnsureUserString = userName => UserShim
             };
         }
 

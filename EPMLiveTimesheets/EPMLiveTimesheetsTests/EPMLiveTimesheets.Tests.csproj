@@ -92,10 +92,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.GetTimesheetUpdates.Tests.cs" />
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SheetTestBase.cs" />
     <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
     <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
   </ItemGroup>

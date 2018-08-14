@@ -22,6 +22,7 @@ namespace TimeSheets
     {
         private static int myworktableid = 6;
         private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
+        private const string GridIoResult = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
 
         static TimesheetAPI()
         {
@@ -43,7 +44,7 @@ namespace TimeSheets
                 XmlDocument docRet = new XmlDocument();
                 docRet.LoadXml("<Grid><IO/><Changes/></Grid>");
 
-                XmlNode ndB = docRet.FirstChild.SelectSingleNode("//Changes");
+                var nodeData = docRet.FirstChild.SelectSingleNode("//Changes");
 
                 TimesheetSettings settings = new TimesheetSettings(oWeb);
 
@@ -64,80 +65,94 @@ namespace TimeSheets
                     }
                 }
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SqlCommand cmd = new SqlCommand("SELECT USER_ID, PERIOD_ID FROM         dbo.TSTIMESHEET INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid", cn);
-                cmd.Parameters.AddWithValue("@uid", id);
-                SqlDataReader drTS = cmd.ExecuteReader();
-
-                string sUser = "";
-                string sPeriod = "";
-
-                if (drTS.Read())
-                {
-                    sUser = drTS.GetInt32(0).ToString();
-                    sPeriod = drTS.GetInt32(1).ToString();
-                }
-                drTS.Close();
-
-                if (sUser == "")
-                {
-                    return "<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>";
-                }
-                else
-                {
-                    SPUser user = GetUser(oWeb, sUser);
-
-                    if (user.ID.ToString() == sUser)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
 
-                        DataSet dsTS = iGetTSData(cn, oWeb, user, sPeriod);
-
-                        bool bCanEdit = true;
-
-                        if (dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                    var userId = string.Empty;
+                    var periodString = string.Empty;
+                    using (var command = new SqlCommand(
+                        @"SELECT USER_ID, PERIOD_ID 
+                        FROM dbo.TSTIMESHEET 
+                        INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID 
+                        where TS_UID=@uid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@uid", id);
+                        using (var reader = command.ExecuteReader())
                         {
-                            bCanEdit = false;
-                        }
-
-                        ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, oWeb, sPeriod);
-
-                        try
-                        {
-                            cn.Close();
-                        }
-                        catch { }
-
-                        foreach (DataRow dr in dsTS.Tables[2].Rows)
-                        {
-                            if (!rows.Contains(dr["TS_ITEM_UID"].ToString()))
+                            if (reader.Read())
                             {
-                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, oWeb);
-
-                                XmlAttribute attr = docRet.CreateAttribute("Added");
-                                attr.Value = "1";
-                                nd.Attributes.Append(attr);
-
-                                ndB.AppendChild(nd);
+                                userId = reader.GetInt32(0).ToString();
+                                periodString = reader.GetInt32(1).ToString();
                             }
                         }
                     }
+
+                    if (string.IsNullOrWhiteSpace(userId))
+                    {
+                        return string.Format(GridIoResult, -1, "Could not determine user");
+                    }
                     else
                     {
-                        return "<Grid><IO Result=\"-1\" Message=\"User mismatch or access denied\"/></Grid>";
-                    }
-                }
+                        var user = GetUser(oWeb, userId);
+                        if (user.ID.ToString() == userId)
+                        {
+                            var dataSetTimestamp = iGetTSData(connection, oWeb, user, periodString);
+                            var canEdit = true;
 
-                return docRet.OuterXml;
+                            if ("True".Equals(
+                                dataSetTimestamp.Tables[1].Rows[0]["SUBMITTED"].ToString(),
+                                StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                canEdit = false;
+                            }
+
+                            var arrPeriods = GetPeriodDaysArray(connection, settings, oWeb, periodString);
+
+                            foreach (DataRow row in dataSetTimestamp.Tables[2].Rows)
+                            {
+                                if (!rows.Contains(row["TS_ITEM_UID"].ToString()))
+                                {
+                                    var node = CreateTSRow(
+                                        ref docRet,
+                                        dataSetTimestamp,
+                                        row,
+                                        arrLookups,
+                                        arrPeriods,
+                                        settings,
+                                        canEdit,
+                                        oWeb);
+
+                                    var attr = docRet.CreateAttribute("Added");
+                                    attr.Value = "1";
+                                    node.Attributes.Append(attr);
+
+                                    nodeData.AppendChild(node);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return string.Format(GridIoResult, -1, "User mismatch or access denied");
+                        }
+                    }
+
+                    return docRet.OuterXml;
+                }
+                finally
+                {
+                    connection?.Dispose();
+                }
             }
             catch (Exception ex)
             {
-                return "<Grid><IO Result=\"-1\" Message=\"" + ex.Message + "\"/></Grid>";
+                return string.Format(GridIoResult, -1, ex.Message);
             }
         }
 
