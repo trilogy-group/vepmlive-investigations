@@ -17,16 +17,20 @@ namespace RPADataCache
 {
     internal class RPATopGrid : RPADataCacheGridBase<Tuple<clsResXData, clsPIData>>
     {
+        private readonly int _pmoAdmin;
+        private readonly string _xmlString;
+
         public RPATopGrid(
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
             string xmlString, 
             int displayMode, 
             IList<RPATGRow> displayList, 
-            clsResourceValues resourceValues,
-            clsLookupList categoryLookupList)
-        : base (columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
+            clsResourceValues resourceValues)
+        : base (columns, displayMode, displayList, resourceValues)
         {
+            _pmoAdmin = pmoAdmin;
+            _xmlString = xmlString;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)

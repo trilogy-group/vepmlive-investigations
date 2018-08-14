@@ -27,12 +27,10 @@ namespace RPADataCache
         private readonly int _heatMapId;
         private readonly int _heatMapColor;
         private readonly int _heatFieldColor;
-        private readonly int _mode;
-        // (CC-78790, 2018-08-14) Used as out parameters by external method therefore type can not be changed without overhead
-        private readonly Dictionary<int, clsViewTargetColours> _targetColors;
         private readonly bool _doZeroRowCleverStuff;
         private readonly bool _displayTotalsDetails;
         private readonly Func<int, string> _resolvePiNameFunc;
+        private readonly Func<CPeriod, string> _resolvePeriodNameFunc;
         
         protected CStruct DefinitionPI;
         protected CStruct LastDataRowNode;
@@ -43,30 +41,25 @@ namespace RPADataCache
             bool useHeatMap,
             int heatMapId,
             int heatMapColor,
-            int mode,
-            Dictionary<int, clsViewTargetColours> targetColors,
             bool doZeroRowCleverStuff,
             bool displayTotalsDetails,
             Func<int, string> resolvePiNameFunc,
-            IList<clsRXDisp> columns, 
-            int pmoAdmin, 
-            string xmlString, 
+            Func<CPeriod, string> resolvePeriodNameFunc,
+            IList<clsRXDisp> columns,
             int displayMode, 
             IList<RPATGRow> displayList, 
-            clsResourceValues resourceValues, 
-            clsLookupList categoryLookupList) 
-        : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
+            clsResourceValues resourceValues) 
+        : base(columns, displayMode, displayList, resourceValues)
         {
             _useRole = useRole;
             _roleHeader = roleHeader;
             _useHeatMap = useHeatMap;
             _heatMapId = heatMapId;
             _heatMapColor = heatMapColor;
-            _mode = mode;
-            _targetColors = targetColors;
             _doZeroRowCleverStuff = doZeroRowCleverStuff;
             _displayTotalsDetails = displayTotalsDetails;
             _resolvePiNameFunc = resolvePiNameFunc;
+            _resolvePeriodNameFunc = resolvePeriodNameFunc;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -246,7 +239,7 @@ namespace RPADataCache
             foreach (var period in periods)
             {
                 var periodId = ResolvePeriodId(period, index++);
-                var periodName = period.PeriodName;
+                var periodName = _resolvePeriodNameFunc(period);
 
                 const string sumFunc = "(Row.id == 'Filter' ? '' : sum())";
                 const string maxFunc = "(Row.id == 'Filter' ? '' : max())";
@@ -255,7 +248,7 @@ namespace RPADataCache
                 var span = _displayList.Count;
                 if (_useHeatMap)
                 {
-                    InitializePeriodHeatMapColumn(periodId, periodName, _mode != 3, sumFunc);
+                    InitializePeriodHeatMapColumn(periodId, periodName, _displayMode != 3, sumFunc);
                     span *= 2;
                 }
 
@@ -315,7 +308,7 @@ namespace RPADataCache
                                 xC.CreateStringAttr("Align", "Right");
                             }
 
-                            if (_mode != 3)
+                            if (_displayMode != 3)
                             {
                                 if (_useHeatMap)
                                 {
@@ -375,7 +368,7 @@ namespace RPADataCache
                         {
                             foreach (var displayRow in _displayList)
                             {
-                                if (GetDataValue(detailRow, displayRow.fid, _mode,  i, false, _useHeatMap ? _heatMapId : 0) != 0)
+                                if (GetDataValue(detailRow, displayRow.fid, _displayMode,  i, false, _useHeatMap ? _heatMapId : 0) != 0)
                                 {
                                     return true;
                                 }
@@ -567,7 +560,7 @@ namespace RPADataCache
 
                     if (_useHeatMap)
                     {
-                        heatMapValue = GetDataValue(detailRowData, _heatMapId, _mode, i, true, 0);
+                        heatMapValue = GetDataValue(detailRowData, _heatMapId, _displayMode, i, true, 0);
                         var cellValue = heatMapValue.ToString(_numberFormat);
                         xI.CreateStringAttr($"P{period.PeriodID}H", cellValue);
                     }
@@ -579,16 +572,21 @@ namespace RPADataCache
                         ++counter;
                         prefix = $"P{period.PeriodID}C{counter}";
 
-                        rowValue = GetDataValue(detailRowData, displayRow.fid, _mode, i, false, _useHeatMap ? _heatMapId : 0);
+                        rowValue = GetDataValue(detailRowData, displayRow.fid, _displayMode, i, false, _useHeatMap ? _heatMapId : 0);
                         var cellValue = rowValue.ToString(_numberFormat);
                         xI.CreateStringAttr(prefix, cellValue);
 
                         if (_useHeatMap && displayRow.fid == 0)
                         {
-                            rowValue = GetDataValue(detailRowData, displayRow.fid, _mode, i, true, _heatMapId);
-                            heatMapValue = GetDataValue(detailRowData, _heatMapId, _mode, i, true, _heatMapId);
+                            rowValue = GetDataValue(detailRowData, displayRow.fid, _displayMode, i, true, _heatMapId);
+                            heatMapValue = GetDataValue(detailRowData, _heatMapId, _displayMode, i, true, _heatMapId);
 
-                            var rgb = RPAGridHelper.TargetBackground(rowValue, heatMapValue, _targetColors, out targetLevel, _heatFieldColor);
+                            var rgb = RPAGridHelper.TargetBackground(
+                                rowValue, 
+                                heatMapValue, 
+                                _resourceValues.TargetColors, 
+                                out targetLevel, 
+                                _heatFieldColor);
 
                             xI.CreateIntAttr($"C{period.PeriodID}C{counter}", targetLevel);
                             xI.CreateIntAttr($"Y{period.PeriodID}C{counter}", targetLevel > 0 ? targetLevel : 0);
@@ -780,7 +778,7 @@ namespace RPADataCache
             return true;
         }
 
-        public void AddPIRow(clsResFullDAta detailRowData, clsResXData piData, int rID, int xLi, int projectId)
+        private void AddPIRow(clsResFullDAta detailRowData, clsResXData piData, int rID, int xLi, int projectId)
         {
             var xIParent = Levels[0];
             var xI = LastDataRowNode.CreateSubStruct("I");
@@ -824,7 +822,7 @@ namespace RPADataCache
                         if (displayRow.fid <= 0)
                         {
                             var piDataValue = GetPIDataValue(detailRowData, piData, i, displayRow.fid, xLi, projectId);
-                            var cellValue = _mode == 0
+                            var cellValue = _displayMode == 0
                                 ? piDataValue.ToString("0.##")
                                 : piDataValue.ToString("0.###");
 
@@ -836,7 +834,7 @@ namespace RPADataCache
                                 var rgb = RPAGridHelper.TargetBackground(
                                     piDataValue, 
                                     piDataValue, 
-                                    _targetColors, 
+                                    _resourceValues.TargetColors, 
                                     out targetLevel, 
                                     _heatFieldColor);
 
@@ -999,7 +997,7 @@ namespace RPADataCache
         private double ComputePIValue(double vval, double fval)
         {
             double result;
-            switch (_mode)
+            switch (_displayMode)
             {
                 case 3:
                     result = fval != 0

@@ -6,7 +6,9 @@ using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
 using PortfolioEngineCore;
-
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace RPADataCache
 {
@@ -2583,8 +2585,7 @@ namespace RPADataCache
                 sXML,
                 m_DispMode,
                 TGStandard, 
-                m_cResVals,
-                m_maj_Cat_lookup);
+                m_cResVals);
 
             grid.AddPeriodsData(m_cResVals.Periods.Values);
 
@@ -2615,142 +2616,101 @@ namespace RPADataCache
 
         public string GetBottomGrid()
         {
-
-            RPANewBottomGrid oGrid = new RPANewBottomGrid();
-            string s;
-
-            if (m_use_role)
-                s = RPConstants.CONST_ROLE;
-            else
-                s = RPConstants.CONST_RESOURCE;
-
-            oGrid.InitializeGridLayout(m_totdispcln, m_use_role, s);
-
-            int i = 0;
-            foreach (CPeriod period in m_cResVals.Periods.Values)
-            {
-                i++;
-                oGrid.AddPeriodColumn(period.PeriodID.ToString(), GetPeriodName(period.PeriodName, m_DispMode), m_DispMode, TotSelectedOrder, m_use_heatmap);
-            }
-
-            oGrid.FinalizeGridLayout();
-            oGrid.InitializeGridData();
-            i = 0;
-
-            Dictionary<int, clsResFullDAta> cln;
-
-            if (m_use_role == false)
-                cln = m_reslist;
-            else if (m_role_mode == 2)
-                cln = m_rolelist;
-            else
-                cln = m_ccrolelist;
-
-            CStruct xRoot = new CStruct();
-            xRoot.Initialize("Rows");
+            var cln =
+                !m_use_role ? m_reslist :
+                m_role_mode == 2 ? m_rolelist :
+                m_ccrolelist;
 
             m_usedbottomcln = cln;
+            m_totalschartdata = GetBottomTotalChartDataGrid(cln); 
 
-            foreach (clsResFullDAta oRFull in cln.Values)
+            var grid = new RPABottomGrid(
+                m_use_role,
+                m_use_role
+                    ? RPConstants.CONST_ROLE
+                    : RPConstants.CONST_RESOURCE,
+                m_use_heatmap,
+                m_use_heatmapID,
+                m_use_heatmapColour,
+                m_use_role,
+                m_DisplayTotDetails,
+                ResolvePIName,
+                period => GetPeriodName(period.PeriodName, m_DispMode),
+                m_totdispcln,
+                m_DispMode,
+                TotSelectedOrder,
+                m_cResVals);
+
+            grid.AddPeriodsData(m_cResVals.Periods.Values);
+            grid.AddDetailRowsData(cln.Values);
+
+            return grid.RenderToXml(GridRenderingTypes.Combined);
+        }
+
+        private string GetBottomTotalChartDataGrid(Dictionary<int, clsResFullDAta> cln)
+        {
+            var xRoot = new CStruct();
+            xRoot.Initialize("Rows");
+
+            var i = 0;
+            foreach (var detailRowData in cln.Values)
             {
                 try
                 {
-                    ++i;
-                    CStruct xRow = xRoot.CreateSubStruct("Row");
+                    i++;
+                    var xRow = xRoot.CreateSubStruct("Row");
                     xRow.CreateIntAttr("ID", i);
-                    xRow.CreateIntAttr("Sel", (oRFull.bSelected ? 1 : 0));
-                    xRow.CreateStringAttr("Name", oRFull.ResOrRole);
+                    xRow.CreateIntAttr("Sel", (detailRowData.bSelected ? 1 : 0));
+                    xRow.CreateStringAttr("Name", detailRowData.ResOrRole);
 
-                    int xi = 0;
-
-                    foreach (CPeriod period in m_cResVals.Periods.Values)
+                    int periodIndex = 0;
+                    foreach (var period in m_cResVals.Periods.Values)
                     {
-                        xi++;
-
-
-                        double tvval = oRFull.tot_Totals.getvarr(xi);
-                        double tfval = oRFull.tot_Totals.getftarr(xi);
-                        double avval = oRFull.tot_avail.getvarr(xi);
-                        double afval = oRFull.tot_avail.getftarr(xi);
-
+                        periodIndex++;
+                        var tvval = detailRowData.tot_Totals.getvarr(periodIndex);
+                        var tfval = detailRowData.tot_Totals.getftarr(periodIndex);
+                        var avval = detailRowData.tot_avail.getvarr(periodIndex);
+                        var afval = detailRowData.tot_avail.getftarr(periodIndex);
                         double tval, aval;
 
-                        if (m_DispMode == 3)
+                        switch (m_DispMode)
                         {
-                            if (tfval == 0)
-                                tval = 0;
-                            else
-                                tval = (tvval * 100) / tfval;
-
-                            if (afval == 0)
-                                aval = 0;
-                            else
-                                aval = (avval * 100) / afval;
-                        }
-                        else if (m_DispMode == 0)
-                        {
-
-                            tval = tvval;
-                            aval = avval;
-                        }
-                        else
-                        {
-                            tval = tfval;
-                            aval = afval;
+                            case 3:
+                                tval = tfval != 0
+                                    ? (tvval * 100) / tfval
+                                    : 0;
+                                aval = afval != 0
+                                    ? (avval * 100) / afval
+                                    : 0;
+                                break;
+                            case 1:
+                                tval = tvval / 100;
+                                aval = avval / 100;
+                                break;
+                            default:
+                                tval = tvval;
+                                aval = avval;
+                                break;
                         }
 
-
-
-                        if (m_DispMode == 1)
-                        {
-                            aval /= 100;
-                            tval /= 100;
-                        }
-
-
-                        CStruct xTot = xRow.CreateSubStruct("Tot");
-                        CStruct xAvail = xRow.CreateSubStruct("Avail");
+                        var xTot = xRow.CreateSubStruct("Tot");
+                        var xAvail = xRow.CreateSubStruct("Avail");
 
                         xTot.CreateDoubleAttr("Value", tval);
                         xAvail.CreateDoubleAttr("Value", aval);
-
-
                     }
-
-
-
-                    oGrid.AddDetailRow(oRFull, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
-                    if (m_DisplayTotDetails)
-                    {
-                        oRFull.ProcessPITotals(m_cResVals.Periods.Count);
-
-                        int xIi = 0;
-                        foreach (clsResXData odt in oRFull.PerPItotals.Values)
-                        {
-                            ++xIi;
-
-                            if (string.IsNullOrEmpty(odt.ProjectName))
-                                odt.ProjectName = ResolvePIName(odt.ProjectID);
-
-                            oGrid.AddPIRow(oRFull, odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour, xIi -1, odt.ProjectID);
-                        }
-                    }
-
                 }
                 catch (Exception ex)
                 {
-                    string StatusText = "";
-                    StatusText = "WriteTrace Exception : " + ex.Message.ToString();
+                    WriteTrace(
+                        Area.EPMLiveWorkEnginePPM,
+                        Categories.EPMLiveWorkEnginePPM.Others,
+                        TraceSeverity.VerboseEx,
+                        ex.ToString());
                 }
             }
 
-            s = oGrid.GetString();
-
-
-            m_totalschartdata = xRoot.XML();
-
-            return s;
-
+            return xRoot.XML();
         }
 
         public void BottomDetailsDisplay(string sIn)

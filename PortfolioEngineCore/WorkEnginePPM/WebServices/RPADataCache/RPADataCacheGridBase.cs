@@ -15,31 +15,22 @@ namespace RPADataCache
     internal abstract class RPADataCacheGridBase<TDetailRowData> : ADataCacheGridBase<CPeriod, TDetailRowData>
     {
         protected readonly IList<clsRXDisp> _columns;
-        protected readonly int _pmoAdmin;
-        protected readonly string _xmlString;
         protected readonly int _displayMode;
         protected readonly IList<RPATGRow> _displayList;
         protected readonly clsResourceValues _resourceValues;
-        protected readonly clsLookupList _categoryLookupList;
 
         protected CStruct MiddleCols;
 
         public RPADataCacheGridBase(
             IList<clsRXDisp> columns,
-            int pmoAdmin,
-            string xmlString,
             int displayMode,
             IList<RPATGRow> displayList, 
-            clsResourceValues resourceValues,
-            clsLookupList categoryLookupList)
+            clsResourceValues resourceValues)
         {
             _columns = columns;
-            _pmoAdmin = pmoAdmin;
-            _xmlString = xmlString;
             _displayMode = displayMode;
             _displayList = displayList;
             _resourceValues = resourceValues;
-            _categoryLookupList = categoryLookupList;
         }
 
         protected override void InitializeGridData(GridRenderingTypes renderingType)
