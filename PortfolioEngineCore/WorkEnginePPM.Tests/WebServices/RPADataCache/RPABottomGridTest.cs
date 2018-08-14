@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EPMLiveCore.Infrastructure.Logging.Fakes;
 using Global.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
@@ -48,6 +49,8 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         private clsResFullDAta _detailRow;
         private int _rowId;
 
+        private IList<string> _errorsLogged;
+
         [TestInitialize]
         public void SetUp()
         {
@@ -58,6 +61,12 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             _testDouble = CreateTestDouble();
 
             ShimCStruct();
+
+            _errorsLogged = new List<string>();
+            ShimLoggingService.WriteTraceStringStringTraceSeverityString = (area, category, severity, text) =>
+            {
+                _errorsLogged.Add(text);
+            };
         }
 
         private void SetUpDefaultValues()
@@ -76,8 +85,8 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
             _columns = new[]
             {
-                new clsRXDisp { m_id = RPConstants.TGRID_RES_ID, m_realname = "test-name-1 /n\r\n", m_dispname = "test-name-1 /n\r\n", },
-                new clsRXDisp { m_id = RPConstants.TGRID_ROLE_ID, m_realname = "test-name-2 /n\r\n", m_dispname = "test-name-2 /n\r\n" }
+                new clsRXDisp { m_id = RPConstants.TGRID_TOTRESRES_ID, m_realname = "test-real-name-1 /n\r\n", m_dispname = "test-name-1 /n\r\n", },
+                new clsRXDisp { m_id = RPConstants.TGRID_TOTITEM_ID, m_realname = "test-real-name-2 /n\r\n", m_dispname = "test-name-2 /n\r\n" }
             };
             _displayList = new[]
             {
@@ -235,11 +244,12 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
             // Assert
             Assert.IsTrue(_substructsCreated.Contains("Cfg"));
-            Assert.AreEqual("PortfolioItem", _stringAttributesCreated["Cfg"]["MainCol"]);
+            Assert.AreEqual("ResOrRole", _stringAttributesCreated["Cfg"]["MainCol"]);
             Assert.AreEqual("GTACCNPSQEBSLC", _stringAttributesCreated["Cfg"]["Code"]);
-            Assert.AreEqual(3, _intAttributesCreated["Cfg"]["SuppressCfg"]);
+            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["SuppressCfg"]);
             Assert.AreEqual(3, _intAttributesCreated["Cfg"]["SuppressMessage"]);
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["PrintCols"]);
+            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["Dragging"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["Sorting"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ColsMoving"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["ColsPosLap"]);
@@ -248,14 +258,9 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["SectionWidthLap"]);
             Assert.AreEqual(1, _intAttributesCreated["Cfg"]["GroupLap"]);
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["WideHScroll"]);
-            Assert.AreEqual(150, _intAttributesCreated["Cfg"]["LeftWidth"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["LeftWidth"]);
             Assert.AreEqual(400, _intAttributesCreated["Cfg"]["Width"]);
-            Assert.AreEqual(800, _intAttributesCreated["Cfg"]["RightWidth"]);
-            Assert.AreEqual(50, _intAttributesCreated["Cfg"]["MinMidWidth"]);
-            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["MinRightWidth"]);
-            Assert.AreEqual(0, _intAttributesCreated["Cfg"]["LeftCanResize"]);
-            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["RightCanResize"]);
-            Assert.AreEqual(1, _intAttributesCreated["Cfg"]["FocusWholeRow"]);
+            Assert.AreEqual(400, _intAttributesCreated["Cfg"]["RightWidth"]);
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["MaxHeight"]);
             Assert.AreEqual(0, _intAttributesCreated["Cfg"]["ShowDeleted"]);
             Assert.AreEqual(true, _booleanAttributesCreated["Cfg"]["DateStrings"]);
@@ -288,7 +293,6 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             Assert.IsTrue(_substructsCreated.Contains("Cols"));
             Assert.IsTrue(_substructsCreated.Contains("RightCols"));
             Assert.AreEqual("RightCols", _testDouble.PeriodCols.Name);
-            Assert.AreEqual("Cols", _testDouble.MiddleCols.Name);
         }
 
         [TestMethod]
@@ -296,7 +300,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         {
             // Arrange
             var definitionsInitialized = new List<string>();
-            ShimGridBase<CPeriod, Tuple<clsResXData, clsPIData>>.AllInstances.InitializeGridLayoutDefinitionStringCStructNullableOfBoolean = (instance, name, definitions, a) =>
+            ShimGridBase<CPeriod, clsResFullDAta>.AllInstances.InitializeGridLayoutDefinitionStringCStructNullableOfBoolean = (instance, name, definitions, a) =>
             {
                 definitionsInitialized.Add(name);
                 return new PortfolioEngineCore.CStruct();
@@ -306,9 +310,9 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             _testDouble.InitializeGridLayout(_renderingType);
 
             // Assert
-            Assert.AreEqual(2, definitionsInitialized.Count);
+            Assert.AreEqual(3, definitionsInitialized.Count);
             Assert.IsTrue(definitionsInitialized.Contains("R"));
-            Assert.IsTrue(definitionsInitialized.Contains("Leaf"));
+            Assert.AreEqual(2, definitionsInitialized.Count(pred => pred == "Leaf"));
         }
 
         [TestMethod]
@@ -536,30 +540,271 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             Assert.AreEqual(_rowId.ToString(), _stringAttributesCreated["I"]["id"]);
             Assert.AreEqual("white", _stringAttributesCreated["I"]["Color"]);
             Assert.AreEqual("Leaf", _stringAttributesCreated["I"]["Def"]);
+            Assert.AreEqual(_rowId, _intAttributesCreated["I"]["rowid"]);
             Assert.AreEqual(1, _intAttributesCreated["I"]["NoColorState"]);
             Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
-            Assert.AreEqual(true, _booleanAttributesCreated["I"]["SelectCanEdit"]);
+            Assert.AreEqual(true, _booleanAttributesCreated["I"]["rtSelectCanEdit"]);
             Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
             Assert.AreEqual(false, _booleanAttributesCreated["I"]["rowidCanEdit"]);
         }
 
         [TestMethod]
-        public void AddDetailRow_PeriodsProvided_ProcessesEachPeriod()
+        public void AddDetailRow_TotResResColumn_AddsAttribute()
         {
-            // Arrange, Act
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTRESRES_ID;
+            _columns = new[] { column };
+            _testDouble = CreateTestDouble();
+
+            // Act
             _testDouble.AddDetailRow(_detailRow, _rowId);
 
             // Assert
-            foreach (var period in _periods)
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey("ResOrRole"));
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotDeptColumnUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTDEPT_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsFalse(_stringAttributesCreated["I"].ContainsKey(sn));
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotDeptColumnNotUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTDEPT_ID;
+            _columns = new[] { column };
+            const string testName = "test-name";
+            _detailRow.resavail = new clsResxAvail { DeptID = 15 };
+            _resourceValues.Departments = new Dictionary<int, clsEPKItem>
             {
-                for (var i = 1; i <= _displayList.Count; i++)
-                {
-                    var prefix = "P" + period.PeriodID + "C" + i;
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "ClassInner"]);
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPostfix"]);
-                    Assert.AreEqual(string.Empty, _stringAttributesCreated["I"][prefix + "HtmlPrefix"]);
-                }
-            }
+                [_detailRow.resavail.DeptID] = new clsEPKItem { Name = testName }
+            };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual(testName, _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotItemColumn_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            const string test1 = "test-1";
+            const string test2 = "test-2";
+            _detailRow.PIList = new Dictionary<int, string>
+            {
+                [1] = test1,
+                [2] = test2,
+            };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual($"{test1},{test2}", _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotRoleColumnUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTROLE_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsFalse(_stringAttributesCreated["I"].ContainsKey(sn));
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotRoleColumnNotUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTROLE_ID;
+            _columns = new[] { column };
+            const string testName = "test-name";
+            _detailRow.resavail = new clsResxAvail { RoleID = 15 };
+            _resourceValues.Roles = new Dictionary<int, clsListItem>
+            {
+                [_detailRow.resavail.RoleID] = new clsListItem { Name = testName }
+            };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual(testName, _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotCostColumnUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTCC_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsFalse(_stringAttributesCreated["I"].ContainsKey(sn));
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotCostColumnNotUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTCC_ID;
+            _columns = new[] { column };
+            const string testName = "test-name";
+            _detailRow.resavail = new clsResxAvail { CostCat = 15 };
+            _resourceValues.CostCategories = new Dictionary<int, clsCatItem>
+            {
+                [_detailRow.resavail.CostCat] = new clsCatItem { Name = testName }
+            };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual(testName, _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotCostFullColumnUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTCCFULL_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsFalse(_stringAttributesCreated["I"].ContainsKey(sn));
+        }
+
+        [TestMethod]
+        public void AddDetailRow_TotCostFullColumnNotUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTCCFULL_ID;
+            _columns = new[] { column };
+            const string testName = "test-name";
+            _detailRow.resavail = new clsResxAvail { CostCat = 15 };
+            _resourceValues.CostCategories = new Dictionary<int, clsCatItem>
+            {
+                [_detailRow.resavail.CostCat] = new clsCatItem { FullName = testName }
+            };
+            _useRole = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual(testName, _stringAttributesCreated["I"][sn]);
         }
 
         [TestMethod]

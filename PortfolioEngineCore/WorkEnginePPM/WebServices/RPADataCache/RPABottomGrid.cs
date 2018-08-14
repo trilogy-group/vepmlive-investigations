@@ -97,6 +97,12 @@ namespace RPADataCache
 
             var xHead = Constructor.CreateSubStruct("Head");
             InitializeGridLayoutHeader1(xHead, 1, 2);
+            Header2 = xHead.CreateSubStruct("Header");
+            Header2.CreateIntAttr("PortfolioItemVisible", 1);
+            Header2.CreateIntAttr("Spanned", -1);
+            Header2.CreateIntAttr("SortIcons", 0);
+            Header2.CreateStringAttr("HoverCell", "Color");
+            Header2.CreateStringAttr("HoverRow", string.Empty);
 
             var categoryColumn = InitializeGridLayoutCategoryColumns(xLeftCols).Last();
             DefinitionRight.CreateBooleanAttr("rtSelectCanEdit", true);
