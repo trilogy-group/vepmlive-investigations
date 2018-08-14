@@ -586,7 +586,8 @@ namespace RPADataCache
 
                         if (_useHeatMap && displayRow.fid == 0)
                         {
-                            rowValue = GetDataValue(detailRowData, _heatMapId, _mode, i, true, _heatMapId);
+                            rowValue = GetDataValue(detailRowData, displayRow.fid, _mode, i, true, _heatMapId);
+                            heatMapValue = GetDataValue(detailRowData, _heatMapId, _mode, i, true, _heatMapId);
 
                             var rgb = RPAGridHelper.TargetBackground(rowValue, heatMapValue, _targetColors, out targetLevel, _heatFieldColor);
 
@@ -780,7 +781,7 @@ namespace RPADataCache
             return true;
         }
 
-        public void AddPIRow(clsResFullDAta oRFull, clsResXData piData, int rID, int xLi, int projectId)
+        public void AddPIRow(clsResFullDAta detailRowData, clsResXData piData, int rID, int xLi, int projectId)
         {
             var xIParent = Levels[0];
             var xI = LastDataRowNode.CreateSubStruct("I");
@@ -801,61 +802,66 @@ namespace RPADataCache
             {
                 InitializePiDataColumn(piData, xI, column, sn);
             });
-            
-            i = 0;
-            cnt = disp.Count;
 
-            if (cnt == 0)
+            if (_displayList.Count == 0)
+            {
                 return;
+            }
 
-            foreach (CPeriod oPer in o_cResVals.Periods.Values)
+            var i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
             {
                 try
                 {
-                    string sCName;
-                    ++i;
-                    cval = 0;
-                    cnt = 0;
+                    i++;
+                    string prefix;
+                    var cValue = 0;
+                    var counter = 0;
 
-                    foreach (RPATGRow ot in disp)
+                    foreach (var displayRow in _displayList)
                     {
-                        ++cnt;
-                        sCName = "P" + oPer.PeriodID.ToString() + "C" + cnt.ToString();
+                        counter++;
+                        prefix = $"P{period.PeriodID}C{counter}";
 
-                        if (ot.fid <= 0)
+                        if (displayRow.fid <= 0)
                         {
-                            xval = GetPIDataValue(oRFull, oDet, iMode, i, ot.fid, xLi, bUseHeatmap, iHeatMapID, projectId, by_role);
-                            cellval = "";
+                            var piDataValue = GetPIDataValue(detailRowData, piData, i, displayRow.fid, xLi, projectId);
+                            var cellValue = _mode == 0
+                                ? piDataValue.ToString("0.##")
+                                : piDataValue.ToString("0.###");
 
-                            if (iMode == 0)
-                                cellval = xval.ToString("0.##");
-                            else if (iMode == 2)
-                                cellval = xval.ToString("0.###");
-                            else
-                                cellval = xval.ToString("0.###");
+                            xI.CreateStringAttr(prefix, cellValue);
 
-                            xI.CreateStringAttr(sCName, cellval);
-
-                            if (bUseHeatmap && ot.fid <= 0)
+                            if (_useHeatMap && displayRow.fid <= 0)
                             {
-                                string rgb = RPAGridHelper.TargetBackground(xval, xval, TargetColors, out tarlev, HeatFieldColour);
-                                xI.CreateIntAttr("X" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
+                                int targetLevel;
+                                var rgb = RPAGridHelper.TargetBackground(
+                                    piDataValue, 
+                                    piDataValue, 
+                                    _targetColors, 
+                                    out targetLevel, 
+                                    _heatFieldColor);
 
-                                if (tarlev <= 0)
-                                    tarlev = 0;
+                                xI.CreateIntAttr($"X{period.PeriodID}C{counter}", targetLevel);
+                                xI.CreateIntAttr($"Y{period.PeriodID}C{counter}", targetLevel > 0 ? targetLevel : 0);
 
-                                xI.CreateIntAttr("Y" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
-
-                                if (rgb != "" && iHeatMapID != ot.fid)
+                                if (!string.IsNullOrEmpty(rgb) && displayRow.fid != _heatMapId)
                                 {
-                                    xI.CreateStringAttr(sCName + "Color", rgb);
-                                    xI.CreateStringAttr(sCName + "ExportStyle", "background-color: " + rgb);
+                                    xI.CreateStringAttr(prefix + "Color", rgb);
+                                    xI.CreateStringAttr(prefix + "ExportStyle", "background-color: " + rgb);
                                 }
                             }
                         }
                     }
                 }
-                catch (Exception ex) { }
+                catch (Exception ex)
+                {
+                    WriteTrace(
+                        Area.EPMLiveWorkEnginePPM,
+                        Categories.EPMLiveWorkEnginePPM.Others,
+                        TraceSeverity.VerboseEx,
+                        ex.ToString());
+                }
             }
         }
 
