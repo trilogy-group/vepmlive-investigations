@@ -11,9 +11,15 @@ internal abstract class ADataCacheGridBase<TPeriodData, TDetailRowData> : GridBa
     protected CStruct DefinitionRight;
     protected CStruct DefinitionLeaf;
 
-    protected abstract int CalculateInternalPeriodMin(TDetailRowData resxData);
+    protected virtual int CalculateInternalPeriodMin(TDetailRowData resxData)
+    {
+        throw new NotImplementedException();
+    }
 
-    protected abstract int CalculateInternalPeriodMax(TDetailRowData resxData);
+    protected virtual int CalculateInternalPeriodMax(TDetailRowData resxData)
+    {
+        throw new NotImplementedException();
+    }
 
     protected CStruct CreateColumn(
         CStruct columns,

@@ -21,23 +21,33 @@ namespace RPADataCache
             NumberGroupSizes = new int[] { 3 }
         };
 
-        private readonly bool _isLayoutByRole;
+        private readonly bool _useRole;
         private readonly string _roleHeader;
-        private readonly int _heatFieldColor;
-        private readonly int _mode;
         private readonly bool _useHeatMap;
         private readonly int _heatMapId;
         private readonly int _heatMapColor;
+        private readonly int _heatFieldColor;
+        private readonly int _mode;
+        // (CC-78790, 2018-08-14) Used as out parameters by external method therefore type can not be changed without overhead
         private readonly Dictionary<int, clsViewTargetColours> _targetColors;
         private readonly bool _doZeroRowCleverStuff;
+        private readonly bool _displayTotalsDetails;
+        private readonly Func<int, string> _resolvePiNameFunc;
         
         protected CStruct DefinitionPI;
         protected CStruct LastDataRowNode;
 
         public RPABottomGrid(
-            bool isLayoutByRole,
+            bool useRole,
             string roleHeader,
             bool useHeatMap,
+            int heatMapId,
+            int heatMapColor,
+            int mode,
+            Dictionary<int, clsViewTargetColours> targetColors,
+            bool doZeroRowCleverStuff,
+            bool displayTotalsDetails,
+            Func<int, string> resolvePiNameFunc,
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
             string xmlString, 
@@ -47,9 +57,16 @@ namespace RPADataCache
             clsLookupList categoryLookupList) 
         : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
         {
-            _isLayoutByRole = isLayoutByRole;
+            _useRole = useRole;
             _roleHeader = roleHeader;
             _useHeatMap = useHeatMap;
+            _heatMapId = heatMapId;
+            _heatMapColor = heatMapColor;
+            _mode = mode;
+            _targetColors = targetColors;
+            _doZeroRowCleverStuff = doZeroRowCleverStuff;
+            _displayTotalsDetails = displayTotalsDetails;
+            _resolvePiNameFunc = resolvePiNameFunc;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -144,7 +161,7 @@ namespace RPADataCache
             {
                 if (col.m_id == RPConstants.TGRID_TOTITEM_ID
                     || col.m_id == RPConstants.TGRID_TOTRESRES_ID
-                    || _isLayoutByRole == false)
+                    || _useRole == false)
                 {
                     var sn = RemoveCharacters(col.m_realname, " \r\n")
                         .Replace("/n", string.Empty);
@@ -395,46 +412,73 @@ namespace RPADataCache
             xI.CreateIntAttr("NoColorState", 1);
             xI.CreateIntAttr("rowid", rowId);
             xI.CreateBooleanAttr("rowidCanEdit", false);
-            xI.CreateStringAttr("rtSelect", Convert.ToInt32(detailRowData.bSelected).ToString()));
+            xI.CreateStringAttr("rtSelect", Convert.ToInt32(detailRowData.bSelected).ToString());
             xI.CreateBooleanAttr("rtSelectCanEdit", true);
 
-            foreach (var column in _columns)
+            InitializeDataColumns((column, sn) =>
             {
-                if ((column.m_id == RPConstants.TGRID_TOTITEM_ID)
-                    || !(_isLayoutByRole 
-                         && (column.m_id > 100 || column.m_id == RPConstants.TGRID_TOTDEPT_ID)))
+                InitializeDetailRowDataColumn(detailRowData, xI, column, sn);
+            });
+
+            InitializeDetailRowDataStyling(detailRowData, xI);
+
+            if (_displayTotalsDetails)
+            {
+                detailRowData.ProcessPITotals(_resourceValues.Periods.Count);
+
+                var i = 0;
+                foreach (var detailPiData in detailRowData.PerPItotals.Values)
                 {
-                    try
+                    i++;
+                    if (string.IsNullOrEmpty(detailPiData.ProjectName))
                     {
-                        InitializeDetailRowDataColumn(detailRowData, xI, column);
+                        detailPiData.ProjectName = _resolvePiNameFunc(detailPiData.ProjectID);
                     }
-                    catch (Exception ex)
+
+                    if (CheckIfPiRowShouldBeAdded(detailPiData))
                     {
-                        WriteTrace(
-                            Area.EPMLiveWorkEnginePPM,
-                            Categories.EPMLiveWorkEnginePPM.Others,
-                            TraceSeverity.VerboseEx,
-                            ex.ToString());
+                        AddPIRow(detailRowData, detailPiData, i * 10000000 + i, i - 1, detailPiData.ProjectID);
                     }
                 }
             }
-
-            InitializeDetailRowDataStyling(detailRowData, xI);
         }
 
-        private void InitializeDetailRowDataColumn(clsResFullDAta detailRowData, CStruct xI, clsRXDisp column)
-        {
-            var sn = column.m_id == RPConstants.TGRID_TOTRESRES_ID
-                ? "ResOrRole"
-                : RemoveCharacters(column.m_realname, " \r\n").Replace("/n", string.Empty);
 
+        private void InitializeDataColumns(Action<clsRXDisp, string> columnInitializationFunc)
+        {
+            foreach (var column in _columns.Where(column =>
+                column.m_id == RPConstants.TGRID_TOTITEM_ID
+                || !(_useRole && (column.m_id > 100 || column.m_id == RPConstants.TGRID_TOTDEPT_ID))
+            ))
+            {
+                try
+                {
+                    var sn = column.m_id == RPConstants.TGRID_TOTRESRES_ID
+                        ? "ResOrRole"
+                        : RemoveCharacters(column.m_realname, " \r\n").Replace("/n", string.Empty);
+
+                    columnInitializationFunc(column, sn);
+                }
+                catch (Exception ex)
+                {
+                    WriteTrace(
+                        Area.EPMLiveWorkEnginePPM,
+                        Categories.EPMLiveWorkEnginePPM.Others,
+                        TraceSeverity.VerboseEx,
+                        ex.ToString());
+                }
+            }
+        }
+
+        private void InitializeDetailRowDataColumn(clsResFullDAta detailRowData, CStruct xI, clsRXDisp column, string sn)
+        {
             clsEPKItem epkItem = null;
             clsListItem listItem = null;
             clsCatItem categoryItem = null;
             switch (column.m_id)
             {
                 case RPConstants.TGRID_TOTDEPT_ID:
-                    if (!_isLayoutByRole)
+                    if (!_useRole)
                     {
                         if (_resourceValues.Departments?.TryGetValue(
                             detailRowData.resavail.DeptID,
@@ -448,7 +492,7 @@ namespace RPADataCache
                     xI.CreateStringAttr(sn, detailRowData.ResOrRole);
                     break;
                 case RPConstants.TGRID_TOTROLE_ID:
-                    if (!_isLayoutByRole)
+                    if (!_useRole)
                     {
                         if (_resourceValues.Roles?.TryGetValue(detailRowData.resavail.RoleID, out listItem) == true)
                         {
@@ -461,7 +505,7 @@ namespace RPADataCache
                     xI.CreateStringAttr(sn, piValue);
                     break;
                 case RPConstants.TGRID_TOTCC_ID:
-                    if (!_isLayoutByRole)
+                    if (!_useRole)
                     {
                         if (_resourceValues.CostCategories?.TryGetValue(detailRowData.resavail.CostCat, out categoryItem) == true)
                         {
@@ -470,7 +514,7 @@ namespace RPADataCache
                     }
                     break;
                 case RPConstants.TGRID_TOTCCFULL_ID:
-                    if (!_isLayoutByRole)
+                    if (!_useRole)
                     {
                         if (_resourceValues.CostCategories?.TryGetValue(detailRowData.resavail.CostCatRole, out categoryItem) == true)
                         {
@@ -567,17 +611,7 @@ namespace RPADataCache
                 }
             }
         }
-
-        protected override int CalculateInternalPeriodMin(clsResFullDAta resxData)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override int CalculateInternalPeriodMax(clsResFullDAta resxData)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         private double GetDataValue(clsResFullDAta oDet, int fid, int iMode, int i, bool bForHeatmap, int iHeatmapID)
         {
             double retval = 0;
@@ -709,6 +743,138 @@ namespace RPADataCache
                 retval /= 100;
 
             return retval;
+        }
+
+        protected bool CheckIfPiRowShouldBeAdded(clsResXData detailRow)
+        {
+            if (_doZeroRowCleverStuff)
+            {
+                if (_displayList.Count != 0)
+                {
+                    for (var i = 0; i < Periods.Count; i++)
+                    {
+                        try
+                        {
+                            foreach (var displayRow in _displayList)
+                            {
+                                if (GetPIDataValue(detailRow, _mode,  i) != 0)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            WriteTrace(
+                                Area.EPMLiveWorkEnginePPM,
+                                Categories.EPMLiveWorkEnginePPM.Others,
+                                TraceSeverity.VerboseEx,
+                                ex.ToString());
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public void AddPIRow(clsResFullDAta oRFull, clsResXData piData, int rID, int xLi, int projectId)
+        {
+            var xIParent = Levels[0];
+            var xI = LastDataRowNode.CreateSubStruct("I");
+            Levels[2] = xI;
+
+            xI.CreateStringAttr("id", rID.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "PI");
+            xI.CreateBooleanAttr("CanEdit", false);
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateIntAttr("rowid", rID);
+            xI.CreateBooleanAttr("rowidCanEdit", false);
+            xI.CreateStringAttr("rtSelectType", "Text");
+            xI.CreateStringAttr("rtSelect", " ");
+            xI.CreateBooleanAttr("rtSelectCanEdit", false);
+            
+            InitializeDataColumns((column, sn) =>
+            {
+                InitializePiDataColumn(piData, xI, column, sn);
+            });
+            
+            i = 0;
+            cnt = disp.Count;
+
+            if (cnt == 0)
+                return;
+
+            foreach (CPeriod oPer in o_cResVals.Periods.Values)
+            {
+                try
+                {
+                    string sCName;
+                    ++i;
+                    cval = 0;
+                    cnt = 0;
+
+                    foreach (RPATGRow ot in disp)
+                    {
+                        ++cnt;
+                        sCName = "P" + oPer.PeriodID.ToString() + "C" + cnt.ToString();
+
+                        if (ot.fid <= 0)
+                        {
+                            xval = GetPIDataValue(oRFull, oDet, iMode, i, ot.fid, xLi, bUseHeatmap, iHeatMapID, projectId, by_role);
+                            cellval = "";
+
+                            if (iMode == 0)
+                                cellval = xval.ToString("0.##");
+                            else if (iMode == 2)
+                                cellval = xval.ToString("0.###");
+                            else
+                                cellval = xval.ToString("0.###");
+
+                            xI.CreateStringAttr(sCName, cellval);
+
+                            if (bUseHeatmap && ot.fid <= 0)
+                            {
+                                string rgb = RPAGridHelper.TargetBackground(xval, xval, TargetColors, out tarlev, HeatFieldColour);
+                                xI.CreateIntAttr("X" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
+
+                                if (tarlev <= 0)
+                                    tarlev = 0;
+
+                                xI.CreateIntAttr("Y" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
+
+                                if (rgb != "" && iHeatMapID != ot.fid)
+                                {
+                                    xI.CreateStringAttr(sCName + "Color", rgb);
+                                    xI.CreateStringAttr(sCName + "ExportStyle", "background-color: " + rgb);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) { }
+            }
+        }
+
+        private void InitializePiDataColumn(clsResXData piData, CStruct xI, clsRXDisp column, string sn)
+        {
+            switch (column.m_id)
+            {
+                case RPConstants.TGRID_TOTDEPT_ID:
+                case RPConstants.TGRID_TOTRESRES_ID:
+                case RPConstants.TGRID_TOTROLE_ID:
+                case RPConstants.TGRID_TOTCC_ID:
+                case RPConstants.TGRID_TOTCCFULL_ID:
+                    break;
+                case RPConstants.TGRID_TOTITEM_ID:
+                    xI.CreateStringAttr(sn, piData.ProjectName);
+                    break;
+                default:
+                    break;
+            }
         }
 
         private double GetPIDataValue(clsResXData oDet, int iMode, int i)
