@@ -21,6 +21,7 @@ namespace TimeSheets
     public class TimesheetAPI
     {
         private static int myworktableid = 6;
+        private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
 
         static TimesheetAPI()
         {
@@ -480,9 +481,9 @@ namespace TimeSheets
 
                     var userid = 0;
                     using (var command = new SqlCommand(
-                        "SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER " +
-                        "INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
-                        " WHERE TS_UID=@tsuid",
+                        @"SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER 
+                        INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID 
+                        WHERE TS_UID=@tsuid",
                         connection))
                     {
                         command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -492,7 +493,6 @@ namespace TimeSheets
                             {
                                 userid = reader.GetInt32(0);
                             }
-                            reader.Close();
                         }
                     }
 
@@ -502,8 +502,7 @@ namespace TimeSheets
 
                         if (user.ID != userid)
                         {
-                            message = 
-                                "<UnSubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                            message = string.Format(UnSubmitTimesheetTemplate, 3, "You do not have access to edit that timesheet.");
                         }
                         else
                         {
@@ -522,24 +521,23 @@ namespace TimeSheets
                                         bLocked = reader.GetBoolean(0);
                                         approval = reader.GetInt32(1);
                                     }
-                                    reader.Close();
                                 }
                             }
 
                             if (bLocked)
                             {
-                                message = "<UnSubmitTimesheet Status=\"4\">That timesheet is locked.</UnSubmitTimesheet>";
+                                message = string.Format(UnSubmitTimesheetTemplate, 4, "That timesheet is locked.");
                             }
                             else if (approval == 1 && !settings.DisableApprovals)
                             {
-                                message = "<UnSubmitTimesheet Status=\"3\">That timesheet has already been approved.</UnSubmitTimesheet>";
+                                message = string.Format(UnSubmitTimesheetTemplate, 3, "That timesheet has already been approved.");
                             }
                             else
                             {
                                 using (var command = new SqlCommand(
-                                    "Update TSTIMESHEET set " +
-                                    "submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name " +
-                                    "where TS_UID=@tsuid",
+                                    @"Update TSTIMESHEET set 
+                                    submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name 
+                                    where TS_UID=@tsuid",
                                     connection))
                                 {
                                     command.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
@@ -548,25 +546,28 @@ namespace TimeSheets
                                     command.ExecuteNonQuery();
                                 }
 
-                                message = "<UnSubmitTimesheet Status=\"0\"></UnSubmitTimesheet>";
+                                message = string.Format(UnSubmitTimesheetTemplate, 0, string.Empty);
                             }
                         }
                     }
                     else
                     {
-                        message = "<UnSubmitTimesheet Status=\"2\">Invalid user found for timesheet.</UnSubmitTimesheet>";
+                        message = string.Format(UnSubmitTimesheetTemplate, 2, "Invalid user found for timesheet.");
                     }
                 }
                 finally
                 {
-                    connection.Dispose();
+                    connection?.Dispose();
                 }
 
                 return message;
             }
             catch (Exception ex)
             {
-                return $"<UnSubmitTimesheet Status=\"1\">Error: {ex.Message}</UnSubmitTimesheet>";
+
+                var errorMessage = $"<UnSubmitTimesheet Status=\"1\">Error: {ex.Message}</UnSubmitTimesheet>";
+                Logger.WriteLog(Logger.Category.Unexpected, errorMessage, ex.ToString());
+                return errorMessage;
             }
         }
 
