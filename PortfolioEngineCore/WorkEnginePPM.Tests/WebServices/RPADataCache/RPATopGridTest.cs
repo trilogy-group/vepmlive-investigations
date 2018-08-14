@@ -330,7 +330,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             Assert.IsTrue(nameAttributeValues.Contains("Select"));
             Assert.IsTrue(typeAttributeValues.Contains("Bool"));
             Assert.IsTrue(nameAttributeValues.Contains("ChangedIcon"));
-            Assert.IsTrue(typeAttributeValues.Contains("Type"));
+            Assert.IsTrue(typeAttributeValues.Contains("Icon"));
             Assert.IsTrue(nameAttributeValues.Contains("RowDraggable"));
             Assert.IsTrue(typeAttributeValues.Contains("Bool"));
             Assert.IsTrue(nameAttributeValues.Contains("RowChanged"));

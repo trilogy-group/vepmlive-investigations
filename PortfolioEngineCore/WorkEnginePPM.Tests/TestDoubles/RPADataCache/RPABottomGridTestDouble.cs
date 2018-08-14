@@ -38,10 +38,12 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
 
-            Header1 = Constructor.CreateSubStruct("Header");
+            Header1 = Constructor.CreateSubStruct("Header1");
+            Header2 = Constructor.CreateSubStruct("Header2");
             base.PeriodCols = Constructor.CreateSubStruct("RightCols");
             base.DefinitionRight = Constructor.CreateSubStruct("Right");
             base.DefinitionLeaf = Constructor.CreateSubStruct("Leaf");
+            base.DefinitionPI= Constructor.CreateSubStruct("PI");
 
             Levels[0] = Constructor.CreateSubStruct("Test");
         }

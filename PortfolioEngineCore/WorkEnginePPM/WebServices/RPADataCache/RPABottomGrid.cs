@@ -288,8 +288,8 @@ namespace RPADataCache
                             {
                                 Header1.CreateStringAttr($"X{periodId}C{counter}", GlobalConstants.Whitespace);
                                 Header1.CreateStringAttr($"Y{periodId}C{counter}", GlobalConstants.Whitespace);
-                                Header2.CreateStringAttr($"X{periodId}C{counter}", periodName + displayRow.Name + "HeatMap");
-                                Header2.CreateStringAttr($"Y{periodId}C{counter}", periodName + displayRow.Name + "HeatMap");
+                                Header2.CreateStringAttr($"X{periodId}C{counter}", $"{periodName}{displayRow.Name}HeatMap");
+                                Header2.CreateStringAttr($"Y{periodId}C{counter}", $"{periodName}{displayRow.Name}HeatMap");
 
                                 xC = CreateColumn(
                                     PeriodCols,
@@ -368,7 +368,7 @@ namespace RPADataCache
             {
                 if (_displayList.Count != 0)
                 {
-                    for (var i = 0; i < Periods.Count; i++)
+                    for (var i = 1; i <= Periods.Count; i++)
                     {
                         try
                         {
