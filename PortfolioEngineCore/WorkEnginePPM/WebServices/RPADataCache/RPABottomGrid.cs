@@ -749,7 +749,7 @@ namespace RPADataCache
             return retval;
         }
 
-        private bool CheckIfPiRowShouldBeAdded(clsResXData detailRow)
+        protected bool CheckIfPiRowShouldBeAdded(clsResXData detailRow)
         {
             if (_doZeroRowCleverStuff)
             {
@@ -784,21 +784,21 @@ namespace RPADataCache
             return true;
         }
 
-        private void AddPIRow(clsResFullDAta detailRowData, clsResXData piData, int rID, int xLi, int projectId)
+        private void AddPIRow(clsResFullDAta detailRowData, clsResXData piData, int rowId, int idx, int projectId)
         {
             var xIParent = Levels[0];
             var xI = LastDataRowNode.CreateSubStruct("I");
             Levels[2] = xI;
 
-            xI.CreateStringAttr("id", rID.ToString());
+            xI.CreateStringAttr("id", rowId.ToString());
             xI.CreateStringAttr("Color", "white");
             xI.CreateStringAttr("Def", "PI");
             xI.CreateBooleanAttr("CanEdit", false);
             xI.CreateIntAttr("NoColorState", 1);
-            xI.CreateIntAttr("rowid", rID);
+            xI.CreateIntAttr("rowid", rowId);
             xI.CreateBooleanAttr("rowidCanEdit", false);
             xI.CreateStringAttr("rtSelectType", "Text");
-            xI.CreateStringAttr("rtSelect", " ");
+            xI.CreateStringAttr("rtSelect", GlobalConstants.Whitespace);
             xI.CreateBooleanAttr("rtSelectCanEdit", false);
             
             InitializeDataColumns((column, sn) =>
@@ -827,7 +827,7 @@ namespace RPADataCache
 
                         if (displayRow.fid <= 0)
                         {
-                            var piDataValue = GetPIDataValue(detailRowData, piData, i, displayRow.fid, xLi, projectId);
+                            var piDataValue = GetPIDataValue(detailRowData, piData, i, displayRow.fid, idx, projectId);
                             var cellValue = _displayMode == 0
                                 ? piDataValue.ToString("0.##")
                                 : piDataValue.ToString("0.###");

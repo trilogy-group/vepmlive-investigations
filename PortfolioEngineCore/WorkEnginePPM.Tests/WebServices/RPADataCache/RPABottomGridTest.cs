@@ -111,7 +111,27 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                 Periods = _periods.ToDictionary(pred => pred.PeriodID, pred => pred)
             };
 
+            _displayTotalsDetails = true;
             _detailRow = new clsResFullDAta();
+            _detailRow.used4totals = new List<clsResXData>
+            {
+                 new clsResXData
+                 {
+                     ProjectName = "test-project",
+                     bTotalize = true,
+                     bFilteredOut = false,
+                     WrkHours = new double[_periods.Count + 1],
+                     FTEVals = new double[_periods.Count + 1]
+                 }
+            };
+            _detailRow.tot_Totals.WrkHours = new double[_periods.Count + 1];
+            _detailRow.tot_Totals.FTEVals = new double[_periods.Count + 1];
+            for (var i = 0; i <= _periods.Count; i++)
+            {
+                _detailRow.tot_Totals.WrkHours[i] = i;
+                _detailRow.tot_Totals.FTEVals[i] = i + 10;
+            }
+
             _rowId = 3;
         }
 
@@ -179,7 +199,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
         private RPABottomGridTestDouble CreateTestDouble()
         {
-            return new RPABottomGridTestDouble(
+            var result = new RPABottomGridTestDouble(
                 _useRole,
                 _roleHeader,
                 _useHeatMap,
@@ -194,6 +214,9 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                 _displayList,
                 _resourceValues
             );
+
+            result.AddPeriodsData(_periods);
+            return result;
         }
 
         [TestMethod]
@@ -964,6 +987,105 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
             Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
             Assert.AreEqual(testName, _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void CheckIfPiRowShouldBeAdded_NotDoCleverStuff_ReturnsTrue()
+        {
+            // Arrange
+            _doZeroRowCleverStuff = false;
+            _testDouble = CreateTestDouble();
+            clsResXData detailRow = null;
+
+            // Act
+            var result = _testDouble.CheckIfPiRowShouldBeAdded(detailRow);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void CheckIfPiRowShouldBeAdded_DoCleverStuffDisplayListEmpty_ReturnsFalse()
+        {
+            // Arrange
+            _displayList = new List<RPATGRow>();
+            _testDouble = CreateTestDouble();
+
+            clsResXData detailRow = null;
+
+            // Act
+            var result = _testDouble.CheckIfPiRowShouldBeAdded(detailRow);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CheckIfPiRowShouldBeAdded_DoCleverStuffDisplayListNotEmpty_ReturnsFalse()
+        {
+            // Arrange
+            _displayList = new List<RPATGRow>();
+            _testDouble = CreateTestDouble();
+
+            clsResXData detailRow = null;
+
+            // Act
+            var result = _testDouble.CheckIfPiRowShouldBeAdded(detailRow);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddPIRow_Always_IStructSetup()
+        {
+            // Arrange
+            _doZeroRowCleverStuff = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, 0);
+
+            // Assert
+            Assert.IsTrue(_substructsCreated.Contains("I"));
+            Assert.AreEqual("I", _testDouble.Levels[2].Name);
+            Assert.AreEqual("10000001", _stringAttributesCreated["I"]["id"]);
+            Assert.AreEqual("white", _stringAttributesCreated["I"]["Color"]);
+            Assert.AreEqual("PI", _stringAttributesCreated["I"]["Def"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["CanEdit"]);
+            Assert.AreEqual(1, _intAttributesCreated["I"]["NoColorState"]);
+            Assert.AreEqual(10000001, _intAttributesCreated["I"]["rowid"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["rowidCanEdit"]);
+            Assert.AreEqual("Text", _stringAttributesCreated["I"]["rtSelectType"]);
+            Assert.AreEqual(" ", _stringAttributesCreated["I"]["rtSelect"]);
+            Assert.AreEqual("white", _stringAttributesCreated["I"]["Color"]);
+            Assert.AreEqual("white", _stringAttributesCreated["I"]["Color"]);
+            Assert.AreEqual(false, _booleanAttributesCreated["I"]["rtSelectCanEdit"]);
+        }
+
+        [TestMethod]
+        public void AddPIRow_TotItemColumnNotUseRole_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _doZeroRowCleverStuff = false;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            var sn = column.m_realname
+                   .Replace(" ", string.Empty)
+                   .Replace("/n", string.Empty)
+                   .Replace("\r", string.Empty)
+                   .Replace("\n", string.Empty);
+
+            Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
+            Assert.AreEqual(_detailRow.used4totals[0].ProjectName, _stringAttributesCreated["I"][sn]);
         }
     }
 }

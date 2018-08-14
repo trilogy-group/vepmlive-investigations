@@ -73,6 +73,11 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             return base.CheckIfDetailRowShouldBeAdded(detailRow);
         }
 
+        public new bool CheckIfPiRowShouldBeAdded(clsResXData piRow)
+        {
+            return base.CheckIfPiRowShouldBeAdded(piRow);
+        }
+
         public new void AddDetailRow(clsResFullDAta detailRowData, int rowId)
         {
             base.AddDetailRow(detailRowData, rowId);
