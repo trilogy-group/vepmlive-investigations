@@ -758,7 +758,7 @@ namespace RPADataCache
                         {
                             foreach (var displayRow in _displayList)
                             {
-                                if (GetPIDataValue(detailRow, _mode,  i) != 0)
+                                if (GetPIDataValue(detailRow, i) != 0)
                                 {
                                     return true;
                                 }
@@ -883,299 +883,75 @@ namespace RPADataCache
             }
         }
 
-        private double GetPIDataValue(clsResXData oDet, int iMode, int i)
+        private double GetPIDataValue(clsResXData piData, int i)
         {
-            double retval = 0;
-            double vval = 0;
-            double fval = 0;
+            var result = 0d;
+            var vval = piData.getvarr(i);
+            var fval = piData.getftarr(i);
 
-
-            vval = oDet.getvarr(i);
-            fval = oDet.getftarr(i);
-
-            if (iMode == 3)
+            switch (_mode)
             {
-                if (fval == 0)
-                    retval = 0;
-                else
-                    retval = (vval * 100) / fval;
+                case 3:
+                    result = fval != 0
+                        ? (vval * 100) / fval
+                        : 0;
+                    break;
+                case 1:
+                    result = fval / 100;
+                    break;
+                case 0:
+                    result = vval;
+                    break;
+                default:
+                    result = fval;
+                    break;
             }
-            else if (iMode == 0)
-                retval = vval;
-            else
-                retval = fval;
 
-
-
-            if (iMode == 1)
-                retval /= 100;
-
-            return retval;
+            return result;
         }
 
-        private double GetPIDataValue(clsResFullDAta oFullData, clsResXData oDet, int iMode, int i, int fid, int idx, bool bUseHeatmap, int iHeatMapID, int projectId, bool byRole)
+        private double GetPIDataValue(clsResFullDAta detailRowData, clsResXData piData, int i, int fieldId, int idx, int projectId)
         {
             //All the calculation performd for Show Totals section is based on following link:
             //https://upland.screenstepslive.com/s/EPMLive2013/m/UserGuide/l/147531-how-do-i-use-the-total-column-feature-within-the-resource-analyzer
-            double retval = 0;
+            double result = 0;
             double vval = 0;
             double fval = 0;
 
             try
             {
-                if (fid == 0)
+                switch (fieldId)
                 {
-                    vval = oDet.getvarr(i);
-                    fval = oDet.getftarr(i);
-                }
-                else if (fid == -1)
-                {
-                    //Actual Work equals Timesheet Actuals entered.
-                    if (oFullData.actual.Count > 0)
-                    {
-                        idx = -1;
-                        if (byRole)
-                        {
-                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
-                            {
-                                if (oFullData.actual[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    vval += Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                        }
-                        else
-                        {
-                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
-                            {
-                                if (oFullData.actual[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    break;
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                            else
-                            {
-                                vval = Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
-                                fval = Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
-                            }
-                        }
-                    }
-                }
-                else if (fid == -2)
-                {
-                    //Proposed Work equals resource planned work that has not yet been committed.
-                    if (oFullData.proposal.Count > 0)
-                    {
-                        idx = -1;
-                        if (byRole)
-                        {
-                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
-                            {
-                                if (oFullData.proposal[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    vval += Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                        }
-                        else
-                        {
-                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
-                            {
-                                if (oFullData.proposal[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    break;
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                            else
-                            {
-                                vval = Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
-                                fval = Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
-                            }
-                        }
-                    }
-                }
-                else if (fid == -3)
-                {
-                    //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
-                    if (byRole)
-                    {
-                        for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
-                        {
-                            if (oFullData.scheduled[counter].ProjectID == projectId)
-                            {
-                                idx = counter;
-                                vval += Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
-                                fval += Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
-                            }
-                        }
-                        if (idx == -1)
-                        {
-                            vval = fval = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (oFullData.scheduled.Count > 0)
+                    case 0:
+                        vval = piData.getvarr(i);
+                        fval = piData.getftarr(i);
+                        break;
+                    case -1:
+                        //Actual Work equals Timesheet Actuals entered.
+                        if (detailRowData.actual.Count > 0)
                         {
                             idx = -1;
-                            for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
+                            if (_useRole)
                             {
-                                if (oFullData.scheduled[counter].ProjectID == projectId)
+                                for (var counter = 0; counter < detailRowData.actual.Count; counter++)
                                 {
-                                    idx = counter;
-                                    break;
+                                    if (detailRowData.actual[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        vval += Convert.ToDouble(detailRowData.actual[idx].WrkHours[i]);
+                                        fval += Convert.ToDouble(detailRowData.actual[idx].FTEVals[i]);
+                                    }
                                 }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
                             }
                             else
                             {
-                                vval = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
-                                fval = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
-                            }
-                        }
-                    }
-                }
-                else if (fid == -4)
-                {
-                    //Committed Work equals the hours in resource plans that have been committed.
-                    if (byRole)
-                    {
-                        for (int counter = 0; counter < oFullData.committed.Count; counter++)
-                        {
-                            if (oFullData.committed[counter].ProjectID == projectId)
-                            {
-                                idx = counter;
-                                vval += Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                                fval += Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
-                            }
-                        }
-                        if (idx == -1)
-                        {
-                            vval = fval = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (oFullData.committed.Count > 0)
-                        {
-                            idx = -1;
-                            for (int counter = 0; counter < oFullData.committed.Count; counter++)
-                            {
-                                if (oFullData.committed[counter].ProjectID == projectId)
+                                for (int counter = 0; counter < detailRowData.actual.Count; counter++)
                                 {
-                                    idx = counter;
-                                    break;
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                            else
-                            {
-                                vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                                fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
-                            }
-                        }
-                    }
-                }
-                else if (fid == -5)
-                {
-                    //Personal Time Off pulls in the hours entered into the Time Off Requests.
-                    if (byRole)
-                    {
-                        for (int counter = 0; counter < oFullData.personel.Count; counter++)
-                        {
-                            if (oFullData.personel[counter].ProjectID == projectId)
-                            {
-                                idx = counter;
-                                vval += Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
-                                fval += Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
-                            }
-                        }
-                        if (idx == -1)
-                        {
-                            vval = fval = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (oFullData.personel.Count > 0)
-                        {
-                            idx = -1;
-                            for (int counter = 0; counter < oFullData.personel.Count; counter++)
-                            {
-                                if (oFullData.personel[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    break;
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                            else
-                            {
-                                vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
-                                fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
-                            }
-                        }
-                    }
-                }
-                else if (fid == -6)
-                {
-                    //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
-                    //It is important to note that this is resource specific based on each resource’s work hours schedule.
-                    vval = oFullData.tot_avail.getvarr(i);
-                    fval = oFullData.tot_avail.getftarr(i);
-                }
-                else if (fid == -7)
-                {
-                    //Remaining Availability equals Availability minus any committed and scheduled work.
-                    double totWrkHrs = 0, totFTEHrs = 0;
-                    double avlWrkHrs = 0, avlFTEHrs = 0;
-
-                    if (oDet.ProjectID == projectId)
-                    {
-                        if (byRole)
-                        {
-                            avlWrkHrs = oFullData.tot_avail.getvarr(i);
-                            avlFTEHrs = oFullData.tot_avail.getftarr(i);
-                        }
-                        else
-                        {
-                            if (oFullData.avail.Count > 0)
-                            {
-                                idx = 0;
-                                for (int counter = 0; counter < oFullData.avail.Count; counter++)
-                                {
-                                    if (oFullData.avail[counter].ProjectID == projectId)
+                                    if (detailRowData.actual[counter].ProjectID == projectId)
                                     {
                                         idx = counter;
                                         break;
@@ -1183,47 +959,278 @@ namespace RPADataCache
                                 }
                                 if (idx == -1)
                                 {
-                                    avlWrkHrs = avlFTEHrs = 0;
+                                    vval = fval = 0;
                                 }
                                 else
                                 {
-                                    avlWrkHrs = Convert.ToDouble(oFullData.avail[idx].WrkHours[i]);
-                                    avlFTEHrs = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
+                                    vval = Convert.ToDouble(detailRowData.actual[idx].WrkHours[i]);
+                                    fval = Convert.ToDouble(detailRowData.actual[idx].FTEVals[i]);
                                 }
                             }
                         }
+                        break;
+                    case -2:
+                        //Proposed Work equals resource planned work that has not yet been committed.
+                        if (detailRowData.proposal.Count > 0)
+                        {
+                            idx = -1;
+                            if (_useRole)
+                            {
+                                for (int counter = 0; counter < detailRowData.proposal.Count; counter++)
+                                {
+                                    if (detailRowData.proposal[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        vval += Convert.ToDouble(detailRowData.proposal[idx].WrkHours[i]);
+                                        fval += Convert.ToDouble(detailRowData.proposal[idx].FTEVals[i]);
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
+                            }
+                            else
+                            {
+                                for (int counter = 0; counter < detailRowData.proposal.Count; counter++)
+                                {
+                                    if (detailRowData.proposal[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
+                                else
+                                {
+                                    vval = Convert.ToDouble(detailRowData.proposal[idx].WrkHours[i]);
+                                    fval = Convert.ToDouble(detailRowData.proposal[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+                        break;
+                    case -3:
+                        //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
+                        if (_useRole)
+                        {
+                            for (int counter = 0; counter < detailRowData.scheduled.Count; counter++)
+                            {
+                                if (detailRowData.scheduled[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(detailRowData.scheduled[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(detailRowData.scheduled[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (detailRowData.scheduled.Count > 0)
+                            {
+                                idx = -1;
+                                for (int counter = 0; counter < detailRowData.scheduled.Count; counter++)
+                                {
+                                    if (detailRowData.scheduled[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
+                                else
+                                {
+                                    vval = Convert.ToDouble(detailRowData.scheduled[idx].WrkHours[i]);
+                                    fval = Convert.ToDouble(detailRowData.scheduled[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+                        break;
+                    case -4:
+                        //Committed Work equals the hours in resource plans that have been committed.
+                        if (_useRole)
+                        {
+                            for (int counter = 0; counter < detailRowData.committed.Count; counter++)
+                            {
+                                if (detailRowData.committed[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(detailRowData.committed[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(detailRowData.committed[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (detailRowData.committed.Count > 0)
+                            {
+                                idx = -1;
+                                for (int counter = 0; counter < detailRowData.committed.Count; counter++)
+                                {
+                                    if (detailRowData.committed[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
+                                else
+                                {
+                                    vval = Convert.ToDouble(detailRowData.committed[idx].WrkHours[i]);
+                                    fval = Convert.ToDouble(detailRowData.committed[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+                        break;
+                    case -5:
+                        //Personal Time Off pulls in the hours entered into the Time Off Requests.
+                        if (_useRole)
+                        {
+                            for (int counter = 0; counter < detailRowData.personel.Count; counter++)
+                            {
+                                if (detailRowData.personel[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(detailRowData.personel[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(detailRowData.personel[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (detailRowData.personel.Count > 0)
+                            {
+                                idx = -1;
+                                for (int counter = 0; counter < detailRowData.personel.Count; counter++)
+                                {
+                                    if (detailRowData.personel[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    vval = fval = 0;
+                                }
+                                else
+                                {
+                                    vval = Convert.ToDouble(detailRowData.personel[idx].WrkHours[i]);
+                                    fval = Convert.ToDouble(detailRowData.personel[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+                        break;
+                    case -6:
+                        //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
+                        //It is important to note that this is resource specific based on each resource’s work hours schedule.
+                        vval = detailRowData.tot_avail.getvarr(i);
+                        fval = detailRowData.tot_avail.getftarr(i);
+                        break;
+                    case -7:
+                        //Remaining Availability equals Availability minus any committed and scheduled work.
+                        double totWrkHrs = 0, totFTEHrs = 0;
+                        double avlWrkHrs = 0, avlFTEHrs = 0;
 
-                        totWrkHrs = oDet.getvarr(i);
-                        totFTEHrs = oDet.getftarr(i);
+                        if (piData.ProjectID == projectId)
+                        {
+                            if (_useRole)
+                            {
+                                avlWrkHrs = detailRowData.tot_avail.getvarr(i);
+                                avlFTEHrs = detailRowData.tot_avail.getftarr(i);
+                            }
+                            else
+                            {
+                                if (detailRowData.avail.Count > 0)
+                                {
+                                    idx = 0;
+                                    for (int counter = 0; counter < detailRowData.avail.Count; counter++)
+                                    {
+                                        if (detailRowData.avail[counter].ProjectID == projectId)
+                                        {
+                                            idx = counter;
+                                            break;
+                                        }
+                                    }
+                                    if (idx == -1)
+                                    {
+                                        avlWrkHrs = avlFTEHrs = 0;
+                                    }
+                                    else
+                                    {
+                                        avlWrkHrs = Convert.ToDouble(detailRowData.avail[idx].WrkHours[i]);
+                                        avlFTEHrs = Convert.ToDouble(detailRowData.avail[idx].FTEVals[i]);
+                                    }
+                                }
+                            }
 
-                        vval = avlWrkHrs - totWrkHrs;
-                        fval = avlFTEHrs - totFTEHrs;
-                    }
+                            totWrkHrs = piData.getvarr(i);
+                            totFTEHrs = piData.getftarr(i);
+
+                            vval = avlWrkHrs - totWrkHrs;
+                            fval = avlFTEHrs - totFTEHrs;
+                        }
+                        break;
+                    default:
+                        if (fieldId > 0 && fieldId <= detailRowData.CapScen.Count)
+                        {
+                            vval = detailRowData.CapScen[fieldId - 1].getvarr(i);
+                            fval = detailRowData.CapScen[fieldId - 1].getftarr(i);
+                        }
+                        break;
                 }
-                else if (fid > 0 && fid <= oFullData.CapScen.Count)
+
+
+                switch (_mode)
                 {
-                    vval = oFullData.CapScen[fid - 1].getvarr(i);
-                    fval = oFullData.CapScen[fid - 1].getftarr(i);
+                    case 3:
+                        result = fval != 0
+                            ? (vval * 100) / fval
+                            : 0;
+                        break;
+                    case 1:
+                        result = fval / 100;
+                        break;
+                    case 0:
+                        result = vval;
+                        break;
+                    default:
+                        result = fval;
+                        break;
                 }
 
-                if (iMode == 3)
-                {
-                    if (fval == 0)
-                        retval = 0;
-                    else
-                        retval = (vval * 100) / fval;
-                }
-                else if (iMode == 0)
-                    retval = vval;
-                else
-                    retval = fval;
-
-                if (iMode == 1)
-                    retval /= 100;
-
-                return retval;
+                return result;
             }
-            catch { return 0; }
+            catch(Exception ex)
+            {
+                WriteTrace(
+                    Area.EPMLiveWorkEnginePPM,
+                    Categories.EPMLiveWorkEnginePPM.Others,
+                    TraceSeverity.VerboseEx,
+                    ex.ToString());
+
+                return 0;
+            }
         }
     }
 }
