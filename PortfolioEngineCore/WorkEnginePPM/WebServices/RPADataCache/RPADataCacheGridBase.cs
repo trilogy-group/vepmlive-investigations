@@ -42,6 +42,18 @@ namespace RPADataCache
             _categoryLookupList = categoryLookupList;
         }
 
+        protected override void InitializeGridData(GridRenderingTypes renderingType)
+        {
+            var xBody = Constructor.CreateSubStruct("Body");
+            var xB = xBody.CreateSubStruct("B");
+            var xI = xBody.CreateSubStruct("I");
+            xI.CreateStringAttr("Grouping", "Totals");
+            xI.CreateBooleanAttr("CanEdit", false);
+
+            Level = 0;
+            Levels[Level] = xI;
+        }
+
         protected CStruct InitializeGridLayoutConfig(
             string mainColName, 
             int suppressCfgStatus,

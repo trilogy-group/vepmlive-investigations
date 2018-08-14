@@ -395,18 +395,6 @@ namespace RPADataCache
             }
         }
         
-        protected override void InitializeGridData(GridRenderingTypes renderingType)
-        {
-            var xBody = Constructor.CreateSubStruct("Body");
-            var xB = xBody.CreateSubStruct("B");
-            var xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            Level = 0;
-            Levels[Level] = xI;
-        }
-
         protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
         {
             return true;

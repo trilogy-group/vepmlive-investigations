@@ -578,11 +578,6 @@ namespace RPADataCache
             throw new NotImplementedException();
         }
 
-        protected override void InitializeGridData(GridRenderingTypes renderingType)
-        {
-            throw new NotImplementedException();
-        }
-
         private double GetDataValue(clsResFullDAta oDet, int fid, int iMode, int i, bool bForHeatmap, int iHeatmapID)
         {
             double retval = 0;
