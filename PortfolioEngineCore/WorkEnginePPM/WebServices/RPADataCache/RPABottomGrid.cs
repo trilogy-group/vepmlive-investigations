@@ -443,7 +443,6 @@ namespace RPADataCache
             }
         }
 
-
         private void InitializeDataColumns(Action<clsRXDisp, string> columnInitializationFunc)
         {
             foreach (var column in _columns.Where(column =>
@@ -746,7 +745,7 @@ namespace RPADataCache
             return retval;
         }
 
-        protected bool CheckIfPiRowShouldBeAdded(clsResXData detailRow)
+        private bool CheckIfPiRowShouldBeAdded(clsResXData detailRow)
         {
             if (_doZeroRowCleverStuff)
             {
@@ -815,7 +814,6 @@ namespace RPADataCache
                 {
                     i++;
                     string prefix;
-                    var cValue = 0;
                     var counter = 0;
 
                     foreach (var displayRow in _displayList)
@@ -885,267 +883,51 @@ namespace RPADataCache
 
         private double GetPIDataValue(clsResXData piData, int i)
         {
-            var result = 0d;
-            var vval = piData.getvarr(i);
-            var fval = piData.getftarr(i);
-
-            switch (_mode)
-            {
-                case 3:
-                    result = fval != 0
-                        ? (vval * 100) / fval
-                        : 0;
-                    break;
-                case 1:
-                    result = fval / 100;
-                    break;
-                case 0:
-                    result = vval;
-                    break;
-                default:
-                    result = fval;
-                    break;
-            }
-
-            return result;
+            var workHours = piData.getvarr(i);
+            var fteValue = piData.getftarr(i);
+            return ComputePIValue(workHours, fteValue);
         }
 
         private double GetPIDataValue(clsResFullDAta detailRowData, clsResXData piData, int i, int fieldId, int idx, int projectId)
         {
             //All the calculation performd for Show Totals section is based on following link:
             //https://upland.screenstepslive.com/s/EPMLive2013/m/UserGuide/l/147531-how-do-i-use-the-total-column-feature-within-the-resource-analyzer
-            double result = 0;
-            double vval = 0;
-            double fval = 0;
+            double workHours = 0;
+            double fteValue = 0;
 
             try
             {
                 switch (fieldId)
                 {
                     case 0:
-                        vval = piData.getvarr(i);
-                        fval = piData.getftarr(i);
+                        workHours = piData.getvarr(i);
+                        fteValue = piData.getftarr(i);
                         break;
                     case -1:
                         //Actual Work equals Timesheet Actuals entered.
-                        if (detailRowData.actual.Count > 0)
-                        {
-                            idx = -1;
-                            if (_useRole)
-                            {
-                                for (var counter = 0; counter < detailRowData.actual.Count; counter++)
-                                {
-                                    if (detailRowData.actual[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        vval += Convert.ToDouble(detailRowData.actual[idx].WrkHours[i]);
-                                        fval += Convert.ToDouble(detailRowData.actual[idx].FTEVals[i]);
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                            }
-                            else
-                            {
-                                for (int counter = 0; counter < detailRowData.actual.Count; counter++)
-                                {
-                                    if (detailRowData.actual[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(detailRowData.actual[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(detailRowData.actual[idx].FTEVals[i]);
-                                }
-                            }
-                        }
+                        ComputePIValues(detailRowData.actual, projectId, i, -1, -1, ref workHours, ref fteValue);
                         break;
                     case -2:
                         //Proposed Work equals resource planned work that has not yet been committed.
-                        if (detailRowData.proposal.Count > 0)
-                        {
-                            idx = -1;
-                            if (_useRole)
-                            {
-                                for (int counter = 0; counter < detailRowData.proposal.Count; counter++)
-                                {
-                                    if (detailRowData.proposal[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        vval += Convert.ToDouble(detailRowData.proposal[idx].WrkHours[i]);
-                                        fval += Convert.ToDouble(detailRowData.proposal[idx].FTEVals[i]);
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                            }
-                            else
-                            {
-                                for (int counter = 0; counter < detailRowData.proposal.Count; counter++)
-                                {
-                                    if (detailRowData.proposal[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(detailRowData.proposal[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(detailRowData.proposal[idx].FTEVals[i]);
-                                }
-                            }
-                        }
+                        ComputePIValues(detailRowData.proposal, projectId, i, -1, -1, ref workHours, ref fteValue);
                         break;
                     case -3:
                         //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
-                        if (_useRole)
-                        {
-                            for (int counter = 0; counter < detailRowData.scheduled.Count; counter++)
-                            {
-                                if (detailRowData.scheduled[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    vval += Convert.ToDouble(detailRowData.scheduled[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(detailRowData.scheduled[idx].FTEVals[i]);
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                        }
-                        else
-                        {
-                            if (detailRowData.scheduled.Count > 0)
-                            {
-                                idx = -1;
-                                for (int counter = 0; counter < detailRowData.scheduled.Count; counter++)
-                                {
-                                    if (detailRowData.scheduled[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(detailRowData.scheduled[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(detailRowData.scheduled[idx].FTEVals[i]);
-                                }
-                            }
-                        }
+                        ComputePIValues(detailRowData.scheduled, projectId, i, idx, -1, ref workHours, ref fteValue);
                         break;
                     case -4:
                         //Committed Work equals the hours in resource plans that have been committed.
-                        if (_useRole)
-                        {
-                            for (int counter = 0; counter < detailRowData.committed.Count; counter++)
-                            {
-                                if (detailRowData.committed[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    vval += Convert.ToDouble(detailRowData.committed[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(detailRowData.committed[idx].FTEVals[i]);
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                        }
-                        else
-                        {
-                            if (detailRowData.committed.Count > 0)
-                            {
-                                idx = -1;
-                                for (int counter = 0; counter < detailRowData.committed.Count; counter++)
-                                {
-                                    if (detailRowData.committed[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(detailRowData.committed[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(detailRowData.committed[idx].FTEVals[i]);
-                                }
-                            }
-                        }
+                        ComputePIValues(detailRowData.committed, projectId, i, idx, -1, ref workHours, ref fteValue);
                         break;
                     case -5:
                         //Personal Time Off pulls in the hours entered into the Time Off Requests.
-                        if (_useRole)
-                        {
-                            for (int counter = 0; counter < detailRowData.personel.Count; counter++)
-                            {
-                                if (detailRowData.personel[counter].ProjectID == projectId)
-                                {
-                                    idx = counter;
-                                    vval += Convert.ToDouble(detailRowData.personel[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(detailRowData.personel[idx].FTEVals[i]);
-                                }
-                            }
-                            if (idx == -1)
-                            {
-                                vval = fval = 0;
-                            }
-                        }
-                        else
-                        {
-                            if (detailRowData.personel.Count > 0)
-                            {
-                                idx = -1;
-                                for (int counter = 0; counter < detailRowData.personel.Count; counter++)
-                                {
-                                    if (detailRowData.personel[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(detailRowData.personel[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(detailRowData.personel[idx].FTEVals[i]);
-                                }
-                            }
-                        }
+                        ComputePIValues(detailRowData.personel, projectId, i, idx, -1, ref workHours, ref fteValue);
                         break;
                     case -6:
                         //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
                         //It is important to note that this is resource specific based on each resource’s work hours schedule.
-                        vval = detailRowData.tot_avail.getvarr(i);
-                        fval = detailRowData.tot_avail.getftarr(i);
+                        workHours = detailRowData.tot_avail.getvarr(i);
+                        fteValue = detailRowData.tot_avail.getftarr(i);
                         break;
                     case -7:
                         //Remaining Availability equals Availability minus any committed and scheduled work.
@@ -1187,41 +969,22 @@ namespace RPADataCache
                             totWrkHrs = piData.getvarr(i);
                             totFTEHrs = piData.getftarr(i);
 
-                            vval = avlWrkHrs - totWrkHrs;
-                            fval = avlFTEHrs - totFTEHrs;
+                            workHours = avlWrkHrs - totWrkHrs;
+                            fteValue = avlFTEHrs - totFTEHrs;
                         }
                         break;
                     default:
                         if (fieldId > 0 && fieldId <= detailRowData.CapScen.Count)
                         {
-                            vval = detailRowData.CapScen[fieldId - 1].getvarr(i);
-                            fval = detailRowData.CapScen[fieldId - 1].getftarr(i);
+                            workHours = detailRowData.CapScen[fieldId - 1].getvarr(i);
+                            fteValue = detailRowData.CapScen[fieldId - 1].getftarr(i);
                         }
                         break;
                 }
 
-
-                switch (_mode)
-                {
-                    case 3:
-                        result = fval != 0
-                            ? (vval * 100) / fval
-                            : 0;
-                        break;
-                    case 1:
-                        result = fval / 100;
-                        break;
-                    case 0:
-                        result = vval;
-                        break;
-                    default:
-                        result = fval;
-                        break;
-                }
-
-                return result;
+                return ComputePIValue(workHours, fteValue);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WriteTrace(
                     Area.EPMLiveWorkEnginePPM,
@@ -1230,6 +993,87 @@ namespace RPADataCache
                     ex.ToString());
 
                 return 0;
+            }
+        }
+
+        private double ComputePIValue(double vval, double fval)
+        {
+            double result;
+            switch (_mode)
+            {
+                case 3:
+                    result = fval != 0
+                        ? (vval * 100) / fval
+                        : 0;
+                    break;
+                case 1:
+                    result = fval / 100;
+                    break;
+                case 0:
+                    result = vval;
+                    break;
+                default:
+                    result = fval;
+                    break;
+            }
+
+            return result;
+        }
+
+        private void ComputePIValues(
+            IList<clsResXData> dataRecords, 
+            int projectId, 
+            int index, 
+            int idxWithRole, 
+            int idxWithoutRole,
+            ref double workHours, 
+            ref double fteValue)
+        {
+            if (_useRole)
+            {
+                ComputePIValuesWithRole(dataRecords, projectId, index, idxWithRole, ref workHours, ref fteValue);
+            }
+            else
+            {
+                ComputePIValuesWithoutRole(dataRecords, projectId, index, idxWithoutRole, ref workHours, ref fteValue);
+            }
+        }
+
+        private static void ComputePIValuesWithoutRole(IList<clsResXData> dataRecords, int projectId, int index, int idx, ref double workHours, ref double fteValues)
+        {
+            for (int counter = 0; counter < dataRecords.Count; counter++)
+            {
+                if (dataRecords[counter].ProjectID == projectId)
+                {
+                    idx = counter;
+                    break;
+                }
+            }
+            if (idx == -1)
+            {
+                workHours = fteValues = 0;
+            }
+            else
+            {
+                workHours = Convert.ToDouble(dataRecords[idx].WrkHours[index]);
+                fteValues = Convert.ToDouble(dataRecords[idx].FTEVals[index]);
+            }
+        }
+
+        private static void ComputePIValuesWithRole(IList<clsResXData> dataRecords, int projectId, int index, int idx, ref double workHours, ref double fteValues)
+        {
+            for (int counter = 0; counter < dataRecords.Count; counter++)
+            {
+                if (dataRecords[counter].ProjectID == projectId)
+                {
+                    idx = counter;
+                    workHours += Convert.ToDouble(dataRecords[idx].WrkHours[index]);
+                    fteValues += Convert.ToDouble(dataRecords[idx].FTEVals[index]);
+                }
+            }
+            if (idx == -1)
+            {
+                workHours = fteValues = 0;
             }
         }
     }
