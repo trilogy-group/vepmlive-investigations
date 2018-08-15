@@ -201,35 +201,12 @@ namespace EPMLive.TestFakes.Utility
             .Bind(new ShimSPListItem[] { });
         }
 
-        private ShimSPListCollection InitializeRootWebSPListCollectionShim()
-        {
-            return new ShimSPListCollection
-            {
-                ItemGetString = key => ListShim,
-                ItemGetGuid = key => ListShim,
-                ItemGetInt32 = key => ListShim
-            };
-        }
-
         private ShimSPSite InitializeSPSiteShim()
         {
             return new ShimSPSite
             {
                 WebApplicationGet = () => ApplicationShim,
                 RootWebGet = () => WebShim
-            };
-        }
-
-        private ShimSPWeb InitializeRootWebSPSiteShim()
-        {
-            return new ShimSPWeb
-            {
-                CurrentUserGet = () => UserShim,
-                ServerRelativeUrlGet = () => ServerRelativeUrl,
-                ListsGet = () => ListsShim,
-                SiteGet = () => SiteShim,
-                GroupsGet = () => GroupsShim,
-                EnsureUserString = userName => UserShim
             };
         }
 
@@ -240,6 +217,7 @@ namespace EPMLive.TestFakes.Utility
                 UserGet = () => UserShim
             };
         }
+
         private ShimSPFieldUserValueCollection InitializeSPFieldUserValuesShim()
         {
             var result = new SPFieldUserValueCollection();
