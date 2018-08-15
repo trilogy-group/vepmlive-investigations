@@ -828,40 +828,43 @@ namespace EPMLiveCore
 
         public static DirectoryEntry getUserFromAD(string userName)
         {
-            if (string.IsNullOrEmpty(userName))
+            if (userName == null)
             {
                 throw new ArgumentNullException(nameof(userName));
             }
 
             DirectoryEntry result = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            if (!string.IsNullOrEmpty(userName))
             {
-                var indexOfDoubleSlash = userName.IndexOf("\\");
-                if (indexOfDoubleSlash > 0)
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    userName = userName.Substring(indexOfDoubleSlash + 1);
-                }
-
-                using (var directoryEntry = new DirectoryEntry
-                {
-                    Path = "LDAP://" + getDomain(),
-                    AuthenticationType = AuthenticationTypes.Secure
-                })
-                {
-                    using (var directorySearcher = new DirectorySearcher
+                    var indexOfDoubleSlash = userName.IndexOf("\\");
+                    if (indexOfDoubleSlash > 0)
                     {
-                        SearchRoot = directoryEntry,
-                        Filter = $"(&(objectClass=user) (cn={userName}))"
+                        userName = userName.Substring(indexOfDoubleSlash + 1);
+                    }
+
+                    using (var directoryEntry = new DirectoryEntry
+                    {
+                        Path = "LDAP://" + getDomain(),
+                        AuthenticationType = AuthenticationTypes.Secure
                     })
                     {
-                        var results = directorySearcher.FindAll();
-                        if (results.Count > 0)
+                        using (var directorySearcher = new DirectorySearcher
                         {
-                            result = results[0].GetDirectoryEntry();
+                            SearchRoot = directoryEntry,
+                            Filter = $"(&(objectClass=user) (cn={userName}))"
+                        })
+                        {
+                            var results = directorySearcher.FindAll();
+                            if (results.Count > 0)
+                            {
+                                result = results[0].GetDirectoryEntry();
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             return result;
         }

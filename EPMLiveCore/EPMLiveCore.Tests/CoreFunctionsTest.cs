@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace EPMLiveCore.Tests
         private IDisposable _shimsContext;
         private AdoShims _adoShims;
         private SharepointShims _sharepointShims;
+        private DirectoryShims _directoryShims;
 
         private Guid _timerJobBuild;
         private int _defaultStatus;
@@ -28,6 +30,7 @@ namespace EPMLiveCore.Tests
             _shimsContext = ShimsContext.Create();
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
+            _directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             _timerJobBuild = Guid.NewGuid();
             _defaultStatus = 1;
@@ -169,6 +172,50 @@ namespace EPMLiveCore.Tests
             var command = _adoShims.CommandsCreated.Single(pred => pred.CommandText == commandTextExpected);
             Assert.AreEqual(commandParametersExpected.Length, command.Parameters.Count);
             Assert.IsTrue(commandParametersExpected.All(pred => command.Parameters.Contains(pred)));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException), "userName")]
+        public void getUserFromAD_UserNameNull_Throws()
+        {
+            // Arrange
+            string username = null;
+
+            // Act
+            CoreFunctions.getUserFromAD(username);
+
+            // Assert
+            // ExpectedException: ArgumentNullException
+        }
+
+        [TestMethod]
+        public void getUserFromAD_NameNotEmpty_CorretlyManagesDirectoryEntry()
+        {
+            // Arrange
+            const string userName = "test";
+
+            // Act
+            CoreFunctions.getUserFromAD(userName);
+
+            // Assert
+            Assert.AreEqual(1, _directoryShims.DirectoryEntriesDisposed.Count);
+            Assert.AreEqual(AuthenticationTypes.Secure, _directoryShims.DirectoryEntriesDisposed[0].AuthenticationType);
+            Assert.IsTrue(_directoryShims.DirectoryEntriesDisposed[0].Path.StartsWith("LDAP://"));
+        }
+
+        [TestMethod]
+        public void getUserFromAD_NameNotEmpty_DirectorySearcherEntry()
+        {
+            // Arrange
+            const string userName = "test";
+
+            // Act
+            CoreFunctions.getUserFromAD(userName);
+
+            // Assert
+            Assert.AreEqual(1, _directoryShims.DirectorySearchersDisposed.Count);
+            Assert.AreEqual(_directoryShims.DirectoryEntriesDisposed[0], _directoryShims.DirectorySearchersDisposed[0].SearchRoot);
+            Assert.AreEqual($"(&(objectClass=user) (cn={userName}))", _directoryShims.DirectorySearchersDisposed[0].Filter);
         }
     }
 }
