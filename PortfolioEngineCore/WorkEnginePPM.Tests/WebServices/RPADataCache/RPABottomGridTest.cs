@@ -47,6 +47,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
         private IList<CPeriod> _periods;
         private clsResFullDAta _detailRow;
+        private clsResXData _piData;
         private int _rowId;
 
         private IList<string> _errorsLogged;
@@ -111,25 +112,26 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
                 Periods = _periods.ToDictionary(pred => pred.PeriodID, pred => pred)
             };
 
-            _displayTotalsDetails = true;
-            _detailRow = new clsResFullDAta();
-            _detailRow.used4totals = new List<clsResXData>
+            _displayTotalsDetails = false;
+            _piData = new clsResXData
             {
-                 new clsResXData
-                 {
-                     ProjectName = "test-project",
-                     bTotalize = true,
-                     bFilteredOut = false,
-                     WrkHours = new double[_periods.Count + 1],
-                     FTEVals = new double[_periods.Count + 1]
-                 }
+                ProjectName = "test-project",
+                bTotalize = true,
+                bFilteredOut = false,
+                WrkHours = new double[_periods.Count + 1],
+                FTEVals = new double[_periods.Count + 1]
             };
+            _detailRow = new clsResFullDAta();
+            _detailRow.used4totals = new List<clsResXData> { _piData };
             _detailRow.tot_Totals.WrkHours = new double[_periods.Count + 1];
             _detailRow.tot_Totals.FTEVals = new double[_periods.Count + 1];
             for (var i = 0; i <= _periods.Count; i++)
             {
                 _detailRow.tot_Totals.WrkHours[i] = i;
                 _detailRow.tot_Totals.FTEVals[i] = i + 10;
+
+                _piData.WrkHours[i] = i * 1.111;
+                _piData.FTEVals[i] = i * 1.222;
             }
 
             _rowId = 3;
@@ -1041,6 +1043,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
         {
             // Arrange
             _doZeroRowCleverStuff = false;
+            _displayTotalsDetails = true;
             _testDouble = CreateTestDouble();
 
             // Act
@@ -1072,6 +1075,7 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
             _columns = new[] { column };
             _useRole = false;
             _doZeroRowCleverStuff = false;
+            _displayTotalsDetails = true;
             _testDouble = CreateTestDouble();
 
             // Act
@@ -1086,6 +1090,144 @@ namespace WorkEnginePPM.Tests.WebServices.RPADataCache
 
             Assert.IsTrue(_stringAttributesCreated["I"].ContainsKey(sn));
             Assert.AreEqual(_detailRow.used4totals[0].ProjectName, _stringAttributesCreated["I"][sn]);
+        }
+
+        [TestMethod]
+        public void AddPIRow_ResourcePeriodsExistDisplayRowFidLE0DisplayMode0_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _doZeroRowCleverStuff = false;
+            _useHeatMap = true;
+            _displayTotalsDetails = true;
+            foreach (var displayRow in _displayList)
+            {
+                displayRow.fid = 0;
+            }
+            _displayMode = 0;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            int i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                i++;
+                for (var j = 0; j < _displayList.Count; j++)
+                {
+                    Assert.AreEqual(
+                        _piData.WrkHours[i].ToString("0.##"),
+                        _stringAttributesCreated["I"][$"P{period.PeriodID}C{j + 1}"]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddPIRow_ResourcePeriodsExistDisplayRowFidLE0DisplayMode1_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _doZeroRowCleverStuff = false;
+            _useHeatMap = true;
+            _displayTotalsDetails = true;
+            foreach (var displayRow in _displayList)
+            {
+                displayRow.fid = 0;
+            }
+            _displayMode = 1;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            int i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                i++;
+                for (var j = 0; j < _displayList.Count; j++)
+                {
+                    Assert.AreEqual(
+                        (_piData.FTEVals[i] / 100).ToString("0.###"),
+                        _stringAttributesCreated["I"][$"P{period.PeriodID}C{j + 1}"]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddPIRow_ResourcePeriodsExistDisplayRowFidLE0UseHeatMap_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _doZeroRowCleverStuff = false;
+            _useHeatMap = true;
+            _displayTotalsDetails = true;
+            foreach (var displayRow in _displayList)
+            {
+                displayRow.fid = 0;
+            }
+            _displayMode = 1;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            int i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                i++;
+                for (var j = 0; j < _displayList.Count; j++)
+                {
+                    Assert.AreEqual(0, _intAttributesCreated["I"][$"X{period.PeriodID}C{j + 1}"]);
+                    Assert.AreEqual(0, _intAttributesCreated["I"][$"Y{period.PeriodID}C{j + 1}"]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddPIRow_ResourcePeriodsExistDisplayRowFidLE0UseHeatMapFidNotHeatMapId_AddsAttribute()
+        {
+            // Arrange
+            var column = _columns[0];
+            column.m_id = RPConstants.TGRID_TOTITEM_ID;
+            _columns = new[] { column };
+            _useRole = false;
+            _doZeroRowCleverStuff = false;
+            _useHeatMap = true;
+            _displayTotalsDetails = true;
+            foreach (var displayRow in _displayList)
+            {
+                displayRow.fid = 0;
+            }
+            _displayMode = 1;
+            _testDouble = CreateTestDouble();
+
+            // Act
+            _testDouble.AddDetailRow(_detailRow, _rowId);
+
+            // Assert
+            int i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                i++;
+                for (var j = 0; j < _displayList.Count; j++)
+                {
+                    Assert.AreEqual("RGB(217, 255, 255)", _stringAttributesCreated["I"][$"P{period.PeriodID}C{j + 1}Color"]);
+                    Assert.AreEqual("background-color: RGB(217, 255, 255)", _stringAttributesCreated["I"][$"P{period.PeriodID}C{j + 1}ExportStyle"]);
+                }
+            }
         }
     }
 }
