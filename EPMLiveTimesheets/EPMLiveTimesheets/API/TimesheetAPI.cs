@@ -1146,8 +1146,7 @@ namespace TimeSheets
                         connection.Open();
                     });
 
-                    bool submitted = false;
-
+                    var submitted = false;
                     using (var command = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", connection))
                     {
                         command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -1180,7 +1179,9 @@ namespace TimeSheets
                         {
                             // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
                             if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
+                            {
                                 CheckNonTeamMemberAllocation(oWeb, tsuid, connection, data);
+                            }
 
                             using (var command = new SqlCommand(
                                 "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31",
@@ -1200,22 +1201,15 @@ namespace TimeSheets
                                 command.Parameters.AddWithValue("@JOBDATA", data);
                                 command.ExecuteNonQuery();
                             }
-
-                            connection.Close();
-
                             return "<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>";
                         }
                         else
                         {
-                            connection.Close();
-
                             return "<SaveTimesheet Status=\"2\">Timesheet is already being processed.</SaveTimesheet>";
                         }
                     }
                     else
                     {
-                        connection.Close();
-
                         return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
                     }
                 }
