@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using System.Data.SqlClient.Fakes;
-using EPMLiveTimesheets.Tests;
-using TimeSheets.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Data;
+﻿using System;
 using System.Collections;
+using System.Data;
+using System.Data.SqlClient.Fakes;
+using System.Linq;
 using System.Xml;
+using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TimeSheets.Fakes;
 
 namespace TimeSheets.Tests
 {

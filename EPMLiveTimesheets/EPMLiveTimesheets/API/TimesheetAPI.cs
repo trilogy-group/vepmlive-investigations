@@ -152,7 +152,9 @@ namespace TimeSheets
             }
             catch (Exception ex)
             {
-                return string.Format(GridIoResult, -1, ex.Message);
+                var message = string.Format(GridIoResult, -1, ex.Message);
+                Logger.WriteLog(Logger.Category.Unexpected, message, ex.ToString());
+                return message;
             }
         }
 
