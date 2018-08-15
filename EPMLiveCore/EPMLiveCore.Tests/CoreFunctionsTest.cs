@@ -234,5 +234,437 @@ namespace EPMLiveCore.Tests
             // Assert
             _adoShims.IsConnectionManagedCorrectly(SharepointShims.DatabaseConnectionString);
         }
+
+        [TestMethod]
+        public void getSiteItems_Always_ViewFieldsAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            var viewField = _sharepointShims.ViewShim.Instance.ViewFields.Cast<string>().First();
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='{viewField}' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_Always_GroupByFieldsAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+            _groupByFieldNames = new[] { "Group-by-Field " };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='{_groupByFieldNames[0]}' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_Always_OrderByFieldsAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+            var orderByFieldName = "TestField";
+            _spQuery = $"<OrderBy><F Name='{orderByFieldName}'></F></OrderBy>";
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='{orderByFieldName}' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_ParentListContainsTitleField_TitleFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+            _sharepointShims.FieldsShim.ContainsFieldString = fieldName => true;
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='Title' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoCreatedField_CreatedFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='Created' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoModerationStatusField_ModerationStatusFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='_ModerationStatus' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoFilterField_FilterFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+            _filterFieldName = "test-filter-field";
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='{_filterFieldName}' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoUseWbsField_UseWbsFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+            _useWbs = "test-filter-field";
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='{_useWbs}' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoCommentCountField_CommentCountFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='CommentCount' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoListField_ListFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='List' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoCommentersField_CommentersFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='Commenters' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoCommentersReadField_CommentersReadFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='CommentersRead' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoAssignedToField_AssignedToFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='_ModerationStatus' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoAuthorField_AuthorFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='Author' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoChildItemField_ChildItemFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='ChildItem' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoParentItemField_ParentItemFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='ParentItem' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_NoWorkspaceUrlField_WorkspaceUrlFieldAdded()
+        {
+            // Arrange
+            string fieldsXml = null;
+            ShimSPSiteDataQuery.AllInstances.ViewFieldsSetString = (instance, fieldsXmlParamter) =>
+            {
+                fieldsXml = fieldsXmlParamter;
+            };
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.IsNotNull(fieldsXml);
+            Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='WorkspaceUrl' Nullable='TRUE' />"));
+        }
     }
 }
