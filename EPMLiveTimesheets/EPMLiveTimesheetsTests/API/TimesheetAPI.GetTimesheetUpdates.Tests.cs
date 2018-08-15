@@ -7,7 +7,10 @@ using System.Data.SqlClient.Fakes;
 using EPMLiveTimesheets.Tests;
 using TimeSheets.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TimeSheets.Fakes;
 
 namespace TimeSheets.Tests
 {
