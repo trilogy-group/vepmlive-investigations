@@ -173,7 +173,7 @@ namespace TimeSheets
                 docTimesheet.LoadXml(data);
 
                 var hours = 0D;
-                using (var connection = GetConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
                     using (var command = new SqlCommand(
                         @"SELECT SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours 
@@ -1382,64 +1382,84 @@ namespace TimeSheets
 
         public static string CheckApproveStatus(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
 
             try
             {
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var timeSheetUid = doc.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var status = -1;
+                var percentComplete = 0;
+                var result = string.Empty;
+                var resultText = string.Empty;
+                var approvalStatus = 0;
+
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        "SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
 
-                SqlCommand cmd = new SqlCommand("SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                status = reader.GetInt32(0);
+                                if (!reader.IsDBNull(1))
+                                {
+                                    percentComplete = reader.GetInt32(1);
+                                }
+                                if (!reader.IsDBNull(2))
+                                {
+                                    result = reader.GetString(2);
+                                }
+                                if (!reader.IsDBNull(3))
+                                {
+                                    resultText = reader.GetString(3);
+                                }
+                            }
+                        }
+                    }
 
-                int status = -1;
-                int pct = 0;
-                string result = "";
-                string resulttext = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    status = dr.GetInt32(0);
-                    if (!dr.IsDBNull(1))
-                        pct = dr.GetInt32(1);
-                    if (!dr.IsDBNull(2))
-                        result = dr.GetString(2);
-                    if (!dr.IsDBNull(3))
-                        resulttext = dr.GetString(3);
+                    using (var command = new SqlCommand(
+                        "SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                approvalStatus = reader.GetInt32(0);
+                            }
+                            reader.Close();
+                        }
+                    }
                 }
-                dr.Close();
 
-                cmd = new SqlCommand("SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                dr = cmd.ExecuteReader();
-
-                int approvalstatus = 0;
-
-                if (dr.Read())
-                {
-                    approvalstatus = dr.GetInt32(0);
-                }
-                dr.Close();
-
-                cn.Close();
-
-
-                return "<ApproveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\" ApprovalStatus=\"" + approvalstatus + "\"></ApproveStatus>";
-
-
+                var message = string.Format(
+                    "<ApproveStatus Result=\"0\" Status=\"{0}\" PercentComplete=\"{1}\" ErrorResult=\"{2}\" " +
+                    "ResultText=\"{3}\" ApprovalStatus=\"{4}\"></ApproveStatus>",
+                    status,
+                    percentComplete,
+                    result,
+                    resultText,
+                    approvalStatus);
+                return message;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<ApproveStatus Result=\"1\">Error: " + ex.Message + "</ApproveStatus>";
+                return string.Format(
+                    "<ApproveStatus Result=\"1\">Error: {0}</ApproveStatus>",
+                    exception.Message);
             }
         }
 
@@ -4489,7 +4509,7 @@ namespace TimeSheets
 
         }
 
-        private static SqlConnection GetConnection(string connectionString)
+        private static SqlConnection GetOpenedConnection(string connectionString)
         {
             SqlConnection connection = null;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
