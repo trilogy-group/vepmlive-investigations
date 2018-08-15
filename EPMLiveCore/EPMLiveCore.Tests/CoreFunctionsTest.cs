@@ -217,5 +217,22 @@ namespace EPMLiveCore.Tests
             // Assert
             // ExpectedException - ArgumentNullException
         }
+
+        [TestMethod]
+        public void getSiteItems_Always_ConnectionIsManagedCorrectly()
+        {
+            // Arrange, Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            _adoShims.IsConnectionManagedCorrectly(SharepointShims.DatabaseConnectionString);
+        }
     }
 }

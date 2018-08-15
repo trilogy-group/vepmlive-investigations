@@ -11,6 +11,8 @@ namespace EPMLive.TestFakes.Utility
 {
     public class SharepointShims
     {
+        public readonly static string DatabaseConnectionString = "test-db-connection-string";
+
         public ShimSPWeb WebShim { get; private set; }
         public ShimSPSite SiteShim { get; private set; }
         public ShimSPListItem ListItemShim { get; private set; }
@@ -298,7 +300,7 @@ namespace EPMLive.TestFakes.Utility
             ShimSPFieldLookupValue.ConstructorString = (instance, value) => { };
 
             ShimSPSecurableObject.AllInstances.RoleAssignmentsGet = instance => RoleAssignmentsShim;
-            ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = instance => string.Empty;
+            ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = instance => DatabaseConnectionString;
         }
     }
 }

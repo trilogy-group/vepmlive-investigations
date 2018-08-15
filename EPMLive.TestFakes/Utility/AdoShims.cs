@@ -57,6 +57,13 @@ namespace EPMLive.TestFakes.Utility
             return result;
         }
 
+        public bool IsConnectionManagedCorrectly(string connectionString)
+        {
+            return IsConnectionCreated(connectionString)
+                && IsConnectionOpened(connectionString)
+                && IsConnectionDisposed(connectionString);
+        }
+
         public bool IsConnectionCreated(string connectionString)
         {
             return ConnectionsCreated.Any(pred => pred.ConnectionString == connectionString);
