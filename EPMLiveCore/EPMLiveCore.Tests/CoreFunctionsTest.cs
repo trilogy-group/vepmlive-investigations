@@ -19,7 +19,6 @@ namespace EPMLiveCore.Tests
         private IDisposable _shimsContext;
         private AdoShims _adoShims;
         private SharepointShims _sharepointShims;
-        private DirectoryShims _directoryShims;
 
         private Guid _timerJobBuild;
         private int _defaultStatus;
@@ -30,7 +29,6 @@ namespace EPMLiveCore.Tests
             _shimsContext = ShimsContext.Create();
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
-            _directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             _timerJobBuild = Guid.NewGuid();
             _defaultStatus = 1;
@@ -193,14 +191,15 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             const string userName = "test";
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             // Act
             CoreFunctions.getUserFromAD(userName);
 
             // Assert
-            Assert.AreEqual(1, _directoryShims.DirectoryEntriesDisposed.Count);
-            Assert.AreEqual(AuthenticationTypes.Secure, _directoryShims.DirectoryEntriesDisposed[0].AuthenticationType);
-            Assert.IsTrue(_directoryShims.DirectoryEntriesDisposed[0].Path.StartsWith("LDAP://"));
+            Assert.AreEqual(1, directoryShims.DirectoryEntriesDisposed.Count);
+            Assert.AreEqual(AuthenticationTypes.Secure, directoryShims.DirectoryEntriesDisposed[0].AuthenticationType);
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed[0].Path.StartsWith("LDAP://"));
         }
 
         [TestMethod]
@@ -208,14 +207,15 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             const string userName = "test";
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             // Act
             CoreFunctions.getUserFromAD(userName);
 
             // Assert
-            Assert.AreEqual(1, _directoryShims.DirectorySearchersDisposed.Count);
-            Assert.AreEqual(_directoryShims.DirectoryEntriesDisposed[0], _directoryShims.DirectorySearchersDisposed[0].SearchRoot);
-            Assert.AreEqual($"(&(objectClass=user) (cn={userName}))", _directoryShims.DirectorySearchersDisposed[0].Filter);
+            Assert.AreEqual(1, directoryShims.DirectorySearchersDisposed.Count);
+            Assert.AreEqual(directoryShims.DirectoryEntriesDisposed[0], directoryShims.DirectorySearchersDisposed[0].SearchRoot);
+            Assert.AreEqual($"(&(objectClass=user) (cn={userName}))", directoryShims.DirectorySearchersDisposed[0].Filter);
         }
     }
 }
