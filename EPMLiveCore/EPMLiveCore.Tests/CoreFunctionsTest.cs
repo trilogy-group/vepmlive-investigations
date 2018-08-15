@@ -21,6 +21,11 @@ namespace EPMLiveCore.Tests
 
         private Guid _timerJobBuild;
         private int _defaultStatus;
+        private string _spQuery;
+        private string _filterFieldName;
+        private string _useWbs;
+        private string _listTitlePattern;
+        private IList<string> _groupByFieldNames;
 
         [TestInitialize]
         public void SetUp()
@@ -31,6 +36,12 @@ namespace EPMLiveCore.Tests
 
             _timerJobBuild = Guid.NewGuid();
             _defaultStatus = 1;
+
+            _spQuery = string.Empty;
+            _filterFieldName = string.Empty;
+            _useWbs = string.Empty;
+            _listTitlePattern = string.Empty;
+            _groupByFieldNames = new List<string>();
         }
 
         [TestCleanup]
@@ -169,6 +180,42 @@ namespace EPMLiveCore.Tests
             var command = _adoShims.CommandsCreated.Single(pred => pred.CommandText == commandTextExpected);
             Assert.AreEqual(commandParametersExpected.Length, command.Parameters.Count);
             Assert.IsTrue(commandParametersExpected.All(pred => command.Parameters.Contains(pred)));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException), "web")]
+        public void getSiteItems_WebParameterNull_Throws()
+        {
+            // Arrange, Act
+            CoreFunctions.getSiteItems(
+                null,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            // ExpectedException - ArgumentNullException
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException), "view")]
+        public void getSiteItems_ViewParameterNull_Throws()
+        {
+            // Arrange, Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                null,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            // ExpectedException - ArgumentNullException
         }
     }
 }

@@ -31,6 +31,9 @@ namespace EPMLive.TestFakes.Utility
         public ShimSPFormCollection FormsShim { get; private set; }
         public ShimSPField FieldShim { get; private set; }
         public ShimSPFieldCollection FieldsShim { get; private set; }
+        public ShimSPViewFieldCollection ViewFieldsShim { get; private set; }
+        public ShimSPView ViewShim { get; private set; }
+        public ShimSPContentDatabase ContentDatabaseShim { get; private set; }
 
         public string ServerRelativeUrl { get; private set; }
         public string WorkspaceUrl { get; private set; }
@@ -64,11 +67,17 @@ namespace EPMLive.TestFakes.Utility
             ListShim = InitializeSPListShim();
             ListsShim = InitializeSPListCollectionShim();
             WebShim = InitializeSPWebShim();
+            ViewFieldsShim = InitializeSPViewFieldCollectionShim();
+            ViewShim = InitializeSPViewShim();
+            ContentDatabaseShim = InitializeSPContentDatabase();
         }
 
         private ShimSPField InitializeSPFieldShim()
         {
-            return new ShimSPField();
+            return new ShimSPField
+            {
+                InternalNameGet = () => "test-field"
+            };
         }
 
         private ShimSPFieldCollection InitializeSPFieldsShim()
@@ -86,6 +95,7 @@ namespace EPMLive.TestFakes.Utility
                 ServerRelativeUrlGet = () => ServerRelativeUrl
             };
         }
+
         private ShimSPFormCollection InitializeSPFormsShim()
         {
             return new ShimSPFormCollection
@@ -209,8 +219,14 @@ namespace EPMLive.TestFakes.Utility
         {
             return new ShimSPSite
             {
-                WebApplicationGet = () => ApplicationShim
+                WebApplicationGet = () => ApplicationShim,
+                ContentDatabaseGet = () => ContentDatabaseShim
             };
+        }
+
+        private ShimSPContentDatabase InitializeSPContentDatabase()
+        {
+            return new ShimSPContentDatabase { };
         }
 
         private ShimSPFieldUserValue InitializeSPFieldUserValueShim()
@@ -220,6 +236,7 @@ namespace EPMLive.TestFakes.Utility
                 UserGet = () => UserShim
             };
         }
+
         private ShimSPFieldUserValueCollection InitializeSPFieldUserValuesShim()
         {
             var result = new SPFieldUserValueCollection();
@@ -231,6 +248,22 @@ namespace EPMLive.TestFakes.Utility
         private ShimSPWebApplication InitializeSPApplicationShim()
         {
             return new ShimSPWebApplication();
+        }
+
+        private ShimSPView InitializeSPViewShim()
+        {
+            return new ShimSPView
+            {
+                ParentListGet = () => ListShim,
+                ViewFieldsGet = () => ViewFieldsShim
+            };
+        }
+
+        private ShimSPViewFieldCollection InitializeSPViewFieldCollectionShim()
+        {
+            var result = new ShimSPViewFieldCollection();
+            result.Bind(new[] { "test-field-1" });
+            return result;
         }
         
         public static SharepointShims ShimSharepointCalls()
@@ -265,6 +298,7 @@ namespace EPMLive.TestFakes.Utility
             ShimSPFieldLookupValue.ConstructorString = (instance, value) => { };
 
             ShimSPSecurableObject.AllInstances.RoleAssignmentsGet = instance => RoleAssignmentsShim;
+            ShimSPDatabase.AllInstances.DatabaseConnectionStringGet = instance => string.Empty;
         }
     }
 }

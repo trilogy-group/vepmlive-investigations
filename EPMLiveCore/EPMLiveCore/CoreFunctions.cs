@@ -1242,7 +1242,7 @@ namespace EPMLiveCore
             string filterFieldName, 
             string useWbs,
             string listTitlePattern,
-            string[] groupByFieldNames)
+            IList<string> groupByFieldNames)
         {
             if (web == null)
             {
@@ -1290,7 +1290,7 @@ namespace EPMLiveCore
                         }
 
                         var xmlDocument = new XmlDocument();
-                        xmlDocument.LoadXml($"<Where>{spQuery}/Where>");
+                        xmlDocument.LoadXml($"<Where>{spQuery}</Where>");
                         var orderByNode = xmlDocument.FirstChild.SelectSingleNode("//OrderBy");
                         if (orderByNode != null)
                         {
