@@ -79,6 +79,13 @@ namespace EPMLive.TestFakes.Utility
             return ConnectionsDisposed.Any(pred => pred.ConnectionString == connectionString);
         }
 
+        public bool IsCommandManagedCorrectly(string commandText)
+        {
+            return IsCommandCreated(commandText)
+                && IsCommandExecuted(commandText)
+                && IsCommandDisposed(commandText);
+        }
+
         public bool IsCommandCreated(string commandText)
         {
             return CommandsCreated.Any(pred => pred.CommandText == commandText);

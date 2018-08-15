@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -665,6 +666,62 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.IsNotNull(fieldsXml);
             Assert.IsTrue(fieldsXml.Contains($"<FieldRef Name='WorkspaceUrl' Nullable='TRUE' />"));
+        }
+
+        [TestMethod]
+        public void getSiteItems_HasListTitlePattern_CommandCorrectlyManaged()
+        {
+            // Arrange
+            const string commandTextPattern = @"SELECT dbo.AllLists.tp_ID";
+            _listTitlePattern = "test";
+
+            // Act
+            CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            var commandsInSubject = _adoShims.CommandsCreated
+                .Where(pred => pred.CommandText.StartsWith(commandTextPattern))
+                .ToArray();
+
+            Assert.AreEqual(1, commandsInSubject.Length);
+            Assert.IsTrue(_adoShims.IsCommandManagedCorrectly(commandsInSubject[0].CommandText));
+        }
+
+        [TestMethod]
+        public void getSiteItems_HasListIds_GetSiteDataExecuted()
+        {
+            // Arrange
+            var resultExpected = new DataTable();
+            SPSiteDataQuery queryUsed = null;
+            _sharepointShims.WebShim.GetSiteDataSPSiteDataQuery = query =>
+            {
+                queryUsed = query;
+                return resultExpected;
+            };
+
+            // Act
+            var result = CoreFunctions.getSiteItems(
+                _sharepointShims.WebShim,
+                _sharepointShims.ViewShim,
+                _spQuery,
+                _filterFieldName,
+                _useWbs,
+                _listTitlePattern,
+                _groupByFieldNames);
+
+            // Assert
+            Assert.AreEqual(resultExpected, result);
+            Assert.IsNotNull(queryUsed);
+            Assert.AreEqual($"<Lists MaxListLimit='0'><List ID='{Guid.Empty}'/></Lists>", queryUsed.Lists);
+            Assert.AreEqual(_spQuery, queryUsed.Query);
+            Assert.AreEqual(SPQueryThrottleOption.Override, queryUsed.QueryThrottleMode);
         }
     }
 }
