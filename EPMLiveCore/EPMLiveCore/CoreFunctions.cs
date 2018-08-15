@@ -164,8 +164,8 @@ namespace EPMLiveCore
         private const string InitVector = "77B2c3D4e1F3g7R1";
         private const string SaltValue = "f53fNDH@";
         private const string HashAlgorithm = "SHA1";
-        private const int passwordIterations = 2;
-        private const int keySize = 256;
+        private const int PasswordIterations = 2;
+        private const int KeySize = 256;
         private static readonly byte[] _initVectorBytes = Encoding.ASCII.GetBytes(InitVector);
         private static readonly byte[] _saltValueBytes = Encoding.ASCII.GetBytes(SaltValue);
 
@@ -3382,9 +3382,9 @@ namespace EPMLiveCore
                 byte[] keyBytes;
                 byte[] cipherTextBytes;
 
-                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, HashAlgorithm, passwordIterations))
+                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, HashAlgorithm, PasswordIterations))
                 {
-                    keyBytes = password.GetBytes(keySize / 8);
+                    keyBytes = password.GetBytes(KeySize / 8);
                 }
 
                 using (var symmetricKey = new RijndaelManaged())
@@ -3422,9 +3422,9 @@ namespace EPMLiveCore
                 byte[] plainTextBytes;
                 int decryptedByteCount;
 
-                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, "SHA1", 2))
+                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, HashAlgorithm, PasswordIterations))
                 {
-                    keyBytes = password.GetBytes(256 / 8);
+                    keyBytes = password.GetBytes(KeySize / 8);
                 }
 
                 using (var symmetricKey = new RijndaelManaged { Mode = CipherMode.CBC })
