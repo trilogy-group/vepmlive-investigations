@@ -1235,188 +1235,238 @@ namespace EPMLiveCore
             return field;
         }
 
-        public static DataTable getSiteItems(SPWeb web, SPView view, string spquery, string filterfield, string usewbs, string rlist, string[] arrGroupFields)
+        public static DataTable getSiteItems(
+            SPWeb web, 
+            SPView view, 
+            string spQuery, 
+            string filterFieldName, 
+            string useWbs,
+            string listTitlePattern,
+            string[] groupByFieldNames)
         {
-            DataTable dt = null;
-            string lists = "";
-            SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            if (web == null)
             {
-                //using (SPSite s = SPContext.Current.Site)
-                {
-                    string dbCon = web.Site.ContentDatabase.DatabaseConnectionString;
-                    cn = new SqlConnection(dbCon);
-                    cn.Open();
-                }
-            });
-
-            if (cn.State == ConnectionState.Open)
+                throw new ArgumentNullException(nameof(web));
+            }
+            if (view == null)
             {
+                throw new ArgumentNullException(nameof(view));
+            }
 
-                try
+            DataTable dataTable = null;
+            SqlConnection sqlConnection = null;
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    string siteurl = web.ServerRelativeUrl.Substring(1);
+                    sqlConnection = new SqlConnection(web.Site.ContentDatabase.DatabaseConnectionString);
+                    sqlConnection.Open();
+                });
 
-                    ArrayList arr = new ArrayList();
-                    string dqFields = "";
-                    foreach (string field in view.ViewFields)
-                    {
-                        SPField f = getRealField(view.ParentList.Fields.GetFieldByInternalName(field));
-                        arr.Add(f.InternalName.ToLower());
-                        dqFields += "<FieldRef Name='" + f.InternalName + "' Nullable='TRUE'/>";
-                    }
-                    foreach (string groupby in arrGroupFields)
-                    {
-                        if (!arr.Contains(groupby.ToLower()))
-                        {
-                            arr.Add(groupby.ToLower());
-                            dqFields += "<FieldRef Name='" + groupby + "' Nullable='TRUE'/>";
-                        }
-                    }
-
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml("<Where>" + spquery + "</Where>");
-                    XmlNode nl = doc.FirstChild.SelectSingleNode("//OrderBy");
-                    if (nl != null)
-                    {
-                        foreach (XmlNode nd in nl.ChildNodes)
-                        {
-                            string fname = nd.Attributes["Name"].Value;
-                            if (!arr.Contains(fname.ToLower()))
-                            {
-                                arr.Add(fname.ToLower());
-                                dqFields += "<FieldRef Name='" + fname + "' Nullable='TRUE'/>";
-                            }
-                        }
-                    }
-
-                    if (!arr.Contains("title") && view.ParentList.Fields.ContainsField("Title"))
-                    {
-                        dqFields += "<FieldRef Name='Title' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("created"))
-                    {
-                        dqFields += "<FieldRef Name='Created'/>";
-                    }
-                    if (!arr.Contains("_moderationstatus"))
-                    {
-                        dqFields += "<FieldRef Name='_ModerationStatus' Nullable='TRUE'/>";
-                    }
-                    if (filterfield != null && filterfield != "")
-                    {
-                        if (!arr.Contains(filterfield.ToLower()))
-                        {
-                            dqFields += "<FieldRef Name='" + filterfield + "' Nullable='TRUE'/>";
-                        }
-                    }
-                    if (usewbs != null && usewbs != "")
-                    {
-                        if (!arr.Contains(usewbs.ToLower()))
-                        {
-                            dqFields += "<FieldRef Name='" + usewbs + "' Nullable='TRUE'/>";
-                        }
-                    }
-                    if (!arr.Contains("list"))
-                    {
-                        dqFields += "<FieldRef Name='List' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commentcount"))
-                    {
-                        dqFields += "<FieldRef Name='CommentCount' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commenters"))
-                    {
-                        dqFields += "<FieldRef Name='Commenters' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commentersread"))
-                    {
-                        dqFields += "<FieldRef Name='CommentersRead' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("assignedto"))
-                    {
-                        dqFields += "<FieldRef Name='AssignedTo' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("author"))
-                    {
-                        dqFields += "<FieldRef Name='Author' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("childitem"))
-                    {
-                        dqFields += "<FieldRef Name='ChildItem' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("parentitem"))
-                    {
-                        dqFields += "<FieldRef Name='ParentItem' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("workspaceurl"))
-                    {
-                        dqFields += "<FieldRef Name='WorkspaceUrl' Nullable='TRUE'/>";
-                    }
+                if (sqlConnection.State == ConnectionState.Open)
+                {
                     try
                     {
-                        lists = "";
-                        string query = "";
-                        if (rlist != "")
+                        var siteUrl = web.ServerRelativeUrl.Substring(1);
+                        var fieldInternalNames = new ArrayList();
+                        var fieldsXml = new List<string>();
+
+                        foreach (string viewFieldName in view.ViewFields)
                         {
-                            if (siteurl == "")
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     webs.siteid='" + web.Site.ID + "' AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-                            else
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     (dbo.Webs.FullUrl LIKE '" + siteurl + "/%' OR dbo.Webs.FullUrl = '" + siteurl + "') AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
+                            var viewField = getRealField(view.ParentList.Fields.GetFieldByInternalName(viewFieldName));
 
-                            SqlCommand cmd = new SqlCommand(query, cn);
-                            //cmd.Parameters.AddWithValue("@rlist", rlist);
-                            SqlDataReader dr = cmd.ExecuteReader();
+                            fieldInternalNames.Add(viewField.InternalName.ToLower());
+                            fieldsXml.Add(GenerateFieldRefXml(viewField.InternalName, true));
+                        }
 
-                            while (dr.Read())
+                        foreach (var groupByFieldName in groupByFieldNames)
+                        {
+                            var groupByFieldNameLowercase = groupByFieldName.ToLower();
+                            if (!fieldInternalNames.Contains(groupByFieldNameLowercase))
                             {
-                                lists += "<List ID='" + dr.GetGuid(0).ToString() + "'/>";
+                                fieldInternalNames.Add(groupByFieldNameLowercase);
+                                fieldsXml.Add(GenerateFieldRefXml(groupByFieldName, true));
                             }
-                            dr.Close();
-                        }
-                        else
-                        {
-                            lists = "<List ID='" + view.ParentList.ID + "'/>";
                         }
 
-
-                        if (lists != "")
+                        var xmlDocument = new XmlDocument();
+                        xmlDocument.LoadXml($"<Where>{spQuery}/Where>");
+                        var orderByNode = xmlDocument.FirstChild.SelectSingleNode("//OrderBy");
+                        if (orderByNode != null)
                         {
-                            SPSiteDataQuery dq = new SPSiteDataQuery();
-                            dq.Lists = "<Lists MaxListLimit='0'>" + lists + "</Lists>";
-                            dq.Query = spquery;
-                            dq.QueryThrottleMode = SPQueryThrottleOption.Override;
-                            if (rlist != "")
-                                dq.Webs = "<Webs Scope='Recursive'/>";
-
-                            dq.ViewFields = dqFields;
-                            try
+                            foreach (XmlNode orderByFieldNode in orderByNode.ChildNodes)
                             {
-                                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                var fieldName = orderByFieldNode.Attributes["Name"].Value;
+                                var fieldNameLowercase = fieldName.ToLower();
+                                if (!fieldInternalNames.Contains(fieldNameLowercase))
                                 {
-                                    dt = web.GetSiteData(dq);
-                                });
+                                    fieldInternalNames.Add(fieldNameLowercase);
+                                    fieldsXml.Add(GenerateFieldRefXml(fieldName, true));
+                                }
                             }
-                            catch (Exception ex)
+                        }
+
+                        if (!fieldInternalNames.Contains("title") && view.ParentList.Fields.ContainsField("Title"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("Title", true));
+                        }
+                        if (!fieldInternalNames.Contains("created"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("Created", false));
+                        }
+                        if (!fieldInternalNames.Contains("_moderationstatus"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("_ModerationStatus", true));
+                        }
+                        if (!string.IsNullOrEmpty(filterFieldName))
+                        {
+                            if (!fieldInternalNames.Contains(filterFieldName.ToLower()))
                             {
-                                throw new Exception("Error getting site data: " + ex.Message + "<br>This may be caused by column data type mismatches throughout your site collection. Check the Field Audit page in General Settings.");
+                                fieldsXml.Add(GenerateFieldRefXml(filterFieldName, true));
                             }
+                        }
+                        if (!string.IsNullOrEmpty(useWbs))
+                        {
+                            if (!fieldInternalNames.Contains(useWbs.ToLower()))
+                            {
+                                fieldsXml.Add(GenerateFieldRefXml(useWbs, true));
+                            }
+                        }
+                        if (!fieldInternalNames.Contains("list"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("List", true));
+                        }
+                        if (!fieldInternalNames.Contains("commentcount"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("CommentCount", true));
+                        }
+                        if (!fieldInternalNames.Contains("commenters"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("Commenters", true));
+                        }
+                        if (!fieldInternalNames.Contains("commentersread"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("CommentersRead", true));
+                        }
+                        if (!fieldInternalNames.Contains("assignedto"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("AssignedTo", true));
+                        }
+                        if (!fieldInternalNames.Contains("author"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("Author", true));
+                        }
+                        if (!fieldInternalNames.Contains("childitem"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("ChildItem", true));
+                        }
+                        if (!fieldInternalNames.Contains("parentitem"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("ParentItem", true));
+                        }
+                        if (!fieldInternalNames.Contains("workspaceurl"))
+                        {
+                            fieldsXml.Add(GenerateFieldRefXml("WorkspaceUrl", true));
+                        }
+
+                        try
+                        {
+                            var listIds = new List<Guid>();
+                            var query = string.Empty;
+                            if (!string.IsNullOrEmpty(listTitlePattern))
+                            {
+                                var whereConditions = new List<string>();
+                                if (string.IsNullOrEmpty(siteUrl))
+                                {
+                                    whereConditions.Add($"webs.siteid = '{web.Site.ID}'");
+                                }
+                                else
+                                {
+                                    whereConditions.Add($"(dbo.Webs.FullUrl LIKE '{siteUrl}/%' OR dbo.Webs.FullUrl = '{siteUrl}')");
+                                }
+
+                                whereConditions.Add($"dbo.AllLists.tp_Title like '{listTitlePattern.Replace("'", "''")}'");
+
+                                query = $@"SELECT dbo.AllLists.tp_ID 
+                                           FROM dbo.Webs 
+                                           INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId 
+                                           WHERE {string.Join(" AND ", whereConditions)}";
+
+                                using (var sqlCommand = new SqlCommand(query, sqlConnection))
+                                {
+                                    using (var dataReader = sqlCommand.ExecuteReader())
+                                    {
+                                        while (dataReader.Read())
+                                        {
+                                            listIds.Add(dataReader.GetGuid(0));
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                listIds.Add(view.ParentList.ID);
+                            }
+
+
+                            if (listIds.Count > 0)
+                            {
+                                var listsXml = string.Join(string.Empty, listIds.Select(id => $"<List ID='{id}'/>"));
+                                var siteDataQuery = new SPSiteDataQuery
+                                {
+                                    Lists = $"<Lists MaxListLimit='0'>{listsXml}</Lists>",
+                                    Query = spQuery,
+                                    QueryThrottleMode = SPQueryThrottleOption.Override,
+                                    ViewFields = string.Join(string.Empty, fieldsXml)
+                                };
+
+                                if (!string.IsNullOrEmpty(listTitlePattern))
+                                {
+                                    siteDataQuery.Webs = "<Webs Scope='Recursive'/>";
+                                }
+
+                                try
+                                {
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                                    {
+                                        dataTable = web.GetSiteData(siteDataQuery);
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw new AggregateException(
+                                        $@"Error getting site data: 
+                                        {ex.Message}
+                                        <br>This may be caused by column data type mismatches throughout your site collection. 
+                                        Check the Field Audit page in General Settings.",
+                                        ex);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new AggregateException($"Error getting site data lists: {ex.Message}", ex);
                         }
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error getting site data lists: " + ex.Message);
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
                     }
-
-                    cn.Close();
                 }
-                catch { }
-                cn.Close();
+            }
+            finally
+            {
+                sqlConnection?.Dispose();
             }
 
-            return dt;
+            return dataTable;
         }
 
-
+        private static string GenerateFieldRefXml(string name, bool isNullable)
+        {
+            var nullableAttribute = isNullable ? "Nullable='TRUE' " : string.Empty;
+            return $"<FieldRef Name='{name}' {nullableAttribute}/>";
+        }
 
         public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web)
         {
