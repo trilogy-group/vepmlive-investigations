@@ -24,6 +24,7 @@ namespace TimeSheets
         private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
         private const string GridIoResultTemplate = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
         private const string StopWatchResultTemplate = "<StopWatch Status=\"{0}\">{1}</StopWatch>";
+        private const string GetOtherHoursResultTemplate = "<GetOtherHours Status=\"{0}\">{1}</GetOtherHours>";
 
         static TimesheetAPI()
         {
@@ -161,38 +162,45 @@ namespace TimeSheets
 
         public static string GetOtherHours(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(oWeb));
+            }
+
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var hours = 0D;
+                using (var connection = GetConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        @"SELECT SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours 
+                        FROM dbo.TSITEMHOURS 
+                        INNER JOIN dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID 
+                        where LIST_UID=@listid and ITEM_ID=@itemid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
+                        command.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
 
-                SqlCommand cmd = new SqlCommand(@"SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours
-                                                    FROM         dbo.TSITEMHOURS INNER JOIN
-                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid", cn);
-                cmd.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
-                cmd.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
-
-                double hours = 0;
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read() && !dr.IsDBNull(0))
-                    hours = dr.GetDouble(0);
-                dr.Close();
-
-                cn.Close();
-
-                return "<GetOtherHours Status=\"0\">" + hours + "</GetOtherHours>";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read() && !reader.IsDBNull(0))
+                            {
+                                hours = reader.GetDouble(0);
+                            }
+                        }
+                    }
+                }
+                return string.Format(GetOtherHoursResultTemplate, 0, hours);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<GetOtherHours Status=\"1\">" + ex.Message + "</GetOtherHours>";
+                var message = string.Format(GetOtherHoursResultTemplate, 1, exception.Message);
+                Logger.WriteLog(Logger.Category.Unexpected, message, exception.ToString());
+                return message;
             }
         }
 
@@ -4479,6 +4487,17 @@ namespace TimeSheets
                 return "<AddWork Status=\"1\">Error: " + ex.Message + "</AddWork>";
             }
 
+        }
+
+        private static SqlConnection GetConnection(string connectionString)
+        {
+            SqlConnection connection = null;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                connection = new SqlConnection(connectionString);
+                connection.Open();
+            });
+            return connection;
         }
     }
 }

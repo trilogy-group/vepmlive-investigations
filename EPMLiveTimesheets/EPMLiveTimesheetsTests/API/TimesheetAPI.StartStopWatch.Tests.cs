@@ -16,7 +16,7 @@ namespace TimeSheets.Tests
         private static readonly DateTime NowSample = new DateTime(2018, 01, 10);
 
         [TestMethod]
-        public void StartStopWatch_Blocked_MessageFilled()
+        public void StartStopWatch_Called_SqlDisposed()
         {
             // Arrange
             SetupShims();
