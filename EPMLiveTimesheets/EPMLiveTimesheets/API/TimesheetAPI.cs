@@ -22,7 +22,8 @@ namespace TimeSheets
     {
         private static int myworktableid = 6;
         private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
-        private const string GridIoResult = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
+        private const string GridIoResultTemplate = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
+        private const string StopWatchResultTemplate = "<StopWatch Status=\"{0}\">{1}</StopWatch>";
 
         static TimesheetAPI()
         {
@@ -96,7 +97,7 @@ namespace TimeSheets
 
                     if (string.IsNullOrWhiteSpace(userId))
                     {
-                        return string.Format(GridIoResult, -1, "Could not determine user");
+                        return string.Format(GridIoResultTemplate, -1, "Could not determine user");
                     }
                     else
                     {
@@ -108,7 +109,7 @@ namespace TimeSheets
 
                             if ("True".Equals(
                                 dataSetTimestamp.Tables[1].Rows[0]["SUBMITTED"].ToString(),
-                                StringComparison.InvariantCultureIgnoreCase))
+                            StringComparison.InvariantCultureIgnoreCase))
                             {
                                 canEdit = false;
                             }
@@ -139,7 +140,7 @@ namespace TimeSheets
                         }
                         else
                         {
-                            return string.Format(GridIoResult, -1, "User mismatch or access denied");
+                            return string.Format(GridIoResultTemplate, -1, "User mismatch or access denied");
                         }
                     }
 
@@ -152,7 +153,7 @@ namespace TimeSheets
             }
             catch (Exception ex)
             {
-                var message = string.Format(GridIoResult, -1, ex.Message);
+                var message = string.Format(GridIoResultTemplate, -1, ex.Message);
                 Logger.WriteLog(Logger.Category.Unexpected, message, ex.ToString());
                 return message;
             }
@@ -1233,67 +1234,90 @@ namespace TimeSheets
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
-                string userid = "";
+                var tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var userid = string.Empty;
                 try
                 {
                     userid = doc.FirstChild.Attributes["UserId"].Value;
                 }
-                catch { }
-
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                catch
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SPUser user = GetUser(oWeb, userid);
-
-                SqlCommand cmd = new SqlCommand("SELECT  *   FROM         dbo.TSITEM INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID where USER_ID=@userid and site_uid=@siteid", cn);
-                cmd.Parameters.AddWithValue("@userid", user.ID);
-                cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
-
-                bool bError = false;
-                string sMessage = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    bError = true;
-                    sMessage = "Timer already started on another item.";
-                }
-                dr.Close();
-
-                if (!bError)
-                {
-
-                    DateTime dt = DateTime.Now;
-                    cmd = new SqlCommand("INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)", cn);
-                    cmd.Parameters.AddWithValue("@tsitemuid", tsuid);
-                    cmd.Parameters.AddWithValue("@dt", dt);
-                    cmd.Parameters.AddWithValue("@userid", user.ID);
-                    cmd.ExecuteNonQuery();
-
-                    sMessage = dt.ToString("F");
-
+                    Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        $"No UserId in {nameof(data)} document.");
                 }
 
-                cn.Close();
-
-                if (bError)
+                var isError = false;
+                var message = string.Empty;
+                SqlConnection connection = null;
+                try
                 {
-                    return "<StopWatch Status=\"1\">Error: " + sMessage + "</StopWatch>";
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                            connection.Open();
+                        });
+
+                    var user = GetUser(oWeb, userid);
+
+                    using (var command = new SqlCommand(
+                        @"SELECT * FROM dbo.TSITEM 
+                         INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
+                         INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
+                         where USER_ID=@userid and site_uid=@siteid", 
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@userid", user.ID);
+                        command.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isError = true;
+                                message = "Timer already started on another item.";
+                            }
+                        }
+                    }
+
+                    if (!isError)
+                    {
+                        var now = DateTime.Now;
+                        using (var command = new SqlCommand(
+                            @"INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@tsitemuid", tsuid);
+                            command.Parameters.AddWithValue("@dt", now);
+                            command.Parameters.AddWithValue("@userid", user.ID);
+                            command.ExecuteNonQuery();
+                        }
+                        message = now.ToString("F");
+                    }
+                }
+                finally
+                {
+                    connection?.Dispose();
+                }
+
+                if (isError)
+                {
+                    return string.Format(StopWatchResultTemplate, 1, $"Error: {message}");
                 }
                 else
                 {
-                    return "<StopWatch Status=\"0\">" + sMessage + "</StopWatch>";
+                    return string.Format(StopWatchResultTemplate, 0, message);
                 }
-
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
+                var errorMessage = string.Format(StopWatchResultTemplate, 1, $"Error: {exception.Message}");
+                Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        errorMessage);
+                return errorMessage;
             }
         }
 
