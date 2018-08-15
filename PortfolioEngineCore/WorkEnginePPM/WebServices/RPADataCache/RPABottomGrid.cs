@@ -26,7 +26,6 @@ namespace RPADataCache
         private readonly bool _useHeatMap;
         private readonly int _heatMapId;
         private readonly int _heatMapColor;
-        private readonly int _heatFieldColor;
         private readonly bool _doZeroRowCleverStuff;
         private readonly bool _displayTotalsDetails;
         private readonly Func<int, string> _resolvePiNameFunc;
@@ -591,8 +590,8 @@ namespace RPADataCache
                                 rowValue, 
                                 heatMapValue, 
                                 _resourceValues.TargetColors, 
-                                out targetLevel, 
-                                _heatFieldColor);
+                                out targetLevel,
+                                _heatMapColor);
 
                             xI.CreateIntAttr($"C{period.PeriodID}C{counter}", targetLevel);
                             xI.CreateIntAttr($"Y{period.PeriodID}C{counter}", targetLevel > 0 ? targetLevel : 0);
@@ -841,8 +840,8 @@ namespace RPADataCache
                                     piDataValue, 
                                     piDataValue, 
                                     _resourceValues.TargetColors, 
-                                    out targetLevel, 
-                                    _heatFieldColor);
+                                    out targetLevel,
+                                    _heatMapColor);
 
                                 xI.CreateIntAttr($"X{period.PeriodID}C{counter}", targetLevel);
                                 xI.CreateIntAttr($"Y{period.PeriodID}C{counter}", targetLevel > 0 ? targetLevel : 0);

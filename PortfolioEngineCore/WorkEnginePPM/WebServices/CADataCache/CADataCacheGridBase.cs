@@ -24,8 +24,6 @@ namespace CADataCache
 
         protected CStruct MiddleCols;
         protected CStruct Definitions;
-        protected CStruct DefinitionRight;
-        protected CStruct DefinitionLeaf;
 
         private readonly bool _respectColumnUnselectableProperty;
 
