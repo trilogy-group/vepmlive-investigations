@@ -716,7 +716,7 @@ namespace PortfolioEngineCore
                 {
                     while (reader.Read())
                     {
-                        int lProjectID = (int)reader["PROJECT_ID"];
+                        int lProjectID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
                         listPIs.Add(lProjectID);
                     }
                     reader.Close();
