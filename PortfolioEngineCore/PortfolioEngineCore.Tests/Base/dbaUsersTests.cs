@@ -16,8 +16,7 @@ namespace PortfolioEngineCore.Tests.Base
         private IDisposable _shimContext;
         private bool _readFirstCall;
         private PrivateObject _privateObject;
-        private AdoShims _shimAdoNetCalls
-            ;
+        private AdoShims _shimAdoNetCalls;
 
         [TestInitialize]
         public void TestInitialize()
@@ -40,7 +39,7 @@ namespace PortfolioEngineCore.Tests.Base
         {
             // Arrange
             ArrangeShims();
-            ShimdbaCCV.SetCostTotalsDBAccessInt32Int32ListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
+            ShimdbaCCV.SetCostTotalsDBAccessInt32Int32IListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
 
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             string sResult;
@@ -80,7 +79,7 @@ namespace PortfolioEngineCore.Tests.Base
         {
             // Arrange
             ArrangeShims();
-            ShimdbaCCV.SetCostTotalsDBAccessInt32Int32ListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
+            ShimdbaCCV.SetCostTotalsDBAccessInt32Int32IListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
 
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             string sResult;

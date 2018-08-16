@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace PortfolioEngineCore
 {
@@ -688,20 +689,218 @@ namespace PortfolioEngineCore
 
     public class dbaCCV
     {
+        private const string No = "@@NO@@";
+        private const string UOM = "@@@@";
+
         public static StatusEnum CalculateCostValues(DBAccess dba, int nCTID, int nCBID, int nProjectID, out string sResult)
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
+            var eStatus = StatusEnum.rsSuccess;
+            sResult = "CCV Complete";
 
-            if (!(nCTID > 0) || !(nCBID >= 0)) goto Exit_Function;
-
-            SqlCommand cmd;
-            SqlDataReader reader;
-            string cmdText;
+            if (!(nCTID > 0) || !(nCBID >= 0))
+            {
+                return eStatus;
+            };
 
             // likely will have to expand on this parameter options later
-            bool bDeleteAllProjects = false;
-            bool bAllProjects = false;
-            List<int> listPIs = new List<int>();
+            bool bDeleteAllProjects;
+            bool bAllProjects;
+            IList<int> listPIs;
+            int lPeriodCount;
+            bool bsingleUOM;
+            string sTotalUoM;
+            CostValues costValues;
+            IDictionary<int, CostCategoryInternal> costCategories;
+            IList<int> costCategoriesIndex;
+
+            PrepareData(
+                dba, 
+                nCTID, 
+                nCBID, 
+                nProjectID, 
+                out bDeleteAllProjects, 
+                out bAllProjects, 
+                out lPeriodCount, 
+                out costCategories, 
+                out costCategoriesIndex, 
+                out bsingleUOM, 
+                out sTotalUoM, 
+                out costValues,
+                out listPIs);
+
+            foreach (var projectId in listPIs)
+            {
+                ReadValues(dba, nCTID, nCBID, costValues, costCategories, projectId);
+                SetValues(costCategories, costCategoriesIndex, lPeriodCount, costValues);
+                RollupValues(costCategoriesIndex, costCategories, lPeriodCount, costValues, sTotalUoM, bsingleUOM);
+
+                try
+                {
+                    eStatus = WriteOutTheResults(
+                        dba,
+                        nCTID,
+                        nCBID,
+                        bDeleteAllProjects,
+                        projectId,
+                        lPeriodCount,
+                        costValues,
+                        costCategoriesIndex,
+                        costCategories);
+                }
+                catch (Exception ex)
+                {
+                    eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);
+                }
+            }
+
+            if (eStatus == StatusEnum.rsSuccess)
+            {
+                eStatus = SetCostTotals(dba, nCTID, nCBID, listPIs, bAllProjects);
+            }
+            
+            return eStatus;
+        }
+
+        private static void PrepareData(
+            DBAccess dba,
+            int nCTID,
+            int nCBID,
+            int nProjectID,
+            out bool bDeleteAllProjects,
+            out bool bAllProjects,
+            out int lPeriodCount,
+            out IDictionary<int, CostCategoryInternal> costCategories,
+            out IList<int> costCategoriesIndex,
+            out bool bsingleUOM,
+            out string sTotalUoM,
+            out CostValues costValues,
+            out IList<int> listPIs)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            sTotalUoM = UOM;
+
+            listPIs = GetProjectIds(dba, nProjectID, out bDeleteAllProjects, out bAllProjects);
+
+            lPeriodCount = GetPeriodCount(dba, nCBID);
+
+            costCategories = new Dictionary<int, CostCategoryInternal>();
+            costCategoriesIndex = new List<int>();
+
+            var nMaxLevel = GetCategories(dba, nCTID, costCategories, costCategoriesIndex, out bsingleUOM);
+
+            // set parent UIDs
+            var parentUiDs = new int[nMaxLevel + 1];
+            foreach (var costcategoryentry in costCategories)
+            {
+                var costcategory = costcategoryentry.Value;
+                parentUiDs[costcategory.Level] = costcategory.UID;
+                if (costcategory.Level > 1)
+                {
+                    costcategory.ParentUID = parentUiDs[costcategory.Level - 1];
+                }
+            }
+
+            if (!bsingleUOM) // if only one UOM can always roll up
+            {
+                sTotalUoM = RollupUOM(costCategories, costCategoriesIndex, sTotalUoM);
+            }
+
+            // set arrays to hold Cost Values - incl extra category line for TOTALS
+            costValues = new CostValues(lPeriodCount, costCategories.Count);
+        }
+
+        private static int GetCategories(
+            DBAccess dba, 
+            int nCTID, 
+            IDictionary<int, CostCategoryInternal> costCategories, 
+            IList<int> costCategoriesIndex,
+            out bool bsingleUOM)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            if (costCategories == null)
+            {
+                throw new ArgumentNullException(nameof(costCategories));
+            }
+            if (costCategoriesIndex == null)
+            {
+                throw new ArgumentNullException(nameof(costCategoriesIndex));
+            }
+            var nMaxLevel = 0;
+            bsingleUOM = true;
+            var susedUOM = string.Empty;
+
+            var cmdText = new StringBuilder();
+            cmdText.Append("SELECT cc.BC_UID,BC_ID,BC_LEVEL,BC_UOM,ac.BC_UID as Avail_BC_UID FROM EPGP_COST_CATEGORIES cc")
+                .AppendFormat(" Left Join EPGP_AVAIL_CATEGORIES ac On ac.BC_UID = cc.BC_UID And ac.CT_ID={0}", nCTID)
+                .AppendFormat(" ORDER BY cc.BC_ID");
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                SqlDataReader reader;
+                if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
+                {
+                    while (reader.Read())
+                    {
+                        var costCategory = new CostCategoryInternal
+                        {
+                            UID = DBAccess.ReadIntValue(reader["BC_UID"]),
+                            ID = DBAccess.ReadIntValue(reader["BC_ID"]),
+                            Level = DBAccess.ReadIntValue(reader["BC_LEVEL"])
+                        };
+                        if (costCategory.Level > nMaxLevel)
+                        {
+                            nMaxLevel = costCategory.Level;
+                        }
+                        costCategory.UOM = DBAccess.ReadStringValue(reader["BC_UOM"]);
+                        costCategory.RollupUOM = costCategory.UOM;
+
+                        if (DBAccess.ReadIntValue(reader["Avail_BC_UID"]) > 0) //  this category available for this CT
+                        {
+                            costCategory.IsAvailable = true;
+                            if (bsingleUOM && costCategory.UOM != string.Empty) // check to see if we use more than one non-blank UOM
+                            {
+                                if (susedUOM == string.Empty)
+                                {
+                                    susedUOM = costCategory.UOM;
+                                }
+                                else
+                                {
+                                    if (susedUOM != costCategory.UOM)
+                                    {
+                                        bsingleUOM = false;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            costCategory.IsAvailable = false;
+                        }
+
+                        costCategories.Add(costCategory.UID, costCategory);
+                        costCategoriesIndex.Add(costCategory.UID); // just used to access the Dictionary in reverse order - will be saved in entry (BC_ID-1)
+                    }
+                    reader.Close();
+                }
+            }
+            return nMaxLevel;
+        }
+
+        private static IList<int> GetProjectIds(DBAccess dba, int nProjectID, out bool bDeleteAllProjects, out bool bAllProjects)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            bDeleteAllProjects = false;
+            bAllProjects = false;
+
+            var listPIs = new List<int>();
             if (nProjectID > 0)
             {
                 listPIs.Add(nProjectID);
@@ -710,329 +909,381 @@ namespace PortfolioEngineCore
             {
                 bDeleteAllProjects = true;
                 bAllProjects = true;
-                cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
-                cmd = new SqlCommand(cmdText, dba.Connection);
+                var cmdText = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION = 0";
+                using (var cmd = new SqlCommand(cmdText, dba.Connection))
+                {
+                    SqlDataReader reader;
+                    if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
+                    {
+                        while (reader.Read())
+                        {
+                            var lProjectID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                            listPIs.Add(lProjectID);
+                        }
+                        reader.Close();
+                    }
+                }
+            }
+            return listPIs;
+        }
+
+        private static int GetPeriodCount(DBAccess dba, int nCBID)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            var lPeriodCount = 0;
+            var cmdText = "Select MAX(PRD_ID) as PeriodCount From EPG_PERIODS Where CB_ID=" + nCBID.ToString();
+            using (var cmd = new SqlCommand(cmdText, dba.Connection))
+            {
+                SqlDataReader reader;
                 if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
                 {
-                    while (reader.Read())
+                    if (reader.Read())
                     {
-                        int lProjectID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                        listPIs.Add(lProjectID);
+                        lPeriodCount = DBAccess.ReadIntValue(reader["PeriodCount"]);
                     }
                     reader.Close();
                 }
             }
+            return lPeriodCount;
+        }
 
-            int lPeriodCount = 0;
-            cmdText = "Select MAX(PRD_ID) as PeriodCount From EPG_PERIODS Where CB_ID=" + nCBID.ToString();
-            cmd = new SqlCommand(cmdText, dba.Connection);
-            if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
+        private static string RollupUOM(IDictionary<int, CostCategoryInternal> costCategories, IList<int> costCategoriesIndex, string sTotalUoM)
+        {
+            if (costCategories == null)
             {
-                if (reader.Read())
-                {
-                    lPeriodCount = DBAccess.ReadIntValue(reader["PeriodCount"]);
-                }
-                reader.Close();
+                throw new ArgumentNullException(nameof(costCategories));
             }
-
-            Dictionary<int, CostCategoryInternal> costcategories = new Dictionary<int, CostCategoryInternal>();  // DIC because I want foreach to get back in order put in
-            List<int> costcategoriesindex = new List<int>();   //  used as a lookup to access the costcategories in reverse order below
-            int nMaxLevel = 0;
-            string susedUOM = "";
-            bool bsingleUOM = true;
-            cmdText = "SELECT cc.BC_UID,BC_ID,BC_LEVEL,BC_UOM,ac.BC_UID as Avail_BC_UID FROM EPGP_COST_CATEGORIES cc"
-                        + " Left Join EPGP_AVAIL_CATEGORIES ac On ac.BC_UID = cc.BC_UID And ac.CT_ID=" + nCTID.ToString()
-                        + " ORDER BY cc.BC_ID";
-            cmd = new SqlCommand(cmdText, dba.Connection);
-            if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
+            if (costCategoriesIndex == null)
             {
-                while (reader.Read())
-                {
-                    CostCategoryInternal costcategory = new CostCategoryInternal();
-                    costcategory.UID = DBAccess.ReadIntValue(reader["BC_UID"]);
-                    costcategory.ID = DBAccess.ReadIntValue(reader["BC_ID"]);
-                    costcategory.Level = DBAccess.ReadIntValue(reader["BC_LEVEL"]);
-                    if (costcategory.Level > nMaxLevel) nMaxLevel = costcategory.Level;
-                    costcategory.UOM = DBAccess.ReadStringValue(reader["BC_UOM"]);
-                    costcategory.RollupUOM = costcategory.UOM;
+                throw new ArgumentNullException(nameof(costCategoriesIndex));
+            }
+            for (var i = costCategories.Count - 1; i >= 0; i--)
+            {
+                var categoryUID = costCategoriesIndex[i];
+                var costcategory = costCategories[categoryUID];
 
-                    if (DBAccess.ReadIntValue(reader["Avail_BC_UID"]) > 0)   //  this category available for this CT
+                if (costcategory.IsAvailable)
+                {
+                    var sUOM = costcategory.RollupUOM; // final determined UOM for this line as children already handled
+                    if (costcategory.ParentUID == 0)
                     {
-                        costcategory.IsAvailable = true;
-                        if (bsingleUOM && costcategory.UOM != "")  // check to see if we use more than one non-blank UOM
+                        // this is a level 1 Category so check UOM against Total line UoM
+                        if (sTotalUoM == UOM)
                         {
-                            if (susedUOM == "")
-                            {
-                                susedUOM = costcategory.UOM;
-                            }
-                            else
-                            {
-                                if (susedUOM != costcategory.UOM) bsingleUOM = false;
-                            }
+                            sTotalUoM = sUOM;
+                        }
+                        else if (sTotalUoM != sUOM)
+                        {
+                            sTotalUoM = No;
                         }
                     }
                     else
                     {
-                        costcategory.IsAvailable = false;
-                    };
-
-                    costcategories.Add(costcategory.UID, costcategory);
-                    costcategoriesindex.Add(costcategory.UID);   // just used to access the Dictionary in reverse order - will be saved in entry (BC_ID-1)
-                }
-                reader.Close();
-            }
-            int lCategoryCount = costcategories.Count;
-
-            // set parent UIDs
-            int[] ParentUIDs = new int[nMaxLevel + 1];
-            foreach (KeyValuePair<int, CostCategoryInternal> costcategoryentry in costcategories)
-            {
-                CostCategoryInternal costcategory = costcategoryentry.Value;
-                ParentUIDs[costcategory.Level] = costcategory.UID;
-                if (costcategory.Level > 1) costcategory.ParentUID = ParentUIDs[costcategory.Level - 1];
-            }
-            ParentUIDs = null;
-
-            // 'Roll up' the UOM values to determine when the quantities will be rolled up - if only one UOM used then always roll up
-
-            // Rollup UOMs to summary lines without UOM - set to NO if childs with diff UOMs - only consider categories available for this CT
-            //    This means that if a summary contains > 1 UOM it won't rollup even if the summary UOM is set to one of the values - TOUGH!
-
-            string sTotalUoM = "@@@@";
-            if (!bsingleUOM)  // if only one UOM can always roll up
-            {
-                for (int i = lCategoryCount - 1; i >= 0; i--)
-                {
-                    int categoryUID = costcategoriesindex[i];
-                    CostCategoryInternal costcategory = costcategories[categoryUID];
-
-                    if (costcategory.IsAvailable)
-                    {
-                        string sUOM = costcategory.RollupUOM;   // final determined UOM for this line as children already handled
-                        if (costcategory.ParentUID == 0)
+                        // rollup UOM all the way up to level 1
+                        while (costcategory.ParentUID > 0)
                         {
-                            // this is a level 1 Category so check UOM against Total line UoM
-                            if (sTotalUoM == "@@@@") sTotalUoM = sUOM; else if (sTotalUoM != sUOM) sTotalUoM = "@@NO@@";
-                        }
-                        else
-                        {
-                            // rollup UOM all the way up to level 1
-                            while (costcategory.ParentUID > 0)
+                            costcategory = costCategories[costcategory.ParentUID];
+                            if (costcategory.RollupUOM == string.Empty)
                             {
-                                costcategory = costcategories[costcategory.ParentUID];
-                                if (costcategory.RollupUOM == "") costcategory.RollupUOM = sUOM; else if (costcategory.RollupUOM != sUOM) costcategory.RollupUOM = "@@NO@@";
+                                costcategory.RollupUOM = sUOM;
+                            }
+                            else if (costcategory.RollupUOM != sUOM)
+                            {
+                                costcategory.RollupUOM = No;
                             }
                         }
                     }
                 }
             }
 
+            return sTotalUoM;
+        }
 
-
-            // set arrays to hold Cost Values - incl extra category line for TOTALS
-            CostValues costvalues = new CostValues(lPeriodCount, lCategoryCount);
-
-
-            //   FOR EACH PI from here
-            foreach (int ProjectID in listPIs)
+        private static void ReadValues(
+            DBAccess dbAccess, 
+            int nCTID, 
+            int nCBID, 
+            CostValues costValues, 
+            IDictionary<int, CostCategoryInternal> costCategories, 
+            int projectId)
+        {
+            if (dbAccess == null)
             {
-                //  reset arrays and category switches
-                costvalues.SetArrays();
-                foreach (KeyValuePair<int, CostCategoryInternal> costcategoryentry in costcategories)
-                {
-                    CostCategoryInternal costcategory = costcategoryentry.Value;
-                    costcategory.IsSummary = false;
-                    costcategory.HasData = false;
-                }
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (costValues == null)
+            {
+                throw new ArgumentNullException(nameof(costValues));
+            }
+            if (costCategories == null)
+            {
+                throw new ArgumentNullException(nameof(costCategories));
+            }
+            costValues.SetArrays();
+            foreach (var costcategoryentry in costCategories)
+            {
+                var costcategory = costcategoryentry.Value;
+                costcategory.IsSummary = false;
+                costcategory.HasData = false;
+            }
 
-                // read cost values
-                cmdText = "SELECT BD_VALUE,BD_COST,BD_PERIOD,BC_UID FROM EPGP_DETAIL_VALUES  WHERE PROJECT_ID=" + ProjectID.ToString() +
-                              " AND CB_ID=" + nCBID.ToString() +
-                              " AND CT_ID=" + nCTID.ToString();
-                cmd = new SqlCommand(cmdText, dba.Connection);
+            // read cost values
+            var cmdText = new StringBuilder();
+            cmdText.AppendFormat("SELECT BD_VALUE,BD_COST,BD_PERIOD,BC_UID FROM EPGP_DETAIL_VALUES  WHERE PROJECT_ID={0}", projectId)
+                .AppendFormat(" AND CB_ID={0}", nCBID)
+                .AppendFormat(" AND CT_ID={0}", nCTID);
+
+            using (var cmd = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                SqlDataReader reader;
                 if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
                 {
                     while (reader.Read())
                     {
-                        int period = DBAccess.ReadIntValue(reader["BD_PERIOD"]);  // doesn't seem worth trying to figure a Period offset in the arrays for periods not used but could do that at the beginning fofr all PIs I suppose 
-                        int category = DBAccess.ReadIntValue(reader["BC_UID"]);
+                        var period = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
+                        // doesn't seem worth trying to figure a Period offset in the arrays for periods not used but could do that at the beginning fofr all PIs I suppose 
+                        var category = DBAccess.ReadIntValue(reader["BC_UID"]);
 
-                        if (costcategories.ContainsKey(category))
+                        if (costCategories.ContainsKey(category))
                         {
-                            CostCategoryInternal costcategory = costcategories[category];
+                            var costcategory = costCategories[category];
 
                             if (costcategory.IsAvailable)
                             {
                                 costcategory.HasData = true;
                                 category = costcategory.ID;
-                                costvalues.incrCost(period, category, DBAccess.ReadDoubleValue(reader["BD_COST"]));
-                                costvalues.incrQuantity(period, category, DBAccess.ReadDoubleValue(reader["BD_VALUE"]));
+                                costValues.incrCost(period, category, DBAccess.ReadDoubleValue(reader["BD_COST"]));
+                                costValues.incrQuantity(period, category, DBAccess.ReadDoubleValue(reader["BD_VALUE"]));
                             }
                         }
                     }
                     reader.Close();
                 }
+            }
+        }
 
-                //  Rollup values using Cost Categories and UOMs determined earlier
+        private static void SetValues(
+            IDictionary<int, CostCategoryInternal> costCategories, 
+            IList<int> costCategoriesIndex, 
+            int lPeriodCount, 
+            CostValues costValues)
+        {
+            if (costCategories == null)
+            {
+                throw new ArgumentNullException(nameof(costCategories));
+            }
+            if (costCategoriesIndex == null)
+            {
+                throw new ArgumentNullException(nameof(costCategoriesIndex));
+            }
+            if (costValues == null)
+            {
+                throw new ArgumentNullException(nameof(costValues));
+            }
+            for (var i = costCategories.Count - 1; i >= 0; i--)
+            {
+                var categoryUID = costCategoriesIndex[i];
+                var costcategory = costCategories[categoryUID];
 
-                //  values can start at any level so need to mark the nodes that are summary for this PI and make sure they have no values except those that are rolled up
-                // not sure this is effective because we  found that when a summary value mistakenly was there for a CCR with details it counted the summary plus the detais, doubling up that little bit - KT June 2012
-                for (int i = lCategoryCount - 1; i >= 0; i--)
+                // if already a summary then no need to look at it
+                if (costcategory.IsSummary)
                 {
-                    int categoryUID = costcategoriesindex[i];
-                    CostCategoryInternal costcategory = costcategories[categoryUID];
+                    continue;
+                }
 
-                    if (costcategory.IsSummary == false)  // if already a summary then no need to look at it
+                if (costcategory.HasData)
+                {
+                    // mark as summary and clear values (just in case) all the way up to level 1
+                    while (costcategory.ParentUID > 0)
                     {
-                        if (costcategory.HasData == true)
+                        costcategory = costCategories[costcategory.ParentUID];
+                        costcategory.IsSummary = true;
+
+                        for (var j = 1; j <= lPeriodCount; j++)
                         {
-                            // mark as summary and clear values (just in case) all the way up to level 1
-                            while (costcategory.ParentUID > 0)
-                            {
-                                costcategory = costcategories[costcategory.ParentUID];
-                                costcategory.IsSummary = true;
-
-                                for (int j = 1; j <= lPeriodCount; j++)
-                                {
-                                    costvalues.setCost(j, costcategory.ID, 0);
-                                    costvalues.setQuantity(j, costcategory.ID, 0);
-                                }
-
-                            }
+                            costValues.setCost(j, costcategory.ID, 0);
+                            costValues.setQuantity(j, costcategory.ID, 0);
                         }
                     }
                 }
+            }
+        }
 
-                // ok now we can roll up the values
-                for (int i = lCategoryCount - 1; i >= 0; i--)
+        private static void RollupValues(
+            IList<int> costcategoriesindex, 
+            IDictionary<int, CostCategoryInternal> costCategories, 
+            int lPeriodCount, 
+            CostValues costValues,
+            string sTotalUoM, 
+            bool bsingleUOM)
+        {
+            if (costcategoriesindex == null)
+            {
+                throw new ArgumentNullException(nameof(costcategoriesindex));
+            }
+            if (costCategories == null)
+            {
+                throw new ArgumentNullException(nameof(costCategories));
+            }
+            if (costValues == null)
+            {
+                throw new ArgumentNullException(nameof(costValues));
+            }
+            for (var i = costCategories.Count - 1; i >= 0; i--)
+            {
+                var categoryUID = costcategoriesindex[i];
+                var costCategory = costCategories[categoryUID];
+                if (costCategory.ParentUID == 0)
                 {
-                    int categoryUID = costcategoriesindex[i];
-                    CostCategoryInternal costcategory = costcategories[categoryUID];
-                    if (costcategory.ParentUID == 0)
+                    // this is a level 1 Category so total to TOTAL line - stored in row where BC_UID = 0
+                    for (var j = 1; j <= lPeriodCount; j++)
                     {
-                        // this is a level 1 Category so total to TOTAL line - stored in row where BC_UID = 0
-                        for (int j = 1; j <= lPeriodCount; j++)
-                        {
-                            costvalues.incrCost(j, 0, costvalues.getCost(j, costcategory.ID));
-                        }
-
-                        if (sTotalUoM != "@@NO@@")
-                        {
-                            for (int j = 1; j <= lPeriodCount; j++)
-                            {
-                                costvalues.incrQuantity(j, 0, costvalues.getQuantity(j, costcategory.ID));
-                            }
-                        }
+                        costValues.incrCost(j, 0, costValues.getCost(j, costCategory.ID));
                     }
-                    else
+
+                    if (!string.Equals(sTotalUoM, No, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        CostCategoryInternal parent_costcategory = costcategories[costcategory.ParentUID];
-                        int thisrow = costcategory.ID;
-                        int parentrow = parent_costcategory.ID;
-
-                        for (int j = 1; j <= lPeriodCount; j++)
+                        for (var j = 1; j <= lPeriodCount; j++)
                         {
-                            costvalues.incrCost(j, parentrow, costvalues.getCost(j, thisrow));
-                        }
-
-                        //if (costcategory.RollupUOM != "" && costcategory.RollupUOM == parent_costcategory.RollupUOM)
-                        if (bsingleUOM || (costcategory.RollupUOM == parent_costcategory.RollupUOM))
-                        {
-                            for (int j = 1; j <= lPeriodCount; j++)
-                            {
-                                costvalues.incrQuantity(j, parentrow, costvalues.getQuantity(j, thisrow));
-                            }
+                            costValues.incrQuantity(j, 0, costValues.getQuantity(j, costCategory.ID));
                         }
                     }
                 }
-
-                // write out the results
-                int lRowsAffected = 0;
-                try
+                else
                 {
-                    cmdText = "DELETE FROM  EPGP_COST_VALUES WHERE CB_ID=" + nCBID.ToString() + " AND CT_ID=" + nCTID.ToString();
+                    var parentCostcategory = costCategories[costCategory.ParentUID];
+                    var thisRow = costCategory.ID;
+                    var parentrow = parentCostcategory.ID;
 
-                    if (!bDeleteAllProjects) cmdText = cmdText + " AND PROJECT_ID=" + ProjectID.ToString();
-                    bDeleteAllProjects = false;
-
-                    cmd = new SqlCommand(cmdText, dba.Connection);
-                    lRowsAffected = cmd.ExecuteNonQuery();
-
-                    try
+                    for (var j = 1; j <= lPeriodCount; j++)
                     {
-                        cmdText = "INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)" +
-                                    " VALUES(" + nCBID.ToString() + "," + nCTID.ToString() + "," + ProjectID.ToString() + ",@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)";
-                        cmd = new SqlCommand(cmdText, dba.Connection);
-                        SqlParameter pBC_UID = cmd.Parameters.Add("@BC_UID", SqlDbType.Int);
-                        SqlParameter pBD_PERIOD = cmd.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
-                        SqlParameter pBD_VALUE = cmd.Parameters.Add("@BD_VALUE", SqlDbType.Float);
-                        SqlParameter pBD_COST = cmd.Parameters.Add("@BD_COST", SqlDbType.Float);
-                        SqlParameter pBD_IsSummary = cmd.Parameters.Add("@BD_IS_SUMMARY", SqlDbType.Int);
+                        costValues.incrCost(j, parentrow, costValues.getCost(j, thisRow));
+                    }
 
-                        pBD_VALUE.Precision = 25;
-                        pBD_VALUE.Scale = 6;
-                        pBD_COST.Precision = 25;
-                        pBD_COST.Scale = 6;
-
-                        int lValueRowsAffected = 0;
-                        // Write out the Grand Total line
-                        for (int i = 1; i <= lPeriodCount; i++)
+                    if (bsingleUOM || (costCategory.RollupUOM == parentCostcategory.RollupUOM))
+                    {
+                        for (var j = 1; j <= lPeriodCount; j++)
                         {
-                            if (costvalues.getCost(i, 0) != 0 || costvalues.getQuantity(i, 0) != 0)
+                            costValues.incrQuantity(j, parentrow, costValues.getQuantity(j, thisRow));
+                        }
+                    }
+                }
+            }
+        }
+
+        private static StatusEnum WriteOutTheResults(
+            DBAccess dba, 
+            int nCTID, 
+            int nCBID, 
+            bool bDeleteAllProjects, 
+            int projectId, 
+            int lPeriodCount,
+            CostValues costValues, 
+            IList<int> costCategoriesIndex, 
+            IDictionary<int, CostCategoryInternal> costCategories)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            if (costValues == null)
+            {
+                throw new ArgumentNullException(nameof(costValues));
+            }
+            if (costCategoriesIndex == null)
+            {
+                throw new ArgumentNullException(nameof(costCategoriesIndex));
+            }
+            if (costCategories == null)
+            {
+                throw new ArgumentNullException(nameof(costCategories));
+            }
+
+            var eStatus = StatusEnum.rsSuccess;
+
+            var cmdText = new StringBuilder();
+            cmdText.AppendFormat("DELETE FROM  EPGP_COST_VALUES WHERE CB_ID={0} AND CT_ID={1}", nCBID, nCTID);
+
+            if (!bDeleteAllProjects)
+            {
+                cmdText.AppendFormat(" AND PROJECT_ID={0}", projectId);
+            }
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            cmdText.Clear();
+
+            try
+            {
+                cmdText
+                    .Append("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY)")
+                    .AppendFormat(" VALUES({0},{1},{2}", nCBID, nCTID, projectId)
+                    .Append(",@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)");
+                using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+                {
+                    var pBcUid = cmd.Parameters.Add("@BC_UID", SqlDbType.Int);
+                    var pBdPeriod = cmd.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+                    var pBdValue = cmd.Parameters.Add("@BD_VALUE", SqlDbType.Float);
+                    var pBdCost = cmd.Parameters.Add("@BD_COST", SqlDbType.Float);
+                    var pBdIsSummary = cmd.Parameters.Add("@BD_IS_SUMMARY", SqlDbType.Int);
+
+                    pBdValue.Precision = 25;
+                    pBdValue.Scale = 6;
+                    pBdCost.Precision = 25;
+                    pBdCost.Scale = 6;
+
+                    var lValueRowsAffected = 0;
+                    // Write out the Grand Total line
+                    for (var i = 1; i <= lPeriodCount; i++)
+                    {
+                        if (costValues.getCost(i, 0) != 0 || costValues.getQuantity(i, 0) != 0)
+                        {
+                            pBcUid.Value = 0;
+                            pBdPeriod.Value = i;
+                            pBdIsSummary.Value = 1;
+                            pBdValue.Value = costValues.getQuantity(i, 0);
+                            pBdCost.Value = costValues.getCost(i, 0);
+
+                            lValueRowsAffected += cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Write out the Cost Category lines
+                    for (var j = 0; j < costCategories.Count; j++)
+                    {
+                        var categoryUID = costCategoriesIndex[j];
+                        var costcategory = costCategories[categoryUID];
+                        var thisRow = costcategory.ID;
+
+                        for (var i = 1; i <= lPeriodCount; i++)
+                        {
+                            if (costValues.getCost(i, thisRow) != 0 || costValues.getQuantity(i, thisRow) != 0)
                             {
-                                pBC_UID.Value = 0;
-                                pBD_PERIOD.Value = i;
-                                pBD_IsSummary.Value = 1;
-                                pBD_VALUE.Value = costvalues.getQuantity(i, 0);
-                                pBD_COST.Value = costvalues.getCost(i, 0);
+                                pBcUid.Value = costcategory.UID;
+                                pBdPeriod.Value = i;
+                                var nIsSummary = costcategory.IsSummary ? 1 : 0;
+                                pBdIsSummary.Value = nIsSummary;
+                                pBdValue.Value = costValues.getQuantity(i, thisRow);
+                                pBdCost.Value = costValues.getCost(i, thisRow);
+
                                 lValueRowsAffected += cmd.ExecuteNonQuery();
                             }
                         }
-
-                        // Write out the Cost Category lines
-                        for (int j = 0; j < lCategoryCount; j++)
-                        {
-                            int categoryUID = costcategoriesindex[j];
-                            CostCategoryInternal costcategory = costcategories[categoryUID];
-                            int thisrow = costcategory.ID;
-
-                            for (int i = 1; i <= lPeriodCount; i++)
-                            {
-                                if (costvalues.getCost(i, thisrow) != 0 || costvalues.getQuantity(i, thisrow) != 0)
-                                {
-                                    pBC_UID.Value = costcategory.UID;
-                                    pBD_PERIOD.Value = i;
-                                    int nIsSummary;
-                                    if (costcategory.IsSummary) nIsSummary = 1; else nIsSummary = 0;
-                                    pBD_IsSummary.Value = nIsSummary;
-                                    pBD_VALUE.Value = costvalues.getQuantity(i, thisrow);
-                                    pBD_COST.Value = costvalues.getCost(i, thisrow);
-                                    lValueRowsAffected += cmd.ExecuteNonQuery();
-                                }
-                            }
-                        }
-
                     }
-                    catch (Exception ex)
-                    {
-                        eStatus = dba.HandleStatusError(SeverityEnum.Exception, "InsertCOST_VALUES", (StatusEnum)99848, ex.Message.ToString());
-                    }
-
                 }
-                catch (Exception ex)
-                {
-                    eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message.ToString());
-                }
-
-            }            //   FOREACH PI ends here
-
-
-            if (eStatus == StatusEnum.rsSuccess) eStatus = SetCostTotals(dba, nCTID, nCBID, listPIs, bAllProjects);
-Exit_Function:
-            sResult = "CCV Complete";
+            }
+            catch (Exception ex)
+            {
+                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "InsertCOST_VALUES", (StatusEnum)99848, ex.Message);
+            }
             return eStatus;
         }
-        internal static StatusEnum SetCostTotals(DBAccess dba, int nCTID, int nCBID, List<int> listPIs, bool bAllProjects)
+
+        internal static StatusEnum SetCostTotals(DBAccess dba, int nCTID, int nCBID, IList<int> listPIs, bool bAllProjects)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
 
