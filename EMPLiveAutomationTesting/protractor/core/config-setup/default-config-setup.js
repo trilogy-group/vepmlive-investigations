@@ -57,7 +57,7 @@ const configSetup = {
         'browserstack.user': process.env.BROWSERSTACK_USERNAME || setupUtilities.getParam("", "--params.browserstack.user", false),
         'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || setupUtilities.getParam("", "--params.browserstack.key", false),
         'browserstack.local': process.env.BROWSERSTACK_LOCAL || setupUtilities.getParam(true, "--params.browserstack.local", false),
-        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER || setupUtilities.getParam("BUILD#" + process.env.BUILD_NUMBER, "--params.browserstack.localIdentifier", false),
+        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
         'build': process.env.BROWSERSTACK_BUILD || setupUtilities.getParam('Local Build - ' + new Date().toISOString(), "--params.browserstack.build", false),
         'browserstack.debug': 'true',
         'acceptSslCerts': 'true',
