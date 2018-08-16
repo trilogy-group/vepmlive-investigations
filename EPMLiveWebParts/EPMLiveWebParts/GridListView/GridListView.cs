@@ -2958,7 +2958,7 @@ namespace EPMLiveWebParts
             {
                 propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);
             }
-            catch{ propBagData = null; }
+            catch { propBagData = null; }
             if (propBagData != null)
             {
                 string[] viewArr;
@@ -3255,267 +3255,245 @@ namespace EPMLiveWebParts
 
         private void RenderSearch(HtmlTextWriter output, SPWeb web)
         {
-            if (bShowSearch && !bHasSearchResults)
-                output.WriteLine("<div id=\"searchload" + sFullGridId + "\" style=\"\">");
-            else
-                output.WriteLine("<div id=\"searchload" + sFullGridId + "\" style=\"display:none\">");
+            const string displayNoneStyle = "display:none";
 
-            if (sSearchField != "" || bShowSearch)
-                output.WriteLine("<div id=\"searchdiv" + sFullGridId + "\" style=\"\">");
-            else
-                output.WriteLine("<div id=\"searchdiv" + sFullGridId + "\" style=\"display:none\">");
+            output.WriteLine($"<div id=\"searchload{sFullGridId}\" style=\"{(bShowSearch && !bHasSearchResults ? string.Empty : displayNoneStyle)}\">");
+            output.WriteLine($"<div id=\"searchdiv{sFullGridId}\" style=\"{(!string.IsNullOrEmpty(sSearchField) || bShowSearch ? string.Empty : displayNoneStyle)}\">");
+
+            var fieldsSorted = new SortedList();
+
+            if (string.IsNullOrEmpty(sSearchField))
             {
-                string fieldlist = "";
-                string jsonfields = "";
-                SortedList slFields = new SortedList();
-
-                if (sSearchField == "")
-                    sSearchField = "Title";
-
-                if (sSearchType == "")
-                    sSearchType = "1";
-
-                Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-                GridGanttSettings gSettings = new GridGanttSettings(list);
-                if (gSettings.DisplaySettings != "")
-                    fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-                bool bflag = false;
-
-                foreach (SPField field in list.Fields)
-                {
-                    if ((field.Reorderable && !field.Hidden) || (IsEnableModeration(field.Id)))
-                    {
-                        //EPML-4625: Title columns bind to Title field and the column name always remain the same
-                        //make sure to always display Title fields irrespective of display rules
-                        if (field.InternalName == "Title")
-                        {
-                            bflag = true;
-                        }
-                        else
-                        {
-                            if (fieldProperties != null)
-                                bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
-                            else
-                                bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
-                        }
-                        if (bflag == true)
-                        {
-                            slFields.Add(field.Title, field.InternalName);
-
-                            if (field.Type == SPFieldType.Choice)
-                            {
-                                jsonfields += field.InternalName + ": [";
-                                SPFieldChoice c = (SPFieldChoice)field;
-                                foreach (string choice in c.Choices)
-                                {
-                                    jsonfields += "\"" + choice.Replace("\"", "\\\"") + "\",";
-                                }
-                                jsonfields = jsonfields.TrimEnd(',') + "],";
-                            }
-                            if (field.Type == SPFieldType.Boolean)
-                            {
-                                jsonfields += field.InternalName + ": [ \"Yes\", \"No\" ],";
-                            }
-                        }
-                    }
-                }
-
-                foreach (DictionaryEntry de in slFields)
-                {
-                    if (sSearchField == de.Value.ToString())
-                        fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
-                    else
-                        fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
-                }
-
-                output.WriteLine("<script language=\"javascript\">");
-                output.WriteLine("var searchfields" + sFullGridId + " = {" + jsonfields.TrimEnd(',') + "};");
-                output.WriteLine("function switchsearch" + sFullGridId + "()");
-                output.WriteLine("{");
-                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
-                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
-                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
-                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
-                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
-                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
-                output.WriteLine("if(sList){");
-                output.WriteLine("searchtext.style.display='none';");
-                output.WriteLine("searchchoice.style.display='';");
-                output.WriteLine("searchchoice.options.length = 0;");
-                output.WriteLine("searchtypechoice.options[2].selected = true;");
-                output.WriteLine("searchtypechoice.disabled = true;");
-                output.WriteLine("for(var i=0; i < sList.length; i++) {     var d = sList[i];     searchchoice.options.add(new Option(d, d)); if(d=='" + sSearchValue + "'){searchchoice.options[searchchoice.options.length-1].selected = true;} } ");
-
-                output.WriteLine("}else{");
-                output.WriteLine("searchtext.style.display='';");
-                output.WriteLine("searchchoice.style.display='none';");
-                output.WriteLine("searchtypechoice.disabled = false;");
-                output.WriteLine("}");
-                output.WriteLine("}");
-
-                output.WriteLine("function unSearch" + sFullGridId + "(){");
-
-                output.WriteLine("var unsearch = document.getElementById('unsearch" + sFullGridId + "');");
-                output.WriteLine("unsearch.style.display=\"none\";");
-                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
-                output.WriteLine("searchtext.value = '';");
-                if (bLockSearch)
-                {
-                    System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
-                    StringBuilder sbUrl = new StringBuilder();
-
-                    string fListId = list.ID.ToString("N");
-
-                    foreach (string key in nv.AllKeys)
-                    {
-                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
-                        {
-                            sbUrl.Append("&");
-                            sbUrl.Append(key);
-                            sbUrl.Append("=");
-                            sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
-                        }
-                    }
-
-                    string urlParams = sbUrl.ToString().TrimStart('&');
-                    if (!String.IsNullOrEmpty(urlParams))
-                        urlParams = "?" + urlParams;
-
-                    string curUrl = Page.Request.Url.ToString();
-
-                    try
-                    {
-                        curUrl = curUrl.Remove(curUrl.IndexOf("?"));
-                    }
-                    catch { }
-
-                    output.WriteLine("var url = '" + curUrl + urlParams + "';");
-
-                    output.WriteLine("location.href= url;");
-                }
-                else
-                {
-                    output.WriteLine("GridUnSearch('" + sFullGridId + "');");
-                }
-                output.WriteLine("}");
-
-                output.WriteLine("function doSearch" + sFullGridId + "(){");
-
-                //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
-                //output.WriteLine("searchbut.disabled = true;");
-                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
-
-                output.WriteLine("var unsearch = document.getElementById('unsearch" + sFullGridId + "');");
-                output.WriteLine("unsearch.style.display=\"table-cell\";");
-                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
-                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
-                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
-                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
-                output.WriteLine("var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;");
-                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
-                output.WriteLine("var searchvalue = \"\";");
-                output.WriteLine("if(sList){");
-                output.WriteLine("searchvalue = searchchoice.options[searchchoice.selectedIndex].value;");
-                output.WriteLine("}else{");
-                output.WriteLine("searchvalue = searchtext.value;");
-                output.WriteLine("}");
-
-                if (bLockSearch)
-                {
-                    System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
-                    StringBuilder sbUrl = new StringBuilder();
-
-                    string fListId = list.ID.ToString("N");
-
-                    foreach (string key in nv.AllKeys)
-                    {
-                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
-                        {
-                            sbUrl.Append("&");
-                            sbUrl.Append(key);
-                            sbUrl.Append("=");
-                            sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
-                        }
-                    }
-
-                    string urlParams = sbUrl.ToString().TrimStart('&');
-                    if (!String.IsNullOrEmpty(urlParams))
-                        urlParams = "?" + urlParams;
-
-                    string curUrl = Page.Request.Url.ToString();
-
-                    try
-                    {
-                        curUrl = curUrl.Remove(curUrl.IndexOf("?"));
-                    }
-                    catch { }
-
-                    output.WriteLine("var url = '" + curUrl + urlParams + "';");
-                    output.WriteLine("if(url.indexOf('?') > 0){url = url + '&';}else{url = url + '?';}");
-                    output.WriteLine("url = url + '" + fListId + "_searchfield=' + searchfield + '&" + fListId + "_searchvalue=' + searchvalue + '&" + fListId + "_searchtype=' + searchtype;");
-                    output.WriteLine("location.href= url;");
-
-                }
-                else
-                {
-
-                    output.WriteLine("GridSearch('" + sFullGridId + "', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
-                }
-
-                output.WriteLine("}");
-
-                output.WriteLine("function enablesearcher" + sFullGridId + "(){");
-                //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
-                //output.WriteLine("searchbut.disabled = false;");
-                output.WriteLine("}");
-
-                output.WriteLine("function searchKeyPress" + sFullGridId + "(e){");
-                output.WriteLine("if(e.keyCode == 13){ doSearch" + sFullGridId + "();}return false;}");
-
-                output.WriteLine("</script>");
-
-                output.Write("<div id=\"search" + this.ID + "\" style=\"width:100%; height:40px;");
-                //if (!bShowSearch)
-                //    output.Write(";display:none");
-                output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 14px;\">");
-                output.Write("Search: ");
-                output.Write("<select id=\"search" + sFullGridId + "\" onChange=\"switchsearch" + sFullGridId + "();\" class=\"form-control\">");
-                output.WriteLine(fieldlist);
-                output.Write("</select>&nbsp;&nbsp;");
-
-                output.WriteLine("<select id=\"searchtype" + sFullGridId + "\" class=\"form-control\">");
-                output.WriteLine(typeoption("1", "Contains"));
-                output.WriteLine(typeoption("8", "Begins With"));
-                output.WriteLine(typeoption("2", "Equals"));
-                output.WriteLine(typeoption("3", "Does Not Equal"));
-                output.WriteLine(typeoption("4", "Greater Than"));
-                output.WriteLine(typeoption("5", "Greater Than or Equal"));
-                output.WriteLine(typeoption("6", "Less Than"));
-                output.WriteLine(typeoption("7", "Less Than or Equal"));
-
-                output.WriteLine("</select>&nbsp;&nbsp;");
-                output.WriteLine("</td><td>");
-                output.WriteLine(@"<div style=""border: 1px solid #CCC;width: 200px;height: 30px;"">
-                    <div id=""unsearch" + sFullGridId + @""" class="""" style=""padding-left:4px;display: " + ((sSearchField == "") ? "none" : "table-cell") + @";min-width: 12px;align:top"">
-                        <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch" + sFullGridId + @"()""/>
-                    </div>
-                    <div style=""display: table-cell"">
-                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px"" onkeypress=""searchKeyPress" + sFullGridId + @"(event);""/>
-                        <select id=""searchchoice" + sFullGridId + @""" style=""border: 0px; width:100%"">
-                        </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div class="""" style=""padding-right:2px; padding-left:10px;padding-top:5px;display: table-cell;min-width: 10px;cursor:pointer"">
-                        <img onclick=""doSearch" + sFullGridId + @"()"" src=""/_layouts/epmlive/images/find_icon.png""/>
-                    </div>
-                </div>");
-
-                //                output.Write("<input type=\"button\" id=\"searchbutton" + sFullGridId + "\" onclick=\"doSearch" + sFullGridId + "()\" value=\"Search\">");
-                output.WriteLine("</td></tr></table>");
-                output.WriteLine("</div>");
-
-                output.WriteLine("<script language=\"javascript\">switchsearch" + sFullGridId + "();</script>");
-
+                sSearchField = "Title";
             }
+
+            if (string.IsNullOrEmpty(sSearchType))
+            {
+                sSearchType = "1";
+            }
+
+            // (CC-78160, 2018-08-16) Concrete type is required, since it's used as a parameter to external methodd, which requires concrete dictionary type
+            Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+            var gridGanttSettings = new GridGanttSettings(list);
+            if (!string.IsNullOrEmpty(gridGanttSettings.DisplaySettings))
+            {
+                fieldProperties = ListDisplayUtils.ConvertFromString(gridGanttSettings.DisplaySettings);
+            }
+
+            var fields = new Dictionary<string, string>();
+            var jsonFields = new Dictionary<string, string>();
+            foreach (SPField field in list.Fields)
+            {
+                if ((field.Reorderable && !field.Hidden) || (IsEnableModeration(field.Id)))
+                {
+                    //EPML-4625: Title columns bind to Title field and the column name always remain the same
+                    //make sure to always display Title fields irrespective of display rules
+                    if (field.InternalName == "Title"
+                        || (fieldProperties != null && EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display")
+                        || !field.ShowInDisplayForm.HasValue
+                        || field.ShowInViewForms == true))
+                    {
+                        fieldsSorted.Add(field.Title, field.InternalName);
+
+                        if (field.Type == SPFieldType.Choice)
+                        {
+                            var choiceField = (SPFieldChoice)field;
+                            jsonFields.Add(field.InternalName,
+                                $@"[{(string.Join(",", choiceField.Choices.Cast<string>()
+                                    .Select(choice => choice.Replace("\"", "\\\""))))}]");
+                        }
+                        if (field.Type == SPFieldType.Boolean)
+                        {
+                            jsonFields.Add(field.InternalName, "[ \"Yes\", \"No\" ]");
+                        }
+                    }
+                }
+            }
+
+            foreach (DictionaryEntry fieldEntry in fieldsSorted)
+            {
+                fields.Add(fieldEntry.Value.ToString(), fieldEntry.Key.ToString());
+            }
+
+            output.WriteLine("<script language=\"javascript\">");
+            output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields.Select(field =>
+                    $"{field.Key}: {field.Value}"
+                ))}}}");
+
+            output.WriteLine($"function switchsearch{sFullGridId}()");
+            output.WriteLine("{");
+            output.WriteLine($"var searcher = document.getElementById('search{sFullGridId}');");
+            output.WriteLine($"var searchtext = document.getElementById('searchtext{sFullGridId}');");
+            output.WriteLine($"var searchchoice = document.getElementById('searchchoice{sFullGridId}');");
+            output.WriteLine($"var searchtypechoice = document.getElementById('searchtype{sFullGridId}');");
+            output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
+            output.WriteLine($"var sList = searchfields{sFullGridId}[searchfield];");
+            output.WriteLine("if(sList){");
+            output.WriteLine("searchtext.style.display='none';");
+            output.WriteLine("searchchoice.style.display='';");
+            output.WriteLine("searchchoice.options.length = 0;");
+            output.WriteLine("searchtypechoice.options[2].selected = true;");
+            output.WriteLine("searchtypechoice.disabled = true;");
+            output.WriteLine($"for(var i=0; i < sList.length; i++) {{     var d = sList[i];     searchchoice.options.add(new Option(d, d)); if(d=='{sSearchValue}'){{searchchoice.options[searchchoice.options.length-1].selected = true;}} }} ");
+            output.WriteLine("}else{");
+            output.WriteLine("searchtext.style.display='';");
+            output.WriteLine("searchchoice.style.display='none';");
+            output.WriteLine("searchtypechoice.disabled = false;");
+            output.WriteLine("}");
+            output.WriteLine("}");
+
+            output.WriteLine($"function unSearch{sFullGridId}(){{");
+            output.WriteLine($"var unsearch = document.getElementById('unsearch{sFullGridId}');");
+            output.WriteLine("unsearch.style.display=\"none\";");
+            output.WriteLine($"var searchtext = document.getElementById('searchtext{sFullGridId}');");
+            output.WriteLine("searchtext.value = '';");
+            if (bLockSearch)
+            {
+                System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
+                StringBuilder sbUrl = new StringBuilder();
+
+                string fListId = list.ID.ToString("N");
+
+                foreach (string key in nv.AllKeys)
+                {
+                    if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
+                    {
+                        sbUrl.Append("&");
+                        sbUrl.Append(key);
+                        sbUrl.Append("=");
+                        sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
+                    }
+                }
+
+                string urlParams = sbUrl.ToString().TrimStart('&');
+                if (!String.IsNullOrEmpty(urlParams))
+                    urlParams = "?" + urlParams;
+
+                string curUrl = Page.Request.Url.ToString();
+
+                try
+                {
+                    curUrl = curUrl.Remove(curUrl.IndexOf("?"));
+                }
+                catch { }
+
+                output.WriteLine("var url = '" + curUrl + urlParams + "';");
+
+                output.WriteLine("location.href= url;");
+            }
+            else
+            {
+                output.WriteLine($"GridUnSearch('{sFullGridId}');");
+            }
+            output.WriteLine("}");
+
+            output.WriteLine($"function doSearch{sFullGridId}(){{");
+            output.WriteLine($"var searcher = document.getElementById('search{sFullGridId}');");
+            output.WriteLine($"var unsearch = document.getElementById('unsearch{sFullGridId}');");
+            output.WriteLine("unsearch.style.display=\"table-cell\";");
+            output.WriteLine($"var searchchoice = document.getElementById('searchchoice{sFullGridId}');");
+            output.WriteLine($"var searchtext = document.getElementById('searchtext{sFullGridId}');");
+            output.WriteLine($"var searchtypechoice = document.getElementById('searchtype{sFullGridId}');");
+            output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
+            output.WriteLine("var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;");
+            output.WriteLine($"var sList = searchfields{sFullGridId}[searchfield];");
+            output.WriteLine("var searchvalue = \"\";");
+            output.WriteLine("if(sList){");
+            output.WriteLine("searchvalue = searchchoice.options[searchchoice.selectedIndex].value;");
+            output.WriteLine("}else{");
+            output.WriteLine("searchvalue = searchtext.value;");
+            output.WriteLine("}");
+
+            if (bLockSearch)
+            {
+                var queryString = Page.Request.QueryString;
+                var urlBuilder = new StringBuilder();
+                var listIdString = list.ID.ToString("N");
+                foreach (var key in queryString.AllKeys)
+                {
+                    if (key != listIdString + "_searchvalue" 
+                        && key != listIdString + "_searchfield" 
+                        && key != listIdString + "_searchtype")
+                    {
+                        urlBuilder.Append("&");
+                        urlBuilder.Append(key);
+                        urlBuilder.Append("=");
+                        urlBuilder.Append(HttpUtility.UrlEncode(queryString[key]));
+                    }
+                }
+
+                var urlParams = urlBuilder.ToString().TrimStart('&');
+                if (!string.IsNullOrEmpty(urlParams))
+                {
+                    urlParams = $"?{urlParams}";
+                }
+
+                var requestUrl = Page.Request.Url.ToString();
+                var queryStringIndex = requestUrl.IndexOf("?");
+                if (queryStringIndex >= 0)
+                {
+                    requestUrl = requestUrl.Remove(queryStringIndex);
+                }
+
+                output.WriteLine($"var url = '{requestUrl}{urlParams}';");
+                output.WriteLine("if(url.indexOf('?') > 0){url = url + '&';}else{url = url + '?';}");
+                output.WriteLine($"url = url + '{listIdString}_searchfield=' + searchfield + '&{listIdString}_searchvalue=' + searchvalue + '&{listIdString}_searchtype=' + searchtype;");
+                output.WriteLine("location.href= url;");
+            }
+            else
+            {
+                output.WriteLine($"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
+            }
+
+            output.WriteLine("}");
+
+            output.WriteLine($"function enablesearcher{sFullGridId}(){{");
+            output.WriteLine("}");
+
+            output.WriteLine($"function searchKeyPress{sFullGridId}(e){{");
+            output.WriteLine($"if(e.keyCode == 13){{ doSearch{sFullGridId}();}}return false;}}");
+
+            output.WriteLine("</script>");
+
+            output.Write($"<div id=\"search{ID}\" style=\"width:100%; height:40px;");
+            output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 14px;\">");
+            output.Write("Search: ");
+            output.Write($"<select id=\"search{sFullGridId}\" onChange=\"switchsearch{sFullGridId}();\" class=\"form-control\">");
+            output.WriteLine(string.Join(string.Empty, fields.Select(field => 
+                $"<option value=\"{field.Key}\"{(sSearchField == field.Key ? " selected" : string.Empty)}>{field.Value}</option>"
+            )));
+            output.Write("</select>&nbsp;&nbsp;");
+
+            output.WriteLine($"<select id=\"searchtype{sFullGridId}\" class=\"form-control\">");
+            output.WriteLine(typeoption("1", "Contains"));
+            output.WriteLine(typeoption("8", "Begins With"));
+            output.WriteLine(typeoption("2", "Equals"));
+            output.WriteLine(typeoption("3", "Does Not Equal"));
+            output.WriteLine(typeoption("4", "Greater Than"));
+            output.WriteLine(typeoption("5", "Greater Than or Equal"));
+            output.WriteLine(typeoption("6", "Less Than"));
+            output.WriteLine(typeoption("7", "Less Than or Equal"));
+            output.WriteLine("</select>&nbsp;&nbsp;");
+
+            output.WriteLine("</td><td>");
+
+            output.WriteLine($@"<div style=""border: 1px solid #CCC;width: 200px;height: 30px;"">
+                <div id=""unsearch{sFullGridId}"" class="""" style=""padding-left:4px;display: {(string.IsNullOrEmpty(sSearchField) ? "none" : "table-cell")};min-width: 12px;align:top"">
+                    <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch{sFullGridId}()""/>
+                </div>
+                <div style=""display: table-cell"">
+                    <input type=""text"" id=""searchtext{sFullGridId}"" value=""{sSearchValue}"" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px"" onkeypress=""searchKeyPress{sFullGridId}(event);""/>
+                    <select id=""searchchoice{sFullGridId}"" style=""border: 0px; width:100%"">
+                    </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                <div class="""" style=""padding-right:2px; padding-left:10px;padding-top:5px;display: table-cell;min-width: 10px;cursor:pointer"">
+                    <img onclick=""doSearch{sFullGridId}()"" src=""/_layouts/epmlive/images/find_icon.png""/>
+                </div>
+            </div>");
+            
+            output.WriteLine("</td></tr></table>");
+            output.WriteLine("</div>");
+            output.WriteLine($"<script language=\"javascript\">switchsearch{sFullGridId}();</script>");
             output.WriteLine("</div>");
             output.WriteLine("</div>");
         }
