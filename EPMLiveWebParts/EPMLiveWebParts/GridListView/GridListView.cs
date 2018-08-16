@@ -3281,7 +3281,7 @@ namespace EPMLiveWebParts
             var fields = new Dictionary<string, string>();
             var jsonFields = new Dictionary<string, string>();
 
-            FilterSearchFields(fieldProperties, fields, jsonFields, field =>
+            FilterSearchFields(fields, jsonFields, field =>
                 ((field.Reorderable && !field.Hidden) || IsEnableModeration(field.Id))
                 //EPML-4625: Title columns bind to Title field and the column name always remain the same
                 //make sure to always display Title fields irrespective of display rules
@@ -3492,8 +3492,6 @@ namespace EPMLiveWebParts
         }
 
         private void FilterSearchFields(
-            // (CC-78160, 2018-08-16) Type has to be concrete as it's passed into external method that expects concrete type
-            Dictionary<string, Dictionary<string, string>> fieldProperties, 
             IDictionary<string, string> fields, 
             IDictionary<string, string> jsonFields,
             Func<SPField, bool> filterFunc)
