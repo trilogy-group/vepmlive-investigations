@@ -323,4 +323,21 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyText(configLabel.firstSelectedField,
             OptimizerPageConstants.selectedFieldsSection, fieldName, stepLogger);
     }
+
+    static async selectSelectedFiedldAndRemove(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        if (!(await PageHelper.isElementPresent(configLabel.firstSelectedField, false))) {
+            this.selectAvailableFieldAndAdd(stepLogger);
+        }
+        stepLogger.step('Select Value from the Selected Fields selection box. Click on Remove button.');
+        await PageHelper.click(configLabel.firstSelectedField);
+        const fieldName = PageHelper.getText(configLabel.firstSelectedField);
+        await PageHelper.click(configLabel.remove);
+        return fieldName;
+    }
+
+    static async verifyRemovedFieldInAvailableFields(fieldName: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getAvailableFieldByName(fieldName),
+            `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`, stepLogger);
+    }
 }

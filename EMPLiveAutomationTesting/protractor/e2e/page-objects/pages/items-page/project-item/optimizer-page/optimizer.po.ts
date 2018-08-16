@@ -162,4 +162,9 @@ export class OptimizerPage extends BasePage {
     static getCurrentViewByName(viewName: string) {
         return element(By.xpath(`//li[@id="idAnalyzerTab_SelView_viewinternal"]//span[normalize-space(text())="${viewName}"]`));
     }
+
+    static getAvailableFieldByName(fieldName: string) {
+        const label = OptimizerPageConstants.optimizerConfiguration;
+        return element(By.xpath(`//select[@id="${label.selectedFieldsSelect}"]//option[text()="${fieldName}"]`));
+    }
 }
