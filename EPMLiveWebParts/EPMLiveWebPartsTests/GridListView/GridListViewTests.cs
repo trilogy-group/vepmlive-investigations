@@ -11,12 +11,47 @@ using Microsoft.SharePoint.Utilities.Fakes;
 using System.Collections.Specialized.Fakes;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
+using EPMLive.TestFakes.Utility;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.Web.UI;
+using System.IO;
 
 namespace EPMLiveWebParts.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class GridListViewTests
     {
+        private IDisposable _shimsContext;
+        private SharepointShims _sharepointShims;
+
+        private GridListView _testable;
+        private PrivateObject _testablePrivate;
+
+        private StringWriter _outputWriterString;
+        private HtmlTextWriter _outputWriterHtml;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _shimsContext = ShimsContext.Create();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
+
+            _testable = new GridListView();
+            _testablePrivate = new PrivateObject(_testable);
+
+            _outputWriterString = new StringWriter();
+            _outputWriterHtml = new HtmlTextWriter(_outputWriterString);
+        }
+
+        [TestCleanup]
+        public void TearDown()
+        {
+            _shimsContext.Dispose();
+
+            _outputWriterString.Dispose();
+            _outputWriterHtml.Dispose();
+        }
+
         [TestMethod()]
         public void GetViewsTest_When_propertbag_Is_Null()
         {
@@ -309,6 +344,17 @@ namespace EPMLiveWebParts.Tests
                 Assert.IsTrue(result.Contains("ViewURL"));
 
             }
+        }
+
+        [TestMethod]
+        public void RenderSearch_()
+        {
+            // Arrange
+
+            // Act
+            _testablePrivate.Invoke("RenderSearch", _outputWriterHtml, _sharepointShims.WebShim.Instance);
+
+            // Assert
         }
     }
     public class TestEnumerator : IEnumerator
