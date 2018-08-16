@@ -37,22 +37,22 @@ namespace TimeSheets
         {
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                string id = docTimesheet.FirstChild.Attributes["ID"].Value;
-                ArrayList rows = new ArrayList(docTimesheet.FirstChild.Attributes["Rows"].Value.Split(','));
+                var id = docTimesheet.FirstChild.Attributes["ID"].Value;
+                var rows = new ArrayList(docTimesheet.FirstChild.Attributes["Rows"].Value.Split(','));
 
-                XmlDocument docRet = new XmlDocument();
+                var docRet = new XmlDocument();
                 docRet.LoadXml("<Grid><IO/><Changes/></Grid>");
 
                 var nodeData = docRet.FirstChild.SelectSingleNode("//Changes");
 
-                TimesheetSettings settings = new TimesheetSettings(oWeb);
+                var settings = new TimesheetSettings(oWeb);
 
-                ArrayList arrLookups = new ArrayList();
+                var arrLookups = new ArrayList();
 
-                SPList lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
+                var lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
 
                 if (lstMyWork != null)
                 {
@@ -60,9 +60,7 @@ namespace TimeSheets
                     {
                         if (field.Type == SPFieldType.Lookup)
                         {
-
                             arrLookups.Add(field.InternalName + "Text");
-
                         }
                     }
                 }
@@ -108,9 +106,9 @@ namespace TimeSheets
                             var dataSetTimestamp = iGetTSData(connection, oWeb, user, periodString);
                             var canEdit = true;
 
-                            if ("True".Equals(
-                                dataSetTimestamp.Tables[1].Rows[0]["SUBMITTED"].ToString(),
-                            StringComparison.InvariantCultureIgnoreCase))
+                            bool submitted;
+                            bool.TryParse(dataSetTimestamp.Tables[1].Rows[0]["SUBMITTED"].ToString(), out submitted);
+                            if (submitted)
                             {
                                 canEdit = false;
                             }

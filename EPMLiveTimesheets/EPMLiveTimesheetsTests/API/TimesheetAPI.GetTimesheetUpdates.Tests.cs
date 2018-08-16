@@ -18,7 +18,7 @@ namespace TimeSheets.Tests
         private const int UserId = 23;
 
         [TestMethod]
-        public void GetTimesheetUpdates_Tests()
+        public void GetTimesheetUpdates_Always_RendersCorrectXML()
         {
             // Arrange
             SetupShims();
