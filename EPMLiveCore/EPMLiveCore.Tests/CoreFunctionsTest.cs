@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Security.Cryptography.Fakes;
 using System.Text;
 using System.Threading.Tasks;
 using EPMLive.TestFakes.Utility;
@@ -19,6 +22,8 @@ namespace EPMLiveCore.Tests
         private IDisposable _shimsContext;
         private AdoShims _adoShims;
         private SharepointShims _sharepointShims;
+        private IOShims _ioShims;
+        private CryptographyShims _cryptographyShims;
 
         private Guid _timerJobBuild;
         private int _defaultStatus;
@@ -34,6 +39,8 @@ namespace EPMLiveCore.Tests
             _shimsContext = ShimsContext.Create();
             _adoShims = AdoShims.ShimAdoNetCalls();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
+            _ioShims = IOShims.ShimIOCalls();
+            _cryptographyShims = CryptographyShims.ShimCryptographyCalls();
 
             _timerJobBuild = Guid.NewGuid();
             _defaultStatus = 1;
@@ -722,6 +729,142 @@ namespace EPMLiveCore.Tests
             Assert.AreEqual($"<Lists MaxListLimit='0'><List ID='{Guid.Empty}'/></Lists>", queryUsed.Lists);
             Assert.AreEqual(_spQuery, queryUsed.Query);
             Assert.AreEqual(SPQueryThrottleOption.Override, queryUsed.QueryThrottleMode);
+        }
+
+        [TestMethod]
+        public void Encrypt_ExeptionThrown_EmptyStringReturned()
+        {
+            // Arrange
+            ShimRijndaelManaged.Constructor = instance => new InvalidOperationException("test");
+
+            // Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_PasswordDeriveBytesManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.DeriveBytesCreated.Count);
+            Assert.IsTrue(_cryptographyShims.DeriveBytesCreated.All(pred => pred is PasswordDeriveBytes));
+            Assert.IsTrue(_cryptographyShims.CheckIfAllDeriveBytesDisposed());
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_RijndaelManagedManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.RijndaelManagedCreated.Count);
+            Assert.IsTrue(_cryptographyShims.CheckIfAllRijindaelManagedDisposed());
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_CryptoStreamManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsTrue(_ioShims.StreamsCreated.OfType<CryptoStream>().Any());
+            Assert.IsTrue(_ioShims.StreamsDisposed.OfType<CryptoStream>().Any());
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_MemoryStreamManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsTrue(_ioShims.StreamsDisposed.OfType<MemoryStream>().Any());
+        }
+
+        [TestMethod]
+        public void Encrypt_Always_EncryptorManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Encrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.EncryptorsCreated.Count);
+            Assert.IsTrue(_cryptographyShims.CheckIfAllEncryptorsDisposed());
+        }
+
+        [TestMethod]
+        public void Decrypt_ExeptionThrown_EmptyStringReturned()
+        {
+            // Arrange
+            ShimRijndaelManaged.Constructor = instance => new InvalidOperationException("test");
+
+            // Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void Decrypt_Always_PasswordDeriveBytesManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.DeriveBytesCreated.Count);
+            Assert.IsTrue(_cryptographyShims.DeriveBytesCreated.All(pred => pred is PasswordDeriveBytes));
+            Assert.IsTrue(_cryptographyShims.CheckIfAllDeriveBytesDisposed());
+        }
+
+        [TestMethod]
+        public void Decrypt_Always_RijndaelManagedManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.RijndaelManagedCreated.Count);
+            Assert.IsTrue(_cryptographyShims.CheckIfAllRijindaelManagedDisposed());
+        }
+
+        [TestMethod]
+        public void Decrypt_Always_CryptoStreamManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsTrue(_ioShims.StreamsCreated.OfType<CryptoStream>().Any());
+            Assert.IsTrue(_ioShims.StreamsDisposed.OfType<CryptoStream>().Any());
+        }
+
+        [TestMethod]
+        public void Decrypt_Always_MemoryStreamManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsTrue(_ioShims.StreamsDisposed.OfType<MemoryStream>().Any());
+        }
+
+        [TestMethod]
+        public void Decrypt_Always_EncryptorManagedCorrectly()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.Decrypt(string.Empty, string.Empty);
+
+            // Assert
+            Assert.AreEqual(1, _cryptographyShims.DecryptorsCreated.Count);
+            Assert.IsTrue(_cryptographyShims.CheckIfAllEncryptorsDisposed());
         }
     }
 }
