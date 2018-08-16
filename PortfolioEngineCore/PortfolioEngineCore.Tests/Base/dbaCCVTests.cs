@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common.Fakes;
-using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Reflection;
 using EPMLive.TestFakes.Utility;
@@ -12,7 +11,7 @@ using PortfolioEngineCore.Fakes;
 namespace PortfolioEngineCore.Tests.Base
 {
     [TestClass]
-    public class dbaUsersTests
+    public class dbaCCVTests
     {
         private IDisposable _shimContext;
         private bool _readFirstCall;
@@ -72,7 +71,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,1,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[6].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
         [TestMethod]
@@ -110,7 +108,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,3,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[5].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
         [TestMethod]
@@ -144,7 +141,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=1 AND CT_ID =1 AND BC_UID=0) AND (table.PROJECT_ID=PROJECT_ID))", list[4].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
         [TestMethod]
@@ -180,7 +176,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=4 AND CT_ID =5 AND BD_IS_SUMMARY=0) AND (table.PROJECT_ID=PROJECT_ID))", list[4].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
         [TestMethod]
@@ -218,7 +213,6 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=1 AND CT_ID =1 AND BC_UID=0) AND (table.PROJECT_ID=PROJECT_ID)) Where PROJECT_ID=22", list[6].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
         [TestMethod]
@@ -257,7 +251,102 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=4 AND CT_ID =5 AND BD_IS_SUMMARY=0) AND (table.PROJECT_ID=PROJECT_ID)) Where PROJECT_ID=22", list[6].CommandText);
 
             Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
-            //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
+        }
+
+        [TestMethod]
+        public void SetCostTotals_When_Empty_Totals_Should_Succeed()
+        {
+            // Arrange
+            ArrangeShims();
+            var index = 5;
+            ShimSqlDb.ReadIntValueObject = o => index--;
+            ShimSqlDataReader.AllInstances.Read = reader => false;
+            var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
+            var listPIs = new List<int> { 11, 22 };
+
+            // Act 
+            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
+        }
+
+        [TestMethod]
+        public void SetCostTotals_When_Empty_Table_Field_Should_Succeed()
+        {
+            // Arrange
+            ArrangeShims();
+            var index = 5;
+            ShimSqlDb.ReadIntValueObject = o => index--;
+            
+            ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = (int a, int b, out string c, out string d) =>
+            {
+                c = "table";
+                d = "field";
+                return false;
+            };
+            var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
+            var listPIs = new List<int> { 11, 22 };
+
+            // Act 
+            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
+        }
+
+        [TestMethod]
+        public void SetCostTotals_When_Not_EditMode_Should_Succeed()
+        {
+            // Arrange
+            ArrangeShims();
+            var index = 5;
+            ShimSqlDb.ReadIntValueObject = o => index--;
+            ShimSqlDataReader.AllInstances.Read = reader =>
+            {
+                if (_readFirstCall)
+                {
+                    _readFirstCall = false;
+                    return index > 0;
+                }
+                return false;
+            };
+
+            var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
+            var listPIs = new List<int> { 11, 22 };
+
+            // Act 
+            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
+        }
+
+        [TestMethod]
+        public void SetCostTotals_With_Zero_Ids_Succeed()
+        {
+            // Arrange
+            ArrangeShims();
+            var index = 5;
+            ShimSqlDb.ReadIntValueObject = o => index--;
+            ShimSqlDataReader.AllInstances.Read = reader =>
+            {
+                if (_readFirstCall)
+                {
+                    _readFirstCall = false;
+                    return index > 0;
+                }
+                return false;
+            };
+
+            var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
+            var listPIs = new List<int> { 11, 22 };
+
+            // Act 
+            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 0, 0, listPIs, false);
+
+            // Assert
+            Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
         }
 
         private void ArrangeShims()
