@@ -174,9 +174,12 @@ export class OptimizerPageHelper {
     }
 
     static async verifyDeleteViewPopup(stepLogger: StepLogger) {
-        const actualDelMessage = await PageHelper.getText(OptimizerPage.getDeleteViewPopup.deleteViewMessage);
+        const label = OptimizerPage.getDeleteViewPopup;
+        const actualDelMessage = await PageHelper.getText(label.deleteViewMessage);
         const expectedDelMessage = OptimizerPageConstants.deleteViewPopup.deleteViewMessage;
         await ExpectationHelper.verifyStringEqualTo(actualDelMessage, expectedDelMessage, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, stepLogger);
     }
 
     static async verifyDeletedView(stepLogger: StepLogger, deletedViewName: string) {
@@ -375,5 +378,16 @@ export class OptimizerPageHelper {
         // takes time to expand dropdown
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(label.currentStrategyDropdownValue);
+    }
+
+    static async verifyViewTabContent(stepLogger: StepLogger) {
+        const viewTabLabel = OptimizerPage.viewManagementOptions;
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.saveView, 'Save view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.renameView, 'Rename view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.deleteView, 'Delete view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.clearSorting, 'Clear sorting', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.selectColumns, 'Select columns', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.currentViewDropdown,
+            OptimizerPageConstants.currentView, stepLogger);
     }
 }

@@ -151,4 +151,23 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickRenameStrategy(stepLogger);
         await OptimizerPageHelper.verifyRenameStrategyPopup(stepLogger);
     });
+
+    fit('Verify the content of View Tab of optimizer. - [744413]', async () => {
+        const stepLogger = new StepLogger(744413);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.clickViewTab(stepLogger);
+        await OptimizerPageHelper.verifyViewTabContent(stepLogger);
+    });
 });
