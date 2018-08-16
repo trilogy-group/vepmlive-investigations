@@ -268,4 +268,10 @@ export class OptimizerPageHelper {
         stepLogger.step('Click on Ok');
         await PageHelper.click(OptimizerPage.getSelectColumnsPopup.ok);
     }
+
+    static async verifyOptimizerTabOptions(stepLogger: StepLogger) {
+        const tabLabel = OptimizerPage.getTabOptions;
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab' , stepLogger);
+    }
 }
