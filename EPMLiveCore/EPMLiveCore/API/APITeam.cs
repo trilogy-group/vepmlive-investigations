@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -2291,6 +2291,7 @@ namespace EPMLiveCore.API
 
             try
             {
+                var allowEditRate = IsPfeSite(oWeb);
                 foreach (DataRow dr in dtTemp.Rows)
                 {
                     if (dr["Disabled"] != null && dr["Disabled"].ToString() == "Yes")
@@ -2320,15 +2321,11 @@ namespace EPMLiveCore.API
                                 ndNew.Attributes.Append(nattr);
                             }
                         }
-                        
-                        var allowEditRate = IsPfeSite(oWeb) && GetResourceId(oWeb, dr) > 0;
-
-                        // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
-                        nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);
-                        nattr.Value = allowEditRate ? "1" : "0";
-                        ndNew.Attributes.Append(nattr);
                     }
-
+                    // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
+                    nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);
+                    nattr.Value = allowEditRate ? "1" : "0";
+                    ndNew.Attributes.Append(nattr);
                     ndBody.AppendChild(ndNew);
                 }
             }
