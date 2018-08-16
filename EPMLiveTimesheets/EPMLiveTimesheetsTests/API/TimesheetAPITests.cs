@@ -9,38 +9,18 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLive.TestFakes.Utility;
-using Microsoft.QualityTools.Testing.Fakes;
 
 namespace TimeSheets.Tests
 {
     [TestClass()]
     public partial class TimesheetAPITests
     {
-        private IDisposable _shimsContext;
-        private SharepointShims _sharepointShims;
-        private AdoShims _adoShims;
-
         private class TestRoleChecker : ISPRoleChecker
         {
             public bool ContainsRole(SPWeb web, string roleName)
             {
                 return false;
             }
-        }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            _shimsContext = ShimsContext.Create();
-            _adoShims = AdoShims.ShimAdoNetCalls();
-            _sharepointShims = SharepointShims.ShimSharepointCalls();
-        }
-
-        [TestCleanup]
-        public void Teardown()
-        {
-            _shimsContext?.Dispose();
         }
 
         [TestMethod()]
@@ -100,7 +80,6 @@ namespace TimeSheets.Tests
                 ShimQueryExecutor.ConstructorSPWeb = (instance, spweb) =>
                 {
                     ShimQueryExecutor moledInstance = new ShimQueryExecutor(instance);
-                    //moledInstance.Dispose = () => { };
                     moledInstance.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
                     (str1, dict) =>
                     {

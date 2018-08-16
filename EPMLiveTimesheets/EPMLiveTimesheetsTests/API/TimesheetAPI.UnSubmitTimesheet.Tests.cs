@@ -3,10 +3,12 @@ using System.Data.SqlClient.Fakes;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeSheets.Fakes;
+using EPMLiveTimesheets.Tests;
 
 namespace TimeSheets.Tests
 {
-    public partial class TimesheetAPITests
+    [TestClass]
+    public class TimesheetAPIUnSubmitTimesheetTests: SheetTestBase
     {
         private const string XmlSample = "<root ID=\"10\"><child ID=\"11\"></child></root>";
         private const int UserId = 23;
