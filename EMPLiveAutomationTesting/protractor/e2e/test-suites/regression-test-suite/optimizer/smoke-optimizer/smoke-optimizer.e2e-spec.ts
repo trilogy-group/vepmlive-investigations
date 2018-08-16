@@ -112,4 +112,23 @@ describe(SuiteNames.regressionTestSuite, () => {
         const fieldName = await OptimizerPageHelper.selectSelectedFiedldAndRemove(stepLogger);
         await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName, stepLogger);
     });
+
+    fit('Verify the content of Save Strategy button. - [744410]', async () => {
+        const stepLogger = new StepLogger(744410);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.openSaveStrategyPopup(stepLogger);
+        await OptimizerPageHelper.verifySaveStrategyPopup(stepLogger);
+    });
 });

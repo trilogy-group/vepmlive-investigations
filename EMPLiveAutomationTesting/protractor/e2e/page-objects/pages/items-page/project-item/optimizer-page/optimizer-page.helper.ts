@@ -340,4 +340,16 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getAvailableFieldByName(fieldName),
             `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`, stepLogger);
     }
+
+    static async verifySaveStrategyPopup(stepLogger: StepLogger) {
+        const saveStategyLabel = OptimizerPage.getOptimierSaveStrategyPopup;
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.strategyName,
+            `Strategy Name in ${OptimizerPageConstants.saveStrategy}`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.personalStrategyCheckBox,
+            `Personal strategy checkbox`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.ok,
+            OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.personalStrategyCheckBox,
+            OptimizerPageConstants.cancel, stepLogger);
+    }
 }

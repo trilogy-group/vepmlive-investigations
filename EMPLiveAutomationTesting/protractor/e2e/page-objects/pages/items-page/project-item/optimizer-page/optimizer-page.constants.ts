@@ -20,6 +20,7 @@ export class OptimizerPageConstants {
     static readonly currentView= 'Current View';
     static readonly configure= 'Configure window';
     static readonly selectColumns= 'Select Columns Window';
+    static readonly saveStrategy = 'Save strategy popup';
 
     static get viewManagementOptions() {
         return {
