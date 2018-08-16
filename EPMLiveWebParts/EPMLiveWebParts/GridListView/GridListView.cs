@@ -3292,7 +3292,9 @@ namespace EPMLiveWebParts
             );
 
             output.WriteLine("<script language=\"javascript\">");
-            output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields.Select(field =>
+            output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields
+                .OrderBy(field => field.Value)
+                .Select(field =>
                     $"{field.Key}: {field.Value}"
                 ))}}}");
 
