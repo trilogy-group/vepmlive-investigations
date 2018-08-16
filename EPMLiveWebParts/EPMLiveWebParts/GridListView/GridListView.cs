@@ -3295,7 +3295,7 @@ namespace EPMLiveWebParts
             output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields
                 .Select(field =>
                     $"{field.Key}: {field.Value}"
-                ))}}}");
+                ))}}};");
 
             output.WriteLine(RenderFunctionSwitchToSearch());
             output.WriteLine(RenderFunctionUnSearch());
@@ -3308,7 +3308,7 @@ namespace EPMLiveWebParts
             output.Write($"<div id=\"search{ID}\" style=\"width:100%; height:40px;");
             output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 14px;\">");
             output.Write("Search: ");
-            output.Write(RenderSearchFieldsSelect(fields));
+            output.Write(RenderSearchFieldsSelect(fields, classAttributeValue: "form-control"));
             output.Write("&nbsp;&nbsp;");
             output.WriteLine(RenderSearchTypesSelect());
             output.Write("&nbsp;&nbsp;");
@@ -3350,9 +3350,9 @@ namespace EPMLiveWebParts
             </select>";
         }
 
-        private string RenderSearchFieldsSelect(IDictionary<string, string> fields)
+        private string RenderSearchFieldsSelect(IDictionary<string, string> fields, string styleAttributeValue = null, string classAttributeValue = null)
         {
-            return $@"<select id=""search{sFullGridId}"" onChange=""switchsearch{sFullGridId}();"" class=""form-control"">
+            return $@"<select id=""search{sFullGridId}"" onChange=""switchsearch{sFullGridId}();"" style=""{styleAttributeValue}"" class=""{classAttributeValue}"">
                 {(string.Join(string.Empty, fields
                     .OrderBy(field => field.Value)
                     .Select(field =>
