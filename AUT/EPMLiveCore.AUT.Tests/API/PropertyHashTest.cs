@@ -1054,27 +1054,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_DirectCall_Overloading_Of_2_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var values = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _propertyHashInstance.Add(values);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Add) (Return Type : void) No Exception Thrown
 
         [Test]

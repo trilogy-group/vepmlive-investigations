@@ -285,27 +285,7 @@ namespace EPMLiveCore.FeatureActivationSvc
         }
 
         #endregion
-
-        #region Method Call : (ActivateKey) (Return Type : int) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_Service_ActivateKey_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var key = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _serviceInstance.ActivateKey(key);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (ActivateKey) (Return Type : int) Results Null (if not primitive type) Test
 
         [Test]
@@ -412,28 +392,7 @@ namespace EPMLiveCore.FeatureActivationSvc
         }
 
         #endregion
-
-        #region Method Call : (ActivateKey) (Return Type : int) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        public void AUT_Service_ActivateKey_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodActivateKey, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_serviceInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (ActivateKey) (Return Type : int) Parameters Count verify
 
         [Test]

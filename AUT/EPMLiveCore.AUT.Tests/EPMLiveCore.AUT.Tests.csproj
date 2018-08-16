@@ -380,7 +380,6 @@
     <Compile Include="ReportHelper\UpgradeReportingDBHelperTest.cs" />
     <Compile Include="ReportHelper\UtilityTest.cs" />
     <Compile Include="ReportingProxy\QueryExecutorTest.cs" />
-    <Compile Include="ReportingProxy\ReportingLoggerTest.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEventTest.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\CreatablesTest.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\ErrorTest.cs" />
@@ -397,7 +396,6 @@
     <Compile Include="SocialEngine\SocialEngineProxyTest.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControlTest.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldTest.cs" />
-    <Compile Include="TagManager\API\GatewayTest.cs" />
     <Compile Include="TagManager\TagManagerTest.cs" />
     <Compile Include="TEMPLATE\admin\epmlive\CreatesiteTest.cs" />
     <Compile Include="TEMPLATE\admin\epmlive\EmailmanagerTest.cs" />
@@ -828,7 +826,9 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TagManager\API\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
