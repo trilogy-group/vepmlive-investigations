@@ -68,4 +68,26 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickConfigure(stepLogger);
         await OptimizerPageHelper.verifyConfigureScreen(stepLogger);
     });
+
+    it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
+        const stepLogger = new StepLogger(744408);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigure(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened(stepLogger);
+        stepLogger.stepId(5);
+        const fieldName = await OptimizerPageHelper.selectAvailableFieldAndAdd(stepLogger);
+        await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName, stepLogger);
+    });
 });

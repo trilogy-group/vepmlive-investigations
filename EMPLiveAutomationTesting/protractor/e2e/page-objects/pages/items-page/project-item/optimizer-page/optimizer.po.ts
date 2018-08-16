@@ -79,6 +79,7 @@ export class OptimizerPage extends BasePage {
     static get getOptimizerConfiguration(){
         const label = OptimizerPageConstants.optimizerConfiguration;
         return{
+            heading: CommonPageHelper.getElementByText(label.heading),
             enterValueLabel: CommonPageHelper.getElementByText(label.enterValueLabel, true),
             titleComparisonLabel: CommonPageHelper.getElementByText(label.titleComparisonLabel, true),
             thirdQuestion: CommonPageHelper.getElementByText(label.thirdQuestion, true),
@@ -92,7 +93,9 @@ export class OptimizerPage extends BasePage {
             downArrow: AnchorHelper.getItemById(label.downArrow),
             ok: this.getButtonOnPopup(label.ok),
             cancel: this.getButtonOnPopup(label.cancel),
-            message : element(By.css('#idOptDlg>div>div:last-child'))
+            message : element(By.css('#idOptDlg>div>div:last-child')),
+            firstAvailableField: element(By.css('select#idOptConfAvailfields>option:first-child')),
+            firstSelectedField: element(By.css('select#idOptConfSelfields>option:first-child'))
         };
     }
 

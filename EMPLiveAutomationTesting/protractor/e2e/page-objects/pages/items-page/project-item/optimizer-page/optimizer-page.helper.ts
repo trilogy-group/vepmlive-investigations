@@ -303,4 +303,24 @@ export class OptimizerPageHelper {
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(OptimizerPage.getConfigure);
     }
+
+    static async verifyOptimizerConfigurationPopupOpened(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerConfiguration.heading,
+            OptimizerPageConstants.configure, stepLogger);
+    }
+
+    static async selectAvailableFieldAndAdd(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        stepLogger.step('Select Value from the Available Fields selection box. Click on Add button.');
+        await PageHelper.click(configLabel.firstAvailableField);
+        const fieldName = PageHelper.getText(configLabel.firstAvailableField);
+        await PageHelper.click(configLabel.add);
+        return fieldName;
+    }
+
+    static async verifyAddedFieldInSelectedFields(fieldName: string, stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        await ExpectationHelper.verifyText(configLabel.firstSelectedField,
+            OptimizerPageConstants.selectedFieldsSection, fieldName, stepLogger);
+    }
 }

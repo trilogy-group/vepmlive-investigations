@@ -62,6 +62,7 @@ export class OptimizerPageConstants {
 
     static get optimizerConfiguration(){
         return{
+            heading: 'Optimizer Configuration',
             enterValueLabel: '1) Which field will be totaled and used to compare to the manually entered value?',
             titleComparisonLabel: '2) Enter a title for the comparison field.',
             thirdQuestion: '3) Which fields will be used as filters?',
