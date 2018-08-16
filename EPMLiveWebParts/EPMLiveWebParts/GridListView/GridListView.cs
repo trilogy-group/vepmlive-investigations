@@ -3281,7 +3281,15 @@ namespace EPMLiveWebParts
             var fields = new Dictionary<string, string>();
             var jsonFields = new Dictionary<string, string>();
 
-            FilterSearchFields(fieldProperties, fields, jsonFields);
+            FilterSearchFields(fieldProperties, fields, jsonFields, field =>
+                ((field.Reorderable && !field.Hidden) || IsEnableModeration(field.Id))
+                //EPML-4625: Title columns bind to Title field and the column name always remain the same
+                //make sure to always display Title fields irrespective of display rules
+                && (field.InternalName == "Title"
+                        || (fieldProperties != null && EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display")
+                        || !field.ShowInDisplayForm.HasValue
+                        || field.ShowInViewForms == true))
+            );
 
             output.WriteLine("<script language=\"javascript\">");
             output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields.Select(field =>
@@ -3484,33 +3492,26 @@ namespace EPMLiveWebParts
             // (CC-78160, 2018-08-16) Type has to be concrete as it's passed into external method that expects concrete type
             Dictionary<string, Dictionary<string, string>> fieldProperties, 
             IDictionary<string, string> fields, 
-            IDictionary<string, string> jsonFields)
+            IDictionary<string, string> jsonFields,
+            Func<SPField, bool> filterFunc)
         {
             var fieldsSorted = new SortedList();
             foreach (SPField field in list.Fields)
             {
-                if ((field.Reorderable && !field.Hidden) || (IsEnableModeration(field.Id)))
+                if (filterFunc(field))
                 {
-                    //EPML-4625: Title columns bind to Title field and the column name always remain the same
-                    //make sure to always display Title fields irrespective of display rules
-                    if (field.InternalName == "Title"
-                        || (fieldProperties != null && EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display")
-                        || !field.ShowInDisplayForm.HasValue
-                        || field.ShowInViewForms == true))
-                    {
-                        fieldsSorted.Add(field.Title, field.InternalName);
+                    fieldsSorted.Add(field.Title, field.InternalName);
 
-                        if (field.Type == SPFieldType.Choice)
-                        {
-                            var choiceField = (SPFieldChoice)field;
-                            jsonFields.Add(field.InternalName,
-                                $@"[{(string.Join(",", choiceField.Choices.Cast<string>()
-                                    .Select(choice => choice.Replace("\"", "\\\""))))}]");
-                        }
-                        if (field.Type == SPFieldType.Boolean)
-                        {
-                            jsonFields.Add(field.InternalName, "[ \"Yes\", \"No\" ]");
-                        }
+                    if (field.Type == SPFieldType.Choice)
+                    {
+                        var choiceField = (SPFieldChoice)field;
+                        jsonFields.Add(field.InternalName,
+                            $@"[{(string.Join(",", choiceField.Choices.Cast<string>()
+                                .Select(choice => choice.Replace("\"", "\\\""))))}]");
+                    }
+                    if (field.Type == SPFieldType.Boolean)
+                    {
+                        jsonFields.Add(field.InternalName, "[ \"Yes\", \"No\" ]");
                     }
                 }
             }
