@@ -3480,7 +3480,11 @@ namespace EPMLiveWebParts
             }}";
         }
 
-        private void FilterSearchFields(Dictionary<string, Dictionary<string, string>> fieldProperties, Dictionary<string, string> fields, Dictionary<string, string> jsonFields)
+        private void FilterSearchFields(
+            // (CC-78160, 2018-08-16) Type has to be concrete as it's passed into external method that expects concrete type
+            Dictionary<string, Dictionary<string, string>> fieldProperties, 
+            IDictionary<string, string> fields, 
+            IDictionary<string, string> jsonFields)
         {
             var fieldsSorted = new SortedList();
             foreach (SPField field in list.Fields)
