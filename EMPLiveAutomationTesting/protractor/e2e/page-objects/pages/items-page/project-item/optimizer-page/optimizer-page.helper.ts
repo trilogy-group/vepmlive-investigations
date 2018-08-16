@@ -274,4 +274,16 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab' , stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab' , stepLogger);
     }
+
+    static async verifyOptimizerTabContents(stepLogger: StepLogger) {
+        const actionsLabel = OptimizerPage.getOptimizerStrategyActions;
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.currentStrategyDropdown,
+            OptimizerPageConstants.currentStrategy , stepLogger);
+    }
 }
