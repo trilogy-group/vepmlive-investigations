@@ -349,7 +349,31 @@ export class OptimizerPageHelper {
             `Personal strategy checkbox`, stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.ok,
             OptimizerPageConstants.ok, stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.personalStrategyCheckBox,
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.cancel,
             OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async clickRenameStrategy(stepLogger: StepLogger) {
+        stepLogger.step('Click on Rename Strategy button.');
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.renameStrategy);
+    }
+
+    static async verifyRenameStrategyPopup(stepLogger: StepLogger) {
+        const renameStategyLabel = OptimizerPage.getOptimierSaveStrategyPopup;
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.strategyName,
+            `Strategy Name in ${OptimizerPageConstants.renameStrategy}`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.ok,
+            OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.cancel,
+            OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async selectStrategyFromCurrentStrategy(stepLogger: StepLogger) {
+        stepLogger.step('Select strategy from current strategy');
+        const label = OptimizerPage.getOptimizerStrategyActions ;
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
+        // takes time to expand dropdown
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(label.currentStrategyDropdownValue);
     }
 }
