@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 
 namespace PortfolioEngineCore
@@ -692,7 +693,7 @@ namespace PortfolioEngineCore
         private const string No = "@@NO@@";
         private const string UOM = "@@@@";
 
-        public static StatusEnum CalculateCostValues(DBAccess dba, int nCTID, int nCBID, int nProjectID, out string sResult)
+        public static StatusEnum CalculateCostValues(DBAccess dbAccess, int nCTID, int nCBID, int nProjectID, out string sResult)
         {
             var eStatus = StatusEnum.rsSuccess;
             sResult = "CCV Complete";
@@ -714,7 +715,7 @@ namespace PortfolioEngineCore
             IList<int> costCategoriesIndex;
 
             PrepareData(
-                dba, 
+                dbAccess, 
                 nCTID, 
                 nCBID, 
                 nProjectID, 
@@ -730,14 +731,14 @@ namespace PortfolioEngineCore
 
             foreach (var projectId in listPIs)
             {
-                ReadValues(dba, nCTID, nCBID, costValues, costCategories, projectId);
+                ReadValues(dbAccess, nCTID, nCBID, costValues, costCategories, projectId);
                 SetValues(costCategories, costCategoriesIndex, lPeriodCount, costValues);
                 RollupValues(costCategoriesIndex, costCategories, lPeriodCount, costValues, sTotalUoM, bsingleUOM);
 
                 try
                 {
                     eStatus = WriteOutTheResults(
-                        dba,
+                        dbAccess,
                         nCTID,
                         nCBID,
                         bDeleteAllProjects,
@@ -749,13 +750,13 @@ namespace PortfolioEngineCore
                 }
                 catch (Exception ex)
                 {
-                    eStatus = dba.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);
+                    eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);
                 }
             }
 
             if (eStatus == StatusEnum.rsSuccess)
             {
-                eStatus = SetCostTotals(dba, nCTID, nCBID, listPIs, bAllProjects);
+                eStatus = SetCostTotals(dbAccess, nCTID, nCBID, listPIs, bAllProjects);
             }
             
             return eStatus;
@@ -842,7 +843,11 @@ namespace PortfolioEngineCore
             using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
             {
                 SqlDataReader reader;
-                if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
+                if (dbaUsers.ExecuteSQLSelect(cmd, out reader) != StatusEnum.rsSuccess)
+                {
+                    return nMaxLevel;
+                }
+                using (reader)
                 {
                     while (reader.Read())
                     {
@@ -883,9 +888,9 @@ namespace PortfolioEngineCore
                         }
 
                         costCategories.Add(costCategory.UID, costCategory);
-                        costCategoriesIndex.Add(costCategory.UID); // just used to access the Dictionary in reverse order - will be saved in entry (BC_ID-1)
+                        costCategoriesIndex.Add(costCategory.UID);
+                        // just used to access the Dictionary in reverse order - will be saved in entry (BC_ID-1)
                     }
-                    reader.Close();
                 }
             }
             return nMaxLevel;
@@ -915,12 +920,15 @@ namespace PortfolioEngineCore
                     SqlDataReader reader;
                     if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
                     {
-                        while (reader.Read())
+                        using (reader)
                         {
-                            var lProjectID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
-                            listPIs.Add(lProjectID);
+                            while (reader.Read())
+                            {
+                                var lProjectID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                                listPIs.Add(lProjectID);
+                            }
                         }
-                        reader.Close();
+
                     }
                 }
             }
@@ -940,11 +948,13 @@ namespace PortfolioEngineCore
                 SqlDataReader reader;
                 if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
                 {
-                    if (reader.Read())
+                    using (reader)
                     {
-                        lPeriodCount = DBAccess.ReadIntValue(reader["PeriodCount"]);
+                        if (reader.Read())
+                        {
+                            lPeriodCount = DBAccess.ReadIntValue(reader["PeriodCount"]);
+                        }
                     }
-                    reader.Close();
                 }
             }
             return lPeriodCount;
@@ -1041,26 +1051,28 @@ namespace PortfolioEngineCore
                 SqlDataReader reader;
                 if (dbaUsers.ExecuteSQLSelect(cmd, out reader) == StatusEnum.rsSuccess)
                 {
-                    while (reader.Read())
+                    using (reader)
                     {
-                        var period = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
-                        // doesn't seem worth trying to figure a Period offset in the arrays for periods not used but could do that at the beginning fofr all PIs I suppose 
-                        var category = DBAccess.ReadIntValue(reader["BC_UID"]);
-
-                        if (costCategories.ContainsKey(category))
+                        while (reader.Read())
                         {
-                            var costcategory = costCategories[category];
+                            var period = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
+                            // doesn't seem worth trying to figure a Period offset in the arrays for periods not used but could do that at the beginning fofr all PIs I suppose 
+                            var category = DBAccess.ReadIntValue(reader["BC_UID"]);
 
-                            if (costcategory.IsAvailable)
+                            if (costCategories.ContainsKey(category))
                             {
-                                costcategory.HasData = true;
-                                category = costcategory.ID;
-                                costValues.incrCost(period, category, DBAccess.ReadDoubleValue(reader["BD_COST"]));
-                                costValues.incrQuantity(period, category, DBAccess.ReadDoubleValue(reader["BD_VALUE"]));
+                                var costcategory = costCategories[category];
+
+                                if (costcategory.IsAvailable)
+                                {
+                                    costcategory.HasData = true;
+                                    category = costcategory.ID;
+                                    costValues.incrCost(period, category, DBAccess.ReadDoubleValue(reader["BD_COST"]));
+                                    costValues.incrQuantity(period, category, DBAccess.ReadDoubleValue(reader["BD_VALUE"]));
+                                }
                             }
                         }
                     }
-                    reader.Close();
                 }
             }
         }
@@ -1285,135 +1297,66 @@ namespace PortfolioEngineCore
 
         internal static StatusEnum SetCostTotals(DBAccess dba, int nCTID, int nCBID, IList<int> listPIs, bool bAllProjects)
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            if (listPIs == null)
+            {
+                throw new ArgumentNullException(nameof(listPIs));
+            }
+            var eStatus = StatusEnum.rsSuccess;
 
-            if (!(nCTID > 0) || !(nCBID >= 0)) goto Exit_Function;
+            if (!(nCTID > 0) || !(nCBID >= 0))
+            {
+                return eStatus;
+            }
 
-            SqlCommand cmd;
-            SqlDataReader reader;
-            string cmdText;
-
-            List<CostTotal> costtotals = new List<CostTotal>();
+            IEnumerable<CostTotal> costTotals;
             try
             {
-                cmd = new SqlCommand("EPG_SP_ReadCostTotals", dba.Connection);
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    CostTotal costtotal = new CostTotal();
-                    costtotal.CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]);
-                    costtotal.CB_ID = DBAccess.ReadIntValue(reader["CB_ID"]);
-                    costtotal.FIELD_ID = DBAccess.ReadIntValue(reader["BUDGET_TOTAL_FIELD"]);
-                    costtotals.Add(costtotal);
-                }
-                reader.Close();
+                costTotals = ReadTotals(dba);
             }
             catch (Exception ex)
             {
                 eStatus = dba.HandleStatusError(SeverityEnum.Exception, "Set COST_VALUES", (StatusEnum)99846, ex.Message.ToString());
-                goto Exit_Function;
+                return eStatus;
             }
-            if (costtotals.Count == 0) goto Exit_Function;
+            if (!costTotals.Any())
+            {
+                return eStatus;
+            }
 
             try
             {
-                int lRowsAffected = 0;
-                foreach (CostTotal costtotal in costtotals)
+                foreach (var costTotal in costTotals)
                 {
-                    if (costtotal.CT_ID == nCTID && costtotal.CB_ID == nCBID)
+                    if (costTotal.CT_ID == nCTID && costTotal.CB_ID == nCBID)
                     {
                         // read info on Total Field
                         string sTable;
                         string sField;
-                        cmdText = "SELECT * FROM EPGC_FIELD_ATTRIBS Where FA_FIELD_ID=" + costtotal.FIELD_ID.ToString();
-                        cmd = new SqlCommand(cmdText, dba.Connection);
-                        reader = cmd.ExecuteReader();
-
-                        if (reader.Read())
+                        if (!ReadInfoOnTotalField(dba, costTotal.FIELD_ID, out sTable, out sField))
                         {
-                            int lTable = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                            int lFieldinTable = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                            if (!(EPKClass01.GetTableAndField(lTable, lFieldinTable, out sTable, out sField))) goto Exit_Function;
+                            return eStatus;
                         }
-                        else
-                        {
-                            goto Exit_Function;
-                        }
-                        reader.Close();
 
                         // read info on CT
-                        int lEditMode = -1;
-                        cmdText = "SELECT CT_EDIT_MODE From EPGP_COST_TYPES Where CT_ID=" + nCTID.ToString();
-                        cmd = new SqlCommand(cmdText, dba.Connection);
-                        reader = cmd.ExecuteReader();
-
-                        if (reader.Read())
+                        var lEditMode = GetEditMode(dba, nCTID);
+                        if (lEditMode == -1)
                         {
-                            lEditMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
+                            return eStatus;
                         }
-                        else
-                        {
-                            goto Exit_Function;
-                        }
-                        reader.Close();
-                        if (lEditMode == -1) goto Exit_Function;
-
-                        // first zeroize Cost value(s) and then set from COST VALUES
-
-                        //   we are going to deal differently with CTs populated by the user rather than entered in EPK
-                        //   use TOTAL row except for user entered directly to DBS where we total ALL (non-summary)rows
+                        
                         if (bAllProjects)
                         {
-                            cmdText = "Update " + sTable + " SET " + sField + "=0";
-                            cmd = new SqlCommand(cmdText, dba.Connection);
-                            lRowsAffected += cmd.ExecuteNonQuery();
-
-                            cmdText = "Update " + sTable + " SET " + sField +
-                            "=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES" +
-                            " WHERE  (CB_ID=" + nCBID.ToString() + " AND CT_ID =" + nCTID.ToString();
-
-                            if (lEditMode == 0)
-                            {
-                                cmdText = cmdText + " AND BD_IS_SUMMARY=0";
-                            }
-                            else
-                            {
-                                cmdText = cmdText + " AND BC_UID=0";
-                            }
-
-                            cmdText = cmdText + ") AND (" + sTable + ".PROJECT_ID=PROJECT_ID))";
-
-                            cmd = new SqlCommand(cmdText, dba.Connection);
-                            lRowsAffected += cmd.ExecuteNonQuery();
+                            UpdateProjects(dba, nCTID, nCBID, sTable, sField, lEditMode);
                         }
                         else
                         {
-                            foreach (int nProjectID in listPIs)
+                            foreach (var nProjectID in listPIs)
                             {
-                                cmdText = "Update " + sTable + " SET " + sField + "=0" + " Where PROJECT_ID=" + nProjectID.ToString();
-                                cmd = new SqlCommand(cmdText, dba.Connection);
-                                lRowsAffected += cmd.ExecuteNonQuery();
-
-                                cmdText = "Update " + sTable + " SET " + sField +
-                                "=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES" +
-                                " WHERE  (CB_ID=" + nCBID.ToString() + " AND CT_ID =" + nCTID.ToString();
-
-                                if (lEditMode == 0)
-                                {
-                                    cmdText = cmdText + " AND BD_IS_SUMMARY=0";
-                                }
-                                else
-                                {
-                                    cmdText = cmdText + " AND BC_UID=0";
-                                }
-
-                                cmdText = cmdText + ") AND (" + sTable + ".PROJECT_ID=PROJECT_ID))";
-                                cmdText = cmdText + " Where PROJECT_ID=" + nProjectID.ToString();
-
-                                cmd = new SqlCommand(cmdText, dba.Connection);
-                                lRowsAffected += cmd.ExecuteNonQuery();
+                                UpdateProject(dba, nCTID, nCBID, sTable, sField, nProjectID, lEditMode);
                             }
                         }
                     }
@@ -1421,12 +1364,140 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "Set COST_VALUES", (StatusEnum)99845, ex.Message.ToString());
-                goto Exit_Function;
+                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "Set COST_VALUES", (StatusEnum)99845, ex.Message);
             }
 
-Exit_Function:
             return eStatus;
+        }
+
+        private static IEnumerable<CostTotal> ReadTotals(DBAccess dba)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            var costTotals = new List<CostTotal>();
+            using (var cmd = new SqlCommand("EPG_SP_ReadCostTotals", dba.Connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var costtotal = new CostTotal
+                        {
+                            CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]),
+                            CB_ID = DBAccess.ReadIntValue(reader["CB_ID"]),
+                            FIELD_ID = DBAccess.ReadIntValue(reader["BUDGET_TOTAL_FIELD"])
+                        };
+                        costTotals.Add(costtotal);
+                    }
+                }
+            }
+
+            return costTotals;
+        }
+
+        private static bool ReadInfoOnTotalField(DBAccess dba, int fieldId, out string sTable, out string sField)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            sTable = string.Empty;
+            sField = string.Empty;
+
+            var cmdText = $"SELECT * FROM EPGC_FIELD_ATTRIBS Where FA_FIELD_ID={fieldId}";
+            using (var cmd = new SqlCommand(cmdText, dba.Connection))
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    var lTable = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
+                    var lFieldinTable = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
+                    return EPKClass01.GetTableAndField(lTable, lFieldinTable, out sTable, out sField);
+                }
+            }
+
+            return false;
+        }
+
+        private static int GetEditMode(DBAccess dba, int nCTID)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            var lEditMode = -1;
+            var cmdText = $"SELECT CT_EDIT_MODE From EPGP_COST_TYPES Where CT_ID={nCTID}";
+            using (var cmd = new SqlCommand(cmdText, dba.Connection))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        lEditMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
+                    }
+                }
+            }
+
+            return lEditMode;
+        }
+
+        private static void UpdateProjects(DBAccess dba, int nCTID, int nCBID, string sTable, string sField, int lEditMode)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            var cmdText =new StringBuilder();
+            cmdText.AppendFormat("Update {0} SET {1}=0", sTable, sField);
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+
+            cmdText.Clear();
+            cmdText.AppendFormat("Update {0} SET {1}", sTable, sField)
+                .Append("=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES")
+                .AppendFormat(" WHERE  (CB_ID={0} AND CT_ID ={1}", nCBID, nCTID);
+
+            cmdText.Append(lEditMode == 0 ? " AND BD_IS_SUMMARY=0" : " AND BC_UID=0");
+
+            cmdText.AppendFormat(") AND ({0}.PROJECT_ID=PROJECT_ID))", sTable);
+
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static void UpdateProject(DBAccess dba, int nCTID, int nCBID, string sTable, string sField, int nProjectID, int lEditMode)
+        {
+            if (dba == null)
+            {
+                throw new ArgumentNullException(nameof(dba));
+            }
+            var cmdText = new StringBuilder();
+            cmdText.AppendFormat("Update {0} SET {1}=0 Where PROJECT_ID={2}", sTable, sField, nProjectID);
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            cmdText.Clear();
+            cmdText.AppendFormat("Update {0} SET {1}", sTable, sField)
+                .Append("=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES")
+                .AppendFormat(" WHERE  (CB_ID={0} AND CT_ID ={1}", nCBID, nCTID);
+
+            cmdText.Append(lEditMode == 0 ? " AND BD_IS_SUMMARY=0" : " AND BC_UID=0");
+
+            cmdText.AppendFormat(") AND ({0}.PROJECT_ID=PROJECT_ID))", sTable)
+                .AppendFormat(" Where PROJECT_ID={0}", nProjectID);
+
+            using (var cmd = new SqlCommand(cmdText.ToString(), dba.Connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 

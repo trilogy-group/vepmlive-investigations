@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Reflection;
@@ -70,7 +71,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,1,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[5].CommandText);
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,1,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[6].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
@@ -108,7 +109,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,3,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[4].CommandText);
             Assert.AreEqual("INSERT INTO EPGP_COST_VALUES (CB_ID,CT_ID,PROJECT_ID,BC_UID, BD_PERIOD,BD_VALUE,BD_COST,BD_IS_SUMMARY) VALUES(2,1,3,@BC_UID,@BD_PERIOD,@BD_VALUE,@BD_COST,@BD_IS_SUMMARY)", list[5].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
@@ -142,7 +143,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=0", list[3].CommandText);
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=1 AND CT_ID =1 AND BC_UID=0) AND (table.PROJECT_ID=PROJECT_ID))", list[4].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
@@ -178,10 +179,9 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=0", list[3].CommandText);
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=4 AND CT_ID =5 AND BD_IS_SUMMARY=0) AND (table.PROJECT_ID=PROJECT_ID))", list[4].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
-
 
         [TestMethod]
         public void SetCostTotals_Without_AllProjects_And_With_EditMode_Should_Succeed()
@@ -217,7 +217,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=0 Where PROJECT_ID=22", list[5].CommandText);
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=1 AND CT_ID =1 AND BC_UID=0) AND (table.PROJECT_ID=PROJECT_ID)) Where PROJECT_ID=22", list[6].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
@@ -256,7 +256,7 @@ namespace PortfolioEngineCore.Tests.Base
             Assert.AreEqual("Update table SET field=0 Where PROJECT_ID=22", list[5].CommandText);
             Assert.AreEqual("Update table SET field=(SELECT  SUM(BD_COST) AS Expr1 FROM  EPGP_COST_VALUES WHERE  (CB_ID=4 AND CT_ID =5 AND BD_IS_SUMMARY=0) AND (table.PROJECT_ID=PROJECT_ID)) Where PROJECT_ID=22", list[6].CommandText);
 
-            //Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
+            Assert.AreEqual(_shimAdoNetCalls.CommandsDisposed.Count, _shimAdoNetCalls.CommandsCreated.Count);
             //Assert.AreEqual(_shimAdoNetCalls.DataReadersDisposed.Count, _shimAdoNetCalls.DataReadersCreated.Count);
         }
 
@@ -279,6 +279,7 @@ namespace PortfolioEngineCore.Tests.Base
                 return false;
             };
             ShimSqlDataReader.AllInstances.Close = reader => { _readFirstCall = true; };
+            ShimDbDataReader.AllInstances.Dispose = reader => { _readFirstCall = true; };
 
             ShimSqlDb.ReadIntValueObject = o => 1;
             ShimSqlDb.ReadStringValueObject = o => "string";
