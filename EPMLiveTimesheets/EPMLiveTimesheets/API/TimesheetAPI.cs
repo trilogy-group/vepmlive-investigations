@@ -164,7 +164,7 @@ namespace TimeSheets
         {
             if (oWeb == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(oWeb));
+                throw new ArgumentNullException(nameof(oWeb));
             }
 
             try

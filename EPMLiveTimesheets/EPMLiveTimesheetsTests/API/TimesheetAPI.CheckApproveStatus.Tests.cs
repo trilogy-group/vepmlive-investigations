@@ -18,6 +18,8 @@ namespace TimeSheets.Tests
         private const int ApprovalStatusId = 9;
         private const string Result = "result-sample";
         private const string ResultText = "result-text-sample";
+        private const int ResultFieldIndex = 2;
+        private const int ResultTextFieldIndex = 3;
 
         [TestMethod]
         public void CheckApproveStatus_Called_SqlDisposed()
@@ -73,11 +75,11 @@ namespace TimeSheets.Tests
             {
                 if (readNum == 0)
                 {
-                    if (num == 2)
+                    if (num == ResultFieldIndex)
                     {
                         return Result;
                     }
-                    else if (num == 3)
+                    else if (num == ResultTextFieldIndex)
                     {
                         return ResultText;
                     }
