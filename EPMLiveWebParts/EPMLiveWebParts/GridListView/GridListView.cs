@@ -3293,7 +3293,6 @@ namespace EPMLiveWebParts
 
             output.WriteLine("<script language=\"javascript\">");
             output.WriteLine($@"var searchfields{sFullGridId} = {{{string.Join(",", jsonFields
-                .OrderBy(field => field.Value)
                 .Select(field =>
                     $"{field.Key}: {field.Value}"
                 ))}}}");
@@ -3354,9 +3353,11 @@ namespace EPMLiveWebParts
         private string RenderSearchFieldsSelect(IDictionary<string, string> fields)
         {
             return $@"<select id=""search{sFullGridId}"" onChange=""switchsearch{sFullGridId}();"" class=""form-control"">
-                {(string.Join(string.Empty, fields.Select(field =>
-                    $"<option value=\"{field.Key}\"{(sSearchField == field.Key ? " selected" : string.Empty)}>{field.Value}</option>"
-                )))}
+                {(string.Join(string.Empty, fields
+                    .OrderBy(field => field.Value)
+                    .Select(field =>
+                        $"<option value=\"{field.Key}\"{(sSearchField == field.Key ? " selected" : string.Empty)}>{field.Value}</option>"
+                    )))}
             </select>";
         }
 
