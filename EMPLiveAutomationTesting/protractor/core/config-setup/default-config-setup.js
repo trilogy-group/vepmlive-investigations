@@ -15,11 +15,6 @@ const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x8
         - https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         - https://developers.google.com/web/tools/puppeteer/troubleshooting
 */
-
-console.log(process.env.BROWSERSTACK_USERNAME);
-console.log(process.env.BROWSERSTACK_ACCESS_KEY);
-console.log(process.env.BROWSERSTACK_LOCAL);
-console.log(process.env.BROWSERSTACK_LOCAL_IDENTIFIER);
 const chromeOptions = {
     args: useHeadlessBrowser ? chromeHeadlessArgs : [],
     // Set download path and avoid prompting for download even though
