@@ -3290,66 +3290,7 @@ namespace EPMLiveWebParts
 
             output.WriteLine(RenderFunctionSwitchToSearch());
             output.WriteLine(RenderFunctionUnSearch());
-
-            output.WriteLine($"function doSearch{sFullGridId}(){{");
-            output.WriteLine($"var searcher = document.getElementById('search{sFullGridId}');");
-            output.WriteLine($"var unsearch = document.getElementById('unsearch{sFullGridId}');");
-            output.WriteLine("unsearch.style.display=\"table-cell\";");
-            output.WriteLine($"var searchchoice = document.getElementById('searchchoice{sFullGridId}');");
-            output.WriteLine($"var searchtext = document.getElementById('searchtext{sFullGridId}');");
-            output.WriteLine($"var searchtypechoice = document.getElementById('searchtype{sFullGridId}');");
-            output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
-            output.WriteLine("var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;");
-            output.WriteLine($"var sList = searchfields{sFullGridId}[searchfield];");
-            output.WriteLine("var searchvalue = \"\";");
-            output.WriteLine("if(sList){");
-            output.WriteLine("searchvalue = searchchoice.options[searchchoice.selectedIndex].value;");
-            output.WriteLine("}else{");
-            output.WriteLine("searchvalue = searchtext.value;");
-            output.WriteLine("}");
-
-            if (bLockSearch)
-            {
-                var queryString = Page.Request.QueryString;
-                var urlBuilder = new StringBuilder();
-                var listIdString = list.ID.ToString("N");
-                foreach (var key in queryString.AllKeys)
-                {
-                    if (key != listIdString + "_searchvalue"
-                        && key != listIdString + "_searchfield"
-                        && key != listIdString + "_searchtype")
-                    {
-                        urlBuilder.Append("&");
-                        urlBuilder.Append(key);
-                        urlBuilder.Append("=");
-                        urlBuilder.Append(HttpUtility.UrlEncode(queryString[key]));
-                    }
-                }
-
-                var urlParams = urlBuilder.ToString().TrimStart('&');
-                if (!string.IsNullOrEmpty(urlParams))
-                {
-                    urlParams = $"?{urlParams}";
-                }
-
-                var requestUrl = Page.Request.Url.ToString();
-                var queryStringIndex = requestUrl.IndexOf("?");
-                if (queryStringIndex >= 0)
-                {
-                    requestUrl = requestUrl.Remove(queryStringIndex);
-                }
-
-                output.WriteLine($"var url = '{requestUrl}{urlParams}';");
-                output.WriteLine("if(url.indexOf('?') > 0){url = url + '&';}else{url = url + '?';}");
-                output.WriteLine($"url = url + '{listIdString}_searchfield=' + searchfield + '&{listIdString}_searchvalue=' + searchvalue + '&{listIdString}_searchtype=' + searchtype;");
-                output.WriteLine("location.href= url;");
-            }
-            else
-            {
-                output.WriteLine($"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
-            }
-
-            output.WriteLine("}");
+            output.WriteLine(RenderFunctionDoSearch());
 
             output.WriteLine($"function enablesearcher{sFullGridId}(){{");
             output.WriteLine("}");
@@ -3401,6 +3342,40 @@ namespace EPMLiveWebParts
 
             output.WriteLine("</div>");
             output.WriteLine("</div>");
+        }
+
+        private string RenderFunctionDoSearch()
+        {
+            return $@"function doSearch{sFullGridId}(){{
+                var searcher = document.getElementById('search{sFullGridId}');
+                var unsearch = document.getElementById('unsearch{sFullGridId}');
+                unsearch.style.display=""table-cell"";
+                var searchchoice = document.getElementById('searchchoice{sFullGridId}');
+                var searchtext = document.getElementById('searchtext{sFullGridId}');
+                var searchtypechoice = document.getElementById('searchtype{sFullGridId}');
+                var searchfield = searcher.options[searcher.selectedIndex].value;
+                var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;
+                var sList = searchfields{sFullGridId}[searchfield];
+                var searchvalue = """";
+                if(sList){{
+                    searchvalue = searchchoice.options[searchchoice.selectedIndex].value;
+                }} else {{ 
+                    searchvalue = searchtext.value;
+                }}
+                
+                {(bLockSearch 
+                    ? $@"var url = '{GenerateSearchRequestUrl()}';
+                        if(url.indexOf('?') > 0) {{
+                            url = url + '&';
+                        }} else {{
+                            url = url + '?';
+                        }}
+                        url = url + '{list.ID.ToString("N")}_searchfield=' + searchfield + '&{list.ID.ToString("N")}_searchvalue=' + searchvalue + '&{list.ID.ToString("N")}_searchtype=' + searchtype;
+                        location.href= url;"
+
+                    : $"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);")}
+                
+            }}";
         }
 
         private string RenderFunctionUnSearch()
