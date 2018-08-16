@@ -1137,72 +1137,86 @@ namespace TimeSheets
 
                 string tsuid = docTimesheet.FirstChild.Attributes["TSUID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                bool submitted = false;
-
-                SqlCommand cmd = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    submitted = dr.GetBoolean(0);
-                }
-                dr.Close();
-
-                if (!submitted)
-                {
-                    int status = 3;
-
-                    cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                    dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        status = dr.GetInt32(0);
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
+
+                    var submitted = false;
+                    using (var command = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                submitted = reader.GetBoolean(0);
+                            }
+                        }
                     }
-                    dr.Close();
 
-                    if (status == 3)
+                    if (!submitted)
                     {
-                        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
-                        if (bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
-                            CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
+                        int status = 3;
 
-                        cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.ExecuteNonQuery();
+                        using (var cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", connection))
+                        {
+                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    status = reader.GetInt32(0);
+                                }
+                            }
+                        }
 
-                        cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,31,@USERID,@JOBDATA)", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                        cmd.Parameters.AddWithValue("@JOBDATA", data);
-                        cmd.ExecuteNonQuery();
+                        if (status == 3)
+                        {
+                            // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
+                            if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
+                            {
+                                CheckNonTeamMemberAllocation(oWeb, tsuid, connection, data);
+                            }
 
-                        cn.Close();
+                            using (var command = new SqlCommand(
+                                "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                command.ExecuteNonQuery();
+                            }
 
-                        return "<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>";
+                            using (var command = new SqlCommand(
+                                @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
+                              VALUES(@tsuid,0,31,@USERID,@JOBDATA)",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                command.Parameters.AddWithValue("@JOBDATA", data);
+                                command.ExecuteNonQuery();
+                            }
+                            return "<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>";
+                        }
+                        else
+                        {
+                            return "<SaveTimesheet Status=\"2\">Timesheet is already being processed.</SaveTimesheet>";
+                        }
                     }
                     else
                     {
-                        cn.Close();
-
-                        return "<SaveTimesheet Status=\"2\">Timesheet is already being processed.</SaveTimesheet>";
+                        return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
                     }
                 }
-                else
+                finally
                 {
-                    cn.Close();
-
-                    return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
+                    connection?.Dispose();
                 }
-
             }
             catch (Exception ex)
             {

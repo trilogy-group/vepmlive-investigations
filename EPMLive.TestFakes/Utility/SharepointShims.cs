@@ -217,6 +217,7 @@ namespace EPMLive.TestFakes.Utility
                 UserGet = () => UserShim
             };
         }
+
         private ShimSPFieldUserValueCollection InitializeSPFieldUserValuesShim()
         {
             var result = new SPFieldUserValueCollection();

@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Data;
-using System.Data.SqlClient.Fakes;
-using System.Linq;
+using System.Collections;
 using System.Xml;
+using System.Linq;
+using System.Data.SqlClient.Fakes;
+using EPMLiveTimesheets.Tests;
+using TimeSheets.Fakes;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,7 +38,7 @@ namespace TimeSheets.Tests
 
         private void SetupShims()
         {
-            ShimTimesheetSettings.ConstructorSPWeb = (instance, spWeb) => {};
+            ShimTimesheetSettings.ConstructorSPWeb = (instance, spWeb) => { };
 
             ShimSqlDataReader.AllInstances.Read = instance => true;
             ShimSqlDataReader.AllInstances.GetStringInt32 = (instance, num) =>
@@ -80,7 +83,7 @@ namespace TimeSheets.Tests
                 };
 
             ShimTimesheetAPI.GetPeriodDaysArraySqlConnectionTimesheetSettingsSPWebString
-                = (_, __, ___, ____) => 
+                = (_, __, ___, ____) =>
                 {
                     var periods = new ArrayList();
                     periods.Add(new DateTime(2017, 04, 28));
@@ -88,14 +91,14 @@ namespace TimeSheets.Tests
                 };
 
             ShimTimesheetAPI.CreateTSRowXmlDocumentRefDataSetDataRowArrayListArrayListTimesheetSettingsBooleanSPWeb
-                = (ref XmlDocument docData, 
-                    DataSet dsTS, 
-                    DataRow dr, 
-                    ArrayList arrLookups, 
-                    ArrayList arrPeriods, 
-                    TimesheetSettings settings, 
-                    bool bCanEdit, 
-                    SPWeb web) => 
+                = (ref XmlDocument docData,
+                    DataSet dsTS,
+                    DataRow dr,
+                    ArrayList arrLookups,
+                    ArrayList arrPeriods,
+                    TimesheetSettings settings,
+                    bool bCanEdit,
+                    SPWeb web) =>
                 {
                     var node = docData.FirstChild.FirstChild;
                     return node;
