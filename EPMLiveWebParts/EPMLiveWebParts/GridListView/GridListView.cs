@@ -3349,36 +3349,38 @@ namespace EPMLiveWebParts
             output.WriteLine("searchtext.value = '';");
             if (bLockSearch)
             {
-                System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
-                StringBuilder sbUrl = new StringBuilder();
+                var queryString = Page.Request.QueryString;
+                var urlBuilder = new StringBuilder();
+                var listIdString = list.ID.ToString("N");
 
-                string fListId = list.ID.ToString("N");
-
-                foreach (string key in nv.AllKeys)
+                foreach (string key in queryString.AllKeys)
                 {
-                    if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
+                    if (key != $"{listIdString}_searchvalue" 
+                        && key != $"{listIdString}_searchfield" 
+                        && key != $"{listIdString}_searchtype")
                     {
-                        sbUrl.Append("&");
-                        sbUrl.Append(key);
-                        sbUrl.Append("=");
-                        sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
+                        urlBuilder.Append("&");
+                        urlBuilder.Append(key);
+                        urlBuilder.Append("=");
+                        urlBuilder.Append(HttpUtility.UrlEncode(queryString[key]));
                     }
                 }
 
-                string urlParams = sbUrl.ToString().TrimStart('&');
-                if (!String.IsNullOrEmpty(urlParams))
-                    urlParams = "?" + urlParams;
-
-                string curUrl = Page.Request.Url.ToString();
-
-                try
+                var urlParams = urlBuilder.ToString().TrimStart('&');
+                if (!string.IsNullOrEmpty(urlParams))
                 {
-                    curUrl = curUrl.Remove(curUrl.IndexOf("?"));
+                    urlParams = $"?{urlParams}";
                 }
-                catch { }
 
-                output.WriteLine("var url = '" + curUrl + urlParams + "';");
+                var requestUrl = Page.Request.Url.ToString();
 
+                var indexOfQueryString = requestUrl.IndexOf("?");
+                if (indexOfQueryString >= 0)
+                {
+                    requestUrl = requestUrl.Remove(indexOfQueryString);
+                }
+
+                output.WriteLine($"var url = '{requestUrl}{urlParams}';");
                 output.WriteLine("location.href= url;");
             }
             else
@@ -3494,6 +3496,7 @@ namespace EPMLiveWebParts
             output.WriteLine("</td></tr></table>");
             output.WriteLine("</div>");
             output.WriteLine($"<script language=\"javascript\">switchsearch{sFullGridId}();</script>");
+
             output.WriteLine("</div>");
             output.WriteLine("</div>");
         }
