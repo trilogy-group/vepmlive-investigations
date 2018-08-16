@@ -1,19 +1,19 @@
-﻿using EPMLiveCore.Fakes;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.SqlClient.Fakes;
+using EPMLiveCore.Fakes;
 using EPMLiveCore.ReportingProxy.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlClient.Fakes;
 
 namespace TimeSheets.Tests
 {
     [TestClass()]
-    public class TimesheetAPITests
+    public partial class TimesheetAPITests
     {
         private class TestRoleChecker : ISPRoleChecker
         {
@@ -80,7 +80,6 @@ namespace TimeSheets.Tests
                 ShimQueryExecutor.ConstructorSPWeb = (instance, spweb) =>
                 {
                     ShimQueryExecutor moledInstance = new ShimQueryExecutor(instance);
-                    //moledInstance.Dispose = () => { };
                     moledInstance.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
                     (str1, dict) =>
                     {
