@@ -2,8 +2,8 @@ import {OptimizerPageConstants} from './optimizer-page.constants';
 import {BasePage} from '../../../base-page';
 import {By, element} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
-import {ComponentHelpers} from '../../../../../components/devfactory/component-helpers/component-helpers';
 import {AnchorHelper} from '../../../../../components/html/anchor-helper';
+import {CommonPageHelper} from '../../../common/common-page.helper';
 
 export class OptimizerPage extends BasePage {
 
@@ -79,7 +79,9 @@ export class OptimizerPage extends BasePage {
     static get getOptimizerConfiguration(){
         const label = OptimizerPageConstants.optimizerConfiguration;
         return{
-            thirdQuestention: element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(label.thirdQuestention, true)}]`)),
+            enterValueLabel: CommonPageHelper.getElementByText(label.enterValueLabel, true),
+            titleComparisonLabel: CommonPageHelper.getElementByText(label.titleComparisonLabel, true),
+            thirdQuestion: CommonPageHelper.getElementByText(label.thirdQuestion, true),
             availableFields: ElementHelper.getElementByText(label.availableFields),
             selectedFilelds: ElementHelper.getElementByText(label.selectedFilelds),
             add: AnchorHelper.getItemById(label.add),

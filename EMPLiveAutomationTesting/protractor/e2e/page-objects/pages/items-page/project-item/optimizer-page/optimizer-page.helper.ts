@@ -98,9 +98,7 @@ export class OptimizerPageHelper {
 
     static async gotoConfigureSection(stepLogger: StepLogger) {
         await CommonPageHelper.gotoOptimizer(stepLogger);
-        stepLogger.step('Click on Configure button.');
-        await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getConfigure);
+        await this.clickConfigure(stepLogger);
     }
 
     static async openSaveStrategyPopup(stepLogger: StepLogger) {
@@ -285,5 +283,24 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy' , stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(actionsLabel.currentStrategyDropdown,
             OptimizerPageConstants.currentStrategy , stepLogger);
+    }
+
+    static async verifyConfigureScreen(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        const configConst = OptimizerPageConstants.optimizerConfiguration;
+        await ExpectationHelper.verifyContainsText(configLabel.enterValueLabel,
+            OptimizerPageConstants.configure, configConst.enterValueLabel , stepLogger);
+        await ExpectationHelper.verifyContainsText(configLabel.titleComparisonLabel,
+            OptimizerPageConstants.configure, configConst.titleComparisonLabel , stepLogger);
+        await ExpectationHelper.verifyContainsText(configLabel.thirdQuestion,
+            OptimizerPageConstants.configure, configConst.thirdQuestion , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.cancel, OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async clickConfigure(stepLogger: StepLogger) {
+        stepLogger.step('Click on Configure button.');
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getConfigure);
     }
 }

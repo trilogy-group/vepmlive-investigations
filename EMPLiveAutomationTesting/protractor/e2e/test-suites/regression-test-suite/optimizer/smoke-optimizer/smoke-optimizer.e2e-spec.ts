@@ -49,4 +49,23 @@ describe(SuiteNames.regressionTestSuite, () => {
         stepLogger.stepId(4);
         await OptimizerPageHelper.verifyOptimizerTabContents(stepLogger);
     });
+
+    it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
+        const stepLogger = new StepLogger(744407);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
+        stepLogger.stepId(4);
+        await OptimizerPageHelper.clickConfigure(stepLogger);
+        await OptimizerPageHelper.verifyConfigureScreen(stepLogger);
+    });
 });
