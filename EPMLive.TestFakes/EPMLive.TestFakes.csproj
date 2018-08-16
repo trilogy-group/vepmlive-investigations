@@ -99,6 +99,9 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="TimeSheets.Fakes">
+      <HintPath>FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="WorkEnginePPM.Fakes">
       <HintPath>FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
@@ -139,6 +142,10 @@
       <Project>{6c2be0de-af49-4f4d-bab8-ae256f1cbdd7}</Project>
       <Name>EPMLiveTimerService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
+      <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>
+      <Name>EPMLiveTimesheets</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
@@ -178,6 +185,7 @@
     <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
     <None Include="EPMLive.TestFakes.snk" />
     <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
+    <Fakes Include="Fakes\TimeSheets.fakes" />
     <Fakes Include="Fakes\System.DirectoryServices.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
