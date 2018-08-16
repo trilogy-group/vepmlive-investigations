@@ -1254,6 +1254,10 @@ namespace EPMLiveCore
             {
                 throw new ArgumentNullException(nameof(view));
             }
+            if (groupByFieldNames == null)
+            {
+                throw new ArgumentNullException(nameof(groupByFieldNames));
+            }
 
             DataTable dataTable = null;
             SqlConnection sqlConnection = null;
