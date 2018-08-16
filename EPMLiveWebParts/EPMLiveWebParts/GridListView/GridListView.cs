@@ -3291,35 +3291,18 @@ namespace EPMLiveWebParts
             output.WriteLine(RenderFunctionSwitchToSearch());
             output.WriteLine(RenderFunctionUnSearch());
             output.WriteLine(RenderFunctionDoSearch());
-
-            output.WriteLine($"function enablesearcher{sFullGridId}(){{");
-            output.WriteLine("}");
-
-            output.WriteLine($"function searchKeyPress{sFullGridId}(e){{");
-            output.WriteLine($"if(e.keyCode == 13){{ doSearch{sFullGridId}();}}return false;}}");
+            output.WriteLine(RenderFunctionEnableSearcher());
+            output.WriteLine(RenderFunctionSearchKeyPress());
 
             output.WriteLine("</script>");
 
             output.Write($"<div id=\"search{ID}\" style=\"width:100%; height:40px;");
             output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 14px;\">");
             output.Write("Search: ");
-            output.Write($"<select id=\"search{sFullGridId}\" onChange=\"switchsearch{sFullGridId}();\" class=\"form-control\">");
-            output.WriteLine(string.Join(string.Empty, fields.Select(field =>
-                $"<option value=\"{field.Key}\"{(sSearchField == field.Key ? " selected" : string.Empty)}>{field.Value}</option>"
-            )));
-            output.Write("</select>&nbsp;&nbsp;");
-
-            output.WriteLine($"<select id=\"searchtype{sFullGridId}\" class=\"form-control\">");
-            output.WriteLine(typeoption("1", "Contains"));
-            output.WriteLine(typeoption("8", "Begins With"));
-            output.WriteLine(typeoption("2", "Equals"));
-            output.WriteLine(typeoption("3", "Does Not Equal"));
-            output.WriteLine(typeoption("4", "Greater Than"));
-            output.WriteLine(typeoption("5", "Greater Than or Equal"));
-            output.WriteLine(typeoption("6", "Less Than"));
-            output.WriteLine(typeoption("7", "Less Than or Equal"));
-            output.WriteLine("</select>&nbsp;&nbsp;");
-
+            output.Write(RenderSearchFieldsSelect(fields));
+            output.Write("&nbsp;&nbsp;");
+            output.WriteLine(RenderSearchTypesSelect());
+            output.Write("&nbsp;&nbsp;");
             output.WriteLine("</td><td>");
 
             output.WriteLine($@"<div style=""border: 1px solid #CCC;width: 200px;height: 30px;"">
@@ -3342,6 +3325,45 @@ namespace EPMLiveWebParts
 
             output.WriteLine("</div>");
             output.WriteLine("</div>");
+        }
+
+        private string RenderSearchTypesSelect()
+        {
+            return $@"<select id=""searchtype{ sFullGridId}"" class=""form-control"">
+                {typeoption("1", "Contains")}
+                {typeoption("8", "Begins With")}
+                {typeoption("2", "Equals")}
+                {typeoption("3", "Does Not Equal")}
+                {typeoption("4", "Greater Than")}
+                {typeoption("5", "Greater Than or Equal")}
+                {typeoption("6", "Less Than")}
+                {typeoption("7", "Less Than or Equal")}
+            </select>";
+        }
+
+        private string RenderSearchFieldsSelect(IDictionary<string, string> fields)
+        {
+            return $@"<select id=""search{sFullGridId}"" onChange=""switchsearch{sFullGridId}();"" class=""form-control"">
+                {(string.Join(string.Empty, fields.Select(field =>
+                    $"<option value=\"{field.Key}\"{(sSearchField == field.Key ? " selected" : string.Empty)}>{field.Value}</option>"
+                )))}
+            </select>";
+        }
+
+        private string RenderFunctionSearchKeyPress()
+        {
+            return $@"function searchKeyPress{sFullGridId}(e){{
+                if(e.keyCode == 13) {{ 
+                    doSearch{sFullGridId}();
+                }}
+                return false;
+            }}";
+        }
+
+        private string RenderFunctionEnableSearcher()
+        {
+            return $@"function enablesearcher{sFullGridId}(){{
+            }}";
         }
 
         private string RenderFunctionDoSearch()
