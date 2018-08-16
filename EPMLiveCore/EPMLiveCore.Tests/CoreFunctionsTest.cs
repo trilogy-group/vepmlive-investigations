@@ -191,6 +191,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             const string userName = "test";
+            ShimCoreFunctions.getDomain = () => string.Empty;
             var directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             // Act
@@ -207,6 +208,7 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             const string userName = "test";
+            ShimCoreFunctions.getDomain = () => string.Empty;
             var directoryShims = DirectoryShims.ShimDirectoryCalls();
 
             // Act

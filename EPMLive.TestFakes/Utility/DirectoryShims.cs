@@ -11,13 +11,34 @@ namespace EPMLive.TestFakes.Utility
 {
     public class DirectoryShims
     {
+        public ShimSearchResult SearchResultShim { get; private set; }
+        public ShimSearchResultCollection SearchResultsShim { get; private set; }
+
         public IList<DirectoryEntry> DirectoryEntriesDisposed { get; }
         public IList<DirectorySearcher> DirectorySearchersDisposed { get; }
 
         private DirectoryShims()
         {
+            SearchResultShim = InitializeShimSearchResult();
+            SearchResultsShim = InitializeShimSearchResultCollection();
+
             DirectoryEntriesDisposed = new List<DirectoryEntry>();
             DirectorySearchersDisposed = new List<DirectorySearcher>();
+        }
+
+        public ShimSearchResult InitializeShimSearchResult()
+        {
+            return new ShimSearchResult();
+        }
+        public ShimSearchResultCollection InitializeShimSearchResultCollection()
+        {
+            var result = new ShimSearchResultCollection
+            {
+                ItemGetInt32 = index => SearchResultShim
+            };
+
+            result.Bind(new SearchResult[] { SearchResultShim });
+            return result;
         }
 
         public static DirectoryShims ShimDirectoryCalls()
@@ -51,6 +72,8 @@ namespace EPMLive.TestFakes.Utility
                     DirectorySearchersDisposed.Add(directorySearcher);
                 }
             };
+
+            ShimDirectorySearcher.AllInstances.FindAll = instance => SearchResultsShim;
         }
     }
 }
