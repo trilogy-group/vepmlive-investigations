@@ -18,6 +18,7 @@ namespace EPMLive.TestFakes.Utility
 
         public IList<SqlConnection> ConnectionsCreated { get; private set; }
         public IList<SqlConnection> ConnectionsOpened { get; private set; }
+        public IList<SqlConnection> ConnectionsClosed { get; private set; }
         public IList<SqlConnection> ConnectionsDisposed { get; private set; }
         public IList<SqlCommand> CommandsCreated { get; private set; }
         public IList<SqlCommand> CommandsExecuted { get; private set; }
@@ -35,6 +36,7 @@ namespace EPMLive.TestFakes.Utility
 
             ConnectionsCreated = new List<SqlConnection>();
             ConnectionsOpened = new List<SqlConnection>();
+            ConnectionsClosed = new List<SqlConnection>();
             ConnectionsDisposed = new List<SqlConnection>();
             CommandsCreated = new List<SqlCommand>();
             CommandsExecuted = new List<SqlCommand>();
@@ -127,6 +129,7 @@ namespace EPMLive.TestFakes.Utility
             };
             ShimSqlConnection.AllInstances.Close = instance =>
             {
+                ConnectionsClosed.Add(instance);
             };
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
             {
