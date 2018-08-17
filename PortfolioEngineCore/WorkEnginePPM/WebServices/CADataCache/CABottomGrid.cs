@@ -64,24 +64,7 @@ namespace CADataCache
             const string sumFunc = "(Row.id == 'Filter' ? '' : sum())";
             if (_useHeatMap)
             {
-                var prefix = "P" + periodId + "H";
-
-                Header1.CreateStringAttr(prefix, periodName + "\nHeatMap");
-
-                var column = CreateColumn(PeriodCols, prefix, "Float",
-                    visible: false,
-                    canMove: false,
-                    canResize: null,
-                    canFilter: null);
-                column.CreateStringAttr("Format", ",0.##");
-                column.CreateStringAttr("Align", "Right");
-                column.CreateIntAttr("MinWidth", 45);
-                column.CreateIntAttr("Width", 65);
-
-                DefinitionRight.CreateStringAttr(prefix + "Formula", sumFunc);
-                DefinitionRight.CreateStringAttr(prefix + "Format", ",#.##");
-                DefinitionLeaf.CreateStringAttr(prefix + "Formula", string.Empty);
-
+                InitializePeriodHeatMapColumn(periodId, periodName, true, sumFunc);
                 span *= 2;
             }
 
