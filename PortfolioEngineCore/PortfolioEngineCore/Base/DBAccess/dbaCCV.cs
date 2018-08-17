@@ -129,7 +129,6 @@ namespace PortfolioEngineCore
 
             var nMaxLevel = GetCategories(dbAccess, ctId, costCategories, costCategoriesIndex, out bsingleUOM);
 
-            // set parent UIDs
             var parentUiDs = new int[nMaxLevel + 1];
             foreach (var costcategoryentry in costCategories)
             {
@@ -264,7 +263,6 @@ namespace PortfolioEngineCore
                                 listPIs.Add(id);
                             }
                         }
-
                     }
                 }
             }

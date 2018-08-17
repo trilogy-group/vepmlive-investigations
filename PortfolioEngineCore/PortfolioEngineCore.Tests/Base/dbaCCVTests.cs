@@ -42,14 +42,14 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCCV.SetCostTotalsDBAccessInt32Int32IListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
 
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
-            string sResult;
+            string result;
 
             // Act 
-            var actualStatus = dbaCCV.CalculateCostValues(dba, 1, 2, 0, out sResult);
+            var actualStatus = dbaCCV.CalculateCostValues(dba, 1, 2, 0, out result);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
-            Assert.AreEqual("CCV Complete",  sResult);
+            Assert.AreEqual("CCV Complete",  result);
 
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
@@ -81,14 +81,14 @@ namespace PortfolioEngineCore.Tests.Base
             ShimdbaCCV.SetCostTotalsDBAccessInt32Int32IListOfInt32Boolean = (a, b, c, d, e) => StatusEnum.rsSuccess;
 
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
-            string sResult;
+            string result;
 
             // Act 
-            var actualStatus = dbaCCV.CalculateCostValues(dba, 1, 2, 3, out sResult);
+            var actualStatus = dbaCCV.CalculateCostValues(dba, 1, 2, 3, out result);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
-            Assert.AreEqual("CCV Complete", sResult);
+            Assert.AreEqual("CCV Complete", result);
 
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(5, list.Count);
@@ -119,7 +119,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 1, 1, listPIs, true);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                1, 
+                1, 
+                listPIs, 
+                true);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -154,7 +161,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, true);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                5, 
+                4, 
+                listPIs, 
+                true);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -187,7 +201,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 1, 1, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                1, 
+                1, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -226,7 +247,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                5, 
+                4, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -265,7 +293,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                5, 
+                4, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -279,17 +314,24 @@ namespace PortfolioEngineCore.Tests.Base
             var index = 5;
             ShimSqlDb.ReadIntValueObject = o => index--;
             
-            ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = (int a, int b, out string c, out string d) =>
+            ShimEPKClass01.GetTableAndFieldInt32Int32StringOutStringOut = (int a, int b, out string tableName, out string fieldName) =>
             {
-                c = "table";
-                d = "field";
+                tableName = "table";
+                fieldName = "field";
                 return false;
             };
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                5, 
+                4, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -316,7 +358,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 5, 4, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                5, 
+                4, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
@@ -343,7 +392,14 @@ namespace PortfolioEngineCore.Tests.Base
             var listPIs = new List<int> { 11, 22 };
 
             // Act 
-            var actualStatus = _privateObject.Invoke("SetCostTotals", BindingFlags.Static | BindingFlags.NonPublic, dba, 0, 0, listPIs, false);
+            var actualStatus = _privateObject.Invoke(
+                "SetCostTotals", 
+                BindingFlags.Static | BindingFlags.NonPublic, 
+                dba, 
+                0, 
+                0, 
+                listPIs, 
+                false);
 
             // Assert
             Assert.AreEqual(StatusEnum.rsSuccess, actualStatus);
