@@ -90,7 +90,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -99,7 +99,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -126,7 +126,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(7, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("Select pg.PROG_UID,PROJECT_ID,LV_FULLVALUE as GROUP_NAME From EPGP_PI_PROGS pg Join EPGP_LOOKUP_VALUES lv on lv.LV_UID=pg.PROG_UID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on PROJECT_ID=LT.TokenVal Order By PROJECT_ID,pg.FIELD_ID", list[4].CommandText);
@@ -136,7 +136,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(7, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("Select pg.PROG_UID,PROJECT_ID,LV_FULLVALUE as GROUP_NAME From EPGP_PI_PROGS pg Join EPGP_LOOKUP_VALUES lv on lv.LV_UID=pg.PROG_UID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on PROJECT_ID=LT.TokenVal Order By PROJECT_ID,pg.FIELD_ID", list[4].CommandText);
@@ -164,7 +164,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("Select WRES_ID,RES_NAME From EPG_RESOURCES", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -173,7 +173,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("Select WRES_ID,RES_NAME From EPG_RESOURCES", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -200,7 +200,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,ps.WPROJ_ID FROM EPGP_PROJECTS pi   Left Join EPGX_PROJECT_VERSIONS ps On ps.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -209,7 +209,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,ps.WPROJ_ID FROM EPGP_PROJECTS pi   Left Join EPGX_PROJECT_VERSIONS ps On ps.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -236,7 +236,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,sg.STAGE_NAME FROM EPGP_PROJECTS pi   Left Join EPGP_STAGES sg On sg.STAGE_ID=pi.PROJECT_STAGE_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -245,7 +245,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,sg.STAGE_NAME FROM EPGP_PROJECTS pi   Left Join EPGP_STAGES sg On sg.STAGE_ID=pi.PROJECT_STAGE_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -272,7 +272,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r1.RES_NAME as StageOwner FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r1 On r1.WRES_ID=pi.PROJECT_OWNER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -281,7 +281,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r1.RES_NAME as StageOwner FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r1 On r1.WRES_ID=pi.PROJECT_OWNER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -308,7 +308,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r2.RES_NAME as ItemManager FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r2 On r2.WRES_ID=pi.PROJECT_MANAGER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -317,7 +317,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r2.RES_NAME as ItemManager FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r2 On r2.WRES_ID=pi.PROJECT_MANAGER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -344,7 +344,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r3.RES_NAME as ScheduleManager FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r3 On r3.WRES_ID=pi.PROJECT_PLAN_OWNER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -353,7 +353,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r3.RES_NAME as ScheduleManager FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r3 On r3.WRES_ID=pi.PROJECT_PLAN_OWNER JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -380,7 +380,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r4.RES_NAME as CreatedBy FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r4 On r4.WRES_ID=pi.PROJECT_CREATEDBY JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -389,7 +389,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,r4.RES_NAME as CreatedBy FROM EPGP_PROJECTS pi   Left Join EPG_RESOURCES r4 On r4.WRES_ID=pi.PROJECT_CREATEDBY JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -416,7 +416,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -425,7 +425,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -452,7 +452,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -461,7 +461,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -488,7 +488,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -497,7 +497,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -524,7 +524,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -533,7 +533,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -560,7 +560,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -569,7 +569,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -596,7 +596,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -605,7 +605,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -632,7 +632,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -641,7 +641,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -668,7 +668,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -677,7 +677,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE FROM EPGP_PROJECTS pi   JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -704,7 +704,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x1 ON x1.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -713,7 +713,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x1 ON x1.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -740,7 +740,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x2 ON x2.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -749,7 +749,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x2 ON x2.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -776,7 +776,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x3 ON x3.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -785,7 +785,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x3 ON x3.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -812,7 +812,7 @@ namespace PortfolioEngineCore.Tests.Base
             var list = _shimAdoNetCalls.CommandsCreated;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x5 ON x5.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
@@ -821,7 +821,7 @@ namespace PortfolioEngineCore.Tests.Base
             list = _shimAdoNetCalls.CommandsExecuted;
             Assert.AreEqual(6, list.Count);
             Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID", list[0].CommandText);
-            Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[1].CommandText);
+            Assert.AreEqual("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f Where FIELD_EXPORT=1 ORDER BY FIELD_ID", list[1].CommandText);
             Assert.AreEqual("Select * From EPGC_FIELD_ATTRIBS f Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID", list[2].CommandText);
             Assert.AreEqual("PPM_SP_ReadLookupValuesByLookup", list[3].CommandText);
             Assert.AreEqual("SELECT pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE,field FROM EPGP_PROJECTS pi   LEFT JOIN table x5 ON x5.PROJECT_ID=pi.PROJECT_ID JOIN dbo.EPG_FN_ConvertListToTable(N'1, 2') LT on pi.PROJECT_ID=LT.TokenVal Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID", list[4].CommandText);
