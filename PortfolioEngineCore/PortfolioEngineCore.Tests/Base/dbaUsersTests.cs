@@ -620,7 +620,7 @@ namespace PortfolioEngineCore.Tests.Base
             // Arrange
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             string sResult;
-            const string expectedResult = "<PortfolioItems Key=\"EPK\"><PortfolioItem ItemID=\"10\"><Field ID=\"Team\" Value=\"11\" /><Field ID=\"9903\" Value=\"2018-01-02T03:04:05\" /></PortfolioItem></PortfolioItems>";
+            const string expectedResult = "<PortfolioItems Key=\"EPK\"><PortfolioItem ItemID=\"10\"><Field ID=\"Team\" Value=\"11\" /><Field ID=\"9903\" Value=\"10\" /></PortfolioItem></PortfolioItems>";
             intValues[0] = 9903;
             // Act
             var actual = dbaUsers.ExportPIInfo(dba, "1, 2", out sResult);
@@ -656,7 +656,7 @@ namespace PortfolioEngineCore.Tests.Base
             // Arrange
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             string sResult;
-            const string expectedResult = "<PortfolioItems Key=\"EPK\"><PortfolioItem ItemID=\"10\"><Field ID=\"Team\" Value=\"11\" /><Field ID=\"9924\" Value=\"2018-01-02T03:04:05\" /></PortfolioItem></PortfolioItems>";
+            const string expectedResult = "<PortfolioItems Key=\"EPK\"><PortfolioItem ItemID=\"10\"><Field ID=\"Team\" Value=\"11\" /></PortfolioItem></PortfolioItems>";
             intValues[0] = 99246;
             // Act
             var actual = dbaUsers.ExportPIInfo(dba, "1, 2", out sResult);
