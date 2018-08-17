@@ -532,6 +532,9 @@ namespace PortfolioEngineCore
                             isDateType = true;
                         }
                         break;
+                    default: 
+                        // nothing here
+                        break;
                 }
             }
         }
