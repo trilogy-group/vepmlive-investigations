@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -88,6 +89,7 @@ namespace PortfolioEngineCore
                 catch (Exception ex)
                 {
                     eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);
+                    Trace.TraceError("Error: {0}", ex);
                 }
             }
 
@@ -624,6 +626,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "InsertCOST_VALUES", (StatusEnum)99848, ex.Message);
+                Trace.TraceError("Error: {0}", ex);
             }
             return eStatus;
         }
@@ -653,6 +656,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "Set COST_VALUES", (StatusEnum)99846, ex.Message);
+                Trace.TraceError("Error: {0}", ex);
                 return eStatus;
             }
             if (!costTotals.Any())
@@ -698,6 +702,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "Set COST_VALUES", (StatusEnum)99845, ex.Message);
+                Trace.TraceError("Error: {0}", ex);
             }
 
             return eStatus;
