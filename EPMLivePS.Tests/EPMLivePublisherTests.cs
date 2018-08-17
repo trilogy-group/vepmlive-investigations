@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.Fakes;
 using System.Security.Principal;
@@ -513,7 +514,7 @@ namespace EPMLivePS.Tests
             Assert.AreEqual(expectedSqlCommandDisposeCalls, _sqlCommandDisposeCallCount);
         }
 
-        private void SetupShims(Array spArray = null)
+        private void SetupShims(ICollection spArray = null)
         {
             var webApplication = new SPWebApplication()
             {
