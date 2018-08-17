@@ -391,4 +391,9 @@ export class OptimizerPageHelper {
         await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.currentViewDropdown,
             OptimizerPageConstants.currentView, stepLogger);
     }
+
+    static async verifyCurrentViewDropdown(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.currentViewDropdown,
+            'Current View Dropdown', stepLogger);
+    }
 }
