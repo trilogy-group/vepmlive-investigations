@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
@@ -209,7 +205,8 @@ namespace EPMLive.TestFakes.Utility
         {
             return new ShimSPSite
             {
-                WebApplicationGet = () => ApplicationShim
+                WebApplicationGet = () => ApplicationShim,
+                RootWebGet = () => WebShim
             };
         }
 
@@ -220,6 +217,7 @@ namespace EPMLive.TestFakes.Utility
                 UserGet = () => UserShim
             };
         }
+
         private ShimSPFieldUserValueCollection InitializeSPFieldUserValuesShim()
         {
             var result = new SPFieldUserValueCollection();

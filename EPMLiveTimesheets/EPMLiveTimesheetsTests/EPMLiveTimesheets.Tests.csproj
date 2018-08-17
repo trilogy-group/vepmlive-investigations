@@ -34,6 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveTimesheets.Tests.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
@@ -66,6 +72,10 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="TimeSheets.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\bin\Debug\TimeSheets.Fakes.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -82,9 +92,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.CheckApproveStatus.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetOtherHours.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.SaveTimesheet.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTimesheetUpdates.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.StartStopWatch.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SheetTestBase.cs" />
     <Compile Include="WebPageCode\GetPMApprovalsTests.cs" />
     <Compile Include="WebPageCode\GetTSApprovalsTests.cs" />
   </ItemGroup>
@@ -108,6 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\EPM Live Core.fakes" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EPMLiveTimesheets.Tests.snk" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

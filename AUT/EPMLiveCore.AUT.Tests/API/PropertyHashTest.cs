@@ -926,28 +926,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_DirectCall_Overloading_Of_1_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var key = CreateType<int>();
-            var value = CreateType<Dictionary<object, object>>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _propertyHashInstance.Add(key, value);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Add) (Return Type : void) No Exception Thrown
 
         [Test]
@@ -1075,27 +1054,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-
-        #region Method Call : (Add) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_Add_Method_DirectCall_Overloading_Of_2_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var values = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _propertyHashInstance.Add(values);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Add) (Return Type : void) No Exception Thrown
 
         [Test]
@@ -2598,71 +2557,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-
-        #region Method Call : (loadProps) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_loadProps_Method_Call_Void_With_4_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var values = CreateType<string>();
-            var CollectionSeperator = CreateType<string>();
-            var ItemSeperator = CreateType<char>();
-            var KeySeperator = CreateType<char>();
-            var methodloadPropsPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(char), typeof(char) };
-            object[] parametersOfloadProps = { values, CollectionSeperator, ItemSeperator, KeySeperator };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodloadProps, methodloadPropsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_propertyHashInstanceFixture, parametersOfloadProps);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfloadProps.ShouldNotBeNull();
-            parametersOfloadProps.Length.ShouldBe(4);
-            methodloadPropsPrametersTypes.Length.ShouldBe(4);
-            methodloadPropsPrametersTypes.Length.ShouldBe(parametersOfloadProps.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
-        #region Method Call : (loadProps) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_PropertyHash_loadProps_Method_Call_Void_With_4_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var values = CreateType<string>();
-            var CollectionSeperator = CreateType<string>();
-            var ItemSeperator = CreateType<char>();
-            var KeySeperator = CreateType<char>();
-            var methodloadPropsPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(char), typeof(char) };
-            object[] parametersOfloadProps = { values, CollectionSeperator, ItemSeperator, KeySeperator };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodloadProps, methodloadPropsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_propertyHashInstanceFixture, parametersOfloadProps);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfloadProps.ShouldNotBeNull();
-            parametersOfloadProps.Length.ShouldBe(4);
-            methodloadPropsPrametersTypes.Length.ShouldBe(4);
-            methodloadPropsPrametersTypes.Length.ShouldBe(parametersOfloadProps.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
+        
         #region Method Call : (loadProps) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
