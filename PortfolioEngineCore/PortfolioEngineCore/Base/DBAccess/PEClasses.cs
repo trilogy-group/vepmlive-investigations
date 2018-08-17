@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace PortfolioEngineCore
 {
@@ -23,7 +24,7 @@ namespace PortfolioEngineCore
         public int CFField;
         public int LookupID;
     }
-    
+
     internal class CostCategoryInternal
     {
         public int UID;
@@ -36,93 +37,153 @@ namespace PortfolioEngineCore
         public bool HasData;
         public bool IsAvailable;
     }
-        internal class CostValues
+    internal class CostValues
+    {
+        private double[,] quantities;
+        private double[,] costs;
+
+        private int lPeriodCount;
+        private int lCategoryCount;
+
+        public CostValues(int periodCount, int categoryCount)
         {
-            private double[,] quantities;
-            private double[,] costs;
+            //  category 0 is the TOTAL line
+            lPeriodCount = periodCount;
+            lCategoryCount = categoryCount + 1;
+            quantities = new double[lPeriodCount, lCategoryCount];
+            costs = new double[lPeriodCount, lCategoryCount];
+        }
 
-            private int lPeriodCount;
-            private int lCategoryCount;
-
-            public CostValues(int periodCount, int categoryCount)
+        public void SetArrays()
+        {
+            for (int i = 0; i < lPeriodCount; i++)
             {
-               //  category 0 is the TOTAL line
-                lPeriodCount = periodCount;
-                lCategoryCount = categoryCount + 1;
-                quantities = new double[lPeriodCount, lCategoryCount];
-                costs = new double[lPeriodCount, lCategoryCount];
-            }
-
-            public void SetArrays ()
-            {
-                for (int i = 0; i < lPeriodCount; i++)
+                for (int j = 0; j < lCategoryCount; j++)
                 {
-                    for (int j = 0; j < lCategoryCount; j++)
-                    {
-                        quantities[i, j] = 0;
-                        costs[i, j] = 0;
-                    }
-                }
-            }
-
-            public void setCost(int period, int category, double costvalue)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                    costs[period - 1, category] = costvalue;
-            }
-
-            public void incrCost(int period, int category, double costvalue)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                    costs[period - 1, category] += costvalue;
-            }
-
-            public double getCost(int period, int category)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                {
-                    return costs[period - 1, category];
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-
-            public void setQuantity(int period, int category, double quantityvalue)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                    quantities[period - 1, category] = quantityvalue;
-            }
-            public void incrQuantity(int period, int category, double quantityvalue)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                    quantities[period - 1, category] += quantityvalue;
-            }
-
-            public double getQuantity(int period, int category)
-            {
-                if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
-                {
-                    return quantities[period - 1, category];
-                }
-                else
-                {
-                    return 0;
+                    quantities[i, j] = 0;
+                    costs[i, j] = 0;
                 }
             }
         }
 
-        internal class CostTotal
+        public void setCost(int period, int category, double costvalue)
         {
-            public int CB_ID;
-            public int CT_ID;
-            public int FIELD_ID;
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+                costs[period - 1, category] = costvalue;
         }
+
+        public void incrCost(int period, int category, double costvalue)
+        {
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+                costs[period - 1, category] += costvalue;
+        }
+
+        public double getCost(int period, int category)
+        {
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
+                return costs[period - 1, category];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public void setQuantity(int period, int category, double quantityvalue)
+        {
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+                quantities[period - 1, category] = quantityvalue;
+        }
+        public void incrQuantity(int period, int category, double quantityvalue)
+        {
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+                quantities[period - 1, category] += quantityvalue;
+        }
+
+        public double getQuantity(int period, int category)
+        {
+            if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
+                return quantities[period - 1, category];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+
+    internal class CostTotal
+    {
+        public int CB_ID;
+        public int CT_ID;
+        public int FIELD_ID;
+    }
 
     public class dbaUsers
     {
+        private static string ValueName = "Value";
+        private static int CodeId = 4;
+        private static int ResorceId = 7;
+        private const string WorkitemStartDate = "WORKITEM_START_DATE";
+        private const string ScheduleManager = "ScheduleManager";
+        private const string ProjectName = "PROJECT_NAME";
+        private const string ProjectStartDate = "PROJECT_START_DATE";
+        private const string ProjectFinishDate = "PROJECT_FINISH_DATE";
+        private const string CreatedBy = "CreatedBy";
+        private const string ProjectCreated = "PROJECT_CREATED";
+        private const string StageOwner = "StageOwner";
+        private const string WProject = "WPROJ_ID";
+        private const string ItemManager = "ItemManager";
+        private const string ProjectPriority = "PROJECT_PRIORITY";
+        private const string StageName = "STAGE_NAME";
+
+        private const string StringType = "s";
+        private const string DateType = "d";
+        private const string IntegerType = "i";
+
         public const int ErrorCode = 99871;
+        private const int WorkitemStartDateId = 9936;
+        private const int ProjectNameId = 9900;
+        private const int ProjectStartDateId = 9901;
+        private const int ProjectFinishDateId = 9902;
+
+        private const int StageNameId = 9911;
+        private const int CreatedById = 9920;
+        private const int StageOwnerId = 9922;
+        private const int WProjectId = 9924;
+        private const int ItemManagerId = 9925;
+        private const int ProjectPriorityId = 9928;
+        private const int ScheduleManagerId = 9930;
+        private const string IdName = "ID";
+        private const string Field = "Field";
+        private const string DoubleType = "dbl";
+        private const int DoubleTypeId = 203;
+        private const int DateTypeId = 205;
+        private const int StringTypeId2 = 202;
+        private const int StringTypeId1 = 201;
+        private const string ProjectIdName = "PROJECT_ID";
+        private const string ProjectExtUid = "PROJECT_EXT_UID";
+        private const string PortfolioItem = "PortfolioItem";
+        private const string ItemId = "ItemID";
+        private const string Team = "Team";
+        private const int LinkedScheduleId = 9224;
+        private const int ProgramGroupId = 9960;
+        private const string WresId = "WRES_ID";
+        private const string GroupName = "GROUP_NAME";
+        private const string LvUid = "LV_UID";
+        private const string LvFullvalue = "LV_FULLVALUE";
+        private const string FaFieldId = "FA_FIELD_ID";
+        private const string FaName = "FA_NAME";
+        private const string FaFormat = "FA_FORMAT";
+        private const string FaTableId = "FA_TABLE_ID";
+        private const string FaFieldInTable = "FA_FIELD_IN_TABLE";
+        private const string FaLookupUid = "FA_LOOKUP_UID";
+        private const string FieldId = "FIELD_ID";
+        private const string FieldName = "FIELD_NAME";
+        private const string FieldFormat = "FIELD_FORMAT";
+
         public static StatusEnum ExecuteSQLSelect(SqlCommand oCommand, out SqlDataReader reader)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
@@ -138,507 +199,805 @@ namespace PortfolioEngineCore
             }
             return eStatus;
         }
-        public static StatusEnum ExportPIInfo(DBAccess dba, string sProjectIDs, out string sResult)
+        public static StatusEnum ExportPIInfo(DBAccess dbAccess, string projectIds, out string result)
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess;
-
-            SqlCommand oCommand;
-            SqlDataReader reader;
-            string cmdText;
+            var status = StatusEnum.rsSuccess;
 
             // see if we have a list of mapped fields, if we do the we will use them to limit the fields we pass
-            bool bMappedFields = false;
+            var bMappedFields = false;
 
-            // jwg 6/12/12 - send back ALL custom fields - ignore any mapping
+            var lookupIds = new List<int>();
+            var standardFields = new SortedList<int, EPKItem>();
+            var customFields = new SortedList<int, EPKCustomField>();
+            var mvsFields = new SortedList<int, SortedList<int, string>>();
+            var fields = new StringBuilder();
+            var joins = new StringBuilder();
 
-            //cmdText = "SELECT COUNT(*) as lCount FROM EPG_WE_MAPPING WHERE WEM_ENTITY=20";
-            //oCommand = new SqlCommand(cmdText, dba.Connection);
-            //if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
-            //{
-            //    if (reader.Read())
-            //    {
-            //        int lCount = (int)reader["lCount"];
-            //        if (lCount > 0) bMappedFields = true;
-            //    }
-            //    reader.Close();
-            //}
+            AddStandartPortfolioFields(dbAccess, standardFields, bMappedFields);
+            var bNeedResources = AddCustomPortfolioFields(dbAccess, bMappedFields, customFields, lookupIds);
+            var clnLookupValues = GetLookupValues(dbAccess, lookupIds);
+            if (standardFields.ContainsKey(ProgramGroupId))
+            {
+                AddProgramGroups(dbAccess, projectIds, mvsFields);
+            }
 
-            // Read list of Standard Portfolio Fields we want - Standard means all except for Custom Fields - only ones that are mapped
-            List<int> clnLookups = new List<int>();
-            SortedList<int, EPKItem> clnStandardFields = new SortedList<int, EPKItem>();
-            SortedList<int, EPKCustomField> clnCustomFields = new SortedList<int, EPKCustomField>();
-            EPKItem oField;
-            EPKCustomField oCustomField;
-            bool bNeedResources = false;
+            var resources = GetResources(dbAccess, bNeedResources);
+            AddStandartFields(fields, joins, standardFields);
+            AddCustomField(customFields, fields, joins);
 
+            var portfolioItems = ReadyToPutTheBeastTogetherAndReadSomeData(
+                dbAccess,
+                projectIds,
+                fields.ToString(),
+                joins.ToString(),
+                standardFields,
+                mvsFields,
+                customFields,
+                clnLookupValues,
+                resources);
+
+            result = portfolioItems.XML();
+            return status;
+        }
+
+        private static void AddStandartPortfolioFields(DBAccess dbAccess, IDictionary<int, EPKItem> standardFields, bool bMappedFields)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            SqlDataReader reader;
             // We want these fields regardless so we'll just add them - they won't be mapped
-            cmdText = "SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS" +
-                    " Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID";
-     //       oCommand.CommandText = cmdText;
-            oCommand = new SqlCommand(cmdText, dba.Connection);
-            if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
+            var cmdText = new StringBuilder();
+            cmdText.Append("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS")
+                .Append(" Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID");
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
             {
-                while (reader.Read())
+                if (ExecuteSQLSelect(command, out reader) == StatusEnum.rsSuccess)
                 {
-                    int nID = DBAccess.ReadIntValue(reader["FIELD_ID"]);
-                    int nFieldType = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-                    string sName = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
-                    oField = new EPKItem();
-                    oField.ID = nID;
-                    oField.Name = sName;
-                    oField.Value = nFieldType;
-                    clnStandardFields.Add(nID, oField);
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            var id = DBAccess.ReadIntValue(reader[FieldId]);
+                            var epkItem = new EPKItem
+                            {
+                                ID = id,
+                                Name = DBAccess.ReadStringValue(reader[FieldName]),
+                                Value = DBAccess.ReadIntValue(reader[FieldFormat])
+                            };
+
+                            standardFields.Add(id, epkItem);
+                        }
+                    }
                 }
-                reader.Close();
             }
 
+            cmdText.Clear();
             //  now read marked list from EPGT_FIELDS
-            cmdText = "SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f";
-            if (bMappedFields) cmdText = cmdText + " Join EPG_WE_MAPPING m On f.FIELD_ID=m.WEM_EPK_FIELD_ID And WEM_ENTITY=20";
-            cmdText = cmdText + " Where FIELD_EXPORT=1 ORDER BY FIELD_ID";
-            oCommand = new SqlCommand(cmdText, dba.Connection);
-            if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
+            cmdText.Append("SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS f");
+            if (bMappedFields)
             {
-                while (reader.Read())
+                cmdText.Append(" Join EPG_WE_MAPPING m On f.FIELD_ID=m.WEM_EPK_FIELD_ID And WEM_ENTITY=20");
+            }
+            cmdText.Append(" Where FIELD_EXPORT=1 ORDER BY FIELD_ID");
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                if (ExecuteSQLSelect(command, out reader) == StatusEnum.rsSuccess)
                 {
-                    int nID = DBAccess.ReadIntValue(reader["FIELD_ID"]);
-                    int nFieldType = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
-                    string sName = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
-                    oField = new EPKItem();
-                    oField.ID = nID;
-                    oField.Name = sName;
-                    oField.Value = nFieldType;
-                    clnStandardFields.Add(nID, oField);
-                    // add lookup UID to collection if TS Dept or RP Dept  - will we have Charge Code and similar here for PIs?
-                    //                    if (nID == 3010) if (!clnLookups.Contains(lTSDeptEROC)) clnLookups.Add(lTSDeptEROC);
-                    //                    if (nID == 3020) if (!clnLookups.Contains(lRPDeptEROC)) clnLookups.Add(lRPDeptEROC);
-                    // we could remove joins to get Resource Name from main SQL because we might have to read the list of resaources anyway
-                    //  for now we won't do that and expect that usually there will not be a CF of type Resource and we can avoid reading them
-                    //  if the main SQL stmnt is too slow then removing the joins to EPG_RESOURCES might be one thing to try
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            var id = DBAccess.ReadIntValue(reader[FieldId]);
+                            var epkItem = new EPKItem
+                            {
+                                ID = id,
+                                Name = DBAccess.ReadStringValue(reader[FieldName]),
+                                Value = DBAccess.ReadIntValue(reader[FieldFormat])
+                            };
+                            standardFields.Add(id, epkItem);
+                        }
+                    }
                 }
-                reader.Close();
+            }
+        }
+
+        private static bool AddCustomPortfolioFields(
+            DBAccess dbAccess,
+            bool bMappedFields,
+            IDictionary<int, EPKCustomField> customFields,
+            ICollection<int> lookupIds)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (customFields == null)
+            {
+                throw new ArgumentNullException(nameof(customFields));
+            }
+            if (lookupIds == null)
+            {
+                throw new ArgumentNullException(nameof(lookupIds));
             }
 
-
+            var bNeedResources = false;
+            var cmdText = new StringBuilder();
+            cmdText.Append("Select * From EPGC_FIELD_ATTRIBS f");
+            if (bMappedFields)
             {
-                //eStatus = HandleStatusError(SeverityEnum.Exception, "SelectDataById", (StatusEnum)eStatusOnException, ex.Message.ToString());
+                cmdText.Append(" Join EPG_WE_MAPPING m On f.FA_FIELD_ID=m.WEM_EPK_FIELD_ID And WEM_ENTITY=20");
             }
+            cmdText.Append(" Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID");
 
-            // read list of Custom Portfolio Fields - if there is a list of mapped fields then get only the ones that are mapped
-            cmdText = "Select * From EPGC_FIELD_ATTRIBS f";
-            if (bMappedFields) cmdText = cmdText + " Join EPG_WE_MAPPING m On f.FA_FIELD_ID=m.WEM_EPK_FIELD_ID And WEM_ENTITY=20";
-            cmdText = cmdText + " Where FA_TABLE_ID > 200 and FA_TABLE_ID < 260 ORDER BY FA_FIELD_ID";
-            oCommand.CommandText = cmdText;
-            oCommand = new SqlCommand(cmdText, dba.Connection);
-            if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
+            using (var oCommand = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
             {
-                while (reader.Read())
+                SqlDataReader reader;
+                if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
                 {
-                    oCustomField = new EPKCustomField();
-                    int nID = DBAccess.ReadIntValue(reader["FA_FIELD_ID"]);
-                    oCustomField.ID = nID;
-                    oCustomField.Name = DBAccess.ReadStringValue(reader["FA_NAME"]);
-                    oCustomField.Fieldtype = DBAccess.ReadIntValue(reader["FA_FORMAT"]);
-                    oCustomField.CFTable = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
-                    oCustomField.CFField = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
-                    oCustomField.LookupID = DBAccess.ReadIntValue(reader["FA_LOOKUP_UID"]);
-
-                    clnCustomFields.Add(nID, oCustomField);
-                    // if it is a Code then add the Lookup to those we need to go get 
-                    if (oCustomField.Fieldtype == 4 && oCustomField.LookupID > 0) if (!clnLookups.Contains(nID)) clnLookups.Add(nID);
-                    if (oCustomField.Fieldtype == 7) bNeedResources = true;
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            var id = DBAccess.ReadIntValue(reader[FaFieldId]);
+                            var customField = new EPKCustomField
+                            {
+                                ID = id,
+                                Name = DBAccess.ReadStringValue(reader[FaName]),
+                                Fieldtype = DBAccess.ReadIntValue(reader[FaFormat]),
+                                CFTable = DBAccess.ReadIntValue(reader[FaTableId]),
+                                CFField = DBAccess.ReadIntValue(reader[FaFieldInTable]),
+                                LookupID = DBAccess.ReadIntValue(reader[FaLookupUid])
+                            };
+                            customFields.Add(id, customField);
+                            // if it is a Code then add the Lookup to those we need to go get 
+                            if (customField.Fieldtype == CodeId && customField.LookupID > 0 && !lookupIds.Contains(id))
+                            {
+                                lookupIds.Add(id);
+                            }
+                            if (customField.Fieldtype == ResorceId)
+                            {
+                                bNeedResources = true;
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
+            return bNeedResources;
+        }
 
-            // Make a list of the lookups we need           
-            SortedList<int, string> clnLookupValues = new SortedList<int, string>();
-            string sLookupList = "";
-            //int lLookup = 0;
-
-            foreach (int iLookupId in clnLookups)
+        private static SortedList<int, string> GetLookupValues(DBAccess dbAccess, IEnumerable<int> lookupIds)
+        {
+            if (dbAccess == null)
             {
-                if (sLookupList.Length > 0)
-                    sLookupList = sLookupList + "," + iLookupId.ToString();
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (lookupIds == null)
+            {
+                throw new ArgumentNullException(nameof(lookupIds));
+            }
+            var lookupValues = new SortedList<int, string>();
+            var lookupList = new StringBuilder();
+
+            foreach (var lookupId in lookupIds)
+            {
+                if (lookupList.Length > 0)
+                {
+                    lookupList.AppendFormat(",{0}", lookupId);
+                }
                 else
-                    sLookupList = iLookupId.ToString();
+                {
+                    lookupList.Append(lookupId);
+                }
             }
 
             // get the full(?) values for the lookup tables
-            if (sLookupList.Length > 0)
+            if (lookupList.Length > 0)
             {
-                oCommand = new SqlCommand("PPM_SP_ReadLookupValuesByLookup", dba.Connection);
-                oCommand.Parameters.AddWithValue("sList", sLookupList);
-                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                reader = oCommand.ExecuteReader();
+                using (var command = new SqlCommand("PPM_SP_ReadLookupValuesByLookup", dbAccess.Connection))
+                {
+                    command.Parameters.AddWithValue("sList", lookupList.ToString());
+                    command.CommandType = CommandType.StoredProcedure;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var intValue = DBAccess.ReadIntValue(reader[LvUid]);
+                            var stringValue = DBAccess.ReadStringValue(reader[LvFullvalue]);
+                            lookupValues.Add(intValue, stringValue);
+                        }
+                    }
+                }
+            }
+            return lookupValues;
+        }
+
+        private static void AddProgramGroups(DBAccess dbAccess, string projectIds, IDictionary<int, SortedList<int, string>> mvsFields)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            if (mvsFields == null)
+            {
+                throw new ArgumentNullException(nameof(mvsFields));
+            }
+            var prevProjectId = 0;
+            var sGroups = "";
+            var cmdText = new StringBuilder();
+            cmdText.Append("Select pg.PROG_UID,PROJECT_ID,LV_FULLVALUE as GROUP_NAME From EPGP_PI_PROGS pg")
+                .Append(" Join EPGP_LOOKUP_VALUES lv on lv.LV_UID=pg.PROG_UID");
+            if (projectIds.Length > 0)
+            {
+                cmdText.AppendFormat(" JOIN dbo.EPG_FN_ConvertListToTable(N'{0}') LT on PROJECT_ID=LT.TokenVal", projectIds);
+            }
+            cmdText.Append(" Order By PROJECT_ID,pg.FIELD_ID");
+
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                SqlDataReader reader;
+                if (ExecuteSQLSelect(command, out reader) == StatusEnum.rsSuccess)
+                {
+                    var mvValues = new SortedList<int, string>();
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            var projectId = DBAccess.ReadIntValue(reader[WresId]);
+                            var stringValue = DBAccess.ReadStringValue(reader[GroupName]);
+                            if (projectId != prevProjectId && prevProjectId > 0)
+                            {
+                                if (!mvValues.ContainsKey(prevProjectId))
+                                {
+                                    mvValues.Add(prevProjectId, sGroups);
+                                }
+                                sGroups = "";
+                            }
+                            if (sGroups.Length > 0)
+                            {
+                                sGroups = sGroups + ", " + stringValue;
+                            }
+                            else
+                            {
+                                sGroups = stringValue;
+                            }
+                            prevProjectId = projectId;
+                        }
+                    }
+
+                    if (sGroups.Length > 0 && !mvValues.ContainsKey(prevProjectId))
+                    {
+                        mvValues.Add(prevProjectId, sGroups);
+                    }
+                    mvsFields.Add(ProgramGroupId, mvValues);
+                }
+            }
+        }
+
+        /// <summary>
+        /// get a resources collection if we need to resolve any Custom Fields
+        /// </summary>
+        private static SortedList<int, string> GetResources(DBAccess dbAccess, bool bNeedResources)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var resources = new SortedList<int, string>();
+            if (!bNeedResources)
+            {
+                return resources;
+            }
+
+            var cmdText = "Select WRES_ID,RES_NAME From EPG_RESOURCES";
+            using (var command = new SqlCommand(cmdText, dbAccess.Connection))
+            {
+                SqlDataReader reader;
+                if (ExecuteSQLSelect(command, out reader) == StatusEnum.rsSuccess)
+                {
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            var id = DBAccess.ReadIntValue(reader[WresId]);
+                            var name = DBAccess.ReadStringValue(reader["RES_NAME"]);
+                            resources.Add(id, name);
+                        }
+                    }
+                }
+            }
+            return resources;
+        }
+
+        private static void AddStandartFields(StringBuilder fields, StringBuilder joins, IDictionary<int, EPKItem> standardFields)
+        {
+            if (fields == null)
+            {
+                throw new ArgumentNullException(nameof(fields));
+            }
+            if (joins == null)
+            {
+                throw new ArgumentNullException(nameof(joins));
+            }
+            if (standardFields == null)
+            {
+                throw new ArgumentNullException(nameof(standardFields));
+            }
+
+            fields.Append("pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID,")
+                .Append("PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE");
+            joins.Append(" ");
+
+            if (standardFields.ContainsKey(LinkedScheduleId)) //  Linked Schedule
+            {
+                fields.Append(",ps.WPROJ_ID");
+                joins.Append(" Left Join EPGX_PROJECT_VERSIONS ps On ps.PROJECT_ID=pi.PROJECT_ID");
+            }
+            if (standardFields.ContainsKey(StageNameId)) //  Stage
+            {
+                fields.Append(",sg.STAGE_NAME");
+                joins.Append(" Left Join EPGP_STAGES sg On sg.STAGE_ID=pi.PROJECT_STAGE_ID");
+            }
+            if (standardFields.ContainsKey(StageOwnerId)) //  Stage Owner
+            {
+                fields.Append(",r1.RES_NAME as StageOwner");
+                joins.Append(" Left Join EPG_RESOURCES r1 On r1.WRES_ID=pi.PROJECT_OWNER");
+            }
+            if (standardFields.ContainsKey(ItemManagerId)) //  Item Manager
+            {
+                fields.Append(",r2.RES_NAME as ItemManager");
+                joins.Append(" Left Join EPG_RESOURCES r2 On r2.WRES_ID=pi.PROJECT_MANAGER");
+            }
+            if (standardFields.ContainsKey(ScheduleManagerId)) //  Schedule Manager
+            {
+                fields.Append(",r3.RES_NAME as ScheduleManager");
+                joins.Append(" Left Join EPG_RESOURCES r3 On r3.WRES_ID=pi.PROJECT_PLAN_OWNER");
+            }
+            if (standardFields.ContainsKey(CreatedById)) //  Created By
+            {
+                fields.Append(",r4.RES_NAME as CreatedBy");
+                joins.Append(" Left Join EPG_RESOURCES r4 On r4.WRES_ID=pi.PROJECT_CREATEDBY");
+            }
+        }
+
+        private static void AddCustomField(IDictionary<int, EPKCustomField> customFields, StringBuilder fields, StringBuilder joins)
+        {
+            if (customFields == null)
+            {
+                throw new ArgumentNullException(nameof(customFields));
+            }
+            if (fields == null)
+            {
+                throw new ArgumentNullException(nameof(fields));
+            }
+            if (joins == null)
+            {
+                throw new ArgumentNullException(nameof(joins));
+            }
+            var isStringType1 = false;
+            var isStringType2 = false;
+            var isDoubleType = false;
+            var isDateType = false;
+
+            foreach (var customField in customFields)
+            {
+                string tableName;
+                string fieldName;
+                switch (customField.Value.CFTable)
+                {
+                    case StringTypeId1:
+                        if (EPKClass01.GetTableAndField(customField.Value.CFTable, customField.Value.CFField, out tableName, out fieldName))
+                        {
+                            fields.AppendFormat(",{0}", fieldName);
+                            if (!isStringType1)
+                            {
+                                joins.AppendFormat(" LEFT JOIN {0} x1 ON x1.PROJECT_ID=pi.PROJECT_ID", tableName);
+                            }
+                            customField.Value.FieldName = fieldName;
+                            isStringType1 = true;
+                        }
+                        break;
+                    case StringTypeId2:
+                        if (EPKClass01.GetTableAndField(customField.Value.CFTable, customField.Value.CFField, out tableName, out fieldName))
+                        {
+                            fields.AppendFormat(",{0}", fieldName);
+                            if (!isStringType2)
+                            {
+                                joins.AppendFormat(" LEFT JOIN {0} x2 ON x2.PROJECT_ID=pi.PROJECT_ID", tableName);
+                            }
+                            customField.Value.FieldName = fieldName;
+                            isStringType2 = true;
+                        }
+                        break;
+                    case DoubleTypeId:
+                        if (EPKClass01.GetTableAndField(customField.Value.CFTable, customField.Value.CFField, out tableName, out fieldName))
+                        {
+                            fields.AppendFormat(",{0}", fieldName);
+                            if (!isDoubleType)
+                            {
+                                joins.AppendFormat(" LEFT JOIN {0} x3 ON x3.PROJECT_ID=pi.PROJECT_ID", tableName);
+                            }
+                            customField.Value.FieldName = fieldName;
+                            isDoubleType = true;
+                        }
+                        break;
+                    case DateTypeId:
+                        if (EPKClass01.GetTableAndField(customField.Value.CFTable, customField.Value.CFField, out tableName, out fieldName))
+                        {
+                            fields.AppendFormat(",{0}", fieldName);
+                            if (!isDateType)
+                            {
+                                joins.AppendFormat(" LEFT JOIN {0} x5 ON x5.PROJECT_ID=pi.PROJECT_ID", tableName);
+                            }
+                            customField.Value.FieldName = fieldName;
+                            isDateType = true;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private static CStruct ReadyToPutTheBeastTogetherAndReadSomeData(
+            DBAccess dbAccess,
+            string projectIds,
+            string sFields,
+            string sJoins,
+            IDictionary<int, EPKItem> standardFields,
+            SortedList<int, SortedList<int, string>> mvsFields,
+            IDictionary<int, EPKCustomField> customFields,
+            SortedList<int, string> lookupValues,
+            SortedList<int, string> resources)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            var cmdText = new StringBuilder();
+            cmdText.AppendFormat("SELECT {0} FROM EPGP_PROJECTS pi {1}", sFields, sJoins);
+            if (projectIds.Length > 0)
+            {
+                cmdText.AppendFormat(" JOIN dbo.EPG_FN_ConvertListToTable(N'{0}') LT on pi.PROJECT_ID=LT.TokenVal", projectIds);
+            }
+            cmdText.Append(" Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID");
+
+            var portfolioItems = new CStruct();
+            portfolioItems.Initialize("PortfolioItems");
+            portfolioItems.CreateStringAttr("Key", "EPK");
+
+            using (var command = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
+            {
+                SqlDataReader reader;
+                if (ExecuteSQLSelect(command, out reader) == StatusEnum.rsSuccess)
+                {
+                    using (reader)
+                    {
+                        var dataTable = new DataTable();
+                        dataTable.Load(reader);
+                        reader.Close();
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            ProcessDataRow(dbAccess, row, portfolioItems, standardFields, mvsFields, customFields, lookupValues, resources);
+                        }
+                    }
+                }
+            }
+            return portfolioItems;
+        }
+
+        private static void ProcessDataRow(
+            DBAccess dbAccess,
+            DataRow row,
+            CStruct portfolioItems,
+            IDictionary<int, EPKItem> standardFields,
+            SortedList<int, SortedList<int, string>> mvsFields,
+            IDictionary<int, EPKCustomField> customFields,
+            SortedList<int, string> lookupValues,
+            SortedList<int, string> resources)
+        {
+            if (row == null)
+            {
+                throw new ArgumentNullException(nameof(row));
+            }
+            if (portfolioItems == null)
+            {
+                throw new ArgumentNullException(nameof(portfolioItems));
+            }
+            if (standardFields == null)
+            {
+                throw new ArgumentNullException(nameof(standardFields));
+            }
+            var projectId = DBAccess.ReadIntValue(row[ProjectIdName]);
+            var projectExtId = DBAccess.ReadStringValue(row[ProjectExtUid]);
+            if (projectId <= 0 || projectExtId.Length <= 0)
+            {
+                return;
+            }
+            var portfolioItem = portfolioItems.CreateSubStruct(PortfolioItem);
+            portfolioItem.CreateStringAttr(ItemId, projectExtId);
+
+            //  get the team -  another SELECT withing the main one is ok? I guess so but not if using SQLDataREader by the way
+            var steamlist = GetStreamList(dbAccess);
+            if (steamlist.Length > 0)
+            {
+                var subStruct = portfolioItem.CreateSubStruct(Field);
+                subStruct.CreateStringAttr(IdName, Team);
+                subStruct.CreateStringAttr(ValueName, steamlist);
+            }
+
+            string xmlType;
+            string stringValue;
+            DateTime dateValue;
+            double doubleValue = 0;
+            int intValue;
+
+            foreach (var standardField in standardFields)
+            {
+                xmlType = GetValues(standardField.Value.ID, row, projectId, mvsFields, out stringValue, out intValue, out dateValue);
+
+                if (xmlType.Length > 0)
+                {
+                    CreateStandartAttribute(portfolioItem, standardField.Value.ID, xmlType, dateValue, intValue, doubleValue, stringValue);
+                }
+            }
+
+            foreach (var customField in customFields)
+            {
+                xmlType = GetValues(customField.Value, row, lookupValues, resources, out stringValue, out intValue, out doubleValue, out dateValue);
+                if (xmlType.Length > 0)
+                {
+                    CreateCustomAttribute(portfolioItem, customField.Value.ID, xmlType, dateValue, intValue, doubleValue, stringValue);
+                }
+            }
+        }
+
+        private static string GetStreamList(DBAccess dbAccess)
+        {
+            if (dbAccess == null)
+            {
+                throw new ArgumentNullException(nameof(dbAccess));
+            }
+            SqlDataReader reader;
+            var steamlist = "";
+            var cmdText = "Select t.* From EPGP_TEAMS t Join EPG_RESOURCES r On r.WRES_ID = t.WRES_ID Where PROJECT_ID=@PROJECT_ID ";
+            var oCommand = new SqlCommand(cmdText, dbAccess.Connection);
+            if (ExecuteSQLSelect(oCommand, out reader) != StatusEnum.rsSuccess)
+            {
+                return steamlist;
+            }
+
+            using (reader)
+            {
                 while (reader.Read())
                 {
-                    int lVal = DBAccess.ReadIntValue(reader["LV_UID"]);
-                    string sVal = DBAccess.ReadStringValue(reader["LV_FULLVALUE"]);
-                    clnLookupValues.Add(lVal, sVal);
-                }
-                reader.Close();
-            }
-
-            // before getting most fields for each PI in one SQL stmnt get the MV field values (Programs only for PIs) into a collection of collections
-            //    stick with same method as for Resources even though there can only be a single MV field
-            SortedList<int, SortedList<int, string>> clnMVs = new SortedList<int, SortedList<int, string>>();
-            SortedList<int, string> clnMVValues;
-            int lPrevProjectID;
-            string sGroups;
-
-            // Program Groups - more complicated as there can be multiple groups - for now I'll just lump them all together and assume the result is self explanatory
-            if (clnStandardFields.ContainsKey(9960))
-            {
-                lPrevProjectID = 0;
-                sGroups = "";
-                cmdText = "Select pg.PROG_UID,PROJECT_ID,LV_FULLVALUE as GROUP_NAME From EPGP_PI_PROGS pg" +
-                            " Join EPGP_LOOKUP_VALUES lv on lv.LV_UID=pg.PROG_UID";
-                if (sProjectIDs.Length > 0) cmdText = cmdText + " JOIN dbo.EPG_FN_ConvertListToTable(N'" + sProjectIDs + "') LT on PROJECT_ID=LT.TokenVal";
-                cmdText = cmdText + " Order By PROJECT_ID,pg.FIELD_ID";
-
-                oCommand = new SqlCommand(cmdText, dba.Connection);
-                if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
-                {
-                    clnMVValues = new SortedList<int, string>();
-                    int lProjectID = 0;
-                    while (reader.Read())
+                    var steamMember = DBAccess.ReadIntValue(reader[WresId]).ToString();
+                    if (steamlist.Length == 0)
                     {
-                        lProjectID = DBAccess.ReadIntValue(reader["WRES_ID"]);
-                        string sVal = DBAccess.ReadStringValue(reader["GROUP_NAME"]);
-                        if (lProjectID != lPrevProjectID && lPrevProjectID > 0)
-                        {
-                            if (!clnMVValues.ContainsKey(lPrevProjectID)) clnMVValues.Add(lPrevProjectID, sGroups);
-                            sGroups = "";
-                        }
-                        if (sGroups.Length > 0) sGroups = sGroups + ", " + sVal; else sGroups = sVal;
-                        lPrevProjectID = lProjectID;
+                        steamlist = steamMember;
                     }
-                    reader.Close();
-                    if (sGroups.Length > 0) if (!clnMVValues.ContainsKey(lPrevProjectID)) clnMVValues.Add(lPrevProjectID, sGroups);
-                    clnMVs.Add(9960, clnMVValues);
-                }
-            }
-
-            // get a resources collection if we need to resolve any Custom Fields
-            SortedList<int, string> clnResources = new SortedList<int, string>();
-            if (bNeedResources)
-            {
-                cmdText = "Select WRES_ID,RES_NAME From EPG_RESOURCES";
-                oCommand = new SqlCommand(cmdText, dba.Connection);
-                if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
-                {
-                    while (reader.Read())
+                    else
                     {
-                        int lWResID = DBAccess.ReadIntValue(reader["WRES_ID"]);
-                        string sName = DBAccess.ReadStringValue(reader["RES_NAME"]);
-                        clnResources.Add(lWResID, sName);
-                    }
-                    reader.Close();
-                }
-            }
-
-            // Build SQL to get Portfolio fields - only add the joins that are needed by special selected fields and Custom Fields
-            string sFields, sJoins;
-
-            // standard fields
-            sFields = "pi.PROJECT_ID,PROJECT_NAME,PROJECT_START_DATE,PROJECT_FINISH_DATE,PROJECT_EXT_UID," +
-                "PROJECT_CREATED,PROJECT_PRIORITY,WORKITEM_START_DATE";
-            sJoins = " ";
-
-            if (clnStandardFields.ContainsKey(9224))    //  Linked Schedule
-            {
-                sFields = sFields + ",ps.WPROJ_ID";
-                sJoins = sJoins + " Left Join EPGX_PROJECT_VERSIONS ps On ps.PROJECT_ID=pi.PROJECT_ID";
-            }
-            if (clnStandardFields.ContainsKey(9911))    //  Stage
-            {
-                sFields = sFields + ",sg.STAGE_NAME";
-                sJoins = sJoins + " Left Join EPGP_STAGES sg On sg.STAGE_ID=pi.PROJECT_STAGE_ID";
-            }
-            if (clnStandardFields.ContainsKey(9922))    //  Stage Owner
-            {
-                sFields = sFields + ",r1.RES_NAME as StageOwner";
-                sJoins = sJoins + " Left Join EPG_RESOURCES r1 On r1.WRES_ID=pi.PROJECT_OWNER";
-            }
-            if (clnStandardFields.ContainsKey(9925))    //  Item Manager
-            {
-                sFields = sFields + ",r2.RES_NAME as ItemManager";
-                sJoins = sJoins + " Left Join EPG_RESOURCES r2 On r2.WRES_ID=pi.PROJECT_MANAGER";
-            }
-            if (clnStandardFields.ContainsKey(9930))    //  Schedule Manager
-            {
-                sFields = sFields + ",r3.RES_NAME as ScheduleManager";
-                sJoins = sJoins + " Left Join EPG_RESOURCES r3 On r3.WRES_ID=pi.PROJECT_PLAN_OWNER";
-            }
-            if (clnStandardFields.ContainsKey(9920))    //  Created By
-            {
-                sFields = sFields + ",r4.RES_NAME as CreatedBy";
-                sJoins = sJoins + " Left Join EPG_RESOURCES r4 On r4.WRES_ID=pi.PROJECT_CREATEDBY";
-            }
-
-            //  add custom fields
-            bool b01 = false, b02 = false, b03 = false, b05 = false;
-            string sTable, sField;
-
-            foreach (KeyValuePair<int, EPKCustomField> oCustomField1 in clnCustomFields)
-            {
-                switch (oCustomField1.Value.CFTable)
-                {
-                    case 201:
-                        if (EPKClass01.GetTableAndField(oCustomField1.Value.CFTable, oCustomField1.Value.CFField, out sTable, out sField))
-                        {
-                            sFields = sFields + "," + sField;
-                            if (!b01) sJoins = sJoins + " LEFT JOIN " + sTable + " x1 ON x1.PROJECT_ID=pi.PROJECT_ID";
-                            oCustomField1.Value.FieldName = sField;
-                            b01 = true;
-                        }
-                        break;
-                    case 202:
-                        if (EPKClass01.GetTableAndField(oCustomField1.Value.CFTable, oCustomField1.Value.CFField, out sTable, out sField))
-                        {
-                            sFields = sFields + "," + sField;
-                            if (!b02) sJoins = sJoins + " LEFT JOIN " + sTable + " x2 ON x2.PROJECT_ID=pi.PROJECT_ID";
-                            oCustomField1.Value.FieldName = sField;
-                            b02 = true;
-                        }
-                        break;
-                    case 203:
-                        if (EPKClass01.GetTableAndField(oCustomField1.Value.CFTable, oCustomField1.Value.CFField, out sTable, out sField))
-                        {
-                            sFields = sFields + "," + sField;
-                            if (!b03) sJoins = sJoins + " LEFT JOIN " + sTable + " x3 ON x3.PROJECT_ID=pi.PROJECT_ID";
-                            oCustomField1.Value.FieldName = sField;
-                            b03 = true;
-                        }
-                        break;
-                    case 205:
-                        if (EPKClass01.GetTableAndField(oCustomField1.Value.CFTable, oCustomField1.Value.CFField, out sTable, out sField))
-                        {
-                            sFields = sFields + "," + sField;
-                            if (!b05) sJoins = sJoins + " LEFT JOIN " + sTable + " x5 ON x5.PROJECT_ID=pi.PROJECT_ID";
-                            oCustomField1.Value.FieldName = sField;
-                            b05 = true;
-                        }
-                        break;
-                }
-            }
-
-            // ready to put the beast together and read some data
-            cmdText = "SELECT " + sFields + " FROM EPGP_PROJECTS pi " + sJoins;
-            if (sProjectIDs.Length > 0) cmdText = cmdText + " JOIN dbo.EPG_FN_ConvertListToTable(N'" + sProjectIDs + "') LT on pi.PROJECT_ID=LT.TokenVal";
-            cmdText = cmdText + " Where PROJECT_MARKED_DELETION=0 Order By PROJECT_ID";
-
-            CStruct xPortfolioItems = new CStruct();
-            xPortfolioItems.Initialize("PortfolioItems");
-            xPortfolioItems.CreateStringAttr("Key", "EPK");
-
-            oCommand = new SqlCommand(cmdText, dba.Connection);
-            if (ExecuteSQLSelect(oCommand, out reader) == StatusEnum.rsSuccess)
-            {
-                DataTable dt = new DataTable();
-                dt.Load(reader);
-                reader.Close();
-                foreach (DataRow row in dt.Rows)
-                {
-                    int lProjectID = 0;
-                    string sWeePID = "";
-                    string sXMLType = "";
-                    string sVal = "";
-                    DateTime dVal = DateTime.MinValue;
-                    double dblVal = 0;
-                    int lVal = 0;
-
-                    lProjectID = DBAccess.ReadIntValue(row["PROJECT_ID"]);
-                    sWeePID = DBAccess.ReadStringValue(row["PROJECT_EXT_UID"]);
-                    if (lProjectID > 0 && sWeePID.Length > 0)
-                    {
-                        CStruct xPortfolioItem = xPortfolioItems.CreateSubStruct("PortfolioItem");
-                        xPortfolioItem.CreateStringAttr("ItemID", sWeePID);
-
-                        //  get the team -  another SELECT withing the main one is ok? I guess so but not if using SQLDataREader by the way
-                        SqlDataReader reader1;
-                        string steamlist = "";
-                        cmdText = "Select t.* From EPGP_TEAMS t Join EPG_RESOURCES r On r.WRES_ID = t.WRES_ID Where PROJECT_ID=@PROJECT_ID ";  // reject entries w/o resource in case
-                        oCommand = new SqlCommand(cmdText, dba.Connection);
-                        SqlParameter pPROJECT_ID = oCommand.Parameters.AddWithValue("@PROJECT_ID", lProjectID);
-                        if (ExecuteSQLSelect(oCommand, out reader1) == StatusEnum.rsSuccess)
-                        {
-                            while (reader1.Read())
-                            {
-                                string steammember = DBAccess.ReadIntValue(reader1["WRES_ID"]).ToString(); ;
-                                if (steamlist.Length == 0) steamlist = steammember; else steamlist += "," + steammember;
-                            }
-                        }
-                        reader1.Close();
-                        if (steamlist.Length > 0)
-                        {
-                            CStruct xTeam = xPortfolioItem.CreateSubStruct("Field");
-                            xTeam.CreateStringAttr("ID", "Team"); 
-                            xTeam.CreateStringAttr("Value", steamlist);
-                        }
-
-                        foreach (KeyValuePair<int, EPKItem> oField1 in clnStandardFields)
-                        {
-                            switch (oField1.Value.ID)
-                            {
-                                case 9900:
-                                    sXMLType = "s";
-                                    sVal = DBAccess.ReadStringValue(row["PROJECT_NAME"]);
-                                    break;
-                                case 9903:
-                                    sXMLType = "i";
-                                    lVal = lProjectID;
-                                    break;
-                                case 9901:
-                                    dVal = DBAccess.ReadDateValue(row["PROJECT_START_DATE"]);
-                                    if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
-                                    break;
-                                case 9902:
-                                    dVal = DBAccess.ReadDateValue(row["PROJECT_FINISH_DATE"]);
-                                    if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
-                                    break;
-                                case 9911:
-                                    sVal = DBAccess.ReadStringValue(row["STAGE_NAME"]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 9918:
-                                    sXMLType = "";
-                                    //sVal = row["PROJECT_EXT_UID"].ToString();
-                                    break;
-                                case 9920:
-                                    sVal = DBAccess.ReadStringValue(row["CreatedBy"]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 9921:
-                                    dVal = DBAccess.ReadDateValue(row["PROJECT_CREATED"]);
-                                    if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
-                                    break;
-                                case 9922:
-                                    sVal = DBAccess.ReadStringValue(row["StageOwner"]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 9924:
-                                    sXMLType = "i";
-                                    lVal = DBAccess.ReadIntValue(row["WPROJ_ID"]);
-                                    break;
-                                case 9925:
-                                    sVal = DBAccess.ReadStringValue(row["ItemManager"]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 9928:
-                                    sXMLType = "i";
-                                    lVal = DBAccess.ReadIntValue(row["PROJECT_PRIORITY"]);
-                                    break;
-                                case 9930:
-                                    sVal = DBAccess.ReadStringValue(row["ScheduleManager"]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 9936:
-                                    dVal = DBAccess.ReadDateValue(row["WORKITEM_START_DATE"]);
-                                    if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
-                                    break;
-                                case 9960:
-                                    sVal = GetMVValue(clnMVs, oField1.Value.ID, lProjectID);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                default:
-                                    sXMLType = "";
-                                    break;
-                            }
-
-                            if (sXMLType.Length > 0)
-                            {
-                                CStruct xField = xPortfolioItem.CreateSubStruct("Field");
-                                xField.CreateIntAttr("ID", oField1.Value.ID);
-                                switch (sXMLType)
-                                {
-                                    case "d":
-                                        xField.CreateDateAttr("Value", dVal);
-                                        break;
-                                    case "i":
-                                        xField.CreateIntAttr("Value", lVal);
-                                        break;
-                                    case "dbl":
-                                        xField.CreateDoubleAttr("Value", dblVal);
-                                        break;
-                                    default:
-                                        xField.CreateStringAttr("Value", sVal);
-                                        break;
-                                }
-                            }
-                        }
-
-                        foreach (KeyValuePair<int, EPKCustomField> oField1 in clnCustomFields)
-                        {
-                            switch (oField1.Value.CFTable)
-                            {
-                                case 201:
-                                    if (oField1.Value.Fieldtype == 4)  // code
-                                    {
-                                        lVal = DBAccess.ReadIntValue(row[oField1.Value.FieldName]);
-                                        sVal = GetLookupValue(clnLookupValues, lVal);
-                                        if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    }
-                                    else if (oField1.Value.Fieldtype == 7)  // resource
-                                    {
-                                        lVal = DBAccess.ReadIntValue(row[oField1.Value.FieldName]);
-                                        sVal = GetLookupValue(clnResources, lVal);
-                                        if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    }
-                                    else
-                                    {
-                                        sXMLType = "i";
-                                        lVal = DBAccess.ReadIntValue(row[oField1.Value.FieldName]);
-                                    }
-                                    break;
-                                case 202:
-                                    sVal = DBAccess.ReadStringValue(row[oField1.Value.FieldName]);
-                                    if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
-                                    break;
-                                case 203:
-                                    sXMLType = "dbl";
-                                    dblVal = DBAccess.ReadDoubleValue(row[oField1.Value.FieldName]);
-                                    break;
-                                case 205:
-                                    dVal = DBAccess.ReadDateValue(row[oField1.Value.FieldName]);
-                                    if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
-                                    break;
-                                default:
-                                    sXMLType = "";
-                                    break;
-                            }
-                            if (sXMLType.Length > 0)
-                            {
-                                CStruct xField = xPortfolioItem.CreateSubStruct("Field");
-                                xField.CreateIntAttr("ID", oField1.Value.ID);
-                                switch (sXMLType)
-                                {
-                                    case "d":
-                                        xField.CreateDateAttr("Value", dVal);
-                                        break;
-                                    case "i":
-                                        xField.CreateIntAttr("Value", lVal);
-                                        break;
-                                    case "dbl":
-                                        xField.CreateDoubleAttr("Value", dblVal);
-                                        break;
-                                    default:
-                                        xField.CreateStringAttr("Value", sVal);
-                                        break;
-                                }
-                            }
-                        }
+                        steamlist += "," + steamMember;
                     }
                 }
-                reader.Close();
             }
-
-
-            sResult = xPortfolioItems.XML();
-            return eStatus;
-
+            return steamlist;
         }
+
+        private static void CreateCustomAttribute(
+            CStruct xPortfolioItem,
+            int fieldValueID,
+            string xmlType,
+            DateTime dateValue,
+            int intValue, double doubleValue,
+            string stringValue)
+        {
+            if (xPortfolioItem == null)
+            {
+                throw new ArgumentNullException(nameof(xPortfolioItem));
+            }
+            var xField = xPortfolioItem.CreateSubStruct(Field);
+            xField.CreateIntAttr(IdName, fieldValueID);
+            switch (xmlType)
+            {
+                case DateType:
+                    xField.CreateDateAttr(ValueName, dateValue);
+                    break;
+                case IntegerType:
+                    xField.CreateIntAttr(ValueName, intValue);
+                    break;
+                case DoubleType:
+                    xField.CreateDoubleAttr(ValueName, doubleValue);
+                    break;
+                default:
+                    xField.CreateStringAttr(ValueName, stringValue);
+                    break;
+            }
+        }
+
+        private static string GetValues(
+            EPKCustomField customField,
+            DataRow row,
+            SortedList<int, string> lookupValues,
+            SortedList<int, string> resources,
+            out string stringValue,
+            out int intValue,
+            out double doubleValue,
+            out DateTime dateValue)
+        {
+            if (customField == null)
+            {
+                throw new ArgumentNullException(nameof(customField));
+            }
+            if (row == null)
+            {
+                throw new ArgumentNullException(nameof(row));
+            }
+            var xmlType = string.Empty;
+
+            stringValue = "";
+            dateValue = DateTime.MinValue;
+            doubleValue = 0;
+            intValue = 0;
+
+            switch (customField.CFTable)
+            {
+                case StringTypeId1:
+                    if (customField.Fieldtype == CodeId)
+                    {
+                        intValue = DBAccess.ReadIntValue(row[customField.FieldName]);
+                        stringValue = GetLookupValue(lookupValues, intValue);
+                        xmlType = stringValue.Length > 0 ? StringType : "";
+                    }
+                    else if (customField.Fieldtype == ResorceId)
+                    {
+                        intValue = DBAccess.ReadIntValue(row[customField.FieldName]);
+                        stringValue = GetLookupValue(resources, intValue);
+                        xmlType = stringValue.Length > 0 ? StringType : "";
+                    }
+                    else
+                    {
+                        xmlType = IntegerType;
+                        intValue = DBAccess.ReadIntValue(row[customField.FieldName]);
+                    }
+                    break;
+                case StringTypeId2:
+                    stringValue = DBAccess.ReadStringValue(row[customField.FieldName]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case DoubleTypeId:
+                    xmlType = DoubleType;
+                    doubleValue = DBAccess.ReadDoubleValue(row[customField.FieldName]);
+                    break;
+                case DateTypeId:
+                    dateValue = DBAccess.ReadDateValue(row[customField.FieldName]);
+                    xmlType = dateValue == DateTime.MinValue ? "" : DateType;
+                    break;
+                default:
+                    xmlType = "";
+                    break;
+            }
+            return xmlType;
+        }
+
+        private static void CreateStandartAttribute(
+            CStruct xPortfolioItem,
+            int fieldValueId,
+            string xmlType,
+            DateTime dateValue,
+            int intValue,
+            double doubleValue,
+            string stringValue)
+        {
+            if (xPortfolioItem == null)
+            {
+                throw new ArgumentNullException(nameof(xPortfolioItem));
+            }
+            var xField = xPortfolioItem.CreateSubStruct(Field);
+            xField.CreateIntAttr(IdName, fieldValueId);
+            switch (xmlType)
+            {
+                case DateType:
+                    xField.CreateDateAttr(ValueName, dateValue);
+                    break;
+                case IntegerType:
+                    xField.CreateIntAttr(ValueName, intValue);
+                    break;
+                case DoubleType:
+                    xField.CreateDoubleAttr(ValueName, doubleValue);
+                    break;
+                default:
+                    xField.CreateStringAttr(ValueName, stringValue);
+                    break;
+            }
+        }
+
+        private static string GetValues(
+            int fieldValueId,
+            DataRow row,
+            int projectId,
+            SortedList<int, SortedList<int, string>> mvsFields,
+            out string stringValue,
+            out int intValue,
+            out DateTime dateValue)
+        {
+            if (row == null)
+            {
+                throw new ArgumentNullException(nameof(row));
+            }
+            stringValue = "";
+            dateValue = DateTime.MinValue;
+            intValue = 0;
+            var xmlType = string.Empty;
+
+            switch (fieldValueId)
+            {
+                case ProjectNameId:
+                    xmlType = StringType;
+                    stringValue = DBAccess.ReadStringValue(row[ProjectName]);
+                    break;
+                case 9903:
+                    xmlType = IntegerType;
+                    intValue = projectId;
+                    break;
+                case ProjectStartDateId:
+                    dateValue = DBAccess.ReadDateValue(row[ProjectStartDate]);
+                    xmlType = dateValue == DateTime.MinValue ? "" : DateType;
+                    break;
+                case ProjectFinishDateId:
+                    dateValue = DBAccess.ReadDateValue(row[ProjectFinishDate]);
+                    xmlType = dateValue == DateTime.MinValue ? "" : DateType;
+                    break;
+                case StageNameId:
+                    stringValue = DBAccess.ReadStringValue(row[StageName]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case 9918:
+                    xmlType = "";
+                    break;
+                case CreatedById:
+                    stringValue = DBAccess.ReadStringValue(row[CreatedBy]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case 9921:
+                    dateValue = DBAccess.ReadDateValue(row[ProjectCreated]);
+                    xmlType = dateValue == DateTime.MinValue ? "" : DateType;
+                    break;
+                case StageOwnerId:
+                    stringValue = DBAccess.ReadStringValue(row[StageOwner]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case WProjectId:
+                    xmlType = IntegerType;
+                    intValue = DBAccess.ReadIntValue(row[WProject]);
+                    break;
+                case ItemManagerId:
+                    stringValue = DBAccess.ReadStringValue(row[ItemManager]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case ProjectPriorityId:
+                    xmlType = IntegerType;
+                    intValue = DBAccess.ReadIntValue(row[ProjectPriority]);
+                    break;
+                case ScheduleManagerId:
+                    stringValue = DBAccess.ReadStringValue(row[ScheduleManager]);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                case WorkitemStartDateId:
+                    dateValue = DBAccess.ReadDateValue(row[WorkitemStartDate]);
+                    xmlType = dateValue == DateTime.MinValue ? "" : DateType;
+                    break;
+                case ProgramGroupId:
+                    stringValue = GetMVValue(mvsFields, fieldValueId, projectId);
+                    xmlType = stringValue.Length > 0 ? StringType : "";
+                    break;
+                default:
+                    xmlType = "";
+                    break;
+            }
+            return xmlType;
+        }
+
         public static string GetMVValue(SortedList<int, SortedList<int, string>> clnMVs, int lFieldID, int lWresID)
         {
             string sValue = "";
@@ -1029,7 +1388,7 @@ namespace PortfolioEngineCore
 
 
             if (eStatus == StatusEnum.rsSuccess) eStatus = SetCostTotals(dba, nCTID, nCBID, listPIs, bAllProjects);
-Exit_Function:
+            Exit_Function:
             sResult = "CCV Complete";
             return eStatus;
         }
@@ -1175,7 +1534,7 @@ Exit_Function:
                 goto Exit_Function;
             }
 
-Exit_Function:
+        Exit_Function:
             return eStatus;
         }
     }
