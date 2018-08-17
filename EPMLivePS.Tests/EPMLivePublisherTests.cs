@@ -8,6 +8,7 @@ using EPMLiveEnterprise.Fakes;
 using EPMLiveEnterprise.WebSvcCustomFields;
 using EPMLiveEnterprise.WebSvcCustomFields.Fakes;
 using EPMLiveEnterprise.WebSvcProject.Fakes;
+using EPMLiveEnterprise.WebSvcWssInterop.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
@@ -15,6 +16,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static EPMLiveEnterprise.EPMLivePublisher;
 using static EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
+using static EPMLiveEnterprise.WebSvcWssInterop.Fakes.ShimWssSettingsDataSet;
 
 namespace EPMLivePS.Tests
 {
@@ -319,12 +321,7 @@ namespace EPMLivePS.Tests
             // Arrange
             SetupShims();
             ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
-            ShimHttpContext.CurrentGet = () => new ShimHttpContext()
-            {
-                UserGet = () => new GenericPrincipal(
-                    new GenericIdentity(string.Empty),
-                    new string[0])
-            };
+            SetupHttpContext();
 
             // Act
             var result = _publisher.getUpdates(Guid.NewGuid().ToString());
@@ -447,6 +444,46 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isEventLogDisposeCalled);
         }
 
+        [TestMethod]
+        public void CreateSiteWithTemplate_ExceptionWhenReadSettings_WriteEntryToEventLog()
+        {
+            // Arrange
+            var spUsers = new SPUser[0];
+            SetupShims(spUsers);
+            SetupHttpContext();
+            ShimWssInterop.AllInstances.ReadWssSettings = _ =>
+            {
+                throw new InvalidOperationException();
+            };
+
+            // Act
+            var result = _publisher.createSiteWithTemplate(ValidUrl, string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void CreateSiteWithTemplate_ExceptionWhenGetUrl_WriteEntryToEventLog()
+        {
+            // Arrange
+            var spUsers = new SPUser[0];
+            SetupShims(spUsers);
+            SetupHttpContext();
+            ShimSPWeb.AllInstances.UrlGet = _ =>
+            {
+                throw new InvalidOperationException();
+            };
+
+            // Act
+            var result = _publisher.createSiteWithTemplate(ValidUrl, string.Empty, string.Empty);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
         private void SetupDataReaderShims(int readCount)
         {
             _sqlReaderReadCount = readCount;
@@ -476,28 +513,15 @@ namespace EPMLivePS.Tests
             Assert.AreEqual(expectedSqlCommandDisposeCalls, _sqlCommandDisposeCallCount);
         }
 
-        private void SetupShims(SPField[] spFields = null)
+        private void SetupShims(Array spArray = null)
         {
             var webApplication = new SPWebApplication()
             {
                 Id = Guid.Empty
             };
-            var shimSPSite = new ShimSPSite()
-            {
-                IDGet = () => Guid.Empty,
-                WebApplicationGet = () => webApplication,
-                RootWebGet = () => new ShimSPWeb()
-                {
-                    GetAvailableWebTemplatesUInt32 = _ => null
-                },
-                UrlGet = () => ValidUrl,
-                Close = () => { }
-            };
-            ShimSPWeb.AllInstances.UrlGet = _ => ValidUrl;
-            ShimSPWeb.AllInstances.SiteGet = _ => shimSPSite;
             var spFieldCollection = new ShimSPFieldCollection()
             {
-                ItemGetGuid = _ => spFields?[0]
+                ItemGetGuid = _ => (spArray as SPField[])?[0]
             };
             var spList = new ShimSPList()
             {
@@ -506,30 +530,53 @@ namespace EPMLivePS.Tests
             var spListCollection = new ShimSPListCollection()
             {
                 ItemGetString = _ => spList,
-                ItemGetGuid = _ => spList 
+                ItemGetGuid = _ => spList
             };
+            var spWeb = new ShimSPWeb()
+            {
+                Close = () => { },
+                ListsGet = () => spListCollection,
+                GetAvailableWebTemplatesUInt32 = _ => null,
+                AllUsersGet = () => new ShimSPUserCollection()
+            };
+            var shimSPSite = new ShimSPSite()
+            {
+                IDGet = () => new Guid(),
+                WebApplicationGet = () => webApplication,
+                RootWebGet = () => spWeb,
+                UrlGet = () => ValidUrl,
+                Close = () => { },
+                ServerRelativeUrlGet = () => ValidUrl
+            };
+            ShimSPWeb.AllInstances.UrlGet = _ => ValidUrl;
+            ShimSPWeb.AllInstances.SiteGet = _ => shimSPSite;
             ShimSPWeb.AllInstances.ListsGet = _ => spListCollection;
+            ShimSPWeb.AllInstances.WebsGet = _ => new ShimSPWebCollection()
+            {
+                AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g) => spWeb
+            };
             ShimSPSite.ConstructorString = (site, _) =>
             {
                 site = shimSPSite;
             };
+            ShimSPSite.ConstructorGuid = (site, _) =>
+            {
+                site = shimSPSite;
+            };
+            ShimSPSite.AllInstances.RootWebGet = _ => spWeb;
             ShimSPSite.AllInstances.WebApplicationGet = _ => webApplication;
             ShimSPSite.AllInstances.OpenWeb = _ => new ShimSPWeb();
             ShimSPSite.AllInstances.Close = _ => { };
             ShimSPContext.CurrentGet = () => new ShimSPContext()
             {
                 SiteGet = () => shimSPSite,
-                WebGet = () => new ShimSPWeb()
-                {
-                    Close = () => { },
-                    ListsGet = () => spListCollection
-                }
+                WebGet = () => spWeb
             };
-            if (spFields == null)
+            if (spArray == null)
             {
-                spFields = new SPField[0];
+                spArray = new SPField[0];
             }            
-            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => spFields.GetEnumerator();
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => spArray.GetEnumerator();
             ShimCustomFields.AllInstances.ReadCustomFieldsByEntityGuid =
                 (_, __) => new CustomFieldDataSet();
             ShimSqlConnection.AllInstances.Open = _ =>
@@ -571,6 +618,17 @@ namespace EPMLivePS.Tests
             {
                 _isEventLogDisposeCalled = true;
             };
+            ShimWssInterop.AllInstances.ReadWssSettings = _ => new ShimWssSettingsDataSet()
+            {
+                WssAdminGet = () => new ShimWssAdminDataTable()
+                {
+                    ItemGetInt32 = (index) => new ShimWssAdminRow()
+                    {
+                        WADMIN_DEFAULT_SITE_COLLECTIONGet = () => string.Empty,
+                        WADMIN_STS_TEMPLATE_LCIDGet = () => 1
+                    }
+                }
+            };
         }
 
         private static ProjectDataTable CreateProjectDataTable()
@@ -586,6 +644,16 @@ namespace EPMLivePS.Tests
             projectDataTable.Rows.Add(row);
 
             return projectDataTable;
+        }
+
+        private static void SetupHttpContext()
+        {
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext()
+            {
+                UserGet = () => new GenericPrincipal(
+                    new GenericIdentity(string.Empty),
+                    new string[0])
+            };
         }
     }
 }
