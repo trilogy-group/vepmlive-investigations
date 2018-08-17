@@ -362,7 +362,7 @@ export class OptimizerPageHelper {
     }
 
     static async verifyRenameStrategyPopup(stepLogger: StepLogger) {
-        const renameStategyLabel = OptimizerPage.getOptimierSaveStrategyPopup;
+        const renameStategyLabel = OptimizerPage.getRenameStrategyPopup;
         await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.strategyName,
             `Strategy Name in ${OptimizerPageConstants.renameStrategy}`, stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.ok,
@@ -378,6 +378,7 @@ export class OptimizerPageHelper {
         // takes time to expand dropdown
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(label.currentStrategyDropdownValue);
+        await browser.sleep(PageHelper.timeout.xs);
     }
 
     static async verifyViewTabContent(stepLogger: StepLogger) {
