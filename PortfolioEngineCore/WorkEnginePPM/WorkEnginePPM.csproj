@@ -886,6 +886,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="WebServices\ModelDataCache\TargetGridsData.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridData.cs" />
     <Compile Include="WebServices\ModelDataCache\TargetLegendGridLayout.cs" />
+    <Compile Include="WebServices\RPADataCache\RPABottomGrid.cs" />
     <Compile Include="WebServices\TargetRowData.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGrid.cs" />
     <Compile Include="WebServices\OptGrids.cs" />

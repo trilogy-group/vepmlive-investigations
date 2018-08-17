@@ -9,7 +9,7 @@ using RPADataCache;
 
 namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
 {
-    internal class RPATopGridTestDouble : RPATopGrid
+    internal class RPABottomGridTestDouble : RPABottomGrid
     {
         public new CStruct PeriodCols => base.PeriodCols;
         public new CStruct MiddleCols => base.MiddleCols;
@@ -18,22 +18,32 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
         public new CStruct[] Levels => base.Levels;
         public new int Level => base.Level;
 
-        public RPATopGridTestDouble(
+        public RPABottomGridTestDouble(
+            bool useRole,
+            string roleHeader,
+            bool useHeatMap,
+            int heatMapId,
+            int heatMapColor,
+            bool doZeroRpwCleverStuff,
+            bool displayTotalsDetails,
+            Func<int, string> resolvePiNameFunc,
+            Func<CPeriod, string> resolvePeriodNameFunc,
             IList<clsRXDisp> columns,
-            int pmoAdmin,
-            string xmlString,
             int displayMode,
             IList<RPATGRow> displayList,
             clsResourceValues resourceValues) 
-        : base(columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues)
+        : base(useRole, roleHeader, useHeatMap, heatMapId, heatMapColor, doZeroRpwCleverStuff, displayTotalsDetails,
+              resolvePiNameFunc, resolvePeriodNameFunc, columns, displayMode, displayList, resourceValues)
         {
             Constructor = new CStruct();
             Constructor.Initialize("Grid");
 
-            Header1 = Constructor.CreateSubStruct("Header");
+            Header1 = Constructor.CreateSubStruct("Header1");
+            Header2 = Constructor.CreateSubStruct("Header2");
             base.PeriodCols = Constructor.CreateSubStruct("RightCols");
             base.DefinitionRight = Constructor.CreateSubStruct("Right");
             base.DefinitionLeaf = Constructor.CreateSubStruct("Leaf");
+            base.DefinitionPI= Constructor.CreateSubStruct("PI");
 
             Levels[0] = Constructor.CreateSubStruct("Test");
         }
@@ -58,19 +68,19 @@ namespace WorkEnginePPM.Tests.TestDoubles.RPADataCache
             base.InitializeGridData(renderingType);
         }
 
-        public new bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
+        public new bool CheckIfDetailRowShouldBeAdded(clsResFullDAta detailRow)
         {
             return base.CheckIfDetailRowShouldBeAdded(detailRow);
         }
 
-        public new void AddDetailRow(Tuple<clsResXData, clsPIData> detailRowDataTuple, int rowId)
+        public new bool CheckIfPiRowShouldBeAdded(clsResXData piRow)
         {
-            base.AddDetailRow(detailRowDataTuple, rowId);
+            return base.CheckIfPiRowShouldBeAdded(piRow);
         }
 
-        protected override string GetResourceAnalyzerView(string sXML)
+        public new void AddDetailRow(clsResFullDAta detailRowData, int rowId)
         {
-            return sXML;
+            base.AddDetailRow(detailRowData, rowId);
         }
     }
 }
