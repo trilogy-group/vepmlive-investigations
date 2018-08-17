@@ -122,6 +122,7 @@ namespace PortfolioEngineCore
 
     public class dbaUsers
     {
+        public const int ErrorCode = 99871;
         public static StatusEnum ExecuteSQLSelect(SqlCommand oCommand, out SqlDataReader reader)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
@@ -179,9 +180,9 @@ namespace PortfolioEngineCore
             {
                 while (reader.Read())
                 {
-                    int nID = (int)reader["FIELD_ID"];
-                    int nFieldType = (int)reader["FIELD_FORMAT"];
-                    string sName = reader["FIELD_NAME"].ToString();
+                    int nID = DBAccess.ReadIntValue(reader["FIELD_ID"]);
+                    int nFieldType = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
+                    string sName = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
                     oField = new EPKItem();
                     oField.ID = nID;
                     oField.Name = sName;
@@ -200,9 +201,9 @@ namespace PortfolioEngineCore
             {
                 while (reader.Read())
                 {
-                    int nID = (int)reader["FIELD_ID"];
-                    int nFieldType = (int)reader["FIELD_FORMAT"];
-                    string sName = reader["FIELD_NAME"].ToString();
+                    int nID = DBAccess.ReadIntValue(reader["FIELD_ID"]);
+                    int nFieldType = DBAccess.ReadIntValue(reader["FIELD_FORMAT"]);
+                    string sName = DBAccess.ReadStringValue(reader["FIELD_NAME"]);
                     oField = new EPKItem();
                     oField.ID = nID;
                     oField.Name = sName;
@@ -236,7 +237,7 @@ namespace PortfolioEngineCore
                     oCustomField = new EPKCustomField();
                     int nID = DBAccess.ReadIntValue(reader["FA_FIELD_ID"]);
                     oCustomField.ID = nID;
-                    oCustomField.Name = reader["FA_NAME"].ToString();
+                    oCustomField.Name = DBAccess.ReadStringValue(reader["FA_NAME"]);
                     oCustomField.Fieldtype = DBAccess.ReadIntValue(reader["FA_FORMAT"]);
                     oCustomField.CFTable = DBAccess.ReadIntValue(reader["FA_TABLE_ID"]);
                     oCustomField.CFField = DBAccess.ReadIntValue(reader["FA_FIELD_IN_TABLE"]);
@@ -273,7 +274,7 @@ namespace PortfolioEngineCore
                 while (reader.Read())
                 {
                     int lVal = DBAccess.ReadIntValue(reader["LV_UID"]);
-                    string sVal = reader["LV_FULLVALUE"].ToString();
+                    string sVal = DBAccess.ReadStringValue(reader["LV_FULLVALUE"]);
                     clnLookupValues.Add(lVal, sVal);
                 }
                 reader.Close();
@@ -304,7 +305,7 @@ namespace PortfolioEngineCore
                     while (reader.Read())
                     {
                         lProjectID = DBAccess.ReadIntValue(reader["WRES_ID"]);
-                        string sVal = reader["GROUP_NAME"].ToString();
+                        string sVal = DBAccess.ReadStringValue(reader["GROUP_NAME"]);
                         if (lProjectID != lPrevProjectID && lPrevProjectID > 0)
                         {
                             if (!clnMVValues.ContainsKey(lPrevProjectID)) clnMVValues.Add(lPrevProjectID, sGroups);
@@ -330,7 +331,7 @@ namespace PortfolioEngineCore
                     while (reader.Read())
                     {
                         int lWResID = DBAccess.ReadIntValue(reader["WRES_ID"]);
-                        string sName = reader["RES_NAME"].ToString();
+                        string sName = DBAccess.ReadStringValue(reader["RES_NAME"]);
                         clnResources.Add(lWResID, sName);
                     }
                     reader.Close();
@@ -449,7 +450,7 @@ namespace PortfolioEngineCore
                     int lVal = 0;
 
                     lProjectID = DBAccess.ReadIntValue(row["PROJECT_ID"]);
-                    sWeePID = row["PROJECT_EXT_UID"].ToString();
+                    sWeePID = DBAccess.ReadStringValue(row["PROJECT_EXT_UID"]);
                     if (lProjectID > 0 && sWeePID.Length > 0)
                     {
                         CStruct xPortfolioItem = xPortfolioItems.CreateSubStruct("PortfolioItem");
@@ -483,7 +484,7 @@ namespace PortfolioEngineCore
                             {
                                 case 9900:
                                     sXMLType = "s";
-                                    sVal = row["PROJECT_NAME"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["PROJECT_NAME"]);
                                     break;
                                 case 9903:
                                     sXMLType = "i";
@@ -498,7 +499,7 @@ namespace PortfolioEngineCore
                                     if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
                                     break;
                                 case 9911:
-                                    sVal = row["STAGE_NAME"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["STAGE_NAME"]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 9918:
@@ -506,7 +507,7 @@ namespace PortfolioEngineCore
                                     //sVal = row["PROJECT_EXT_UID"].ToString();
                                     break;
                                 case 9920:
-                                    sVal = row["CreatedBy"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["CreatedBy"]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 9921:
@@ -514,7 +515,7 @@ namespace PortfolioEngineCore
                                     if (dVal == DateTime.MinValue) sXMLType = ""; else sXMLType = "d";
                                     break;
                                 case 9922:
-                                    sVal = row["StageOwner"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["StageOwner"]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 9924:
@@ -522,7 +523,7 @@ namespace PortfolioEngineCore
                                     lVal = DBAccess.ReadIntValue(row["WPROJ_ID"]);
                                     break;
                                 case 9925:
-                                    sVal = row["ItemManager"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["ItemManager"]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 9928:
@@ -530,7 +531,7 @@ namespace PortfolioEngineCore
                                     lVal = DBAccess.ReadIntValue(row["PROJECT_PRIORITY"]);
                                     break;
                                 case 9930:
-                                    sVal = row["ScheduleManager"].ToString();
+                                    sVal = DBAccess.ReadStringValue(row["ScheduleManager"]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 9936:
@@ -592,7 +593,7 @@ namespace PortfolioEngineCore
                                     }
                                     break;
                                 case 202:
-                                    sVal = row[oField1.Value.FieldName].ToString();
+                                    sVal = DBAccess.ReadStringValue(row[oField1.Value.FieldName]);
                                     if (sVal.Length > 0) sXMLType = "s"; else sXMLType = "";
                                     break;
                                 case 203:
