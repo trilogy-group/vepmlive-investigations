@@ -22,7 +22,9 @@ namespace TimeSheets
     {
         private static int myworktableid = 6;
         private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
-        private const string GridIoResult = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
+        private const string GridIoResultTemplate = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
+        private const string StopWatchResultTemplate = "<StopWatch Status=\"{0}\">{1}</StopWatch>";
+        private const string GetOtherHoursResultTemplate = "<GetOtherHours Status=\"{0}\">{1}</GetOtherHours>";
 
         static TimesheetAPI()
         {
@@ -94,7 +96,7 @@ namespace TimeSheets
 
                     if (string.IsNullOrWhiteSpace(userId))
                     {
-                        return string.Format(GridIoResult, -1, "Could not determine user");
+                        return string.Format(GridIoResultTemplate, -1, "Could not determine user");
                     }
                     else
                     {
@@ -137,7 +139,7 @@ namespace TimeSheets
                         }
                         else
                         {
-                            return string.Format(GridIoResult, -1, "User mismatch or access denied");
+                            return string.Format(GridIoResultTemplate, -1, "User mismatch or access denied");
                         }
                     }
 
@@ -150,7 +152,7 @@ namespace TimeSheets
             }
             catch (Exception ex)
             {
-                var message = string.Format(GridIoResult, -1, ex.Message);
+                var message = string.Format(GridIoResultTemplate, -1, ex.Message);
                 Logger.WriteLog(Logger.Category.Unexpected, message, ex.ToString());
                 return message;
             }
@@ -158,38 +160,45 @@ namespace TimeSheets
 
         public static string GetOtherHours(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
+
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var hours = 0D;
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        @"SELECT SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours 
+                        FROM dbo.TSITEMHOURS 
+                        INNER JOIN dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID 
+                        where LIST_UID=@listid and ITEM_ID=@itemid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
+                        command.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
 
-                SqlCommand cmd = new SqlCommand(@"SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours
-                                                    FROM         dbo.TSITEMHOURS INNER JOIN
-                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid", cn);
-                cmd.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
-                cmd.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
-
-                double hours = 0;
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read() && !dr.IsDBNull(0))
-                    hours = dr.GetDouble(0);
-                dr.Close();
-
-                cn.Close();
-
-                return "<GetOtherHours Status=\"0\">" + hours + "</GetOtherHours>";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read() && !reader.IsDBNull(0))
+                            {
+                                hours = reader.GetDouble(0);
+                            }
+                        }
+                    }
+                }
+                return string.Format(GetOtherHoursResultTemplate, 0, hours);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<GetOtherHours Status=\"1\">" + ex.Message + "</GetOtherHours>";
+                var message = string.Format(GetOtherHoursResultTemplate, 1, exception.Message);
+                Logger.WriteLog(Logger.Category.Unexpected, message, exception.ToString());
+                return message;
             }
         }
 
@@ -1231,67 +1240,90 @@ namespace TimeSheets
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
-                string userid = "";
+                var tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var userid = string.Empty;
                 try
                 {
                     userid = doc.FirstChild.Attributes["UserId"].Value;
                 }
-                catch { }
-
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                catch
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SPUser user = GetUser(oWeb, userid);
-
-                SqlCommand cmd = new SqlCommand("SELECT  *   FROM         dbo.TSITEM INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID where USER_ID=@userid and site_uid=@siteid", cn);
-                cmd.Parameters.AddWithValue("@userid", user.ID);
-                cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
-
-                bool bError = false;
-                string sMessage = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    bError = true;
-                    sMessage = "Timer already started on another item.";
-                }
-                dr.Close();
-
-                if (!bError)
-                {
-
-                    DateTime dt = DateTime.Now;
-                    cmd = new SqlCommand("INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)", cn);
-                    cmd.Parameters.AddWithValue("@tsitemuid", tsuid);
-                    cmd.Parameters.AddWithValue("@dt", dt);
-                    cmd.Parameters.AddWithValue("@userid", user.ID);
-                    cmd.ExecuteNonQuery();
-
-                    sMessage = dt.ToString("F");
-
+                    Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        $"No UserId in {nameof(data)} document.");
                 }
 
-                cn.Close();
-
-                if (bError)
+                var isError = false;
+                var message = string.Empty;
+                SqlConnection connection = null;
+                try
                 {
-                    return "<StopWatch Status=\"1\">Error: " + sMessage + "</StopWatch>";
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                            connection.Open();
+                        });
+
+                    var user = GetUser(oWeb, userid);
+
+                    using (var command = new SqlCommand(
+                        @"SELECT * FROM dbo.TSITEM 
+                         INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
+                         INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
+                         where USER_ID=@userid and site_uid=@siteid", 
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@userid", user.ID);
+                        command.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isError = true;
+                                message = "Timer already started on another item.";
+                            }
+                        }
+                    }
+
+                    if (!isError)
+                    {
+                        var now = DateTime.Now;
+                        using (var command = new SqlCommand(
+                            @"INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@tsitemuid", tsuid);
+                            command.Parameters.AddWithValue("@dt", now);
+                            command.Parameters.AddWithValue("@userid", user.ID);
+                            command.ExecuteNonQuery();
+                        }
+                        message = now.ToString("F");
+                    }
+                }
+                finally
+                {
+                    connection?.Dispose();
+                }
+
+                if (isError)
+                {
+                    return string.Format(StopWatchResultTemplate, 1, $"Error: {message}");
                 }
                 else
                 {
-                    return "<StopWatch Status=\"0\">" + sMessage + "</StopWatch>";
+                    return string.Format(StopWatchResultTemplate, 0, message);
                 }
-
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
+                var errorMessage = string.Format(StopWatchResultTemplate, 1, $"Error: {exception.Message}");
+                Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        errorMessage);
+                return errorMessage;
             }
         }
 
@@ -1348,64 +1380,84 @@ namespace TimeSheets
 
         public static string CheckApproveStatus(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
 
             try
             {
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var timeSheetUid = doc.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var status = -1;
+                var percentComplete = 0;
+                var result = string.Empty;
+                var resultText = string.Empty;
+                var approvalStatus = 0;
+
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        "SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
 
-                SqlCommand cmd = new SqlCommand("SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                status = reader.GetInt32(0);
+                                if (!reader.IsDBNull(1))
+                                {
+                                    percentComplete = reader.GetInt32(1);
+                                }
+                                if (!reader.IsDBNull(2))
+                                {
+                                    result = reader.GetString(2);
+                                }
+                                if (!reader.IsDBNull(3))
+                                {
+                                    resultText = reader.GetString(3);
+                                }
+                            }
+                        }
+                    }
 
-                int status = -1;
-                int pct = 0;
-                string result = "";
-                string resulttext = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    status = dr.GetInt32(0);
-                    if (!dr.IsDBNull(1))
-                        pct = dr.GetInt32(1);
-                    if (!dr.IsDBNull(2))
-                        result = dr.GetString(2);
-                    if (!dr.IsDBNull(3))
-                        resulttext = dr.GetString(3);
+                    using (var command = new SqlCommand(
+                        "SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                approvalStatus = reader.GetInt32(0);
+                            }
+                            reader.Close();
+                        }
+                    }
                 }
-                dr.Close();
 
-                cmd = new SqlCommand("SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                dr = cmd.ExecuteReader();
-
-                int approvalstatus = 0;
-
-                if (dr.Read())
-                {
-                    approvalstatus = dr.GetInt32(0);
-                }
-                dr.Close();
-
-                cn.Close();
-
-
-                return "<ApproveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\" ApprovalStatus=\"" + approvalstatus + "\"></ApproveStatus>";
-
-
+                var message = string.Format(
+                    "<ApproveStatus Result=\"0\" Status=\"{0}\" PercentComplete=\"{1}\" ErrorResult=\"{2}\" " +
+                    "ResultText=\"{3}\" ApprovalStatus=\"{4}\"></ApproveStatus>",
+                    status,
+                    percentComplete,
+                    result,
+                    resultText,
+                    approvalStatus);
+                return message;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<ApproveStatus Result=\"1\">Error: " + ex.Message + "</ApproveStatus>";
+                return string.Format(
+                    "<ApproveStatus Result=\"1\">Error: {0}</ApproveStatus>",
+                    exception.Message);
             }
         }
 
@@ -4453,6 +4505,17 @@ namespace TimeSheets
                 return "<AddWork Status=\"1\">Error: " + ex.Message + "</AddWork>";
             }
 
+        }
+
+        private static SqlConnection GetOpenedConnection(string connectionString)
+        {
+            SqlConnection connection = null;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                connection = new SqlConnection(connectionString);
+                connection.Open();
+            });
+            return connection;
         }
     }
 }
