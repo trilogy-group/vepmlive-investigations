@@ -14,7 +14,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('To Verify User is Able to Create Workspace - [2488594]', async () => {
+    it('To Verify User is Able to Create Workspace - [2488594]', async () => {
         const stepLogger = new StepLogger(2488594);
         await WorkspacePageHelper.createWorkspace(stepLogger);
     });

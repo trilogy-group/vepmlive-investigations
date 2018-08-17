@@ -26,7 +26,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Navigate to Edit Resource Plan- [966351]', async () => {
+    it('Navigate to Edit Resource Plan- [966351]', async () => {
         const stepLogger = new StepLogger(966351);
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(

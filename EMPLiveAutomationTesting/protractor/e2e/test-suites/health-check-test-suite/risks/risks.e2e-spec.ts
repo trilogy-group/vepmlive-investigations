@@ -14,13 +14,13 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Add, Edit and Delete Risk- [829719]', async () => {
+    it('Add, Edit and Delete Risk- [829719]', async () => {
         const stepLogger = new StepLogger(829719);
         stepLogger.stepId(1);
         let titleValue = await RiskItemPageHelper.createRiskAndValidateIt(stepLogger);
 
-        titleValue = await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue );
+        titleValue = await RiskItemPageHelper.editRiskAndValidateIt(stepLogger, titleValue);
 
-        await RiskItemPageHelper.deleteRiskAndValidateIt(stepLogger, titleValue );
+        await RiskItemPageHelper.deleteRiskAndValidateIt(stepLogger, titleValue);
     });
 });

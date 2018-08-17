@@ -8,7 +8,7 @@ import {CommonPage} from '../../../page-objects/pages/common/common.po';
 import {CommonPageConstants} from '../../../page-objects/pages/common/common-page.constants';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
-     fit('Valid License for viewing EPM Live site- [743132]', async () => {
+    it('Valid License for viewing EPM Live site- [743132]', async () => {
         let loginPage: LoginPage;
         const stepLogger = new StepLogger(743132);
         await PageHelper.maximizeWindow();
@@ -18,9 +18,9 @@ describe(SuiteNames.healthCheckTestSuite, () => {
 
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
-             HomePage.navigation.projects.projects,
-             CommonPage.pageHeaders.projects.projectsCenter,
-             CommonPageConstants.pageHeaders.projects.projectCenter,
-             stepLogger);
- });
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+    });
 });

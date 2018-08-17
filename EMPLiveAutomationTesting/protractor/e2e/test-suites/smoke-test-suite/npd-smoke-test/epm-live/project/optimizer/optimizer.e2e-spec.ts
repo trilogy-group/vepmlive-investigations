@@ -22,7 +22,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Save View  - [785307]', async () => {
+    fit('Save View  - [785307]', async () => {
         const stepLogger = new StepLogger(785307);
         // Preconditions -Navigation Panel> Projects> Select project(s)> Click on 'Optimizer'
         await CommonPageHelper.navigateToItemPageUnderNavigation(
