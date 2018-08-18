@@ -41,7 +41,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(RiskItemPageConstants.pageName,
@@ -66,7 +66,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
 
         await PageHelper.click(CommonPage.projectShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.inputs.project);
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.inputs.project);
         const projectName = await RiskItemPage.inputs.project.getText();
         await PageHelper.click(RiskItemPage.inputs.project);
 
@@ -154,7 +154,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await WaitHelper.getInstance().waitForElement(RiskItemPage.riskItem);
+        await WaitHelper.waitForElement(RiskItemPage.riskItem);
 
         const titleValue = await RiskItemPage.riskItem.getText();
         stepLogger.verification('Search item by title');
@@ -189,7 +189,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.risks,
             stepLogger);
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.riskItem);
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.riskItem);
 
         const titleValue = await RiskItemPage.riskItem.getText();
         await CommonPageHelper.viewOptionViaRibbon(stepLogger);

@@ -105,7 +105,7 @@ export class EventsPageHelper {
         await PageHelper.click(EventsPage.newEvent);
 
         stepLogger.verification('"Events - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(EventsPageConstants.pageName, ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
 

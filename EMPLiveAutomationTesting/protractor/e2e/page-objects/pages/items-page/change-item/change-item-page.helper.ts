@@ -29,7 +29,7 @@ export class ChangeItemPageHelper {
 
         stepLogger.step('Click on projectShowAllButton');
         await PageHelper.click(CommonPage.projectShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ChangeItemPage.inputs.project);
+        await WaitHelper.waitForElementToBeDisplayed(ChangeItemPage.inputs.project);
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         const projectName = await ChangeItemPage.inputs.project.getText();
         await PageHelper.click(ChangeItemPage.inputs.project);
@@ -41,7 +41,7 @@ export class ChangeItemPageHelper {
 
         stepLogger.step(`Priority: Select the value "${priority}"`);
         await PageHelper.sendKeysToInputField(ChangeItemPage.inputs.priority, priority);
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.xs);
+        await WaitHelper.staticWait(PageHelper.timeout.xs);
         stepLogger.verification(`Verify - Priority: Select the value  "${priority}"`);
        /* await expect(await ElementHelper.hasSelectedOption(ChangeItemPage.inputs.priority, priority))
             .toBe(true,

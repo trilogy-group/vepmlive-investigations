@@ -43,11 +43,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -69,7 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(2);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
 
         stepLogger.step('switch to default content');
@@ -85,14 +85,14 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Mouse hover on any Project created as per pre requisites');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.record);
         await ElementHelper.actionHoverOver(CommonPage.record);
 
         stepLogger.step('Click on the Ellipses button (...)');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ellipse);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ellipse);
         await PageHelper.click(CommonPage.ellipse);
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.contextMenuOptions.editPlan);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.contextMenuOptions.editPlan);
         stepLogger.step('select "Edit Plan" from the options displayed');
         await PageHelper.click(CommonPage.contextMenuOptions.editPlan);
 
@@ -110,20 +110,20 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(6);
         stepLogger.step('Enter New Task in the "Add a Task"');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.newTask);
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.newTask);
         await TextboxHelper.sendKeys(ProjectItemPage.newTask, uniqueId, true);
 
         stepLogger.step('click on "Edit Team" button');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.editTeamProjectPlanner);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.editTeamProjectPlanner);
         await PageHelper.click(CommonPage.ribbonItems.editTeamProjectPlanner);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Observe that the newly added "Resource" is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.first());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));

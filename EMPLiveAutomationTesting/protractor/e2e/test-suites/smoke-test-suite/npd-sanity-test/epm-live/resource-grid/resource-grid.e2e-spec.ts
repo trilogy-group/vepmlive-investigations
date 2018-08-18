@@ -48,7 +48,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getButtonDisplayedValidation(ResourcesPageConstants.inviteLink));
         await PageHelper.click(ResourcesPage.newInviteLink);
         stepLogger.verification('"Resources - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ResourcesPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ResourcesPageConstants.pageName));

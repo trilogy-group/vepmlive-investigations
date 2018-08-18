@@ -49,7 +49,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(true, ValidationsHelper.getPageDisplayedValidation(projectCommonPageElement.reports));
 
         stepLogger.step('Click on Projects and expand the list');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(
+        await WaitHelper.waitForElementToBeDisplayed(
             await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
         await PageHelper.click(await ReportsItemPage.expandReportListItem(projectReportListConstant.projects));
 
@@ -61,13 +61,13 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(projectReportListElement.projectHealth);
 
         stepLogger.verification(`Project health view is displayed`);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(projectReportListConstant.projectHealth,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(projectReportListConstant.projectHealth));
 
         stepLogger.step('Click on close button');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.closeButton);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.closeButton);
         await PageHelper.click(CommonPage.closeButton);
 
         stepLogger.verification(`Classic Reporting page is displayed`);

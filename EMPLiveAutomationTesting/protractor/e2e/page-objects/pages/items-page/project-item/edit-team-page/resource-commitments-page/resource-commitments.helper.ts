@@ -10,7 +10,7 @@ import {CommonPage} from '../../../../common/common.po';
 export class ResourceCommitmentsHelper {
     static async selectResourceAndApply(stepLogger: StepLogger) {
         // this is work around without it not able to work on new tab
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
 
         await PageHelper.switchToNewTabIfAvailable(0);
         await PageHelper.switchToNewTabIfAvailable(1);

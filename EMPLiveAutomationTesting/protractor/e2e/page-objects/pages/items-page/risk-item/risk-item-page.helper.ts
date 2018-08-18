@@ -22,7 +22,7 @@ export class RiskItemPageHelper {
         await this.verifyPage(stepLogger);
 
         stepLogger.verification('Values selected/entered while creating the Risk are pre populated in respective fields');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(RiskItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
@@ -123,7 +123,7 @@ export class RiskItemPageHelper {
 
     static async verifyPage(stepLogger: StepLogger) {
         stepLogger.verification('"Edit Risk" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(RiskItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
@@ -194,7 +194,7 @@ export class RiskItemPageHelper {
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         await PageHelper.click(CommonPage.projectShowAllButton);
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(RiskItemPage.inputs.project);
+        await WaitHelper.waitForElementToBeDisplayed(RiskItemPage.inputs.project);
 
         await PageHelper.click(RiskItemPage.inputs.project);
     }

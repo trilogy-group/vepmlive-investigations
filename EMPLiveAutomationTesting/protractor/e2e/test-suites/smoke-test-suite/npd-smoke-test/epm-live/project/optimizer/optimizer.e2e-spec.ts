@@ -42,7 +42,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(1);
         stepLogger.step('Click on "View" tab');
         await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.view));
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(OptimizerPage.viewManagementOptions.saveView, PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.viewManagementOptions.saveView, PageHelper.timeout.s);
         stepLogger.verification('View tab details displayed');
         await expect(await PageHelper.isElementDisplayed(OptimizerPage.viewManagementOptions.saveView)).toBe(true,
             ValidationsHelper.getPageDisplayedValidation(OptimizerPageConstants.viewTab));
@@ -69,7 +69,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(6);
         stepLogger.step('Provide "View Name" and check "Personal View" checkbox');
         const label = OptimizerPage.saveViewPopup;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.viewName, PageHelper.timeout.s);
+        await WaitHelper.waitForElementToBeDisplayed(label.viewName, PageHelper.timeout.s);
         // Generating unique save name
         const uniqueId = PageHelper.getUniqueId();
         const viewName = `${OptimizerPageConstants.newViewName}${uniqueId}`;
@@ -82,7 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.step('Click on "Ok" button');
         await PageHelper.click(label.ok);
-        await WaitHelper.getInstance().waitForTextToBePresent(OptimizerPage.viewManagementOptions.currentViewDropdown, viewName);
+        await WaitHelper.waitForTextToBePresent(OptimizerPage.viewManagementOptions.currentViewDropdown, viewName);
         // Taking time to reflect
         stepLogger.verification('View saved and displayed under "Current View"');
         await expect(await PageHelper.getText(OptimizerPage.viewManagementOptions.currentViewDropdown))

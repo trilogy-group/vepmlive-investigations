@@ -40,7 +40,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.delete);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.delete);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
@@ -80,7 +80,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.precondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on Project tab');
@@ -144,7 +144,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.project);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.project);
         await ElementHelper.actionHoverOver(CommonPage.project);
 
         stepLogger.step('Click on the Ellipses button (...)');
@@ -163,7 +163,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Select a template');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.verification('User should be navigated to Project Planner page');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))

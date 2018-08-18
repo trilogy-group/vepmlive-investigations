@@ -53,7 +53,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.addNewLink);
 
         stepLogger.verification('"To Do - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.pageName));
@@ -105,7 +105,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPage.contextMenuOptions.editItem, stepLogger);
 
         stepLogger.verification('"Edit Project" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.editPageName));
@@ -175,7 +175,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(LinkPage.newLink);
 
         stepLogger.verification('"Link - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(LinkPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
@@ -214,7 +214,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(MyTimeOffPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pagePrefix));
@@ -262,7 +262,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification('"Events" Page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(EventsPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pagePrefix));
@@ -274,7 +274,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.clickUsingJs(EventsPage.addNewEvent(EventsPageConstants.addEvent));
 
         stepLogger.verification('"Events - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(EventsPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.pageName));
@@ -326,7 +326,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on the "Edit Item" button menu displayed in "View" tab on top of the page');
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
         stepLogger.verification('"Edit Event" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
+        await WaitHelper.waitForElementToBeDisplayed(CommonPageHelper.getElementUsingText('Save', false));
         await expect(await CommonPage.title.getText())
             .toBe(EventsPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(EventsPageConstants.editPageName));
@@ -376,7 +376,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(DiscussionsPage.replyButton);
 
         stepLogger.verification('Reply should be displayed below the discussion');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(DiscussionsPage.replyBody);
+        await WaitHelper.waitForElementToBeDisplayed(DiscussionsPage.replyBody);
         await expect(await DiscussionsPage.replyBody.getText())
             .toBe(message, ValidationsHelper.getLabelDisplayedValidation(message));
     });

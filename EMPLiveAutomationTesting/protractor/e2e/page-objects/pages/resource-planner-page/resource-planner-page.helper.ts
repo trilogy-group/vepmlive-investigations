@@ -12,7 +12,7 @@ export class ResourcePlannerPageHelper  {
         // first deleting all the resources
         stepLogger.step('Add hours for the resource added in the top-grid');
         stepLogger.stepId(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
 
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
@@ -27,7 +27,7 @@ export class ResourcePlannerPageHelper  {
 
         stepLogger.stepId(4);
         await CommonPageHelper.fieldDisplayedValidation(ResourcePlannerPage.greenCheckImg , ResourcePlannerConstants.greenCheckImg );
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
         await PageHelper.click(CommonPage.ribbonItems.close);
     }
 
@@ -62,7 +62,7 @@ export class ResourcePlannerPageHelper  {
     static async  deletingUserAndSave(stepLogger: StepLogger) {
         //  deleting all the resources
         stepLogger.stepId(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.topSection.save);
 
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);

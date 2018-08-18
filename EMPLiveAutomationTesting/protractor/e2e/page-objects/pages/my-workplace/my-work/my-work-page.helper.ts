@@ -23,7 +23,7 @@ export class MyWorkPageHelper {
 
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         await PageHelper.click(MyWorkPage.dropdownAll.project);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(MyWorkPage.inputs.project);
+        await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.inputs.project);
         const projectName = await MyWorkPage.inputs.project.getText();
         await PageHelper.click(MyWorkPage.inputs.project);
 
@@ -46,7 +46,7 @@ export class MyWorkPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.staticWait(PageHelper.timeout.m);
 
         stepLogger.verification('Newly created Item [Ex: Title 1] displayed in "My Work" page');
         await expect(await PageHelper.isElementPresent(AnchorHelper.getElementByTextInsideGrid(titleValue)))
@@ -83,7 +83,7 @@ export class MyWorkPageHelper {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.staticWait(PageHelper.timeout.m);
     }
 
     static async clickOnPageTab(stepLogger: StepLogger) {

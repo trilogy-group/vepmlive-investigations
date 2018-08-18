@@ -27,7 +27,7 @@ export class TaskPageHelper {
         stepLogger.verification('Changes done in "Project Planner" page are saved');
         // After save It need static wait(5 sec) and no element found which get change after save.
         await browser.sleep(PageHelper.timeout.s);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPageHelper.newTasksFields.title);
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.one, ProjectItemPageConstants.newTaskFields.start).click();
         await ProjectItemPageHelper.verifyTitleAndDuration(uniqueId, CommonPageConstants.hours.durationHours1);
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
@@ -50,7 +50,7 @@ export class TaskPageHelper {
         await PageHelper.click(CommonPage.addButton);
 
         stepLogger.verification('Add Link pop up is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.addButton);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.addButton);
         await expect(await CommonPage.addButton.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.buttonName.addButton));
 
@@ -117,7 +117,7 @@ export class TaskPageHelper {
         await PageHelper.click(CommonPage.editPlan);
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
     }
 

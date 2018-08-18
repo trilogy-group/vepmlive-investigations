@@ -24,7 +24,7 @@ export class SocialStreamPageHelper {
         const overallHealthOnTrack = CommonPageConstants.overallHealth.onTrack;
         const projectUpdateManual = CommonPageConstants.projectUpdate.manual;
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
+        await WaitHelper.waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
         stepLogger.step('Click on "Project" Link on the top menu bar');
 
         await ElementHelper.click(HomePage.toolBarMenuItems.project);

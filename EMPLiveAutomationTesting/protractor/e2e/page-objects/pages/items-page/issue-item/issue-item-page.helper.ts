@@ -85,7 +85,7 @@ export class IssueItemPageHelper {
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
         await PageHelper.click(CommonPage.projectShowAllButton);
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(IssueItemPage.inputs.project);
+        await WaitHelper.waitForElementToBeDisplayed(IssueItemPage.inputs.project);
         const projectName = await IssueItemPage.inputs.project.getText();
 
         await this.clickProject(stepLogger, projectName, labels.project );
