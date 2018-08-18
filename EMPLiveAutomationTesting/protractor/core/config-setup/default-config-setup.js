@@ -40,8 +40,8 @@ const configSetup = {
     suites: {
         health_tests: './e2e/test-suites/health-check-test-suite/**/*.e2e-spec.ts',
         api_tests: './e2e/test-suites/api-test-suite/**/*.e2e-spec.ts',
-        smoke_tests: 'e2e/test-suites/smoke-test-suite/**/*.e2e-spec.ts',
-        regression_tests: './e2e/test-suites/regression-test-suite/**/*.e2e-spec.ts'
+        smoke_tests: 'e2e/test-suites/smoke-test-suite/**/optimizer.e2e-spec.ts',
+        regression_tests: './e2e/test-suites/regression-test-suite/**/smoke-optimizer.e2e-spec.ts'
     },
     capabilities: {
         "browserName": "chrome",
@@ -57,7 +57,7 @@ const configSetup = {
         'browserstack.user': process.env.BROWSERSTACK_USERNAME || setupUtilities.getParam("", "--params.browserstack.user", false),
         'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || setupUtilities.getParam("", "--params.browserstack.key", false),
         'browserstack.local': process.env.BROWSERSTACK_LOCAL || setupUtilities.getParam(true, "--params.browserstack.local", false),
-        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER || setupUtilities.getParam("BUILD#" + process.env.BUILD_NUMBER, "--params.browserstack.localIdentifier", false),
+        'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
         'build': process.env.BROWSERSTACK_BUILD || setupUtilities.getParam('Local Build - ' + new Date().toISOString(), "--params.browserstack.build", false),
         'browserstack.debug': 'true',
         'acceptSslCerts': 'true',

@@ -121,6 +121,7 @@ export class CommonPage extends BasePage {
             editResource: CommonPageHelper.getRibbonButtonByText(labels.editResource, true),
             resourceAnalyzer: CommonPageHelper.getRibbonButtonByText(labels.resourceAnalyzer),
             delete: CommonPageHelper.getRibbonButtonById(labels.delete),
+            optimizer: CommonPageHelper.getRibbonButtonByText(labels.optimizer)
         };
     }
 
@@ -237,6 +238,10 @@ export class CommonPage extends BasePage {
 
     static get record() {
         return element(By.xpath(`(${this.selectorForRecordsWithGreenTick})[1]`));
+    }
+
+    static get secondRecord() {
+        return element(By.css(`tr.GMClassSelected +tr > td.GMCellPanel`));
     }
 
     static get recordWithoutGreenTicket() {

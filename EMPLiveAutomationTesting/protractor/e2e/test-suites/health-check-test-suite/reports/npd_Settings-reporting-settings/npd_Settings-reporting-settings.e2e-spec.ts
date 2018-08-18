@@ -19,7 +19,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Run Refresh Schedule - [829793]', async () => {
+    it('Run Refresh Schedule - [829793]', async () => {
         const stepLogger = new StepLogger(829793);
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(

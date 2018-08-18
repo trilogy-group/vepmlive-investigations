@@ -43,7 +43,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         // Planner takes time to get open so sleep required
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on "Views" tab');
@@ -90,7 +90,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.okButton);
 
         stepLogger.verification('Create Column window is Closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.okButton);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.okButton);
         await expect(await CommonPage.okButton.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.createColumn));
 
@@ -115,12 +115,12 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
             'Click on Project Planner in the list of planners displayed');
         stepLogger.step('Click ITEMS tab select Edit Plan');
-        await WaitHelper.getInstance().waitForPageToStable();
+        await WaitHelper.waitForPageToStable();
         await PageHelper.click(CommonPage.editPlan);
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.verification('"Project Planner" window is displayed');
         await expect(await PageHelper.isElementDisplayed(ProjectItemPage.save))
@@ -170,7 +170,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         // Planner takes time to get open so sleep required
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         stepLogger.precondition('Unchecked checkbox If checked already');
         await ProjectItemPageHelper.unCheckedSelectColumnIfChecked;
 
@@ -226,7 +226,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ProjectItemPage.OkButton);
 
         stepLogger.verification('Save View pop up is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.okButton);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.okButton);
         await expect(await CommonPage.okButton.isPresent()).toBe(false,
             ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.saveView));
 

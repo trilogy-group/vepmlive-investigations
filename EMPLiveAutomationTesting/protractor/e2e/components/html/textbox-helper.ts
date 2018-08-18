@@ -28,7 +28,7 @@ export class TextboxHelper {
     static async sendKeys(locator: ElementFinder,
                           value: string,
                           sendEnter = false) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(locator);
+        await WaitHelper.waitForElementToBeDisplayed(locator);
         await this.clearText(locator);
 
         // On IE, text is sometimes not well sent, this is a workaround

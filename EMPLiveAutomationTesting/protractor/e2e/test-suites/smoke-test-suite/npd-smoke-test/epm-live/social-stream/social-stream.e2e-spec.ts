@@ -34,7 +34,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
@@ -66,7 +66,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.uploadButton);
 
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
@@ -92,7 +92,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         const stepLogger = new StepLogger(743926);
 
         stepLogger.step('Enter some comments for text area displaying text What are you working on?');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
+        await WaitHelper.waitForElementToBeDisplayed(HomePage.whatAreYouWorkingOnTextBox);
         await TextboxHelper.sendKeys(HomePage.whatAreYouWorkingOnTextBox, HomePageConstants.comment);
 
         stepLogger.verification('Verify Comment entered and posted is displayed in Activity Stream of user Home Page');
@@ -103,7 +103,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.project);
 
         stepLogger.verification('Verify Project Center - New Item window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ProjectItemPageConstants.pageName,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(ProjectItemPageConstants.pageName));
@@ -145,7 +145,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.timeOff);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(MyTimeOffPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
@@ -178,7 +178,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.link);
 
         stepLogger.verification(`Links - New Item' window is displayed`);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitles.first());
         await expect(await CommonPage.dialogTitles.first().getText())
             .toBe(LinkPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pageName));
@@ -195,7 +195,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             stepLogger);
 
         stepLogger.verification(`'Links' page is displayed`);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(LinkPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(LinkPageConstants.pagePrefix));

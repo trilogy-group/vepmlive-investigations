@@ -45,7 +45,7 @@ export class DiscussionsPageHelper {
         stepLogger.step('Click on "+ new discussion" link displayed on top of "Discussions" page');
         await PageHelper.click(DiscussionsPage.newDiscussionLink);
         stepLogger.verification('"Discussion - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(DiscussionsPageConstants.pagePrefix, ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));
         stepLogger.stepId(2);
@@ -87,7 +87,7 @@ export class DiscussionsPageHelper {
         await PageHelper.click(DiscussionsPage.newDiscussionLink);
 
         stepLogger.verification('"Discussion - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(DiscussionsPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(DiscussionsPageConstants.pageName));

@@ -108,7 +108,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.stepId(7);
         stepLogger.step('Select the project created as per pre requisites [Ex: Smoke Test Project 2]');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.project);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.project);
         const projectName = await ElementHelper.getText(CommonPage.project);
         await PageHelper.click(CommonPage.project);
 
@@ -140,7 +140,7 @@ export class PlannerSettingsPageHelper {
         stepLogger.verification('Selected Project is opened using the Newly created Planner [Ex: Smoke Test Planner 1]');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await expect(await browser.getTitle()).toContain(projectName,
             ValidationsHelper.getDisplayedValidation(PlannerSettingsPageConstants.validation.project));
         await expect(await browser.getTitle()).toContain(name,
@@ -155,7 +155,7 @@ export class PlannerSettingsPageHelper {
         await browser.switchTo().alert().accept();
 
         stepLogger.verification('Project Planner window [Ex: Smoke Test Planner 1] is closed');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.editPlan);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.editPlan);
         await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 

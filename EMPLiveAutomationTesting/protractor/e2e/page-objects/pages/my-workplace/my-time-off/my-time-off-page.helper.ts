@@ -24,7 +24,7 @@ export class MyTimeOffPageHelper {
 
         stepLogger.step('Select any Time OFf type from the drop down');
         await PageHelper.click(MyTimeOffPage.timeOffTypeShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.timeOffType);
+        await WaitHelper.waitForElementToBeDisplayed(inputs.timeOffType);
         const timeOffName = await inputs.timeOffType.getText();
 
         stepLogger.verification('Required values selected in Time Off type Field');
@@ -67,7 +67,7 @@ export class MyTimeOffPageHelper {
         await PageHelper.click(CommonPage.formButtons.save);
 
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.staticWait(PageHelper.timeout.m);
 
         stepLogger.verification('"New Time Off" page is closed');
         await expect(await CommonPage.formButtons.save.isPresent())

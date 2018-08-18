@@ -14,7 +14,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Add, Edit and Delete Project - [829527]', async () => {
+    it('Add, Edit and Delete Project - [829527]', async () => {
         const stepLogger = new StepLogger(829527);
         stepLogger.stepId(1);
         // Step #1 Inside this function

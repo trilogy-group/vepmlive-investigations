@@ -13,12 +13,12 @@ export class ElementHelper {
     }
 
     static async actionMouseMove(item: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
         return browser.actions().mouseMove(item).perform();
     }
 
     static async actionMouseDown(item: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
         return browser.actions().mouseDown(item).perform();
     }
 
@@ -123,7 +123,7 @@ export class ElementHelper {
     }
 
     static async click(targetElement: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
+        await WaitHelper.waitForElementToBeClickable(targetElement);
         return targetElement.click();
     }
 
@@ -136,7 +136,7 @@ export class ElementHelper {
     }
 
     static async clickUsingJs(targetElement: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBeClickable(targetElement);
+        await WaitHelper.waitForElementToBeClickable(targetElement);
         return this.clickUsingJsNoWait(targetElement);
     }
 
@@ -148,7 +148,7 @@ export class ElementHelper {
                                            kClass: string,
                                            timeout = PageHelper.DEFAULT_TIMEOUT,
                                            message = '') {
-        return WaitHelper.getInstance().waitForElementToResolve(
+        return WaitHelper.waitForElementToResolve(
             () => this.hasClass(targetElement, kClass),
             (result: any) => result, timeout, message);
     }
@@ -169,14 +169,14 @@ export class ElementHelper {
     }
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(elem);
+        await WaitHelper.waitForElementToBeDisplayed(elem);
         try {
             const value = await elem.getAttribute(attribute);
             return value.trim();
         } catch (e) { return '' ; }
     }
     static async getText(elem: ElementFinder) {
-        await WaitHelper.getInstance().waitForElementToBePresent(elem);
+        await WaitHelper.waitForElementToBePresent(elem);
         const text = await elem.getText();
         return text.trim();
     }

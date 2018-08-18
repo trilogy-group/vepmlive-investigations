@@ -50,7 +50,7 @@ export class LinkPageHelper {
         await PageHelper.click(CommonPage.formButtons.save);
 
         stepLogger.verification('"New Link" page is closed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.formButtons.save.isPresent())
             .toBe(false, ValidationsHelper.getWindowShouldNotBeDisplayedValidation(LinkPageConstants.pageName));
 

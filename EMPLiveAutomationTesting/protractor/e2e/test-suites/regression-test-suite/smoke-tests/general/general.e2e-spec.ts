@@ -25,7 +25,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ProjectItemPageHelper.createProjectAndNavigateToBuildTeamPage(uniqueId, stepLogger);
 
         stepLogger.verification('Verify Save and Close button is disabled by default');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.saveAndClose);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.saveAndClose);
         await expect(await ElementHelper.hasClass(ProjectItemPage.saveAndClose,
             ProjectItemPageConstants.buildTeamContentClass.saveAndCloseDisabled))
             .toBe(true,

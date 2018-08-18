@@ -1,20 +1,12 @@
-import {browser, ElementFinder, protractor} from 'protractor';
 import {PageHelper} from './page-helper';
+import {browser, ElementFinder, protractor} from 'protractor';
 
 export class WaitHelper {
-    private static instance: WaitHelper;
-    private readonly EC = protractor.ExpectedConditions;
+    static readonly EC = protractor.ExpectedConditions;
 
-    private constructor() {
+    static async staticWait(ms: number) {
+        await browser.sleep(ms);
     }
-
-    static getInstance() {
-        if (!WaitHelper.instance) {
-            WaitHelper.instance = new WaitHelper();
-        }
-        return WaitHelper.instance;
-    }
-
     /**
      * Default timeout for promises
      * @type {number}
@@ -25,21 +17,12 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElement(targetElement: ElementFinder,
-                         timeout = PageHelper.DEFAULT_TIMEOUT,
-                         message = 'Element should exist') {
+    static async waitForElement(targetElement: ElementFinder,
+                                timeout = PageHelper.DEFAULT_TIMEOUT,
+                                message = 'Element should exist') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
-    }
-
-    async waitForPageToStable() {
-        while (true) {
-            const result = browser.executeScript('return document.readyState == \'complete\'');
-            if (result) {
-                return;
-            }
-        }
     }
 
     /**
@@ -48,9 +31,9 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBeDisplayed(targetElement: ElementFinder,
-                                      timeout = PageHelper.DEFAULT_TIMEOUT,
-                                      message = 'Element should be visible') {
+    static async waitForElementToBeDisplayed(targetElement: ElementFinder,
+                                             timeout = PageHelper.DEFAULT_TIMEOUT,
+                                             message = 'Element should be visible') {
         return browser.wait(this.EC.visibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -63,9 +46,9 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBePresent(targetElement: ElementFinder,
-                                    timeout = PageHelper.DEFAULT_TIMEOUT,
-                                    message = 'Element should be visible') {
+    static async waitForElementToBePresent(targetElement: ElementFinder,
+                                           timeout = PageHelper.DEFAULT_TIMEOUT,
+                                           message = 'Element should be visible') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -79,10 +62,10 @@ export class WaitHelper {
      * @param {string} message
      * @returns {any}
      */
-    async waitForElementToBeHidden(targetElement: ElementFinder,
-                                   timeout = PageHelper.DEFAULT_TIMEOUT,
-                                   message = 'Element should not be visible') {
-        return browser.wait(async () => !(await targetElement.isPresent() && await targetElement.isDisplayed()),
+    static async waitForElementToBeHidden(targetElement: ElementFinder,
+                                          timeout = PageHelper.DEFAULT_TIMEOUT,
+                                          message = 'Element should not be visible') {
+        return browser.wait(this.EC.invisibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
     }
@@ -93,34 +76,45 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBeClickable(targetElement: ElementFinder,
-                                      timeout = PageHelper.DEFAULT_TIMEOUT,
-                                      message = 'Element not clickable') {
+    static async waitForElementToBeClickable(targetElement: ElementFinder,
+                                             timeout = PageHelper.DEFAULT_TIMEOUT,
+                                             message = 'Element not clickable') {
         return browser.wait(this.EC.elementToBeClickable(targetElement),
             timeout,
             targetElement.locator().toString() + message);
     }
 
-    async waitForElementToResolve(promiseCall: Function,
-                                  resolver: Function,
-                                  timeout = PageHelper.DEFAULT_TIMEOUT,
-                                  message = '') {
+    static async waitForElementToResolve(promiseCall: Function,
+                                         resolver: Function,
+                                         timeout = PageHelper.DEFAULT_TIMEOUT,
+                                         message = '') {
         let result = false;
         return browser.wait(() => {
             promiseCall().then((value: any) => (result = resolver(value)));
             return result;
         }, timeout, message);
     }
-    async waitForTextToBePresent(targetElement: ElementFinder, value: string) {
-        const EC = protractor.ExpectedConditions;
-        await browser.wait(EC.textToBePresentInElement(targetElement, value), 25000);
+
+    static async waitForElementToHaveText(
+        targetElement: ElementFinder,
+        timeout = PageHelper.DEFAULT_TIMEOUT,
+        message = ''
+    ) {
+        await browser.wait(async () => (await targetElement.getText()).trim() !== '',
+            timeout, message);
     }
 
-    async waitForElementToHaveText(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT, message = '') {
-        return this.waitForElementToResolve(() => targetElement.getText(), (text: string) => text.length > 0, timeout, message);
+    static async waitForElementToHaveExactText(
+        targetElement: ElementFinder,
+        value: string,
+        timeout = PageHelper.DEFAULT_TIMEOUT,
+        message = ''
+    ) {
+        await browser.wait(async () => (await targetElement.getText()).trim() === value,
+            timeout, message);
     }
 
-    async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
+    static async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
         const isDisplayed = this.EC.presenceOf(targetElement);
         return browser.wait(isDisplayed, timeout).then(function () {
             return true;
@@ -130,9 +124,30 @@ export class WaitHelper {
     }
 
     /**
-     * Wait for element to Load
+     * Wait for an element to be enabled
+     * @param {ElementFinder} targetElement
+     * @param {number} timeout
+     * @param {string} message
+     * @returns {any}
      */
-    public async staticWait(timeoutInMS = PageHelper.timeout.xs) {
-        return browser.sleep(timeoutInMS);
+    static async waitForElementToBeEnabled(targetElement: ElementFinder,
+                                           timeout = PageHelper.DEFAULT_TIMEOUT,
+                                           message = 'Element not enabled') {
+        return await browser.wait(targetElement.isEnabled(), timeout,
+            targetElement.locator().toString() + message);
+    }
+
+    /**
+     * Wait for an element to be selected
+     * @param {ElementFinder} targetElement
+     * @param {number} timeout
+     * @param {string} message
+     * @returns {any}
+     */
+    static async waitForElementToBeSelected(targetElement: ElementFinder,
+                                            timeout = PageHelper.DEFAULT_TIMEOUT,
+                                            message = 'Element not selected') {
+        return await browser.wait(targetElement.isSelected(), timeout,
+            targetElement.locator().toString() + message);
     }
 }

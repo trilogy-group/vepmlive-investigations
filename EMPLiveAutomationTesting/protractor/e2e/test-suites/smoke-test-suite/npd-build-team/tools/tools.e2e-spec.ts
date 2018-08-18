@@ -42,11 +42,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -66,16 +66,16 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Select few resources from "Current Team" using check boxes');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(1));
 
         stepLogger.step('Click on "Assignment Planner" displayed on top of "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.assignmentPlanner);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.assignmentPlanner);
         await PageHelper.click(CommonPage.ribbonItems.assignmentPlanner);
 
         // Assignment planner takes around 10 seconds to Loading view and Randering data
-        await WaitHelper.getInstance().staticWait(10000);
+        await WaitHelper.staticWait(10000);
 
         stepLogger.step('switch to default context');
         await PageHelper.switchToDefaultContent();
@@ -91,7 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click "Close" button in "Assignment Planner" window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
         stepLogger.step('switch to default content');
@@ -104,7 +104,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.assignmentPlanner));
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
@@ -112,7 +112,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.switchToContentFrame(stepLogger);
         stepLogger.stepId(6);
         stepLogger.step('Click "Close" button in "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
         stepLogger.step('switch to default content');
@@ -149,11 +149,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -173,12 +173,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(4);
         stepLogger.step('Select few resources from "Current Team" using check boxes');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(0));
         await PageHelper.click(ProjectItemPage.teamRecords.currentTeam.get(1));
 
         stepLogger.step('Click on "view Reports" drop down displayed on top of "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
         await PageHelper.click(CommonPage.ribbonItems.viewReports);
 
         stepLogger.verification('Following options are displayed');
@@ -209,13 +209,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click "Close" button in "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.viewReports);
         await ElementHelper.actionClick(CommonPage.ribbonItems.viewReports);
 
         // view Reports dropdown takes 2-3 seconds time to close and after that only close button is accessible else it thows exception
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
 
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.close);
         await PageHelper.click(CommonPage.ribbonItems.close);
 
         stepLogger.step('switch to default content');

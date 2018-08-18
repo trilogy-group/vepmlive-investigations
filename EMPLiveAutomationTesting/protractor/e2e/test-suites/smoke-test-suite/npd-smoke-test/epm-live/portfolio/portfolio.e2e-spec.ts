@@ -44,7 +44,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CreateNewPage.navigation.listApps.portfolio);
 
         stepLogger.verification('"Portfolios - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(PortfolioItemPageConstants.pageName,
@@ -105,7 +105,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.record, CommonPage.contextMenuOptions.editItem, stepLogger);
 
         stepLogger.verification('"Edit Portfolio" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(PortfolioItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));

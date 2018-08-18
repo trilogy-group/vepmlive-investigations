@@ -97,7 +97,8 @@ export class CommonPageConstants {
             resourceWorkVsCapacity: 'Resource Work vs. Capacity',
             editResource: 'Edit Resource',
             resourceAnalyzer: 'ResourceAnalyzer',
-            apply: 'Apply'
+            apply: 'Apply',
+            optimizer: 'Optimizer'
         };
     }
 

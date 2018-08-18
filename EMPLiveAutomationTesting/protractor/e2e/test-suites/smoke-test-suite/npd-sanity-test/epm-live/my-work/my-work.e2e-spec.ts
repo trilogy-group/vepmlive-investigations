@@ -59,7 +59,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.changesItem);
 
         stepLogger.verification('Wait for "Changes - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Changes - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.changes))
@@ -91,7 +91,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.issuesItem);
 
         stepLogger.verification('Wait for "Issues - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Issues - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.issues))
@@ -123,7 +123,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.risksItem);
 
         stepLogger.verification('Wait for "Risks - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Risks - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.risks))
@@ -155,7 +155,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.timeOffItem);
 
         stepLogger.verification('Wait for "Time Off - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.timeOff))
@@ -202,7 +202,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(MyWorkPage.newItemMenu.toDoItem);
 
         stepLogger.verification('Wait for "To Do - New Item" window to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         stepLogger.verification('"To Do - New Item" window is displayed');
         await expect(await PageHelper.isElementDisplayed(MyWorkPage.widowTitleName.toDo))
@@ -233,7 +233,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(MyWorkPageConstants.editPageName));
         // Wait for the page to close after clicking on save. This is to reduce window close synchronization issues
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.m);
+        await WaitHelper.staticWait(PageHelper.timeout.m);
     });
 
     it('Edit Item - Attach File - [855672]', async () => {
@@ -249,7 +249,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         // Common functionality to edit any item
         const item = CommonPage.recordWithoutGreenTicket;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
 
         stepLogger.stepId(3);
         stepLogger.step('Click on the row of item created as per pre requisites');
@@ -262,7 +262,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
         stepLogger.verification('Edit work item pop-up should load successfully');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(true,
                 ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
@@ -312,7 +312,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.verification('Popup window is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));
@@ -396,7 +396,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('NO Tasks displayed in Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
@@ -457,7 +457,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ElementHelper.clickUsingJs(ProjectItemPage.close);
 
         stepLogger.verification('Project Planner window is closed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.pageHeaders.projects.projectsCenter);
         await expect(await CommonPage.pageHeaders.projects.projectPlanner.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.projectPlanner));
 

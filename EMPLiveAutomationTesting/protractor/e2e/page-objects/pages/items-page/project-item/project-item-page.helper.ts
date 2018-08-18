@@ -64,7 +64,7 @@ export class ProjectItemPageHelper {
         // Add portfolio name
         stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
         await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
+        await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
         const portfolioName = await inputs.portfolio.getText();
         stepLogger.verification('Required values selected in Portfolio Field');
 
@@ -163,7 +163,7 @@ export class ProjectItemPageHelper {
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
@@ -189,7 +189,7 @@ export class ProjectItemPageHelper {
 
     static async waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger: StepLogger) {
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ProjectItemPageConstants.buildTeamPage,
@@ -202,7 +202,7 @@ export class ProjectItemPageHelper {
     static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string) {
 
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
@@ -233,7 +233,7 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
 
         stepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.step('Wait for Build Team Page to open');
@@ -270,7 +270,7 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
 
         stepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.step('Wait for Build Team Page to open');
@@ -294,7 +294,7 @@ export class ProjectItemPageHelper {
     static async checkResourceAddedInCurrentTeam(resourceName: string) {
         let size = 0, resourceFound = false, text;
         const label = ProjectItemPage.teamRecordsName.currentTeam;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
+        await WaitHelper.waitForElementToBeDisplayed(label.first());
         size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
             await ElementHelper.scrollToElement(label.get(index));

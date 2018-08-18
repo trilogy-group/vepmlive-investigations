@@ -14,7 +14,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Add an item from Social Stream - [829790]', async () => {
+    it('Add an item from Social Stream - [829790]', async () => {
         const stepLogger = new StepLogger(829790);
         await SocialStreamPageHelper.addStreamAndValidateIt(stepLogger);
     });

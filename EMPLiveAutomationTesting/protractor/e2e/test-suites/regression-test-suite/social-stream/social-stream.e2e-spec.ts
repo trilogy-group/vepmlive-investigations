@@ -28,7 +28,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ElementHelper.click(HomePage.toolBarMenuItems.timeOff);
 
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(MyTimeOffPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(MyTimeOffPageConstants.pageName));
@@ -49,7 +49,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await PageHelper.switchToDefaultContent();
 
         stepLogger.verification('Newly created Time off displayed in Home page');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ElementHelper.getElementByText(title));
+        await WaitHelper.waitForElementToBeDisplayed(ElementHelper.getElementByText(title));
         await expect(await PageHelper.isElementPresent(ElementHelper.getElementByText(title)))
             .toBe(true, ValidationsHelper.getLabelDisplayedValidation(title));
     });
