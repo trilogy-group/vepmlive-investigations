@@ -16,7 +16,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    it('Verify the Close button of the Optimizer page  - [744351]', async () => {
+    fit('Verify the Close button of the Optimizer page  - [744351]', async () => {
         const stepLogger = new StepLogger(744351);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -35,7 +35,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
     });
 
-    it('Verify that when user select only single project  - [744353]', async () => {
+    fit('Verify that when user select only single project  - [744353]', async () => {
         const stepLogger = new StepLogger(744353);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -51,7 +51,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyAlertMessageForSingleProjectSelection(stepLogger);
     });
 
-    it('Verify that Saved Strategy name displayed in the Current Strategy drop down box  - [744366]', async () => {
+    fit('Verify that Saved Strategy name displayed in the Current Strategy drop down box  - [744366]', async () => {
         const stepLogger = new StepLogger(744366);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -72,7 +72,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyCurrentStrategyName(strategyName, stepLogger);
     });
 
-    it('Verify the Delete Strategy button  - [744369]', async () => {
+    fit('Verify the Delete Strategy button  - [744369]', async () => {
         const stepLogger = new StepLogger(744369);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -91,7 +91,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeleteStrategyPopup(stepLogger);
     });
 
-    it('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
+    fit('Verify the content of label name "Which fields will be used as filters? of Optimizer configuration screen. - [744356]',
         async () => {
             const stepLogger = new StepLogger(744356);
             // Step 1 is inside the below function
@@ -108,7 +108,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             await OptimizerPageHelper.verifyFilterSectionLabels(stepLogger);
      });
 
-    it('Verify that Strategy should be Deleted.  - [744370]', async () => {
+    fit('Verify that Strategy should be Deleted.  - [744370]', async () => {
         const stepLogger = new StepLogger(744370);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -129,7 +129,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeletedStrategy(stepLogger, strategyNameToDel);
     });
 
-    it('Verify the Minus Sign  - [744373]', async () => {
+    fit('Verify the Minus Sign  - [744373]', async () => {
         const stepLogger = new StepLogger(744373);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -148,7 +148,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyRibbonCollapsed(stepLogger);
     });
 
-    it('Verify the close button of the View Tab.  - [744376]', async () => {
+    fit('Verify the close button of the View Tab.  - [744376]', async () => {
         const stepLogger = new StepLogger(744376);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -170,7 +170,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyOptimizerWindowClosed(stepLogger);
     });
 
-    it('Verify that View should be Deleted.  - [744382]', async () => {
+    fit('Verify that View should be Deleted.  - [744382]', async () => {
         const stepLogger = new StepLogger(744382);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -193,7 +193,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeletedView(stepLogger, viewNameToDel);
     });
 
-    it('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
+    fit('Verify the message display on the bottom of the Optimizer configuration page. - [744360]', async () => {
         const stepLogger = new StepLogger(744360);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -210,7 +210,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyMessageOnConfiguration(stepLogger);
     });
 
-    it('Verify that Current strategy drop down. - [744372]', async () => {
+    fit('Verify that Current strategy drop down. - [744372]', async () => {
         const stepLogger = new StepLogger(744372);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -228,7 +228,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verfyCurrentStrategyDropdown(stepLogger);
     });
 
-    it('Verify the Select column button. - [744384]', async () => {
+    fit('Verify the Select column button. - [744384]', async () => {
         const stepLogger = new StepLogger(744384);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -248,7 +248,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifySelectColumnsPopup(stepLogger);
     });
 
-    it('Verify the Hide all button of the Select column to display page should be displayed - [744385]', async () => {
+    fit('Verify the Hide all button of the Select column to display page should be displayed - [744385]', async () => {
         const stepLogger = new StepLogger(744385);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -273,7 +273,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyAllColumnSelected(stepLogger);
     });
 
-    it('Verify that selected column should be displayed on View Management grid. - [744386]', async () => {
+    fit('Verify that selected column should be displayed on View Management grid. - [744386]', async () => {
         const stepLogger = new StepLogger(744386);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
