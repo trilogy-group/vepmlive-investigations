@@ -8,7 +8,8 @@
     "clean": "rm -rf allure-reporter *.log",
     "test": "protractor protractor.conf.js",
     "e2e": "protractor protractor.conf.js",
-    "e2e:bs": "protractor protractor.browserstack.conf.js",
+    "e2e:bsf": "protractor protractor.browserstack.conf.js",
+    "e2e:bs": "protractor protractor.browserstack-serial.conf.js",
     "e2e-selenium": "protractor protractor.selenium-hub.conf.js",
     "e2e:report": "allure generate auto-generated/allure-results -o e2e-report --clean",
     "e2e-tc": "protractor protractor.local.conf.js"

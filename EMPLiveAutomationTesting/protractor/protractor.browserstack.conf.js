@@ -1,5 +1,3 @@
-const {_} = require("underscore");
-const browserstack = require("browserstack-local");
 const defaultConfigSetup = require('./core/config-setup/default-config-setup.js');
 const reportersSetup = require('./core/config-setup/reporters-setup');
 const setupUtilities = require('./core/config-setup/setup-utilities');
