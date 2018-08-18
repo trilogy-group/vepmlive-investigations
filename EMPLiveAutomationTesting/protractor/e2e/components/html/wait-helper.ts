@@ -2,19 +2,8 @@ import {browser, ElementFinder, protractor} from 'protractor';
 import {PageHelper} from './page-helper';
 
 export class WaitHelper {
-    private static instance: WaitHelper;
-    private readonly EC = protractor.ExpectedConditions;
-
-    private constructor() {
-    }
-
-    static getInstance() {
-        if (!WaitHelper.instance) {
-            WaitHelper.instance = new WaitHelper();
-        }
-        return WaitHelper.instance;
-    }
-
+    static readonly EC = protractor.ExpectedConditions;
+    // private readonly EC = protractor.ExpectedConditions;
     /**
      * Default timeout for promises
      * @type {number}
@@ -25,32 +14,22 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElement(targetElement: ElementFinder,
-                         timeout = PageHelper.DEFAULT_TIMEOUT,
-                         message = 'Element should exist') {
+    static async waitForElement(targetElement: ElementFinder,
+                                timeout = PageHelper.DEFAULT_TIMEOUT,
+                                message = 'Element should exist') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
     }
-
-    async waitForPageToStable() {
-        while (true) {
-            const result = browser.executeScript('return document.readyState == \'complete\'');
-            if (result) {
-                return;
-            }
-        }
-    }
-
     /**
      * Wait for an element to display
      * @param {ElementFinder} targetElement
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBeDisplayed(targetElement: ElementFinder,
-                                      timeout = PageHelper.DEFAULT_TIMEOUT,
-                                      message = 'Element should be visible') {
+    static async waitForElementToBeDisplayed(targetElement: ElementFinder,
+                                             timeout = PageHelper.DEFAULT_TIMEOUT,
+                                             message = 'Element should be visible') {
         return browser.wait(this.EC.visibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -58,14 +37,20 @@ export class WaitHelper {
     }
 
     /**
+     * Wait for element to Load
+     */
+    static async staticWait(timeoutInMS = PageHelper.timeout.xs) {
+        return browser.sleep(timeoutInMS);
+    }
+    /**
      * Wait for an element to present
      * @param {ElementFinder} targetElement
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBePresent(targetElement: ElementFinder,
-                                    timeout = PageHelper.DEFAULT_TIMEOUT,
-                                    message = 'Element should be visible') {
+    static async waitForElementToBePresent(targetElement: ElementFinder,
+                                           timeout = PageHelper.DEFAULT_TIMEOUT,
+                                           message = 'Element should be visible') {
         return browser.wait(this.EC.presenceOf(targetElement),
             timeout,
             targetElement.locator().toString() + message)
@@ -79,10 +64,10 @@ export class WaitHelper {
      * @param {string} message
      * @returns {any}
      */
-    async waitForElementToBeHidden(targetElement: ElementFinder,
-                                   timeout = PageHelper.DEFAULT_TIMEOUT,
-                                   message = 'Element should not be visible') {
-        return browser.wait(async () => !(await targetElement.isPresent() && await targetElement.isDisplayed()),
+    static async waitForElementToBeHidden(targetElement: ElementFinder,
+                                          timeout = PageHelper.DEFAULT_TIMEOUT,
+                                          message = 'Element should not be visible') {
+        return browser.wait(this.EC.invisibilityOf(targetElement),
             timeout,
             targetElement.locator().toString() + message);
     }
@@ -93,10 +78,63 @@ export class WaitHelper {
      * @param {number} timeout
      * @param {string} message
      */
-    async waitForElementToBeClickable(targetElement: ElementFinder,
-                                      timeout = PageHelper.DEFAULT_TIMEOUT,
-                                      message = 'Element not clickable') {
+    static async waitForElementToBeClickable(targetElement: ElementFinder,
+                                             timeout = PageHelper.DEFAULT_TIMEOUT,
+                                             message = 'Element not clickable') {
         return browser.wait(this.EC.elementToBeClickable(targetElement),
+            timeout,
+            targetElement.locator().toString() + message);
+    }
+
+    static async waitForElementToResolve(promiseCall: Function,
+                                         resolver: Function,
+                                         timeout = PageHelper.DEFAULT_TIMEOUT,
+                                         message = '') {
+        let result = false;
+        return browser.wait(() => {
+            promiseCall().then((value: any) => (result = resolver(value)));
+            return result;
+        }, timeout, message);
+    }
+
+    static async waitForElementToHaveText(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT, message = '') {
+        await browser.wait(async () => (await targetElement.getText()).trim() !== '', timeout, message);
+    }
+
+    static async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
+        const isDisplayed = this.EC.presenceOf(targetElement);
+        return browser.wait(isDisplayed, timeout).then(function () {
+            return true;
+        }, function () {
+            return false;
+        });
+    }
+    private constructor() {
+    }
+    /**
+     * Default timeout for promises
+     * @type {number}
+     */
+    async waitForPageToStable() {
+        while (true) {
+            const result = browser.executeScript('return document.readyState == \'complete\'');
+            if (result) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Wait for an element to hide
+     * @param {ElementFinder} targetElement
+     * @param {number} timeout
+     * @param {string} message
+     * @returns {any}
+     */
+    async waitForElementToBeHidden(targetElement: ElementFinder,
+                                   timeout = PageHelper.DEFAULT_TIMEOUT,
+                                   message = 'Element should not be visible') {
+        return browser.wait(async () => !(await targetElement.isPresent() && await targetElement.isDisplayed()),
             timeout,
             targetElement.locator().toString() + message);
     }
@@ -120,19 +158,4 @@ export class WaitHelper {
         return this.waitForElementToResolve(() => targetElement.getText(), (text: string) => text.length > 0, timeout, message);
     }
 
-    async waitForElementOptionallyPresent(targetElement: ElementFinder, timeout = PageHelper.DEFAULT_TIMEOUT) {
-        const isDisplayed = this.EC.presenceOf(targetElement);
-        return browser.wait(isDisplayed, timeout).then(function () {
-            return true;
-        }, function () {
-            return false;
-        });
-    }
-
-    /**
-     * Wait for element to Load
-     */
-    public async staticWait(timeoutInMS = PageHelper.timeout.xs) {
-        return browser.sleep(timeoutInMS);
-    }
 }

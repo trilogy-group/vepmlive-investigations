@@ -2,6 +2,8 @@ import {OptimizerPageConstants} from './optimizer-page.constants';
 import {BasePage} from '../../../base-page';
 import {By, element} from 'protractor';
 import {ElementHelper} from '../../../../../components/html/element-helper';
+import {ComponentHelpers} from '../../../../../components/devfactory/component-helpers/component-helpers';
+import {AnchorHelper} from '../../../../../components/html/anchor-helper';
 
 export class OptimizerPage extends BasePage {
 
@@ -32,14 +34,25 @@ export class OptimizerPage extends BasePage {
         const label = OptimizerPageConstants.selectColumnsPopup;
         return{
             ok: ElementHelper.getElementByText(label.ok),
+            cancel: ElementHelper.getElementByText(label.cancel),
             hideAll: ElementHelper.getElementByText(label.hideAll),
             column: element.all(By.css('.GMColumnsMenuItemText')),
-            selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div'))
+            eachColumn: element(By.css('.GMColumnsMenuItemText')),
+            selectedColumn: element.all(By.css('.GMColumnsMenuCheckedIconRight>div')),
+            eachSelectedColumn: element(By.css('.GMColumnsMenuCheckedIconRight>div')),
+            heading: element(By.css('.GMColumnsMenuHead')),
+            unchecked: element(By.css('.GMColumnsMenuUncheckedIconRight')),
+            showAll: ElementHelper.getElementByText(label.showAll),
         };
     }
 
-    static getTabOptions(tabName: string) {
-            return element(By.xpath(`//div[contains(@class,"dhx_tabbar_row")]//span[normalize-space(text())="${tabName}"]`));
+    static get getTabOptions() {
+        const label = OptimizerPageConstants.tabOptions;
+        const tabSection = '//div[contains(@class,"dhx_tabbar_row")]';
+        return {
+            optimizer: element(By.xpath(`${tabSection}//span[normalize-space(text())="${label.optimizer}"]`)),
+            view: element(By.xpath(`${tabSection}//span[normalize-space(text())="${label.view}"]`))
+        };
     }
 
     static get getCloseOptimizerWindow(){
@@ -57,5 +70,91 @@ export class OptimizerPage extends BasePage {
     static getButtonOnPopup(buttonName: string) {
         const activeWindow = 'div.dhtmlx_window_active';
         return element(By.css(`${activeWindow} input[value="${buttonName}"]`));
+    }
+
+    static get getConfigure(){
+        return element(By.css('ul#idOptimizerTabDiv_ul img[src*="configure"]'));
+    }
+
+    static get getOptimizerConfiguration(){
+        const label = OptimizerPageConstants.optimizerConfiguration;
+        return{
+            thirdQuestention: element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(label.thirdQuestention, true)}]`)),
+            availableFields: ElementHelper.getElementByText(label.availableFields),
+            selectedFilelds: ElementHelper.getElementByText(label.selectedFilelds),
+            add: AnchorHelper.getItemById(label.add),
+            remove: AnchorHelper.getItemById(label.remove),
+            availableFieldsSelect: AnchorHelper.getItemById(label.availableFieldsSelect),
+            selectedFieldsSelect: AnchorHelper.getItemById(label.selectedFieldsSelect),
+            upArrow: AnchorHelper.getItemById(label.upArrow),
+            downArrow: AnchorHelper.getItemById(label.downArrow),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel),
+            message : element(By.css('#idOptDlg>div>div:last-child'))
+        };
+    }
+
+    static get getOptimizerStrategyActions(){
+        const label = OptimizerPageConstants.optimizerStrategyActions;
+        return{
+            saveStrategy: AnchorHelper.getAnchorById(label.saveStrategy),
+            renameStrategy: AnchorHelper.getAnchorById(label.renameStrategy),
+            deleteStrategy: AnchorHelper.getAnchorById(label.deleteStrategy),
+            commitStrategy: AnchorHelper.getAnchorById(label.commitStrategy),
+            currentStrategyDropdown: AnchorHelper.getAnchorById(label.currentStrategyDropdown),
+            currentStrategyDropdownValue: element(By.xpath('//li[@id="idOptTab_SelView_viewinternal"]/a[2]')),
+            currentStrategyDropdownSpan: element(By.id(label.currentStrategyDropdownSpan))
+        };
+    }
+
+    static get getOptimierSaveStrategyPopup(){
+        const label = OptimizerPageConstants.optimierSaveStrategyPopup;
+        return{
+            strategyName: element(By.id(label.strategyName)),
+            personalStrategyCheckBox: element(By.id(label.personalStrategyCheckBox)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static get getDeleteStrategyPopup(){
+        const label = OptimizerPageConstants.optimierSaveStrategyPopup;
+        return{
+            message: element(By.xpath('//div[@id="idDeleteStratagy"]/div/div[1]')),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static getCurrentStrategyByName(strategyName: string) {
+        return element(By.xpath(`//li[@id="idOptTab_SelView_viewinternal"]//span[normalize-space(text())="${strategyName}"]`));
+    }
+
+    static get getOptimizerRibbon() {
+        const label = OptimizerPageConstants.optimizerRibbon;
+        return{
+            collapseView: element(By.id(label.collapseView)),
+            expandView: element(By.id(label.expandView)),
+            minusSign: element(By.css(`#${label.expandView}>span>img`)),
+            plusSign: element(By.css(`#${label.collapseView}>span>img`))
+        };
+    }
+
+    static get getCloseOptimizerViewTab(){
+        return element(By.xpath('//ul[@id="idViewTabDiv_ul"]//span[text()="Close"]'));
+    }
+
+    static get getDeleteViewPopup(){
+        const label = OptimizerPageConstants.deleteViewPopup;
+        return {
+            deleteViewMessage: element(By.xpath(`//div[@id="${label.deleteViewPopup}"]/div/div[1]`)),
+            viewName: element(By.id(label.viewName)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
+    static getCurrentViewByName(viewName: string) {
+        return element(By.xpath(`//li[@id="idAnalyzerTab_SelView_viewinternal"]//span[normalize-space(text())="${viewName}"]`));
     }
 }
