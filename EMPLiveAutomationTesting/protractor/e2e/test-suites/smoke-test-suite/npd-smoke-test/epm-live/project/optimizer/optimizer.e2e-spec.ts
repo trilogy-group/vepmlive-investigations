@@ -41,7 +41,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         stepLogger.step('Click on "View" tab');
-        await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.view));
+        await PageHelper.click(OptimizerPage.getTabOptions.view);
         await WaitHelper.waitForElementToBeDisplayed(OptimizerPage.viewManagementOptions.saveView, PageHelper.timeout.s);
         stepLogger.verification('View tab details displayed');
         await expect(await PageHelper.isElementDisplayed(OptimizerPage.viewManagementOptions.saveView)).toBe(true,
@@ -82,7 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.step('Click on "Ok" button');
         await PageHelper.click(label.ok);
-        await WaitHelper.waitForTextToBePresent(OptimizerPage.viewManagementOptions.currentViewDropdown, viewName);
+        await WaitHelper.waitForElementToHaveExactText(OptimizerPage.viewManagementOptions.currentViewDropdown, viewName);
         // Taking time to reflect
         stepLogger.verification('View saved and displayed under "Current View"');
         await expect(await PageHelper.getText(OptimizerPage.viewManagementOptions.currentViewDropdown))
@@ -90,7 +90,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(8);
         stepLogger.step('Click on "Close"');
-        await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.optimizer));
+        await PageHelper.click(OptimizerPage.getTabOptions.optimizer);
         await PageHelper.click(OptimizerPage.getCloseOptimizerWindow);
         stepLogger.verification('Optimizer window closed');
         await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCloseOptimizerWindow)).toBe(false,
@@ -105,7 +105,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(10);
         stepLogger.step('Go to "View" Tab and Expand "Current View" drop down');
-        await PageHelper.click(OptimizerPage.getTabOptions(OptimizerPageConstants.tabOptions.view));
+        await PageHelper.click(OptimizerPage.getTabOptions.view);
         await OptimizerPageHelper.selectPreviouslySavedView(viewName);
 
         stepLogger.stepId(11);
