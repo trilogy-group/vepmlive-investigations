@@ -167,4 +167,14 @@ export class OptimizerPage extends BasePage {
         const label = OptimizerPageConstants.optimizerConfiguration;
         return element(By.xpath(`//select[@id="${label.selectedFieldsSelect}"]//option[text()="${fieldName}"]`));
     }
+
+    static get getRenameStrategyPopup(){
+        const label = OptimizerPageConstants.renameStrategyPopup;
+        return{
+            strategyName: element(By.id(label.strategyName)),
+            ok: this.getButtonOnPopup(label.ok),
+            cancel: this.getButtonOnPopup(label.cancel)
+        };
+    }
+
 }

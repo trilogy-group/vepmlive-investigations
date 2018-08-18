@@ -174,9 +174,12 @@ export class OptimizerPageHelper {
     }
 
     static async verifyDeleteViewPopup(stepLogger: StepLogger) {
-        const actualDelMessage = await PageHelper.getText(OptimizerPage.getDeleteViewPopup.deleteViewMessage);
+        const label = OptimizerPage.getDeleteViewPopup;
+        const actualDelMessage = await PageHelper.getText(label.deleteViewMessage);
         const expectedDelMessage = OptimizerPageConstants.deleteViewPopup.deleteViewMessage;
         await ExpectationHelper.verifyStringEqualTo(actualDelMessage, expectedDelMessage, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, stepLogger);
     }
 
     static async verifyDeletedView(stepLogger: StepLogger, deletedViewName: string) {
@@ -339,5 +342,58 @@ export class OptimizerPageHelper {
     static async verifyRemovedFieldInAvailableFields(fieldName: string, stepLogger: StepLogger) {
         await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getAvailableFieldByName(fieldName),
             `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`, stepLogger);
+    }
+
+    static async verifySaveStrategyPopup(stepLogger: StepLogger) {
+        const saveStategyLabel = OptimizerPage.getOptimierSaveStrategyPopup;
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.strategyName,
+            `Strategy Name in ${OptimizerPageConstants.saveStrategy}`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.personalStrategyCheckBox,
+            `Personal strategy checkbox`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.ok,
+            OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(saveStategyLabel.cancel,
+            OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async clickRenameStrategy(stepLogger: StepLogger) {
+        stepLogger.step('Click on Rename Strategy button.');
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.renameStrategy);
+    }
+
+    static async verifyRenameStrategyPopup(stepLogger: StepLogger) {
+        const renameStategyLabel = OptimizerPage.getRenameStrategyPopup;
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.strategyName,
+            `Strategy Name in ${OptimizerPageConstants.renameStrategy}`, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.ok,
+            OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(renameStategyLabel.cancel,
+            OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async selectStrategyFromCurrentStrategy(stepLogger: StepLogger) {
+        stepLogger.step('Select strategy from current strategy');
+        const label = OptimizerPage.getOptimizerStrategyActions ;
+        await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
+        // takes time to expand dropdown
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(label.currentStrategyDropdownValue);
+        await browser.sleep(PageHelper.timeout.xs);
+    }
+
+    static async verifyViewTabContent(stepLogger: StepLogger) {
+        const viewTabLabel = OptimizerPage.viewManagementOptions;
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.saveView, 'Save view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.renameView, 'Rename view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.deleteView, 'Delete view', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.clearSorting, 'Clear sorting', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.selectColumns, 'Select columns', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabLabel.currentViewDropdown,
+            OptimizerPageConstants.currentView, stepLogger);
+    }
+
+    static async verifyCurrentViewDropdown(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.currentViewDropdown,
+            'Current View Dropdown', stepLogger);
     }
 }

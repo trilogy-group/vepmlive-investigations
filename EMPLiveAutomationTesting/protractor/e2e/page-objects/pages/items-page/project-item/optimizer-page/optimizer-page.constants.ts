@@ -20,6 +20,8 @@ export class OptimizerPageConstants {
     static readonly currentView= 'Current View';
     static readonly configure= 'Configure window';
     static readonly selectColumns= 'Select Columns Window';
+    static readonly saveStrategy = 'Save strategy popup';
+    static readonly renameStrategy = 'Rename strategy popup';
 
     static get viewManagementOptions() {
         return {
@@ -122,6 +124,14 @@ export class OptimizerPageConstants {
             deleteViewPopup: 'idDeleteViewDlg',
             deleteViewMessage: 'Are you sure you want to delete this view?',
             viewName: 'id_DeleteView_Name',
+            ok: 'OK',
+            cancel: 'Cancel'
+        };
+    }
+
+    static get renameStrategyPopup(){
+        return{
+            strategyName: 'idRenameStrat',
             ok: 'OK',
             cancel: 'Cancel'
         };
