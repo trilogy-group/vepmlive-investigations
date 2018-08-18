@@ -4,6 +4,9 @@ import {browser, ElementFinder, protractor} from 'protractor';
 export class WaitHelper {
     static readonly EC = protractor.ExpectedConditions;
 
+    static async staticWait(ms: number) {
+        await browser.sleep(ms);
+    }
     /**
      * Default timeout for promises
      * @type {number}
