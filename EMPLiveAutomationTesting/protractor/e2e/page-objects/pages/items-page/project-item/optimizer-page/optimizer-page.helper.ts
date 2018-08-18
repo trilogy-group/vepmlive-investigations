@@ -98,9 +98,7 @@ export class OptimizerPageHelper {
 
     static async gotoConfigureSection(stepLogger: StepLogger) {
         await CommonPageHelper.gotoOptimizer(stepLogger);
-        stepLogger.step('Click on Configure button.');
-        await browser.sleep(PageHelper.timeout.xs);
-        await PageHelper.click(OptimizerPage.getConfigure);
+        await this.clickConfigure(stepLogger);
     }
 
     static async openSaveStrategyPopup(stepLogger: StepLogger) {
@@ -267,5 +265,79 @@ export class OptimizerPageHelper {
     static async clickOKonSelectColumnPopup(stepLogger: StepLogger) {
         stepLogger.step('Click on Ok');
         await PageHelper.click(OptimizerPage.getSelectColumnsPopup.ok);
+    }
+
+    static async verifyOptimizerTabOptions(stepLogger: StepLogger) {
+        const tabLabel = OptimizerPage.getTabOptions;
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab' , stepLogger);
+    }
+
+    static async verifyOptimizerTabContents(stepLogger: StepLogger) {
+        const actionsLabel = OptimizerPage.getOptimizerStrategyActions;
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.currentStrategyDropdown,
+            OptimizerPageConstants.currentStrategy , stepLogger);
+    }
+
+    static async verifyConfigureScreen(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        const configConst = OptimizerPageConstants.optimizerConfiguration;
+        await ExpectationHelper.verifyContainsText(configLabel.enterValueLabel,
+            OptimizerPageConstants.configure, configConst.enterValueLabel , stepLogger);
+        await ExpectationHelper.verifyContainsText(configLabel.titleComparisonLabel,
+            OptimizerPageConstants.configure, configConst.titleComparisonLabel , stepLogger);
+        await ExpectationHelper.verifyContainsText(configLabel.thirdQuestion,
+            OptimizerPageConstants.configure, configConst.thirdQuestion , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(configLabel.cancel, OptimizerPageConstants.cancel, stepLogger);
+    }
+
+    static async clickConfigure(stepLogger: StepLogger) {
+        stepLogger.step('Click on Configure button.');
+        await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getConfigure);
+    }
+
+    static async verifyOptimizerConfigurationPopupOpened(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getOptimizerConfiguration.heading,
+            OptimizerPageConstants.configure, stepLogger);
+    }
+
+    static async selectAvailableFieldAndAdd(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        stepLogger.step('Select Value from the Available Fields selection box. Click on Add button.');
+        await PageHelper.click(configLabel.firstAvailableField);
+        const fieldName = PageHelper.getText(configLabel.firstAvailableField);
+        await PageHelper.click(configLabel.add);
+        return fieldName;
+    }
+
+    static async verifyAddedFieldInSelectedFields(fieldName: string, stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        await ExpectationHelper.verifyText(configLabel.firstSelectedField,
+            OptimizerPageConstants.selectedFieldsSection, fieldName, stepLogger);
+    }
+
+    static async selectSelectedFiedldAndRemove(stepLogger: StepLogger) {
+        const configLabel = OptimizerPage.getOptimizerConfiguration;
+        if (!(await PageHelper.isElementPresent(configLabel.firstSelectedField, false))) {
+            this.selectAvailableFieldAndAdd(stepLogger);
+        }
+        stepLogger.step('Select Value from the Selected Fields selection box. Click on Remove button.');
+        await PageHelper.click(configLabel.firstSelectedField);
+        const fieldName = PageHelper.getText(configLabel.firstSelectedField);
+        await PageHelper.click(configLabel.remove);
+        return fieldName;
+    }
+
+    static async verifyRemovedFieldInAvailableFields(fieldName: string, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getAvailableFieldByName(fieldName),
+            `${fieldName} in ${OptimizerPageConstants.selectedFieldsSection}`, stepLogger);
     }
 }
