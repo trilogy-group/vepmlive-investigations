@@ -43,9 +43,9 @@ export class ChangeItemPageHelper {
         await PageHelper.sendKeysToInputField(ChangeItemPage.inputs.priority, priority);
         await WaitHelper.staticWait(PageHelper.timeout.xs);
         stepLogger.verification(`Verify - Priority: Select the value  "${priority}"`);
-       /* await expect(await ElementHelper.hasSelectedOption(ChangeItemPage.inputs.priority, priority))
-            .toBe(true,
-                ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));*/
+        /* await expect(await ElementHelper.hasSelectedOption(ChangeItemPage.inputs.priority, priority))
+             .toBe(true,
+                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.priority, priority));*/
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "Save" button in "Changes - New Item" window');
@@ -59,12 +59,14 @@ export class ChangeItemPageHelper {
         stepLogger.step('Various Create New options are displayed');
 
         await CommonPageHelper.labelDisplayedValidation
-        (CreateNewPage.navigation.listApps.change , CreateNewPageConstants.navigationLabels.listApps.change );
+        (CreateNewPage.navigation.listApps.change, CreateNewPageConstants.navigationLabels.listApps.change);
     }
+
     static async createChangeLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "Change" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.change);
-       }
+    }
+
     static async createNewChangeAndValidateIt(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await this.createNewChange(stepLogger);
@@ -86,13 +88,13 @@ export class ChangeItemPageHelper {
         await ChangeItemPageHelper.fillForm(titleValue, priority, stepLogger);
 
         stepLogger.verification('"Changes - New Item" window is closed');
-      //  await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
+        //  await CommonPageHelper.windowShouldNotBeDisplayedValidation(ChangeItemPageConstants.pageName);
 
         stepLogger
             .verification('Notification about New Changes created [Ex: New Change Item 1]' +
                 ' displayed on the Home Page');
         await CommonPageHelper.notificationDisplayedValidation
-        (CommonPageHelper.getNotificationByText(titleValue) , ChangeItemPageConstants.pageName );
+        (CommonPageHelper.getNotificationByText(titleValue), ChangeItemPageConstants.pageName);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
             CommonPage.pageHeaders.projects.changes,
@@ -102,6 +104,7 @@ export class ChangeItemPageHelper {
             ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         return titleValue;
     }
+
     static async editChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await CommonPageHelper.editOptionViaRibbon(stepLogger);
         titleValue = titleValue + 'Edited';
@@ -117,9 +120,10 @@ export class ChangeItemPageHelper {
             titleValue,
             ChangeItemPageConstants.columnNames.linkTitleNoMenu);
         stepLogger.verification('Newly created Change [Ex: New Change Item 1] displayed in "Changes" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue), titleValue);
         return titleValue;
-      }
+    }
+
     static async deleteChangeAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.changes,
             CommonPage.pageHeaders.projects.changes,
@@ -138,6 +142,6 @@ export class ChangeItemPageHelper {
             ChangeItemPageConstants.columnNames.linkTitleNoMenu);
 
         stepLogger.step('Validating deleted Risk  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 }

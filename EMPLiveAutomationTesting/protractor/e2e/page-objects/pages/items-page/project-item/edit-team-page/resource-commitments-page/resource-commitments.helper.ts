@@ -17,20 +17,21 @@ export class ResourceCommitmentsHelper {
 
         stepLogger.verification('Specific Parameter Values is displayed ');
         await CommonPageHelper.fieldDisplayedValidation
-        (ResourceCommitments.specifyParameterValues, ResourceCommitmentsConstansts.specifyParameterValues );
+        (ResourceCommitments.specifyParameterValues, ResourceCommitmentsConstansts.specifyParameterValues);
 
-        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource , 1 ));
+        await  PageHelper.click(CommonPage.getDropDownByParameterName(ResourceCommitmentsConstansts.resource, 1));
 
         await this.selectResource(stepLogger);
 
         await CommonPageHelper.clickApplyButton(stepLogger);
     }
+
     static async selectResource(stepLogger: StepLogger) {
         await  PageHelper.click(ResourceCommitments.getDropDownByParameterName);
         stepLogger.step('Select Resource ');
 
         await DropDownHelper.selectOptionByVal
-        (ResourceCommitments.getDropDownByParameterName, '10001' );
+        (ResourceCommitments.getDropDownByParameterName, '10001');
         await CommonPageHelper.waitForApplyButtontoDisplayed();
     }
 }

@@ -21,17 +21,20 @@ export class IssueItemPageHelper {
     static async clickCreateNewIssue(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
-        }
+    }
+
     static async newIconFromLeftSideMenu(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
-        }
+    }
+
     static async clickIssueLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "Issue" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.issue);
-         }
-    static async clickProject(stepLogger: StepLogger , projectName: string , labels: string) {
+    }
+
+    static async clickProject(stepLogger: StepLogger, projectName: string, labels: string) {
         await PageHelper.click(IssueItemPage.inputs.project);
         stepLogger.verification('Required values entered/selected in Project Field');
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(projectName).isPresent())
@@ -41,26 +44,26 @@ export class IssueItemPageHelper {
 
     }
 
-    static async enterIssueTitle(stepLogger: StepLogger , titleValue: string ) {
+    static async enterIssueTitle(stepLogger: StepLogger, titleValue: string) {
         stepLogger.step('Title *: Random New Issue Item');
         await TextboxHelper.sendKeys(IssueItemPage.inputs.title, titleValue);
 
     }
 
-    static  async createIssueAndValidateIt(stepLogger: StepLogger ) {
+    static async createIssueAndValidateIt(stepLogger: StepLogger) {
         stepLogger.stepId(1);
         await this.clickCreateNewIssue(stepLogger);
 
         stepLogger.step('Various Create New options are displayed');
         await CommonPageHelper.labelDisplayedValidation
-        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
+        (CreateNewPage.navigation.listApps.issue, CreateNewPageConstants.navigationLabels.listApps.issue);
 
         stepLogger.stepId(2);
         await this.newIconFromLeftSideMenu(stepLogger);
 
         stepLogger.step('Various Create New options are displayed');
         await CommonPageHelper.labelDisplayedValidation
-        (CreateNewPage.navigation.listApps.issue , CreateNewPageConstants.navigationLabels.listApps.issue );
+        (CreateNewPage.navigation.listApps.issue, CreateNewPageConstants.navigationLabels.listApps.issue);
 
         stepLogger.stepId(3);
         await this.clickIssueLink(stepLogger);
@@ -75,7 +78,7 @@ export class IssueItemPageHelper {
 
         stepLogger.step('Title *: Random New Issue Item');
         const titleValue = `${labels.title} ${uniqueId}`;
-        await this.enterIssueTitle(stepLogger, titleValue ) ;
+        await this.enterIssueTitle(stepLogger, titleValue);
 
         stepLogger.verification('Required values entered/selected in title Field');
         await expect(await TextboxHelper.hasValue(IssueItemPage.inputs.title, titleValue))
@@ -88,7 +91,7 @@ export class IssueItemPageHelper {
         await WaitHelper.waitForElementToBeDisplayed(IssueItemPage.inputs.project);
         const projectName = await IssueItemPage.inputs.project.getText();
 
-        await this.clickProject(stepLogger, projectName, labels.project );
+        await this.clickProject(stepLogger, projectName, labels.project);
 
         stepLogger.stepId(4);
         stepLogger.step('Click on "Save" button in "Issues - New Item" window');
@@ -98,7 +101,7 @@ export class IssueItemPageHelper {
         stepLogger
             .verification('Notification about New Issues created [Ex: New Issue Item 1] displayed on the Home Page');
         await CommonPageHelper.notificationDisplayedValidation
-        (CommonPageHelper.getNotificationByText(titleValue) , IssueItemPageConstants.pageName );
+        (CommonPageHelper.getNotificationByText(titleValue), IssueItemPageConstants.pageName);
 
         stepLogger.stepId(5);
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
@@ -109,10 +112,11 @@ export class IssueItemPageHelper {
             IssueItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Issue [Ex: New Issue Item 1] displayed in "Issues" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue), titleValue);
         return titleValue;
     }
-    static async editItemAndValidateIt(stepLogger: StepLogger, titleValue: string ) {
+
+    static async editItemAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         titleValue = titleValue + 'Edited';
 
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -135,7 +139,8 @@ export class IssueItemPageHelper {
             IssueItemPageConstants.columnNames.title);
         return titleValue;
     }
-    static async deleteItemAndValidateIt(stepLogger: StepLogger, titleValue: string ) {
+
+    static async deleteItemAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await RiskItemPageHelper.deleteOptionViaRibbon(stepLogger);
 
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.issues,
@@ -146,6 +151,6 @@ export class IssueItemPageHelper {
             IssueItemPageConstants.columnNames.title);
 
         stepLogger.step('Validating deleted Risk  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 }

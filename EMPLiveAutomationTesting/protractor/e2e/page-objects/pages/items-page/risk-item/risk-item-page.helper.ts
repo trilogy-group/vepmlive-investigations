@@ -10,7 +10,7 @@ import {StepLogger} from '../../../../../core/logger/step-logger';
 import {RiskItemPage} from './risk-item.po';
 import {CommonPage} from '../../common/common.po';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import { CheckboxHelper } from '../../../../components/html/checkbox-helper';
+import {CheckboxHelper} from '../../../../components/html/checkbox-helper';
 import {CreateNewPage} from '../create-new.po';
 import {HomePage} from '../../homepage/home.po';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
@@ -104,20 +104,20 @@ export class RiskItemPageHelper {
     static async unCheckColumns(stepLogger: StepLogger) {
         stepLogger.step('Deselect non required and default selected column "Schedule Status"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.scheduledStatusCheckBox))
-        .toBe(true,
-            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.scheduleStatus));
         await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.scheduledStatusCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column "Exposure"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.exposureCheckBox))
-        .toBe(true,
-            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.exposure));
         await  CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.exposureCheckBox, false);
 
         stepLogger.step('Deselect non required and default selected column Schedule "Due"');
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewNewPageActions.dueCheckBox))
-        .toBe(true,
-            ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
+            .toBe(true,
+                ValidationsHelper.getDisplayedValidation(CommonPageConstants.newPublicViewformLabels.due));
         await CheckboxHelper.markCheckbox(CommonPage.viewNewPageActions.dueCheckBox, false);
     }
 
@@ -132,50 +132,54 @@ export class RiskItemPageHelper {
     static async verifyRiskViewAdd(stepLogger: StepLogger, titleNewView: string) {
         stepLogger.verification('Newly created Public risk view is selected in "View" drop down');
         await expect(await PageHelper.isElementDisplayed(CommonPageHelper.getDropDownViewByText(titleNewView)))
-                    .toBe(true,
+            .toBe(true,
                 ValidationsHelper.getDisplayedValidation(titleNewView));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.title} columns selected to display in the view should be displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.titleViewColumn))
-                        .toBe(true,
-                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.title));
+            .toBe(true,
+                ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.title));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.assignedTo} columns
         selected to display in the view should be displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.assignedToViewColumn))
-                        .toBe(true,
-                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.assignedTo));
+            .toBe(true,
+                ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.assignedTo));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.status} columns selected to display in the view should be displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.statusViewColumn))
-                        .toBe(true,
-                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.status));
+            .toBe(true,
+                ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.status));
 
         stepLogger.verification(`${RiskItemPageConstants.columnNames.dueDate} columns selected to display in the view should be displayed`);
         await expect(await PageHelper.isElementDisplayed(CommonPage.viewPageActions.dueDateViewColumn))
-                        .toBe(true,
-                            ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
+            .toBe(true,
+                ValidationsHelper.getNewViewCloumnShouldDisplayed(RiskItemPageConstants.columnNames.dueDate));
     }
+
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
 
-        await CommonPageHelper.refreshPageIfRibbonElementIsDisable(stepLogger, RiskItemPage.deleteRisk );
+        await CommonPageHelper.refreshPageIfRibbonElementIsDisable(stepLogger, RiskItemPage.deleteRisk);
 
         stepLogger.step('Select "Delete" from the options displayed');
         await PageHelper.click(RiskItemPage.deleteRisk);
 
         await PageHelper.acceptAlert();
     }
+
     static async clickCreateNew(stepLogger: StepLogger) {
         stepLogger.step('Select "Create New" icon  from left side menu');
         await PageHelper.click(CommonPage.sidebarMenus.createNew);
 
     }
+
     static async clickNewRiskIcon(stepLogger: StepLogger) {
         stepLogger.step('Click on "Risk" link from the options displayed');
         await PageHelper.click(CreateNewPage.navigation.listApps.risk);
 
     }
+
     static async enterRiskTitle(stepLogger: StepLogger) {
         const uniqueId = PageHelper.getUniqueId();
         const labels = RiskItemPageConstants.inputLabels;
@@ -189,6 +193,7 @@ export class RiskItemPageHelper {
 
         return titleValue;
     }
+
     static async selectProjectFromDropDown(stepLogger: StepLogger) {
 
         stepLogger.step('Project *: Select any project from the drop down [Ex: PM User Project 1])');
@@ -198,21 +203,22 @@ export class RiskItemPageHelper {
 
         await PageHelper.click(RiskItemPage.inputs.project);
     }
+
     static async saveRisk(stepLogger: StepLogger) {
         stepLogger.step('Click on "Save" button in "Risks - New Item" window');
         await PageHelper.click(CommonPage.formButtons.save);
-        }
+    }
 
-    static async  createRiskAndValidateIt(stepLogger: StepLogger) {
+    static async createRiskAndValidateIt(stepLogger: StepLogger) {
         stepLogger.step('Enter/Select required details in "Risks - New Item" window as described below');
 
         await this.clickCreateNew(stepLogger);
 
         await this.clickNewRiskIcon(stepLogger);
 
-        const titleValue = await this.enterRiskTitle(stepLogger );
+        const titleValue = await this.enterRiskTitle(stepLogger);
 
-        await this.selectProjectFromDropDown(stepLogger );
+        await this.selectProjectFromDropDown(stepLogger);
 
         await this.saveRisk(stepLogger);
 
@@ -225,10 +231,11 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue), titleValue);
         return titleValue;
     }
-    static async  editRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+
+    static async editRiskAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
             CommonPageConstants.pageHeaders.projects.risks,
@@ -242,7 +249,7 @@ export class RiskItemPageHelper {
         titleValue = titleValue + 'Edited';
         await TextboxHelper.sendKeys(RiskItemPage.inputs.title, titleValue);
 
-        await this.saveRisk(stepLogger );
+        await this.saveRisk(stepLogger);
 
         await PageHelper.switchToDefaultContent();
 
@@ -254,12 +261,13 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Risk [Ex: New Risk Item 1] displayed in "Risks" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue) , titleValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(titleValue), titleValue);
 
         return titleValue;
 
     }
-    static async deleteRiskAndValidateIt(stepLogger: StepLogger , titleValue: string  ) {
+
+    static async deleteRiskAndValidateIt(stepLogger: StepLogger, titleValue: string) {
         stepLogger.step('Select a Risk and Click on "ITEMS" >> Delete Item');
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.risks,
             CommonPage.pageHeaders.projects.risks,
@@ -278,6 +286,6 @@ export class RiskItemPageHelper {
             RiskItemPageConstants.columnNames.title);
 
         stepLogger.step('Validating deleted Risk  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound );
-      }
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
+    }
 }
