@@ -16,7 +16,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
+    it('Verify the Optimizer and View Option of the Optimizer page.  - [744404]', async () => {
         const stepLogger = new StepLogger(744404);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -32,7 +32,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyOptimizerTabOptions(stepLogger);
     });
 
-    fit('Verify the Content of Optimizer Option Tab.  - [744405]', async () => {
+    it('Verify the Content of Optimizer Option Tab.  - [744405]', async () => {
         const stepLogger = new StepLogger(744405);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -50,7 +50,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyOptimizerTabContents(stepLogger);
     });
 
-    fit('Verify the content of Optimizer configuration screen. - [744407]', async () => {
+    it('Verify the content of Optimizer configuration screen. - [744407]', async () => {
         const stepLogger = new StepLogger(744407);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -69,7 +69,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyConfigureScreen(stepLogger);
     });
 
-    fit('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
+    it('Verify the Add button of the Optimizer configuration screen. - [744408]', async () => {
         const stepLogger = new StepLogger(744408);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -91,7 +91,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyAddedFieldInSelectedFields(fieldName, stepLogger);
     });
 
-    fit('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
+    it('Verify the Remove button of the Optimizer configuration screen. - [744409]', async () => {
         const stepLogger = new StepLogger(744409);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -113,7 +113,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName, stepLogger);
     });
 
-    fit('Verify the content of Save Strategy button. - [744410]', async () => {
+    it('Verify the content of Save Strategy button. - [744410]', async () => {
         const stepLogger = new StepLogger(744410);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -132,7 +132,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifySaveStrategyPopup(stepLogger);
     });
 
-    fit('Verify the Rename Strategy button. - [744411]', async () => {
+    it('Verify the Rename Strategy button. - [744411]', async () => {
         const stepLogger = new StepLogger(744411);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -152,7 +152,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyRenameStrategyPopup(stepLogger);
     });
 
-    fit('Verify the content of View Tab of optimizer. - [744413]', async () => {
+    it('Verify the content of View Tab of optimizer. - [744413]', async () => {
         const stepLogger = new StepLogger(744413);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -171,7 +171,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyViewTabContent(stepLogger);
     });
 
-    fit('Verify the on Delete View button. - [744414]', async () => {
+    it('Verify the on Delete View button. - [744414]', async () => {
         const stepLogger = new StepLogger(744414);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -191,7 +191,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.verifyDeleteViewPopup(stepLogger);
     });
 
-    fit('Verify the Current View drop down - [744415]', async () => {
+    it('Verify the Current View drop down - [744415]', async () => {
         const stepLogger = new StepLogger(744415);
         // Step 1 is inside the below function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
