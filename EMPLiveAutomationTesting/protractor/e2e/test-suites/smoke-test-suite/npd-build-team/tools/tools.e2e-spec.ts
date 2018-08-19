@@ -13,11 +13,9 @@ import {ElementHelper} from '../../../../components/html/element-helper';
 import {LoginPage} from '../../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });

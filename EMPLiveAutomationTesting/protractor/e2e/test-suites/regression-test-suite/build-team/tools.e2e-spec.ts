@@ -14,11 +14,9 @@ import {ProjectItemPageHelper} from '../../../page-objects/pages/items-page/proj
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 
 describe(SuiteNames.regressionTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });

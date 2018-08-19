@@ -18,11 +18,9 @@ import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resou
 import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });

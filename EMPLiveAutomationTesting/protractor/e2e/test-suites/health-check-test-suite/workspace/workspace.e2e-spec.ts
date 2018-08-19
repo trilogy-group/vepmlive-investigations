@@ -1,5 +1,4 @@
 import {PageHelper} from '../../../components/html/page-helper';
-import {HomePage} from '../../../page-objects/pages/homepage/home.po';
 import {SuiteNames} from '../../helpers/suite-names';
 import {LoginPage} from '../../../page-objects/pages/login/login.po';
 import {StepLogger} from '../../../../core/logger/step-logger';
