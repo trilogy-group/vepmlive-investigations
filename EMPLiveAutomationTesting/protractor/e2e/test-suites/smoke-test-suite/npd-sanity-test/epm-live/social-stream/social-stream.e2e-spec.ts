@@ -59,7 +59,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(SocialStreamPage.settingItems.socialStream);
 
         stepLogger.verification('the respective options should get selected');
-        await expect(SocialStreamPage.socialStreamColumn.getText()).toBe(SocialStreamPageConstants.settingItems.socialStream,
+        await expect(await SocialStreamPage.socialStreamColumn.getText()).toBe(SocialStreamPageConstants.settingItems.socialStream,
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.socialStream));
 
         stepLogger.stepId(5);

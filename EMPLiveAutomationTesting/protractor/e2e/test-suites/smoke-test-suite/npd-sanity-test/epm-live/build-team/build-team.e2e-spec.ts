@@ -15,6 +15,7 @@ import {ProjectItemPageValidations} from '../../../../../page-objects/pages/item
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -452,7 +453,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(CommonPage.regionCheckBox, false);
 
         stepLogger.verification('Always follow web settings check box is unchecked');
-        await expect(CheckboxHelper.checkboxstatus(CommonPage.regionCheckBox)).toBe(false,
+        await expect(await CheckboxHelper.isCheckboxChecked(CommonPage.regionCheckBox)).toBe(false,
             ValidationsHelper.getCheckBoxNotSelectedValidation());
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');
