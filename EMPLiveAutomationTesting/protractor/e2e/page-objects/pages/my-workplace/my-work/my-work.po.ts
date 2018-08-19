@@ -100,4 +100,48 @@ export class MyWorkPage {
     static get selectedPageTab() {
         return element(By.xpath(`.//*[@aria-selected="true" and @title='${CommonPageConstants.ribbonMenuTitles.page}']`));
     }
+
+    static get selectRibbonTabs(){
+        const tabNames = MyWorkPageConstants.ribbonTabs;
+        return{
+            page: this.getLinkByTitle(tabNames.page),
+            hide: this.getLinkByTitle(tabNames.hide),
+            manage: this.getLinkByTitle(tabNames.manage),
+            views: this.getLinkByTitle(tabNames.views)
+        };
+    }
+
+    static get getViewRibbonOptions(){
+        const viewRibbonlabel = MyWorkPageConstants.viewRibbonOptions;
+        return{
+            saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
+            renameView: AnchorHelper.getAnchorById(viewRibbonlabel.renameView),
+            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView)
+        };
+    }
+
+    static get viewsPopup(){
+        const viewPopuplabel = MyWorkPageConstants.viewsPopUp;
+        return{
+            title: AnchorHelper.getItemById(viewPopuplabel.title),
+            name: this.saveViewElements(viewPopuplabel.name),
+            defaultView: this.saveViewElements(viewPopuplabel.defaultView),
+            personalView: this.saveViewElements(viewPopuplabel.personalView),
+            ok: this.saveViewElements(viewPopuplabel.ok),
+            cancel: this.saveViewElements(viewPopuplabel.cancel),
+            newName: this.saveViewElements(viewPopuplabel.newName),
+        };
+    }
+
+    static get getCurrentView() {
+        return element(By.css('.ms-cui-dd-text>a'));
+    }
+
+    static getLinkByTitle(text: string) {
+        return element(By.css(`[title='${text}']`));
+    }
+
+    static saveViewElements(idOrAny: string) {
+        return element(By.xpath(`//div[@class='ms-dlgBorder']//input[@*="${idOrAny}"]`));
+    }
 }
