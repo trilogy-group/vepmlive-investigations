@@ -6,11 +6,9 @@ import {StepLogger} from '../../../../core/logger/step-logger';
 import {WorkspacePageHelper} from '../../../page-objects/pages/workspaces/workspace-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
