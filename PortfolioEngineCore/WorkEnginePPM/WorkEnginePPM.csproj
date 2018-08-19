@@ -791,6 +791,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>workitems.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\XEPKadmin1.cs" />
+    <Compile Include="Layouts\ppm\XmlHelper.cs" />
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="MyTasks\MyTasks.cs" />
     <Compile Include="PersonalPlanner\PersonalPlanner.cs" />
