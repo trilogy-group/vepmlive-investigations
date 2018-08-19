@@ -102,43 +102,43 @@ export class MyWorkPage {
     }
 
     static get selectRibbonTabs(){
-        const label = MyWorkPageConstants.ribbonTabs;
+        const tabNames = MyWorkPageConstants.ribbonTabs;
         return{
-            page: this.getLinkByTitle(label.page),
-            hide: this.getLinkByTitle(label.hide),
-            manage: this.getLinkByTitle(label.manage),
-            views: this.getLinkByTitle(label.views)
+            page: this.getLinkByTitle(tabNames.page),
+            hide: this.getLinkByTitle(tabNames.hide),
+            manage: this.getLinkByTitle(tabNames.manage),
+            views: this.getLinkByTitle(tabNames.views)
         };
     }
 
     static get getViewRibbonOptions(){
-        const label = MyWorkPageConstants.viewRibbonOptions;
+        const viewRibbonlabel = MyWorkPageConstants.viewRibbonOptions;
         return{
-            saveView: AnchorHelper.getAnchorById(label.saveView),
-            renameView: AnchorHelper.getAnchorById(label.renameView),
-            deleteView: AnchorHelper.getAnchorById(label.deleteView)
+            saveView: AnchorHelper.getAnchorById(viewRibbonlabel.saveView),
+            renameView: AnchorHelper.getAnchorById(viewRibbonlabel.renameView),
+            deleteView: AnchorHelper.getAnchorById(viewRibbonlabel.deleteView)
         };
     }
 
     static get viewsPopup(){
-        const label = MyWorkPageConstants.viewsPopUp;
+        const viewPopuplabel = MyWorkPageConstants.viewsPopUp;
         return{
-            title: AnchorHelper.getItemById(label.title),
-            name: this.saveViewElements(label.name),
-            defaultView: this.saveViewElements(label.defaultView),
-            personalView: this.saveViewElements(label.personalView),
-            ok: this.saveViewElements(label.ok),
-            cancel: this.saveViewElements(label.cancel),
-            newName: this.saveViewElements(label.newName),
+            title: AnchorHelper.getItemById(viewPopuplabel.title),
+            name: this.saveViewElements(viewPopuplabel.name),
+            defaultView: this.saveViewElements(viewPopuplabel.defaultView),
+            personalView: this.saveViewElements(viewPopuplabel.personalView),
+            ok: this.saveViewElements(viewPopuplabel.ok),
+            cancel: this.saveViewElements(viewPopuplabel.cancel),
+            newName: this.saveViewElements(viewPopuplabel.newName),
         };
     }
 
-    static getCurrentView() {
-        return element(By.xpath('//span[@class="ms-cui-dd-text"]/a'));
+    static get getCurrentView() {
+        return element(By.css('.ms-cui-dd-text>a'));
     }
 
     static getLinkByTitle(text: string) {
-        return element(By.css(`a[title*='${text}']`));
+        return element(By.css(`[title='${text}']`));
     }
 
     static saveViewElements(idOrAny: string) {

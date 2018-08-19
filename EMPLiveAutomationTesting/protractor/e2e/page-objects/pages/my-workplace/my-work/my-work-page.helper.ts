@@ -10,7 +10,7 @@ import {MyWorkPage} from './my-work.po';
 import {LoginPageHelper} from '../../login/login-page.helper';
 import {AnchorHelper} from '../../../../components/html/anchor-helper';
 import {CommonPageConstants} from '../../common/common-page.constants';
-import {browser} from 'protractor';
+import {ExpectationHelper} from '../../../../components/misc-utils/expectation-helper';
 
 export class MyWorkPageHelper {
 
@@ -139,19 +139,20 @@ export class MyWorkPageHelper {
             CommonPageConstants.ribbonMenuTitles.page));
     }
 
-    static async fillAndSubmitSaveView(viewName: string) {
-        const label = MyWorkPage.viewsPopup;
-        await PageHelper.click(label.name);
-        // await label.name.clear();
-        await TextboxHelper.sendKeys(label.name, viewName);
-        // await PageHelper.sendKeysToInputField(label.name, viewName);
-        if (!(label.defaultView.isSelected())) {
-            label.defaultView.click();
+    static async fillAndSubmitSaveView() {
+        const uniqueId = PageHelper.getUniqueId();
+        const viewName = `${MyWorkPageConstants.viewName}${uniqueId}`;
+        const viewsPopupItems = MyWorkPage.viewsPopup;
+        await PageHelper.click(viewsPopupItems.name);
+        await TextboxHelper.sendKeys(viewsPopupItems.name, viewName);
+        if (!(await viewsPopupItems.defaultView.isSelected())) {
+            await PageHelper.click(viewsPopupItems.defaultView);
         }
-        if (!(label.personalView.isSelected())) {
-            label.defaultView.click();
+        if (!(await viewsPopupItems.personalView.isSelected())) {
+            await PageHelper.click(viewsPopupItems.personalView);
         }
-        await PageHelper.click(label.ok);
+        await PageHelper.click(viewsPopupItems.ok);
+        return viewName;
     }
 
     static async fillAndSubmitRenameView() {
@@ -161,10 +162,10 @@ export class MyWorkPageHelper {
         await PageHelper.click(MyWorkPage.viewsPopup.ok);
         return viewNewName;
     }
-    static async verifyAndAcceptRenameConfirmationPopup(viewName: string) {
-       await  browser.switchTo().alert().getText().then(function (popUpText) {
-           expect(popUpText).toBe(`Would you like to rename the "${viewName}" view?`);
-       });
-       await PageHelper.acceptAlert();
+    static async verifyAndAcceptRenameConfirmationPopup(viewName: string, stepLogger: StepLogger) {
+        const renamePopUpText = await PageHelper.getAlertText();
+        const expectedPopUpText = `Would you like to rename the "${viewName}" view?`;
+        await ExpectationHelper.verifyStringEqualTo(renamePopUpText, expectedPopUpText, stepLogger);
+        await PageHelper.acceptAlert();
     }
 }
