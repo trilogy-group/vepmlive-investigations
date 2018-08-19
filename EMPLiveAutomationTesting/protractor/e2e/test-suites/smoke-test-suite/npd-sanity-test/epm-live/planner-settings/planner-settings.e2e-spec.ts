@@ -106,7 +106,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('All existing Planners are displayed in the list along with the new planner created' +
             ' as per pre requisites [Ex: Smoke Test Planner 1]');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(plannerName)))
-            .toBe(true, ValidationsHelper.getRecordCreatedValidation(plannerName));
+            .toBe(true, ValidationsHelper.getRecordCreatedValidation([plannerName]));
 
         stepLogger.stepId(2);
         stepLogger.step('Mouse over the name of the newly created planner [Ex: Smoke Test Planner 1]\n' +

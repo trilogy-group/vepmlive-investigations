@@ -115,7 +115,6 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Click on the ITEMS tab above the grid From the ITEMS ribbon menu, click on Edit Plan' +
             'Click on Project Planner in the list of planners displayed');
         stepLogger.step('Click ITEMS tab select Edit Plan');
-        await WaitHelper.waitForPageToStable();
         await PageHelper.click(CommonPage.editPlan);
         stepLogger.step('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);

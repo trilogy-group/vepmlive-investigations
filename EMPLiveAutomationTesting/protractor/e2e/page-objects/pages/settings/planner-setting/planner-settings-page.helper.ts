@@ -16,12 +16,6 @@ import {ProjectItemPage} from '../../items-page/project-item/project-item.po';
 import {PlannerSettingPage} from './planner-setting.po';
 
 export class PlannerSettingsPageHelper {
-    static async expandPlannerSettingsNode() {
-        if (await PlannerSettingPage.collapsedMode.isPresent()) {
-            await PageHelper.click(PlannerSettingPage.collapsedMode);
-        }
-    }
-
     static get menu() {
         const menuTitles = PlannerSettingsPageConstants.menuTitles;
         const leftMenus = PlannerSettingsPageConstants.leftMenus;
@@ -49,6 +43,12 @@ export class PlannerSettingsPageHelper {
                 projectRequest: ElementHelper.getElementByText(labels.projectRequest)
             }
         };
+    }
+
+    static async expandPlannerSettingsNode() {
+        if (await PlannerSettingPage.collapsedMode.isPresent()) {
+            await PageHelper.click(PlannerSettingPage.collapsedMode);
+        }
     }
 
     static selectedSourceList(value: String) {
@@ -89,7 +89,7 @@ export class PlannerSettingsPageHelper {
 
         stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
-            .toBe(true, ValidationsHelper.getRecordCreatedValidation(name));
+            .toBe(true, ValidationsHelper.getRecordCreatedValidation([name]));
 
         stepLogger.stepId(6);
         stepLogger.step('Select "Navigation" icon  from left side menu');
@@ -123,7 +123,7 @@ export class PlannerSettingsPageHelper {
         stepLogger.verification('Newly created Planner [Ex: Smoke Test Planner 1] is displayed in the list');
         await PageHelper.switchToFrame(CommonPage.contentFrame);
         await expect(await PageHelper.isElementDisplayed(ElementHelper.getElementByText(name)))
-            .toBe(true, ValidationsHelper.getRecordCreatedValidation(name));
+            .toBe(true, ValidationsHelper.getRecordCreatedValidation([name]));
         await PageHelper.switchToDefaultContent();
 
         if (navigatedTOCreatedPlanner === true) {
