@@ -290,6 +290,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.designer.cs">
       <DependentUpon>CustomFieldForm.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CustomFieldHelper.cs" />
     <Compile Include="Layouts\ppm\Customfields.ashx.cs">
       <DependentUpon>Customfields.ashx</DependentUpon>
     </Compile>
