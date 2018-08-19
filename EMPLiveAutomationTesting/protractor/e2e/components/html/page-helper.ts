@@ -424,8 +424,7 @@ export class PageHelper {
         await item.sendKeys(filePath);
     }
 
-    public static async getAlertText(timeout: number = PageHelper.DEFAULT_TIMEOUT, message: string = 'Alert is not present') {
-        await this.waitForAlertToBePresent(timeout, message);
+    public static async getAlertText() {
         return await browser.switchTo().alert().getText();
     }
 
