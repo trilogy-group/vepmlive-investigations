@@ -41,11 +41,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -100,7 +100,7 @@ describe(SuiteNames.smokeTestSuite, () => {
                 stepLogger);
         stepLogger.stepId(3);
         stepLogger.step('Mouse over on any Project created as per pre requisites');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.record);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.record);
         await ElementHelper.actionHoverOver(CommonPage.record);
 
         stepLogger.step('Click on the Ellipses button (...)');
@@ -109,7 +109,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.contextMenuOptions.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
         .toBe(CommonPageConstants.ribbonLabels.editTeam,

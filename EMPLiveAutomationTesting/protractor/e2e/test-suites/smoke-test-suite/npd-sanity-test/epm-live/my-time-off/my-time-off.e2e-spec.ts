@@ -45,7 +45,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "+ new link" link displayed on top of "Time Off" page');
         await PageHelper.click(CommonPage.addNewLink);
         stepLogger.verification('"Time Off - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
 
         stepLogger.stepId(2);
         // step#3 and step#4 are inside this function
@@ -82,7 +82,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
             CommonPage.contextMenuOptions.viewItem, stepLogger);
         stepLogger.verification('"View TimeOff" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.myWorkplace.timeOff))
             .toBe(true,
                 ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.myWorkplace.timeOff));

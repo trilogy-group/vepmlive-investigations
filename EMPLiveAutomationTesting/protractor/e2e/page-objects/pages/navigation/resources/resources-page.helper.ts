@@ -40,7 +40,7 @@ export class ResourcesPageHelper {
     }
     static async clickNewInviteLink(stepLogger: StepLogger) {
         stepLogger.step('Click on "+ Invite" link displayed on top of "Resources" page');
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
         await CommonPageHelper.buttonDisplayedValidation(ResourcesPage.newInviteLink, ResourcesPageConstants.inviteLink );
 
         await PageHelper.click(ResourcesPage.newInviteLink);
@@ -68,11 +68,11 @@ export class ResourcesPageHelper {
         stepLogger.step('Provide values in required fields');
         await this.fillFormAndSave(displayName, stepLogger);
 
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
         stepLogger.stepId(4);
         await this.clickSearchIcon(stepLogger);
 
-        await WaitHelper.getInstance().staticWait(PageHelper.timeout.s);
+        await WaitHelper.staticWait(PageHelper.timeout.s);
         stepLogger.step('Enter newly created resource name');
         await TextboxHelper.sendKeys(ResourcesPage.searchTextbox, displayName, true);
 

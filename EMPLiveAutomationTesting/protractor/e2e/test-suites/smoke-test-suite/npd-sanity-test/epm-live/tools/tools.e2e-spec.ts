@@ -18,15 +18,13 @@ import {ResourcePlannerPageHelper} from '../../../../../page-objects/pages/resou
 import {ResourcePlannerPage} from '../../../../../page-objects/pages/resource-planner-page/resource-planner-page.po';
 
 describe(SuiteNames.smokeTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Navigate to Edit Resource Plan- [966351]', async () => {
+    it('Navigate to Edit Resource Plan- [966351]', async () => {
         const stepLogger = new StepLogger(966351);
         // Step #1 Inside this function
         await CommonPageHelper.navigateToItemPageUnderNavigation(
@@ -40,7 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.pageDisplayedValidation(ProjectItemPageConstants.pagePrefix);
 
         stepLogger.stepId(1);
-        await  WaitHelper.getInstance().waitForElementToBeDisplayed(ResourcePlannerPage.delete);
+        await  WaitHelper.waitForElementToBeDisplayed(ResourcePlannerPage.delete);
         await PageHelper.switchToDefaultContent();
         await PageHelper.switchToFrame(CommonPage.contentFrame);
 
@@ -80,7 +78,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.precondition('click on Project Planner');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on Project tab');
@@ -144,7 +142,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         stepLogger.step('Mouse over the item created as per pre requisites that need to be viewed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.project);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.project);
         await ElementHelper.actionHoverOver(CommonPage.project);
 
         stepLogger.step('Click on the Ellipses button (...)');
@@ -163,7 +161,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             'Select a template');
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
 
         stepLogger.verification('User should be navigated to Project Planner page');
         await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.projectPlanner))

@@ -15,6 +15,7 @@ import {ProjectItemPageValidations} from '../../../../../page-objects/pages/item
 import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {CheckboxHelper} from '../../../../../components/html/checkbox-helper';
+
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
     beforeEach(async () => {
@@ -43,11 +44,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -90,10 +91,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(5);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
         // After Saving Record, Security queue job takes 5-10 seconds to complete and update record.
-        await WaitHelper.getInstance().staticWait(5000);
+        await WaitHelper.staticWait(5000);
 
         stepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
@@ -116,16 +117,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
@@ -173,11 +174,11 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(CommonPageConstants.ribbonLabels.editTeam,
@@ -214,10 +215,10 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(7);
         stepLogger.step('Click on "Save & Close" button in "Edit Team" window');
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
         // After Saving Record, Security queue job takes 5-10 seconds to complete and update record.
-        await WaitHelper.getInstance().staticWait(5000);
+        await WaitHelper.staticWait(5000);
 
         stepLogger.step('switch to default content');
         await PageHelper.switchToDefaultContent();
@@ -240,16 +241,16 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonTitles.items);
 
         stepLogger.step('Click on "Edit Team" icon from ribbon panel');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await CommonPageHelper.switchToContentFrame(stepLogger);
 
         stepLogger.verification('Selected resource [Ex: Generic Resource 1] is added to "Current Team" (Left Side) grid');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
+        await WaitHelper.waitForElementToBeDisplayed(ProjectItemPage.teamRecordsName.currentTeam.last());
         await expect(await ProjectItemPageHelper.checkResourceAddedInCurrentTeam(selectedResourcePoolResourceName))
             .toBe(true,
                 ProjectItemPageValidations.getResourceAddedValidation(ProjectItemPageConstants.teamSectionlabels.currentTeam));
@@ -289,14 +290,14 @@ describe(SuiteNames.smokeTestSuite, () => {
             CommonPageConstants.pageHeaders.projects.projectCenter, stepLogger);
         await PageHelper.click(CommonPage.projectCheckbox);
         await PageHelper.click(CommonPage.ribbonTitles.items);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await CommonPageHelper.switchToContentFrame(stepLogger);
         await PageHelper.click(ProjectItemPage.teamRecords.resourcePool.first());
         const selectedResourcePoolResourceName = await ProjectItemPage.teamRecordsName.resourcePool.first().getText();
         await PageHelper.click(ProjectItemPage.teamChangeButtons.add);
-        await WaitHelper.getInstance().waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
+        await WaitHelper.waitForElementToBeClickable(CommonPage.ribbonItems.saveAndClose);
         await PageHelper.click(CommonPage.ribbonItems.saveAndClose);
         // 5 Sec wait required to let it save
         await browser.sleep(PageHelper.timeout.s);
@@ -340,7 +341,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.verification('NO Tasks displayed in Project Planner');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await expect(await ProjectItemPage.selectTaskName.isPresent()).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(CommonPageConstants.pageHeaders.projects.tasks));
@@ -349,7 +350,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on + Task button');
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
 
@@ -407,7 +408,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.verification('"Edit Team" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await expect(await PageHelper.isElementDisplayed(CommonPage.dialogTitle))
             .toBe(true, ValidationsHelper.getWindowShouldBeDisplayedValidation(CommonPageConstants.ribbonLabels.editTeam));
 
@@ -452,7 +453,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(CommonPage.regionCheckBox, false);
 
         stepLogger.verification('Always follow web settings check box is unchecked');
-        await expect(CheckboxHelper.checkboxstatus(CommonPage.regionCheckBox)).toBe(false,
+        await expect(await CheckboxHelper.isCheckboxChecked(CommonPage.regionCheckBox)).toBe(false,
             ValidationsHelper.getCheckBoxNotSelectedValidation());
 
         stepLogger.verification('Options in Time Zone and Region gets enabled');

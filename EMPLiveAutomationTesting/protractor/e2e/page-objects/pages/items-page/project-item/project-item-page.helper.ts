@@ -64,7 +64,7 @@ export class ProjectItemPageHelper {
         // Add portfolio name
         stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
         await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(inputs.portfolio);
+        await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
         const portfolioName = await inputs.portfolio.getText();
         stepLogger.verification('Required values selected in Portfolio Field');
 
@@ -163,7 +163,7 @@ export class ProjectItemPageHelper {
 
         // Note - little mismatch, It doesn't open a popup window
         stepLogger.verification('"Project Center - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ProjectItemPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ProjectItemPageConstants.editPageName));
@@ -189,7 +189,7 @@ export class ProjectItemPageHelper {
 
     static async waitForBuildTeamPageToOpenAndSwitchToPage(stepLogger: StepLogger) {
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
 
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(ProjectItemPageConstants.buildTeamPage,
@@ -202,7 +202,7 @@ export class ProjectItemPageHelper {
     static async createTask(uniqueId: string, stepLogger: StepLogger, finishDate: string) {
 
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         stepLogger.step('Click on Add Task');
         await PageHelper.click(CommonPage.ribbonItems.addTask);
@@ -233,7 +233,7 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
 
         stepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.step('Wait for Build Team Page to open');
@@ -270,7 +270,7 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndOpenProjectPage(projectNameValue, stepLogger);
 
         stepLogger.step('Select "Edit Team" from the options displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeam);
         await PageHelper.click(CommonPage.ribbonItems.editTeam);
 
         stepLogger.step('Wait for Build Team Page to open');
@@ -292,10 +292,10 @@ export class ProjectItemPageHelper {
     }
 
     static async checkResourceAddedInCurrentTeam(resourceName: string) {
-        let size = 0, resourceFound = false, text;
+        let resourceFound = false, text;
         const label = ProjectItemPage.teamRecordsName.currentTeam;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(label.first());
-        size = await label.count();
+        await WaitHelper.waitForElementToBeDisplayed(label.first());
+        const size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
             await ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();
@@ -362,7 +362,7 @@ export class ProjectItemPageHelper {
 
     static async verifyGanttChart() {
         const isBarChartPresent = await ProjectItemPage.ganttChartBars.isPresent();
-        await expect(await isBarChartPresent).toBe(false,
+        await expect(isBarChartPresent).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
     }
 
@@ -434,7 +434,8 @@ export class ProjectItemPageHelper {
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
-    static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+
+    static async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
@@ -458,10 +459,11 @@ export class ProjectItemPageHelper {
             ProjectItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue);
         return projectNameValue;
 
     }
+
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
 
@@ -470,7 +472,8 @@ export class ProjectItemPageHelper {
 
         await PageHelper.acceptAlert();
     }
-    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+
+    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
         await this.deleteOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Navigate to page');
@@ -482,7 +485,7 @@ export class ProjectItemPageHelper {
             ProjectItemPageConstants.columnNames.title);
 
         stepLogger.step('Validating deleted Project  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 
 }

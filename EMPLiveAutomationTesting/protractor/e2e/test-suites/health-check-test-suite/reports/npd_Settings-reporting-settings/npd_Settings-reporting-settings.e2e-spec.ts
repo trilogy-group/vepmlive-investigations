@@ -10,16 +10,14 @@ import {CommonPageConstants} from '../../../../page-objects/pages/common/common-
 import {ReportingSettingsPageHelper} from '../../../../page-objects/pages/settings/enterprise-reporting/reporting-settings/reporting-settings-page.helper';
 
 describe(SuiteNames.healthCheckTestSuite, () => {
-    let homePage: HomePage;
     let loginPage: LoginPage;
     beforeEach(async () => {
         await PageHelper.maximizeWindow();
-        homePage = new HomePage();
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
 
-    fit('Run Refresh Schedule - [829793]', async () => {
+    it('Run Refresh Schedule - [829793]', async () => {
         const stepLogger = new StepLogger(829793);
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(

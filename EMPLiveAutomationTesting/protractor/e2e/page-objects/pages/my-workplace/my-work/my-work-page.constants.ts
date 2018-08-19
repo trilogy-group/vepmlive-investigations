@@ -5,6 +5,9 @@ export class MyWorkPageConstants {
     static readonly pagePrefix = 'My Work';
     static readonly editPageName = `${MyWorkPageConstants.pagePrefix}${CommonPageConstants.pagePostFix.editItem}`;
     static readonly edit = 'Edit.Edit';
+    static readonly viewName= 'View';
+    static readonly renameView= 'rView';
+    static readonly currentView= 'Current View';
 
     static get pageName() {
         return {
@@ -54,6 +57,35 @@ export class MyWorkPageConstants {
         return {
             stopEditing: 'Actions.Stop',
             editPage: 'Actions.Edit-Menu',
+        };
+    }
+
+    static get ribbonTabs(){
+        return{
+            page: 'Page',
+            hide: 'Hide',
+            manage: 'Manage Work',
+            views: 'Manage Views'
+        };
+    }
+
+    static get viewRibbonOptions(){
+        return{
+          saveView: 'Ribbon.MyWork.Views.SaveView-Medium',
+          renameView: 'Ribbon.MyWork.Views.RenameView-Medium',
+          deleteView: 'Ribbon.MyWork.Views.DeleteView-Medium'
+        };
+    }
+
+    static get viewsPopUp(){
+        return{
+            title: 'dialogTitleSpan',
+            name: 'MWG_ViewName',
+            defaultView: 'MWG_DefaultView',
+            personalView: 'MWG_PersonalView',
+            ok: 'OK',
+            cancel: 'Cancel',
+            newName: 'MWG_ViewNewName'
         };
     }
 }

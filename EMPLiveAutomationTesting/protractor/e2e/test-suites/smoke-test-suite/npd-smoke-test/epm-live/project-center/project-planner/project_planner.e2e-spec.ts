@@ -55,7 +55,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.selectPlannerIfPopUpAppears(ProjectItemPage.selectPlanner.projectPlanner);
         // After select project Planner wait required, not element found which can use with waitHelper.
         await browser.sleep(PageHelper.timeout.m);
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.plannerbox);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.plannerbox);
         await CommonPageHelper.deleteTask();
         await PageHelper.click(CommonPage.ribbonItems.addTask);
         stepLogger.step('Enter details for Task (Name, Finish Date, Hours)');
@@ -111,7 +111,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('On the ribbon, click "Edit Team"-> add another person -> save and close.');
         await browser.sleep(PageHelper.timeout.s);
         await PageHelper.click(CommonPage.editTeamButtonOnTask);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         await CommonPageHelper.switchToContentFrame(stepLogger);
         await ProjectItemPageHelper.removeAssignedUserIfPresent(stepLogger);
         await PageHelper.click(ProjectItemPage.title);

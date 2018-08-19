@@ -65,7 +65,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await PageHelper.click(ReportingSettingsPage.topMenus.settings.childMenu.refreshSchedule);
 
         stepLogger.verification('"Report Manager" Page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect((await CommonPage.title.getText()).trim())
             .toBe(ReportManagerPageConstants.pageName,
                 ValidationsHelper.getPageDisplayedValidation(ReportManagerPageConstants.pageName));

@@ -21,7 +21,7 @@ export class WorkspacePageHelper {
         stepLogger.step(`Click on the 'New Workspace' button`);
         await ElementHelper.click(WorkSpacesPage.newWorkSpaceButton);
         stepLogger.step('Waiting for page to open');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.dialogTitle);
         stepLogger.verification(`'Create Workspace' pop-up displayed with the following details`);
         await expect(await CommonPage.dialogTitle.getText())
             .toBe(WorkspacesConstants.windowTitle,
@@ -40,7 +40,7 @@ export class WorkspacePageHelper {
         await TextboxHelper.sendKeys(WorkSpacesPage.descInputField, description);
         stepLogger.step(`Select the radio button 'Open - Accessible and open to anyone who has permission to the parent site'`);
         await ElementHelper.click(WorkSpacesPage.openPermission);
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(WorkSpacesPage.projectTemplate);
+        await WaitHelper.waitForElementToBeDisplayed(WorkSpacesPage.projectTemplate);
         stepLogger.step(`Select 'Project' as the 'Online' template`);
         await ElementHelper.click(WorkSpacesPage.projectTemplate);
         stepLogger.stepId(4);

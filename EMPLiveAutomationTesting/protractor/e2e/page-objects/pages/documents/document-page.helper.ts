@@ -180,7 +180,7 @@ export class DocumentPageHelper {
     }
 
     static async verifyDocumentPopUp() {
-        await WaitHelper.getInstance().waitForElementOptionallyPresent(DocumentPage.documentTitle);
+        await WaitHelper.waitForElementOptionallyPresent(DocumentPage.documentTitle);
         await expect(await CommonPage.dialogTitle.getText()).toBe(HomePageConstants.addADocumentWindow.addADocumentTitle,
             ValidationsHelper.getDisplayedValidation(HomePageConstants.addADocumentWindow.addADocumentTitle));
 

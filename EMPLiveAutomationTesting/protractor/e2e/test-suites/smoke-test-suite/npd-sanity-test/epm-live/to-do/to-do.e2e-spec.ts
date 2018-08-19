@@ -48,7 +48,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.step('Click on "+ new link" link displayed on top of "Discussions" page');
         await PageHelper.click(CommonPage.addNewLink);
         stepLogger.verification('"To Do - New Item" window is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.pageName));
@@ -89,7 +89,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CommonPageHelper.actionTakenViaContextMenu(CommonPage.recordWithoutGreenTicket,
             CommonPage.contextMenuOptions.editItem, stepLogger);
         stepLogger.verification('"Edit Project" page is displayed');
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(CommonPage.title);
+        await WaitHelper.waitForElementToBeDisplayed(CommonPage.title);
         await expect(await CommonPage.title.getText())
             .toBe(ToDoPageConstants.pagePrefix,
                 ValidationsHelper.getPageDisplayedValidation(ToDoPageConstants.editPageName));
@@ -128,7 +128,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         // Common functionality to edit any item
         const item = CommonPage.recordWithoutGreenTicket;
-        await WaitHelper.getInstance().waitForElementToBeDisplayed(item);
+        await WaitHelper.waitForElementToBeDisplayed(item);
 
         stepLogger.stepId(1);
         stepLogger.step('Click on the row of item created as per pre requisites');
@@ -174,7 +174,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await browser.sleep(PageHelper.timeout.m);
 
         stepLogger.verification('Popup window is closed');
-        await WaitHelper.getInstance().waitForElementToBeHidden(CommonPage.dialogTitle);
+        await WaitHelper.waitForElementToBeHidden(CommonPage.dialogTitle);
         await expect(await CommonPage.dialogTitle.isPresent())
             .toBe(false,
                 ValidationsHelper.getWindowShouldNotBeDisplayedValidation(CommonPageConstants.ribbonLabels.editItem));

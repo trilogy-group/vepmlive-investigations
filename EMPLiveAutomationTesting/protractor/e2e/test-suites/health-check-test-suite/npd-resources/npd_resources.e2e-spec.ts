@@ -16,7 +16,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Add  resource - [829512]', async () => {
+    it('Add  resource - [829512]', async () => {
         const stepLogger = new StepLogger(829512);
         stepLogger.stepId(1);
         await CommonPageHelper.navigateToItemPageUnderNavigation(
