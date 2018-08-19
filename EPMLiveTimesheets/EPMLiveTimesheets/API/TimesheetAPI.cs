@@ -4115,11 +4115,7 @@ namespace TimeSheets
                     }
                     drTS.Close();
 
-                    cmd = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", TSID);
-
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsCur);
+                    FillTimesheetItemsDataset(TSID, dsCur, cn);
 
                     cn.Close();
 
@@ -4319,6 +4315,28 @@ namespace TimeSheets
             }
 
             return docOut.OuterXml;
+        }
+
+        private static void FillTimesheetItemsDataset(string id, DataSet dataSet, SqlConnection connection)
+        {
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            using (var command = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", id);
+                using (var dataAdapter = new SqlDataAdapter(command))
+                {
+                    dataAdapter.Fill(dataSet);
+                }
+            }
         }
 
         private static DataTable GetWorkDT(SPWeb oWeb, bool bOtherWork, bool bNonWork, string userid, TimesheetSettings settings, string SearchField, string SearchText)
