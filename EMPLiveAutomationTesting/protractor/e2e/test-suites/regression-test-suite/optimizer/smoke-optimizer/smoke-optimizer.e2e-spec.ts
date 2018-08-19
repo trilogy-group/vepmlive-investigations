@@ -28,7 +28,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerTabOptions(stepLogger);
     });
 
@@ -44,7 +44,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.verifyOptimizerTabContents(stepLogger);
@@ -62,7 +62,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure(stepLogger);
@@ -81,7 +81,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure(stepLogger);
@@ -103,7 +103,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickConfigure(stepLogger);
@@ -125,7 +125,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.openSaveStrategyPopup(stepLogger);
@@ -144,7 +144,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.selectStrategyFromCurrentStrategy(stepLogger);
@@ -164,7 +164,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab(stepLogger);
@@ -183,7 +183,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab(stepLogger);
@@ -203,7 +203,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         // Step 2 is inside the below function
         await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
         stepLogger.stepId(3);
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await OptimizerPageHelper.verifyOptimizerPageOpened(stepLogger);
         stepLogger.stepId(4);
         await OptimizerPageHelper.clickViewTab(stepLogger);

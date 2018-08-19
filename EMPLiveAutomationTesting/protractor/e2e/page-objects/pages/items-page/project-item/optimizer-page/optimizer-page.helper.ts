@@ -97,7 +97,7 @@ export class OptimizerPageHelper {
     }
 
     static async gotoConfigureSection(stepLogger: StepLogger) {
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await this.clickConfigure(stepLogger);
     }
 
