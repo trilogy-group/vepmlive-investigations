@@ -13,6 +13,7 @@ import {HomePage} from '../../../../../../page-objects/pages/homepage/home.po';
 import {OptimizerPage} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer.po';
 import {OptimizerPageHelper} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.helper';
 import {OptimizerPageConstants} from '../../../../../../page-objects/pages/items-page/project-item/optimizer-page/optimizer-page.constants';
+import {ExpectationHelper} from '../../../../../../components/misc-utils/expectation-helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -37,6 +38,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         // optimizer option
         await PageHelper.click(CommonPage.ribbonItems.optimizer);
         await browser.sleep(PageHelper.timeout.m);
+        // await browser.sleep(PageHelper.timeout.s);
         await CommonPageHelper.switchToFirstContentFrame();
 
         stepLogger.stepId(1);
@@ -90,11 +92,12 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(8);
         stepLogger.step('Click on "Close"');
-        await PageHelper.click(OptimizerPage.getTabOptions.optimizer);
-        await PageHelper.click(OptimizerPage.getCloseOptimizerWindow);
+        // await PageHelper.click(OptimizerPage.getTabOptions.optimizer);
+        // await browser.sleep(PageHelper.timeout.xs);
+        await PageHelper.click(OptimizerPage.getCloseOptimizerViewTab);
         stepLogger.verification('Optimizer window closed');
-        await expect(await PageHelper.isElementDisplayed(OptimizerPage.getCloseOptimizerWindow)).toBe(false,
-            ValidationsHelper.getNotDisplayedValidation(OptimizerPageConstants.viewTab));
+        await ExpectationHelper.verifyNotDisplayedStatus(OptimizerPage.getCloseOptimizerWindow,
+            OptimizerPageConstants.viewTab, stepLogger);
 
         stepLogger.stepId(9);
         stepLogger.step('From project center page select same projects and click on "Optimizer" button');
