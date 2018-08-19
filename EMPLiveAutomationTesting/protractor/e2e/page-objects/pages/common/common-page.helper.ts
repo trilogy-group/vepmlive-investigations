@@ -1,4 +1,4 @@
-import {browser, By, element, ElementFinder, ElementArrayFinder} from 'protractor';
+import {browser, By, element, ElementArrayFinder, ElementFinder} from 'protractor';
 import {ComponentHelpers} from '../../../components/devfactory/component-helpers/component-helpers';
 import {HtmlHelper} from '../../../components/misc-utils/html-helper';
 import {PageHelper} from '../../../components/html/page-helper';
@@ -66,20 +66,26 @@ export class CommonPageHelper {
         return new Date().getFullYear();
     }
 
-    static getRibbonButtonById(id: string) {
-        return element(By.xpath(`//*[contains(@id,'${id}')]`));
-    }
-
     public static get getTodayInMMDDYYYY() {
         const currentDate = this.getCurrentMonth + '/' + this.getPreviousDate + '/' + this.getCurrentYear;
         return currentDate;
     }
-    static getElementByText(text: string, isContains = false) {
-        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
-    }
+
     public static get getYesterdayInMMDDYYYY() {
         const tomorrowDate = this.getCurrentMonth + '/' + this.getCurrentDate + '/' + this.getCurrentYear;
         return tomorrowDate;
+    }
+
+    static get save() {
+        return element(By.css('[id*="SaveButton"]'));
+    }
+
+    static getRibbonButtonById(id: string) {
+        return element(By.xpath(`//*[contains(@id,'${id}')]`));
+    }
+
+    static getElementByText(text: string, isContains = false) {
+        return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
     static getSidebarLinkByTextUnderCreateNew(title: string) {
@@ -215,6 +221,7 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.sidebarMenus.navigation);
         await CommonPageHelper.navigateToSubPage(pageName, linkOfThePage, pageHeader, stepLogger);
     }
+
     static async searchByTitle(linkOfThePage: ElementFinder,
                                pageHeader: ElementFinder,
                                pageName: string,
@@ -306,10 +313,6 @@ export class CommonPageHelper {
 
     static getPageNumberByTitle(title: string) {
         return element(By.xpath(`//a[contains(@class,'pageNumber') and contains(@title,"${title}")]`));
-    }
-
-    static get save() {
-        return element(By.css('[id*="SaveButton"]'));
     }
 
     static getMenuItemFromRibbonContainer(title: string) {
@@ -761,7 +764,7 @@ export class CommonPageHelper {
         return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.optimizer);
     }
 
-    static async gotoOptimizer(stepLogger: StepLogger) {
+    static async goToOptimizer(stepLogger: StepLogger) {
         stepLogger.step('Click on Optimizer button from the items tab.');
         await PageHelper.click( this.getOptimizerButton());
         // Takes time to load the iframe

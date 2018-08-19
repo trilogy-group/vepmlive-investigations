@@ -56,13 +56,13 @@ export class TaskPageHelper {
 
         stepLogger.verification('Selected tasks are linked');
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.two, ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessors1, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText())
+            .toBe(CommonPageConstants.predecessorsData.predecessors1,
+                ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessors1));
         await ProjectItemPageHelper.getselectTask(ProjectItemPageConstants.index.three,
             ProjectItemPageConstants.newTaskFields.start).click();
-        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.
-            predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
+        await expect(await ProjectItemPageHelper.newTasksFields.predecessors.getText()).toBe(CommonPageConstants.predecessorsData.predecessors2, ValidationsHelper.getFieldShouldHaveValueValidation(ProjectItemPageConstants.newTaskFields.predecessors,
             CommonPageConstants.predecessorsData.predecessors2));
 
         stepLogger.stepId(4);
@@ -105,11 +105,11 @@ export class TaskPageHelper {
 
         stepLogger.verification('Task1\'s Finish Date gets shifted forward');
         stepLogger.verification('Start and Finish dates for Task 2 and Task 3 get shifted forward');
-        await expect(await updatedFinishDate).not.toBe(finishDate, ValidationsHelper.getNotDisplayedValidation(finishDate));
-        await expect(await updatedStartDate1).not.toBe(startDate1, ValidationsHelper.getNotDisplayedValidation(startDate1));
-        await expect(await updatedStartDate2).not.toBe(startDate2, ValidationsHelper.getNotDisplayedValidation(startDate2));
-        await expect(await updatedFinishDate1).not.toBe(finishDate1, ValidationsHelper.getNotDisplayedValidation(finishDate1));
-        await expect(await updatedFinishDate2).not.toBe(finishDate2, ValidationsHelper.getNotDisplayedValidation(finishDate2));
+        await expect(updatedFinishDate).not.toBe(finishDate, ValidationsHelper.getNotDisplayedValidation(finishDate));
+        await expect(updatedStartDate1).not.toBe(startDate1, ValidationsHelper.getNotDisplayedValidation(startDate1));
+        await expect(updatedStartDate2).not.toBe(startDate2, ValidationsHelper.getNotDisplayedValidation(startDate2));
+        await expect(updatedFinishDate1).not.toBe(finishDate1, ValidationsHelper.getNotDisplayedValidation(finishDate1));
+        await expect(updatedFinishDate2).not.toBe(finishDate2, ValidationsHelper.getNotDisplayedValidation(finishDate2));
     }
 
     static async navigateToPlannerAndDeleteTask() {

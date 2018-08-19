@@ -15,12 +15,12 @@ export class OptimizerPageHelper {
         stepLogger.step(`select columns by checking respective check box`);
         await PageHelper.click(label.hideAll);
         let i, j: number;
-        for ( i = 0; i < 7; i++) {
+        for (i = 0; i < 7; i++) {
             await PageHelper.click(label.column.get(i));
         }
         // Getting the selected columns dynamically
         const allSelectedColumns: string[] = [];
-        for ( j = 0; j < 3; j++ ) {
+        for (j = 0; j < 3; j++) {
             let eachColumnName: string;
             eachColumnName = await PageHelper.getText(label.selectedColumn.get(j));
             allSelectedColumns.push(eachColumnName);
@@ -28,12 +28,11 @@ export class OptimizerPageHelper {
         return allSelectedColumns;
     }
 
-    static async verifyColumnNamesInGrid (columnsSelected: string[], stepLogger: StepLogger) {
-        let i: number;
+    static async verifyColumnNamesInGrid(columnsSelected: string[], stepLogger: StepLogger) {
         stepLogger.verification('Columns which were selected and saved for this particular view displayed');
-        for ( i = 0; i < columnsSelected.length - 1 ; i++) {
-            const currentColumnText = await PageHelper.getText(OptimizerPage.getDisplyedColumns( i + 1));
-            await expect(columnsSelected).toContain( currentColumnText,
+        for (let i = 0; i < columnsSelected.length - 1; i++) {
+            const currentColumnText = await PageHelper.getText(OptimizerPage.getDisplyedColumns(i + 1));
+            await expect(columnsSelected).toContain(currentColumnText,
                 ValidationsHelper.getNewViewCloumnShouldDisplayed(columnsSelected[i]));
         }
     }
@@ -64,9 +63,9 @@ export class OptimizerPageHelper {
         const label = OptimizerPage.getDeleteStrategyPopup;
         const optimizerConstLabel = OptimizerPageConstants.deleteStrategyPopup;
         await ExpectationHelper.verifyText(label.message,
-             optimizerConstLabel.message , optimizerConstLabel.message, stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.ok,  OptimizerPageConstants.ok, stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.cancel,  OptimizerPageConstants.cancel, stepLogger);
+            optimizerConstLabel.message, optimizerConstLabel.message, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, stepLogger);
     }
 
     static async verifyOptimizerWindowClosed(stepLogger: StepLogger) {
@@ -88,7 +87,7 @@ export class OptimizerPageHelper {
     }
 
     static async verifyOptimizerPageOpened(stepLogger: StepLogger) {
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure,  'Optimizer page', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Optimizer page', stepLogger);
     }
 
     static async closeOptimizerWindowFromOptimizerTab(stepLogger: StepLogger) {
@@ -97,7 +96,7 @@ export class OptimizerPageHelper {
     }
 
     static async gotoConfigureSection(stepLogger: StepLogger) {
-        await CommonPageHelper.gotoOptimizer(stepLogger);
+        await CommonPageHelper.goToOptimizer(stepLogger);
         await this.clickConfigure(stepLogger);
     }
 
@@ -122,7 +121,7 @@ export class OptimizerPageHelper {
     }
 
     static async openDeleteStrategyPopup(stepLogger: StepLogger) {
-        const label = OptimizerPage.getOptimizerStrategyActions ;
+        const label = OptimizerPage.getOptimizerStrategyActions;
         stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
         await PageHelper.click(label.currentStrategyDropdown);
         // takes time to expand dropdown
@@ -135,7 +134,7 @@ export class OptimizerPageHelper {
     }
 
     static async deleteStrategy(stepLogger: StepLogger) {
-        const label = OptimizerPage.getOptimizerStrategyActions ;
+        const label = OptimizerPage.getOptimizerStrategyActions;
         stepLogger.step('Select a strategy in current strategy and Click on Delete Strategy button.');
         await PageHelper.click(label.currentStrategyDropdownSpan);
         // takes time to expand dropdown
@@ -202,7 +201,7 @@ export class OptimizerPageHelper {
     }
 
     static async verifyViewPageOpened(stepLogger: StepLogger) {
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.saveView,  'View page', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.viewManagementOptions.saveView, 'View page', stepLogger);
     }
 
     static async closeOptimizerWindowFromViewTab(stepLogger: StepLogger) {
@@ -236,11 +235,11 @@ export class OptimizerPageHelper {
         const optConst = OptimizerPageConstants.selectColumnsPopup;
         await ExpectationHelper.verifyText(label.heading,
             OptimizerPageConstants.selectColumns, optConst.header, stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.eachColumn, 'Column names' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.eachSelectedColumn, 'Column checkbox' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.hideAll, optConst.hideAll , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.eachColumn, 'Column names', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.eachSelectedColumn, 'Column checkbox', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.hideAll, optConst.hideAll, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.ok, OptimizerPageConstants.ok, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(label.cancel, OptimizerPageConstants.cancel, stepLogger);
     }
 
     static async clickHideAll(stepLogger: StepLogger) {
@@ -251,7 +250,7 @@ export class OptimizerPageHelper {
     static async verifyNoColumnSelected(stepLogger: StepLogger) {
         const label = OptimizerPage.getSelectColumnsPopup;
         await browser.sleep(PageHelper.timeout.xs);
-        await ExpectationHelper.verifyNotDisplayedStatus(label.eachSelectedColumn, 'Checkbox selected' , stepLogger);
+        await ExpectationHelper.verifyNotDisplayedStatus(label.eachSelectedColumn, 'Checkbox selected', stepLogger);
     }
 
     static async clickShowAll(stepLogger: StepLogger) {
@@ -262,7 +261,7 @@ export class OptimizerPageHelper {
     static async verifyAllColumnSelected(stepLogger: StepLogger) {
         const label = OptimizerPage.getSelectColumnsPopup;
         await browser.sleep(PageHelper.timeout.xs);
-        await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected' , stepLogger);
+        await ExpectationHelper.verifyNotDisplayedStatus(label.unchecked, 'Checkbox unselected', stepLogger);
     }
 
     static async clickOKonSelectColumnPopup(stepLogger: StepLogger) {
@@ -272,31 +271,31 @@ export class OptimizerPageHelper {
 
     static async verifyOptimizerTabOptions(stepLogger: StepLogger) {
         const tabLabel = OptimizerPage.getTabOptions;
-        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.optimizer, 'Optimizer tab', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(tabLabel.view, 'View tab', stepLogger);
     }
 
     static async verifyOptimizerTabContents(stepLogger: StepLogger) {
         const actionsLabel = OptimizerPage.getOptimizerStrategyActions;
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy' , stepLogger);
-        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy' , stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getCloseOptimizerWindow, 'Close', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(OptimizerPage.getConfigure, 'Configure', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.saveStrategy, 'Save Strategy', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.renameStrategy, 'Rename Strategy', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.deleteStrategy, 'Delete Strategy', stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(actionsLabel.commitStrategy, 'Commit Strategy', stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(actionsLabel.currentStrategyDropdown,
-            OptimizerPageConstants.currentStrategy , stepLogger);
+            OptimizerPageConstants.currentStrategy, stepLogger);
     }
 
     static async verifyConfigureScreen(stepLogger: StepLogger) {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         const configConst = OptimizerPageConstants.optimizerConfiguration;
         await ExpectationHelper.verifyContainsText(configLabel.enterValueLabel,
-            OptimizerPageConstants.configure, configConst.enterValueLabel , stepLogger);
+            OptimizerPageConstants.configure, configConst.enterValueLabel, stepLogger);
         await ExpectationHelper.verifyContainsText(configLabel.titleComparisonLabel,
-            OptimizerPageConstants.configure, configConst.titleComparisonLabel , stepLogger);
+            OptimizerPageConstants.configure, configConst.titleComparisonLabel, stepLogger);
         await ExpectationHelper.verifyContainsText(configLabel.thirdQuestion,
-            OptimizerPageConstants.configure, configConst.thirdQuestion , stepLogger);
+            OptimizerPageConstants.configure, configConst.thirdQuestion, stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(configLabel.ok, OptimizerPageConstants.ok, stepLogger);
         await ExpectationHelper.verifyDisplayedStatus(configLabel.cancel, OptimizerPageConstants.cancel, stepLogger);
     }
@@ -373,7 +372,7 @@ export class OptimizerPageHelper {
 
     static async selectStrategyFromCurrentStrategy(stepLogger: StepLogger) {
         stepLogger.step('Select strategy from current strategy');
-        const label = OptimizerPage.getOptimizerStrategyActions ;
+        const label = OptimizerPage.getOptimizerStrategyActions;
         await PageHelper.click(OptimizerPage.getOptimizerStrategyActions.currentStrategyDropdown);
         // takes time to expand dropdown
         await browser.sleep(PageHelper.timeout.xs);

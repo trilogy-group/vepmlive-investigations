@@ -362,7 +362,7 @@ export class ProjectItemPageHelper {
 
     static async verifyGanttChart() {
         const isBarChartPresent = await ProjectItemPage.ganttChartBars.isPresent();
-        await expect(await isBarChartPresent).toBe(false,
+        await expect(isBarChartPresent).toBe(false,
             ValidationsHelper.getNotDisplayedValidation(ProjectItemPageConstants.ganttChart));
     }
 
@@ -434,7 +434,8 @@ export class ProjectItemPageHelper {
     static selectAssign(index: number) {
         return element(By.css(`[class*="MenuBody"] > div > div:nth-child(${index})`));
     }
-    static  async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+
+    static async editProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
@@ -458,10 +459,11 @@ export class ProjectItemPageHelper {
             ProjectItemPageConstants.columnNames.title);
 
         stepLogger.verification('Newly created Project [Ex: Project 1] displayed in "Project" page');
-        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue) , projectNameValue );
+        await CommonPageHelper.labelDisplayedValidation(AnchorHelper.getElementByTextInsideGrid(projectNameValue), projectNameValue);
         return projectNameValue;
 
     }
+
     static async deleteOptionViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
 
@@ -470,7 +472,8 @@ export class ProjectItemPageHelper {
 
         await PageHelper.acceptAlert();
     }
-    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string ) {
+
+    static async deleteProjectAndValidateIt(stepLogger: StepLogger, projectNameValue: string) {
         await this.deleteOptionViaRibbon(stepLogger);
 
         stepLogger.verification('Navigate to page');
@@ -482,7 +485,7 @@ export class ProjectItemPageHelper {
             ProjectItemPageConstants.columnNames.title);
 
         stepLogger.step('Validating deleted Project  is not  Present');
-        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg , ProjectItemPageConstants.noDataFound );
+        await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 
 }

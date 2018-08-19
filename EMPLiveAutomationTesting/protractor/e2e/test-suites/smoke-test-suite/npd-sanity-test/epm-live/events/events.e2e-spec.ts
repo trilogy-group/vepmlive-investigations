@@ -97,7 +97,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await CheckboxHelper.markCheckbox(EventsPage.choiceCheckbox, true);
 
         stepLogger.verification('the respective column type should get selected');
-        await expect(EventsPage.choiceCheckbox.isEnabled()).toBe(true,
+        await expect(await EventsPage.choiceCheckbox.isEnabled()).toBe(true,
             ValidationsHelper.getMenuDisplayedValidation(CommonPageConstants.columnType));
 
         stepLogger.stepId(4);
