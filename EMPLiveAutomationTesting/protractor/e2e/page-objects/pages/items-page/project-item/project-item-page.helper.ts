@@ -292,10 +292,10 @@ export class ProjectItemPageHelper {
     }
 
     static async checkResourceAddedInCurrentTeam(resourceName: string) {
-        let size = 0, resourceFound = false, text;
+        let resourceFound = false, text;
         const label = ProjectItemPage.teamRecordsName.currentTeam;
         await WaitHelper.waitForElementToBeDisplayed(label.first());
-        size = await label.count();
+        const size = await label.count();
         for (let index = 0; index < size && !resourceFound; index++) {
             await ElementHelper.scrollToElement(label.get(index));
             text = await label.get(index).getText();

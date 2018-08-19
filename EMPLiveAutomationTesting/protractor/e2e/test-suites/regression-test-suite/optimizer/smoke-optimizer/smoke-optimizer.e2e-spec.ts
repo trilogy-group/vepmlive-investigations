@@ -109,7 +109,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await OptimizerPageHelper.clickConfigure(stepLogger);
         await OptimizerPageHelper.verifyOptimizerConfigurationPopupOpened(stepLogger);
         stepLogger.stepId(5);
-        const fieldName = await OptimizerPageHelper.selectSelectedFiedldAndRemove(stepLogger);
+        const fieldName = await OptimizerPageHelper.selectSelectedFieldAndRemove(stepLogger);
         await OptimizerPageHelper.verifyRemovedFieldInAvailableFields(fieldName, stepLogger);
     });
 

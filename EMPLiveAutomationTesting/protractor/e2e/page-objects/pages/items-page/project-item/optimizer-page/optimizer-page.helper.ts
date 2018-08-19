@@ -315,7 +315,7 @@ export class OptimizerPageHelper {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         stepLogger.step('Select Value from the Available Fields selection box. Click on Add button.');
         await PageHelper.click(configLabel.firstAvailableField);
-        const fieldName = PageHelper.getText(configLabel.firstAvailableField);
+        const fieldName = await PageHelper.getText(configLabel.firstAvailableField);
         await PageHelper.click(configLabel.add);
         return fieldName;
     }
@@ -326,14 +326,14 @@ export class OptimizerPageHelper {
             OptimizerPageConstants.selectedFieldsSection, fieldName, stepLogger);
     }
 
-    static async selectSelectedFiedldAndRemove(stepLogger: StepLogger) {
+    static async selectSelectedFieldAndRemove(stepLogger: StepLogger) {
         const configLabel = OptimizerPage.getOptimizerConfiguration;
         if (!(await PageHelper.isElementPresent(configLabel.firstSelectedField, false))) {
-            this.selectAvailableFieldAndAdd(stepLogger);
+            await this.selectAvailableFieldAndAdd(stepLogger);
         }
         stepLogger.step('Select Value from the Selected Fields selection box. Click on Remove button.');
         await PageHelper.click(configLabel.firstSelectedField);
-        const fieldName = PageHelper.getText(configLabel.firstSelectedField);
+        const fieldName = await PageHelper.getText(configLabel.firstSelectedField);
         await PageHelper.click(configLabel.remove);
         return fieldName;
     }

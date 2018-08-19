@@ -1,9 +1,9 @@
-import { PageHelper } from '../html/page-helper';
-import { browser, ElementFinder } from 'protractor';
-import { StepLogger } from '../../../core/logger/step-logger';
-import { ValidationsHelper } from './validation-helper';
-import { HtmlHelper } from './html-helper';
-import { CheckboxHelper } from '../html/checkbox-helper';
+import {PageHelper} from '../html/page-helper';
+import {browser, ElementFinder} from 'protractor';
+import {StepLogger} from '../../../core/logger/step-logger';
+import {ValidationsHelper} from './validation-helper';
+import {HtmlHelper} from './html-helper';
+import {CheckboxHelper} from '../html/checkbox-helper';
 import {TextboxHelper} from '../html/textbox-helper';
 
 export class ExpectationHelper {
@@ -12,6 +12,7 @@ export class ExpectationHelper {
      * @param {ElementFinder} targetElement
      * @param {string} elementName
      * @param {StepLogger} stepLogger
+     * @param refresh
      * @returns {Promise<void>}
      */
     static async verifyDisplayedStatus(targetElement: ElementFinder, elementName: string, stepLogger: StepLogger, refresh = true) {
@@ -59,6 +60,7 @@ export class ExpectationHelper {
      * @param {ElementFinder} targetElement
      * @param {string} elementName
      * @param {StepLogger} stepLogger
+     * @param toWait
      * @returns {Promise<void>}
      */
     static async verifyHiddenStatus(targetElement: ElementFinder, elementName: string, stepLogger: StepLogger, toWait = true) {

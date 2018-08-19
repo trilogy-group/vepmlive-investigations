@@ -116,12 +116,6 @@ export class ElementHelper {
         return PageHelper.getAttributeValue(locator, HtmlHelper.attributes.value);
     }
 
-    static async hasClassRegex(locator: ElementFinder, klass: string) {
-        const classAttribute = await locator.getAttribute('class');
-        const pattern = new RegExp('(^|\\s)' + klass + '(\\s|$)');
-        return pattern.test(classAttribute);
-    }
-
     static async click(targetElement: ElementFinder) {
         await WaitHelper.waitForElementToBeClickable(targetElement);
         return targetElement.click();
