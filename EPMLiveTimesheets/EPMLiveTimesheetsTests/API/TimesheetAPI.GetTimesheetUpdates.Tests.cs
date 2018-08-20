@@ -51,7 +51,7 @@ namespace TimeSheets.Tests
                 throw new Exception("Unexpected call to read.");
             };
 
-            ShimTimesheetAPI.iGetTSDataSqlConnectionSPWebSPUserString
+            ShimTimesheetAPI.GetTSDataSetSqlConnectionSPWebSPUserString
                 = (_, __, ___, ____) =>
                 {
                     var dataSet = new DataSet();

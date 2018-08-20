@@ -15,6 +15,7 @@ using Microsoft.SharePoint;
 using TimeSheets.Log;
 using TimeSheets.Models;
 using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
+using CoreReportHelper = EPMLiveCore.ReportHelper;
 
 namespace TimeSheets
 {
@@ -103,7 +104,7 @@ namespace TimeSheets
                         var user = GetUser(oWeb, userId);
                         if (user.ID.ToString() == userId)
                         {
-                            var dataSetTimestamp = iGetTSData(connection, oWeb, user, periodString);
+                            var dataSetTimestamp = GetTSDataSet(connection, oWeb, user, periodString);
                             var canEdit = true;
 
                             bool submitted;
@@ -3112,7 +3113,7 @@ namespace TimeSheets
                 });
 
 
-                DataSet dsTS = iGetTSData(cn, web, user, sPeriod);
+                DataSet dsTS = GetTSDataSet(cn, web, user, sPeriod);
 
                 ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
 
@@ -3722,7 +3723,7 @@ namespace TimeSheets
             });
 
 
-            DataSet ds = iGetTSData(cn, web, user, sPeriod);
+            DataSet ds = GetTSDataSet(cn, web, user, sPeriod);
 
 
             try
@@ -3734,55 +3735,67 @@ namespace TimeSheets
             return ds.GetXml();
         }
 
-        private static DataSet iGetTSData(SqlConnection cn, SPWeb web, SPUser user, string sPeriod)
+        private static DataSet GetTSDataSet(SqlConnection connection, SPWeb web, SPUser user, string period)
         {
+            var rptData = new CoreReportHelper.MyWorkReportData(web.Site.ID);
 
-            EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
-
-            SqlCommand cmd = new SqlCommand("select TOP 1 TS_UID from TSTIMESHEET where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username", cn);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@period", sPeriod);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-
-            Guid tsuid = Guid.Empty;
-
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            var timesheetId = Guid.Empty;
+            using (var command = new SqlCommand(
+                @"select TOP 1 TS_UID from TSTIMESHEET 
+                    where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username",
+                connection))
             {
-                tsuid = dr.GetGuid(0);
-            }
-            dr.Close();
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                command.Parameters.AddWithValue("@period", period);
+                command.Parameters.AddWithValue("@username", user.LoginName);
 
-            if (tsuid == Guid.Empty)
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        timesheetId = reader.GetGuid(0);
+                    }
+                }
+            }
+
+            if (timesheetId == Guid.Empty)
             {
-                tsuid = iGenerateTSFromPast(cn, web, user, sPeriod, rptData);
+                timesheetId = iGenerateTSFromPast(connection, web, user, period, rptData);
             }
 
-            cmd = new SqlCommand("SPTSSetUser", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-            cmd.Parameters.AddWithValue("@name", user.Name);
-            cmd.Parameters.AddWithValue("@userid", user.ID);
-            cmd.ExecuteNonQuery();
-
-            cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE USER_ID=@uid", cn);
-            cmd.Parameters.AddWithValue("@uid", user.ID);
-            Guid userid = Guid.Empty;
-
-            dr = cmd.ExecuteReader();
-            if (dr.Read())
+            using (var command = new SqlCommand("SPTSSetUser", connection))
             {
-                userid = dr.GetGuid(0);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                command.Parameters.AddWithValue("@username", user.LoginName);
+                command.Parameters.AddWithValue("@name", user.Name);
+                command.Parameters.AddWithValue("@userid", user.ID);
+                command.ExecuteNonQuery();
             }
-            dr.Close();
 
-            cmd = new SqlCommand("UPDATE TSTIMESHEET SET TSUSER_UID=@uid where TS_UID=@tsuid", cn);
-            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-            cmd.Parameters.AddWithValue("@uid", userid);
-            cmd.ExecuteNonQuery();
+            var userId = Guid.Empty;
+            using (var cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE USER_ID=@uid", connection))
+            {
+                cmd.Parameters.AddWithValue("@uid", user.ID);
 
-            return iiGetTSData(cn, web, sPeriod, tsuid, rptData, Convert.ToString(user.ID));
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        userId = reader.GetGuid(0);
+                    }
+                    reader.Close();
+                }
+            }
+
+            using (var command = new SqlCommand("UPDATE TSTIMESHEET SET TSUSER_UID=@uid where TS_UID=@tsuid", connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", timesheetId);
+                command.Parameters.AddWithValue("@uid", userId);
+                command.ExecuteNonQuery();
+            }
+
+            return iiGetTSData(connection, web, period, timesheetId, rptData, Convert.ToString(user.ID));
         }
 
         private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData, string userId)
