@@ -3379,6 +3379,7 @@ namespace EPMLiveWebParts
 
         private string RenderFunctionDoSearch()
         {
+            var queryStringParameterPrefix = list.ID.ToString("N");
             return $@"function doSearch{sFullGridId}(){{
                 var searcher = document.getElementById('search{sFullGridId}');
                 var unsearch = document.getElementById('unsearch{sFullGridId}');
@@ -3403,7 +3404,7 @@ namespace EPMLiveWebParts
                         }} else {{
                             url = url + '?';
                         }}
-                        url = url + '{list.ID.ToString("N")}_searchfield=' + searchfield + '&{list.ID.ToString("N")}_searchvalue=' + searchvalue + '&{list.ID.ToString("N")}_searchtype=' + searchtype;
+                        url = url + '{queryStringParameterPrefix}_searchfield=' + searchfield + '&{queryStringParameterPrefix}_searchvalue=' + searchvalue + '&{queryStringParameterPrefix}_searchtype=' + searchtype;
                         location.href= url;"
 
                     : $"GridSearch('{sFullGridId}', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);")}
