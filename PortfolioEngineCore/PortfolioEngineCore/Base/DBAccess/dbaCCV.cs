@@ -88,8 +88,8 @@ namespace PortfolioEngineCore
                 }
                 catch (Exception ex)
                 {
-                    eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);
                     Trace.TraceError("Error: {0}", ex);
+                    eStatus = dbAccess.HandleStatusError(SeverityEnum.Exception, "UpdatePermGroup_Delete_Perms", (StatusEnum)99847, ex.Message);                    
                 }
             }
 
@@ -177,7 +177,7 @@ namespace PortfolioEngineCore
             var cmdText = new StringBuilder();
             cmdText.Append("SELECT cc.BC_UID,BC_ID,BC_LEVEL,BC_UOM,ac.BC_UID as Avail_BC_UID FROM EPGP_COST_CATEGORIES cc")
                 .AppendFormat(" Left Join EPGP_AVAIL_CATEGORIES ac On ac.BC_UID = cc.BC_UID And ac.CT_ID={0}", ctId)
-                .AppendFormat(" ORDER BY cc.BC_ID");
+                .Append(" ORDER BY cc.BC_ID");
             using (var cmd = new SqlCommand(cmdText.ToString(), dbAccess.Connection))
             {
                 SqlDataReader reader;
@@ -431,9 +431,9 @@ namespace PortfolioEngineCore
             {
                 throw new ArgumentNullException(nameof(costValues));
             }
-            for (var i = costCategories.Count - 1; i >= 0; i--)
+            for (var categoryIndex = costCategories.Count - 1; categoryIndex >= 0; categoryIndex--)
             {
-                var categoryUID = costCategoriesIndex[i];
+                var categoryUID = costCategoriesIndex[categoryIndex];
                 var costcategory = costCategories[categoryUID];
 
                 // if already a summary then no need to look at it
@@ -450,10 +450,10 @@ namespace PortfolioEngineCore
                         costcategory = costCategories[costcategory.ParentUID];
                         costcategory.IsSummary = true;
 
-                        for (var j = 1; j <= periodCount; j++)
+                        for (var periodIndex = 1; periodIndex <= periodCount; periodIndex++)
                         {
-                            costValues.setCost(j, costcategory.ID, 0);
-                            costValues.setQuantity(j, costcategory.ID, 0);
+                            costValues.setCost(periodIndex, costcategory.ID, 0);
+                            costValues.setQuantity(periodIndex, costcategory.ID, 0);
                         }
                     }
                 }
