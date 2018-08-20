@@ -92,6 +92,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
     <Compile Include="API\TimesheetAPI.CheckApproveStatus.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetOtherHours.Tests.cs" />
     <Compile Include="API\TimesheetAPI.SaveTimesheet.Tests.cs" />
