@@ -68,13 +68,17 @@ namespace PortfolioEngineCore
         public void setCost(int period, int category, double costvalue)
         {
             if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
                 costs[period - 1, category] = costvalue;
+            }
         }
 
         public void incrCost(int period, int category, double costvalue)
         {
             if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
                 costs[period - 1, category] += costvalue;
+            }
         }
 
         public double getCost(int period, int category)
@@ -92,12 +96,16 @@ namespace PortfolioEngineCore
         public void setQuantity(int period, int category, double quantityvalue)
         {
             if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
                 quantities[period - 1, category] = quantityvalue;
+            }
         }
         public void incrQuantity(int period, int category, double quantityvalue)
         {
             if ((period > 0 && period <= lPeriodCount) && (category >= 0 && category < lCategoryCount))
+            {
                 quantities[period - 1, category] += quantityvalue;
+            }
         }
 
         public double getQuantity(int period, int category)
