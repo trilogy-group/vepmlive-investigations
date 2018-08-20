@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Admininfos\AdmininfosTests.cs" />
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
+    <Compile Include="Base\dbaCCVTests.cs" />
     <Compile Include="Base\dbaUsersTests.cs" />
     <Compile Include="OptimizerDataTest.cs" />
     <Compile Include="Analyzers\CostAnalyzerDataTest.cs" />
