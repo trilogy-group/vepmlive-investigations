@@ -771,4 +771,12 @@ export class CommonPageHelper {
         await browser.sleep(PageHelper.timeout.m);
         await CommonPageHelper.switchToFirstContentFrame();
     }
+
+    static async gotoModeler(stepLogger: StepLogger) {
+        stepLogger.step('Click on Modeler button from the items tab.');
+        await PageHelper.click( CommonPage.modelerButton);
+        // Takes time to load the iframe
+        await browser.sleep(PageHelper.timeout.s);
+        await CommonPageHelper.switchToFirstContentFrame();
+    }
 }

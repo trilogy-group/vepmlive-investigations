@@ -547,4 +547,8 @@ export class CommonPage extends BasePage {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
         (name)})[2]//option[last()]`));
     }
+
+    static get modelerButton() {
+        return CommonPageHelper.getRibbonButtonByText(CommonPageConstants.ribbonLabels.modeler);
+    }
 }

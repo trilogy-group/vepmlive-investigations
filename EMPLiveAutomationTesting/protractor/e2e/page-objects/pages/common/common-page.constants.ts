@@ -98,7 +98,8 @@ export class CommonPageConstants {
             editResource: 'Edit Resource',
             resourceAnalyzer: 'ResourceAnalyzer',
             apply: 'Apply',
-            optimizer: 'Optimizer'
+            optimizer: 'Optimizer',
+            modeler: 'Modeler'
         };
     }
 
