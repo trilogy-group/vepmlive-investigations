@@ -137,17 +137,21 @@ public abstract class GridBase<TPeriodData, TDetailRowData>
 
     protected abstract void AddPeriodColumns(IEnumerable<TPeriodData> periods);
 
-    protected CStruct InitializeGridLayoutDefinition(string name, CStruct m_xDef)
+    protected CStruct InitializeGridLayoutDefinition(string name, CStruct m_xDef, bool? calculated)
     {
-        var m_xDefTree = m_xDef.CreateSubStruct("D");
-        m_xDefTree.CreateStringAttr("Name", name);
-        m_xDefTree.CreateStringAttr("HoverCell", "Color");
-        m_xDefTree.CreateStringAttr("HoverRow", "Color");
-        m_xDefTree.CreateStringAttr("FocusCell", string.Empty);
-        m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
-        m_xDefTree.CreateIntAttr("NoColorState", 1);
+        var definition = m_xDef.CreateSubStruct("D");
+        definition.CreateStringAttr("Name", name);
+        definition.CreateStringAttr("HoverCell", "Color");
+        definition.CreateStringAttr("HoverRow", "Color");
+        definition.CreateStringAttr("FocusCell", string.Empty);
+        definition.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
+        definition.CreateIntAttr("NoColorState", 1);
+        if (calculated != null)
+        {
+            definition.CreateStringAttr("Calculated", Convert.ToInt32(calculated.Value).ToString());
+        }
 
-        return m_xDefTree;
+        return definition;
     }
 
     protected void InitializeGridLayoutHeader1(CStruct xHead, int spanned = -1, int sortIcons = 0)

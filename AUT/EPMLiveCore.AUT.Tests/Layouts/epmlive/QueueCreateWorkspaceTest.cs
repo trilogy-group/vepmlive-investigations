@@ -1436,28 +1436,7 @@ namespace EPMLiveCore.Layouts.epmlive
         }
 
         #endregion
-
-        #region Method Call : (GetWorkspaceTitle) (Return Type : string) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_QueueCreateWorkspace_GetWorkspaceTitle_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetWorkspaceTitle, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_queueCreateWorkspaceInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (GetDefaultCreateWorkspaceUISettings) (Return Type : void) private call definition
 
         [ExcludeFromCodeCoverage]

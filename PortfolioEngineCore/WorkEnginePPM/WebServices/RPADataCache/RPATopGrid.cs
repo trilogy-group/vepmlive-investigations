@@ -15,18 +15,22 @@ using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace RPADataCache
 {
-    internal class RPATopGrid : RPADataCacheGridBase
+    internal class RPATopGrid : RPADataCacheGridBase<Tuple<clsResXData, clsPIData>>
     {
+        private readonly int _pmoAdmin;
+        private readonly string _xmlString;
+
         public RPATopGrid(
             IList<clsRXDisp> columns, 
             int pmoAdmin, 
             string xmlString, 
             int displayMode, 
             IList<RPATGRow> displayList, 
-            clsResourceValues resourceValues,
-            clsLookupList categoryLookupList)
-        : base (columns, pmoAdmin, xmlString, displayMode, displayList, resourceValues, categoryLookupList)
+            clsResourceValues resourceValues)
+        : base (columns, displayMode, displayList, resourceValues)
         {
+            _pmoAdmin = pmoAdmin;
+            _xmlString = xmlString;
         }
 
         protected override void InitializeGridLayout(GridRenderingTypes renderingType)
@@ -43,7 +47,22 @@ namespace RPADataCache
             var currentViewCols = xdoc.SelectSingleNode("Result/View/g_1").Attributes["Cols"].InnerText;
             var strCurrentViewCols = currentViewCols.Split(',').Select(x => x.Split(':')).ToArray();
 
-            InitializeGridLayoutConfig();
+            var xToolbar = Constructor.CreateSubStruct("Toolbar");
+            xToolbar.CreateIntAttr("Visible", 0);
+
+            var xPanel = Constructor.CreateSubStruct("Panel");
+            xPanel.CreateIntAttr("Visible", 0);
+            xPanel.CreateIntAttr("Select", 0);
+            xPanel.CreateIntAttr("Delete", 0);
+            xPanel.CreateIntAttr("CanHide", 0);
+            xPanel.CreateIntAttr("CanSelect", 0);
+
+            var xCfg = InitializeGridLayoutConfig("PortfolioItem", 3, _pmoAdmin, 150, 800);
+            xCfg.CreateIntAttr("MinMidWidth", 50);
+            xCfg.CreateIntAttr("MinRightWidth", 400);
+            xCfg.CreateIntAttr("LeftCanResize", 0);
+            xCfg.CreateIntAttr("RightCanResize", 1);
+            xCfg.CreateIntAttr("FocusWholeRow", 1);
 
             var xLeftCols = Constructor.CreateSubStruct("LeftCols");
             var xCols = Constructor.CreateSubStruct("Cols");
@@ -52,12 +71,8 @@ namespace RPADataCache
             MiddleCols = xCols;
 
             var m_xDef = Constructor.CreateSubStruct("Def");
-
-            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef);
-            DefinitionRight.CreateStringAttr("Calculated", "1");
-
-            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef);
-            DefinitionLeaf.CreateStringAttr("Calculated", "0");
+            DefinitionRight = InitializeGridLayoutDefinition("R", m_xDef, true);
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", m_xDef, false);
             
             var xHead = Constructor.CreateSubStruct("Head");
             var xFilter = xHead.CreateSubStruct("Filter");
@@ -75,73 +90,15 @@ namespace RPADataCache
             var xSolid = Constructor.CreateSubStruct("Solid");
             var xGroup = xSolid.CreateSubStruct("Group");
 
-            foreach (clsRXDisp col in _columns)
+            foreach (var column in _columns)
             {
-                if (col.m_id != RPConstants.TGRID_GRP_ID)
+                if (column.m_id != RPConstants.TGRID_GRP_ID)
                 {
-                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, categoryColumn, col);
+                    categoryColumn = InitializeViewColumn(strCurrentViewCols, xCols, categoryColumn, column);
                 }
             }
         }
-
-        private CStruct InitializeGridLayoutConfig()
-        {
-            var xToolbar = Constructor.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            var xPanel = Constructor.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Select", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            xPanel.CreateIntAttr("CanHide", 0);
-            xPanel.CreateIntAttr("CanSelect", 0);
-
-            var xCfg = Constructor.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("MainCol", "PortfolioItem");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("SuppressMessage", 3);
-            xCfg.CreateIntAttr("PrintCols", 0);
-            xCfg.CreateIntAttr("Dragging", _pmoAdmin);
-            xCfg.CreateIntAttr("Sorting", 1);
-            xCfg.CreateIntAttr("ColsMoving", 1);
-            xCfg.CreateIntAttr("ColsPosLap", 1);
-            xCfg.CreateIntAttr("ColsLap", 1);
-            xCfg.CreateIntAttr("VisibleLap", 1);
-            xCfg.CreateIntAttr("SectionWidthLap", 1);
-            xCfg.CreateIntAttr("GroupLap", 1);
-            xCfg.CreateIntAttr("WideHScroll", 0);
-            xCfg.CreateIntAttr("LeftWidth", 150);
-            xCfg.CreateIntAttr("Width", 400);
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 50);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 0);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("MaxSort", 2);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
-            xCfg.CreateIntAttr("FastColumns", 1);
-            xCfg.CreateIntAttr("ExpandAllLevels", 3);
-            xCfg.CreateIntAttr("GroupSortMain", 1);
-            xCfg.CreateIntAttr("GroupRestoreSort", 1);
-            xCfg.CreateIntAttr("NoTreeLines", 1);
-            xCfg.CreateIntAttr("ShowVScroll", 1);
-
-            return xCfg;
-        }
-
+        
         private CStruct InitializeViewColumn(
             IList<string[]> strCurrentViewCols, 
             CStruct xCols,
@@ -317,7 +274,7 @@ namespace RPADataCache
             Header1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
             yield return categoryColumn;
 
-            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Type",
+            categoryColumn = CreateColumn(xLeftCols, "ChangedIcon", "Icon",
                 width: 20,
                 canEdit: false,
                 canMove: false,
@@ -442,18 +399,6 @@ namespace RPADataCache
             }
         }
         
-        protected override void InitializeGridData(GridRenderingTypes renderingType)
-        {
-            var xBody = Constructor.CreateSubStruct("Body");
-            var xB = xBody.CreateSubStruct("B");
-            var xI = xBody.CreateSubStruct("I");
-            xI.CreateStringAttr("Grouping", "Totals");
-            xI.CreateBooleanAttr("CanEdit", false);
-
-            Level = 0;
-            Levels[Level] = xI;
-        }
-
         protected override bool CheckIfDetailRowShouldBeAdded(Tuple<clsResXData, clsPIData> detailRow)
         {
             return true;
@@ -525,6 +470,46 @@ namespace RPADataCache
                        ex.ToString());
                 }
             }
+        }
+
+        protected override int CalculateInternalPeriodMax(Tuple<clsResXData, clsPIData> data)
+        {
+            for (int i = _resourceValues.Periods.Values.Count; i > 1; i--)
+            {
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        var value = GetDetailRowValue(data.Item1, displayRow.fid, i);
+
+                        if (value != 0)
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        protected override int CalculateInternalPeriodMin(Tuple<clsResXData, clsPIData> data)
+        {
+            var i = 0;
+            foreach (var period in _resourceValues.Periods.Values)
+            {
+                ++i;
+                foreach (var displayRow in _displayList)
+                {
+                    if (displayRow.bUse)
+                    {
+                        var value = GetDetailRowValue(data.Item1, displayRow.fid, i);
+                        return i;
+                    }
+                }
+            }
+
+            return 0;
         }
 
         private void ProcessDetailDataRowPeriod(CPeriod period, int i, clsResXData resxData, CStruct xI)
@@ -834,6 +819,66 @@ namespace RPADataCache
             }
 
             return true;
+        }
+
+        protected double GetDetailRowValue(clsResXData detailRowData, int fieldId, int i)
+        {
+            double result = 0;
+
+            if (fieldId == 0)
+            {
+                switch (_displayMode)
+                {
+                    case 3:
+                        try
+                        {
+                            if (detailRowData.getftarr(i) == 0)
+                            {
+                                result = 0;
+                            }
+                            else
+                            {
+                                result = detailRowData.getvarr(i) * 100;
+                                result /= detailRowData.getftarr(i);
+                                result = (int)result;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            result = 0;
+
+                            LoggingService.WriteTrace(
+                                Area.EPMLiveWorkEnginePPM,
+                                Categories.EPMLiveWorkEnginePPM.Others,
+                                TraceSeverity.VerboseEx,
+                                ex.ToString());
+                        }
+                        break;
+                    case 0:
+                        result = detailRowData.getvarr(i);
+                        break;
+                    default:
+                        result = detailRowData.getftarr(i);
+                        break;
+                }
+            }
+
+            if (fieldId == 1)
+            {
+                if (detailRowData.bRealone)
+                {
+                    result = _displayMode == 0
+                        ? detailRowData.getvarr(i)
+                        : detailRowData.getftarr(i);
+                }
+            }
+
+            if (_displayMode == 1)
+            {
+                result /= 100;
+            }
+
+            return result;
         }
 
         protected virtual string GetResourceAnalyzerView(string sXML)
