@@ -3464,10 +3464,10 @@ namespace EPMLiveWebParts
         {
             return $@"function switchsearch{sFullGridId}()
             {{
-                var searcher = document.getElementById('search{sFullGridId}'
-                var searchtext = document.getElementById('searchtext{sFullGridId}'
-                var searchchoice = document.getElementById('searchchoice{sFullGridId}'
-                var searchtypechoice = document.getElementById('searchtype{sFullGridId}'
+                var searcher = document.getElementById('search{sFullGridId}');
+                var searchtext = document.getElementById('searchtext{sFullGridId}');
+                var searchchoice = document.getElementById('searchchoice{sFullGridId}');
+                var searchtypechoice = document.getElementById('searchtype{sFullGridId}');
                 var searchfield = searcher.options[searcher.selectedIndex].value;
                 var sList = searchfields{sFullGridId}[searchfield];
                 if(sList) {{
