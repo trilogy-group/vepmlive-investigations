@@ -76,6 +76,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.JustMock, Version=2016.2.426.1, Culture=neutral, PublicKeyToken=721b6c5bc0326b3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JustMock.2016.2.426.1\lib\Net35\Telerik.JustMock.dll</HintPath>
