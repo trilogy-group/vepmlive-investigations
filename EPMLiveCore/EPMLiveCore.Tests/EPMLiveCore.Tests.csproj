@@ -128,6 +128,7 @@
     <Compile Include="Jobs\ResourceImportJobTests.cs" />
     <Compile Include="Jobs\ResourcePlanTest.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
+    <Compile Include="Layouts\epmlive\GenericQueryControlTests.cs" />
     <Compile Include="Layouts\epmlive\WorkspaceListWPCanvasTest.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="RequestWorkspaceTest.cs" />

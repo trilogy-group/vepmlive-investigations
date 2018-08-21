@@ -2,6 +2,7 @@
 using System.Web.UI;
 using System.Web.UI.Fakes;
 using System.Web.UI.WebControls;
+using EPMLive.TestFakes.Utility;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,11 +20,13 @@ namespace EPMLiveCore.Tests.Layouts.epmlive
         private IDisposable _shimsContext;
         private WorkspaceListWPCanvas _testEntity;
         private PrivateObject _testEntityPrivate;
+        private SharepointShims _sharepointShims;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _shimsContext = ShimsContext.Create();
+            _sharepointShims = SharepointShims.ShimSharepointCalls();
             InitializeSharePoint();
         }
 

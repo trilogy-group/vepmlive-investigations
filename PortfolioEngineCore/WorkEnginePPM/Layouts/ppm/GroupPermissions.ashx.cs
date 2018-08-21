@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using PortfolioEngineCore;
+using WorkEnginePPM.Layouts.ppm;
 
 namespace WorkEnginePPM
 {
@@ -391,44 +392,7 @@ namespace WorkEnginePPM
 
             if (dt != null)
             {
-                CStruct xI;
-                foreach (DataRow row in dt.Rows)
-                {
-                    int nPermLevel = DBAccess.ReadIntValue(row["PERM_LEVEL"]);
-                    if (nPermLevel > 0)
-                    {
-                        int nPermUID = DBAccess.ReadIntValue(row["PERM_UID"]);
-
-                        string sPermName = DBAccess.ReadStringValue(row["PERM_NAME"]);
-
-                        CStruct xIParent;
-                        if (nPermLevel == 1)
-                        {
-                            xIParent = xLevels[0];                      // grab the node we are adding a child to
-                            xI = xIParent.CreateSubStruct("I");         // add a new child
-                            xLevels[1] = xI;                            // save a new parent node at this new level
-                            xI.CreateIntAttr("FieldID", nPermUID);      //  carry on and define details for our new node
-                            xI.CreateStringAttr("CBType", "Text");        // don't want a cb on title lines
-                            xI.CreateBooleanAttr("CanEdit", false);
-                            //xI.CreateStringAttr("CB", "");
-                        }
-                        else
-                        {
-                            xIParent = xLevels[1];
-                            xI = xIParent.CreateSubStruct("I");
-                            xI.CreateIntAttr("FieldID", nPermUID);
-                            xI.CreateBooleanAttr("CanEdit", true);
-                            int nJoinedGroup = DBAccess.ReadIntValue(row["GROUP_ID"]);
-                            bool bPermSet;
-                            if (nJoinedGroup > 0) bPermSet = true; else bPermSet = false;
-                            xI.CreateBooleanAttr("CB", bPermSet);
-                        }
-                        xI.CreateStringAttr("Permission", sPermName);
-
-                        xI.CreateStringAttr("Color", "254,254,254");
-                        xI.CreateIntAttr("NoColorState", 1);
-                    }
-                }
+                XmlHelper.FillFieldsXml(dt, xLevels);
             }
             return xGrid;
         }

@@ -86,7 +86,9 @@
     <Compile Include="Base\DBAccess\CostValues.cs" />
     <Compile Include="Base\DBAccess\CostViews.cs" />
     <Compile Include="Base\DBAccess\DataAccess.cs" />
+    <Compile Include="Base\DBAccess\dbaCCV.cs" />
     <Compile Include="Base\DBAccess\DBAdmin.cs" />
+    <Compile Include="Base\DBAccess\dbaUsers.cs" />
     <Compile Include="Base\DBAccess\DbRepository.cs" />
     <Compile Include="Base\DBAccess\General.cs" />
     <Compile Include="Base\DBAccess\Groups.cs" />

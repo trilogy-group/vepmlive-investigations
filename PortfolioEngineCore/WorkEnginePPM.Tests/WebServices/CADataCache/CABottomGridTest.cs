@@ -312,7 +312,7 @@ namespace WorkEnginePPM.Tests.WebServices.CADataCache
         {
             // Arrange
             var definitionsInitialized = new List<string>();
-            ShimGridBase<clsPeriodData, CATotRow>.AllInstances.InitializeGridLayoutDefinitionStringCStruct = (instance, name, definitions) =>
+            ShimGridBase<clsPeriodData, CATotRow>.AllInstances.InitializeGridLayoutDefinitionStringCStructNullableOfBoolean = (instance, name, definitions, a) =>
             {
                 definitionsInitialized.Add(name);
                 return new PortfolioEngineCore.CStruct();

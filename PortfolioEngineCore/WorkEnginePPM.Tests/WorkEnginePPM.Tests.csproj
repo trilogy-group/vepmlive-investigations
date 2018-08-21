@@ -110,6 +110,7 @@
     <Compile Include="TestDoubles\GridBaseTestDouble.cs" />
     <Compile Include="TestDoubles\ModelDataCache\BottomGridTestDouble.cs" />
     <Compile Include="TestDoubles\ModelDataCache\TopGridTestDouble.cs" />
+    <Compile Include="TestDoubles\RPADataCache\RPABottomGridTestDouble.cs" />
     <Compile Include="TestDoubles\RPADataCache\RPATopGridTestDouble.cs" />
     <Compile Include="WebServices\CADataCache\CADataCacheGridBaseTest.cs" />
     <Compile Include="WebServices\CADataCache\CABottomGridTest.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="WebServices\ModelDataCache\ModelDataCacheGridBaseTest.cs" />
     <Compile Include="WebServices\ModelDataCache\BottomGridTest.cs" />
     <Compile Include="WebServices\ModelDataCache\TopGridTest.cs" />
+    <Compile Include="WebServices\RPADataCache\RPABottomGridTest.cs" />
     <Compile Include="WebServices\RPADataCache\RPATopGridTest.cs" />
   </ItemGroup>
   <ItemGroup>
