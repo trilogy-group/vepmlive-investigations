@@ -18,6 +18,12 @@ namespace TimeSheets
 {
     public partial class GetTsApprovals : ApprovalBase
     {
+        private const string TsUid = "ts_uid";
+        private const string WebUid = "web_uid";
+        private const string ListUid = "list_uid";
+        private const string ItemId = "item_id";
+        private const string UserName = "username";
+        private const string ApprovalNotes = "approval_notes";
         SPSite site = SPContext.Current.Site;
         int period;
         string username = SPContext.Current.Web.CurrentUser.LoginName;
@@ -158,213 +164,270 @@ namespace TimeSheets
 
         public override void populateGroups(string query, SortedList arrGTemp, SPWeb curWeb)
         {
-            if (resWeb != null)
+            if (arrGTemp == null)
             {
-                SPQuery spquery = new SPQuery();
-                spquery.Query = "<Where><Eq><FieldRef Name='TimesheetManager'/><Value Type='User'><UserID/></Value></Eq></Where>";
+                throw new ArgumentNullException(nameof(arrGTemp));
+            }
+            if (curWeb == null)
+            {
+                throw new ArgumentNullException(nameof(curWeb));
+            }
+            if (resWeb == null)
+            {
+                return;
+            }
 
-                DataTable dtItems = new DataTable();
-                dtItems.Columns.Add("WebId");
-                dtItems.Columns.Add("ListId");
-                dtItems.Columns.Add("ItemId");
-                dtItems.Columns.Add("Username");
-                dtItems.Columns.Add("Name");
+            var spquery = new SPQuery
+            {
+                Query = "<Where><Eq><FieldRef Name='TimesheetManager'/><Value Type='User'><UserID/></Value></Eq></Where>"
+            };
 
-                SPList resList = resWeb.Lists["Resources"];
+            var dtItems = new DataTable();
+            dtItems.Columns.Add("WebId");
+            dtItems.Columns.Add("ListId");
+            dtItems.Columns.Add("ItemId");
+            dtItems.Columns.Add("Username");
+            dtItems.Columns.Add("Name");
 
-                foreach (SPListItem li in resList.GetItems(spquery))
+            var resources = resWeb.Lists["Resources"];
+
+            foreach (SPListItem listItem in resources.GetItems(spquery))
+            {
+                if (listItem["SharePointAccount"] != null)
                 {
-                    if (li["SharePointAccount"] != null)
-                    {
-                        SPFieldUserValue uv = new SPFieldUserValue(curWeb, li["SharePointAccount"].ToString());
-                        if (uv.User != null)
-                        {
-                            DataRow[] drs = dsTimesheetTasks.Tables[0].Select("username = '" + uv.User.LoginName + "'");
-
-                            DataRow[] drts = dsTimesheets.Tables[0].Select("username = '" + uv.User.LoginName + "'");
-
-                            if (!arrGTemp.Contains(li.Title))
-                            {
-                                arrGTemp.Add(li.Title, string.Empty);
-                            }
-
-                            XmlNode newNode = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
-                            XmlAttribute attrId = docXml.CreateAttribute("id");
-                            attrId.InnerText = li.Title;
-                            newNode.Attributes.Append(attrId);
-
-                            string status = string.Empty;//<![CDATA[<img src=\"_layouts/epmlive/images/tsflagnone.gif\" alt=\"No Timesheet\">]]>";
-                            string notes = string.Empty;
-
-                            if (drts.Length > 0)
-                            {
-                                XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                newCol.InnerText = drts[0]["ts_uid"].ToString();
-                                XmlAttribute attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "tsuid";
-                                newCol.Attributes.Append(attrName);
-                                newNode.AppendChild(newCol);
-
-                                string locked = "0";
-
-                                if(drts[0]["jobstatus"].ToString().ToLower() == "1")
-                                {
-                                    switch(drts[0]["jobtype_id"].ToString())
-                                    {
-                                        case "30":
-                                            status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Approval Processing\">]]>";
-                                            break;
-                                        default:
-                                            status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Item Processing\">]]>";
-                                            break;
-                                    }
-                                    locked = "1";
-                                }
-                                else if(drts[0]["jobstatus"].ToString().ToLower() == "0")
-                                {
-                                    switch(drts[0]["jobtype_id"].ToString())
-                                    {
-                                        case "30":
-                                            status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Approval Queued\">]]>";
-                                            break;
-                                        default:
-                                            status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Item Queued\">]]>";
-                                            break;
-                                    }
-                                    locked = "1";
-                                }
-                                else if (drts[0]["approval_status"].ToString().ToLower() == "1")
-                                {
-                                    status = "<![CDATA[<img src=\"_layouts/images/green.gif\" alt=\"Approved\">]]>";
-                                }
-                                else if (drts[0]["approval_status"].ToString().ToLower() == "2")
-                                {
-                                    status = "<![CDATA[<img src=\"_layouts/images/red.gif\" alt=\"Rejected\">]]>";
-                                }
-                                else if (drts[0]["submitted"].ToString().ToLower() == "true")
-                                {
-                                    status = "<![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Submitted\">]]>";
-                                }
-                                else
-                                {
-                                    locked = "1";
-                                }
-
-                                newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                newCol.InnerText = locked;
-                                attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "nosub";
-                                newCol.Attributes.Append(attrName);
-                                newNode.AppendChild(newCol);
-
-                                notes = drts[0]["approval_notes"].ToString();
-                            }
-                            else
-                            {
-                                XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                newCol.InnerText = string.Empty;
-                                XmlAttribute attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "tsuid";
-                                newCol.Attributes.Append(attrName);
-                                newNode.AppendChild(newCol);
-
-                                newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                newCol.InnerText = "1";
-                                attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "nosub";
-                                newCol.Attributes.Append(attrName);
-                                newNode.AppendChild(newCol);
-                            }
-
-                            XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = string.Empty;
-                            XmlAttribute attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
-                            newCell.Attributes.Append(attrStyle);
-                            newNode.AppendChild(newCell);
-
-                            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = notes;
-                            attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
-                            newCell.Attributes.Append(attrStyle);
-                            newNode.AppendChild(newCell);
-
-                            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerXml = status;
-                            attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
-                            newCell.Attributes.Append(attrStyle);
-                            newNode.AppendChild(newCell);
-
-                            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = string.Empty;
-                            attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
-                            newCell.Attributes.Append(attrStyle);
-                            newNode.AppendChild(newCell);
-
-                            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            newCell.InnerText = li.Title;
-                            attrStyle = docXml.CreateAttribute("style");
-                            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
-                            newNode.Attributes.Append(attrStyle);
-                            newNode.AppendChild(newCell);
-
-
-
-                            ndMainParent.AppendChild(newNode);
-
-                            hshItemNodes.Add(li.Title, newNode);
-
-                            foreach (DataRow dr in drs)
-                            {
-                                dtItems.Rows.Add(new string[] { dr["web_uid"].ToString(), dr["list_uid"].ToString(), dr["item_id"].ToString(), dr["username"].ToString(), li.Title });
-                            }
-                        }
-                    }
-                }
-
-                Guid webGuid = new Guid();
-                Guid listGuid = new Guid();
-                SPWeb iWeb = null;
-                SPList iList = null;
-
-                foreach (DataRow dr in dtItems.Select(string.Empty, "WebId, ListId"))
-                {
-                    try
-                    {
-                        Guid wGuid = new Guid(dr[0].ToString());
-                        Guid lGuid = new Guid(dr[1].ToString());
-
-                        if (webGuid != wGuid)
-                        {
-                            if (iWeb != null)
-                            {
-                                iWeb.Close();
-                                iWeb = site.OpenWeb(wGuid);
-                            }
-                            else
-                            {
-                                iWeb = site.OpenWeb(wGuid);
-                            }
-                            webGuid = iWeb.ID;
-                        }
-                        if (listGuid != lGuid)
-                        {
-                            iList = iWeb.Lists[lGuid];
-                            listGuid = iList.ID;
-                        }
-                        SPListItem li = iList.GetItemById(int.Parse(dr[2].ToString()));
-
-                        addTSItem(li, arrGTemp, dr[3].ToString(), dr[4].ToString());
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-                    }
+                    FillItems(arrGTemp, curWeb, dtItems, listItem);
                 }
             }
+
+            foreach (var dataRow in dtItems.Select(string.Empty, "WebId, ListId"))
+            {
+                try
+                {
+                    AddListItem(arrGTemp, dataRow);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+        }
+
+        private void FillItems(IDictionary arrGTemp, SPWeb curWeb, DataTable dtItems, SPListItem listItem)
+        {
+            if (arrGTemp == null)
+            {
+                throw new ArgumentNullException(nameof(arrGTemp));
+            }
+            if (dtItems == null)
+            {
+                throw new ArgumentNullException(nameof(dtItems));
+            }
+            if (listItem == null)
+            {
+                throw new ArgumentNullException(nameof(listItem));
+            }
+            var userValue = new SPFieldUserValue(curWeb, listItem["SharePointAccount"].ToString());
+            if (userValue.User == null)
+            {
+                return;
+            }
+
+            var dataRowsTimeSheetTask = dsTimesheetTasks.Tables[0].Select($"username = '{userValue.User.LoginName}'");
+
+            var dataRowsTimeSheet = dsTimesheets.Tables[0].Select($"username = '{userValue.User.LoginName} '");
+
+            if (!arrGTemp.Contains(listItem.Title))
+            {
+                arrGTemp.Add(listItem.Title, string.Empty);
+            }
+
+            var newNode = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
+            var attrId = docXml.CreateAttribute("id");
+            attrId.InnerText = listItem.Title;
+            newNode.Attributes.Append(attrId);
+
+            var status = string.Empty;
+            var notes = string.Empty;
+
+            if (dataRowsTimeSheet.Length > 0)
+            {
+                AddColumn(newNode, dataRowsTimeSheet[0][TsUid].ToString(), "tsuid");
+                string locked;
+                GetValues(dataRowsTimeSheet, out status, out locked);
+                AddColumn(newNode, locked, "nosub");
+                notes = dataRowsTimeSheet[0][ApprovalNotes].ToString();
+            }
+            else
+            {
+                AddColumn(newNode, string.Empty, "tsuid");
+                AddColumn(newNode, "1", "nosub");
+            }
+
+            AddCells(listItem, newNode, status, notes);
+
+            ndMainParent.AppendChild(newNode);
+
+            hshItemNodes.Add(listItem.Title, newNode);
+
+            foreach (var dataRow in dataRowsTimeSheetTask)
+            {
+                var array = new string[] {
+                    dataRow[WebUid].ToString(),
+                    dataRow[ListUid].ToString(),
+                    dataRow[ItemId].ToString(),
+                    dataRow[UserName].ToString(),
+                    listItem.Title };
+
+                dtItems.Rows.Add(array);
+            }
+        }
+
+        private void AddCells(SPListItem listItem, XmlNode newNode, string status, string notes)
+        {
+            if (listItem == null)
+            {
+                throw new ArgumentNullException(nameof(listItem));
+            }
+            if (newNode == null)
+            {
+                throw new ArgumentNullException(nameof(newNode));
+            }
+            AddCell(newNode, string.Empty);
+            AddCell(newNode, notes);
+
+            var newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCell.InnerXml = status;
+            var attrStyle = docXml.CreateAttribute("style");
+            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
+            newCell.Attributes.Append(attrStyle);
+            newNode.AppendChild(newCell);
+
+            AddCell(newNode, string.Empty);
+
+            newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCell.InnerText = listItem.Title;
+            attrStyle = docXml.CreateAttribute("style");
+            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
+            newNode.Attributes.Append(attrStyle);
+            newNode.AppendChild(newCell);
+        }
+
+        private static void GetValues(DataRow[] dataRowsTimeSheet, out string status, out string locked)
+        {
+            if (dataRowsTimeSheet == null || dataRowsTimeSheet.Length == 0)
+            {
+                throw new ArgumentException("Argument is empty collection", nameof(dataRowsTimeSheet));
+            }
+            status = string.Empty;
+            locked = "0";
+
+            if (dataRowsTimeSheet[0]["jobstatus"].ToString().ToLower() == "1")
+            {
+                switch (dataRowsTimeSheet[0]["jobtype_id"].ToString())
+                {
+                    case "30":
+                        status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Approval Processing\">]]>";
+                        break;
+                    default:
+                        status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Item Processing\">]]>";
+                        break;
+                }
+                locked = "1";
+            }
+            else if (dataRowsTimeSheet[0]["jobstatus"].ToString().ToLower() == "0")
+            {
+                switch (dataRowsTimeSheet[0]["jobtype_id"].ToString())
+                {
+                    case "30":
+                        status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Approval Queued\">]]>";
+                        break;
+                    default:
+                        status = "<![CDATA[<img src=\"_layouts/epmlive/images/tsqueueprocessing.gif\" alt=\"Item Queued\">]]>";
+                        break;
+                }
+                locked = "1";
+            }
+            else if (dataRowsTimeSheet[0]["approval_status"].ToString().ToLower() == "1")
+            {
+                status = "<![CDATA[<img src=\"_layouts/images/green.gif\" alt=\"Approved\">]]>";
+            }
+            else if (dataRowsTimeSheet[0]["approval_status"].ToString().ToLower() == "2")
+            {
+                status = "<![CDATA[<img src=\"_layouts/images/red.gif\" alt=\"Rejected\">]]>";
+            }
+            else if (dataRowsTimeSheet[0]["submitted"].ToString().ToLower() == "true")
+            {
+                status = "<![CDATA[<img src=\"_layouts/images/yellow.gif\" alt=\"Submitted\">]]>";
+            }
+            else
+            {
+                locked = "1";
+            }
+        }
+
+        private void AddColumn(XmlNode newNode, string innerText, string value)
+        {
+            if (newNode == null)
+            {
+                throw new ArgumentNullException(nameof(newNode));
+            }
+            var newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+            newCol.InnerText = innerText;
+            var attrName = docXml.CreateAttribute("name");
+            attrName.Value = value;
+            newCol.Attributes.Append(attrName);
+            newNode.AppendChild(newCol);
+        }
+
+        private void AddCell(XmlNode newNode, string innerText)
+        {
+            if (newNode == null)
+            {
+                throw new ArgumentNullException(nameof(newNode));
+            }
+            var newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+            newCell.InnerText = innerText;
+            var attrStyle = docXml.CreateAttribute("style");
+            attrStyle.Value = "background: #DFE7F7; font-weight:bold";
+            newCell.Attributes.Append(attrStyle);
+            newNode.AppendChild(newCell);
+        }
+
+        private void AddListItem(SortedList arrGTemp, DataRow dataRow)
+        {
+            if (dataRow == null)
+            {
+                throw new ArgumentNullException(nameof(dataRow));
+            }
+            var webGuid = new Guid();
+            var listGuid = new Guid();
+            SPWeb iWeb = null;
+            SPList iList = null;
+
+            var wGuid = new Guid(dataRow[0].ToString());
+            var lGuid = new Guid(dataRow[1].ToString());
+
+            if (webGuid != wGuid)
+            {
+                if (iWeb != null)
+                {
+                    iWeb.Close();
+                    iWeb = site.OpenWeb(wGuid);
+                }
+                else
+                {
+                    iWeb = site.OpenWeb(wGuid);
+                }
+                webGuid = iWeb.ID;
+            }
+            if (listGuid != lGuid)
+            {
+                iList = iWeb.Lists[lGuid];
+                listGuid = iList.ID;
+            }
+            var listItem = iList.GetItemById(int.Parse(dataRow[2].ToString()));
+
+            addTSItem(listItem, arrGTemp, dataRow[3].ToString(), dataRow[4].ToString());
         }
 
         protected override void outputXml()
