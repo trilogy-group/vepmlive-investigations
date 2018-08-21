@@ -28,6 +28,7 @@
     <Add FullName="EPMLiveCore.Jobs.ResourcePlan!"/>
     <Add FullName="EPMLiveCore.API.APIEmail!"/>
     <Add FullName="EPMLiveCore.API.Integration.IntegrationCore!"/>
+    <Add FullName="EPMLiveCore.ReportHelper.MyWorkReportData!"/>
     <Add FullName="EPMLiveCore.GenericQueryControl!"/>
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
   </ShimGeneration>
