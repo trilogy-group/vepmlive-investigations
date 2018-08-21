@@ -11,6 +11,7 @@ namespace WorkEnginePPM.Layouts.ppm
 {
     public partial class CustomFieldForm : LayoutsPageBase
     {
+        private const string UpdateCustomFieldId = "Update_CustomField";
         protected string DialogTitle = "";
         private int c_id = 0;
         public int id
@@ -284,7 +285,7 @@ namespace WorkEnginePPM.Layouts.ppm
 
                         if (useField > maxField)
                         {
-                            eStatus = dbAccess.HandleStatusError(SeverityEnum.Error, "Update_CustomField", (StatusEnum)99884, "Can't save Field, all Fields of this type are already used");
+                            eStatus = dbAccess.HandleStatusError(SeverityEnum.Error, UpdateCustomFieldId, (StatusEnum)99884, "Can't save Field, all Fields of this type are already used");
                             return eStatus;
                         }
 
@@ -324,7 +325,7 @@ namespace WorkEnginePPM.Layouts.ppm
                         var existingId = DBAccess.ReadIntValue(reader["FA_FIELD_ID"]);
                         if (existingId != customField.id)
                         {
-                            eStatus = dbAccess.HandleStatusError(SeverityEnum.Error, "Update_CustomField", (StatusEnum)99886, "Can't save Field, a Field with this name already exists");
+                            eStatus = dbAccess.HandleStatusError(SeverityEnum.Error, UpdateCustomFieldId, (StatusEnum)99886, "Can't save Field, a Field with this name already exists");
                             return false;
                         }
                     }
