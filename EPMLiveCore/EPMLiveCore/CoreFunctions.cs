@@ -828,34 +828,47 @@ namespace EPMLiveCore
             return retVal;
         }
 
-        public static DirectoryEntry getUserFromAD(string username)
+        public static DirectoryEntry getUserFromAD(string userName)
         {
-            DirectoryEntry deUser = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            if (userName == null)
             {
+                throw new ArgumentNullException(nameof(userName));
+            }
 
-                if (username.IndexOf("\\") > 0)
-                    username = username.Substring(username.IndexOf("\\") + 1);
-
-                DirectoryEntry de = new DirectoryEntry();
-                de.Path = "LDAP://" + getDomain();
-                de.AuthenticationType = AuthenticationTypes.Secure;
-
-                DirectorySearcher deSearch = new DirectorySearcher();
-
-                deSearch.SearchRoot = de;
-                deSearch.Filter = "(&(objectClass=user) (cn=" + username + "))";
-
-                SearchResultCollection results = deSearch.FindAll();
-
-                if (results.Count > 0)
+            DirectoryEntry result = null;
+            if (!string.IsNullOrEmpty(userName))
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SearchResult sr = results[0];
-                    deUser = sr.GetDirectoryEntry();
-                }
-            });
+                    var indexOfDoubleSlash = userName.IndexOf("\\");
+                    if (indexOfDoubleSlash > 0)
+                    {
+                        userName = userName.Substring(indexOfDoubleSlash + 1);
+                    }
 
-            return deUser;
+                    using (var directoryEntry = new DirectoryEntry
+                    {
+                        Path = "LDAP://" + getDomain(),
+                        AuthenticationType = AuthenticationTypes.Secure
+                    })
+                    {
+                        using (var directorySearcher = new DirectorySearcher
+                        {
+                            SearchRoot = directoryEntry,
+                            Filter = $"(&(objectClass=user) (cn={userName}))"
+                        })
+                        {
+                            var results = directorySearcher.FindAll();
+                            if (results.Count > 0)
+                            {
+                                result = results[0].GetDirectoryEntry();
+                            }
+                        }
+                    }
+                });
+            }
+
+            return result;
         }
 
         public static string GetScheduleStatusField(SPListItem ListItem)
