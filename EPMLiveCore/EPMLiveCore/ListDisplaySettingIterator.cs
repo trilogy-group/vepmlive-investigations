@@ -347,19 +347,21 @@ namespace EPMLiveCore
                                         }
                                         else
                                         {
-                                            cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                            cmd.CommandType = CommandType.StoredProcedure;
-                                            cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                            cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                                            SqlDataReader dr = cmd.ExecuteReader();
-
-                                            if (dr.Read())
+                                            using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                             {
-                                                ownerusername = dr.GetString(13);
-                                                ownername = dr.GetString(5);
+                                                cmd.CommandType = CommandType.StoredProcedure;
+                                                cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                                cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
+
+                                                SqlDataReader dr = cmd.ExecuteReader();
+
+                                                if (dr.Read())
+                                                {
+                                                    ownerusername = dr.GetString(13);
+                                                    ownername = dr.GetString(5);
+                                                }
+                                                dr.Close();
                                             }
-                                            dr.Close();
                                         }
                                         cn.Close();
                                     }
