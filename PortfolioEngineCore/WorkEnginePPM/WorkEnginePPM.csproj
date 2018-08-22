@@ -391,6 +391,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EditList.aspx.designer.cs">
       <DependentUpon>EditList.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\EPKClass01.cs" />
     <Compile Include="Layouts\ppm\EPKCSRequest.ashx.cs">
       <DependentUpon>EPKCSRequest.ashx</DependentUpon>
     </Compile>

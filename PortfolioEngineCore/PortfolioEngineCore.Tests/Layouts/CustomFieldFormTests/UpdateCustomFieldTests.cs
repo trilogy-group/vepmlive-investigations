@@ -42,7 +42,7 @@ namespace PortfolioEngineCore.Tests.Layouts
             // Arrange
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             var lRowsAffected = 0;
-            ShimCustomFieldForm.AllInstances.idGet = _ => 1;
+            ShimCustomFieldForm.AllInstances.IdGet = _ => 1;
 
             // Act
             var actualStatus = _privateObject.Invoke(
@@ -74,7 +74,7 @@ namespace PortfolioEngineCore.Tests.Layouts
             // Arrange
             var dba = new ShimDBAccess(new StubDBAccess(string.Empty)).Instance;
             var lRowsAffected = 0;
-            ShimCustomFieldForm.AllInstances.idGet = _ => 0;
+            ShimCustomFieldForm.AllInstances.IdGet = _ => 0;
             ShimCustomFieldForm.AllInstances.EntityGet = _ => (int)EntityID.Resource;
             ShimCustomFieldForm.AllInstances.DataTypeGet = _ => (int)FieldType.TypeNumber;
             ShimSqlDb.ReadIntValueObject = o => 0;
