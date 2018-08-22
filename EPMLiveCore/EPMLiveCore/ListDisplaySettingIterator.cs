@@ -323,7 +323,7 @@ namespace EPMLiveCore
                                                 cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
                                                 cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
 
-                                                SqlDataReader dr = cmd.ExecuteReader();
+                                                var dr = cmd.ExecuteReader();
 
                                                 if (dr.Read())
                                                 {
@@ -337,11 +337,17 @@ namespace EPMLiveCore
                                                         width = 100;
 
                                                     if ((max - count) <= 1)
+                                                    {
                                                         barcolor = "FF0000";
+                                                    }
                                                     else if ((max - count) < 5)
+                                                    {
                                                         barcolor = "FFFF00";
+                                                    }
                                                     else
+                                                    {
                                                         barcolor = "009900";
+                                                    }
 
                                                     ownerusername = dr.GetString(13);
                                                     ownername = dr.GetString(5);
