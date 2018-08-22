@@ -127,7 +127,9 @@ namespace EPMLiveCore
             try
             {
                 if (isOnline)
-                    cn.Close();
+                {
+                    cn?.Dispose();
+                }
             }
             catch { }
         }
@@ -967,7 +969,9 @@ namespace EPMLiveCore
             try
             {
                 if (isOnline)
-                    cn.Close();
+                {
+                    cn?.Dispose();
+                }
             }
             catch { }
         }
