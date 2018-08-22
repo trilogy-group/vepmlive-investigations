@@ -685,23 +685,26 @@ namespace EPMLiveCore
 
         private string getTempPassword(string username)
         {
-
-            DataSet ds;
             SqlCommand cmdGetPassword;
-            SqlDataAdapter da;
 
             cmdGetPassword = new SqlCommand("SP_GetPassword", cn);
             cmdGetPassword.CommandType = CommandType.StoredProcedure;
             cmdGetPassword.Parameters.AddWithValue("@username", username);
 
-            da = new SqlDataAdapter(cmdGetPassword);
-            ds = new DataSet();
-            da.Fill(ds);
+            using (var dataAdapter = new SqlDataAdapter(cmdGetPassword))
+            {
+                var dataSet = new DataSet();
+                dataAdapter.Fill(dataSet);
 
-            if (ds.Tables[0].Rows.Count > 0)
-                return ds.Tables[0].Rows[0][0].ToString();
-            else
-                return "";
+                if (dataSet.Tables[0].Rows.Count > 0)
+                {
+                    return dataSet.Tables[0].Rows[0][0].ToString();
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
         }
 
         private bool setPermissions(SPItemEventProperties properties, bool isAdd)
