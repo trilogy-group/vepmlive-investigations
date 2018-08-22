@@ -481,10 +481,12 @@ namespace EPMLiveCore
                                 bIsNewUser = true;
                                 location = "1008";
                                 //ONLY setups the new email but doesnt send it as of now
-                                cmd = new SqlCommand("INSERT INTO NEWACCOUNTEMAIL (username) VALUES (@username)", cn);
-                                cmd.CommandType = CommandType.Text;
-                                cmd.Parameters.AddWithValue("@username", newusername);
-                                cmd.ExecuteNonQuery();
+                                using (cmd = new SqlCommand("INSERT INTO NEWACCOUNTEMAIL (username) VALUES (@username)", cn))
+                                {
+                                    cmd.CommandType = CommandType.Text;
+                                    cmd.Parameters.AddWithValue("@username", newusername);
+                                    cmd.ExecuteNonQuery();
+                                }
                                 location = "1009";
                             }
                             else
