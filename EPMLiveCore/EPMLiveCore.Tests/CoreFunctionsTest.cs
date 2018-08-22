@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.DirectoryServices;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -729,6 +730,54 @@ namespace EPMLiveCore.Tests
             Assert.AreEqual($"<Lists MaxListLimit='0'><List ID='{Guid.Empty}'/></Lists>", queryUsed.Lists);
             Assert.AreEqual(_spQuery, queryUsed.Query);
             Assert.AreEqual(SPQueryThrottleOption.Override, queryUsed.QueryThrottleMode);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException), "userName")]
+        public void getUserFromAD_UserNameNull_Throws()
+        {
+            // Arrange
+            string username = null;
+
+            // Act
+            CoreFunctions.getUserFromAD(username);
+
+            // Assert
+            // ExpectedException: ArgumentNullException
+        }
+
+        [TestMethod]
+        public void getUserFromAD_NameNotEmpty_CorretlyManagesDirectoryEntry()
+        {
+            // Arrange
+            const string userName = "test";
+            ShimCoreFunctions.getDomain = () => string.Empty;
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+
+            // Act
+            CoreFunctions.getUserFromAD(userName);
+
+            // Assert
+            Assert.AreEqual(1, directoryShims.DirectoryEntriesDisposed.Count);
+            Assert.AreEqual(AuthenticationTypes.Secure, directoryShims.DirectoryEntriesDisposed[0].AuthenticationType);
+            Assert.IsTrue(directoryShims.DirectoryEntriesDisposed[0].Path.StartsWith("LDAP://"));
+        }
+
+        [TestMethod]
+        public void getUserFromAD_NameNotEmpty_DirectorySearcherEntry()
+        {
+            // Arrange
+            const string userName = "test";
+            ShimCoreFunctions.getDomain = () => string.Empty;
+            var directoryShims = DirectoryShims.ShimDirectoryCalls();
+
+            // Act
+            CoreFunctions.getUserFromAD(userName);
+
+            // Assert
+            Assert.AreEqual(1, directoryShims.DirectorySearchersDisposed.Count);
+            Assert.AreEqual(directoryShims.DirectoryEntriesDisposed[0], directoryShims.DirectorySearchersDisposed[0].SearchRoot);
+            Assert.AreEqual($"(&(objectClass=user) (cn={userName}))", directoryShims.DirectorySearchersDisposed[0].Filter);
         }
 
         [TestMethod]
