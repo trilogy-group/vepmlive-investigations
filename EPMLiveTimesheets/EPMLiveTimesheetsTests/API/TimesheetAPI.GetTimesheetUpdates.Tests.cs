@@ -38,6 +38,7 @@ namespace TimeSheets.Tests
         {
             ShimTimesheetSettings.ConstructorSPWeb = (instance, spWeb) => { };
             ShimLogger.WriteLogLoggerCategoryStringString = (categoryName, source, message) => { };
+            _sharepointShims.SiteShim.RootWebGet = () => _sharepointShims.WebShim;
 
             ShimSqlDataReader.AllInstances.Read = instance => true;
             ShimSqlDataReader.AllInstances.GetStringInt32 = (instance, num) =>
