@@ -281,7 +281,7 @@ namespace EPMLiveCore
                                     try
                                     {
                                         SqlConnection cn = null;
-                                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                                         {
                                             MethodInfo m;
 
@@ -300,8 +300,10 @@ namespace EPMLiveCore
                                         cmd.Parameters.AddWithValue("@username", "");
 
                                         DataSet ds = new DataSet();
-                                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                        da.Fill(ds);
+                                        using (var da = new SqlDataAdapter(cmd))
+                                        {
+                                            da.Fill(ds);
+                                        }
 
                                         try
                                         {
