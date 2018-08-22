@@ -8,6 +8,7 @@ using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeSheets.Fakes;
+using TimeSheets.Log.Fakes;
 
 namespace TimeSheets.Tests
 {
@@ -36,6 +37,7 @@ namespace TimeSheets.Tests
         private void SetupShims()
         {
             ShimTimesheetSettings.ConstructorSPWeb = (instance, spWeb) => { };
+            ShimLogger.WriteLogLoggerCategoryStringString = (categoryName, source, message) => { };
 
             ShimSqlDataReader.AllInstances.Read = instance => true;
             ShimSqlDataReader.AllInstances.GetStringInt32 = (instance, num) =>
