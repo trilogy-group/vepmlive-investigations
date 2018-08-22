@@ -1205,6 +1205,7 @@ namespace EPMLiveCore
                 }
             }
             userPanel?.Dispose();
+            profilePanel?.Dispose();
             permissionPanel?.Dispose();
             base.Dispose();
         }
