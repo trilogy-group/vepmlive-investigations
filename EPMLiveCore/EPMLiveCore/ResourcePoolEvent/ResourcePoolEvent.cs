@@ -528,23 +528,25 @@ namespace EPMLiveCore
 
                     //Check if current user is associated to an Account site
                     location = "1017";
-                    cmd = new SqlCommand("SP_IsUserInAccountSite", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@siteuid", properties.SiteId);
-                    cmd.Parameters.AddWithValue("@username", newusername);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    location = "1018";
-                    if (dr.Read())
+                    using (cmd = new SqlCommand("SP_IsUserInAccountSite", cn))
                     {
-                        if (dr.GetInt32(0) == 1)
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@siteuid", properties.SiteId);
+                        cmd.Parameters.AddWithValue("@username", newusername);
+
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        location = "1018";
+                        if (dr.Read())
                         {
-                            bIsApproved = true;
-                            //Check if the user already exists with some other Site, set approved to true
-                            properties.AfterProperties["Approved"] = "1";
+                            if (dr.GetInt32(0) == 1)
+                            {
+                                bIsApproved = true;
+                                //Check if the user already exists with some other Site, set approved to true
+                                properties.AfterProperties["Approved"] = "1";
+                            }
                         }
+                        dr.Close();
                     }
-                    dr.Close();
 
                     location = "1019";
                     bool bhaspermsadded = setPermissions(properties, isAdd);    //SETUP PERMISSION Add/Edit mode
