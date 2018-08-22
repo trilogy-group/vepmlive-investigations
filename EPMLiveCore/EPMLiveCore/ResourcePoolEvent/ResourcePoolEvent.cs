@@ -547,18 +547,18 @@ namespace EPMLiveCore
                         cmd.Parameters.AddWithValue("@siteuid", properties.SiteId);
                         cmd.Parameters.AddWithValue("@username", newusername);
 
-                        SqlDataReader dr = cmd.ExecuteReader();
+                        var dataReader = cmd.ExecuteReader();
                         location = "1018";
-                        if (dr.Read())
+                        if (dataReader.Read())
                         {
-                            if (dr.GetInt32(0) == 1)
+                            if (dataReader.GetInt32(0) == 1)
                             {
                                 bIsApproved = true;
                                 // Check if the user already exists with some other Site, set approved to true
                                 properties.AfterProperties["Approved"] = "1";
                             }
                         }
-                        dr.Close();
+                        dataReader.Close();
                     }
 
                     location = "1019";
