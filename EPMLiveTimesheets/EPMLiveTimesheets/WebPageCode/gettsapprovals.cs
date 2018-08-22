@@ -207,6 +207,8 @@ namespace TimeSheets
                 }
                 catch (Exception ex)
                 {
+                    // here we catch more than few exceptions
+                    // listing all of them might kill simplicty
                     Debug.WriteLine(ex);
                 }
             }
