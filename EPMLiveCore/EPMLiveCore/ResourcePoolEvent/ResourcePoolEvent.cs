@@ -586,17 +586,21 @@ namespace EPMLiveCore
                                 if ((properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True") && !bCurApproved)
                                 {
                                     location = "1026";
-                                    cmd = new SqlCommand("SELECT COUNT(*) FROM NEWACCOUNTEMAIL where username = @username", cn);
-                                    cmd.CommandType = CommandType.Text;
-                                    cmd.Parameters.AddWithValue("@username", newusername);
-                                    dr = cmd.ExecuteReader();
-                                    location = "1027";
-                                    if (dr.Read())
+                                    using (cmd = new SqlCommand("SELECT COUNT(*) FROM NEWACCOUNTEMAIL where username = @username", cn))
                                     {
-                                        if (dr.GetInt32(0) > 0)
-                                            bIsNewUser = true;
+                                        cmd.CommandType = CommandType.Text;
+                                        cmd.Parameters.AddWithValue("@username", newusername);
+                                        dr = cmd.ExecuteReader();
+                                        location = "1027";
+                                        if (dr.Read())
+                                        {
+                                            if (dr.GetInt32(0) > 0)
+                                            {
+                                                bIsNewUser = true;
+                                            }
+                                        }
+                                        dr.Close();
                                     }
-                                    dr.Close();
                                     location = "1028";
                                     if (bIsNewUser)
                                     {
