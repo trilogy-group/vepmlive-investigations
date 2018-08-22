@@ -322,11 +322,7 @@ export class CommonPageHelper {
     static async refreshPageIfRibbonElementIsDisable(stepLogger: StepLogger, targetElement: ElementFinder , item = CommonPage.record ) {
         let maxAttempts = 0;
         await browser.sleep(PageHelper.timeout.s);
-        while ((!(await PageHelper.isElementDisplayed(targetElement, false )) ) && maxAttempts++ < 10) {
-            browser.refresh();
-            await this.selectRecordFromGrid(stepLogger, item );
-        }
-        maxAttempts = 0;
+
         while ((await CommonPageHelper.getRibbonIsDisable(targetElement, 'aria-disabled') === 'true') && maxAttempts++ < 10) {
             browser.refresh();
             await this.selectRecordFromGrid(stepLogger, item );
@@ -340,6 +336,29 @@ export class CommonPageHelper {
         stepLogger.step('Select "Edit Item" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editItem);
 
+    }
+    static async editCostViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost );
+
+        stepLogger.step('Select "Edit Cost" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editCost);
+
+    }
+    static async editCostViaEllipsisHorizontal(stepLogger: StepLogger, item = CommonPage.record) {
+        await this.selectRecordFromGrid(stepLogger, item);
+        await ElementHelper.actionMouseMove(item);
+
+        stepLogger.step('Select "Edit Cost" from the options displayed');
+        await this.clickIconEllipsisHorizontal(stepLogger);
+
+        await PageHelper.click(CommonPage.contextMenuOptions.editCosts);
+
+    }
+    static async clickEditCost(stepLogger: StepLogger) {
+        stepLogger.step('Select "Edit Cost" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.editCost);
     }
     static async clickEditResourcePlanViaRibbon(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
@@ -430,6 +449,11 @@ export class CommonPageHelper {
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
+    static async clickItemTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+    }
+
     static async selectTwoRecordsFromGrid(stepLogger: StepLogger, item = CommonPage.record) {
         stepLogger.stepId(2);
         stepLogger.step('Select the check box for two record');
@@ -437,8 +461,6 @@ export class CommonPageHelper {
         await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(CommonPage.secondRecord);
-        stepLogger.step('Click on ITEMS on ribbon');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
     }
 
     static async verifyProjectCenterDisplayed(stepLogger: StepLogger) {
@@ -732,6 +754,12 @@ export class CommonPageHelper {
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels, projectName));
     }
+    static async textPresentValidation( targetElement: ElementFinder , text: string ) {
+        await WaitHelper.waitForElementToBeDisplayed(targetElement);
+        await expect(await ElementHelper.getText(targetElement))
+            .toBe(text,
+                ValidationsHelper.getImageDisplayedValidation(text));
+    }
     static async clickNewLink( stepLogger: StepLogger) {
         stepLogger.step('click on add new link ');
         await PageHelper.click(CommonPage.addNewLink);
@@ -778,5 +806,59 @@ export class CommonPageHelper {
         // Takes time to load the iframe
         await browser.sleep(PageHelper.timeout.s);
         await CommonPageHelper.switchToFirstContentFrame();
+    }
+
+    static async elementAttribueValueValidation( targetElement: ElementFinder , attributeValue: string, attributeName: string) {
+        await expect(await this.getRibbonIsDisable(targetElement , attributeName ))
+            .toBe(attributeValue,
+                ValidationsHelper.getDisabledValidation(attributeName));
+    }
+    static async clickIconEllipsisHorizontal(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ellipsis Horizontal');
+        await PageHelper.click(CommonPage.ellipse);
+    }
+
+    static  async selectProjectAndClickEllipsisButton (stepLogger: StepLogger, item = CommonPage.record ) {
+        await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
+
+        await ElementHelper.actionMouseMove(item);
+
+        await CommonPageHelper.clickIconEllipsisHorizontal(stepLogger);
+    }
+
+    static  async verifyItemDisabled(targetElement: ElementFinder ) {
+        await this.elementAttribueValueValidation(targetElement, 'true' , 'aria-disabled');
+    }
+
+    static  async validateContentOfItemTabIsDisabled(stepLogger: StepLogger) {
+        stepLogger.step('Validate Edit Cost Is Disabled ');
+        await this.verifyItemDisabled(CommonPage.ribbonItems.editCost);
+
+        stepLogger.step('Validate viewItem Is Disabled ');
+        await this.verifyItemDisabled(CommonPage.ribbonItems.viewItem);
+
+        stepLogger.step('Validate editItem Is Disabled ');
+        await this.verifyItemDisabled(CommonPage.ribbonItems.editItem);
+
+        stepLogger.step('Validate editResource Is Disabled ');
+        await this.verifyItemDisabled(CommonPage.ribbonItems.editResource);
+    }
+
+    static  async verifyVariousOptionsOnContextMenu (stepLogger: StepLogger ) {
+        stepLogger.verification('On Context Menu Edit Cost is present');
+        await CommonPageHelper.fieldDisplayedValidation
+        (CommonPage.contextMenuOptions.editCosts , CommonPageConstants.contextMenuOptions.editCosts);
+
+        stepLogger.verification('On Context Menu comments is present');
+        await CommonPageHelper.fieldDisplayedValidation
+        (CommonPage.contextMenuOptions.comments , CommonPageConstants.contextMenuOptions.comments);
+
+        stepLogger.verification('On Context Menu deleteItem is present');
+        await CommonPageHelper.fieldDisplayedValidation
+        (CommonPage.contextMenuOptions.deleteItem , CommonPageConstants.contextMenuOptions.deleteItem);
+
+        stepLogger.verification('On Context Menu editPlan is present');
+        await CommonPageHelper.fieldDisplayedValidation
+        (CommonPage.contextMenuOptions.editPlan , CommonPageConstants.contextMenuOptions.editPlan);
     }
 }

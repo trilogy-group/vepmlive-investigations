@@ -53,7 +53,10 @@ export class PageHelper {
     }
 
     static async sendKeysToInputField(elem: ElementFinder, key: string) {
-        await elem.sendKeys(key);
+        // send keys in not working in perticular fields, Its required actions classes.
+        await WaitHelper.waitForElementToBeDisplayed(elem);
+        await elem.click();
+        await browser.actions().sendKeys(key).perform();
     }
 
     static actionKeyUp(key: string) {
@@ -62,6 +65,10 @@ export class PageHelper {
 
     static keyPressForBrowser(key: string) {
         return browser.actions().sendKeys(key).perform();
+    }
+
+    static enterPressForBrowser() {
+        return browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
     static actionMouseUp(location: WebElement) {
@@ -486,4 +493,13 @@ export class PageHelper {
         return attributeValue.trim();
     }
 
+    static async sendKeysToInputFieldAndEnter(elem: ElementFinder, key: string) {
+        await this.sendKeysToInputField(elem, key);
+        await this.enterPressForBrowser();
+    }
+
+    static async clickAndEnter(elem: ElementFinder) {
+        await this.click(elem);
+        await this.enterPressForBrowser();
+    }
 }

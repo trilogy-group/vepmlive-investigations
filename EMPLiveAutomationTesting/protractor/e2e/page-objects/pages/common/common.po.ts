@@ -402,7 +402,8 @@ export class CommonPage extends BasePage {
             deleteItem: CommonPageHelper.getContextMenuItemByText(options.deleteItem),
             comments: CommonPageHelper.getContextMenuItemByText(options.comments),
             editTeam: CommonPageHelper.getContextMenuItemByText(options.editTeam),
-            editPlan: CommonPageHelper.getContextMenuItemByText(options.editPlan)
+            editPlan: CommonPageHelper.getContextMenuItemByText(options.editPlan),
+            editCosts: CommonPageHelper.getContextMenuItemByText(options.editCosts)
         };
     }
 
@@ -420,7 +421,10 @@ export class CommonPage extends BasePage {
             cell1: CommonPageHelper.getCellText(cells.cell1),
             cell2: CommonPageHelper.getCellText(cells.cell2),
             cell3: CommonPageHelper.getCellText(cells.cell3),
-            cell4: CommonPageHelper.getCellText(cells.cell4)
+            cell4: CommonPageHelper.getCellText(cells.cell4),
+            cell5: CommonPageHelper.getCellText(cells.cell5),
+            cell6: CommonPageHelper.getCellText(cells.cell6),
+            cell7: CommonPageHelper.getCellText(cells.cell7)
         };
     }
 

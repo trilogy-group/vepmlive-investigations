@@ -15,6 +15,7 @@ import {LoginPage} from '../../../../../page-objects/pages/login/login.po';
 import {ItemSettingsPageHelper} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.helper';
 import {ItemSettingsPage} from '../../../../../page-objects/pages/items-page/item-settings/item-settings.po';
 import {ItemSettingsPageConstants} from '../../../../../page-objects/pages/items-page/item-settings/item-settings-page.constants';
+import {EditCostHelper} from '../../../../../page-objects/pages/items-page/project-item/edit-cost-page/edit-cost.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -195,5 +196,54 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.step('Add resource to Current team and verify');
         await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
+    });
+
+    fit('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
+        const stepLogger = new StepLogger(743932);
+        const cost =  4;
+        const uniqueId = PageHelper.getUniqueId();
+
+        stepLogger.precondition('Creating New Project');
+        const  projectNameValue = await ProjectItemPageHelper.createNewProject(uniqueId, stepLogger);
+
+        stepLogger.stepId(1);
+        stepLogger.stepId(2);
+        await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger,
+            projectNameValue,
+            ProjectItemPageConstants.columnNames.title);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.editCostViaRibbon(stepLogger);
+
+        await CommonPageHelper.switchToFirstContentFrame();
+
+        await EditCostHelper.validateEditCostWebElements(stepLogger);
+
+        stepLogger.stepId(4);
+        await EditCostHelper.enterValueInBudgetCost(stepLogger, cost);
+
+        await EditCostHelper.verifyValueInBudgetCost(stepLogger, cost);
+
+        stepLogger.stepId(5);
+        await EditCostHelper.clickActualCostsTab(stepLogger);
+
+        await EditCostHelper.enterValueInActualCost(stepLogger , cost);
+
+        await EditCostHelper.verifyValueInActualCost(stepLogger, cost);
+
+        stepLogger.stepId(6);
+        await EditCostHelper.clickBenefitsTab(stepLogger);
+
+        await EditCostHelper.enterValueInBenefitTab(stepLogger, cost);
+
+        await EditCostHelper.verifyValueInBenefitCost(stepLogger, cost);
+
+        stepLogger.stepId(7);
+        stepLogger.stepId(8);
+        stepLogger.stepId(9);
+        await EditCostHelper.validateEditCostFunctionality(stepLogger, cost);
     });
 });

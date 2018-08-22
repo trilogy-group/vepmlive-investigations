@@ -161,7 +161,10 @@ export class CommonPageConstants {
             cell1: 'HideCol0C10',
             cell2: 'HideCol0C11',
             cell3: 'HideCol0C13',
-            cell4:  'HideCol0C15'
+            cell4:  'HideCol0C15',
+            cell5: 'HideCol0C1',
+            cell6: 'HideCol1C1',
+            cell7: 'HideCol2C1'
         };
     }
 
@@ -195,7 +198,8 @@ export class CommonPageConstants {
             comments: 'Comments',
             editTeam: 'Edit Team',
             costPlan: 'Cost Plan',
-            editPlan: 'Edit Plan'
+            editPlan: 'Edit Plan',
+            editCosts: 'Edit Costs'
         };
     }
 

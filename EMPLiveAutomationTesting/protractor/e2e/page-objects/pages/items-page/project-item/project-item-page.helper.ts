@@ -61,7 +61,7 @@ export class ProjectItemPageHelper {
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.projectName, projectNameValue));
 
-        // Add portfolio name
+       /* // Add portfolio name
         stepLogger.step('Select any Portfolio from the drop down [Ex: Test Portfolio1]');
         await PageHelper.click(ProjectItemPage.portfolioShowAllButton);
         await WaitHelper.waitForElementToBeDisplayed(inputs.portfolio);
@@ -72,7 +72,7 @@ export class ProjectItemPageHelper {
         await expect(await CommonPageHelper.getAutoCompleteItemByDescription(portfolioName).isPresent())
             .toBe(true,
                 ValidationsHelper.getFieldShouldHaveValueValidation(labels.portfolio, portfolioName));
-
+*/
         // Add Project Description
         stepLogger.step('Enter some text [Ex: Description for Smoke Test Project 1]');
         await TextboxHelper.sendKeys(inputs.projectDescription, projectDescription);

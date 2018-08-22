@@ -164,6 +164,7 @@ export class ElementHelper {
 
     static async getAttributeValue(elem: ElementFinder, attribute: string) {
         await WaitHelper.waitForElementToBeDisplayed(elem);
+
         try {
             const value = await elem.getAttribute(attribute);
             return value.trim();
@@ -183,6 +184,9 @@ export class ElementHelper {
         return element(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
     }
 
+    static getAllElementByText(text: string, isContains = false) {
+        return element.all(By.xpath(`//*[${ComponentHelpers.getXPathFunctionForText(text, isContains)}]`));
+    }
     static browserRefresh() {
         browser.refresh();
     }
