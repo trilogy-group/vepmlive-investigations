@@ -87,6 +87,7 @@
     <Reference Include="System.DirectoryServices.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.DirectoryServices.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
@@ -120,8 +121,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Testables\TestableCryptoTransform.cs" />
     <Compile Include="Utility\AdoShims.cs" />
     <Compile Include="Utility\DirectoryShims.cs" />
+    <Compile Include="Utility\CryptographyShims.cs" />
+    <Compile Include="Utility\IOShims.cs" />
     <Compile Include="Utility\SharepointShims.cs" />
     <Compile Include="Utility\HttpShims.cs" />
   </ItemGroup>

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Data;
 using System.Collections;
-using System.Xml;
-using System.Linq;
+using System.Data;
 using System.Data.SqlClient.Fakes;
-using EPMLiveTimesheets.Tests;
-using TimeSheets.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Xml;
 using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -54,7 +51,7 @@ namespace TimeSheets.Tests
                 throw new Exception("Unexpected call to read.");
             };
 
-            ShimTimesheetAPI.iGetTSDataSqlConnectionSPWebSPUserString
+            ShimTimesheetAPI.GetTSDataSetSqlConnectionSPWebSPUserString
                 = (_, __, ___, ____) =>
                 {
                     var dataSet = new DataSet();

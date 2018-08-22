@@ -24,8 +24,6 @@ namespace CADataCache
 
         protected CStruct MiddleCols;
         protected CStruct Definitions;
-        protected CStruct DefinitionRight;
-        protected CStruct DefinitionLeaf;
 
         private readonly bool _respectColumnUnselectableProperty;
 
@@ -66,13 +64,11 @@ namespace CADataCache
 
             Definitions = Constructor.CreateSubStruct("Def");
 
-            DefinitionRight = InitializeGridLayoutDefinition("R", Definitions);
-            DefinitionRight.CreateStringAttr("Calculated", "1");
+            DefinitionRight = InitializeGridLayoutDefinition("R", Definitions, true);
             DefinitionRight.CreateBooleanAttr("SelectCanEdit", true);
             DefinitionRight.CreateStringAttr("rowid", string.Empty);
 
-            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", Definitions);
-            DefinitionLeaf.CreateStringAttr("Calculated", "0");
+            DefinitionLeaf = InitializeGridLayoutDefinition("Leaf", Definitions, false);
 
             var xHead = Constructor.CreateSubStruct("Head");
             var xFilter = xHead.CreateSubStruct("Filter");

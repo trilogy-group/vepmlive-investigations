@@ -56,6 +56,10 @@
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SPEmulators">
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
     </Reference>
@@ -92,8 +96,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.ApproveTimesheetsCore.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetTSDataSet.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.CheckApproveStatus.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.GetOtherHours.Tests.cs" />
     <Compile Include="API\TimesheetAPI.SaveTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTimesheetUpdates.Tests.cs" />
+    <Compile Include="API\TimesheetAPI.StartStopWatch.Tests.cs" />
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
@@ -125,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EPMLiveTimesheets.Tests.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
