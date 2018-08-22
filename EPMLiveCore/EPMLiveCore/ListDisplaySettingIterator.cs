@@ -27,6 +27,7 @@ namespace EPMLiveCore
         private const string Barcolor1 = "FF0000";
         private const string Barcolor2 = "FFFF00";
         private const string Barcolor3 = "009900";
+        private const int ActivationId = 3;
         private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
         private SPList list = null;
         private SPControlMode mode = 0;
@@ -302,7 +303,7 @@ namespace EPMLiveCore
                                             {
                                                 command.CommandType = CommandType.StoredProcedure;
                                                 command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                                command.Parameters.AddWithValue("@username", "");
+                                                command.Parameters.AddWithValue("@username", string.Empty);
 
                                                 var dataSet = new DataSet();
                                                 using (var dataAdapter = new SqlDataAdapter(command))
@@ -319,7 +320,7 @@ namespace EPMLiveCore
                                                     Trace.WriteLine(ex.ToString());
                                                 }
                                             }
-                                            if (ActivationType != 3)
+                                            if (ActivationType != ActivationId)
                                             {
                                                 using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
                                                 {
@@ -338,7 +339,9 @@ namespace EPMLiveCore
                                                         barcolor = string.Empty;
 
                                                         if (width > 100)
+                                                        {
                                                             width = 100;
+                                                        }
 
                                                         if ((max - count) <= 1)
                                                         {
