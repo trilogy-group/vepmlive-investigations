@@ -56,50 +56,55 @@ namespace EPMLiveCore
                                 cn.Open();
 
 
-                                SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
-                                cmd.CommandType = CommandType.StoredProcedure;
-                                cmd.Parameters.AddWithValue("@siteid", siteuid);
-                                cmd.Parameters.AddWithValue("@username", "");
-
-                                DataSet ds = new DataSet();
-                                using (var dataAdapter = new SqlDataAdapter(cmd))
+                                using (var command = new SqlCommand("2012SP_GetActivationInfo", cn))
                                 {
-                                    dataAdapter.Fill(ds);
+                                    command.CommandType = CommandType.StoredProcedure;
+                                    command.Parameters.AddWithValue("@siteid", siteuid);
+                                    command.Parameters.AddWithValue("@username", "");
+
+                                    var dataSet = new DataSet();
+                                    using (var dataAdapter = new SqlDataAdapter(command))
+                                    {
+                                        dataAdapter.Fill(dataSet);
+                                    }
+
+                                    try
+                                    {
+                                        ActivationType = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Trace.WriteLine(ex.ToString());
+                                    }
                                 }
 
-                                try
+
+                                using (var command = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                 {
-                                    ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-                                }
-                                catch { }
+                                    command.CommandType = CommandType.StoredProcedure;
+                                    command.Parameters.AddWithValue("@siteid", siteuid);
+                                    command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
 
+                                    var reader = command.ExecuteReader();
 
-                                using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
-                                {
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@siteid", siteuid);
-                                    cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
-
-                                    SqlDataReader dr = cmd.ExecuteReader();
-
-                                    if (dr.Read())
+                                    if (reader.Read())
                                     {
                                         try
                                         {
-                                            expired = dr.GetBoolean(6);
+                                            expired = reader.GetBoolean(6);
                                         }
                                         catch(Exception ex)
                                         {
                                             Trace.WriteLine(ex.ToString());
                                         }
-                                        max = dr.GetInt32(0);
-                                        count = dr.GetInt32(1);
-                                        accountid = dr.GetGuid(2);
-                                        ownerusername = dr.GetString(13);
-                                        owneremail = dr.GetString(14);
-                                        billingtype = dr.GetInt32(11);
+                                        max = reader.GetInt32(0);
+                                        count = reader.GetInt32(1);
+                                        accountid = reader.GetGuid(2);
+                                        ownerusername = reader.GetString(13);
+                                        owneremail = reader.GetString(14);
+                                        billingtype = reader.GetInt32(11);
                                     }
-                                    dr.Close();
+                                    reader.Close();
                                 }
                             }
                             catch
@@ -602,7 +607,7 @@ namespace EPMLiveCore
                                     {
                                         cmd.CommandType = CommandType.Text;
                                         cmd.Parameters.AddWithValue("@username", newusername);
-                                        dr = cmd.ExecuteReader();
+                                        var dr = cmd.ExecuteReader();
                                         location = "1027";
                                         if (dr.Read())
                                         {
