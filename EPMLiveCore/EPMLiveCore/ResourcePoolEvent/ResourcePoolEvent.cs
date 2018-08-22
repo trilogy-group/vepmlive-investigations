@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Reflection;
 using System.Collections;
+using System.Diagnostics;
 
 namespace EPMLiveCore
 {
@@ -71,28 +72,33 @@ namespace EPMLiveCore
                                 catch { }
 
 
-                                cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                cmd.CommandType = CommandType.StoredProcedure;
-                                cmd.Parameters.AddWithValue("@siteid", siteuid);
-                                cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
-
-                                SqlDataReader dr = cmd.ExecuteReader();
-
-                                if (dr.Read())
+                                using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                 {
-                                    try
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@siteid", siteuid);
+                                    cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel(site));
+
+                                    SqlDataReader dr = cmd.ExecuteReader();
+
+                                    if (dr.Read())
                                     {
-                                        expired = dr.GetBoolean(6);
+                                        try
+                                        {
+                                            expired = dr.GetBoolean(6);
+                                        }
+                                        catch(Exception ex)
+                                        {
+                                            Trace.WriteLine(ex.ToString());
+                                        }
+                                        max = dr.GetInt32(0);
+                                        count = dr.GetInt32(1);
+                                        accountid = dr.GetGuid(2);
+                                        ownerusername = dr.GetString(13);
+                                        owneremail = dr.GetString(14);
+                                        billingtype = dr.GetInt32(11);
                                     }
-                                    catch { }
-                                    max = dr.GetInt32(0);
-                                    count = dr.GetInt32(1);
-                                    accountid = dr.GetGuid(2);
-                                    ownerusername = dr.GetString(13);
-                                    owneremail = dr.GetString(14);
-                                    billingtype = dr.GetInt32(11);
+                                    dr.Close();
                                 }
-                                dr.Close();
                             }
                             catch
                             {
