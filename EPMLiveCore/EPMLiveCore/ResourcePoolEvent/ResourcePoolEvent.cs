@@ -673,14 +673,16 @@ namespace EPMLiveCore
 
         private void addUserToAccount(string firstname, string lastname, string email, string username)
         {
-            SqlCommand cmd = new SqlCommand("SP_AddAccountUserByUsername", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@username", username);
-            cmd.Parameters.AddWithValue("@first", firstname);
-            cmd.Parameters.AddWithValue("@last", lastname);
-            cmd.Parameters.AddWithValue("@email", email);
-            cmd.Parameters.AddWithValue("@account_id", accountid);
-            cmd.ExecuteNonQuery();
+            using (var command = new SqlCommand("SP_AddAccountUserByUsername", cn))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@username", username);
+                command.Parameters.AddWithValue("@first", firstname);
+                command.Parameters.AddWithValue("@last", lastname);
+                command.Parameters.AddWithValue("@email", email);
+                command.Parameters.AddWithValue("@account_id", accountid);
+                command.ExecuteNonQuery();
+            }
         }
 
         private string getTempPassword(string username)
