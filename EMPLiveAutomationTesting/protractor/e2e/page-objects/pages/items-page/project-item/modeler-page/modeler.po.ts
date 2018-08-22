@@ -11,7 +11,9 @@ export class ModelerPage extends BasePage {
             selectModelDropdown: element(By.id(modelAndVersionsLabel.selectModelDropdown)),
             versionsSelectionBox: element(By.id(modelAndVersionsLabel.versionsSelectionBox)),
             ok: this.getButtonOnPopup(modelAndVersionsLabel.ok),
-            cancel: this.getButtonOnPopup(modelAndVersionsLabel.cancel)
+            cancel: this.getButtonOnPopup(modelAndVersionsLabel.cancel),
+            selectedOptionVersionsBox: element(By.css('select#idVersionList>option:checked')),
+            selectVersionsOptions: element(By.css('select#idVersionList>option'))
         };
     }
 
@@ -36,12 +38,24 @@ export class ModelerPage extends BasePage {
     static get displayTabOptions() {
         const displayTabLabels = ModelerPageConstants.displayTabOptions;
         return {
-            close: element(By.css(`div#idOptimizerTabDiv_ribbon img[src*="${displayTabLabels.close}"]`)),
+            close: element(By.css(`#idRibbonDiv_ul img[src*="${displayTabLabels.close}"]`)),
             totalDetails: element(By.id(displayTabLabels.totalDetails)),
             searchSettings: element(By.id(displayTabLabels.searchSettings)),
             findNext: element(By.id(displayTabLabels.findNext)),
             saveVersion: element(By.id(displayTabLabels.saveVersion)),
             copyVersion: element(By.id(displayTabLabels.copyVersion)),
+            exportToExcel: element(By.id(displayTabLabels.exportToExcel)),
+            print: element(By.id(displayTabLabels.print)),
+            detailsTopGrid: element(By.id(displayTabLabels.detailsTopGrid)),
+            applyTarget: element(By.id(displayTabLabels.applyTarget)),
+            totalsDetails: element(By.id(displayTabLabels.totalsDetails)),
+            createTarget: element(By.id(displayTabLabels.createTarget)),
+            editTarget: element(By.id(displayTabLabels.editTarget)),
+            deleteTarget: element(By.id(displayTabLabels.deleteTarget)),
+            copyTarget: element(By.id(displayTabLabels.copyTarget)),
+            exportToExcelBottom: element(By.id(displayTabLabels.exportToExcelBottom)),
+            printBottom: element(By.id(displayTabLabels.printBottom)),
+            totalsBottomGrid: element(By.id(displayTabLabels.totalsBottomGrid)),
         };
     }
 
@@ -56,5 +70,9 @@ export class ModelerPage extends BasePage {
             ok: this.getButtonOnPopup(searchSettingsLabel.ok),
             cancel: this.getButtonOnPopup(searchSettingsLabel.cancel)
         };
+    }
+
+    static getSelectVersionOptionText(index: number) {
+        return element(By.css(`select#idVersionList>option:nth-child(${index})`));
     }
 }
