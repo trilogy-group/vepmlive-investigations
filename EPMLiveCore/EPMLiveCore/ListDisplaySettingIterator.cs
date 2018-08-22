@@ -294,26 +294,30 @@ namespace EPMLiveCore
                                             cn.Open();
                                         });
 
-                                        SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
-                                        cmd.CommandType = CommandType.StoredProcedure;
-                                        cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                        cmd.Parameters.AddWithValue("@username", "");
-
-                                        DataSet ds = new DataSet();
-                                        using (var da = new SqlDataAdapter(cmd))
+                                        using (var cmd = new SqlCommand("2012SP_GetActivationInfo", cn))
                                         {
-                                            da.Fill(ds);
-                                        }
+                                            cmd.CommandType = CommandType.StoredProcedure;
+                                            cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                            cmd.Parameters.AddWithValue("@username", "");
 
-                                        try
-                                        {
-                                            ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-                                        }
-                                        catch { }
+                                            var ds = new DataSet();
+                                            using (var da = new SqlDataAdapter(cmd))
+                                            {
+                                                da.Fill(ds);
+                                            }
 
+                                            try
+                                            {
+                                                ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Trace.WriteLine(ex.ToString());
+                                            }
+                                        }
                                         if (ActivationType != 3)
                                         {
-                                            using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
+                                            using (var cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                             {
                                                 cmd.CommandType = CommandType.StoredProcedure;
                                                 cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
@@ -351,7 +355,7 @@ namespace EPMLiveCore
                                         }
                                         else
                                         {
-                                            using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
+                                            using (var cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                             {
                                                 cmd.CommandType = CommandType.StoredProcedure;
                                                 cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
