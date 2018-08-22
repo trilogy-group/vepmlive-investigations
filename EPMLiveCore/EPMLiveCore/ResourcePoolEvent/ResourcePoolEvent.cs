@@ -685,24 +685,24 @@ namespace EPMLiveCore
 
         private string getTempPassword(string username)
         {
-            SqlCommand cmdGetPassword;
-
-            cmdGetPassword = new SqlCommand("SP_GetPassword", cn);
-            cmdGetPassword.CommandType = CommandType.StoredProcedure;
-            cmdGetPassword.Parameters.AddWithValue("@username", username);
-
-            using (var dataAdapter = new SqlDataAdapter(cmdGetPassword))
+            using (var cmdGetPassword = new SqlCommand("SP_GetPassword", cn))
             {
-                var dataSet = new DataSet();
-                dataAdapter.Fill(dataSet);
+                cmdGetPassword.CommandType = CommandType.StoredProcedure;
+                cmdGetPassword.Parameters.AddWithValue("@username", username);
 
-                if (dataSet.Tables[0].Rows.Count > 0)
+                using (var dataAdapter = new SqlDataAdapter(cmdGetPassword))
                 {
-                    return dataSet.Tables[0].Rows[0][0].ToString();
-                }
-                else
-                {
-                    return string.Empty;
+                    var dataSet = new DataSet();
+                    dataAdapter.Fill(dataSet);
+
+                    if (dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        return dataSet.Tables[0].Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
                 }
             }
         }
