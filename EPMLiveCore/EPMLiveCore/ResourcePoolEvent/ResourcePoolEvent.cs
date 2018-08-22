@@ -62,8 +62,10 @@ namespace EPMLiveCore
                                 cmd.Parameters.AddWithValue("@username", "");
 
                                 DataSet ds = new DataSet();
-                                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                da.Fill(ds);
+                                using (var dataAdapter = new SqlDataAdapter(cmd))
+                                {
+                                    dataAdapter.Fill(ds);
+                                }
 
                                 try
                                 {
