@@ -1,16 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
-using System.Security.Permissions;
+using System.Reflection;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Security;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.Workflow;
-using System.Data.SqlClient;
-using System.Data;
-using System.Reflection;
-using System.Collections;
-using System.Diagnostics;
 
 namespace EPMLiveCore
 {
@@ -558,7 +554,7 @@ namespace EPMLiveCore
                             if (dr.GetInt32(0) == 1)
                             {
                                 bIsApproved = true;
-                                //Check if the user already exists with some other Site, set approved to true
+                                // Check if the user already exists with some other Site, set approved to true
                                 properties.AfterProperties["Approved"] = "1";
                             }
                         }
