@@ -311,39 +311,41 @@ namespace EPMLiveCore
 
                                         if (ActivationType != 3)
                                         {
-                                            cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                            cmd.CommandType = CommandType.StoredProcedure;
-                                            cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                            cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                                            SqlDataReader dr = cmd.ExecuteReader();
-
-                                            if (dr.Read())
+                                            using (cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn))
                                             {
-                                                max = dr.GetInt32(0);
-                                                count = dr.GetInt32(1);
-                                                width = (count * 100) / max;
+                                                cmd.CommandType = CommandType.StoredProcedure;
+                                                cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                                cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
 
-                                                barcolor = "";
+                                                SqlDataReader dr = cmd.ExecuteReader();
 
-                                                if (width > 100)
-                                                    width = 100;
+                                                if (dr.Read())
+                                                {
+                                                    max = dr.GetInt32(0);
+                                                    count = dr.GetInt32(1);
+                                                    width = (count * 100) / max;
 
-                                                if ((max - count) <= 1)
-                                                    barcolor = "FF0000";
-                                                else if ((max - count) < 5)
-                                                    barcolor = "FFFF00";
-                                                else
-                                                    barcolor = "009900";
+                                                    barcolor = "";
 
-                                                ownerusername = dr.GetString(13);
-                                                ownername = dr.GetString(5);
+                                                    if (width > 100)
+                                                        width = 100;
 
-                                                accountid = dr.GetGuid(2);
+                                                    if ((max - count) <= 1)
+                                                        barcolor = "FF0000";
+                                                    else if ((max - count) < 5)
+                                                        barcolor = "FFFF00";
+                                                    else
+                                                        barcolor = "009900";
 
-                                                billingtype = dr.GetInt32(11);
+                                                    ownerusername = dr.GetString(13);
+                                                    ownername = dr.GetString(5);
+
+                                                    accountid = dr.GetGuid(2);
+
+                                                    billingtype = dr.GetInt32(11);
+                                                }
+                                                dr.Close();
                                             }
-                                            dr.Close();
                                         }
                                         else
                                         {
