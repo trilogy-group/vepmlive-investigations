@@ -24,6 +24,10 @@ namespace EPMLiveCore
 {
     public class ListDisplaySettingIterator : ListFieldIterator
     {
+        private const string Barcolor1 = "FF0000";
+        private const string Barcolor2 = "FFFF00";
+        private const string Barcolor3 = "009900";
+        private const int ActivationId = 3;
         private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
         private SPList list = null;
         private SPControlMode mode = 0;
@@ -280,91 +284,111 @@ namespace EPMLiveCore
 
                                     try
                                     {
-                                        SqlConnection cn = null;
-                                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                                        SqlConnection connection = null;
+                                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                                         {
                                             MethodInfo m;
 
                                             Assembly assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
                                             Type thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.Settings", true, true);
                                             m = thisClass.GetMethod("getConnectionString");
-                                            string sConn = (string)m.Invoke(null, new object[] { });
+                                            var connectionString = (string)m.Invoke(null, new object[] { });
 
-                                            cn = new SqlConnection(sConn);
-                                            cn.Open();
+                                            connection = new SqlConnection(connectionString);
+                                            connection.Open();
                                         });
-
-                                        SqlCommand cmd = new SqlCommand("2012SP_GetActivationInfo", cn);
-                                        cmd.CommandType = CommandType.StoredProcedure;
-                                        cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                        cmd.Parameters.AddWithValue("@username", "");
-
-                                        DataSet ds = new DataSet();
-                                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                        da.Fill(ds);
-
-                                        try
+                                        using (connection)
                                         {
-                                            ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-                                        }
-                                        catch { }
-
-                                        if (ActivationType != 3)
-                                        {
-                                            cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                            cmd.CommandType = CommandType.StoredProcedure;
-                                            cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                            cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                                            SqlDataReader dr = cmd.ExecuteReader();
-
-                                            if (dr.Read())
+                                            using (var command = new SqlCommand("2012SP_GetActivationInfo", connection))
                                             {
-                                                max = dr.GetInt32(0);
-                                                count = dr.GetInt32(1);
-                                                width = (count * 100) / max;
+                                                command.CommandType = CommandType.StoredProcedure;
+                                                command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                                command.Parameters.AddWithValue("@username", string.Empty);
 
-                                                barcolor = "";
+                                                var dataSet = new DataSet();
+                                                using (var dataAdapter = new SqlDataAdapter(command))
+                                                {
+                                                    dataAdapter.Fill(dataSet);
+                                                }
 
-                                                if (width > 100)
-                                                    width = 100;
-
-                                                if ((max - count) <= 1)
-                                                    barcolor = "FF0000";
-                                                else if ((max - count) < 5)
-                                                    barcolor = "FFFF00";
-                                                else
-                                                    barcolor = "009900";
-
-                                                ownerusername = dr.GetString(13);
-                                                ownername = dr.GetString(5);
-
-                                                accountid = dr.GetGuid(2);
-
-                                                billingtype = dr.GetInt32(11);
+                                                try
+                                                {
+                                                    ActivationType = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Trace.WriteLine(ex.ToString());
+                                                }
                                             }
-                                            dr.Close();
-                                        }
-                                        else
-                                        {
-                                            cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
-                                            cmd.CommandType = CommandType.StoredProcedure;
-                                            cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
-                                            cmd.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
-
-                                            SqlDataReader dr = cmd.ExecuteReader();
-
-                                            if (dr.Read())
+                                            if (ActivationType != ActivationId)
                                             {
-                                                ownerusername = dr.GetString(13);
-                                                ownername = dr.GetString(5);
+                                                using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
+                                                {
+                                                    command.CommandType = CommandType.StoredProcedure;
+                                                    command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                                    command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
+
+                                                    var dataReaser = command.ExecuteReader();
+
+                                                    if (dataReaser.Read())
+                                                    {
+                                                        max = dataReaser.GetInt32(0);
+                                                        count = dataReaser.GetInt32(1);
+                                                        width = (count * 100) / max;
+
+                                                        barcolor = string.Empty;
+
+                                                        if (width > 100)
+                                                        {
+                                                            width = 100;
+                                                        }
+
+                                                        if ((max - count) <= 1)
+                                                        {
+                                                            barcolor = Barcolor1;
+                                                        }
+                                                        else if ((max - count) < 5)
+                                                        {
+                                                            barcolor = Barcolor2;
+                                                        }
+                                                        else
+                                                        {
+                                                            barcolor = Barcolor3;
+                                                        }
+
+                                                        ownerusername = dataReaser.GetString(13);
+                                                        ownername = dataReaser.GetString(5);
+
+                                                        accountid = dataReaser.GetGuid(2);
+
+                                                        billingtype = dataReaser.GetInt32(11);
+                                                    }
+                                                    dataReaser.Close();
+                                                }
                                             }
-                                            dr.Close();
+                                            else
+                                            {
+                                                using (var command = new SqlCommand("2010SP_GetSiteAccountNums", connection))
+                                                {
+                                                    command.CommandType = CommandType.StoredProcedure;
+                                                    command.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
+                                                    command.Parameters.AddWithValue("@contractLevel", CoreFunctions.getContractLevel());
+
+                                                    var dataReader = command.ExecuteReader();
+
+                                                    if (dataReader.Read())
+                                                    {
+                                                        ownerusername = dataReader.GetString(13);
+                                                        ownername = dataReader.GetString(5);
+                                                    }
+                                                    dataReader.Close();
+                                                }
+                                            }
                                         }
-                                        cn.Close();
                                     }
-                                    catch
+                                    catch (Exception ex)
                                     {
+                                        Trace.WriteLine(ex.ToString());
                                         max = 0;
                                     }
                                 }
@@ -1193,6 +1217,21 @@ namespace EPMLiveCore
             }
             else
                 base.RenderControl(writer);
+        }
+
+        public override void Dispose()
+        {
+            if (Controls != null)
+            {
+                for (var i = Controls.Count - 1; i >= 0; i--)
+                {
+                    Controls[i]?.Dispose();
+                }
+            }
+            userPanel?.Dispose();
+            profilePanel?.Dispose();
+            permissionPanel?.Dispose();
+            base.Dispose();
         }
 
         #region resourcepool methods
