@@ -31,5 +31,6 @@
     <Add FullName="EPMLiveCore.ReportHelper.MyWorkReportData!"/>
     <Add FullName="EPMLiveCore.GenericQueryControl!"/>
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
+    <Add FullName="EPMLiveCore.ExtensionMethods!"/>
   </ShimGeneration>
 </Fakes>
