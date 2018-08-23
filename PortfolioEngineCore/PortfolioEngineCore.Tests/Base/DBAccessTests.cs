@@ -14,6 +14,7 @@ using Shouldly;
 namespace PortfolioEngineCore.Tests.Base
 {
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class DBAccessTests
     {
         private IDisposable _shimObject;
