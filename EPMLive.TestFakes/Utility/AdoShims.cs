@@ -57,6 +57,13 @@ namespace EPMLive.TestFakes.Utility
             return result;
         }
 
+        public bool IsConnectionManagedCorrectly(string connectionString)
+        {
+            return IsConnectionCreated(connectionString)
+                && IsConnectionOpened(connectionString)
+                && IsConnectionDisposed(connectionString);
+        }
+
         public bool IsConnectionCreated(string connectionString)
         {
             return ConnectionsCreated.Any(pred => pred.ConnectionString == connectionString);
@@ -70,6 +77,13 @@ namespace EPMLive.TestFakes.Utility
         public bool IsConnectionDisposed(string connectionString)
         {
             return ConnectionsDisposed.Any(pred => pred.ConnectionString == connectionString);
+        }
+
+        public bool IsCommandManagedCorrectly(string commandText)
+        {
+            return IsCommandCreated(commandText)
+                && IsCommandExecuted(commandText)
+                && IsCommandDisposed(commandText);
         }
 
         public bool IsCommandCreated(string commandText)
@@ -131,6 +145,8 @@ namespace EPMLive.TestFakes.Utility
             {
                 ConnectionsClosed.Add(instance);
             };
+            ShimSqlConnection.AllInstances.StateGet = instance => System.Data.ConnectionState.Open;
+
             ShimSqlCommand.ConstructorStringSqlConnection = (instance, commandText, connection) =>
             {
                 instance.CommandText = commandText;
