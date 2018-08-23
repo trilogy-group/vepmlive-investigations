@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Web.Fakes;
 using EPMLiveCore.API;
 using EPMLiveCore.API.Fakes;
+using EPMLiveCore.SocialEngine;
+using EPMLiveCore.SocialEngine.Core;
+using EPMLiveCore.SocialEngine.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
@@ -27,10 +30,11 @@ namespace EPMLiveCore.Tests.API.Comments
         private string GetMyCommentsByDateMethodName = "GetMyCommentsByDate";
         private string UserIsAssignedMethodName = "UserIsAssigned";
         private string SendEmailNotificationMethodName = "SendEmailNotification";
+        private string SetSocialEngineTransactionMethodName = "SetSocialEngineTransaction";
 
         private const string DummyUrl = "https://server.org/dummy/url";
         private const string DummyString = "DummyString";
-
+        private string DeleteFromSocialStreamMethodName = "DeleteFromSocialStream";
 
         [TestInitialize]
         public void Initialize()
@@ -55,11 +59,139 @@ namespace EPMLiveCore.Tests.API.Comments
         [TestCleanup]
         public void Cleanup()
         {
+
             _shimContext?.Dispose();
         }
 
+
         [TestMethod]
-        public void SendEmailNotification()
+        public void DeleteFromSocialStream()
+        {
+            // Arrange
+            var currentWeb = new ShimSPWeb
+            {
+                IDGet = () => Guid.NewGuid(),
+                SiteGet = () => new ShimSPSite
+                {
+                    IDGet = () => Guid.NewGuid()
+                },
+                CurrentUserGet = () => new ShimSPUser
+                {
+                    IDGet = () => 1
+                }
+            }.Instance;
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                RegionalSettingsGet = () => new ShimSPRegionalSettings
+                {
+                    TimeZoneGet = () => new ShimSPTimeZone
+                    {
+                        UTCToLocalTimeDateTime = date => DateTime.Now
+                    }
+                }
+            };
+            
+            // Act
+            _privateType.InvokeStatic(
+                DeleteFromSocialStreamMethodName,
+                DummyString,
+                DummyString, 
+                Guid.NewGuid(),
+                1,
+                DummyUrl,
+                Guid.NewGuid(),
+                currentWeb);
+
+            // Assert
+
+        }
+
+        [TestMethod]
+        public void InsertCommentCount()
+        {
+            // Arrange
+
+            // Act
+
+            // Assert
+            Assert.Fail("Not Implemented");
+        }
+
+        [TestMethod]
+        public void SetSocialEngineTransaction_Should_SetTransaction()
+        {
+            // Arrange
+            var setTransactionWasCalled = false;
+            var listItem = new ShimSPListItem
+            {
+
+            }.Instance;
+            ShimSocialEngineProxy.SetTransactionGuidGuidInt32StringSPWeb =
+                (guid, listId, itemId, componentName, web) =>
+                {
+                    setTransactionWasCalled = false;
+                    return Guid.Empty;
+                };
+
+            // Act
+            _privateType.InvokeStatic(SetSocialEngineTransactionMethodName, listItem);
+
+            // Assert
+            setTransactionWasCalled.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void SendEmailNotification_OnSuccess_QueueMessage()
+        {
+            // Arrange
+            var messageQueued = false;
+            ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection
+            {
+                GetByIDInt32 = id => new ShimSPUser()
+            };
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                ItemGetGuid = guid => new ShimSPList()
+            };
+            ShimSPList.AllInstances.GetItemByIdInt32 = (_, id) => new ShimSPListItem();
+            ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection
+            {
+                GetFieldByInternalNameString = name => new ShimSPField
+                {
+                    IdGet = () => Guid.NewGuid()
+                }
+            };
+            ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString; // chante on next test
+            ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
+            ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection
+            {
+                ItemGetPAGETYPE = type => new ShimSPForm
+                {
+                    ServerRelativeUrlGet = () => DummyUrl
+                }
+            };
+            ShimAPIEmail.QueueItemMessageInt32BooleanHashtableStringArrayStringArrayBooleanBooleanSPListItemSPUserBoolean = 
+                (template, hide, parameters, users, deleteUsers, doNotEmail, unmarked, listItem, user, force) =>
+            {
+                messageQueued = true;
+            };
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser
+            {
+                NameGet = () => DummyString
+            };
+
+            // Act
+            var result = _privateType.InvokeStatic(SendEmailNotificationMethodName,
+                1, Guid.NewGuid().ToString(), "1", DummyString, DummyString) as bool?;
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => messageQueued.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void SendEmailNotification_OnException_ReturnsFalse()
         {
             // Arrange
             ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection
@@ -78,20 +210,34 @@ namespace EPMLiveCore.Tests.API.Comments
                     IdGet = () => Guid.NewGuid()
                 }
             };
-            ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString; // chante on next test
-            ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection
+            ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => null;
+            ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
+            ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection
             {
-                
+                ItemGetPAGETYPE = type => new ShimSPForm
+                {
+                    ServerRelativeUrlGet = () => DummyUrl
+                }
             };
+            ShimAPIEmail.QueueItemMessageInt32BooleanHashtableStringArrayStringArrayBooleanBooleanSPListItemSPUserBoolean =
+                (template, hide, parameters, users, deleteUsers, doNotEmail, unmarked, listItem, user, force) =>
+                {
+                    throw new Exception();
+                };
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser
+            {
+                NameGet = () => DummyString
+            };
+            var comment = DummyString + "%20";
 
             // Act
             var result = _privateType.InvokeStatic(SendEmailNotificationMethodName,
-                1, Guid.NewGuid().ToString(), "1", DummyString, DummyString) as bool?;
+                1, Guid.NewGuid().ToString(), "1", comment, DummyString) as bool?;
 
             // Assert
-            result.ShouldNotBeNull();
-            result.Value.ShouldBeTrue();
-
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Value.ShouldBeFalse());
         }
 
         [TestMethod]
