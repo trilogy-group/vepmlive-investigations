@@ -8,12 +8,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NUnit.Framework;
 using Shouldly;
 
 namespace PortfolioEngineCore.Tests.Base
 {
-    [TestFixture]
+    [TestClass]
     [ExcludeFromCodeCoverage]
     public class DBAccessTests
     {
@@ -36,7 +35,7 @@ namespace PortfolioEngineCore.Tests.Base
         private const string InvalidDate = "1000-00-00";
         private const int DummyInt = 1;
 
-        [SetUp]
+        [TestInitialize]
         public void TestInitialize()
         {
             _isOpened = false;
@@ -53,7 +52,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimsSetup();
         }
 
-        [TearDown]
+        [TestCleanup]
         public void TestCleanup()
         {
             _shimObject?.Dispose();
@@ -99,7 +98,7 @@ namespace PortfolioEngineCore.Tests.Base
             ShimEventLog.WriteEntryStringStringEventLogEntryType = (_, _1, _2) => _logInvoked = true;
         }
 
-        [Test]
+        [TestMethod]
         public void Constructor_WithSqlConnection_ConfirmResult()
         {
             // Arrange
@@ -112,7 +111,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.Connection.ShouldBe(sqlConnection);
         }
 
-        [Test]
+        [TestMethod]
         public void Open_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -124,7 +123,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.ShouldBe(StatusEnum.rsSuccess));
         }
 
-        [Test]
+        [TestMethod]
         public void Open_WhenConnectionStringIsEmpty_ConfirmResult()
         {
             // Arrange
@@ -140,7 +139,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.ShouldBe(StatusEnum.rsSuccess));
         }
 
-        [Test]
+        [TestMethod]
         public void Dispose_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -156,7 +155,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => _isDisposed.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void SelectData_WhenCommandString_ConfirmResult()
         {
             // Arrange
@@ -171,7 +170,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataTable.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void SelectData_WhenSqlCommand_ConfirmResult()
         {
             // Arrange
@@ -186,7 +185,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataTable.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void SelectDataById_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -201,7 +200,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataTable.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void SelectDataByName_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -216,7 +215,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataTable.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteDataById_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -231,7 +230,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => rowsAffected.ShouldBe(DummyInt));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteData_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -246,7 +245,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => rowsAffected.ShouldBe(DummyInt));
         }
 
-        [Test]
+        [TestMethod]
         public void ExecuteReader_StringCommand_ConfirmResult()
         {
             // Arrange
@@ -261,7 +260,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataReader.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void ExecuteReader_SqlCommand_ConfirmResult()
         {
             // Arrange
@@ -276,7 +275,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => dataReader.ShouldNotBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void ExecuteNonQuery_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -291,7 +290,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => rowsAffected.ShouldBe(DummyInt));
         }
 
-        [Test]
+        [TestMethod]
         public void HandleException_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -315,7 +314,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => _nonQueryExecuted.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void WriteImmTrace_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -325,7 +324,7 @@ namespace PortfolioEngineCore.Tests.Base
             _nonQueryExecuted.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void BeginTransaction_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -338,7 +337,7 @@ namespace PortfolioEngineCore.Tests.Base
             _transactionStarted.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void CommitTransaction_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -352,7 +351,7 @@ namespace PortfolioEngineCore.Tests.Base
             _commited.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void RollbackTransaction_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -366,7 +365,7 @@ namespace PortfolioEngineCore.Tests.Base
             _rollback.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDateValue_WithObject_ConfirmResult()
         {
             // Arrange, Act
@@ -376,7 +375,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(Convert.ToDateTime(DummyDate));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDateValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -386,7 +385,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(Convert.ToDateTime(DateTime.MinValue));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDateValue_WithDBNullAndBoolean_ReturnBoolean()
         {
             // Arrange
@@ -401,7 +400,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDateValue_WithInvalidDateAndBoolean_ReturnBoolean()
         {
             // Arrange
@@ -416,7 +415,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDateValue_WithObjectAndBoolean_ReturnBoolean()
         {
             // Arrange
@@ -431,7 +430,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadNullableDateValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -443,7 +442,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.Value.ShouldBe(Convert.ToDateTime(DummyDate)));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadNullableDateValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -454,7 +453,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.ShouldBeNull());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadStringValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -465,7 +464,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => result.ShouldBe(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadStringValue_WithBoolean_ConfirmResult()
         {
             // Arrange
@@ -480,7 +479,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadStringValue_WithDBNull_ConfirmResult()
         {
             // Arrange
@@ -495,7 +494,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDoubleValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -505,7 +504,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(10.5);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDoubleValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -515,7 +514,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(0.0);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDoubleValue_WithBoolean_ConfirmResult()
         {
             // Arrange
@@ -530,7 +529,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDoubleValue_WithDBNullAndBoolean_ConfirmResult()
         {
             // Arrange
@@ -545,7 +544,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDecimalValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -555,7 +554,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(12.6M);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDecimalValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -565,7 +564,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(0.0M);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDecimalValue_WithBoolean_ConfirmResult()
         {
             // Arrange
@@ -580,7 +579,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDecimalValue_WithDBNullAndBoolean_ConfirmResult()
         {
             // Arrange
@@ -595,7 +594,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBoolValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -605,7 +604,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBoolValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -615,7 +614,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBeFalse();
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBoolValue_WithBoolean_ConfirmResult()
         {
             // Arrange
@@ -630,7 +629,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBoolValue_WithDBNullAndBoolean_ConfirmResult()
         {
             // Arrange
@@ -645,7 +644,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -655,7 +654,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(DummyInt);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_WithDBNull_ConfirmResult()
         {
             // Arrange, Act
@@ -665,7 +664,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(0);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_WithInvalidInt_ConfirmResult()
         {
             // Arrange, Act
@@ -675,7 +674,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(0);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_WithBoolean_ConfirmResult()
         {
             // Arrange
@@ -690,7 +689,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_WithDBNullAndBoolean_ConfirmResult()
         {
             // Arrange
@@ -705,7 +704,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadIntValue_WithInValidIntAndBoolean_ConfirmResult()
         {
             // Arrange
@@ -720,7 +719,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => bIsNull.ShouldBeFalse());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadGuidValue_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -733,7 +732,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe(new Guid(guid));
         }
 
-        [Test]
+        [TestMethod]
         public void PrepareText_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -743,7 +742,7 @@ namespace PortfolioEngineCore.Tests.Base
             result.ShouldBe($"'{DummyString}'");
         }
 
-        [Test]
+        [TestMethod]
         public void GetLastIdentityValue_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -758,7 +757,7 @@ namespace PortfolioEngineCore.Tests.Base
                 () => lAutoNumber.ShouldBe(DummyInt));
         }
 
-        [Test]
+        [TestMethod]
         public void FormatAdminError_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
