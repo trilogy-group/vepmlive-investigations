@@ -67,7 +67,11 @@ export class CommonPage extends BasePage {
                 resources: CommonPageHelper.getPageHeaderByTitle(projectsLabels.resources, true),
                 reports: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reports),
                 reporting: CommonPageHelper.getPageHeaderByTitle(projectsLabels.reporting),
-                projectPlanner: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPlanner, true)
+                projectPlanner: CommonPageHelper.getPageHeaderByTitle(projectsLabels.projectPlanner, true),
+                optimizer: CommonPageHelper.getElementByText(projectsLabels.optimizer),
+                projectDetails: CommonPageHelper.getElementByText(CommonPageConstants.pageHeaders.projects.projectDetails, true),
+                optimizerConfiguration: CommonPageHelper.getElementByText(CommonPageConstants.pageHeaders.projects.optimizerConfiguration),
+
             },
             myWorkplace: {
                 myWork: CommonPageHelper.getPageHeaderByTitle(myWorkplaceLabels.myWork, true),
@@ -261,7 +265,9 @@ export class CommonPage extends BasePage {
     static get timeZone() {
         return element(By.css('[name*="TimeZone"][disabled]'));
     }
-
+    static get iconEllipsisHorizontal() {
+        return element(By.xpath('//*[@class="GMSection"]//*[@class="icon-ellipsis-horizontal"]'));
+    }
     static get selectorForRecordsWithGreenTick() {
         return `${this.selectorForRecordsWithoutGreenTick}//img[contains(@src,"green") or contains(@src,"checkmark")]`;
     }
@@ -550,6 +556,10 @@ export class CommonPage extends BasePage {
     static periodEndOptionValue(name: string) {
         return element(By.xpath(`(${this.getDropDownByParameterNameXpath
         (name)})[2]//option[last()]`));
+    }
+
+    static getNthRecord(index = 1) {
+        return element.all(By.xpath(`(${this.selectorForRecordsWithoutGreenTick}//td[contains(@class,'GMCellPanel')])`)).get(index);
     }
 
     static get modelerButton() {

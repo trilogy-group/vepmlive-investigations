@@ -208,6 +208,7 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         stepLogger.stepId(1);
         stepLogger.stepId(2);
+
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
@@ -216,6 +217,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ProjectItemPageConstants.columnNames.title);
 
         stepLogger.stepId(3);
+
         await CommonPageHelper.editCostViaRibbon(stepLogger);
 
         await CommonPageHelper.switchToFirstContentFrame();
@@ -244,6 +246,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         stepLogger.stepId(7);
         stepLogger.stepId(8);
         stepLogger.stepId(9);
+
         await EditCostHelper.validateEditCostFunctionality(stepLogger, cost);
     });
 });

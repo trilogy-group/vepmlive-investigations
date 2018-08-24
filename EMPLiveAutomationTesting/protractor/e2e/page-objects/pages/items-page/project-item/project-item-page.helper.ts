@@ -488,4 +488,9 @@ export class ProjectItemPageHelper {
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
 
+    static async verifyProjectDetailsDisplayed(stepLogger: StepLogger) {
+        stepLogger.verification('Project Details opened ');
+        await CommonPageHelper.labelDisplayedValidation
+        (CommonPage.pageHeaders.projects.projectDetails, CommonPageConstants.pageHeaders.projects.projectDetails);
+    }
 }

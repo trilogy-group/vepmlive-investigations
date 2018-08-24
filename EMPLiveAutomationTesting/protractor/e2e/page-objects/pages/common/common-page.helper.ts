@@ -18,6 +18,8 @@ import {ProjectItemPageHelper} from '../items-page/project-item/project-item-pag
 import {ProjectItemPageConstants} from '../items-page/project-item/project-item-page.constants';
 import {ResourceAnalyzerPageHelper} from '../resource-analyzer-page/resource-analyzer-page.helper';
 import {ResourceAnalyzerPage} from '../resource-analyzer-page/resource-analyzer-page.po';
+import {IssueItemPageHelper} from '../items-page/issue-item/issue-item-page.helper';
+import {ExpectationHelper} from '../../../components/misc-utils/expectation-helper';
 
 const fs = require('fs');
 
@@ -126,8 +128,9 @@ export class CommonPageHelper {
         return element(By.xpath(`//a[contains(@class,'ms-cui-ctl') and normalize-space(@title)='${title}']`));
     }
 
-    static getRibbonMediumButtonByTitle(title: string) {
-        return element(By.xpath(`//span[contains(@class,'ms-cui-ctl-mediumlabel') and ${ComponentHelpers.getXPathFunctionForDot(title)}]`));
+    static getRibbonMediumButtonByTitle(title: string, isContains = false) {
+        return element(By.xpath
+        (`//span[contains(@class,'ms-cui-ctl-mediumlabel') and ${ComponentHelpers.getXPathFunctionForDot(title, isContains)}]`));
     }
 
     static getToolBarItemsByText(title: string) {
@@ -342,20 +345,19 @@ export class CommonPageHelper {
 
         await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost );
 
+        await IssueItemPageHelper.validateContentOfItemTab(stepLogger);
+
         stepLogger.step('Select "Edit Cost" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editCost);
 
     }
-    static async editCostViaEllipsisHorizontal(stepLogger: StepLogger, item = CommonPage.record) {
+    static async selectRecordAndClickItem(stepLogger: StepLogger, item = CommonPage.record) {
         await this.selectRecordFromGrid(stepLogger, item);
-        await ElementHelper.actionMouseMove(item);
 
-        stepLogger.step('Select "Edit Cost" from the options displayed');
-        await this.clickIconEllipsisHorizontal(stepLogger);
-
-        await PageHelper.click(CommonPage.contextMenuOptions.editCosts);
+        await this.refreshPageIfRibbonElementIsDisable(stepLogger, CommonPage.ribbonItems.editCost );
 
     }
+
     static async clickEditCost(stepLogger: StepLogger) {
         stepLogger.step('Select "Edit Cost" from the options displayed');
         await PageHelper.click(CommonPage.ribbonItems.editCost);
@@ -448,8 +450,18 @@ export class CommonPageHelper {
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
+    static async selectTwoRecordFromGrid(stepLogger: StepLogger) {
+        stepLogger.stepId(2);
+        stepLogger.step('Select the check box for record');
+        await PageHelper.click(CommonPage.getNthRecord());
 
+        await PageHelper.click(CommonPage.getNthRecord(2));
+
+        stepLogger.step('Click on ITEMS on ribbon');
+        await PageHelper.click(CommonPage.ribbonTitles.items);
+    }
     static async clickItemTab(stepLogger: StepLogger) {
+
         stepLogger.step('Click on ITEMS on ribbon');
         await PageHelper.click(CommonPage.ribbonTitles.items);
     }
@@ -724,10 +736,10 @@ export class CommonPageHelper {
         await expect(await PageHelper.isElementDisplayed(targetElement))
             .toBe(true, ValidationsHelper.getNotDisplayedValidation(name));
     }
-    static async labelDisplayedValidation(targetElement: ElementFinder , name: string) {
+    static async labelDisplayedValidation(targetElement: ElementFinder , name: string, expectedResult = true) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
         await expect(await PageHelper.isElementPresent(targetElement))
-            .toBe(true,
+            .toBe(expectedResult,
                 ValidationsHelper.getLabelDisplayedValidation(name));
     }
     static async   labelContainValidation( title: string) {
@@ -757,6 +769,7 @@ export class CommonPageHelper {
     }
     static async textPresentValidation( targetElement: ElementFinder , text: string ) {
         await WaitHelper.waitForElementToBeDisplayed(targetElement);
+
         await expect(await ElementHelper.getText(targetElement))
             .toBe(text,
                 ValidationsHelper.getImageDisplayedValidation(text));
@@ -809,16 +822,6 @@ export class CommonPageHelper {
         await CommonPageHelper.switchToFirstContentFrame();
     }
 
-    static async elementAttribueValueValidation( targetElement: ElementFinder , attributeValue: string, attributeName: string) {
-        await expect(await this.getRibbonIsDisable(targetElement , attributeName ))
-            .toBe(attributeValue,
-                ValidationsHelper.getDisabledValidation(attributeName));
-    }
-    static async clickIconEllipsisHorizontal(stepLogger: StepLogger) {
-        stepLogger.step('Click on Ellipsis Horizontal');
-        await PageHelper.click(CommonPage.ellipse);
-    }
-
     static  async selectProjectAndClickEllipsisButton (stepLogger: StepLogger, item = CommonPage.record ) {
         await CommonPageHelper.selectRecordFromGrid(stepLogger, item);
 
@@ -827,24 +830,27 @@ export class CommonPageHelper {
         await CommonPageHelper.clickIconEllipsisHorizontal(stepLogger);
     }
 
-    static  async verifyItemDisabled(targetElement: ElementFinder ) {
-        await this.elementAttribueValueValidation(targetElement, 'true' , 'aria-disabled');
+    static  async verifyItemDisabled(targetElement: ElementFinder, stepLogger: StepLogger) {
+        await ExpectationHelper.verifyAttributeValue(targetElement,  'aria-disabled', 'true', stepLogger);
     }
 
-    static  async validateContentOfItemTabIsDisabled(stepLogger: StepLogger) {
-        stepLogger.step('Validate Edit Cost Is Disabled ');
-        await this.verifyItemDisabled(CommonPage.ribbonItems.editCost);
+    static async clickIconEllipsisHorizontal(stepLogger: StepLogger) {
+        stepLogger.step('Click on Ellipsis Horizontal');
+        await PageHelper.click(CommonPage.iconEllipsisHorizontal);
+    }
+    static async optimizerViaRibbon(stepLogger: StepLogger) {
+        await this.selectTwoRecordFromGrid(stepLogger);
 
-        stepLogger.step('Validate viewItem Is Disabled ');
-        await this.verifyItemDisabled(CommonPage.ribbonItems.viewItem);
-
-        stepLogger.step('Validate editItem Is Disabled ');
-        await this.verifyItemDisabled(CommonPage.ribbonItems.editItem);
-
-        stepLogger.step('Validate editResource Is Disabled ');
-        await this.verifyItemDisabled(CommonPage.ribbonItems.editResource);
+        stepLogger.step('Select "Optimizer" from the options displayed');
+        await PageHelper.click(CommonPage.ribbonItems.optimizer);
     }
 
+    static async verifyNavigation(stepLogger: StepLogger) {
+        stepLogger.verification('Optimizer page is displayed');
+        await expect(await PageHelper.isElementDisplayed(CommonPage.pageHeaders.projects.optimizer)).toBe(true,
+            ValidationsHelper.getPageDisplayedValidation(CommonPageConstants.pageHeaders.projects.optimizer));
+
+    }
     static  async verifyVariousOptionsOnContextMenu (stepLogger: StepLogger ) {
         stepLogger.verification('On Context Menu Edit Cost is present');
         await CommonPageHelper.fieldDisplayedValidation

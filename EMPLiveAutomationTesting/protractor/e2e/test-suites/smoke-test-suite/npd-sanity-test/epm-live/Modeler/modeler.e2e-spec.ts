@@ -9,6 +9,7 @@ import {CommonPageHelper} from '../../../../../page-objects/pages/common/common-
 import {CommonPage} from '../../../../../page-objects/pages/common/common.po';
 import {ProjectItemPageConstants} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.constants';
 import {ProjectItemPageHelper} from '../../../../../page-objects/pages/items-page/project-item/project-item-page.helper';
+import {IssueItemPageHelper} from '../../../../../page-objects/pages/items-page/issue-item/issue-item-page.helper';
 
 describe(SuiteNames.smokeTestSuite, () => {
     let loginPage: LoginPage;
@@ -17,6 +18,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
+
     it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
         const stepLogger = new StepLogger(783206);
         const cost =  4;
@@ -35,12 +37,13 @@ describe(SuiteNames.smokeTestSuite, () => {
 
         await CommonPageHelper.clickItemTab(stepLogger);
 
-        await CommonPageHelper.validateContentOfItemTabIsDisabled(stepLogger);
+        await IssueItemPageHelper.validateContentOfItemTabIsDisabled(stepLogger);
 
         stepLogger.stepId(2);
         await EditCostHelper.validateEditCostIsDisabled(stepLogger);
 
         stepLogger.stepId(3);
+
         await CommonPageHelper.searchByTitle(HomePage.navigation.projects.projects,
             CommonPage.pageHeaders.projects.projectsCenter,
             CommonPageConstants.pageHeaders.projects.projectCenter,
@@ -51,6 +54,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await EditCostHelper.validateEditCostIsEnable(stepLogger);
 
         stepLogger.stepId(4);
+
         await CommonPageHelper.editCostViaRibbon(stepLogger);
 
         await CommonPageHelper.switchToFirstContentFrame();

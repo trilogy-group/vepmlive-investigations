@@ -2,6 +2,7 @@ import {ElementHelper} from '../../../../../components/html/element-helper';
 import {EditCostConstants} from './edit-cost.constants';
 import {CommonPage} from '../../../common/common.po';
 import {By, element} from 'protractor';
+
 export class EditCost {
 
     static  getEditInput( index = 1 ) {

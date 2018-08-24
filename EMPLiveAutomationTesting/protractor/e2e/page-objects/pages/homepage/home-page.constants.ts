@@ -26,7 +26,10 @@ export class HomePageConstants {
                 resources: 'Resources',
                 reports: 'Reports',
                 reporting: 'Reporting',
-                projectPlanner: 'Project Planner'
+                projectPlanner: 'Project Planner',
+                projectDetails: 'Project Name',
+                optimizer: 'Optimizer',
+                optimizerConfiguration: 'Optimizer Configuration'
             }
         };
     }

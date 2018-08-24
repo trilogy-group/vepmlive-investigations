@@ -153,4 +153,31 @@ export class IssueItemPageHelper {
         stepLogger.step('Validating deleted Risk  is not  Present');
         await CommonPageHelper.fieldDisplayedValidation(ProjectItemPage.noProjecrMsg, ProjectItemPageConstants.noDataFound);
     }
+
+    static  async validateContentOfItemTab(stepLogger: StepLogger) {
+        stepLogger.step('Validate Edit Cost Is Present');
+        await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editCost, CommonPageConstants.ribbonLabels.editCost);
+
+        stepLogger.step('Validate viewItem Is Present');
+        await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.viewItem, CommonPageConstants.ribbonLabels.viewItem);
+
+        stepLogger.step('Validate editItem Is Present');
+        await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editItem, CommonPageConstants.ribbonLabels.editItem);
+
+        stepLogger.step('Validate editResource Is Present');
+        await CommonPageHelper.fieldDisplayedValidation(CommonPage.ribbonItems.editResource, CommonPageConstants.ribbonLabels.editResource);
+    }
+    static  async validateContentOfItemTabIsDisabled(stepLogger: StepLogger) {
+        stepLogger.step('Validate Edit Cost Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost, stepLogger);
+
+        stepLogger.step('Validate viewItem Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.viewItem, stepLogger);
+
+        stepLogger.step('Validate editItem Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editItem, stepLogger);
+
+        stepLogger.step('Validate editResource Is Disabled ');
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editResource, stepLogger);
+    }
 }

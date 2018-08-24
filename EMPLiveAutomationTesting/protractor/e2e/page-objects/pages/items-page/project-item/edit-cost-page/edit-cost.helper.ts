@@ -7,6 +7,7 @@ import {WaitHelper} from '../../../../../components/html/wait-helper';
 import {EditCostConstants} from './edit-cost.constants';
 import {HomePage} from '../../../homepage/home.po';
 import {HomePageConstants} from '../../../homepage/home-page.constants';
+import {ExpectationHelper} from '../../../../../components/misc-utils/expectation-helper';
 
 export class EditCostHelper {
 
@@ -80,19 +81,19 @@ export class EditCostHelper {
 
     static  async validateEditCostIsDisabled(stepLogger: StepLogger) {
         stepLogger.verification('Validate Edit Cost Is Disabled ');
-        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost);
+        await CommonPageHelper.verifyItemDisabled(CommonPage.ribbonItems.editCost, stepLogger);
     }
 
     static  async validateEditCostIsEnable(stepLogger: StepLogger) {
         stepLogger.verification('Validate Edit Cost Is Enabled');
-        await CommonPageHelper.elementAttribueValueValidation(CommonPage.ribbonItems.editCost, '' , 'aria-disabled');
+        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.editCost,  'aria-disabled', '', stepLogger);
     }
 
     static  async validateSaveButtonDisabled(stepLogger: StepLogger) {
         stepLogger.verification('Validate SaveButton Is Disabled ');
         const expectedValue = 'ms-cui-ctl-large ms-cui-disabled';
 
-        await CommonPageHelper.elementAttribueValueValidation(CommonPage.ribbonItems.save, expectedValue , 'class');
+        await ExpectationHelper.verifyAttributeValue(CommonPage.ribbonItems.save,  'class', expectedValue, stepLogger);
        }
 
     static  async validateEditCostFunctionality(stepLogger: StepLogger, value: number) {
@@ -120,6 +121,7 @@ export class EditCostHelper {
         await CommonPageHelper.switchToFirstContentFrame();
 
         stepLogger.verification('Validate that Budget  Cost is save ');
+
         await this.verifyValueInBudgetCost(stepLogger, value);
 
         await this.clickActualCostsTab(stepLogger);
@@ -147,6 +149,7 @@ export class EditCostHelper {
        await CommonPageHelper.fieldDisplayedValidation(EditCost.costTab.benefitsTab, EditCostConstants.costTabs.benefitsTab);
 
        stepLogger.verification('category is present for benefitsTab  Cost ');
+
        await CommonPageHelper.fieldDisplayedValidation(EditCost.category(), EditCostConstants.category);
     }
 
@@ -193,5 +196,10 @@ export class EditCostHelper {
 
         stepLogger.verification('Verify  Value in Benefit Cell2');
         await CommonPageHelper.textPresentValidation(CommonPage.getCostCell.cell2 , cost.toString());
+    }
+
+    static async clickEditCostFromContextMenu(stepLogger: StepLogger) {
+        stepLogger.step('Select "Edit Cost" from Context Menu options displayed');
+        await PageHelper.click(CommonPage.contextMenuOptions.editCosts);
     }
 }
