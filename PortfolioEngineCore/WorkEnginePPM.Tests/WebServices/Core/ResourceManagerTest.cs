@@ -223,7 +223,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
         public void GetRequestedResources_WhenDataElementNotFound_ThrowException()
         {
             // Arrange
-            var xmlString = @"
+            const string xmlString = @"
                      <root>
                         <Resource />
                      </root>";
@@ -239,7 +239,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
         public void GetRequestedResources_WhenResourceElementNotFound_ThrowException()
         {
             // Arrange
-            var xmlString = @"
+            const string xmlString = @"
                      <root>
                         <Data />
                      </root>";
@@ -584,9 +584,9 @@ namespace WorkEnginePPM.Tests.WebServices.Core
 
         private void SetupShims()
         {
-            ShimSPWeb.AllInstances.Dispose = (_) => { };
-            ShimSPWeb.AllInstances.CurrentUserGet = (_) => new ShimSPUser();
-            ShimSPWeb.AllInstances.UsersGet = (_) =>
+            ShimSPWeb.AllInstances.Dispose = _ => { };
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser();
+            ShimSPWeb.AllInstances.UsersGet = _ =>
             {
                 ShimSPUserCollection users = new ShimSPUserCollection();
                 users.CountGet = () => 0;
@@ -602,7 +602,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 }
             };
 
-            ShimConfigFunctions.GetCleanUsernameSPWeb = (_) => DummyString;
+            ShimConfigFunctions.GetCleanUsernameSPWeb = _ => DummyString;
 
             ShimExtensionMethods.GetExtIdSPUserSPWeb = (_, __) => DummyInt;
 
