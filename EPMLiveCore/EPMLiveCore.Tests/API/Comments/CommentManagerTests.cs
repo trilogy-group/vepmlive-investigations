@@ -47,6 +47,8 @@ namespace EPMLiveCore.Tests.API.Comments
         private const string ItemIdKey = "ItemId";
         private const string CommentKey = "Comment";
         private const string CreatedKey = "Created";
+        private string SyncToSocialStreamMethodName = "SyncToSocialStream";
+        private string SyncStatusUpdateToSocialStreamMethodName = "SyncStatusUpdateToSocialStream";
 
         [TestInitialize]
         public void Initialize()
@@ -56,6 +58,12 @@ namespace EPMLiveCore.Tests.API.Comments
             _commentManager = new CommentManager();
             _privateObject = new PrivateObject(_commentManager);
             _privateType = new PrivateType(typeof(CommentManager));
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _shimContext?.Dispose();
         }
 
         private void SetupShims()
@@ -97,13 +105,6 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimCommentManager.InsertCommentCountStringString = (list, item) => { };
 
 
-        }
-
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            _shimContext?.Dispose();
         }
 
         [TestMethod]
@@ -312,25 +313,64 @@ namespace EPMLiveCore.Tests.API.Comments
         }
 
         [TestMethod]
-        public void SyncToSocialStream()
+        public void SyncToSocialStream_Should_ExecuteCorrectly()
         {
             // Arrange
+            var web = new ShimSPWeb
+            {
+                SiteGet = () => new ShimSPSite(),
+                CurrentUserGet = () => new ShimSPUser()
+            }.Instance;
+            var commentList = new List<int>();
+            const string Operation = "ADD";
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => { };
+            ShimCommentManager.SyncToSocialStreamGuidStringGuidInt32StringStringStringListOfInt32DateTimeSPWebString = null;
 
             // Act
+            Action action = () => _privateType.InvokeStatic(SyncToSocialStreamMethodName,
+                Guid.NewGuid(),
+                DummyString,
+                Guid.NewGuid(),
+                1,
+                DummyString,
+                DummyString,
+                DummyUrl,
+                commentList,
+                DateTime.Now,
+                web,
+                Operation);
 
             // Assert
-            //Assert.Fail("Not Implemented");
+            action.ShouldNotThrow();
         }
 
         [TestMethod]
-        public void SyncStatusUpdateToSocialStream()
+        public void SyncStatusUpdateToSocialStream_Should_ExecuteCorrectly()
         {
             // Arrange
+            const string Operation = "ADD";
+            var web = new ShimSPWeb
+            {
+                SiteGet = () => new ShimSPSite(),
+                CurrentUserGet = () => new ShimSPUser()
+            }.Instance;
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => { };
+            ShimCommentManager.SyncStatusUpdateToSocialStreamGuidStringGuidInt32DateTimeSPWebStringNullableOfDateTimeNullableOfGuid = null;
 
             // Act
+            Action action = () => _privateType.InvokeStatic(SyncStatusUpdateToSocialStreamMethodName,
+                Guid.NewGuid(),
+                DummyString,
+                Guid.NewGuid(),
+                1,
+                DateTime.Now,
+                web,
+                Operation,
+                DateTime.Now,
+                Guid.NewGuid());
 
             // Assert
-            //Assert.Fail("Not Implemented");
+            action.ShouldNotThrow();
         }
 
         [TestMethod]
@@ -415,7 +455,7 @@ namespace EPMLiveCore.Tests.API.Comments
             //    }
             //};
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => { };
-            
+
 
             // Act
             Action action = () => _privateType.InvokeStatic(
@@ -866,6 +906,75 @@ namespace EPMLiveCore.Tests.API.Comments
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
                 () => result.ShouldBe(ExpectedValue));
+        }
+
+        [TestMethod]
+        public void UpdateComment_CommentListNull_ThrowException()
+        {
+            // Arrange
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => null;
+
+            // Act
+            Action action = () => CommentManager.UpdateComment(DummyString);
+
+            // Assert
+            action.ShouldThrow<Exception>();
+        }
+
+        [TestMethod]
+        public void UpdateComment()
+        {
+            // Arrange
+            const string CommentItemIdKey = "CommentItemId";
+            const int CommentItemId = 1;
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => new ShimSPList
+            {
+                FieldsGet = () => new ShimSPFieldCollection
+                {
+                    GetFieldByInternalNameString = internalName => new ShimSPField()
+                }
+            };
+            ShimXMLDataManager.AllInstances.GetPropValString = (_, xml) =>
+            {
+                switch (xml)
+                {
+                    case StatusUpdateKey:
+                        return bool.TrueString;
+                    case StatusUpdateIdKey:
+                        return Guid.NewGuid().ToString();
+                    case ListIdKey:
+                        return Guid.NewGuid().ToString();
+                    case ItemIdKey:
+                        return "2";
+                    case CommentKey:
+                        return DummyString;
+                    case CommentItemIdKey:
+                        return CommentItemId.ToString();
+                    default:
+                        return null;
+                }
+            };
+            ShimSPList.AllInstances.GetItemsSPQuery = (_, query) => new ShimSPListItemCollection
+            {
+                CountGet = () => 1,
+                GetEnumerator = () => new List<SPListItem>
+                {
+                    new ShimSPListItem
+                    {
+                        IDGet = () => CommentItemId,
+                    }
+                }.GetEnumerator()
+            };
+            ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser
+            {
+                NameGet = () => DummyString
+            };
+
+            // Act
+            CommentManager.UpdateComment(DummyString);
+
+            // Assert
+
         }
 
 
