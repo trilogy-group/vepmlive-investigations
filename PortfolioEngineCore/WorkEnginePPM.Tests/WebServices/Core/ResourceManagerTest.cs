@@ -6,7 +6,6 @@ using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NUnit.Framework;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;
 using PortfolioEngineCore.Infrastructure.Entities;
@@ -15,11 +14,12 @@ using PortfolioEngineCore.Infrastructure.Fields;
 using PortfolioEngineCore.Infrastructure.Fields.Fakes;
 using Shouldly;
 using WorkEnginePPM.Core.Fakes;
+using WorkEnginePPM.Fakes;
 using WorkEnginePPM.WebServices.Core;
 
 namespace WorkEnginePPM.Tests.WebServices.Core
 {
-    [TestFixture]
+    [TestClass]
     [ExcludeFromCodeCoverage]
     public class ResourceManagerTest
     {
@@ -57,7 +57,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
         private const string DataIdIsNull = "Please specify the DataId Attribute.";
         private const string DuplicateDataId = "Duplicate DataId found.";
 
-        [SetUp]
+        [TestInitialize]
         public void TestInitialize()
         {
             _resourceDeleted = false;
@@ -65,21 +65,24 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             _availabilitiesCalculated = false;
             _shimObject = ShimsContext.Create();
 
-            ShimBaseManager.ConstructorSPWeb = (_, __) => { };
-
-            _testObject = new ResourceManager(new ShimSPWeb().Instance);
-            _privateObject = new PrivateObject(_testObject);
-
             SetupShims();
+
+            _testObject = new ResourceManager(new ShimSPWeb
+            {
+                InitWebPublic = () => { },
+                CurrentUserGet = () => new ShimSPUser()
+            });
+
+            _privateObject = new PrivateObject(_testObject);
         }
 
-        [TearDown]
+        [TestCleanup]
         public void TestCleanup()
         {
             _shimObject?.Dispose();
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResourceCheck_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -95,7 +98,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResources_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -112,7 +115,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => _resourceDeleted.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadPermissionGroups_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -126,7 +129,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourceCostCategoryRole_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -143,7 +146,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourcePermissionGroups_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -159,7 +162,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResources_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -175,7 +178,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(DummyString));
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateResources_OnValidCall_ConfirmResult()
         {
             // Arrange
@@ -191,7 +194,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => _resourceUpdated.ShouldBeTrue());
         }
 
-        [Test]
+        [TestMethod]
         public void CalculateResourceAvailabilities_OnValidCall_ConfirmResult()
         {
             // Arrange, Act
@@ -201,7 +204,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             _availabilitiesCalculated.ShouldBeTrue();
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenRootNotFound_ThrowException()
         {
             // Arrange
@@ -216,7 +219,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(RootElementNotFound);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenDataElementNotFound_ThrowException()
         {
             // Arrange
@@ -232,7 +235,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(DataElementNotFound);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenResourceElementNotFound_ThrowException()
         {
             // Arrange
@@ -248,7 +251,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(ResourceNotFound);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenIdIsNull_ThrowException()
         {
             // Arrange
@@ -268,7 +271,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(IdIsNull);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenNoDataId_ThrowException()
         {
             // Arrange
@@ -288,7 +291,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(DataIdNotFound);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenDataIdIsNull_ThrowException()
         {
             // Arrange
@@ -308,7 +311,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(DataIdIsNull);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRequestedResources_WhenDuplicatedDataId_ThrowException()
         {
             // Arrange
@@ -331,7 +334,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
             Should.Throw<Exception>(action).Message.ShouldBe(DuplicateDataId);
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateResources_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -347,7 +350,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateResources_WhenException_ReturnError()
         {
             // Arrange
@@ -363,7 +366,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResources_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -380,7 +383,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResources_WhenException_ReturnError()
         {
             // Arrange
@@ -397,7 +400,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourcePermissionGroups_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -414,7 +417,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourcePermissionGroups_WhenException_ReturnError()
         {
             // Arrange
@@ -431,7 +434,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourceCostCategoryRole_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -448,7 +451,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadResourceCostCategoryRole_WhenException_ReturnError()
         {
             // Arrange
@@ -465,7 +468,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadPermissionGroups_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -481,7 +484,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadPermissionGroups_WhenException_ReturnError()
         {
             // Arrange
@@ -497,7 +500,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResources_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -514,7 +517,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResources_WhenException_ReturnError()
         {
             // Arrange
@@ -531,7 +534,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureFalse));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResourceCheck_WhenPFEException_ReturnError()
         {
             // Arrange
@@ -548,7 +551,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
                 () => result.ShouldContain(PfEFailureTrue));
         }
 
-        [Test]
+        [TestMethod]
         public void DeleteResourceCheck_WhenException_ReturnError()
         {
             // Arrange
@@ -581,14 +584,25 @@ namespace WorkEnginePPM.Tests.WebServices.Core
 
         private void SetupShims()
         {
+            ShimSPWeb.AllInstances.Dispose = (_) => { };
+            ShimSPWeb.AllInstances.CurrentUserGet = (_) => new ShimSPUser();
+            ShimSPWeb.AllInstances.UsersGet = (_) =>
+            {
+                ShimSPUserCollection users = new ShimSPUserCollection();
+                users.CountGet = () => 0;
+                return users;
+            };
+
+            ShimBaseManager.ConstructorSPWeb = (_, __) => { };
             ShimBaseManager.AllInstances.WebGet = _ => new ShimSPWeb
             {
                 SiteGet = () => new ShimSPSite
                 {
                     IDGet = () => Guid.NewGuid()
-                },
-                CurrentUserGet = () => new ShimSPUser()
+                }
             };
+
+            ShimConfigFunctions.GetCleanUsernameSPWeb = (_) => DummyString;
 
             ShimExtensionMethods.GetExtIdSPUserSPWeb = (_, __) => DummyInt;
 
@@ -596,6 +610,7 @@ namespace WorkEnginePPM.Tests.WebServices.Core
 
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.RootWebGet = _ => new ShimSPWeb();
+            ShimSPSite.AllInstances.Dispose = _ => { };
 
             ShimResources.ConstructorStringStringStringStringStringSecurityLevelsBoolean =
                 (_, _1, _2, _3, _4, _5, _6, _7) => new ShimResources();
