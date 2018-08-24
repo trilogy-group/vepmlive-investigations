@@ -75,4 +75,46 @@ export class ModelerPage extends BasePage {
     static getSelectVersionOptionText(index: number) {
         return element(By.css(`select#idVersionList>option:nth-child(${index})`));
     }
+
+    static get copyVersionPopup() {
+        const copyVersionLabel = ModelerPageConstants.copyVersionPopup;
+        return {
+            from: element(By.id(copyVersionLabel.from)),
+            to: element(By.id(copyVersionLabel.to)),
+            notInToVersion: element(By.id(copyVersionLabel.notInToVersion)),
+            bothVersions: element(By.id(copyVersionLabel.bothVersions)),
+            ok: this.getButtonOnPopup(copyVersionLabel.ok),
+            cancel: this.getButtonOnPopup(copyVersionLabel.cancel)
+        };
+    }
+
+    static get collapseAndExpandRibbons() {
+        const ribbonItems = ModelerPageConstants.collapseAndExpandRibbons;
+        return{
+            collapseViewTopRibbon: element(By.id(ribbonItems.collapseViewTopRibbon)),
+            expandViewTopRibbon: element(By.id(ribbonItems.expandViewTopRibbon)),
+            minusSignTopRibbon: element(By.css(`#${ribbonItems.expandViewTopRibbon}>span>img`)),
+            plusSignTopRibbon: element(By.css(`#${ribbonItems.collapseViewTopRibbon}>span>img`)),
+            collapseViewBottomRibbon: element(By.id(ribbonItems.collapseViewBottomRibbon)),
+            expandViewBottomRibbon: element(By.id(ribbonItems.expandViewBottomRibbon)),
+            minusSignBottomRibbon: element(By.css(`#${ribbonItems.expandViewBottomRibbon}>span>img`)),
+            plusSignBottomRibbon: element(By.css(`#${ribbonItems.collapseViewBottomRibbon}>span>img`))
+        };
+    }
+
+    static get viewTabOptions() {
+        const viewTabLabels = ModelerPageConstants.viewTabOptions;
+        return {
+            close: element(By.css(`#idViewTabDiv_ul img[src*="${viewTabLabels.close}"]`)),
+            saveView: element(By.id(viewTabLabels.saveView)),
+            renameView: element(By.id(viewTabLabels.renameView)),
+            deleteView: element(By.id(viewTabLabels.deleteView)),
+            sortAndGroup: element(By.id(viewTabLabels.sortAndGroup)),
+            columnOrder: element(By.id(viewTabLabels.columnOrder)),
+            periodsAndValues: element(By.id(viewTabLabels.periodsAndValues)),
+            showGantt: element(By.id(viewTabLabels.showGantt)),
+            ganttZoom: element(By.id(viewTabLabels.ganttZoom)),
+            currentView: element(By.id(viewTabLabels.currentView))
+        };
+    }
 }

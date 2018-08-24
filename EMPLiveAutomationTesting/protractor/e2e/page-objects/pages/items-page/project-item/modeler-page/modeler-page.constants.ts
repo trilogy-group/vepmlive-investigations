@@ -36,6 +36,22 @@ export class ModelerPageConstants {
     static readonly printBottom = 'Print Bottom';
     static readonly totalsBottomGrid = 'Totals Bottom Grid';
     static readonly noVersionsPopupText = 'There are either no versions defined or versions that have been loaded or copied to save!';
+    static readonly from = 'From dropdown';
+    static readonly to = 'To dropdown';
+    static readonly notInToVersion = 'Not in To Version selection box';
+    static readonly bothVersions = 'Both Versions';
+    static readonly collapsedTopRibbon = 'Collapsed Top Ribbon';
+    static readonly collapsedBottomRibbon = 'Collapsed Bottom Ribbon';
+    static readonly noTargetsAlertText = 'No Targets have been defined  or are available to apply';
+    static readonly saveView = 'Save View';
+    static readonly renameView = 'Rename View';
+    static readonly deleteView = 'Delete View';
+    static readonly sortAndGroup = 'Sort And Group';
+    static readonly columnOrder = 'Colum Order';
+    static readonly periodsAndValues = 'Periods And Values';
+    static readonly showGantt = 'Show Gantt';
+    static readonly ganttZoom = 'Gantt Zoom Dropdown';
+    static readonly currentView = 'Current View Dropdown';
 
     static get selectModelAndVersionsPopup() {
         return {
@@ -88,6 +104,41 @@ export class ModelerPageConstants {
             totals: 'rbSearchTot',
             ok: 'OK',
             cancel: 'Cancel'
+        };
+    }
+
+    static get copyVersionPopup() {
+        return {
+            from: 'SelFromVersion',
+            to: 'SelToVersion',
+            notInToVersion: 'idSelVersTo',
+            bothVersions: 'idSelVersBoth',
+            ok: 'OK',
+            cancel: 'Cancel'
+        };
+    }
+
+    static get collapseAndExpandRibbons() {
+        return{
+            collapseViewTopRibbon: 'idRibbonDiv_ulCollapsed',
+            expandViewTopRibbon: 'idRibbonDiv_ul',
+            collapseViewBottomRibbon: 'idBottomRibbonDiv_ulCollapsed',
+            expandViewBottomRibbon: 'idBottomRibbonDiv_ul',
+        };
+    }
+
+    static get viewTabOptions() {
+        return {
+            close: 'close',
+            saveView: 'SaveViewBtn',
+            renameView: 'RenameViewBtn',
+            deleteView: 'DeleteViewBtn',
+            sortAndGroup: 'SortBtn',
+            columnOrder: 'ColumnBtn',
+            periodsAndValues: 'PerBtn',
+            showGantt: 'GanttChk',
+            ganttZoom: 'idGanttZoom_textbox',
+            currentView: 'idUserViews_button'
         };
     }
 }

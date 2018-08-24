@@ -31,7 +31,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await ProjectItemPageHelper.deleteProjectAndValidateIt(stepLogger, projectNameValue);
     });
 
-    fit('Edit Project Cost - [829775]', async () => {
+    it('Edit Project Cost - [829775]', async () => {
         const stepLogger = new StepLogger(829775);
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();

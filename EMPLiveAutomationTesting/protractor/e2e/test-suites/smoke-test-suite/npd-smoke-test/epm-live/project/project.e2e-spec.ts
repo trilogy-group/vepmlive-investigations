@@ -198,7 +198,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await ProjectItemPageHelper.addResourceAndVerifyUserMovedUnderCurrentTeam(uniqueId, stepLogger);
     });
 
-    fit('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
+    it('Validate Edit Cost Functionality in Cost Planner - [743932]', async () => {
         const stepLogger = new StepLogger(743932);
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();

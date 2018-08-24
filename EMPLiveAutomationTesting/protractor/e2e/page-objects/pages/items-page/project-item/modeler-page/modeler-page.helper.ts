@@ -5,6 +5,7 @@ import {ModelerPageConstants} from './modeler-page.constants';
 import {PageHelper} from '../../../../../components/html/page-helper';
 import {browser} from 'protractor';
 import {HtmlHelper} from '../../../../../components/misc-utils/html-helper';
+import {CommonPageHelper} from '../../../common/common-page.helper';
 
 export class ModelerPageHelper {
     static async verifyModelerPopupDisplayed(stepLogger: StepLogger) {
@@ -89,6 +90,11 @@ export class ModelerPageHelper {
             stepLogger);
     }
 
+    static async clickSaveVersion(stepLogger: StepLogger) {
+        stepLogger.step('Click on Save Version button.');
+        await PageHelper.click(ModelerPage.displayTabOptions.saveVersion);
+    }
+
     static async verifySelectVersionsSelectionBox(stepLogger: StepLogger) {
         const modelAndVersionPopupItems = ModelerPage.selectModelAndVersionsPopup;
         await ExpectationHelper.verifyText(
@@ -155,11 +161,6 @@ export class ModelerPageHelper {
             stepLogger);
     }
 
-    static async clickSaveVersion(stepLogger: StepLogger) {
-        stepLogger.step('Click on Save Version button.');
-        await PageHelper.click(ModelerPage.displayTabOptions.saveVersion);
-    }
-
     static async verifyNoVersionsAlert(stepLogger: StepLogger) {
         // Takes time to open alert
         await browser.sleep(PageHelper.timeout.s);
@@ -168,5 +169,78 @@ export class ModelerPageHelper {
             actualAlertText,
             ModelerPageConstants.noVersionsPopupText,
             stepLogger);
+    }
+
+    static async verifyCopyVersionPopup(stepLogger: StepLogger) {
+        const copyVersionItems = ModelerPage.copyVersionPopup;
+        await ExpectationHelper.verifyDisplayedStatus(copyVersionItems.from,
+            ModelerPageConstants.from, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(copyVersionItems.to,
+            ModelerPageConstants.to, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(copyVersionItems.notInToVersion,
+            ModelerPageConstants.notInToVersion, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(copyVersionItems.bothVersions,
+            ModelerPageConstants.bothVersions, stepLogger);
+    }
+
+    static async clickOkCopyVersion(stepLogger: StepLogger) {
+        stepLogger.step('Click on Copy Version button.');
+        await PageHelper.click(ModelerPage.displayTabOptions.copyVersion);
+    }
+
+    static async clickMinusSignOnBothRibbons(stepLogger: StepLogger) {
+        const ribbonItems = ModelerPage.collapseAndExpandRibbons;
+        stepLogger.step('Click on Minus Sign to the right in the top and bottom ribbons to collapse the ribbon.');
+        await PageHelper.click(ribbonItems.minusSignTopRibbon);
+        await PageHelper.click(ribbonItems.minusSignBottomRibbon);
+    }
+
+    static async verifyBothRibbonsCollapsed(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyDisplayedStatus(ModelerPage.collapseAndExpandRibbons.collapseViewTopRibbon,
+            ModelerPageConstants.collapsedTopRibbon, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(ModelerPage.collapseAndExpandRibbons.collapseViewBottomRibbon,
+            ModelerPageConstants.collapsedBottomRibbon, stepLogger);
+    }
+
+    static async clickApplyTarget(stepLogger: StepLogger) {
+        stepLogger.step('Click on Apply Target button.');
+        await PageHelper.click(ModelerPage.displayTabOptions.applyTarget);
+    }
+
+    static async verifyNoTargetsAlert(stepLogger: StepLogger) {
+        // Takes time to open alert
+        await browser.sleep(PageHelper.timeout.xs);
+        const actualAlertText = await PageHelper.getAlertText();
+        await ExpectationHelper.verifyStringEqualTo(
+            actualAlertText,
+            ModelerPageConstants.noTargetsAlertText,
+            stepLogger);
+    }
+
+    static async verifyViewTabContent(stepLogger: StepLogger) {
+        const viewTabOptions = ModelerPage.viewTabOptions;
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.close, ModelerPageConstants.close, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.saveView, ModelerPageConstants.saveView, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.renameView, ModelerPageConstants.renameView, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.deleteView, ModelerPageConstants.deleteView, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.sortAndGroup, ModelerPageConstants.sortAndGroup, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.columnOrder, ModelerPageConstants.columnOrder, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.periodsAndValues, ModelerPageConstants.periodsAndValues, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.showGantt, ModelerPageConstants.showGantt, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.ganttZoom, ModelerPageConstants.ganttZoom, stepLogger);
+        await ExpectationHelper.verifyDisplayedStatus(viewTabOptions.currentView, ModelerPageConstants.currentView, stepLogger);
+    }
+
+    static async verifyViewTabClosedAndRedirect(stepLogger: StepLogger) {
+        await ExpectationHelper.verifyNotDisplayedStatus(
+            ModelerPage.viewTabOptions.saveView,
+            ModelerPageConstants.viewTab,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+    }
+
+    static async clickCloseButtonViewTab(stepLogger: StepLogger) {
+        stepLogger.step('Click on close button.');
+        await PageHelper.click(ModelerPage.viewTabOptions.close);
     }
 }

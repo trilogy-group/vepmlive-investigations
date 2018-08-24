@@ -461,6 +461,7 @@ export class CommonPageHelper {
         await PageHelper.click(item);
         await browser.sleep(PageHelper.timeout.xs);
         await PageHelper.click(CommonPage.secondRecord);
+        await this.clickItemTab(stepLogger);
     }
 
     static async verifyProjectCenterDisplayed(stepLogger: StepLogger) {

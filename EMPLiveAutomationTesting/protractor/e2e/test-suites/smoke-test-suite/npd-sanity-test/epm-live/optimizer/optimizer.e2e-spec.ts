@@ -17,7 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Set Cost Plan for Project - [785226]', async () => {
+    it('Set Cost Plan for Project - [785226]', async () => {
         const stepLogger = new StepLogger(785226);
         const cost =  4;
         stepLogger.precondition('Creating a project');

@@ -18,7 +18,7 @@ describe(SuiteNames.healthCheckTestSuite, () => {
         await loginPage.goToAndLogin();
     });
 
-    fit('Edit Project Cost - [2488601]', async () => {
+    it('Edit Project Cost - [2488601]', async () => {
         const stepLogger = new StepLogger(2488601);
         const cost =  4;
         const uniqueId = PageHelper.getUniqueId();

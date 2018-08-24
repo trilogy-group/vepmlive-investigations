@@ -17,7 +17,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         loginPage = new LoginPage();
         await loginPage.goToAndLogin();
     });
-    fit('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
+    it('Validate Edit Cost Functionality in Cost Planner - [783206]', async () => {
         const stepLogger = new StepLogger(783206);
         const cost =  4;
 

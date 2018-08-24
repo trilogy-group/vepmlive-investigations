@@ -126,4 +126,138 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ModelerPageHelper.clickSaveVersion(stepLogger);
         await ModelerPageHelper.verifyNoVersionsAlert(stepLogger);
     });
+
+    it('Verify the Copy Version button - [744222]', async () => {
+        const stepLogger = new StepLogger(744222);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler(stepLogger);
+        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+
+        stepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
+        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+
+        stepLogger.stepId(5);
+        await ModelerPageHelper.clickOkCopyVersion(stepLogger);
+        await ModelerPageHelper.verifyCopyVersionPopup(stepLogger);
+    });
+
+    it('Verify the Minus sign. - [744227]', async () => {
+        const stepLogger = new StepLogger(744227);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler(stepLogger);
+        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+
+        stepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
+        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+
+        stepLogger.stepId(5);
+        await ModelerPageHelper.clickMinusSignOnBothRibbons(stepLogger);
+        await ModelerPageHelper.verifyBothRibbonsCollapsed(stepLogger);
+    });
+
+    it('Verify the Apply Target button. - [744229]', async () => {
+        const stepLogger = new StepLogger(744229);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler(stepLogger);
+        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+
+        stepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
+        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+
+        stepLogger.stepId(5);
+        await ModelerPageHelper.clickApplyTarget(stepLogger);
+        await ModelerPageHelper.verifyNoTargetsAlert(stepLogger);
+    });
+
+    it('Verify the content of View Tab - [744239]', async () => {
+        const stepLogger = new StepLogger(744239);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler(stepLogger);
+        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+
+        stepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
+        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+
+        stepLogger.stepId(5);
+        await ModelerPageHelper.clickViewTab(stepLogger);
+        await ModelerPageHelper.verifyViewTabContent(stepLogger);
+    });
+
+    it('Verify the Close button of the View Tab - [744240]', async () => {
+        const stepLogger = new StepLogger(744240);
+        // Step 1 is inside the below function
+        await CommonPageHelper.navigateToItemPageUnderNavigation(
+            HomePage.navigation.projects.projects,
+            CommonPage.pageHeaders.projects.projectsCenter,
+            CommonPageConstants.pageHeaders.projects.projectCenter,
+            stepLogger);
+        await CommonPageHelper.verifyProjectCenterDisplayed(stepLogger);
+
+        // Step 2 is inside the below function
+        await CommonPageHelper.selectTwoRecordsFromGrid(stepLogger);
+
+        stepLogger.stepId(3);
+        await CommonPageHelper.gotoModeler(stepLogger);
+        await ModelerPageHelper.verifyModelerPopupDisplayed(stepLogger);
+
+        stepLogger.stepId(4);
+        await ModelerPageHelper.clickOkButtonOnPopup(stepLogger);
+        await ModelerPageHelper.modelerPageDisplayed(stepLogger);
+
+        stepLogger.stepId(5);
+        await ModelerPageHelper.clickViewTab(stepLogger);
+        await ModelerPageHelper.verifyViewTabDisplayed(stepLogger);
+
+        stepLogger.stepId(6);
+        await ModelerPageHelper.clickCloseButtonViewTab(stepLogger);
+        await ModelerPageHelper.verifyViewTabClosedAndRedirect(stepLogger);
+    });
 });
