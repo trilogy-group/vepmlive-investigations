@@ -37,5 +37,6 @@
     <Add FullName="EPMLiveCore.XMLDataManager!"/>
     <Add Namespace="EPMLiveCore.SocialEngine!"/>
     <Add Namespace="EPMLiveCore.SocialEngine.Core!"/>
+    <Add FullName="EPMLiveCore.ExtensionMethods!"/>
   </ShimGeneration>
 </Fakes>

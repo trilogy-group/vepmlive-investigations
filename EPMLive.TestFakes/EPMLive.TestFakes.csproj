@@ -100,6 +100,10 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="TimeSheets.Fakes">
       <HintPath>FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
@@ -191,6 +195,7 @@
     <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
     <Fakes Include="Fakes\TimeSheets.fakes" />
     <Fakes Include="Fakes\System.DirectoryServices.fakes" />
+    <Fakes Include="Fakes\System.Xml.Linq.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
