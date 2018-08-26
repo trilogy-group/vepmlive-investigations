@@ -84,7 +84,8 @@ namespace EPMLive.TestFakes.Utility
             {
                 GetFieldByInternalNameString = (internalName) => 
                 {
-                    FieldShim.InternalNameGet = () => internalName;
+                    var fieldShim = InitializeSPFieldShim();
+                    fieldShim.InternalNameGet = () => internalName;
                     return FieldShim;
                 }
             };
