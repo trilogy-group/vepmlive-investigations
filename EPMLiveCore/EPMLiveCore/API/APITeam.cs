@@ -2531,7 +2531,6 @@ namespace EPMLiveCore.API
                                 ndNew.Attributes.Append(nattr);
                             }
                         }
-                        
                     }
                     // this value used in UI to determine whether new team members can edit rates (i.e. we can get valid resource id)
                     nattr = docOut.CreateAttribute(AllowEditProjectRateColumn);

@@ -19,13 +19,7 @@ namespace TimerService
         {
             if (!base.InitializeTask())
                 return false;
-            ReQueueTimeSheetStuckJobs();
 
-            return true;
-        }
-
-        private void ReQueueTimeSheetStuckJobs()
-        {
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
@@ -37,7 +31,7 @@ namespace TimerService
                         try
                         {
                             cn.Open();
-                            using (var cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where DATEDIFF(HH,DTSTARTED,getdate()) > 1 and (status = 1 OR STATUS = 2)", cn))
+                            using (var cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where DATEDIFF(HH,DTSTARTED,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
                             {
                                 cmd.ExecuteNonQuery();
                             }
@@ -52,28 +46,20 @@ namespace TimerService
                     }
                 }
             }
+
+            return true;
         }
 
-        DateTime lastHeartBeat = DateTime.Now;
-        const int HEART_BEAT_MINUTES = 30;
         public override void RunTask(CancellationToken token)
         {
             try
             {
-                DateTime newHeartBeat = DateTime.Now;
-                if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
-                {
-                    lastHeartBeat = newHeartBeat;
-                    ReQueueTimeSheetStuckJobs();
-                }
-                
                 SPWebApplicationCollection _webcolections = GetWebApplications();
                 foreach (SPWebApplication webApp in _webcolections)
                 {
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
-                        
                         using (SqlConnection cn = new SqlConnection(sConn))
                         {
                             try

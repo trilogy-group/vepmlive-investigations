@@ -1,4 +1,4 @@
-<Fakes xmlns="http://schemas.microsoft.com/fakes/2011/">
+<Fakes xmlns="http://schemas.microsoft.com/fakes/2011/" Diagnostic="true">
   <Assembly Name="EPM Live Core"/>
   <StubGeneration>
     <Clear/>
@@ -31,6 +31,13 @@
     <Add FullName="EPMLiveCore.ReportHelper.MyWorkReportData!"/>
     <Add FullName="EPMLiveCore.GenericQueryControl!"/>
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
+    <Add FullName="EPMLiveCore.API.CommentManager!"/>
+    <Add FullName="EPMLiveCore.SocialEngine.Core.Logger!"/>
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
+    <Add FullName="EPMLiveCore.XMLDataManager!"/>
+    <Add Namespace="EPMLiveCore.SocialEngine!"/>
+    <Add Namespace="EPMLiveCore.SocialEngine.Core!"/>
+    <Add FullName="EPMLiveCore.ExtensionMethods!"/>
+    <Add FullName="EPMLiveCore.API.CommentManager!"/>
   </ShimGeneration>
 </Fakes>
