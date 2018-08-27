@@ -920,7 +920,6 @@ namespace EPMLiveCore
                             if (dControls.ContainsKey("Generic"))
                             {
                                 writer.WriteLine("  if(document.getElementById('" + dControls["Generic"] + "').checked){");
-                                writer.WriteLine("setLicenseType();");
                                 try
                                 {
                                     writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
@@ -1072,6 +1071,7 @@ namespace EPMLiveCore
                         catch { }
 
                         writer.WriteLine("cleanupfields();");
+			writer.WriteLine("try { setLicenseType(); }catch(e){}");
                         // To make default collapsed div, if there isnt any mandatory field in it
                         writer.WriteLine("$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem["Generic"]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
