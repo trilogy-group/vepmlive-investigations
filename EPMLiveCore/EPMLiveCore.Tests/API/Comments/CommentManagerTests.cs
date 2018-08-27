@@ -177,10 +177,6 @@ namespace EPMLiveCore.Tests.API.Comments
                 TitleGet = () => DummyString,
                 IDGet = () => Guid.NewGuid()
             };
-            //ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun =>
-            //{
-            //    codeToRun();
-            //};
             ShimSPList.AllInstances.GetItemByUniqueIdGuid = (_, guid) => new ShimSPListItem();
             ShimSPUser.AllInstances.IDGet = _ => 10;
             ShimExtensionMethods.ContainsFieldWithInternalNameSPFieldCollectionString = (_, name) => true;
@@ -192,9 +188,13 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, guid) =>
             {
                 if (guid == SPBuiltInFieldId.Author)
+                {
                     return new ShimSPFieldUser().Instance;
+                }
                 else
+                {
                     return new ShimSPField();
+                }
             };
             ShimSPFieldUser.AllInstances.GetFieldValueString = (_, name) =>
             {
@@ -413,14 +413,6 @@ namespace EPMLiveCore.Tests.API.Comments
                     }
                 }
             };
-            //ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun =>
-            //{
-            //    try
-            //    {
-            //        codeToRun();
-            //    }
-            //    catch { }
-            //};
 
             // Act
             _privateType.InvokeStatic(EnsurePublicCommentsListExistMethodName);
@@ -446,18 +438,7 @@ namespace EPMLiveCore.Tests.API.Comments
                     IDGet = () => 1
                 },
             }.Instance;
-            //ShimSPContext.CurrentGet = () => new ShimSPContext
-            //{
-            //    RegionalSettingsGet = () => new ShimSPRegionalSettings
-            //    {
-            //        TimeZoneGet = () => new ShimSPTimeZone
-            //        {
-            //            UTCToLocalTimeDateTime = date => DateTime.Now
-            //        }
-            //    }
-            //};
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => { };
-
 
             // Act
             Action action = () => _privateType.InvokeStatic(
@@ -517,7 +498,6 @@ namespace EPMLiveCore.Tests.API.Comments
                 }
             };
             ShimSPList.AllInstances.GetItemByIdInt32 = (_, id) => new ShimSPListItem();
-            //ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimSPSite.AllInstances.OpenWebString = (_, url) => new ShimSPWeb
             {
                 ListsGet = () => new ShimSPListCollection
@@ -568,7 +548,6 @@ namespace EPMLiveCore.Tests.API.Comments
                 }
             };
             ShimSPList.AllInstances.GetItemByIdInt32 = (_, id) => new ShimSPListItem();
-            //ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimSPSite.AllInstances.OpenWebString = (_, url) => new ShimSPWeb
             {
                 ListsGet = () => new ShimSPListCollection
@@ -642,7 +621,7 @@ namespace EPMLiveCore.Tests.API.Comments
                     IdGet = () => Guid.NewGuid()
                 }
             };
-            ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString; // chante on next test
+            ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString;
             ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
             ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection
             {
@@ -822,14 +801,13 @@ namespace EPMLiveCore.Tests.API.Comments
             {
                 GetFieldByInternalNameString = name => new ShimSPField
                 {
-                    IdGet = () => Guid.NewGuid() // null on next test
+                    IdGet = () => Guid.NewGuid()
                 }
             };
             ShimSPWeb.AllInstances.CurrentUserGet = _ => new ShimSPUser
             {
                 NameGet = () => DummyString
             };
-            //ShimCommentManager
 
             // Act
             var result = _privateType.InvokeStatic(
@@ -895,9 +873,13 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, guid) =>
             {
                 if (guid == SPBuiltInFieldId.Author)
+                {
                     return new ShimSPFieldUser().Instance;
+                }
                 else
+                {
                     return null;
+                }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => "1";
             ShimSPFieldUser.AllInstances.GetFieldValueString = (_, value) => new ShimSPFieldUserValue
@@ -932,26 +914,6 @@ namespace EPMLiveCore.Tests.API.Comments
                     GetFieldByInternalNameString = internalName => new ShimSPField()
                 }
             };
-            //ShimXMLDataManager.AllInstances.GetPropValString = (_, xml) =>
-            //{
-            //    switch (xml)
-            //    {
-            //        case StatusUpdateKey:
-            //            return bool.TrueString;
-            //        case StatusUpdateIdKey:
-            //            return Guid.NewGuid().ToString();
-            //        case ListIdKey:
-            //            return Guid.NewGuid().ToString();
-            //        case ItemIdKey:
-            //            return "2";
-            //        case CommentKey:
-            //            return DummyString;
-            //        case CommentItemIdKey:
-            //            return CommentItemId.ToString();
-            //        default:
-            //            return null;
-            //    }
-            //};
             ShimSPList.AllInstances.GetItemsSPQuery = (_, query) => new ShimSPListItemCollection
             {
                 CountGet = () => 0,
@@ -979,14 +941,12 @@ namespace EPMLiveCore.Tests.API.Comments
         }
 
         [TestMethod]
-        public void GetMyCommentsByDate()
+        public void GetMyCommentsByDate_Should_ReturnCommentContent()
         {
             // Arrange
+            const string NumberOfThreads = "NumThreads";
             var listId = Guid.NewGuid().ToString();
-            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => new ShimSPList
-            {
-
-            };
+            ShimSPListCollection.AllInstances.TryGetListString = (_, name) => new ShimSPList();
             ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection
             {
                 GetEnumerator = () =>
@@ -1040,7 +1000,7 @@ namespace EPMLiveCore.Tests.API.Comments
             {
                 switch (xml)
                 {
-                    case "NumThreads":
+                    case NumberOfThreads:
                         return "4";
                     case StatusUpdateIdKey:
                         return Guid.NewGuid().ToString();
@@ -1059,11 +1019,14 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, guid) =>
             {
                 if (guid == SPBuiltInFieldId.Author)
+                {
                     return new ShimSPFieldUser().Instance;
+                }
                 else
+                {
                     return new ShimSPField();
+                }
             };
-            //ShimSPFieldUser.AllInstances.GetFieldValue
             ShimSPList.AllInstances.GetItemsSPQuery = (_, query) => new ShimSPListItemCollection
             {
                 GetEnumerator = () =>
@@ -1107,7 +1070,6 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString;
             ShimSPListItem.AllInstances.TitleGet = _ => DummyString;
             ShimCommentManager.ContainsItemListOfStringArrayStringArray = (list, items) => false;
-            //ShimSPListItem.AllInstances.ItemGetString = (_, key) => string.Empty;
             ShimCommentManager.GetXMLSafeVersionString = value => DummyString;
             ShimSPWeb.AllInstances.SiteUserInfoListGet = _ => new ShimSPList
             {
@@ -1171,7 +1133,7 @@ namespace EPMLiveCore.Tests.API.Comments
         }
 
         [TestMethod]
-        public void GetXMLSafeVersion_Should_ReturnExepctedSafeValue()
+        public void GetXMLSafeVersion_Should_ReturnExpectedSafeValue()
         {
             // Arrange
             const string Value = "&dummy<value>";
@@ -1254,9 +1216,13 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, guid) =>
             {
                 if (guid == SPBuiltInFieldId.Author)
+                {
                     return new ShimSPFieldUser().Instance;
+                }
                 else
+                {
                     return null;
+                }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => "6";
             ShimSPFieldUser.AllInstances.GetFieldValueString = (_, value) => new ShimSPFieldUserValue
@@ -1268,10 +1234,6 @@ namespace EPMLiveCore.Tests.API.Comments
             }.Instance;
             ShimCommentManager.SendEmailNotificationInt32StringStringStringString =
                 (userId, listId, itmId, comment, email) => true;
-            //ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code =>
-            //{
-            //    code();
-            //};
             ShimCommentManager.InsertCommentCountStringString = (listId, itemId) => { };
             ShimCommentManager.SyncToSocialStreamGuidStringGuidInt32StringStringStringListOfInt32DateTimeSPWebString =
                 (id, comment, listId, itemId, itemTitle, listTitle, url, commmenters, time, spWeb, operaiton) => { };
@@ -1334,6 +1296,5 @@ namespace EPMLiveCore.Tests.API.Comments
             // Assert
             action.ShouldThrow<Exception>();
         }
-
     }
 }
