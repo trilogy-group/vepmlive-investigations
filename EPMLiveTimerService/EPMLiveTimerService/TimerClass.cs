@@ -26,11 +26,10 @@ namespace TimerService
 
         public override bool InitializeTask()
         {
-            return base.InitializeTask();
-        }
+            if (!base.InitializeTask())
+                return false;
 
-        public void ReQueueTimerStuckJobs()
-        {
+            logMessage("INIT", "STMR", "Clearing Queue");
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
@@ -55,28 +54,20 @@ namespace TimerService
                         }
                         catch
                         {
-                            
+                            return false;
                         }
 
                     }
                 }
             }
-        }
 
+            return true;
+        }
         DateTime lastRun = DateTime.Now;
-        DateTime lastHeartBeat = DateTime.Now;
-        const int HEARTBEATMINUTES = 30;
         public override void RunTask(CancellationToken token)
         {
             try
             {
-                DateTime newHeartBeat = DateTime.Now;
-                if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEARTBEATMINUTES, 0))
-                {
-                    lastHeartBeat = newHeartBeat;
-                    ReQueueTimerStuckJobs();
-                }
-               
                 SPWebApplicationCollection _webcolections = GetWebApplications();
                 foreach (SPWebApplication webApp in _webcolections)
                 {
