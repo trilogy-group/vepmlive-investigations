@@ -470,7 +470,7 @@ namespace WorkEnginePPM.Tests.WebServices
             var id = 0;
             var level = 0;
             var groupLevel = 0;
-            var value = "";
+            var value = string.Empty;
 
             _testObj.NewGrouping();
             _testObj.DefineItemValues(DummyOne, DummyOne, DummyOne, DummyOne, DummyString, DummyString);
