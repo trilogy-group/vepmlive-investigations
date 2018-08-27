@@ -1,11 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace WorkEnginePPM.Tests.WebServices
 {
     [TestClass]
+    [ExcludeFromCodeCoverage]
     public class SortAndGroupTest
     {
         private SortAndGroup _testObj;
