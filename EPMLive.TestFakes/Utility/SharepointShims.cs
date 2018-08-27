@@ -80,7 +80,7 @@ namespace EPMLive.TestFakes.Utility
 
         private ShimSPFieldCollection InitializeSPFieldsShim()
         {
-            var result = new ShimSPFieldCollection
+            return new ShimSPFieldCollection
             {
                 GetFieldByInternalNameString = (internalName) => 
                 {
@@ -88,9 +88,6 @@ namespace EPMLive.TestFakes.Utility
                     return FieldShim;
                 }
             };
-            result.Bind(new SPField[] { FieldShim });
-
-            return result;
         }
 
         private ShimSPForm InitializeSPFormShim()
