@@ -161,11 +161,13 @@ namespace EPMLiveCore
     public class CoreFunctions
     {
         private const string SharepointSystemAccountLowercase = "sharepoint\\system";
-        static string saltValue = "f53fNDH@";
-        static string hashAlgorithm = "SHA1";
-        static int passwordIterations = 2;
-        static string initVector = "77B2c3D4e1F3g7R1";
-        static int keySize = 256;
+        private const string InitVector = "77B2c3D4e1F3g7R1";
+        private const string SaltValue = "f53fNDH@";
+        private const string HashAlgorithm = "SHA1";
+        private const int PasswordIterations = 2;
+        private const int KeySize = 256;
+        private static readonly byte[] _initVectorBytes = Encoding.ASCII.GetBytes(InitVector);
+        private static readonly byte[] _saltValueBytes = Encoding.ASCII.GetBytes(SaltValue);
 
         private static PlannerDefinition CreatePlannerDef(string title, string image, bool enabled, string command, string description, int displaytype, string commandPrefix)
         {
@@ -826,34 +828,47 @@ namespace EPMLiveCore
             return retVal;
         }
 
-        public static DirectoryEntry getUserFromAD(string username)
+        public static DirectoryEntry getUserFromAD(string userName)
         {
-            DirectoryEntry deUser = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            if (userName == null)
             {
+                throw new ArgumentNullException(nameof(userName));
+            }
 
-                if (username.IndexOf("\\") > 0)
-                    username = username.Substring(username.IndexOf("\\") + 1);
-
-                DirectoryEntry de = new DirectoryEntry();
-                de.Path = "LDAP://" + getDomain();
-                de.AuthenticationType = AuthenticationTypes.Secure;
-
-                DirectorySearcher deSearch = new DirectorySearcher();
-
-                deSearch.SearchRoot = de;
-                deSearch.Filter = "(&(objectClass=user) (cn=" + username + "))";
-
-                SearchResultCollection results = deSearch.FindAll();
-
-                if (results.Count > 0)
+            DirectoryEntry result = null;
+            if (!string.IsNullOrEmpty(userName))
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SearchResult sr = results[0];
-                    deUser = sr.GetDirectoryEntry();
-                }
-            });
+                    var indexOfDoubleSlash = userName.IndexOf("\\");
+                    if (indexOfDoubleSlash > 0)
+                    {
+                        userName = userName.Substring(indexOfDoubleSlash + 1);
+                    }
 
-            return deUser;
+                    using (var directoryEntry = new DirectoryEntry
+                    {
+                        Path = "LDAP://" + getDomain(),
+                        AuthenticationType = AuthenticationTypes.Secure
+                    })
+                    {
+                        using (var directorySearcher = new DirectorySearcher
+                        {
+                            SearchRoot = directoryEntry,
+                            Filter = $"(&(objectClass=user) (cn={userName}))"
+                        })
+                        {
+                            var results = directorySearcher.FindAll();
+                            if (results.Count > 0)
+                            {
+                                result = results[0].GetDirectoryEntry();
+                            }
+                        }
+                    }
+                });
+            }
+
+            return result;
         }
 
         public static string GetScheduleStatusField(SPListItem ListItem)
@@ -1164,9 +1179,9 @@ namespace EPMLiveCore
             return isInRole;
         }
 
-        public static List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
+        public static IList<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, IList<SPEventReceiverType> types)
         {
-            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+            var evts = new List<SPEventReceiverDefinition>();
 
             try
             {
@@ -1235,188 +1250,258 @@ namespace EPMLiveCore
             return field;
         }
 
-        public static DataTable getSiteItems(SPWeb web, SPView view, string spquery, string filterfield, string usewbs, string rlist, string[] arrGroupFields)
+        public static DataTable getSiteItems(
+            SPWeb web, 
+            SPView view, 
+            string spQuery, 
+            string filterFieldName, 
+            string useWbs,
+            string listTitlePattern,
+            IList<string> groupByFieldNames)
         {
-            DataTable dt = null;
-            string lists = "";
-            SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            if (web == null)
             {
-                //using (SPSite s = SPContext.Current.Site)
-                {
-                    string dbCon = web.Site.ContentDatabase.DatabaseConnectionString;
-                    cn = new SqlConnection(dbCon);
-                    cn.Open();
-                }
-            });
-
-            if (cn.State == ConnectionState.Open)
+                throw new ArgumentNullException(nameof(web));
+            }
+            if (view == null)
             {
+                throw new ArgumentNullException(nameof(view));
+            }
+            if (groupByFieldNames == null)
+            {
+                throw new ArgumentNullException(nameof(groupByFieldNames));
+            }
 
-                try
+            DataTable dataTable = null;
+            SqlConnection sqlConnection = null;
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    string siteurl = web.ServerRelativeUrl.Substring(1);
+                    sqlConnection = new SqlConnection(web.Site.ContentDatabase.DatabaseConnectionString);
+                    sqlConnection.Open();
+                });
 
-                    ArrayList arr = new ArrayList();
-                    string dqFields = "";
-                    foreach (string field in view.ViewFields)
-                    {
-                        SPField f = getRealField(view.ParentList.Fields.GetFieldByInternalName(field));
-                        arr.Add(f.InternalName.ToLower());
-                        dqFields += "<FieldRef Name='" + f.InternalName + "' Nullable='TRUE'/>";
-                    }
-                    foreach (string groupby in arrGroupFields)
-                    {
-                        if (!arr.Contains(groupby.ToLower()))
-                        {
-                            arr.Add(groupby.ToLower());
-                            dqFields += "<FieldRef Name='" + groupby + "' Nullable='TRUE'/>";
-                        }
-                    }
-
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml("<Where>" + spquery + "</Where>");
-                    XmlNode nl = doc.FirstChild.SelectSingleNode("//OrderBy");
-                    if (nl != null)
-                    {
-                        foreach (XmlNode nd in nl.ChildNodes)
-                        {
-                            string fname = nd.Attributes["Name"].Value;
-                            if (!arr.Contains(fname.ToLower()))
-                            {
-                                arr.Add(fname.ToLower());
-                                dqFields += "<FieldRef Name='" + fname + "' Nullable='TRUE'/>";
-                            }
-                        }
-                    }
-
-                    if (!arr.Contains("title") && view.ParentList.Fields.ContainsField("Title"))
-                    {
-                        dqFields += "<FieldRef Name='Title' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("created"))
-                    {
-                        dqFields += "<FieldRef Name='Created'/>";
-                    }
-                    if (!arr.Contains("_moderationstatus"))
-                    {
-                        dqFields += "<FieldRef Name='_ModerationStatus' Nullable='TRUE'/>";
-                    }
-                    if (filterfield != null && filterfield != "")
-                    {
-                        if (!arr.Contains(filterfield.ToLower()))
-                        {
-                            dqFields += "<FieldRef Name='" + filterfield + "' Nullable='TRUE'/>";
-                        }
-                    }
-                    if (usewbs != null && usewbs != "")
-                    {
-                        if (!arr.Contains(usewbs.ToLower()))
-                        {
-                            dqFields += "<FieldRef Name='" + usewbs + "' Nullable='TRUE'/>";
-                        }
-                    }
-                    if (!arr.Contains("list"))
-                    {
-                        dqFields += "<FieldRef Name='List' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commentcount"))
-                    {
-                        dqFields += "<FieldRef Name='CommentCount' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commenters"))
-                    {
-                        dqFields += "<FieldRef Name='Commenters' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("commentersread"))
-                    {
-                        dqFields += "<FieldRef Name='CommentersRead' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("assignedto"))
-                    {
-                        dqFields += "<FieldRef Name='AssignedTo' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("author"))
-                    {
-                        dqFields += "<FieldRef Name='Author' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("childitem"))
-                    {
-                        dqFields += "<FieldRef Name='ChildItem' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("parentitem"))
-                    {
-                        dqFields += "<FieldRef Name='ParentItem' Nullable='TRUE'/>";
-                    }
-                    if (!arr.Contains("workspaceurl"))
-                    {
-                        dqFields += "<FieldRef Name='WorkspaceUrl' Nullable='TRUE'/>";
-                    }
+                if (sqlConnection.State == ConnectionState.Open)
+                {
                     try
                     {
-                        lists = "";
-                        string query = "";
-                        if (rlist != "")
+                        var siteUrl = web.ServerRelativeUrl.Substring(1);
+                        var fieldInternalNames = new ArrayList();
+                        var fieldsXml = new List<string>();
+
+                        GenerateSiteItemFields(
+                            view, 
+                            spQuery, 
+                            filterFieldName, 
+                            useWbs, 
+                            groupByFieldNames, 
+                            fieldInternalNames, 
+                            fieldsXml);
+
+                        try
                         {
-                            if (siteurl == "")
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     webs.siteid='" + web.Site.ID + "' AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-                            else
-                                query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     (dbo.Webs.FullUrl LIKE '" + siteurl + "/%' OR dbo.Webs.FullUrl = '" + siteurl + "') AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
+                            var listIds = GetSiteItemsListIds(
+                                web, 
+                                view,
+                                listTitlePattern,
+                                sqlConnection,
+                                siteUrl);
 
-                            SqlCommand cmd = new SqlCommand(query, cn);
-                            //cmd.Parameters.AddWithValue("@rlist", rlist);
-                            SqlDataReader dr = cmd.ExecuteReader();
-
-                            while (dr.Read())
+                            if (listIds.Count > 0)
                             {
-                                lists += "<List ID='" + dr.GetGuid(0).ToString() + "'/>";
+                                dataTable = GetSiteItemsData(
+                                    web, 
+                                    spQuery, 
+                                    listTitlePattern, 
+                                    dataTable, 
+                                    fieldsXml, 
+                                    listIds);
                             }
-                            dr.Close();
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            lists = "<List ID='" + view.ParentList.ID + "'/>";
-                        }
-
-
-                        if (lists != "")
-                        {
-                            SPSiteDataQuery dq = new SPSiteDataQuery();
-                            dq.Lists = "<Lists MaxListLimit='0'>" + lists + "</Lists>";
-                            dq.Query = spquery;
-                            dq.QueryThrottleMode = SPQueryThrottleOption.Override;
-                            if (rlist != "")
-                                dq.Webs = "<Webs Scope='Recursive'/>";
-
-                            dq.ViewFields = dqFields;
-                            try
-                            {
-                                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                                {
-                                    dt = web.GetSiteData(dq);
-                                });
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new Exception("Error getting site data: " + ex.Message + "<br>This may be caused by column data type mismatches throughout your site collection. Check the Field Audit page in General Settings.");
-                            }
+                            throw new AggregateException($"Error getting site data lists: {ex.Message}", ex);
                         }
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error getting site data lists: " + ex.Message);
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
                     }
-
-                    cn.Close();
                 }
-                catch { }
-                cn.Close();
+            }
+            finally
+            {
+                sqlConnection?.Dispose();
             }
 
-            return dt;
+            return dataTable;
         }
 
+        private static DataTable GetSiteItemsData(
+            SPWeb web, 
+            string spQuery, 
+            string listTitlePattern, 
+            DataTable dataTable, 
+            IList<string> fieldsXml, 
+            IList<Guid> listIds)
+        {
+            var listsXml = string.Join(string.Empty, listIds.Select(id => $"<List ID='{id}'/>"));
+            var siteDataQuery = new SPSiteDataQuery
+            {
+                Lists = $"<Lists MaxListLimit='0'>{listsXml}</Lists>",
+                Query = spQuery,
+                QueryThrottleMode = SPQueryThrottleOption.Override,
+                ViewFields = string.Join(string.Empty, fieldsXml)
+            };
 
+            if (!string.IsNullOrEmpty(listTitlePattern))
+            {
+                siteDataQuery.Webs = "<Webs Scope='Recursive'/>";
+            }
+
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    dataTable = web.GetSiteData(siteDataQuery);
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new AggregateException(
+                    $@"Error getting site data: 
+                        {ex.Message}
+                        <br>This may be caused by column data type mismatches throughout your site collection. 
+                        Check the Field Audit page in General Settings.",
+                    ex);
+            }
+
+            return dataTable;
+        }
+
+        private static IList<Guid> GetSiteItemsListIds(SPWeb web, SPView view, string listTitlePattern, SqlConnection sqlConnection, string siteUrl)
+        {
+            var listIds = new List<Guid>();
+            var query = string.Empty;
+            if (!string.IsNullOrEmpty(listTitlePattern))
+            {
+                var whereConditions = new List<string>();
+                if (string.IsNullOrEmpty(siteUrl))
+                {
+                    whereConditions.Add($"webs.siteid = '{web.Site.ID}'");
+                }
+                else
+                {
+                    whereConditions.Add($"(dbo.Webs.FullUrl LIKE '{siteUrl}/%' OR dbo.Webs.FullUrl = '{siteUrl}')");
+                }
+
+                whereConditions.Add($"dbo.AllLists.tp_Title like '{listTitlePattern.Replace("'", "''")}'");
+
+                query = $@"SELECT dbo.AllLists.tp_ID 
+                            FROM dbo.Webs 
+                            INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId 
+                            WHERE {string.Join(" AND ", whereConditions)}";
+
+                using (var sqlCommand = new SqlCommand(query, sqlConnection))
+                {
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            listIds.Add(dataReader.GetGuid(0));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                listIds.Add(view.ParentList.ID);
+            }
+
+            return listIds;
+        }
+
+        private static void GenerateSiteItemFields(
+            SPView view, 
+            string spQuery, 
+            string filterFieldName, 
+            string useWbs, 
+            IList<string> groupByFieldNames, 
+            ArrayList fieldInternalNames, 
+            IList<string> fieldsXml)
+        {
+            foreach (string viewFieldName in view.ViewFields)
+            {
+                var viewField = getRealField(view.ParentList.Fields.GetFieldByInternalName(viewFieldName));
+
+                if (AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, viewField.InternalName, true))
+                {
+                    fieldInternalNames.Add(viewField.InternalName.ToLower());
+                }
+            }
+
+            foreach (var groupByFieldName in groupByFieldNames)
+            {
+                if (AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, groupByFieldName, true))
+                {
+                    fieldInternalNames.Add(groupByFieldName.ToLower());
+                }
+            }
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml($"<Where>{spQuery}</Where>");
+            var orderByNode = xmlDocument.FirstChild.SelectSingleNode("//OrderBy");
+            if (orderByNode != null)
+            {
+                foreach (XmlNode orderByFieldNode in orderByNode.ChildNodes)
+                {
+                    var fieldName = orderByFieldNode.Attributes["Name"].Value;
+                    if (AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, fieldName, true))
+                    {
+                        fieldInternalNames.Add(fieldName.ToLower());
+                    }
+                }
+            }
+
+            if (view.ParentList.Fields.ContainsField("Title"))
+            {
+                AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "Title", true);
+            }
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "Created", false);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "_ModerationStatus", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, filterFieldName, true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, useWbs, true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "List", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "CommentCount", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "Commenters", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "CommentersRead", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "AssignedTo", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "Author", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "ChildItem", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "ParentItem", true);
+            AddFieldsXmlIfNotInternal(fieldsXml, fieldInternalNames, "WorkspaceUrl", true);
+        }
+
+        private static string GenerateFieldRefXml(string name, bool isNullable)
+        {
+            var nullableAttribute = isNullable ? "Nullable='TRUE' " : string.Empty;
+            return $"<FieldRef Name='{name}' {nullableAttribute}/>";
+        }
+
+        private static bool AddFieldsXmlIfNotInternal(IList<string> fieldsXml, ArrayList internalFieldNames, string name, bool isNullable)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (!internalFieldNames.Contains(name.ToLower()))
+                {
+                    fieldsXml.Add(GenerateFieldRefXml(name, isNullable));
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public static string getItemXml(SPListItem li, Hashtable hshFields, SPItemEventDataCollection properties, SPWeb web)
         {
@@ -2186,104 +2271,20 @@ namespace EPMLiveCore
                     {
                         SPSecurity.RunWithElevatedPrivileges(() =>
                         {
-                            using (SPSite s = new SPSite(web.Url))
+                            using (var spSite = new SPSite(web.Url))
                             {
-                                using (SPWeb w = s.OpenWeb())
+                                using (var spWeb = spSite.OpenWeb())
                                 {
-                                    Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title,
-                                        w.AllUsers[user]);
-                                    strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w,
+                                    var groups = Security.AddBasicSecurityToWorkspace(
+                                        spWeb, 
+                                        spWeb.Title,
+                                        spWeb.AllUsers[user]);
+
+                                    strEPMLiveGroupsPermAssignments = getConfigSetting(
+                                        spWeb,
                                         "EPMLiveGroupsPermAssignments");
-                                    List<SPEventReceiverDefinition> evts = null;
-                                    List<Guid> listsToBeMapped = new List<Guid>();
-                                    Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
-                                    string EPMLiveReportingAssembly =
-                                        "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
 
-                                    MethodInfo m = null;
-                                    Assembly assemblyInstance = null;
-                                    Type thisClass = null;
-                                    object apiClass = null;
-                                    string listIcon = string.Empty;
-
-                                    foreach (SPList l in w.Lists)
-                                    {
-                                        string sClass = "EPMLiveReportsAdmin.ListEvents";
-
-                                        evts = CoreFunctions.GetListEvents(l,
-                                            EPMLiveReportingAssembly,
-                                            sClass,
-                                            new List<SPEventReceiverType>
-                                            {
-                                            SPEventReceiverType.ItemAdded,
-                                            SPEventReceiverType.ItemUpdated,
-                                            SPEventReceiverType.ItemDeleting
-                                            });
-
-                                        if (evts.Count > 0 &&
-                                            !listsToBeMapped.Contains(l.ID))
-                                        {
-                                            listsToBeMapped.Add(l.ID);
-
-                                            try
-                                            {
-                                                //Set List Icon
-                                                var gSettings = new GridGanttSettings(l);
-                                                listIcon = gSettings.ListIcon;
-                                                listIconsToBeSet.Add(l.ID.ToString(), listIcon);
-                                            }
-                                            catch { }
-
-                                            continue;
-                                        }
-                                    }
-
-                                    if (listsToBeMapped.Count > 0)
-                                    {
-                                        try
-                                        {
-                                            //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                            //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                            //m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
-                                            //apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
-
-                                            //if (m != null &&
-                                            //    assemblyInstance != null &&
-                                            //    thisClass != null &&
-                                            //    apiClass != null)
-                                            //{
-                                            //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
-                                            //}
-
-                                            ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
-
-                                            epmData.SetListIcon(listIconsToBeSet);
-
-                                        }
-                                        catch { }
-                                    }
-
-                                    // use reflection to map list
-                                    try
-                                    {
-                                        //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                        //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        //m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
-                                        //apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
-
-                                        //if (m != null &&
-                                        //    assemblyInstance != null &&
-                                        //    thisClass != null &&
-                                        //    apiClass != null)
-                                        //{
-                                        //    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
-                                        //}
-
-                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
-
-                                        epmData.MapLists(listsToBeMapped, w.ID);
-                                    }
-                                    catch { }
+                                    SPUtilities.SPListUtility.MapListsReporting(spWeb);
                                 }
                             }
                         });
@@ -2315,67 +2316,11 @@ namespace EPMLiveCore
                     {
                         SPSecurity.RunWithElevatedPrivileges(() =>
                         {
-                            using (SPSite s = new SPSite(web.Url))
+                            using (SPSite spSite = new SPSite(web.Url))
                             {
-                                using (SPWeb w = s.OpenWeb())
+                                using (SPWeb spWeb = spSite.OpenWeb())
                                 {
-                                    List<SPEventReceiverDefinition> evts = null;
-                                    List<Guid> listsToBeMapped = new List<Guid>();
-                                    Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
-                                    string EPMLiveReportingAssembly =
-                                        "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
-
-                                    MethodInfo m = null;
-                                    string listIcon = string.Empty;
-
-                                    foreach (SPList l in w.Lists)
-                                    {
-                                        string sClass = "EPMLiveReportsAdmin.ListEvents";
-
-                                        evts = CoreFunctions.GetListEvents(l,
-                                            EPMLiveReportingAssembly,
-                                            sClass,
-                                            new List<SPEventReceiverType>
-                                            {
-                                            SPEventReceiverType.ItemAdded,
-                                            SPEventReceiverType.ItemUpdated,
-                                            SPEventReceiverType.ItemDeleting
-                                            });
-
-                                        if (evts.Count > 0 &&
-                                            !listsToBeMapped.Contains(l.ID))
-                                        {
-                                            listsToBeMapped.Add(l.ID);
-
-                                            try
-                                            {
-                                                //Set List Icon
-                                                var gSettings = new GridGanttSettings(l);
-                                                listIcon = gSettings.ListIcon;
-                                                listIconsToBeSet.Add(l.ID.ToString(), listIcon);
-                                            }
-                                            catch { }
-
-                                            continue;
-                                        }
-                                    }
-
-                                    if (listsToBeMapped.Count > 0)
-                                    {
-                                        try
-                                        {
-                                            ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
-                                            epmData.SetListIcon(listIconsToBeSet);
-                                        }
-                                        catch { }
-                                    }
-
-                                    try
-                                    {
-                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
-                                        epmData.MapLists(listsToBeMapped, w.ID);
-                                    }
-                                    catch { }
+                                    SPUtilities.SPListUtility.MapListsReporting(spWeb);
                                 }
                             }
                         });
@@ -2487,95 +2432,14 @@ namespace EPMLiveCore
                     API.Applications.GenerateQuickLaunchFromApp(web);
                     SPSecurity.RunWithElevatedPrivileges(() =>
                     {
-                        using (SPSite ss = new SPSite(web.Url))
+                        using (SPSite spSite = new SPSite(web.Url))
                         {
-                            using (SPWeb sw = ss.OpenWeb())
+                            using (SPWeb spWeb = spSite.OpenWeb())
                             {
-
-                                List<SPEventReceiverDefinition> evts = null;
-                                List<Guid> listsToBeMapped = new List<Guid>();
-                                Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
-                                string EPMLiveReportingAssembly =
-                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
-
-                                MethodInfo m = null;
-                                Assembly assemblyInstance = null;
-                                Type thisClass = null;
-                                object apiClass = null;
-                                string listIcon = string.Empty;
-
-                                foreach (SPList l in sw.Lists)
-                                {
-                                    string sClass = "EPMLiveReportsAdmin.ListEvents";
-
-                                    evts = CoreFunctions.GetListEvents(l,
-                                        EPMLiveReportingAssembly,
-                                        sClass,
-                                        new List<SPEventReceiverType>
-                                            {
-                                            SPEventReceiverType.ItemAdded,
-                                            SPEventReceiverType.ItemUpdated,
-                                            SPEventReceiverType.ItemDeleting
-                                            });
-
-                                    if (evts.Count > 0 &&
-                                        !listsToBeMapped.Contains(l.ID) && !listsNotToBeMapped.Contains(l.Title))
-                                    {
-                                        listsToBeMapped.Add(l.ID);
-
-                                        try
-                                        {
-                                            //Set List Icon
-                                            var gSettings = new GridGanttSettings(l);
-                                            listIcon = gSettings.ListIcon;
-                                            listIconsToBeSet.Add(l.ID.ToString(), listIcon);
-                                        }
-                                        catch { }
-
-                                        continue;
-                                    }
-                                }
-                                if (listsToBeMapped.Count > 0)
-                                {
-                                    try
-                                    {
-                                        //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                        //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        //m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
-                                        //apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
-
-                                        //if (m != null &&
-                                        //    assemblyInstance != null &&
-                                        //    thisClass != null &&
-                                        //    apiClass != null)
-                                        //{
-                                        //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
-                                        //}
-                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
-
-                                        epmData.SetListIcon(listIconsToBeSet);
-                                    }
-                                    catch { }
-                                }
-                                try
-                                {
-                                    //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                    //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                    //m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
-                                    //apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
-
-                                    //if (m != null &&
-                                    //    assemblyInstance != null &&
-                                    //    thisClass != null &&
-                                    //    apiClass != null)
-                                    //{
-                                    //    m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
-                                    //}
-                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
-
-                                    epmData.MapLists(listsToBeMapped, sw.ID);
-                                }
-                                catch { }
+                                SPUtilities.SPListUtility.MapListsReporting(
+                                    spWeb, 
+                                    spList => !listsNotToBeMapped.Contains(spList.Title)
+                                );
                             }
                         }
 
@@ -3595,86 +3459,79 @@ namespace EPMLiveCore
 
         public static string Encrypt(string plainText, string passPhrase)
         {
-
             try
             {
-                byte[] initVectorBytes = Encoding.ASCII.GetBytes(initVector);
-                byte[] saltValueBytes = Encoding.ASCII.GetBytes(saltValue);
+                var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+                byte[] keyBytes;
+                byte[] cipherTextBytes;
 
-                byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, HashAlgorithm, PasswordIterations))
+                {
+                    keyBytes = password.GetBytes(KeySize / 8);
+                }
 
-                PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, saltValueBytes, hashAlgorithm, passwordIterations);
+                using (var symmetricKey = new RijndaelManaged())
+                {
+                    symmetricKey.Mode = CipherMode.CBC;
+                    using (var encryptor = symmetricKey.CreateEncryptor(keyBytes, _initVectorBytes))
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                            {
+                                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+                                cryptoStream.FlushFinalBlock();
+                                cipherTextBytes = memoryStream.ToArray();
+                            }
+                        }
+                    }
+                }
 
-                byte[] keyBytes = password.GetBytes(keySize / 8);
-
-                RijndaelManaged symmetricKey = new RijndaelManaged();
-
-                symmetricKey.Mode = CipherMode.CBC;
-
-                ICryptoTransform encryptor = symmetricKey.CreateEncryptor(
-                                                                 keyBytes,
-                                                                 initVectorBytes);
-                MemoryStream memoryStream = new MemoryStream();
-
-                CryptoStream cryptoStream = new CryptoStream(memoryStream,
-                                                             encryptor,
-                                                             CryptoStreamMode.Write);
-
-                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
-
-                cryptoStream.FlushFinalBlock();
-
-                byte[] cipherTextBytes = memoryStream.ToArray();
-                memoryStream.Close();
-                cryptoStream.Close();
-                string cipherText = Convert.ToBase64String(cipherTextBytes);
-                return cipherText;
+                return Convert.ToBase64String(cipherTextBytes);
             }
-            catch { return ""; }
+            catch(Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                return string.Empty;
+            }
         }
 
         public static string Decrypt(string cipherText, string passPhrase)
         {
             try
             {
-                byte[] initVectorBytes = Encoding.ASCII.GetBytes("77B2c3D4e1F3g7R1");
-                byte[] saltValueBytes = Encoding.ASCII.GetBytes("f53fNDH@");
-                byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+                var cipherTextBytes = Convert.FromBase64String(cipherText);
+                byte[] keyBytes;
+                byte[] plainTextBytes;
+                int decryptedByteCount;
 
-                PasswordDeriveBytes password = new PasswordDeriveBytes(
-                                                                passPhrase,
-                                                                saltValueBytes,
-                                                                "SHA1",
-                                                                2);
+                using (var password = new PasswordDeriveBytes(passPhrase, _saltValueBytes, HashAlgorithm, PasswordIterations))
+                {
+                    keyBytes = password.GetBytes(KeySize / 8);
+                }
 
-                byte[] keyBytes = password.GetBytes(256 / 8);
-
-                RijndaelManaged symmetricKey = new RijndaelManaged();
-                symmetricKey.Mode = CipherMode.CBC;
-                ICryptoTransform decryptor = symmetricKey.CreateDecryptor(
-                                                                 keyBytes,
-                                                                 initVectorBytes);
-
-                MemoryStream memoryStream = new MemoryStream(cipherTextBytes);
-
-                CryptoStream cryptoStream = new CryptoStream(memoryStream,
-                                                              decryptor,
-                                                              CryptoStreamMode.Read);
-
-                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-
-                int decryptedByteCount = cryptoStream.Read(plainTextBytes,
-                                                           0,
-                                                           plainTextBytes.Length);
-                memoryStream.Close();
-                cryptoStream.Close();
-
-                string plainText = Encoding.UTF8.GetString(plainTextBytes,
-                                                           0,
-                                                           decryptedByteCount);
-                return plainText;
+                using (var symmetricKey = new RijndaelManaged { Mode = CipherMode.CBC })
+                {
+                    using (var decryptor = symmetricKey.CreateDecryptor(keyBytes, _initVectorBytes))
+                    {
+                        using (var memoryStream = new MemoryStream(cipherTextBytes))
+                        {
+                            using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                            {
+                                plainTextBytes = new byte[cipherTextBytes.Length];
+                                decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
+                            }
+                        }
+                    }
+                }
+                
+                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
             }
-            catch { return ""; }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+                return string.Empty;
+            }
         }
 
         public static void deleteKey(string key)
@@ -3923,51 +3780,60 @@ namespace EPMLiveCore
 
         public static void enqueue(Guid timerjobuid, int defaultstatus, SPSite site)
         {
-            using (SPWeb web = site.OpenWeb())
+            if (site == null)
+            {
+                throw new ArgumentNullException("site");
+            }
+
+            using (var web = site.OpenWeb())
             {
                 //Added code for the Cost Planner Integration - EPML-5327
-                int userid = 0;
-                if (web.CurrentUser == null)
-                    userid = 1;
-                else
-                    userid = web.CurrentUser.ID;
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    SqlConnection cn = new SqlConnection(getConnectionString(site.WebApplication.Id));
-                    cn.Open();
+                    var status = 2;
 
-                    SqlCommand cmd = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", cn);
-                    cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                    SqlDataReader dr = cmd.ExecuteReader();
-
-                    int status = 2;
-
-                    if (dr.Read())
+                    using (var connection = new SqlConnection(getConnectionString(site.WebApplication.Id)))
                     {
-                        status = dr.GetInt32(0);
+                        connection.Open();
+
+                        using (var command = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", connection))
+                        {
+                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+
+                            using (var dataReader = command.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    status = dataReader.GetInt32(0);
+                                }
+                            }
+                        }
+
+                        if (status == 2)
+                        {
+                            using (var command = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.ExecuteNonQuery();
+                            }
+
+                            using (var command = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.ExecuteNonQuery();
+                            }
+
+                            using (var command = new SqlCommand(@"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
+                                                                  VALUES (@timerjobuid, @status, 0, @userid) ", connection))
+                            {
+                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                command.Parameters.AddWithValue("@status", defaultstatus);
+                                command.Parameters.AddWithValue("@userid", web.CurrentUser != null ? web.CurrentUser.ID : 1);
+                                command.ExecuteNonQuery();
+                            }
+                        }
                     }
-
-                    dr.Close();
-
-                    if (status == 2)
-                    {
-                        cmd = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.ExecuteNonQuery();
-
-                        cmd = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.ExecuteNonQuery();
-
-                        cmd = new SqlCommand("INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) VALUES (@timerjobuid, @status, 0, @userid) ", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.Parameters.AddWithValue("@status", defaultstatus);
-                        cmd.Parameters.AddWithValue("@userid", userid);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    cn.Close();
                 });
             }
         }
@@ -4168,6 +4034,114 @@ namespace EPMLiveCore
             MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
             object apiClass = Activator.CreateInstance(thisClass);
             return (string)m.Invoke(apiClass, new object[] { null, spWeb });
+        }
+        
+        public static string CreateProjectInNewWorkspace(SPWeb web, string listTitle, string url, string title)
+        {
+            if (web == null)
+            {
+                throw new ArgumentNullException("web");
+            }
+
+            SPListItem li = null;
+            try
+            {
+                var workspacelist = web.Lists["Workspace Center"];
+                li = workspacelist.Items.Add();
+                li["URL"] = url + ", " + title;
+                li.Update();
+
+                var workspaceID = li.ID;
+                var listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
+            }
+            catch (Exception ex)
+            {
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
+            }
+
+            using (var webAtUrl = web.Webs[url])
+            {
+                SPList list = null;
+                try
+                {
+                    list = webAtUrl.Lists[listTitle];
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                }
+
+                if (list != null)
+                {
+                    SPField field = null;
+                    try
+                    {
+                        field = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                    }
+
+                    if (field == null)
+                    {
+                        if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
+                        {
+                            try
+                            {
+                                list.ParentWeb.AllowUnsafeUpdates = true;
+                                field = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
+                                field.Hidden = true;
+                                list.Fields.Add(field);
+                                field.Update();
+                                list.Update();
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString());
+                            }
+                        }
+                    }
+
+                    var query = new SPQuery();
+                    query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
+
+                    li = null;
+
+                    foreach (SPListItem listItem in list.GetItems(query))
+                    {
+                        li = listItem;
+                        listItem["Title"] = title;
+                        listItem.SystemUpdate();
+                        break;
+                    }
+
+                    if (li == null)
+                    {
+                        li = list.Items.Add();
+                        li["Title"] = title;
+                        li.Update();
+                    }
+
+                    return list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID;
+                }
+
+                return null;
+            }
+        }
+
+        // (CC-76700, 2018-07-24) Ideally, we should add | RegexOptions.CultureInvariand and .IgnoreCase, but this will break the existing behavior, therefore not adding
+        // We're making the RegexCompiled to save time on compliation on every call
+        private static readonly Regex _alphaNumericRegex = new Regex(@"[^a-zA-Z0-9\s]", RegexOptions.Compiled);
+
+        public static bool IsAlphaNumeric(string strToCheck)
+        {
+            if (strToCheck == null)
+            {
+                throw new ArgumentNullException("strToCheck");
+            }
+
+            return !_alphaNumericRegex.IsMatch(strToCheck);
         }
     }
 }

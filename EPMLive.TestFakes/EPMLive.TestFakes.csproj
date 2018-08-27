@@ -34,9 +34,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLive.TestFakes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveEnterprise.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveEnterprise.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveIntegrationService.Fakes">
+      <HintPath>FakesAssemblies\EPMLiveIntegrationService.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveTimerService.Fakes">
       <HintPath>FakesAssemblies\EPMLiveTimerService.Fakes.dll</HintPath>
@@ -47,9 +59,15 @@
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint.Security\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
@@ -65,6 +83,11 @@
     <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.DirectoryServices.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
@@ -76,6 +99,13 @@
     <Reference Include="System.XML" />
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="TimeSheets.Fakes">
+      <HintPath>FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="WorkEnginePPM.Fakes">
       <HintPath>FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
@@ -95,20 +125,34 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\EPM Live Core.fakes">
-      <SubType>Designer</SubType>
-    </Fakes>
+    <Compile Include="Testables\TestableCryptoTransform.cs" />
+    <Compile Include="Utility\AdoShims.cs" />
+    <Compile Include="Utility\DirectoryShims.cs" />
+    <Compile Include="Utility\CryptographyShims.cs" />
+    <Compile Include="Utility\IOShims.cs" />
+    <Compile Include="Utility\SharepointShims.cs" />
+    <Compile Include="Utility\HttpShims.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EPMLiveIntegrationService\EPMLiveIntegrationService\EPMLiveIntegrationService.csproj">
+      <Project>{e7043f73-7633-4476-b33d-222ec3ac1c8b}</Project>
+      <Name>EPMLiveIntegrationService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLivePS\EPMLivePS\EPMLivePS.csproj">
+      <Project>{1121d2ff-7eaa-4532-a1ce-473de551dd70}</Project>
+      <Name>EPMLivePS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService\EPMLiveTimerService.csproj">
       <Project>{6c2be0de-af49-4f4d-bab8-ae256f1cbdd7}</Project>
       <Name>EPMLiveTimerService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
+      <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>
+      <Name>EPMLiveTimesheets</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
@@ -145,6 +189,13 @@
     <Fakes Include="Fakes\System.fakes" />
     <Fakes Include="Fakes\EPMLiveTimerService.fakes" />
     <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
+    <Fakes Include="Fakes\EPM Live Core.fakes" />
+    <Fakes Include="Fakes\EPMLiveEnterprise.fakes" />
+    <None Include="EPMLive.TestFakes.snk" />
+    <Fakes Include="Fakes\EPMLiveIntegrationService.fakes" />
+    <Fakes Include="Fakes\TimeSheets.fakes" />
+    <Fakes Include="Fakes\System.DirectoryServices.fakes" />
+    <Fakes Include="Fakes\System.Xml.Linq.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

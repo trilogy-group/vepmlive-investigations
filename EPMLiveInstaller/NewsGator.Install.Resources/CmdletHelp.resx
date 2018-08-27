@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DisableAllFeatures" xml:space="preserve">
+    <value>Disable All Sitrion Social Features</value>
+  </data>
+  <data name="DisableAllFeaturesDescription" xml:space="preserve">
+    <value>This will disable ALL Sitrion Social features on the local farm</value>
+  </data>
+  <data name="HelpCaching" xml:space="preserve">
+    <value>See the Sitrion Social Caching Documentation for details.</value>
+  </data>
+  <data name="HelpCompress" xml:space="preserve">
+    <value>Use -Compress to compress the output to a Zip file.</value>
+  </data>
+  <data name="HelpConsumingFarm" xml:space="preserve">
+    <value>Use the -ConsumingFarm flag to treat the current farm as a farm that consumes the Sitrion Social Service Applications of another farm.  The Sitrion Social solutions and feature will be installed and activated, however no Service Applications will be provisioned.</value>
+  </data>
+  <data name="HelpDeleteDatabases" xml:space="preserve">
+    <value>Use -DeleteDatabases to delete the Sitrion Social databases during uninstall.</value>
+  </data>
+  <data name="HelpEnrichOptions" xml:space="preserve">
+    <value>See the Sitrion Social Enrich (Learning) Module Documentation.</value>
+  </data>
+  <data name="HelpIgnoreMissingModules" xml:space="preserve">
+    <value>Use -IgnoreMissingModules to update Sitrion Social even if one or more Sitrion Social module solutions are missing.</value>
+  </data>
+  <data name="HelpInnovationOptions" xml:space="preserve">
+    <value>See the Sitrion Social Innovation Solution Documentation.</value>
+  </data>
+  <data name="HelpInterCommOptions" xml:space="preserve">
+    <value>See the Sitrion Social Internal Communications Solution Documentation.</value>
+  </data>
+  <data name="HelpLiteralPath" xml:space="preserve">
+    <value>Use -LiteralPath "&lt;Path&gt;" to specify the directory containing the Sitrion Social solutions. Default: The current directory.</value>
+  </data>
+  <data name="HelpLogLocation" xml:space="preserve">
+    <value>Use -LogLocation "&lt;Path&gt;" to specify where the installer should create the log file. Default: The current directory.</value>
+  </data>
+  <data name="HelpLogOutput" xml:space="preserve">
+    <value>Use -LogOutput to instruct the cmdlet to write verbose output to a log file.</value>
+  </data>
+  <data name="HelpModuleFlag" xml:space="preserve">
+    <value>Use one or more of the following flags to specify the module(s) to process: -News, -Video, -Enrich, -Ideas, -Spotlight, -EnrichVideoScenarios, -VideoScreenCast, -PivotViewer, -CaCommon, -Innovation, -Scorecard, or -InterComm.</value>
+  </data>
+  <data name="HelpNewsOptions" xml:space="preserve">
+    <value>See the Sitrion Social News Manager Module Documentation.</value>
+  </data>
+  <data name="HelpNoLog" xml:space="preserve">
+    <value>Use the -NoLog flag to instruct the installer not to create a log file.</value>
+  </data>
+  <data name="HelpScriptOnly" xml:space="preserve">
+    <value>Use -ScriptOnly to output the list of PowerShell commands to execute in order to complete this operation to the log file.</value>
+  </data>
+  <data name="HelpServiceApplicationFlag" xml:space="preserve">
+    <value>Use -SocialPlatform to specify the Platform Services Service Application, -News to specify the News Manager Service Application, -Enrich to specify the Enrich Service Applicationm  -Innovation to specify the Innovation Service Application, -InterComm to specify the Internal Communications Service Application, or -Video to specify the Video Service Application.  For -InterComm, use the -SocialApplicationPoolName to specify the application pool for the Social Platform Services Service Application (InterComm requires use of the same application pool as the Social Platform Services Service Application).</value>
+  </data>
+  <data name="HelpSkipPrerequisites" xml:space="preserve">
+    <value>Use -SkipPrerequisites to skip the prerequisites check during an install or upgrade operation.</value>
+  </data>
+  <data name="HelpSocialApplicationPoolName" xml:space="preserve">
+    <value>Use -SocialApplicationPoolName "&lt;Service Application Pool Name&gt;" to specify the new or existing SharePoint Service Application Pool to use for the platform services. Default: "SharePoint Web Services System" is used.</value>
+  </data>
+  <data name="HelpSocialApplicationPoolPassword" xml:space="preserve">
+    <value>Use -SocialApplicationPoolPassword "&lt;Password&gt;" to specify the password for the -SocialApplicationPoolUsername service account when creating a new SharePoint Service Application Pool. Default: None.</value>
+  </data>
+  <data name="HelpSocialApplicationPoolUsername" xml:space="preserve">
+    <value>Use -SocialApplicationPoolUsername "&lt;DOMAIN\UserName&gt;" to specify the service account to use when creating a new SharePoint Service Application Pool.  If the SharePoint Service Application Pool already exists, the service account specified here will be ignored.  If the SharePoint Service Application Pool does not already exist, but the -SocialApplicationPoolPassword is not provided, the service account specified here will be ignored.  Default: The SharePoint Farm Service Account.</value>
+  </data>
+  <data name="HelpSocialDatabaseFailoverServer" xml:space="preserve">
+    <value>Use -SocialDatabaseFailoverServer "&lt;Server Name&gt;" to specify the failover database server to install the platform services database.  Default: No failover server is used.</value>
+  </data>
+  <data name="HelpSocialDatabaseName" xml:space="preserve">
+    <value>Use -SocialDatabaseName "&lt;Database Name&gt;" to override the default platform services database name.  Default: "NewsGator_PlatformServices".</value>
+  </data>
+  <data name="HelpSocialDatabaseServer" xml:space="preserve">
+    <value>Use -SocialDatabaseServer "&lt;Server Name&gt;" to specify the database server to install the platform services database.  Default: The default SharePoint Content Database server.</value>
+  </data>
+  <data name="HelpSocialEmailListWebUrl" xml:space="preserve">
+    <value>Use -SocialEmailListWebUrl "&lt;Url&gt;" to specify the SharePoint site to install the Sitrion Social email handlers.  Default: None.</value>
+  </data>
+  <data name="HelpSocialLicenseKey" xml:space="preserve">
+    <value>Use -SocialLicenseKey "&lt;License Key&gt;" to provide the Sitrion Social license key.  If not provided when installing Sitrion Social or when provisioning the Sitrion Social Platform Services service application, the license key may be provided via the Sitrion Social Platform Services service application management page in Central Administration. Default: None.</value>
+  </data>
+  <data name="HelpSocialMySiteEnableLookout" xml:space="preserve">
+    <value>Use the -SocialMySiteEnableLookout flag to instruct the installer to enable the Sitrion Social Lookout feature on the My Site host site.</value>
+  </data>
+  <data name="HelpSocialMySiteReplaceWebParts" xml:space="preserve">
+    <value>Use the -SocialMySiteReplaceWebParts flag to instruct the installer to enable the Sitrion Social feature that replaces the default My Site Newsfeed page web parts with the default Sitrion Social web parts.</value>
+  </data>
+  <data name="HelpSocialMySiteSetLookoutAsMySiteHomePage" xml:space="preserve">
+    <value>Use the -SocialMySiteSetLookoutAsMySiteHomePage flag to instruct the installer to set the Sitrion Social Lookout page as the home page of the My Site host site.</value>
+  </data>
+  <data name="HelpSocialMySiteWebUrl" xml:space="preserve">
+    <value>Use -SocialMySiteWebUrl "&lt;Url&gt;" to specify the SharePoint My Site host site.  Default: Will attempt to locate the My Site host site.  If multiple My Site hosts are found, an error will occur.</value>
+  </data>
+  <data name="HelpSocialReportingDatabaseFailoverServer" xml:space="preserve">
+    <value>Use -SocialReportingDatabaseFailoverServer "&lt;Server Name&gt;" to specify the failover database server to install the platform services reporting database.  Default: Same as -SocialDatabaseFailoverServer if specified, otherwise no failover server is used.</value>
+  </data>
+  <data name="HelpSocialReportingDatabaseName" xml:space="preserve">
+    <value>Use -SocialReportingDatabaseName "&lt;Database Name&gt;" to override the default platform services reporting database name.  Default: "NewsGator_Reporting".</value>
+  </data>
+  <data name="HelpSocialReportingDatabaseServer" xml:space="preserve">
+    <value>Use -SocialReportingDatabaseServer "&lt;Server Name&gt;" to specify the database server to install the platform services reporting database.  Default: Same as -SocialDatabaseServer if specified, otherwise the default SharePoint Content Database server.</value>
+  </data>
+  <data name="HelpSolutionName" xml:space="preserve">
+    <value>Sitrion Social solution file name (solutionname.wsp) to process.</value>
+  </data>
+  <data name="HelpStopIis" xml:space="preserve">
+    <value>Use -StopIis to stop Internet Information Services during this process instead of restarting it.  Internet Information Services will be restarted at the end of the process.</value>
+  </data>
+  <data name="HelpUseTimerJob" xml:space="preserve">
+    <value>Use -UseTimerJob to perform server-specific operations in a SharePoint timer job when operations cannot be executed remotely (when firewall rules prevent it, for instance).</value>
+  </data>
+  <data name="HelpVideoOptions" xml:space="preserve">
+    <value>See the Sitrion Social Video Module Documentation.</value>
+  </data>
+  <data name="HelpWebApplications" xml:space="preserve">
+    <value>Use -WebApplications "&lt;Url 1&gt;", "&lt;Url 2&gt;" to specify specific SharePoint Web Applications to enable Sitrion Social features -OR- use -AllWebApplications to specify all SharePoint Content Web Applications. Default: All SharePoint Content Web Applications will be used for a new install and the existing Content Web Applications will be used for updates or repairs.</value>
+  </data>
+  <data name="ShouldProcessUninstallMessage" xml:space="preserve">
+    <value>Uninstalling Sitrion Social</value>
+  </data>
+  <data name="ShouldProcessUninstallModuleMessage" xml:space="preserve">
+    <value>Uninstalling Sitrion Social Module</value>
+  </data>
+</root>

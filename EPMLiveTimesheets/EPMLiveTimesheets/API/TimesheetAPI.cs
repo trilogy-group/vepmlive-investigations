@@ -1,27 +1,32 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using Microsoft.SharePoint;
-using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using System.Data;
-using System.Collections;
-using EPMLiveCore.ReportingProxy;
-using System.Globalization;
 using EPMLiveCore.API;
-using TimeSheets.Models;
-using System.ComponentModel;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 using TimeSheets.Log;
-using System.Transactions;
-using System.Text.RegularExpressions;
+using TimeSheets.Models;
+using CoreReportHelper = EPMLiveCore.ReportHelper;
+using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
 
 namespace TimeSheets
 {
     public class TimesheetAPI
     {
         private static int myworktableid = 6;
+        private const string UnSubmitTimesheetTemplate = "<UnSubmitTimesheet Status=\"{0}\">{1}</UnSubmitTimesheet>";
+        private const string GridIoResultTemplate = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
+        private const string StopWatchResultTemplate = "<StopWatch Status=\"{0}\">{1}</StopWatch>";
+        private const string GetOtherHoursResultTemplate = "<GetOtherHours Status=\"{0}\">{1}</GetOtherHours>";
 
         static TimesheetAPI()
         {
@@ -34,22 +39,22 @@ namespace TimeSheets
         {
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                string id = docTimesheet.FirstChild.Attributes["ID"].Value;
-                ArrayList rows = new ArrayList(docTimesheet.FirstChild.Attributes["Rows"].Value.Split(','));
+                var id = docTimesheet.FirstChild.Attributes["ID"].Value;
+                var rows = new ArrayList(docTimesheet.FirstChild.Attributes["Rows"].Value.Split(','));
 
-                XmlDocument docRet = new XmlDocument();
+                var docRet = new XmlDocument();
                 docRet.LoadXml("<Grid><IO/><Changes/></Grid>");
 
-                XmlNode ndB = docRet.FirstChild.SelectSingleNode("//Changes");
+                var nodeData = docRet.FirstChild.SelectSingleNode("//Changes");
 
-                TimesheetSettings settings = new TimesheetSettings(oWeb);
+                var settings = new TimesheetSettings(oWeb);
 
-                ArrayList arrLookups = new ArrayList();
+                var arrLookups = new ArrayList();
 
-                SPList lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
+                var lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
 
                 if (lstMyWork != null)
                 {
@@ -57,124 +62,145 @@ namespace TimeSheets
                     {
                         if (field.Type == SPFieldType.Lookup)
                         {
-
                             arrLookups.Add(field.InternalName + "Text");
-
                         }
                     }
                 }
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SqlCommand cmd = new SqlCommand("SELECT USER_ID, PERIOD_ID FROM         dbo.TSTIMESHEET INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid", cn);
-                cmd.Parameters.AddWithValue("@uid", id);
-                SqlDataReader drTS = cmd.ExecuteReader();
-
-                string sUser = "";
-                string sPeriod = "";
-
-                if (drTS.Read())
-                {
-                    sUser = drTS.GetInt32(0).ToString();
-                    sPeriod = drTS.GetInt32(1).ToString();
-                }
-                drTS.Close();
-
-                if (sUser == "")
-                {
-                    return "<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>";
-                }
-                else
-                {
-                    SPUser user = GetUser(oWeb, sUser);
-
-                    if (user.ID.ToString() == sUser)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
 
-                        DataSet dsTS = iGetTSData(cn, oWeb, user, sPeriod);
-
-                        bool bCanEdit = true;
-
-                        if (dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                    var userId = string.Empty;
+                    var periodString = string.Empty;
+                    using (var command = new SqlCommand(
+                        @"SELECT USER_ID, PERIOD_ID 
+                        FROM dbo.TSTIMESHEET 
+                        INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID 
+                        where TS_UID=@uid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@uid", id);
+                        using (var reader = command.ExecuteReader())
                         {
-                            bCanEdit = false;
-                        }
-
-                        ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, oWeb, sPeriod);
-
-                        try
-                        {
-                            cn.Close();
-                        }
-                        catch { }
-
-                        foreach (DataRow dr in dsTS.Tables[2].Rows)
-                        {
-                            if (!rows.Contains(dr["TS_ITEM_UID"].ToString()))
+                            if (reader.Read())
                             {
-                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, oWeb);
-
-                                XmlAttribute attr = docRet.CreateAttribute("Added");
-                                attr.Value = "1";
-                                nd.Attributes.Append(attr);
-
-                                ndB.AppendChild(nd);
+                                userId = reader.GetInt32(0).ToString();
+                                periodString = reader.GetInt32(1).ToString();
                             }
                         }
                     }
+
+                    if (string.IsNullOrWhiteSpace(userId))
+                    {
+                        return string.Format(GridIoResultTemplate, -1, "Could not determine user");
+                    }
                     else
                     {
-                        return "<Grid><IO Result=\"-1\" Message=\"User mismatch or access denied\"/></Grid>";
-                    }
-                }
+                        var user = GetUser(oWeb, userId);
+                        if (user.ID.ToString() == userId)
+                        {
+                            var dataSetTimestamp = GetTSDataSet(connection, oWeb, user, periodString);
+                            var canEdit = true;
 
-                return docRet.OuterXml;
+                            bool submitted;
+                            bool.TryParse(dataSetTimestamp.Tables[1].Rows[0]["SUBMITTED"].ToString(), out submitted);
+                            if (submitted)
+                            {
+                                canEdit = false;
+                            }
+
+                            var arrPeriods = GetPeriodDaysArray(connection, settings, oWeb, periodString);
+
+                            foreach (DataRow row in dataSetTimestamp.Tables[2].Rows)
+                            {
+                                if (!rows.Contains(row["TS_ITEM_UID"].ToString()))
+                                {
+                                    var node = CreateTSRow(
+                                        ref docRet,
+                                        dataSetTimestamp,
+                                        row,
+                                        arrLookups,
+                                        arrPeriods,
+                                        settings,
+                                        canEdit,
+                                        oWeb);
+
+                                    var attr = docRet.CreateAttribute("Added");
+                                    attr.Value = "1";
+                                    node.Attributes.Append(attr);
+
+                                    nodeData.AppendChild(node);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return string.Format(GridIoResultTemplate, -1, "User mismatch or access denied");
+                        }
+                    }
+
+                    return docRet.OuterXml;
+                }
+                finally
+                {
+                    connection?.Dispose();
+                }
             }
             catch (Exception ex)
             {
-                return "<Grid><IO Result=\"-1\" Message=\"" + ex.Message + "\"/></Grid>";
+                var message = string.Format(GridIoResultTemplate, -1, ex.Message);
+                Logger.WriteLog(Logger.Category.Unexpected, message, ex.ToString());
+                return message;
             }
         }
 
         public static string GetOtherHours(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
+
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var hours = 0D;
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        @"SELECT SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours 
+                        FROM dbo.TSITEMHOURS 
+                        INNER JOIN dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID 
+                        where LIST_UID=@listid and ITEM_ID=@itemid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
+                        command.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
 
-                SqlCommand cmd = new SqlCommand(@"SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours
-                                                    FROM         dbo.TSITEMHOURS INNER JOIN
-                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid", cn);
-                cmd.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
-                cmd.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
-
-                double hours = 0;
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read() && !dr.IsDBNull(0))
-                    hours = dr.GetDouble(0);
-                dr.Close();
-
-                cn.Close();
-
-                return "<GetOtherHours Status=\"0\">" + hours + "</GetOtherHours>";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read() && !reader.IsDBNull(0))
+                            {
+                                hours = reader.GetDouble(0);
+                            }
+                        }
+                    }
+                }
+                return string.Format(GetOtherHoursResultTemplate, 0, hours);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<GetOtherHours Status=\"1\">" + ex.Message + "</GetOtherHours>";
+                var message = string.Format(GetOtherHoursResultTemplate, 1, exception.Message);
+                Logger.WriteLog(Logger.Category.Unexpected, message, exception.ToString());
+                return message;
             }
         }
 
@@ -463,90 +489,111 @@ namespace TimeSheets
         {
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
+                var tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var message = string.Empty;
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                int userid = 0;
-
-                if (dr.Read())
-                {
-                    userid = dr.GetInt32(0);
-                }
-                dr.Close();
-
-                string message = "";
-
-                if (userid != 0)
-                {
-
-
-                    SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
-
-                    if (user.ID != userid)
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        message = "<UnSubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        connection = new SqlConnection(
+                            EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
+
+                    var userid = 0;
+                    using (var command = new SqlCommand(
+                        @"SELECT dbo.TSUSER.USER_ID FROM dbo.TSUSER 
+                        INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID 
+                        WHERE TS_UID=@tsuid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                userid = reader.GetInt32(0);
+                            }
+                        }
                     }
-                    else
+
+                    if (userid != 0)
                     {
-                        TimesheetSettings settings = new TimesheetSettings(oWeb);
+                        var user = GetUser(oWeb, userid.ToString());
 
-                        cmd = new SqlCommand("SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        bool bLocked = false;
-                        int approval = 0;
-                        dr = cmd.ExecuteReader();
-                        if (dr.Read())
+                        if (user.ID != userid)
                         {
-                            bLocked = dr.GetBoolean(0);
-                            approval = dr.GetInt32(1);
-                        }
-                        dr.Close();
-
-                        if (bLocked)
-                        {
-                            message = "<UnSubmitTimesheet Status=\"4\">That timesheet is locked.</UnSubmitTimesheet>";
-                        }
-                        else if (approval == 1 && !settings.DisableApprovals)
-                        {
-                            message = "<UnSubmitTimesheet Status=\"3\">That timesheet has already been approved.</UnSubmitTimesheet>";
+                            message = string.Format(UnSubmitTimesheetTemplate, 3, "You do not have access to edit that timesheet.");
                         }
                         else
                         {
+                            var settings = new TimesheetSettings(oWeb);
+                            var bLocked = false;
+                            var approval = 0;
+                            using (var command = new SqlCommand(
+                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", 
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    if (reader.Read())
+                                    {
+                                        bLocked = reader.GetBoolean(0);
+                                        approval = reader.GetInt32(1);
+                                    }
+                                }
+                            }
 
-                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
-                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                            cmd.ExecuteNonQuery();
+                            if (bLocked)
+                            {
+                                message = string.Format(UnSubmitTimesheetTemplate, 4, "That timesheet is locked.");
+                            }
+                            else if (approval == 1 && !settings.DisableApprovals)
+                            {
+                                message = string.Format(UnSubmitTimesheetTemplate, 3, "That timesheet has already been approved.");
+                            }
+                            else
+                            {
+                                using (var command = new SqlCommand(
+                                    @"Update TSTIMESHEET set 
+                                    submitted=0,APPROVAL_STATUS=0,APPROVAL_DATE=NULL,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name 
+                                    where TS_UID=@tsuid",
+                                    connection))
+                                {
+                                    command.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
+                                    command.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.ExecuteNonQuery();
+                                }
 
-                            message = "<UnSubmitTimesheet Status=\"0\"></UnSubmitTimesheet>";
+                                message = string.Format(UnSubmitTimesheetTemplate, 0, string.Empty);
+                            }
                         }
                     }
+                    else
+                    {
+                        message = string.Format(UnSubmitTimesheetTemplate, 2, "Invalid user found for timesheet.");
+                    }
                 }
-                else
-                    message = "<UnSubmitTimesheet Status=\"2\">Invalid user found for timesheet.</UnSubmitTimesheet>";
-
-                cn.Close();
+                finally
+                {
+                    connection?.Dispose();
+                }
 
                 return message;
             }
             catch (Exception ex)
             {
-                return "<UnSubmitTimesheet Status=\"1\">Error: " + ex.Message + "</UnSubmitTimesheet>";
+
+                var errorMessage = $"<UnSubmitTimesheet Status=\"1\">Error: {ex.Message}</UnSubmitTimesheet>";
+                Logger.WriteLog(Logger.Category.Unexpected, errorMessage, ex.ToString());
+                return errorMessage;
             }
         }
 
@@ -1101,72 +1148,86 @@ namespace TimeSheets
 
                 string tsuid = docTimesheet.FirstChild.Attributes["TSUID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                SqlConnection connection = null;
+                try
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                bool submitted = false;
-
-                SqlCommand cmd = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    submitted = dr.GetBoolean(0);
-                }
-                dr.Close();
-
-                if (!submitted)
-                {
-                    int status = 3;
-
-                    cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                    dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        status = dr.GetInt32(0);
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
+
+                    var submitted = false;
+                    using (var command = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                submitted = reader.GetBoolean(0);
+                            }
+                        }
                     }
-                    dr.Close();
 
-                    if (status == 3)
+                    if (!submitted)
                     {
-                        // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
-                        if (bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
-                            CheckNonTeamMemberAllocation(oWeb, tsuid, cn, data);
+                        int status = 3;
 
-                        cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.ExecuteNonQuery();
+                        using (var cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", connection))
+                        {
+                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    status = reader.GetInt32(0);
+                                }
+                            }
+                        }
 
-                        cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,31,@USERID,@JOBDATA)", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                        cmd.Parameters.AddWithValue("@JOBDATA", data);
-                        cmd.ExecuteNonQuery();
+                        if (status == 3)
+                        {
+                            // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
+                            if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
+                            {
+                                CheckNonTeamMemberAllocation(oWeb, tsuid, connection, data);
+                            }
 
-                        cn.Close();
+                            using (var command = new SqlCommand(
+                                "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                command.ExecuteNonQuery();
+                            }
 
-                        return "<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>";
+                            using (var command = new SqlCommand(
+                                @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
+                              VALUES(@tsuid,0,31,@USERID,@JOBDATA)",
+                                connection))
+                            {
+                                command.Parameters.AddWithValue("@tsuid", tsuid);
+                                command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                command.Parameters.AddWithValue("@JOBDATA", data);
+                                command.ExecuteNonQuery();
+                            }
+                            return "<SaveTimesheet Status=\"0\">Save Queued</SaveTimesheet>";
+                        }
+                        else
+                        {
+                            return "<SaveTimesheet Status=\"2\">Timesheet is already being processed.</SaveTimesheet>";
+                        }
                     }
                     else
                     {
-                        cn.Close();
-
-                        return "<SaveTimesheet Status=\"2\">Timesheet is already being processed.</SaveTimesheet>";
+                        return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
                     }
                 }
-                else
+                finally
                 {
-                    cn.Close();
-
-                    return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
+                    connection?.Dispose();
                 }
-
             }
             catch (Exception ex)
             {
@@ -1181,67 +1242,90 @@ namespace TimeSheets
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
-                string userid = "";
+                var tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var userid = string.Empty;
                 try
                 {
                     userid = doc.FirstChild.Attributes["UserId"].Value;
                 }
-                catch { }
-
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                catch
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                SPUser user = GetUser(oWeb, userid);
-
-                SqlCommand cmd = new SqlCommand("SELECT  *   FROM         dbo.TSITEM INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID where USER_ID=@userid and site_uid=@siteid", cn);
-                cmd.Parameters.AddWithValue("@userid", user.ID);
-                cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
-
-                bool bError = false;
-                string sMessage = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    bError = true;
-                    sMessage = "Timer already started on another item.";
-                }
-                dr.Close();
-
-                if (!bError)
-                {
-
-                    DateTime dt = DateTime.Now;
-                    cmd = new SqlCommand("INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)", cn);
-                    cmd.Parameters.AddWithValue("@tsitemuid", tsuid);
-                    cmd.Parameters.AddWithValue("@dt", dt);
-                    cmd.Parameters.AddWithValue("@userid", user.ID);
-                    cmd.ExecuteNonQuery();
-
-                    sMessage = dt.ToString("F");
-
+                    Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        $"No UserId in {nameof(data)} document.");
                 }
 
-                cn.Close();
-
-                if (bError)
+                var isError = false;
+                var message = string.Empty;
+                SqlConnection connection = null;
+                try
                 {
-                    return "<StopWatch Status=\"1\">Error: " + sMessage + "</StopWatch>";
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                            connection.Open();
+                        });
+
+                    var user = GetUser(oWeb, userid);
+
+                    using (var command = new SqlCommand(
+                        @"SELECT * FROM dbo.TSITEM 
+                         INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
+                         INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
+                         where USER_ID=@userid and site_uid=@siteid", 
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@userid", user.ID);
+                        command.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isError = true;
+                                message = "Timer already started on another item.";
+                            }
+                        }
+                    }
+
+                    if (!isError)
+                    {
+                        var now = DateTime.Now;
+                        using (var command = new SqlCommand(
+                            @"INSERT INTO TSSW (TSITEMUID, STARTED, USER_ID) VALUES (@tsitemuid, @dt, @userid)",
+                            connection))
+                        {
+                            command.Parameters.AddWithValue("@tsitemuid", tsuid);
+                            command.Parameters.AddWithValue("@dt", now);
+                            command.Parameters.AddWithValue("@userid", user.ID);
+                            command.ExecuteNonQuery();
+                        }
+                        message = now.ToString("F");
+                    }
+                }
+                finally
+                {
+                    connection?.Dispose();
+                }
+
+                if (isError)
+                {
+                    return string.Format(StopWatchResultTemplate, 1, $"Error: {message}");
                 }
                 else
                 {
-                    return "<StopWatch Status=\"0\">" + sMessage + "</StopWatch>";
+                    return string.Format(StopWatchResultTemplate, 0, message);
                 }
-
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
+                var errorMessage = string.Format(StopWatchResultTemplate, 1, $"Error: {exception.Message}");
+                Logger.WriteLog(
+                        Logger.Category.Unexpected,
+                        "TimeSheetAPI Approve TimeSheet",
+                        errorMessage);
+                return errorMessage;
             }
         }
 
@@ -1298,64 +1382,84 @@ namespace TimeSheets
 
         public static string CheckApproveStatus(string data, SPWeb oWeb)
         {
+            if (oWeb == null)
+            {
+                throw new ArgumentNullException(nameof(oWeb));
+            }
 
             try
             {
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                string tsuid = doc.FirstChild.Attributes["ID"].Value;
+                var timeSheetUid = doc.FirstChild.Attributes["ID"].Value;
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                var status = -1;
+                var percentComplete = 0;
+                var result = string.Empty;
+                var resultText = string.Empty;
+                var approvalStatus = 0;
+
+                using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
+                    using (var command = new SqlCommand(
+                        "SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
 
-                SqlCommand cmd = new SqlCommand("SELECT STATUS,PERCENTCOMPLETE,RESULT,RESULTTEXT FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                status = reader.GetInt32(0);
+                                if (!reader.IsDBNull(1))
+                                {
+                                    percentComplete = reader.GetInt32(1);
+                                }
+                                if (!reader.IsDBNull(2))
+                                {
+                                    result = reader.GetString(2);
+                                }
+                                if (!reader.IsDBNull(3))
+                                {
+                                    resultText = reader.GetString(3);
+                                }
+                            }
+                        }
+                    }
 
-                int status = -1;
-                int pct = 0;
-                string result = "";
-                string resulttext = "";
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    status = dr.GetInt32(0);
-                    if (!dr.IsDBNull(1))
-                        pct = dr.GetInt32(1);
-                    if (!dr.IsDBNull(2))
-                        result = dr.GetString(2);
-                    if (!dr.IsDBNull(3))
-                        resulttext = dr.GetString(3);
+                    using (var command = new SqlCommand(
+                        "SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@tsuid", timeSheetUid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                approvalStatus = reader.GetInt32(0);
+                            }
+                            reader.Close();
+                        }
+                    }
                 }
-                dr.Close();
 
-                cmd = new SqlCommand("SELECT APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                dr = cmd.ExecuteReader();
-
-                int approvalstatus = 0;
-
-                if (dr.Read())
-                {
-                    approvalstatus = dr.GetInt32(0);
-                }
-                dr.Close();
-
-                cn.Close();
-
-
-                return "<ApproveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\" ApprovalStatus=\"" + approvalstatus + "\"></ApproveStatus>";
-
-
+                var message = string.Format(
+                    "<ApproveStatus Result=\"0\" Status=\"{0}\" PercentComplete=\"{1}\" ErrorResult=\"{2}\" " +
+                    "ResultText=\"{3}\" ApprovalStatus=\"{4}\"></ApproveStatus>",
+                    status,
+                    percentComplete,
+                    result,
+                    resultText,
+                    approvalStatus);
+                return message;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                return "<ApproveStatus Result=\"1\">Error: " + ex.Message + "</ApproveStatus>";
+                return string.Format(
+                    "<ApproveStatus Result=\"1\">Error: {0}</ApproveStatus>",
+                    exception.Message);
             }
         }
 
@@ -1562,215 +1666,246 @@ namespace TimeSheets
         {
             return ApproveTimesheetsCore(data, oWeb, transaction);
         }
+
         public static string ApproveTimesheetsCore(string data, SPWeb oWeb, SqlTransaction transaction = null)
         {
             try
             {
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.LoadXml(data);
 
-                //XmlNode ndPeriod = doc.FirstChild.SelectSingleNode("//Period");
-                XmlNodeList ndTS = doc.FirstChild.SelectNodes("//TS");
+                var timesheetNodes = doc.FirstChild.SelectNodes("//TS");
 
-                string ApprovalStatus = "1";
+                var approvalStatus = "1";
                 try
                 {
-                    ApprovalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
+                    approvalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
                 }
-                catch { }
-
-                string outData = "";
-                bool errors = false;
-
-                //if(ndPeriod == null)
-                //{
-                //    throw new EPMLiveCore.API.APIException(900001, "No Period Provided");
-                //}
-                //else 
-                if (ndTS.Count <= 0)
+                catch(Exception exception)
                 {
-                    throw new EPMLiveCore.API.APIException(900002, "No submitted timesheets were selected");
+                    Trace.TraceError(exception.ToString());
+                }
+
+                var outData = new StringBuilder();
+                var errors = false;
+
+                if (timesheetNodes.Count <= 0)
+                {
+                    throw new APIException(900002, "No submitted timesheets were selected");
                 }
                 else
                 {
+                    outData.Append("<Approve>");
 
-                    //Guid tJob = Guid.NewGuid();
+                    bool liveHours;
+                    bool.TryParse(EpmCoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
-                    //SqlCommand cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, jobdata, [key]) VALUES (@timerjobuid, @siteguid, 30, 'Timesheet Approval', 0, @jobdata, @key)", cn);
-                    //cmd.Parameters.AddWithValue("@siteguid", oWeb.Site.ID);
-                    //cmd.Parameters.AddWithValue("@jobdata", ndTS.InnerText);
-                    //cmd.Parameters.AddWithValue("@timerjobuid", tJob);
-                    //cmd.Parameters.AddWithValue("@key", ndPeriod.InnerText);
-                    //cmd.ExecuteNonQuery();
-
-                    //EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
-
-
-                    outData = "<Approve>";
-
-                    bool liveHours = false;
-
-                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
-
-
-                    //string[] tsUids = ndTS.InnerText.Split(',');
-
-                    int status = 3;
+                    var status = 3;
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+                        using (var connection =
+                        new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                         {
-                            cn.Open();
-                            foreach (XmlNode TS in ndTS)
+                            connection.Open();
+                            foreach (XmlNode timesheetNode in timesheetNodes)
                             {
-                                //if (tsUid != "")
+                                try
                                 {
-                                    try
+                                    using (var command = new SqlCommand(
+                                        @"update TSTIMESHEET 
+                                          set approval_status=@status,approval_notes=@notes,approval_date=GETDATE()
+                                          where ts_uid=@ts_uid",
+                                        transaction == null ? connection : transaction.Connection))
                                     {
-                                        //string[] tsData = tsUid.Split('|');
-
-                                        SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE()"
-                                            +"where ts_uid=@ts_uid", transaction == null ? cn : transaction.Connection);
                                         if (transaction != null)
                                         {
-                                            cmd.Transaction = transaction;
+                                            command.Transaction = transaction;
                                         }
-                                        cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                        cmd.Parameters.AddWithValue("@notes", TS.InnerText);
-                                        cmd.Parameters.AddWithValue("@status", ApprovalStatus);
-                                                                                  
-                                        cmd.ExecuteNonQuery();
+                                        command.Parameters.AddWithValue("@ts_uid", timesheetNode.Attributes["id"].Value);
+                                        command.Parameters.AddWithValue("@notes", timesheetNode.InnerText);
+                                        command.Parameters.AddWithValue("@status", approvalStatus);
 
-                                        if (!liveHours)
+                                        command.ExecuteNonQuery(); 
+                                    }
+
+                                    if (!liveHours)
+                                    {
+                                        using(var command = new SqlCommand(
+                                            "SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
+                                            connection))
                                         {
-                                            cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
+                                            command.Parameters.AddWithValue("@tsuid", timesheetNode.Attributes["id"].Value);
 
-                                            SqlDataReader dr = cmd.ExecuteReader();
-                                            if (dr.Read())
+                                            using (var reader = command.ExecuteReader())
                                             {
-                                                status = dr.GetInt32(0);
-                                            }
-                                            dr.Close();
-
-                                            if (status == 3)
-                                            {
-                                                cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                                cmd.ExecuteNonQuery();
-
-                                                cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
-                                                cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
-                                                cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                                // if (tsData.Length > 1)
-                                                //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
-                                                //else
-                                                cmd.Parameters.AddWithValue("@JOBDATA", "");
-                                                cmd.ExecuteNonQuery();
-
-                                            }
-
-                                        }
-
-                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
-                                        if (ApprovalStatus == "2")
-                                        {
-                                            Guid tuseruid = Guid.Empty;
-                                            int sharepointaccountid = 0;
-                                            string emailto = string.Empty;
-                                            string emailcontent = string.Empty;
-                                            string ResourceName = "";
-                                            cmd = new SqlCommand("Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid", cn);
-                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                            using (SqlDataReader dr = cmd.ExecuteReader())
-                                            {
-
-                                                if (dr.Read())
+                                                if (reader.Read())
                                                 {
-                                                    ResourceName = Convert.ToString(dr["RESOURCENAME"]);
-                                                    tuseruid = Guid.Parse(Convert.ToString(dr["TSUSER_UID"]));
+                                                    status = reader.GetInt32(0);
+                                                }
+                                            }
+                                        }
+
+                                        if (status == 3)
+                                        {
+                                            using (var command = new SqlCommand(
+                                                                    "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
+                                                                    connection))
+                                            {
+                                                command.Parameters.AddWithValue("@tsuid", timesheetNode.Attributes["id"].Value);
+                                                command.ExecuteNonQuery();
+                                            }
+
+                                            using (var command = 
+                                                new SqlCommand(
+                                                    "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)",
+                                                    connection))
+                                            {
+                                                command.Parameters.AddWithValue("@tsuid", timesheetNode.Attributes["id"].Value);
+                                                command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                                command.Parameters.AddWithValue("@JOBDATA", "");
+                                                command.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+
+                                    outData.AppendFormat("<TS id='{0}' Status=\"0\"/>", timesheetNode.Attributes["id"].Value);
+
+                                    if (approvalStatus == "2")
+                                    {
+                                        var userUid = Guid.Empty;
+                                        var sharepointaccountid = 0;
+                                        var emailTo = string.Empty;
+                                        var emailcontent = string.Empty;
+                                        var ResourceName = string.Empty;
+                                        using (var command =
+                                            new SqlCommand(
+                                                "Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid",
+                                                connection))
+                                        {
+                                            command.Parameters.AddWithValue("@ts_uid", timesheetNode.Attributes["id"].Value);
+                                            using (var reader = command.ExecuteReader())
+                                            {
+                                                if (reader.Read())
+                                                {
+                                                    ResourceName = Convert.ToString(reader["RESOURCENAME"]);
+                                                    userUid = Guid.Parse(Convert.ToString(reader["TSUSER_UID"]));
 
                                                 }
                                             }
-                                            cmd = new SqlCommand("SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid", cn);
-                                            cmd.Parameters.AddWithValue("@tsuser_uid", tuseruid);
-                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                        }
+
+                                        using (var command = new SqlCommand(
+                                                                "SELECT USER_ID FROM TSUSER where TSUSERUID=@tsuser_uid",
+                                                                connection))
+                                        {
+                                            command.Parameters.AddWithValue("@tsuser_uid", userUid);
+                                            using (var reader = command.ExecuteReader())
                                             {
-                                                if (dr.Read())
+                                                if (reader.Read())
                                                 {
-                                                    sharepointaccountid = Convert.ToInt32(dr["USER_ID"]);
+                                                    sharepointaccountid = Convert.ToInt32(reader["USER_ID"]);
                                                 }
                                             }
-                                            //Getting reciepient email address
-                                            SPSecurity.RunWithElevatedPrivileges(() =>
+                                        }
+
+                                        //Getting reciepient email address
+                                        SPSecurity.RunWithElevatedPrivileges(() =>
+                                        {
+                                            using (var reportingConnection =
+                                                new SqlConnection(
+                                                    EpmCoreFunctions.getReportingConnectionString(
+                                                        oWeb.Site.WebApplication.Id,
+                                                        oWeb.Site.ID)))
                                             {
-                                                using (SqlConnection rptcon = new SqlConnection(EPMLiveCore.CoreFunctions.getReportingConnectionString(oWeb.Site.WebApplication.Id, oWeb.Site.ID)))
+                                                reportingConnection.Open();
+                                                using (var command =
+                                                    new SqlCommand(
+                                                        "Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid",
+                                                        reportingConnection))
                                                 {
-                                                    rptcon.Open();
-                                                    cmd = new SqlCommand("Select Email from LSTResourcepool where SharePointAccountID=@sharepointaccountid", rptcon);
-                                                    cmd.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
-                                                    using (SqlDataReader dr = cmd.ExecuteReader())
+                                                    command.Parameters.AddWithValue("@sharepointaccountid", sharepointaccountid);
+                                                    using (var reader = command.ExecuteReader())
                                                     {
-                                                        if (dr.Read())
+                                                        if (reader.Read())
                                                         {
-                                                            emailto = Convert.ToString(dr["Email"]);
+                                                            emailTo = Convert.ToString(reader["Email"]);
                                                         }
                                                     }
                                                 }
-                                            });
-                                            //Getting List pf rejected entries
-                                            cmd = new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", cn);
-                                            cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
-                                            using (SqlDataReader dr = cmd.ExecuteReader())
+                                            }
+                                        });
+
+                                        //Getting List pf rejected entries
+                                        using (var command =
+                                            new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", connection))
+                                        {
+                                            command.Parameters.AddWithValue("@ts_uid", timesheetNode.Attributes["id"].Value);
+                                            using (var reader = command.ExecuteReader())
                                             {
-                                                while (dr.Read())
+                                                while (reader.Read())
                                                 {
-                                                    emailcontent += "<li>" + dr["Title"] + "</li>";
+                                                    emailcontent += "<li>" + reader["Title"] + "</li>";
                                                 }
                                             }
+                                        }
 
-
-                                            if (!string.IsNullOrEmpty(emailto))
+                                        if (!string.IsNullOrWhiteSpace(emailTo))
+                                        {
+                                            var emaillist = new List<string>();
+                                            emaillist.Add(emailTo);
+                                            try
                                             {
-                                                List<string> emaillist = new List<string>();
-                                                emaillist.Add(emailto);
-                                                try
-                                                {
-                                                    APIEmail.sendEmail(TIMESHEET_REJECTION_NOTIFICATION,
-                                                           new Hashtable() { { "TimesheetUser_Name", ResourceName },
-                                      { "Element_Entries", emailcontent } },
-                                                           emaillist, string.Empty, oWeb, true);
-                                                }
-                                                catch (Exception ex)
-                                                {
-
-                                                    Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
-                                                }
-
+                                                APIEmail.sendEmail(
+                                                    TIMESHEET_REJECTION_NOTIFICATION,
+                                                    new Hashtable()
+                                                    {
+                                                        { "TimesheetUser_Name", ResourceName },
+                                                        { "Element_Entries", emailcontent }
+                                                    },
+                                                    emaillist,
+                                                    string.Empty,
+                                                    oWeb,
+                                                    true);
+                                            }
+                                            catch (Exception exception)
+                                            {
+                                                Logger.WriteLog(
+                                                    Logger.Category.Medium,
+                                                    "TimeSheetAPI Approve TimeSheet",
+                                                    exception.ToString());
                                             }
                                         }
                                     }
-                                    catch (Exception ex)
-                                    {
-                                        Logger.WriteLog(Logger.Category.Medium, "TimeSheetAPI Approve TimeSheet", ex.ToString());
-                                        errors = true;
-                                        outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
-                                    }
+                                }
+                                catch (Exception exception)
+                                {
+                                    Logger.WriteLog(
+                                        Logger.Category.Medium,
+                                        "TimeSheetAPI Approve TimeSheet",
+                                        exception.ToString());
+                                    errors = true;
+                                    outData.AppendFormat(
+                                        "<TS id='{0}' Status=\"2\">{1}</TS>",
+                                        timesheetNode.Attributes["id"].Value,
+                                        exception.Message);
                                 }
                             }
-                            outData += "</Approve>";
+                            outData.Append("</Approve>");
                         }
                     });
-
                 }
                 if (errors)
-                    return EPMLiveCore.API.Response.Failure(90010, outData);
+                {
+                    return Response.Failure(90010, outData.ToString());
+                }
                 else
-                    return EPMLiveCore.API.Response.Success(outData);
+                {
+                    return Response.Success(outData.ToString());
+                }
             }
-            catch (EPMLiveCore.API.APIException ex)
+            catch (APIException ex)
             {
-                return EPMLiveCore.API.Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
 
@@ -3010,7 +3145,7 @@ namespace TimeSheets
                 });
 
 
-                DataSet dsTS = iGetTSData(cn, web, user, sPeriod);
+                DataSet dsTS = GetTSDataSet(cn, web, user, sPeriod);
 
                 ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
 
@@ -3620,7 +3755,7 @@ namespace TimeSheets
             });
 
 
-            DataSet ds = iGetTSData(cn, web, user, sPeriod);
+            DataSet ds = GetTSDataSet(cn, web, user, sPeriod);
 
 
             try
@@ -3632,55 +3767,67 @@ namespace TimeSheets
             return ds.GetXml();
         }
 
-        private static DataSet iGetTSData(SqlConnection cn, SPWeb web, SPUser user, string sPeriod)
+        private static DataSet GetTSDataSet(SqlConnection connection, SPWeb web, SPUser user, string period)
         {
+            var rptData = new CoreReportHelper.MyWorkReportData(web.Site.ID);
 
-            EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
-
-            SqlCommand cmd = new SqlCommand("select TOP 1 TS_UID from TSTIMESHEET where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username", cn);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@period", sPeriod);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-
-            Guid tsuid = Guid.Empty;
-
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            var timesheetId = Guid.Empty;
+            using (var command = new SqlCommand(
+                @"select TOP 1 TS_UID from TSTIMESHEET 
+                    where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username",
+                connection))
             {
-                tsuid = dr.GetGuid(0);
-            }
-            dr.Close();
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                command.Parameters.AddWithValue("@period", period);
+                command.Parameters.AddWithValue("@username", user.LoginName);
 
-            if (tsuid == Guid.Empty)
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        timesheetId = reader.GetGuid(0);
+                    }
+                }
+            }
+
+            if (timesheetId == Guid.Empty)
             {
-                tsuid = iGenerateTSFromPast(cn, web, user, sPeriod, rptData);
+                timesheetId = iGenerateTSFromPast(connection, web, user, period, rptData);
             }
 
-            cmd = new SqlCommand("SPTSSetUser", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-            cmd.Parameters.AddWithValue("@name", user.Name);
-            cmd.Parameters.AddWithValue("@userid", user.ID);
-            cmd.ExecuteNonQuery();
-
-            cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE USER_ID=@uid", cn);
-            cmd.Parameters.AddWithValue("@uid", user.ID);
-            Guid userid = Guid.Empty;
-
-            dr = cmd.ExecuteReader();
-            if (dr.Read())
+            using (var command = new SqlCommand("SPTSSetUser", connection))
             {
-                userid = dr.GetGuid(0);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                command.Parameters.AddWithValue("@username", user.LoginName);
+                command.Parameters.AddWithValue("@name", user.Name);
+                command.Parameters.AddWithValue("@userid", user.ID);
+                command.ExecuteNonQuery();
             }
-            dr.Close();
 
-            cmd = new SqlCommand("UPDATE TSTIMESHEET SET TSUSER_UID=@uid where TS_UID=@tsuid", cn);
-            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-            cmd.Parameters.AddWithValue("@uid", userid);
-            cmd.ExecuteNonQuery();
+            var userId = Guid.Empty;
+            using (var cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE USER_ID=@uid", connection))
+            {
+                cmd.Parameters.AddWithValue("@uid", user.ID);
 
-            return iiGetTSData(cn, web, sPeriod, tsuid, rptData, Convert.ToString(user.ID));
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        userId = reader.GetGuid(0);
+                    }
+                    reader.Close();
+                }
+            }
+
+            using (var command = new SqlCommand("UPDATE TSTIMESHEET SET TSUSER_UID=@uid where TS_UID=@tsuid", connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", timesheetId);
+                command.Parameters.AddWithValue("@uid", userId);
+                command.ExecuteNonQuery();
+            }
+
+            return iiGetTSData(connection, web, period, timesheetId, rptData, Convert.ToString(user.ID));
         }
 
         private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData, string userId)
@@ -3731,7 +3878,7 @@ namespace TimeSheets
                     {
                         DataTable dtTSItem = new DataTable();
 
-                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
+                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
                         cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
                         cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
 
@@ -3741,7 +3888,8 @@ namespace TimeSheets
                         if (dtTSItem != null)
                         {
                             string project = Regex.Replace(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]), @"(\s+|@|&|'|\(|\)|<|>|#)", " ");
-                            sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) + " ProjectID, '" + project + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,0 IsAssignment,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'Task Center' WorkType, null DataSource,'true' IsDeleted ");
+                            string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
+                            sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + projectID + " ProjectID, '" + project + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,0 IsAssignment,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'" + dtTSItem.Rows[0]["LIST"] + "' WorkType, null DataSource,'true' IsDeleted ");
                             myWorkDataTable = rptData.ExecuteSql(sql);
 
                             if (myWorkDataTable.Rows.Count > 0)
@@ -4012,11 +4160,7 @@ namespace TimeSheets
                     }
                     drTS.Close();
 
-                    cmd = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", TSID);
-
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dsCur);
+                    FillTimesheetItemsDataset(TSID, dsCur, cn);
 
                     cn.Close();
 
@@ -4218,6 +4362,28 @@ namespace TimeSheets
             return docOut.OuterXml;
         }
 
+        private static void FillTimesheetItemsDataset(string id, DataSet dataSet, SqlConnection connection)
+        {
+            if (dataSet == null)
+            {
+                throw new ArgumentNullException(nameof(dataSet));
+            }
+
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            using (var command = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", connection))
+            {
+                command.Parameters.AddWithValue("@tsuid", id);
+                using (var dataAdapter = new SqlDataAdapter(command))
+                {
+                    dataAdapter.Fill(dataSet);
+                }
+            }
+        }
+
         private static DataTable GetWorkDT(SPWeb oWeb, bool bOtherWork, bool bNonWork, string userid, TimesheetSettings settings, string SearchField, string SearchText)
         {
             EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
@@ -4402,6 +4568,17 @@ namespace TimeSheets
                 return "<AddWork Status=\"1\">Error: " + ex.Message + "</AddWork>";
             }
 
+        }
+
+        private static SqlConnection GetOpenedConnection(string connectionString)
+        {
+            SqlConnection connection = null;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                connection = new SqlConnection(connectionString);
+                connection.Open();
+            });
+            return connection;
         }
     }
 }

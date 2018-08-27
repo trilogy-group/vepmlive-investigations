@@ -1,4 +1,4 @@
-﻿using EPMLiveCore.Infrastructure;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using PortfolioEngineCore;
 using System;
@@ -325,7 +325,7 @@ namespace WorkEnginePPM.DataServiceModules
                                         switch (Convert.ToInt32(_dvCostCustomFields[0]["fa_field_id"]))
                                         {
                                             case 11801:
-                                                 try { oc_01Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_01Value = 0; }
+                                                try { oc_01Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_01Value = 0; }
                                                 break;
                                             case 11802:
                                                 try { oc_02Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_02Value = 0; }
@@ -513,19 +513,19 @@ namespace WorkEnginePPM.DataServiceModules
                                 Boolean isDirty = Convert.ToBoolean(icdGrp.key.isdirty);
                                 if (!isDirty)
                                 {
-                                    dtInsertCostDetails.Rows.Add(new object[] { 
-                                    icdGrp.key.bc_uid, 
-                                    icdGrp.key.bc_seq, 
-                                    icdGrp.key.rt_uid, 
-                                    icdGrp.key.oc_01, 
-                                    icdGrp.key.oc_02, 
-                                    icdGrp.key.oc_03, 
-                                    icdGrp.key.oc_04, 
-                                    icdGrp.key.oc_05, 
-                                    icdGrp.key.text_01, 
-                                    icdGrp.key.text_02, 
-                                    icdGrp.key.text_03, 
-                                    icdGrp.key.text_04, 
+                                    dtInsertCostDetails.Rows.Add(new object[] {
+                                    icdGrp.key.bc_uid,
+                                    icdGrp.key.bc_seq,
+                                    icdGrp.key.rt_uid,
+                                    icdGrp.key.oc_01,
+                                    icdGrp.key.oc_02,
+                                    icdGrp.key.oc_03,
+                                    icdGrp.key.oc_04,
+                                    icdGrp.key.oc_05,
+                                    icdGrp.key.text_01,
+                                    icdGrp.key.text_02,
+                                    icdGrp.key.text_03,
+                                    icdGrp.key.text_04,
                                     icdGrp.key.text_05
                                 });
                                 }
@@ -619,7 +619,7 @@ namespace WorkEnginePPM.DataServiceModules
                         }
                     }
                 }
-
+                UpdateProject(projectId);
             }
             catch (Exception ex)
             {
@@ -644,6 +644,21 @@ namespace WorkEnginePPM.DataServiceModules
             }
 
             return returnValue;
+        }
+
+        private bool UpdateProject(int projectId)
+        {
+            var projectList = _spWeb.Lists["Project Center"];
+            try
+            {
+                var item = projectList.GetItemById(projectId);
+                item.Update();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         private Int32 GetMasterRecordId(string columnName, string columnValue, string foreignKeyId, string[] costCategoryArray)

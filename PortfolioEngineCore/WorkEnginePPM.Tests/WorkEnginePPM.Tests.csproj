@@ -16,6 +16,8 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,27 +36,33 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.SharePoint\v4.0_16.0.0.0__71e9bce111e9429c\Microsoft.SharePoint.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes, Version=16.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="PortfolioEngineCore.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SPEmulators">
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
@@ -65,7 +73,6 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
@@ -75,8 +82,11 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Xml.Linq.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -96,13 +106,38 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Admininfos\AllWorkhoursTests.cs" />
+    <Compile Include="DataCacheBaseTest.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
     <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
     <Compile Include="Jobs\CleanupTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperFunctionsTests.cs" />
+    <Compile Include="Testables\DataCacheBaseTestable.cs" />
+    <Compile Include="TestDoubles\CADataCache\CADataCacheGridBaseTestDouble .cs" />
+    <Compile Include="TestDoubles\CADataCache\CABottomGridTestDouble.cs" />
+    <Compile Include="TestDoubles\CADataCache\CATopGridTestDouble.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\ModelDataCacheGridBaseTestDouble.cs" />
+    <Compile Include="TestDoubles\GridBaseTestDouble.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\BottomGridTestDouble.cs" />
+    <Compile Include="TestDoubles\ModelDataCache\TopGridTestDouble.cs" />
+    <Compile Include="TestDoubles\RPADataCache\RPABottomGridTestDouble.cs" />
+    <Compile Include="TestDoubles\RPADataCache\RPATopGridTestDouble.cs" />
+    <Compile Include="WebServices\CADataCache\CADataCacheGridBaseTest.cs" />
+    <Compile Include="WebServices\CADataCache\CABottomGridTest.cs" />
+    <Compile Include="WebServices\CADataCache\CATopGridTest.cs" />
+    <Compile Include="WebServices\Core\ResourceManagerTest.cs" />
+    <Compile Include="WebServices\GridBaseTest.cs" />
+    <Compile Include="WebServices\ModelDataCache\ModelDataCacheGridBaseTest.cs" />
+    <Compile Include="WebServices\ModelDataCache\BottomGridTest.cs" />
+    <Compile Include="WebServices\ModelDataCache\TopGridTest.cs" />
+    <Compile Include="WebServices\RPADataCache\RPABottomGridTest.cs" />
+    <Compile Include="WebServices\RPADataCache\RPATopGridTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
@@ -112,6 +147,11 @@
       <Name>WorkEnginePPM</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="signature.snk" />
+  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
