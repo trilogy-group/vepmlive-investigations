@@ -94,9 +94,6 @@ namespace EPMLiveCore.Tests.API.Comments
             ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
             ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
             ShimSPFieldUserValue.AllInstances.UserGet = _ => new ShimSPUser();
-            ShimCommentManager.SetSocialEngineTransactionSPListItem = _ => { };
-            ShimCommentManager.EnsureMetaColsSPList = _ => { };
-            ShimCommentManager.InsertCommentCountStringString = (list, item) => { };
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
             ShimXMLDataManager.AllInstances.GetPropValString = (_, xml) =>
             {
@@ -155,7 +152,11 @@ namespace EPMLiveCore.Tests.API.Comments
             };
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
             {
-                TryGetListString = name => commentList
+                TryGetListString = name => commentList,
+                GetListGuidBoolean = (guid, metadata) => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem()
+                }
             };
             ShimSPListItem.AllInstances.ItemGetString = (_, name) =>
             {
@@ -206,13 +207,8 @@ namespace EPMLiveCore.Tests.API.Comments
                     }
                 }.Instance;
             };
-            ShimCommentManager.UserIsAssignedInt32SPListItem = (id, list) => false;
-            ShimCommentManager.SendEmailNotificationInt32StringStringStringString =
-                (authorId, listId, itemIt, comment, type) => true;
-            ShimCommentManager.SyncStatusUpdateToSocialStreamGuidStringGuidInt32DateTimeSPWebStringNullableOfDateTimeNullableOfGuid =
-                (id, status, listId, itemId, time, spWeb, operation, commentTime, commentId) => { };
-            ShimCommentManager.SyncToSocialStreamGuidStringGuidInt32StringStringStringListOfInt32DateTimeSPWebString =
-                (id, comment, listId, itemId, itemTitle, listTitle, url, commmenters, time, spWeb, operaiton) => { };
+            ShimSPListCollection.AllInstances.GetListByIdGuidBoolean = (_, guid, metadata) => new ShimSPList();
+            ShimSPList.AllInstances.GetItemByIdInt32 = (_, id) => new ShimSPListItem();
 
             // Act
             var result = CommentManager.CreateComment(DummyString);
@@ -247,8 +243,9 @@ namespace EPMLiveCore.Tests.API.Comments
                 switch (value)
                 {
                     case ListIdKey:
-                    case ItemIdKey:
                         return Guid.NewGuid().ToString();
+                    case ItemIdKey:
+                        return DummyItemId;
                     case CommentItemIdKey:
                         return CommentItemId.ToString();
                     default:
@@ -284,7 +281,17 @@ namespace EPMLiveCore.Tests.API.Comments
                 }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString;
-            ShimCommentManager.InsertCommentCountStringString = (listId, ItemId) => { };
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                GetListGuidBoolean = (guid, metadata) => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem(),
+                    FieldsGet = () => new ShimSPFieldCollection
+                    {
+                        GetFieldByInternalNameString = name => new ShimSPField()
+                    }
+                }
+            };
 
             // Act
             var result = CommentManager.ReadComment(DummyString);
@@ -316,7 +323,6 @@ namespace EPMLiveCore.Tests.API.Comments
             {
                 configSettingWasSet = true;
             };
-            ShimCommentManager.EnsureMetaColsSPList = null;
 
             // Act
             _privateType.InvokeStatic(EnsureMetaColsMethodName, list);
@@ -337,7 +343,6 @@ namespace EPMLiveCore.Tests.API.Comments
             var commentList = new List<int>();
             const string Operation = "ADD";
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => { };
-            ShimCommentManager.SyncToSocialStreamGuidStringGuidInt32StringStringStringListOfInt32DateTimeSPWebString = null;
 
             // Act
             Action action = () => _privateType.InvokeStatic(SyncToSocialStreamMethodName,
@@ -368,7 +373,6 @@ namespace EPMLiveCore.Tests.API.Comments
                 CurrentUserGet = () => new ShimSPUser()
             }.Instance;
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => { };
-            ShimCommentManager.SyncStatusUpdateToSocialStreamGuidStringGuidInt32DateTimeSPWebStringNullableOfDateTimeNullableOfGuid = null;
 
             // Act
             Action action = () => _privateType.InvokeStatic(SyncStatusUpdateToSocialStreamMethodName,
@@ -462,7 +466,6 @@ namespace EPMLiveCore.Tests.API.Comments
             var listId = Guid.NewGuid().ToString();
             var itemId = "1";
             ShimSPListCollection.AllInstances.TryGetListString = (_, name) => null;
-            ShimCommentManager.InsertCommentCountStringString = null;
 
             // Act
             Action action = () => CommentManager.InsertCommentCount(listId, itemId);
@@ -478,7 +481,6 @@ namespace EPMLiveCore.Tests.API.Comments
             var listId = Guid.NewGuid().ToString();
             var itemId = "1";
             var systemUpdateWasCalled = false;
-            ShimCommentManager.InsertCommentCountStringString = null;
             ShimSPListCollection.AllInstances.TryGetListString = (_, name) => new ShimSPList
             {
                 GetItemsSPQuery = query => new ShimSPListItemCollection
@@ -508,7 +510,6 @@ namespace EPMLiveCore.Tests.API.Comments
                     }
                 }
             };
-            ShimCommentManager.SetSocialEngineTransactionSPListItem = item => { };
             ShimSPListItem.AllInstances.SystemUpdate = _ =>
             {
                 systemUpdateWasCalled = true;
@@ -528,7 +529,6 @@ namespace EPMLiveCore.Tests.API.Comments
             var listId = Guid.NewGuid().ToString();
             var itemId = "1";
             var systemUpdateWasCalled = false;
-            ShimCommentManager.InsertCommentCountStringString = null;
             ShimSPListCollection.AllInstances.TryGetListString = (_, name) => new ShimSPList
             {
                 GetItemsSPQuery = query => new ShimSPListItemCollection
@@ -562,7 +562,6 @@ namespace EPMLiveCore.Tests.API.Comments
                     }
                 }
             };
-            ShimCommentManager.SetSocialEngineTransactionSPListItem = item => { };
             ShimSPListItem.AllInstances.SystemUpdate = _ =>
             {
                 systemUpdateWasCalled = true;
@@ -579,7 +578,6 @@ namespace EPMLiveCore.Tests.API.Comments
         public void SetSocialEngineTransaction_Should_SetTransaction()
         {
             // Arrange
-            ShimCommentManager.SetSocialEngineTransactionSPListItem = null;
             var setTransactionWasCalled = false;
             var listItem = new ShimSPListItem
             {
@@ -893,6 +891,13 @@ namespace EPMLiveCore.Tests.API.Comments
             {
                 deleteWasCalled = true;
             };
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                GetListGuidBoolean = (guid, metadata) => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem()
+                }
+            };
 
             // Act
             var result = CommentManager.DeleteComment(DummyString);
@@ -1069,8 +1074,6 @@ namespace EPMLiveCore.Tests.API.Comments
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, guid) => DummyString;
             ShimSPListItem.AllInstances.TitleGet = _ => DummyString;
-            ShimCommentManager.ContainsItemListOfStringArrayStringArray = (list, items) => false;
-            ShimCommentManager.GetXMLSafeVersionString = value => DummyString;
             ShimSPWeb.AllInstances.SiteUserInfoListGet = _ => new ShimSPList
             {
                 GetItemByIdInt32 = id => new ShimSPListItem
@@ -1232,11 +1235,17 @@ namespace EPMLiveCore.Tests.API.Comments
                     IDGet = () => 40
                 }
             }.Instance;
-            ShimCommentManager.SendEmailNotificationInt32StringStringStringString =
-                (userId, listId, itmId, comment, email) => true;
-            ShimCommentManager.InsertCommentCountStringString = (listId, itemId) => { };
-            ShimCommentManager.SyncToSocialStreamGuidStringGuidInt32StringStringStringListOfInt32DateTimeSPWebString =
-                (id, comment, listId, itemId, itemTitle, listTitle, url, commmenters, time, spWeb, operaiton) => { };
+            ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection
+            {
+                GetListGuidBoolean = (guid, metadata) => new ShimSPList
+                {
+                    GetItemByIdInt32 = id => new ShimSPListItem(),
+                    FieldsGet = () => new ShimSPFieldCollection
+                    {
+                        GetFieldByInternalNameString = name => new ShimSPField()
+                    }
+                }
+            };
             ShimSPListItem.AllInstances.SystemUpdate = _ =>
             {
                 systemUpdateWasCalled = true;
