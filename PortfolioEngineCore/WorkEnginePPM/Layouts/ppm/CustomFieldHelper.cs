@@ -2,6 +2,7 @@
 using System.Data;
 using System.Web;
 using PortfolioEngineCore;
+using System.Diagnostics;
 
 namespace WorkEnginePPM.Layouts.ppm
 {
@@ -60,6 +61,9 @@ namespace WorkEnginePPM.Layouts.ppm
                     break;
                 case "DeleteCustomfieldInfo":
                     reply = deleteCustomFieldInfo(httpContext, xData);
+                    break;
+                default:
+                    Trace.TraceWarning("Unexpected requestContext '{0}'.", requestContext);
                     break;
             }
 
