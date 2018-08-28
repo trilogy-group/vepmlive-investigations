@@ -470,7 +470,7 @@ namespace WorkEnginePPM.Tests.WebServices
             var id = 0;
             var level = 0;
             var groupLevel = 0;
-            var value = string.Empty;
+            var elementValue = string.Empty;
 
             _testObj.NewGrouping();
             _testObj.DefineItemValues(DummyOne, DummyOne, DummyOne, DummyOne, DummyString, DummyString);
@@ -492,7 +492,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _testObj.CalculateGrouplingList(DummyOne, DummyFour);
 
             // Act
-            var result = _testObj.ElementDetails(DummyOne, ref group, ref id, ref level, ref groupLevel, ref value);
+            var result = _testObj.ElementDetails(DummyOne, ref group, ref id, ref level, ref groupLevel, ref elementValue);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -501,7 +501,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => id.ShouldBe(DummyOne),
                 () => level.ShouldBe(DummyOne),
                 () => groupLevel.ShouldBe(DummyOne),
-                () => value.ShouldBe(DummyString));
+                () => elementValue.ShouldBe(DummyString));
         }
 
         [TestMethod]
@@ -512,7 +512,7 @@ namespace WorkEnginePPM.Tests.WebServices
             var id = 0;
             var level = 0;
             var groupLevel = 0;
-            var value = string.Empty;
+            var elementValue = string.Empty;
 
             _testObj.NewGrouping();
 
@@ -524,7 +524,7 @@ namespace WorkEnginePPM.Tests.WebServices
             _testObj.CalculateGrouplingList(DummyOne, DummyZero);
 
             // Act
-            var result = _testObj.ElementDetails(DummyOne, ref group, ref id, ref level, ref groupLevel, ref value);
+            var result = _testObj.ElementDetails(DummyOne, ref group, ref id, ref level, ref groupLevel, ref elementValue);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -533,7 +533,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 () => id.ShouldBe(DummyOne),
                 () => level.ShouldBe(DummyOne),
                 () => groupLevel.ShouldBe(DummyZero),
-                () => value.ShouldBe(DummyString));
+                () => elementValue.ShouldBe(DummyString));
         }
     }
 }
