@@ -2,74 +2,75 @@
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Register TagPrefix="wssuc" TagName="InputFormSection" src="~/_controltemplates/InputFormSection.ascx" %>
-<%@ Register TagPrefix="wssuc" TagName="InputFormControl" src="~/_controltemplates/InputFormControl.ascx" %>
-<%@ Register TagPrefix="wssuc" TagName="ButtonSection" src="~/_controltemplates/ButtonSection.ascx" %>
-<%@ Register Tagprefix="wssawc" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> 
+<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register TagPrefix="wssuc" TagName="InputFormSection" Src="~/_controltemplates/InputFormSection.ascx" %>
+<%@ Register TagPrefix="wssuc" TagName="InputFormControl" Src="~/_controltemplates/InputFormControl.ascx" %>
+<%@ Register TagPrefix="wssuc" TagName="ButtonSection" Src="~/_controltemplates/ButtonSection.ascx" %>
+<%@ Register TagPrefix="wssawc" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="createsite.aspx.cs" Inherits="EPMLiveCore.Layouts.EPMLiveCore.createsite" DynamicMasterPageFile="~masterurl/default.master" %>
 
-<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
     <script type="text/javascript">
-// <![CDATA[
-        function ULS9xi() { var o = new Object; o.ULSTeamName = "Microsoft SharePoint Foundation"; o.ULSFileName = "createsite.aspx"; return o; }
-        
-        function SiteNameOptionChanged() {
-            ULS9xi: ;
-            SetSiteNameCtlsState(true);
-            constructUrl();
-        }
-        function SetSiteNameCtlsState(bSilent) {
-            ULS9xi: ;
-            var i = (document.getElementById("<%= DdlWildcardInclusion.ClientID %>")).selectedIndex;
-            var bUseWildcardInclusion = false;
-            var inclusionList = (document.getElementById("<%= DdlWildcardInclusion.ClientID %>")).options;
-            if (i >= 0 && inclusionList.length > i) {
-                bUseWildcardInclusion = inclusionList[i].value.substring(0, 1) == "0";
-            }
-            (document.getElementById("<%= TxtSiteName.ClientID %>")).disabled = !bUseWildcardInclusion;
-            (document.getElementById("<%= TxtSiteName.ClientID %>")).style.display = bUseWildcardInclusion ? "inline" : "none";
-            if (!bUseWildcardInclusion)
-                (document.getElementById("<%= TxtSiteName.ClientID %>")).Text = "";
-            STSValidatorEnable("<%= ReqValSiteName.ClientID %>", bUseWildcardInclusion, bSilent);
-            STSValidatorEnable("<%= CusValSiteName.ClientID %>", bUseWildcardInclusion, bSilent);
-        }
-        function constructUrl() {
-            ULS9xi: ;
-            var strVsUrl = (document.getElementById("<%= HidVirtualServerUrl.ClientID %>")).value;
-            document.getElementById("SpanConstructedUrl").innerHTML = STSHtmlEncode(strVsUrl);
-        }
-        function _spBodyOnLoad() {
-            ULS9xi: ;
-            SetSiteNameCtlsState(true);
+    	// <![CDATA[
+    	function ULS9xi() { var o = new Object; o.ULSTeamName = "Microsoft SharePoint Foundation"; o.ULSFileName = "createsite.aspx"; return o; }
 
-            constructUrl();
-        }
-        function _spFormOnSubmit() {
-            ULS9xi: ;
-            (document.getElementById("<%= BtnCreateSite.ClientID %>")).disabled = true;
-            (document.getElementById("<%= BtnCreateSiteTop.ClientID %>")).disabled = true;
-        }
+    	function SiteNameOptionChanged() {
+    		ULS9xi:;
+    		SetSiteNameCtlsState(true);
+    		constructUrl();
+    	}
+    	function SetSiteNameCtlsState(bSilent) {
+    		ULS9xi:;
+    		var i = (document.getElementById("<%= DdlWildcardInclusion.ClientID %>")).selectedIndex;
+    		var bUseWildcardInclusion = false;
+    		var inclusionList = (document.getElementById("<%= DdlWildcardInclusion.ClientID %>")).options;
+    		if (i >= 0 && inclusionList.length > i) {
+    			bUseWildcardInclusion = inclusionList[i].value.substring(0, 1) == "0";
+    		}
+    		(document.getElementById("<%= TxtSiteName.ClientID %>")).disabled = !bUseWildcardInclusion;
+    		(document.getElementById("<%= TxtSiteName.ClientID %>")).style.display = bUseWildcardInclusion ? "inline" : "none";
+    		if (!bUseWildcardInclusion)
+    			(document.getElementById("<%= TxtSiteName.ClientID %>")).Text = "";
+			STSValidatorEnable("<%= ReqValSiteName.ClientID %>", bUseWildcardInclusion, bSilent);
+    		STSValidatorEnable("<%= CusValSiteName.ClientID %>", bUseWildcardInclusion, bSilent);
+    	}
+    	function constructUrl() {
+    		ULS9xi:;
+    		var strVsUrl = (document.getElementById("<%= HidVirtualServerUrl.ClientID %>")).value;
+    		document.getElementById("SpanConstructedUrl").innerHTML = STSHtmlEncode(strVsUrl);
+    	}
+    	function _spBodyOnLoad() {
+    		ULS9xi:;
+    		SetSiteNameCtlsState(true);
 
-        function toggleSAccount(show) {
-            if (show) {
-                document.getElementById('<%=trNew3.ClientID %>').style.display = 'block';
-                document.getElementById('<%=trNew4.ClientID %>').style.display = 'block';
-            }
-            else {
-                document.getElementById('<%=trNew3.ClientID %>').style.display = 'none';
-                document.getElementById('<%=trNew4.ClientID %>').style.display = 'none';
-            }
-        }
-// ]]>
+    		constructUrl();
+    	}
+    	function _spFormOnSubmit() {
+    		ULS9xi:;
+    		(document.getElementById("<%= BtnCreateSite.ClientID %>")).disabled = true;
+    		(document.getElementById("<%= BtnCreateSiteTop.ClientID %>")).disabled = true;
+    	}
+
+    	function toggleSAccount(show) {
+    		if (show) {
+    			document.getElementById('<%=trNew3.ClientID %>').style.display = 'block';
+        		document.getElementById('<%=trNew4.ClientID %>').style.display = 'block';
+        	}
+        	else {
+        		document.getElementById('<%=trNew3.ClientID %>').style.display = 'none';
+        		document.getElementById('<%=trNew4.ClientID %>').style.display = 'none';
+        	}
+		}
+		// ]]>
 </script>
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
 
     <table border="0" cellspacing="0" cellpadding="0" class="ms-propertysheet" width="100%">
 	<wssuc:ButtonSection runat="server" TopButtons="true" BottomSpacing="5" ShowSectionLine="false" ShowStandardCancelButton="false">
@@ -135,26 +136,62 @@
 				<Template_Control>
 				<table dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
 					<tr>
-						<td class="ms-descriptiontext" nowrap="nowrap">
-							<input type="hidden" id="HidVirtualServerUrl" runat="server"/>
-							<b id="SpanConstructedUrl"></b>
-						</td>
-						<td>
-							<asp:DropDownList id="DdlWildcardInclusion" runat="server" onchange="SiteNameOptionChanged()"
-								Title="<%$Resources:spadmin, createsite_siteprefix_title%>" />
-						</td>
-						<td width="100%">
-							<wssawc:InputFormTextBox title="<%$Resources:spadmin, createsite_sitename%>" class="ms-input" ID="TxtSiteName" Columns="18" Runat="server" MaxLength=128 />
+						
+						<td colspan="2">
+							<asp:panel id="pnlNonHostHeader" runat="server">
+								<table dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
+				
+									<tr>
+										<td class="ms-descriptiontext" nowrap="nowrap">
+											<input type="hidden" id="HidVirtualServerUrl" runat="server"/>
+											<b id="SpanConstructedUrl"></b>
+										</td>
+										<td>
+											<asp:DropDownList id="DdlWildcardInclusion" runat="server" onchange="SiteNameOptionChanged()"
+												Title="<%$Resources:spadmin, createsite_siteprefix_title%>" />
+										</td>
+										<td width="100%">
+											<wssawc:InputFormTextBox title="<%$Resources:spadmin, createsite_sitename%>" class="ms-input" ID="TxtSiteName" Columns="18" Runat="server" MaxLength=128 />
+										</td>
+									</tr>
+									<tr>
+										<td class="ms-descriptiontext" nowrap="nowrap" colspan="3">
+											<wssawc:InputFormRequiredFieldValidator ID="ReqValSiteName" ControlToValidate="TxtSiteName"
+												ErrorMessage="<%$Resources:spadmin, createsite_missingurl%>" Runat="server"/>
+											<wssawc:UrlNameValidator
+												ID="CusValSiteName"
+												ControlToValidate="TxtSiteName"
+												runat="server"/>
+										</td>
+									</tr>
+								</table>
+							</asp:panel>
 						</td>
 					</tr>
 					<tr>
-						<td class="ms-descriptiontext" nowrap="nowrap" colspan="3">
-							<wssawc:InputFormRequiredFieldValidator ID="ReqValSiteName" ControlToValidate="TxtSiteName"
-								ErrorMessage="<%$Resources:spadmin, createsite_missingurl%>" Runat="server"/>
-							<wssawc:UrlNameValidator
-								ID="CusValSiteName"
-								ControlToValidate="TxtSiteName"
-								runat="server"/>
+						<td colspan="2">
+						&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<wssawc:InputFormCheckBox id="chkHostHeader" runat="Server" LabelText="Use host-header site collection" OnCheckedChanged="chkHostHeader_CheckedChanged" AutoPostBack="true">
+							</wssawc:InputFormCheckBox>
+						</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+							<asp:panel id="pnlHostHeader" runat="Server" Visible="false">
+								<table  dir="ltr" border="0" width="100%" cellspacing="0" cellpadding="0" class="authoringcontrols">
+									<tr>
+										<td  nowrap="nowrap" colspan="3">
+						
+											<asp:DropDownList id="ddlSiteCollections" runat="server" Title="<%$Resources:spadmin, createsite_siteprefix_title%>" />
+										</td>
+									</tr>
+								</table>
+							</asp:panel>
 						</td>
 					</tr>
 				</table>
@@ -255,12 +292,12 @@
 	</wssuc:ButtonSection>
    </table>
 
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+<asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
 Create WorkEngine Site
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
+<asp:content id="PageTitleInTitleArea" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
 Create WorkEngine Site
-</asp:Content>
+</asp:content>
