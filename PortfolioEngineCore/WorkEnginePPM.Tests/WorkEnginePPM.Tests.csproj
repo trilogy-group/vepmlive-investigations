@@ -132,6 +132,7 @@
     <Compile Include="WebServices\ModelDataCache\TopGridTest.cs" />
     <Compile Include="WebServices\RPADataCache\RPABottomGridTest.cs" />
     <Compile Include="WebServices\RPADataCache\RPATopGridTest.cs" />
+    <Compile Include="WebServices\SortAndGroupTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
