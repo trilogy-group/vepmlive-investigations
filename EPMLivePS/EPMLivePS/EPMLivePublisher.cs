@@ -296,13 +296,6 @@ namespace EPMLiveEnterprise
                         {
                             if (pubWeb.Url.ToLower() == baseURL.ToLower())
                             {
-                                //SPWeb pubWeb = site.RootWeb;
-                                //if(baseURL != "")
-                                //    pubWeb = site.OpenWeb(baseURL);
-
-                                //try
-                                //{
-                                //wssInterop.CreateWssSite(projectUID, adminRow.WADMIN_CURRENT_STS_SERVER_UID, url, adminRow.WADMIN_STS_TEMPLATE_LCID, adminRow.WADMIN_STS_TEMPLATE_ID);
                                 SPWeb web;
                                 
                                 pubSite.AllowUnsafeUpdates = true;
@@ -313,13 +306,6 @@ namespace EPMLiveEnterprise
                                     web = pubWeb.Webs.Add(realURL, projectName, "", (uint)adminRow.WADMIN_STS_TEMPLATE_LCID, template, true, false);
 
                                 web.AllowUnsafeUpdates = true;
-                                //}
-                                //catch { }
-
-                                //WebSvcWssInterop.ProjectWSSInfoDataSet ds = wssInterop.ReadWssData(projectUID);
-                                //siteUrl = ds.ProjWssInfo[0].PROJECT_WORKSPACE_URL.Replace(ds.ProjWssInfo[0].PROJECT_WORKSPACE_VSERVER_URL, "");
-
-                                //SPWeb web = site.OpenWeb(url);
 
                                 web.Navigation.TopNavigationBar.Navigation.UseShared = true;
 
@@ -450,8 +436,13 @@ namespace EPMLiveEnterprise
                                 {
                                     SPSecurity.RunWithElevatedPrivileges(delegate()
                                     {
-                                        EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                                        myLog.WriteEntry("Error in createSite Synch Workspace: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                                        using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                                        {
+                                            myLog.WriteEntry(
+                                                $"Error in createSite Synch Workspace: {ex.Message}{ex.StackTrace}",
+                                                EventLogEntryType.Error,
+                                                1000);
+                                        }
                                     });
                                     success = false;
                                 }
@@ -461,8 +452,13 @@ namespace EPMLiveEnterprise
                         {
                             SPSecurity.RunWithElevatedPrivileges(delegate()
                             {
-                                EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                                myLog.WriteEntry("Error in createSite(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                                using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                                {
+                                    myLog.WriteEntry(
+                                        $"Error in createSite(): {ex.Message}{ex.StackTrace}",
+                                        EventLogEntryType.Error,
+                                        1000);
+                                }
                             });
                             success = false;
                         }
@@ -474,8 +470,13 @@ namespace EPMLiveEnterprise
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
-                    myLog.WriteEntry("Error in createSite(): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                    using (var myLog = new EventLog("EPM Live", ".", "Publisher WS"))
+                    {
+                        myLog.WriteEntry(
+                            $"Error in createSite(): {ex.Message}{ex.StackTrace}",
+                            EventLogEntryType.Error,
+                            1000);
+                    }
                 });
                 success = false;
             }
