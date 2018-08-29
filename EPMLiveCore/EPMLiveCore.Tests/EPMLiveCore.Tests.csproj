@@ -124,6 +124,7 @@
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
+    <Compile Include="CoreFunctions.GetPlannerList.Tests.cs" />
     <Compile Include="CoreFunctionsTest.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
