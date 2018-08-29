@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Web;
-using System.IO;
-using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Web;
 using PortfolioEngineCore;
+using WorkEnginePPM.Layouts.ppm;
 
 namespace WorkEnginePPM
 {
@@ -62,84 +62,34 @@ namespace WorkEnginePPM
 
         public static string RPCustomFieldsRequest(HttpContext Context, string sRequestContext, CStruct xData)
         {
-            string sReply = "";
+            var reply = string.Empty;
             try
             {
-                switch (sRequestContext)
-                {
-                    case "ReadCustomfieldInfo":
-                        {
-                            int nFieldId = Int32.Parse(xData.InnerText);
-                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                            DataAccess da = new DataAccess(sBaseInfo);
-                            DBAccess dba = da.dba;
-                            if (dba.Open() == StatusEnum.rsSuccess)
-                            {
-                                sReply = ReadCustomFieldInfo(dba, nFieldId);
-                            }
-                            dba.Close();
-                            break;
-                        }
-                    case "ReadLookup":
-                        {
-                            int nFieldId = Int32.Parse(xData.InnerText);
-                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                            DataAccess da = new DataAccess(sBaseInfo);
-                            DBAccess dba = da.dba;
-                            if (dba.Open() == StatusEnum.rsSuccess)
-                            {
-                                sReply = ReadLookup(dba, nFieldId);
-                            }
-                            dba.Close();
-                            break;
-                        }
-                    case "UpdateCustomfieldInfo":
-                        sReply = UpdateCustomFieldInfo(Context, xData);
-                        break;
-                    case "DeleteCustomfieldInfo":
-                        sReply = DeleteCustomFieldInfo(Context, xData);
-                        break;
-                }
+                reply = CustomFieldHelper.CreateCustomFieldRequest(
+                    Context,
+                    sRequestContext,
+                    xData,
+                    ReadCustomFieldInfo,
+                    UpdateCustomFieldInfo,
+                    DeleteCustomFieldInfo);
             }
             catch (Exception ex)
             {
-                sReply = WebAdmin.FormatError("exception", "RPCustomFields.CustomfieldRequest", ex.Message);
+                Trace.TraceError(ex.ToString());
+                reply = WebAdmin.FormatError("exception", "RPCustomFields.CustomfieldRequest", ex.Message);
             }
 
-            return sReply;
+            return reply;
         }
 
-        private static void InitializeColumns(_TGrid tg)
+        private static void InitializeColumns(_TGrid grid)
         {
-            tg.AddColumn(title: "ID", width: 50, name: "LV_UID", isId: true, hidden: true);
-            tg.AddColumn(title: "Name", width: 180, name: "LV_VALUE", maincol: true, editable: true);
-            tg.AddColumn(title: "Level", width: 180, name: "LV_LEVEL", mainlevelcol: true, hidden: true);
+            CustomFieldHelper.InitializeColumns(grid);
         }
 
-        private static string ReadLookup(DBAccess dba, int lookupuid)
+        private static string ReadLookup(DBAccess dbAccess, int lookupuId)
         {
-            string sReply = "";
-            CStruct xCustomfield = new CStruct();
-            xCustomfield.Initialize("customfield");
-            DataTable dt;
-
-            //if (lookupuid > 0)
-            {
-                dbaGeneral.SelectLookup(dba, lookupuid, out dt);
-
-                _TGrid tg = new _TGrid();
-                InitializeColumns(tg);
-                tg.SetDataTable(dt);
-                string tgridData = "";
-                tg.Build(out tgridData);
-                xCustomfield.CreateString("tgridData", tgridData);
-
-            }
-
-            dba.Close();
-
-            sReply = xCustomfield.XML();
-            return sReply;
+            return CustomFieldHelper.ReadLookup(dbAccess, lookupuId);
         }
 
         private static string ReadCustomFieldInfo(DBAccess dba, int nFieldId)

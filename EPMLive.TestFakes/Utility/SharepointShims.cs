@@ -80,14 +80,18 @@ namespace EPMLive.TestFakes.Utility
 
         private ShimSPFieldCollection InitializeSPFieldsShim()
         {
-            return new ShimSPFieldCollection
+            var result = new ShimSPFieldCollection
             {
                 GetFieldByInternalNameString = (internalName) => 
                 {
-                    FieldShim.InternalNameGet = () => internalName;
-                    return FieldShim;
+                    var fieldShim = InitializeSPFieldShim();
+                    fieldShim.InternalNameGet = () => internalName;
+                    return fieldShim;
                 }
             };
+            result.Bind(new SPField[] { FieldShim });
+
+            return result;
         }
 
         private ShimSPForm InitializeSPFormShim()

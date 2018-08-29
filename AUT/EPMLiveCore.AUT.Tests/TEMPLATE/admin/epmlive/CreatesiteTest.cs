@@ -1461,6 +1461,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
         {
             // Arrange
             var url = CreateType<string>();
+			var subscription = CreateType<SPSiteSubscription>();
             var title = CreateType<string>();
             var description = CreateType<string>();
             var user = CreateType<string>();
@@ -1468,20 +1469,20 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
             var email = CreateType<string>();
             var template = CreateType<string>();
             var siteid = CreateType<Guid>();
-            var methodcreateSitePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(Guid) };
-            object[] parametersOfcreateSite = { url, title, description, user, fullName, email, template, siteid };
+            var methodcreateSitePrametersTypes = new Type[] { typeof(string), typeof(SPSiteSubscription), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(Guid) };
+            object[] parametersOfcreateSite = { url, subscription, title, description, user, fullName, email, template, siteid };
             Exception exception = null;
             var methodInfo = GetMethodInfo(MethodcreateSite, methodcreateSitePrametersTypes, out exception);
-
+			 
             // Act
             Action currentAction = () => methodInfo.Invoke(_createsiteInstanceFixture, parametersOfcreateSite);
 
             // Assert
-            methodInfo.ShouldNotBeNull();
+            methodInfo.ShouldNotBeNull(); 
             exception.ShouldBeNull();
             parametersOfcreateSite.ShouldNotBeNull();
-            parametersOfcreateSite.Length.ShouldBe(8);
-            methodcreateSitePrametersTypes.Length.ShouldBe(8);
+            parametersOfcreateSite.Length.ShouldBe(9);
+            methodcreateSitePrametersTypes.Length.ShouldBe(9);
             Should.NotThrow(currentAction);
         }
 
@@ -1589,7 +1590,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodcreateSite, 0);
-            const int parametersCount = 8;
+            const int parametersCount = 9;
 
             // Act
             var parameters = methodInfo.GetParameters();
