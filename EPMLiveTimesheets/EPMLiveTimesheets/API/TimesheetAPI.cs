@@ -3792,7 +3792,7 @@ namespace TimeSheets
 
             if (timesheetId == Guid.Empty)
             {
-                timesheetId = iGenerateTSFromPast(connection, web, user, period, rptData);
+                timesheetId = GenerateTSFromPast(connection, web, user, period, rptData);
             }
 
             using (var command = new SqlCommand("SPTSSetUser", connection))
@@ -3954,96 +3954,144 @@ namespace TimeSheets
             return ds;
         }
 
-        private static Guid iGenerateTSFromPast(SqlConnection cn, SPWeb web, SPUser user, string period, EPMLiveCore.ReportHelper.MyWorkReportData rptData)
+        private static Guid GenerateTSFromPast(
+            SqlConnection connection,
+            SPWeb web,
+            SPUser user,
+            string period,
+            CoreReportHelper.MyWorkReportData reportData)
         {
-            Guid tsuid = Guid.NewGuid();
-
-            SqlCommand cmd = new SqlCommand("select top 1 ts_uid from TSTIMESHEET where period_id < @period and site_uid=@siteid and username=@username order by period_id desc", cn);
-            cmd.Parameters.AddWithValue("@period", period);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-
-            Guid copyfromtsuid = Guid.Empty;
-
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            if (dr.Read())
+            var timesheetGuid = Guid.NewGuid();
+            var copyfromtGuid = Guid.Empty;
+            using (var command = new SqlCommand(
+                "select top 1 ts_uid from TSTIMESHEET " +
+                "where period_id < @period and site_uid=@siteid and username=@username order by period_id desc",
+                connection))
             {
-                copyfromtsuid = dr.GetGuid(0);
+                command.Parameters.AddWithValue("@period", period);
+                command.Parameters.AddWithValue("@username", user.LoginName);
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        copyfromtGuid = reader.GetGuid(0);
+                    }
+                }
             }
-            dr.Close();
 
-
-            cmd = new SqlCommand("INSERT INTO TSTIMESHEET (TS_UID, USERNAME, RESOURCENAME, PERIOD_ID, SITE_UID) VALUES (@tsuid, @username, @resourcename, @period, @siteid)", cn);
-            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-            cmd.Parameters.AddWithValue("@period", period);
-            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@username", user.LoginName);
-            cmd.Parameters.AddWithValue("@resourcename", user.Name);
-            cmd.ExecuteNonQuery();
-
-            if (copyfromtsuid != Guid.Empty)
+            using (var command = new SqlCommand(
+                "INSERT INTO TSTIMESHEET (TS_UID, USERNAME, RESOURCENAME, PERIOD_ID, SITE_UID) " +
+                "VALUES (@tsuid, @username, @resourcename, @period, @siteid)",
+                connection))
             {
+                command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                command.Parameters.AddWithValue("@period", period);
+                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                command.Parameters.AddWithValue("@username", user.LoginName);
+                command.Parameters.AddWithValue("@resourcename", user.Name);
+                command.ExecuteNonQuery();
+            }
 
+            if (copyfromtGuid != Guid.Empty)
+            {
+                var itemsSet = new DataSet();
+                using (var command = new SqlCommand(
+                    "SELECT * FROM TSITEM where TS_UID = @tsuid and item_type = 1",
+                    connection))
+                {
+                    command.Parameters.AddWithValue("@tsuid", copyfromtGuid);
+                    using (var adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(itemsSet);
+                    }
+                }
 
-
-                cmd = new SqlCommand("SELECT * FROM TSITEM where TS_UID = @tsuid and item_type = 1", cn);
-                cmd.Parameters.AddWithValue("@tsuid", copyfromtsuid);
-
-                DataSet dsItems = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsItems);
-
-                foreach (DataRow drItem in dsItems.Tables[0].Rows)
+                foreach (DataRow itemRow in itemsSet.Tables[0].Rows)
                 {
                     try
                     {
-                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND ([AssignedToID] = -99 or [AssignedToID] = " + user.ID + ") AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
-                        DataTable myWorkDataTable = rptData.ExecuteSql(sql);
+                        var sql = string.Format(
+                            "SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' " +
+                            "AND ([AssignedToID] = -99 or [AssignedToID] = {0}) AND [SiteId] = N'{1}' " +
+                            "AND LISTID = N'{2}' AND ITEMID=N'{3}'",
+                            user.ID,
+                            web.Site.ID,
+                            itemRow["LIST_UID"].ToString(),
+                            itemRow["ITEM_ID"].ToString());
+                        var myWorkDataTable = reportData.ExecuteSql(sql);
 
                         if (myWorkDataTable.Rows.Count > 0)
                         {
-
-                            if (myWorkDataTable.Rows[0]["Timesheet"].ToString() == "True")
+                            if (myWorkDataTable.Rows[0]["Timesheet"].ToString() == bool.TrueString)
                             {
-                                cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID,AssignedToID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid, @assignedtoid)", cn);
-                                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                                cmd.Parameters.AddWithValue("@webuid", drItem["WEB_UID"].ToString());
-                                cmd.Parameters.AddWithValue("@listuid", drItem["LIST_UID"].ToString());
-                                cmd.Parameters.AddWithValue("@itemid", drItem["ITEM_ID"].ToString());
-                                cmd.Parameters.AddWithValue("@title", drItem["TITLE"].ToString());
-                                cmd.Parameters.AddWithValue("@assignedtoid", user.ID);
+                                using (var command = new SqlCommand(
+                                    "INSERT INTO TSITEM " +
+                                    "(TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, " +
+                                    "PROJECT_LIST_UID,AssignedToID) " +
+                                    "VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, " +
+                                    "@projectlistuid, @assignedtoid)",
+                                    connection))
+                                {
+                                    command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                                    command.Parameters.AddWithValue("@webuid", itemRow["WEB_UID"].ToString());
+                                    command.Parameters.AddWithValue("@listuid", itemRow["LIST_UID"].ToString());
+                                    command.Parameters.AddWithValue("@itemid", itemRow["ITEM_ID"].ToString());
+                                    command.Parameters.AddWithValue("@title", itemRow["TITLE"].ToString());
+                                    command.Parameters.AddWithValue("@assignedtoid", user.ID);
 
-                                if (drItem["PROJECT"].ToString() == "")
-                                    cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                else
-                                    cmd.Parameters.AddWithValue("@project", drItem["PROJECT"].ToString());
+                                    if (string.IsNullOrWhiteSpace(itemRow["PROJECT"].ToString()))
+                                    {
+                                        command.Parameters.AddWithValue("@project", DBNull.Value);
+                                    }
+                                    else
+                                    {
+                                        command.Parameters.AddWithValue(
+                                            "@project",
+                                            itemRow["PROJECT"].ToString());
+                                    }
 
-                                if (drItem["PROJECT_ID"].ToString() == "")
-                                    cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
-                                else
-                                    cmd.Parameters.AddWithValue("@projectid", drItem["PROJECT_ID"].ToString());
+                                    if (string.IsNullOrWhiteSpace(itemRow["PROJECT_ID"].ToString()))
+                                    {
+                                        command.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                    }
+                                    else
+                                    {
+                                        command.Parameters.AddWithValue(
+                                            "@projectid",
+                                            itemRow["PROJECT_ID"].ToString());
+                                    }
 
-                                cmd.Parameters.AddWithValue("@list", drItem["LIST"].ToString());
+                                    command.Parameters.AddWithValue("@list", itemRow["LIST"].ToString());
 
-                                if (drItem["PROJECT_LIST_UID"].ToString() == "")
-                                    cmd.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
-                                else
-                                    cmd.Parameters.AddWithValue("@projectlistuid", drItem["PROJECT_LIST_UID"].ToString());
+                                    if (string.IsNullOrWhiteSpace(itemRow["PROJECT_LIST_UID"].ToString()))
+                                    {
+                                        command.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
+                                    }
+                                    else
+                                    {
+                                        command.Parameters.AddWithValue(
+                                            "@projectlistuid",
+                                            itemRow["PROJECT_LIST_UID"].ToString());
+                                    }
 
-                                cmd.ExecuteNonQuery();
-
+                                    command.ExecuteNonQuery();
+                                }
                             }
-
                         }
                     }
-                    catch { }
+                    catch(Exception exception)
+                    {
+                        Logger.WriteLog(
+                            Logger.Category.Unexpected,
+                            "TimeSheetAPI GenerateTSFromPast",
+                            exception.ToString());
+                    }
                 }
-
-
             }
 
-            return tsuid;
+            return timesheetGuid;
         }
 
         private static bool iVerifyDelegate(SPWeb web, SPUser u)

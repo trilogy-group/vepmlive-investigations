@@ -96,6 +96,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPI.GenerateTSFromPast.Tests.cs" />
     <Compile Include="API\TimesheetAPI.ApproveTimesheetsCore.Tests.cs" />
     <Compile Include="API\TimesheetAPI.GetTSDataSet.Tests.cs" />
     <Compile Include="API\TimesheetAPI.FillTimesheetItemsDataset.Tests.cs" />
