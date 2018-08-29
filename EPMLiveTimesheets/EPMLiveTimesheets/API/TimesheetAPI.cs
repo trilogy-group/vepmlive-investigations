@@ -17,6 +17,8 @@ using TimeSheets.Log;
 using TimeSheets.Models;
 using CoreReportHelper = EPMLiveCore.ReportHelper;
 using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
+using System.IO;
+using System.Web;
 
 namespace TimeSheets
 {
@@ -597,105 +599,118 @@ namespace TimeSheets
             }
         }
 
-        public static string SubmitTimesheet(string data, SPWeb oWeb)
+        public static string SubmitTimesheet(string data, SPWeb sharepointWeb)
         {
-            SqlTransaction transaction = null;
-            SqlConnection cn = null;
             try
             {
-                XmlDocument docTimesheet = new XmlDocument();
+                var docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
+                var timesheetGuid = docTimesheet.FirstChild.Attributes["ID"].Value;
+                var message = string.Empty;
 
-                string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                using (var connection =
+                    GetOpenedConnection(EpmCoreFunctions.getConnectionString(sharepointWeb.Site.WebApplication.Id)))
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                    cn.Open();
-                });
-
-                var cmd = new SqlCommand("SELECT dbo.TSUSER.USER_ID " +
-                                        "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET " +
-                                        "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
-                                        "WHERE TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", tsuid);
-
-                var dr = cmd.ExecuteReader();
-
-                int userid = 0;
-
-                try
-                {
-                    if (dr.Read())
+                    var userid = 0;
+                    using (var command = new SqlCommand("SELECT dbo.TSUSER.USER_ID " +
+                                            "FROM dbo.TSUSER INNER JOIN dbo.TSTIMESHEET " +
+                                            "    ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID " +
+                                            "WHERE TS_UID=@tsuid",
+                                            connection))
                     {
-                        userid = dr.GetInt32(0);
+                        command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            try
+                            {
+                                if (reader.Read())
+                                {
+                                    userid = reader.GetInt32(0);
+                                }
+                            }
+                            catch(Exception exception)
+                            {
+                                Logger.WriteLog(
+                                    Logger.Category.Unexpected,
+                                    "Timesheet SubmitTimesheet",
+                                    exception.ToString());
+                            }
+                        }
                     }
-                }
-                finally
-                {
-                    dr.Close();
-                }
 
-                string message = "";
-
-                if (userid != 0)
-                {
-                    SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
-
-                    if (user.ID != userid)
+                    if (userid != 0)
                     {
-                        message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        var user = GetUser(sharepointWeb, userid.ToString());
+                        if (user.ID != userid)
+                        {
+                            message =
+                                "<SubmitTimesheet Status=\"3\">" +
+                                "You do not have access to edit that timesheet.</SubmitTimesheet>";
+                        }
+                        else
+                        {
+                            var transaction = connection.BeginTransaction();
+                            try
+                            {
+                                using (var command = new SqlCommand(
+                                    "Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, " +
+                                    "LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser " +
+                                    "where TS_UID=@tsuid",
+                                    connection,
+                                    transaction))
+                                {
+                                    command.Parameters.AddWithValue("@uname", sharepointWeb.CurrentUser.LoginName);
+                                    command.Parameters.AddWithValue("@name", sharepointWeb.CurrentUser.Name);
+                                    command.Parameters.AddWithValue("@tsuid", timesheetGuid);
+                                    command.Parameters.AddWithValue("@lastSubmittedByName", sharepointWeb.CurrentUser.Name);
+                                    command.Parameters.AddWithValue(
+                                        "@lastSubmittedByUser",
+                                        sharepointWeb.CurrentUser.LoginName);
+                                    command.ExecuteNonQuery();
+                                }
+
+                                var settings = new TimesheetSettings(sharepointWeb);
+                                if (settings.DisableApprovals)
+                                {
+                                    var resultDocument = new XmlDocument();
+                                    resultDocument.LoadXml(AutoApproveTimesheets(
+                                        string.Format(
+                                            "<Approve ApproveStatus=\"1\"><TS id=\"{0}\"></TS></Approve>",
+                                            timesheetGuid),
+                                        sharepointWeb,
+                                        transaction));
+
+                                    if (resultDocument.FirstChild.Attributes["Status"].Value == "1")
+                                    {
+                                        throw new InvalidDataException(
+                                            HttpUtility.HtmlDecode(
+                                                resultDocument.FirstChild.SelectSingleNode("//Error").InnerText));
+                                    }
+                                }
+                                transaction.Commit();
+                            }
+                            catch(Exception exception)
+                            {
+                                if (transaction != null)
+                                {
+                                    transaction.Rollback();
+                                }
+                                Logger.WriteLog(
+                                    Logger.Category.Unexpected,
+                                    "TimesheepAPI SubmitTimesheet",
+                                    exception.ToString());
+                                throw;
+                            }
+                            message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
+                        }
                     }
                     else
                     {
-                        transaction = cn.BeginTransaction();
-                        try
-                        {
-                            cmd = new SqlCommand("Update TSTIMESHEET set submitted=1,LASTMODIFIEDBYU=@uname,LASTMODIFIEDBYN=@name, LastSubmittedByName=@lastSubmittedByName, LastSubmittedByUser=@lastSubmittedByUser where TS_UID=@tsuid", cn, transaction);
-                            cmd.Parameters.AddWithValue("@uname", oWeb.CurrentUser.LoginName);
-                            cmd.Parameters.AddWithValue("@name", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                            cmd.Parameters.AddWithValue("@lastSubmittedByName", oWeb.CurrentUser.Name);
-                            cmd.Parameters.AddWithValue("@lastSubmittedByUser", oWeb.CurrentUser.LoginName);
-
-                            cmd.ExecuteNonQuery();
-
-                            TimesheetSettings settings = new TimesheetSettings(oWeb);
-
-                            if (settings.DisableApprovals)
-                            {
-                                XmlDocument docRet = new XmlDocument();
-                                docRet.LoadXml(AutoApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb, transaction));
-
-                                if (docRet.FirstChild.Attributes["Status"].Value == "1")
-                                {
-                                    throw new Exception(System.Web.HttpUtility.HtmlDecode(docRet.FirstChild.SelectSingleNode("//Error").InnerText));
-                                }
-                            }
-
-                            transaction.Commit();
-                        }
-                        catch
-                        {
-                            if (transaction != null)
-                            {
-                                transaction.Rollback();
-                            }
-                            throw;
-                        }
-
-
-                        message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
+                        message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
                     }
-                }
-                else
-                {
-                    message = "<SubmitTimesheet Status=\"2\">Invalid user found for timesheet.</SubmitTimesheet>";
-                }
 
-                ProcessFullMeta(oWeb.Site, cn, tsuid);
-
-                cn.Close();
+                    ProcessFullMeta(sharepointWeb.Site, connection, timesheetGuid);
+                }
 
                 return message;
             }
@@ -703,11 +718,6 @@ namespace TimeSheets
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
-            finally
-            {
-                if(cn != null)
-                    cn.Dispose();
-            }            
         }
 
         public static void ProcessFullMeta(SPSite site, SqlConnection cn, string ts_uid)
