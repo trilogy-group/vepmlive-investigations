@@ -1818,7 +1818,7 @@ namespace EPMLiveCore
             return cn;
         }
 
-        static private DataTable GetTable(SqlCommand command)
+        private static DataTable GetTable(SqlCommand command)
         {
             var dataTable = new DataTable();
             try
