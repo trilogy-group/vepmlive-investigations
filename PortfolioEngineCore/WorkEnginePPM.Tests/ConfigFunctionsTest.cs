@@ -123,6 +123,7 @@ namespace WorkEnginePPM.Tests
             // Act
             var result = ConfigFunctions.GetCleanUsername(new ShimSPWeb().Instance);
 
+            // Assert
             result.ShouldBe(DummyString);
         }
 
