@@ -33,7 +33,8 @@ namespace WorkEnginePPM.Jobs
                 string basepath = doc.FirstChild.SelectSingleNode("BasePath").InnerText;
                 string PID = doc.FirstChild.SelectSingleNode("PID").InnerText;
                 string Company = doc.FirstChild.SelectSingleNode("Company").InnerText;
-                string DBServer = doc.FirstChild.SelectSingleNode("DBServer").InnerText;
+				string OverrideAdmin = doc.FirstChild.SelectSingleNode("OverrideAdmin") != null? doc.FirstChild.SelectSingleNode("OverrideAdmin").InnerText:"";
+				string DBServer = doc.FirstChild.SelectSingleNode("DBServer").InnerText;
                 string DB = doc.FirstChild.SelectSingleNode("DB").InnerText;
                 string Username = doc.FirstChild.SelectSingleNode("Username").InnerText;
                 string Password = doc.FirstChild.SelectSingleNode("Password").InnerText;
@@ -73,8 +74,15 @@ namespace WorkEnginePPM.Jobs
 
                     arrUserInfo.Add(ui);
 
-                    string adminaccount = site.WebApplication.ApplicationPool.Username;
-
+					string adminaccount;
+					if (string.IsNullOrEmpty(OverrideAdmin))
+					{
+						adminaccount = site.WebApplication.ApplicationPool.Username;
+					}
+					else
+					{
+						adminaccount = OverrideAdmin;
+					}
                     setup.Setup(basepath, PID, Company, DBServer, DB, Username, Password, (PortfolioEngineCore.Setup.DataScript[])arrScripts.ToArray(typeof(PortfolioEngineCore.Setup.DataScript)), adminaccount, (PortfolioEngineCore.Setup.UserInformation[])arrUserInfo.ToArray(typeof(PortfolioEngineCore.Setup.UserInformation)), web.Url);
 
                     if (setup.SetupErrors)
