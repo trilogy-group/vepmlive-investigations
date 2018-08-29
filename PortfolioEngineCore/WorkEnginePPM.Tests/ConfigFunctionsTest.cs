@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Collections.Specialized.Fakes;
 using System.Configuration.Fakes;
 using System.Data;
 using System.Data.SqlClient.Fakes;
@@ -9,18 +9,17 @@ using System.DirectoryServices.ActiveDirectory.Fakes;
 using System.DirectoryServices.Fakes;
 using System.IO.Fakes;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Fakes;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using WorkEnginePPM.Fakes;
 
 namespace WorkEnginePPM.Tests
 {
@@ -36,6 +35,23 @@ namespace WorkEnginePPM.Tests
         private const string DummyUser = "xyz\\DummyString";
         private const string DummyDomain = "DummySubDomain.DummyDomain";
         private const string DummyField = "DummyField";
+        private const string DummyField2 = "DummyField2";
+        private const string DummyFilterField = "DummyFilterField";
+        private const string EPMLiveListConfig = "EPMLiveListConfig";
+        private const string UseWbs = "UseWbs";
+        private const string ExtId = "<Item EXTID";
+        private const string CData = "<Title><![CDATA[";
+        private const string TotalSettings = "TotalSettings";
+        private const string GeneralSettings = "GeneralSettings";
+        private const string DisplaySettings = "DisplaySettings";
+        private const string EnableResourcePlan = "EnableResourcePlan";
+        private const string Url = "URL";
+        private const string TotalSettingsValue = "epmlivelisttotals-URL";
+        private const string GeneralSettingsValue = "URL-GridSettings";
+        private const string DisplaySettingsValue = "DisplaySettingURL";
+        private const string EnableResourcePlanValue = "URL-EnableResPlan";
+        private const string CipherText = "k1sq1YvNq35Mwn5ZqaJVDQ==";
+        private const string EPMLiveKeys = "EPMLiveKeys";
 
         [TestInitialize]
         public void TestInitialize()
@@ -63,6 +79,7 @@ namespace WorkEnginePPM.Tests
             {
                 ContentDatabaseGet = () => new ShimSPContentDatabase()
             };
+            ShimSPWeb.AllInstances.Dispose = _ => { };
 
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (action) =>
             {
@@ -73,7 +90,7 @@ namespace WorkEnginePPM.Tests
             {
                 GetFieldByInternalNameString = x =>
                 {
-                    if (x == "EPMLiveListConfig")
+                    if (x == EPMLiveListConfig)
                     {
                         return null;
                     }
@@ -92,6 +109,9 @@ namespace WorkEnginePPM.Tests
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
 
             ShimSPFarm.LocalGet = () => new ShimSPFarm();
+
+            ShimSPSite.AllInstances.Dispose = _ => { };
+            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => new ShimSPWeb();
         }
 
         [TestMethod]
@@ -179,8 +199,6 @@ namespace WorkEnginePPM.Tests
             ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
             ShimSPField.AllInstances.InternalNameGet = _ => DummyString;
 
-            
-
             ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => { };
 
             ShimSqlCommand.AllInstances.ExecuteReader = _ => {
@@ -203,15 +221,15 @@ namespace WorkEnginePPM.Tests
 
             ShimSPSiteDataQuery.Constructor = _ => { };
 
-            var xmlQuery = $"<OrderBy><FieldRef Name='DummyField2' NULLABLE='TRUE'/></OrderBy>";
+            var xmlQuery = $"<OrderBy><FieldRef Name='{DummyField2}' NULLABLE='TRUE'/></OrderBy>";
 
             // Act
             var result = ConfigFunctions.getSiteItems(
                 new ShimSPWeb().Instance, 
                 new ShimSPView().Instance,
                 xmlQuery, 
-                "DummyFilterField", 
-                "UseWbs", 
+                DummyFilterField, 
+                UseWbs, 
                 DummyString, 
                 new string[] 
                 {
@@ -250,9 +268,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -279,9 +297,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -328,9 +346,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -357,9 +375,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -386,9 +404,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -418,9 +436,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         [TestMethod]
@@ -447,9 +465,9 @@ namespace WorkEnginePPM.Tests
             // Assert
             result.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNullOrEmpty(),
-                () => result.ShouldContain("<Item EXTID"),
+                () => result.ShouldContain(ExtId),
                 () => result.ShouldContain(DummyString),
-                () => result.ShouldContain("<Title><![CDATA["));
+                () => result.ShouldContain(CData));
         }
 
         private static void SetupForGetItemXml()
@@ -464,14 +482,6 @@ namespace WorkEnginePPM.Tests
             ShimSPList.AllInstances.TitleGet = _ => DummyString;
 
             var dataTable = new DataTable();
-            //dataTable.Columns.Add("SPID", typeof(int));
-            //dataTable.Columns.Add("EXTID", typeof(int));
-
-            //var dataRow = dataTable.NewRow();
-            //dataRow["SPID"] = DummyInt;
-            //dataRow["EXTID"] = DummyInt;
-
-            //dataTable.Rows.Add(dataRow);
 
             ShimAPITeam.GetResourcePoolStringSPWeb = (_, __) => dataTable;
 
@@ -496,6 +506,8 @@ namespace WorkEnginePPM.Tests
             // Arrange
             const string PoolingInterval = "PollingInterval";
             const string QueueThreads = "QueueThreads";
+            const string ExpectedValuePollingInterval = "10";
+            const string ExpectedValueQueueThreads = "5";
 
             ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable();
 
@@ -505,8 +517,8 @@ namespace WorkEnginePPM.Tests
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => result1.ShouldBe("10"),
-                () => result2.ShouldBe("5"));
+                () => result1.ShouldBe(ExpectedValuePollingInterval),
+                () => result2.ShouldBe(ExpectedValueQueueThreads));
         }
 
         [TestMethod]
@@ -516,7 +528,7 @@ namespace WorkEnginePPM.Tests
             var updated = false;
 
             ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable() { [DummyString] = DummyString };
-            ShimSPFarm.AllInstances.Update = _ => { updated = true; };
+            ShimSPFarm.AllInstances.Update = _ => updated = true;
 
             // Act
             ConfigFunctions.setFarmSetting(DummyString, DummyString);
@@ -532,7 +544,7 @@ namespace WorkEnginePPM.Tests
             var updated = false;
 
             ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable();
-            ShimSPFarm.AllInstances.Update = _ => { updated = true; };
+            ShimSPFarm.AllInstances.Update = _ => updated = true;
 
             // Act
             ConfigFunctions.setFarmSetting(DummyString, DummyString);
@@ -560,9 +572,67 @@ namespace WorkEnginePPM.Tests
         }
 
         [TestMethod]
-        public void GetListSetting_OnValidCall_ConfirmResult()
+        public void GetListSetting_WhenTotalSettings_ConfirmResult()
         {
             // Arrange
+            SetupForGetListSetting();
+
+            // Act
+            var result = ConfigFunctions.getListSetting(new ShimSPList().Instance, TotalSettings);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetListSetting_WhenGeneralSettings_ConfirmResult()
+        {
+            // Arrange
+            SetupForGetListSetting();
+
+            // Act
+            var result = ConfigFunctions.getListSetting(new ShimSPList().Instance, GeneralSettings);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetListSetting_WhenDisplaySettings_ConfirmResult()
+        {
+            // Arrange
+            SetupForGetListSetting();
+
+            // Act
+            var result = ConfigFunctions.getListSetting(new ShimSPList().Instance, DisplaySettings);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetListSetting_WhenEnableResourcePlan_ConfirmResult()
+        {
+            // Arrange
+            SetupForGetListSetting();
+
+            // Act
+            var result = ConfigFunctions.getListSetting(new ShimSPList().Instance, EnableResourcePlan);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        private static void SetupForGetListSetting()
+        {
             ShimSPSecurableObject.AllInstances.DoesUserHavePermissionsSPBasePermissions = (_, __) => true;
 
             ShimSPList.AllInstances.Update = _ => { };
@@ -575,21 +645,267 @@ namespace WorkEnginePPM.Tests
             ShimSPField.AllInstances.Update = _ => { };
             ShimSPField.AllInstances.HiddenSetBoolean = (_, __) => { };
 
-            ShimPath.GetDirectoryNameString = _ => "URL";
+            ShimPath.GetDirectoryNameString = _ => Url;
 
             ShimSPWeb.AllInstances.IDGet = _ => Guid.NewGuid();
             ShimSPWeb.AllInstances.PropertiesGet = _ => new ShimSPPropertyBag();
+            ShimStringDictionary.AllInstances.ContainsKeyString = (_, key) =>
+            {
+                if (key == TotalSettingsValue ||
+                    key == GeneralSettingsValue ||
+                    key == DisplaySettingsValue ||
+                    key == EnableResourcePlanValue)
+                {
+                    return true;
+                }
+                return false;
+            };
+            ShimStringDictionary.AllInstances.ItemGetString = (_, key) =>
+            {
+                if (key == TotalSettingsValue ||
+                    key == GeneralSettingsValue ||
+                    key == DisplaySettingsValue ||
+                    key == EnableResourcePlanValue)
+                {
+                    return DummyString;
+                }
+                return null;
+            };
             ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => DummyString;
             ShimSPWeb.AllInstances.Close = _ => { };
 
             ShimSPSite.ConstructorGuid = (_, __) => { };
-            ShimSPSite.AllInstances.Dispose = _ => { };
-            ShimSPSite.AllInstances.OpenWebGuid = (_, __) => new ShimSPWeb();
+        }
+
+        [TestMethod]
+        public void SetConfigSetting_WhenValueIsEmpty_ConfirmResult()
+        {
+            // Arrange
+            var updated = false;
+            ShimSPWeb.AllInstances.PropertiesGet = _ => new ShimSPPropertyBag();
+            ShimSPPropertyBag.AllInstances.Update = _ => updated = true;
+            ShimStringDictionary.AllInstances.ContainsKeyString = (_, __) => true;
+            ShimStringDictionary.AllInstances.ItemGetString = (_, __) => string.Empty;
 
             // Act
-            var result = ConfigFunctions.getListSetting(new ShimSPList().Instance, "TotalSettings");
+            ConfigFunctions.setConfigSetting(new ShimSPWeb().Instance, DummyString, string.Empty);
 
             // Assert
+            updated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void SetConfigSetting_WhenSettingExists_ConfirmResult()
+        {
+            // Arrange
+            var updated = false;
+            ShimSPWeb.AllInstances.PropertiesGet = _ => new ShimSPPropertyBag();
+            ShimSPPropertyBag.AllInstances.Update = _ => updated = true;
+            ShimStringDictionary.AllInstances.ContainsKeyString = (_, __) => true;
+            ShimStringDictionary.AllInstances.ItemGetString = (_, __) => string.Empty;
+
+            // Act
+            ConfigFunctions.setConfigSetting(new ShimSPWeb().Instance, DummyString, DummyString);
+
+            // Assert
+            updated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void SetConfigSetting_WhenSettingNotExists_ConfirmResult()
+        {
+            // Arrange
+            var updated = false;
+            ShimSPWeb.AllInstances.PropertiesGet = _ => new ShimSPPropertyBag();
+            ShimSPPropertyBag.AllInstances.Update = _ => updated = true;
+            ShimStringDictionary.AllInstances.ContainsKeyString = (_, __) => false;
+            ShimStringDictionary.AllInstances.AddStringString = (_, __, ___) => { };
+
+            // Act
+            ConfigFunctions.setConfigSetting(new ShimSPWeb().Instance, DummyString, DummyString);
+
+            // Assert
+            updated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void GetLockConfigSetting_WhenGuidIsNotEmpty_ConfirmResult()
+        {
+            // Arrange
+            ShimSPWeb.AllInstances.IDGet = _ => Guid.NewGuid();
+
+            ShimConfigFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+            ShimConfigFunctions.getConfigSettingSPWebStringBooleanBoolean = (_1, _2, _3, _4) => DummyString;
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                SiteGet = () => new ShimSPSite()
+            };
+
+            // Act
+            var result = ConfigFunctions.getLockConfigSetting(new ShimSPWeb().Instance, DummyString, true);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void GetLockConfigSetting_WhenGuidIsEmpty_ConfirmResult()
+        {
+            // Arrange
+            ShimSPWeb.AllInstances.IDGet = _ => Guid.NewGuid();
+
+            ShimConfigFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+            ShimConfigFunctions.getConfigSettingSPWebStringBooleanBoolean = (_1, _2, _3, _4) => DummyString;
+
+            // Act
+            var result = ConfigFunctions.getLockConfigSetting(new ShimSPWeb().Instance, DummyString, true);
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void FarmEncode_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            const string Expected = "342395117854676768122";
+            ShimSPFarm.LocalGet = () => new ShimSPFarm();
+            ShimSPPersistedObject.AllInstances.IdGet = _ => new Guid("FB2F7E71-BE24-448A-B31B-108C1B3AC812");
+
+            // Act
+            var result = ConfigFunctions.farmEncode(DummyString);
+
+            // Assert
+            result.ShouldBe(Expected);
+        }
+
+        [TestMethod]
+        public void ComputerCode_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            const string Expected = "000000000035";
+            ShimDns.GetHostName = () => DummyString;
+
+            // Act
+            var result = ConfigFunctions.computerCode(DummyString);
+
+            // Assert
+            result.ShouldBe(Expected);
+        }
+
+        [TestMethod]
+        public void Encrypt_OnValidCall_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = ConfigFunctions.Encrypt(DummyString, DummyString);
+
+            // Assert
+            result.ShouldBe(CipherText);
+        }
+
+        [TestMethod]
+        public void Decrypt_OnValidCall_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = ConfigFunctions.Decrypt(CipherText, DummyString);
+
+            // Assert
+            result.ShouldBe(DummyString);
+        }
+
+        [TestMethod]
+        public void DeleteKey_OnValidCall_ConfirResult()
+        {
+            // Arrange
+            var updated = false;
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                WebGet = () => new ShimSPWeb()
+            };
+
+            ShimSPSite.AllInstances.WebApplicationGet = _ => new ShimSPWebApplication();
+
+            ShimSPPersistedObject.AllInstances.FarmGet = _ => new ShimSPFarm();
+            ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable() { [EPMLiveKeys] = $"{DummyUser}\t{DummyString}" };
+
+            ShimSPFarm.AllInstances.Update = _ => updated = true;
+
+            // Act
+            ConfigFunctions.deleteKey(DummyString);
+
+            // Assert
+            updated.ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void FeatureList_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            ShimConfigFunctions.farmEncodeString = _ => DummyString;
+            ShimSPPersistedObject.AllInstances.PropertiesGet = _ => new Hashtable() { [EPMLiveKeys] = $"{DummyString}\t{DummyString}" };
+
+            // Act
+            var result = ConfigFunctions.featureList();
+
+            // Assert
+            result.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.Count().ShouldBe(1),
+                () => result.Contains(DummyString).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Enqueue_OnValidCall_ConfirmResult()
+        {
+            // Arrange
+            var commandExecuted = false;
+            ShimSPContext.CurrentGet = () => new ShimSPContext
+            {
+                SiteGet = () => new ShimSPSite
+                {
+                    WebApplicationGet = () => new ShimSPWebApplication()
+                }
+            };
+
+            ShimSPPersistedObject.AllInstances.IdGet = _ => Guid.NewGuid();
+
+            ShimSPWebService.ContentServiceGet = () => new ShimSPWebService
+            {
+                WebApplicationsGet = () => new ShimSPWebApplicationCollection()
+            };
+
+            ShimConfigurationManager.ConnectionStringsGet = () => new ShimConnectionStringSettingsCollection();
+            ShimConnectionStringSettingsCollection.AllInstances.ItemGetString = (_, __) => new ShimConnectionStringSettings
+            {
+                ConnectionStringGet = () => DummyString
+            };
+
+            ShimSqlConnection.ConstructorString = (_, __) => { };
+            ShimSqlConnection.AllInstances.Open = _ => { };
+            ShimSqlConnection.AllInstances.Close = _ => { };
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => { };
+            ShimSqlCommand.AllInstances.ExecuteReader = _ => new ShimSqlDataReader();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                commandExecuted = true;
+                return DummyInt;
+            };
+
+            ShimSqlDataReader.AllInstances.Read = _ => true;
+            ShimSqlDataReader.AllInstances.GetInt32Int32 = (_, __) => 2;
+            ShimSqlDataReader.AllInstances.Close = _ => { };
+            
+            // Act
+            ConfigFunctions.enqueue(Guid.NewGuid(), DummyInt);
+
+            // Assert
+            commandExecuted.ShouldBeTrue();
         }
     }
 }

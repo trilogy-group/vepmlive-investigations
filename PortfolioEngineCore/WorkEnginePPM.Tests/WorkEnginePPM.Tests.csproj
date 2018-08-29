@@ -71,6 +71,7 @@
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Configuration.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
