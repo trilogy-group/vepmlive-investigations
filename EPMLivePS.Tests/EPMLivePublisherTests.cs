@@ -311,7 +311,7 @@ namespace EPMLivePS.Tests
             Assert.IsTrue(_isConnectionOpenedCalled);
             Assert.AreEqual(4, _executeReaderCallCount);
             Assert.IsTrue(_isWriteEntryCalled);
-            const int expectedSqlCommandDisposeCalls = 3;
+            const int expectedSqlCommandDisposeCalls = 4;
             AssertThatObjectsAreDisposed(expectedSqlCommandDisposeCalls);
             Assert.IsTrue(_isEventLogDisposeCalled);
         }
@@ -483,6 +483,56 @@ namespace EPMLivePS.Tests
             // Assert
             Assert.IsFalse(result);
             Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetDefaultPublishURL_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            SetupHttpContext();
+            ShimEPMLivePublisher.AllInstances.getEnterpriseSettingString = (_, __) => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.getDefaultPublishURL();
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetProjectSite_Exception_WriteEntryToEventLog()
+        {
+            // Arrange
+            SetupShims();
+            SetupHttpContext();
+            ShimSqlConnection.AllInstances.Open = _ => { throw new InvalidOperationException(); };
+
+            // Act
+            var result = _publisher.getProjectSite(Guid.Empty);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+            Assert.IsTrue(_isWriteEntryCalled);
+            Assert.IsTrue(_isEventLogDisposeCalled);
+        }
+
+        [TestMethod]
+        public void GetProjectSite_ValidConnection_OpenConnectionAndExecuteCommand()
+        {
+            // Arrange
+            SetupShims();
+
+            // Act
+            var result = _publisher.getProjectSite(Guid.Empty);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+            Assert.IsTrue(_isConnectionOpenedCalled);
+            Assert.AreEqual(1, _executeReaderCallCount);
+            AssertThatObjectsAreDisposed();
         }
 
         private void SetupDataReaderShims(int readCount)
