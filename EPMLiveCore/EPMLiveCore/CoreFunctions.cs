@@ -1815,26 +1815,22 @@ namespace EPMLiveCore
             return cn;
         }
 
-        static private DataTable GetTable(SqlCommand cmd)
+        static private DataTable GetTable(SqlCommand command)
         {
-            SqlDataAdapter da;
-            var dt = new DataTable();
+            var dataTable = new DataTable();
             try
             {
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                da.Dispose();
+                using (var adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(dataTable);
+                }
             }
             catch (Exception ex)
             {
-
+                Trace.WriteLine(ex.ToString());
             }
-            finally
-            {
-
-            }
-
-            return dt;
+            
+            return dataTable;
         }
 
         /// <summary>
